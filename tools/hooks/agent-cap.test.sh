@@ -1217,13 +1217,19 @@ else
 fi
 # TOOL-dGroundRules-18 — rule 2 judges a `gov:fixed-writers` split against the agent limit and a
 # `gov:fixed-verifiers` split against MAX_VERIFIERS whatever the limit. The copy sits beside a STUB
-# policy-mirror.js answering the limit; "$TMP" lies in no checkout, so rules 6 and 7 add nothing.
-WS="$TMP/writer-split"; mkdir -p "$WS/hooks" "$WS/policy"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$WS/hooks/"
+# policy-mirror.js answering the limit, which arms rule 7, so the arms run in a scratch checkout whose
+# settings hold both variables at 4, at or under each stub limit below (TOOL-dGroundRules-68): rule 7
+# admits, rule 6 finds no role index there, and each arm judges rule 2. With no stub, rule 7 adds no
+# rule.
+WS="$TMP/writer-split"; mkdir -p "$WS/hooks" "$WS/policy" "$WS/.claude"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$WS/hooks/"
+printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"4","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"4"}}\n' > "$WS/.claude/settings.json"
+( unset GIT_DIR GIT_WORK_TREE; cd "$WS" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
+    && git config user.name t && git add -A && git commit -qm writer-split --no-verify )
 write_limit_stub() { # limit
   printf 'class PolicyRefusal extends Error {}\nmodule.exports = { PolicyRefusal, readPolicy: () => ({ value: %s, source: "stub", reason: "stub" }) }\n' "$1" > "$WS/policy/policy-mirror.js"
 }
-WS_WRITER='{"tool_name":"Workflow","tool_input":{"script":"const SPEC_WRITERS = 6\nconst g = chunk(s, Math.ceil(s.length / SPEC_WRITERS)) // gov:fixed-writers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), SPEC_WRITERS)"}}'
-WS_VERIFIER='{"tool_name":"Workflow","tool_input":{"script":"const K = 6\nconst g = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), 5)"}}'
+WS_WRITER='{"tool_name":"Workflow","cwd":"'"$NODEDIR/writer-split"'","tool_input":{"script":"const SPEC_WRITERS = 6\nconst g = chunk(s, Math.ceil(s.length / SPEC_WRITERS)) // gov:fixed-writers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), SPEC_WRITERS)"}}'
+WS_VERIFIER='{"tool_name":"Workflow","cwd":"'"$NODEDIR/writer-split"'","tool_input":{"script":"const K = 6\nconst g = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), 5)"}}'
 write_limit_stub 4
 run_limit_call "writer split: K 6 above a stub limit of 4 -> deny, naming the marker" 2 "$WS_WRITER" "$WS/hooks/agent-cap.js" 'gov:fixed-writers but its bounded split'
 run_limit_call "writer split: ...and the K it read against that limit" 2 "$WS_WRITER" "$WS/hooks/agent-cap.js" 'resolves to 6, above the bound 4: runtime.agents-in-flight'

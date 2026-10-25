@@ -425,3 +425,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T22:21:33Z dispatch · item 7e80dee4 TOOL-dGroundRules-67 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-10-24T23:38:56Z rescope · item add TOOL-dGroundRules-68 · reason close finding: agent-cap.test.sh's four TOOL-dGroundRules-18 writer-split arms red at HEAD (359/4) — their payload runs from $TMP, in no checkout, and rule 7 now refuses a cwd it cannot read; the arms need a scratch checkout whose rendered settings hold the stub limit
+
+2026-10-25T00:01:22Z dispatch · item 7c0beaba TOOL-dGroundRules-68 · reason tools/hooks/agent-cap.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-68.md
+
+2026-10-25T00:01:24Z brief · item TOOL-dGroundRules-68 · reason 8697b90bf659 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-68-spec-brief.md

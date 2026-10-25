@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-68 — the writer-split arms of the hook suite run inside a scratch checkout whose settings hold the stub limit, so rule 7 reads before it admits
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base 7e845618 · streams tooling · order 22
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base 7e845618 · streams tooling · order 22
 
 **Derived:** PLAY-dClosedLoop-2
 
