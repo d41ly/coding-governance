@@ -515,7 +515,6 @@ def print_roster(memory_root):
 
     lines, bad, warned = [], [], []
     cap, mode, rule = lib.read_cap_answer("roster-line=default:%d" % ROSTER_LINE_MAX, ".", KIT_DIR)
-    cap = cap or ROSTER_LINE_MAX
     for slot in sorted(roles, key=derive_rank):
         keys = roles[slot]["keys"]
         missing = [k for k in ("description", "mandatory", "output") if not keys.get(k)]
@@ -532,9 +531,9 @@ def print_roster(memory_root):
             when = "Mandatory " + mandatory
         line = ("- `%s`: %s %s. Output: %s." % (slot, keys["description"], when, output)).replace(
             lib.MEMORY_ROOT_TOKEN, memory_root)
-        if len(line) > cap and mode == "warn":
+        if cap and len(line) > cap and mode == "warn":
             warned.append("BUDGET WARN — roster-line · %s · %d chars over %d · %s" % (slot, len(line), cap, rule))
-        elif len(line) > cap:
+        elif cap and len(line) > cap:
             bad.append("roster line for %s is %d characters, past the %d a one-line charter rule may "
                        "take; shorten its description, mandatory or output (%s)" % (slot, len(line), cap, rule))
         lines.append(line)

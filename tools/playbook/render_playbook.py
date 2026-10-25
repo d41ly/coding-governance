@@ -685,7 +685,7 @@ def read_one_line_cap(target: Path) -> tuple:
             import budgets  # the policy kit's caps module, found above
             try:
                 a = budgets.resolve_caps([f'one-line-rule=default:{ONE_LINE_MAX}'], key)['one-line-rule']
-                _ONE_LINE_ANSWERS[key] = (a.value or ONE_LINE_MAX, a.mode, a.rule)
+                _ONE_LINE_ANSWERS[key] = (a.value, a.mode, a.rule)
             except budgets.policy.Refusal as exc:
                 why = f'the policy reader refused: {exc}'
         except (LookupError, ImportError) as exc:
@@ -729,7 +729,7 @@ def check_one_line_regions(text: str, cap: tuple | None = None) -> list:
         if not re.match(r'- \S', line):
             raise Refusal(f'line {n}: a one-line region holds a line that is not a `- ` bullet, '
                           f'so a rule spans two lines or is not a rule: {quoted!r}')
-        if len(line.rstrip()) > limit:
+        if limit and len(line.rstrip()) > limit:
             if mode == 'warn':
                 warned.append(f'BUDGET WARN — one-line-rule · line {n} {quoted!r} · '
                               f'{len(line.rstrip())} chars over {limit} · {rule}')

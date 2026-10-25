@@ -8583,6 +8583,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_zero_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "describe_foreign_run",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

@@ -132,7 +132,9 @@ installed (TOOL-dGroundRules-17). `budgets-pinned-outside`, `budgets-pinned-exem
 `budgets-` cases are outcome cases, one repository per observation. One `budgets-cap-<name>` case per
 census row, declared in CAP_CASES, builds a scratch repository on main with no remote, plants the
 cap's subject over its value, read from the source, and runs the row's enforcer under `warn` and under
-`refuse`: a `switch` row must warn and pass, then refuse naming `budgets.enforce`; an outside row must
+`refuse`: a `switch` row must warn and pass, then refuse naming `budgets.enforce`, and one that is not a
+family runs a third time with its value at 0 in the policy file, which must pass unchecked
+(TOOL-dGroundRules-75); an outside row must
 answer the same under both, and the reader must refuse to answer it.
 
 WHAT SHIPS (TOOL-dGroundRules-17) adds two cases that read only this kit and its source repository,
@@ -3455,6 +3457,23 @@ def derive_outside_probe_plant(cap):
                                   f"import {mod}; print({mod}.{key})"], "warn": str(v)}
 
 
+def derive_zero_plant(cap, p):
+    """`p`, a census row's plant, with the row's value at 0 in the policy file and none in its legacy
+    home, so the reader answers 0 from the file: a `limits:` row's line left out of the limits file the
+    plant writes, a `conf:` key's assignment left out of that conf, a `constant:` home untouched."""
+    form, _c, rest = cap.home.partition(":")
+    files = dict(p["files"])
+    if form == "limits":
+        lrel = budgets.derive_limits_rel()
+        files[lrel] = "".join(ln for ln in files[lrel].splitlines(True) if not ln.startswith(cap.name + "\t"))
+    elif form == "conf":
+        path, _c, key = rest.rpartition(":")
+        rx = re.compile(budgets.SHELL_KEY.format(re.escape(key)))
+        if path in files:
+            files[path] = "".join(ln for ln in files[path].splitlines(True) if not rx.match(ln))
+    return {**p, "files": files, "extra": f'"{cap.name}" = 0\n'}
+
+
 # The census row -> its plant. DECLARED, never derived from the census, so `arm_cap_census` reads a
 # census row with no case, and a case with no row, as the defects they are.
 CAP_CASES = {
@@ -3498,7 +3517,9 @@ def run_cap_mode(t, cap, plant, mode):
 def run_cap_case(name):
     """`budgets-cap-<name>` (AC5, AC6): the census row's plant built twice, at `warn` and at `refuse`,
     in fresh repositories, and its enforcer run. A `switch` row must exit 0 printing its BUDGET WARN
-    line under `warn` and refuse naming `budgets.enforce` under `refuse`; its two modes run at once,
+    line under `warn` and refuse naming `budgets.enforce` under `refuse`; a `switch` row that is not a
+    family runs a third mode, `zero` (TOOL-dGroundRules-75): `derive_zero_plant` under `refuse`, which
+    must exit 0 with no breach line and no awk error, a 0 read as unchecked; its modes run at once,
     each at its own path. An outside row must print the same exit and output under both, its marker in
     it, so its two modes run in turn at ONE path; and the policy reader must refuse to answer it."""
     cap_name = name[len(CAP_CASE_PREFIX):]
@@ -3515,8 +3536,15 @@ def run_cap_case(name):
     try:
         if cap.cls == "switch":
             import concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-                runs = dict(zip(("warn", "refuse"), pool.map(lambda m: run_cap_mode(t / m, cap, plant, m), ("warn", "refuse"))))
+            # A family takes no policy value, so it has no zero run.
+            modes = ("warn", "refuse") if cap.family else ("warn", "refuse", "zero")
+
+            def run_mode(m):
+                if m == "zero":
+                    return run_cap_mode(t / m, cap, lambda c: derive_zero_plant(c, plant(c)), "refuse")
+                return run_cap_mode(t / m, cap, plant, m)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+                runs = dict(zip(modes, pool.map(run_mode, modes)))
         else:
             runs = {m: run_cap_mode(t / "r", cap, plant, m) for m in ("warn", "refuse")}
         for mode, got in runs.items():
@@ -3525,9 +3553,13 @@ def run_cap_case(name):
                 continue
             rc, out, p = got
             seen[mode] = (rc, SHA_SHAPE.sub("<sha>", out))
-            mark = p["refuse" if mode == "refuse" and cap.cls == "switch" else "warn"]
+            mark = p["refuse" if mode in ("refuse", "zero") and cap.cls == "switch" else "warn"]
             said = render_said(out, mark)
-            if cap.cls == "switch":
+            if mode == "zero":
+                checks.append(("zero", "a value of 0 under refuse: exit 0, no breach line, no awk error",
+                               rc == 0 and mark not in out and "BUDGET WARN" not in out and "awk:" not in out,
+                               f"exit {rc} · {said}"))
+            elif cap.cls == "switch":
                 ok = (rc == 0) if mode == "warn" else (rc not in (0, None))
                 checks.append((mode, f"exit {'0' if mode == 'warn' else 'non-zero'} and {mark!r}", ok and mark in out,
                                f"exit {rc} · {said}"))

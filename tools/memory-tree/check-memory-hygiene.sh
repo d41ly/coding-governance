@@ -1123,7 +1123,8 @@ if [ -n "$sel6" ]; then
             sz = b[f]+0
             if (rd && (f in g)) { if (g[f]+0 < 0) rd = 2; else sz = b[f] - g[f] }
             else rd = 0
-            ob = sz>cb; ol = cl>0 && l[f]+0>cl
+            # A policy-layer 0 is unchecked (budgets `check_cap`); the conf layer refuses a 0 at load.
+            ob = cb>0 && sz>cb; ol = cl>0 && l[f]+0>cl
             if (ob || ol) {
               if (rd == 1 && cl>0) msg = sprintf("%s (%dB authored %dL > %dB/%dL; generated regions not priced in bytes)", f, sz, l[f]+0, cb, cl)
               else if (rd == 1)    msg = sprintf("%s (%dB authored > %dB; generated regions not priced; no line cap for this class)", f, sz, cb)
@@ -1238,7 +1239,8 @@ if [ -n "$sel7" ]; then
         if (fence != "") continue
         uln++
         # The suffix of the switch (TOOL-dGroundRules-9): the mode of the class, its cap, the measure.
-        if (length(line) > cap && line !~ /^#/ && line !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/)
+        # A policy-layer 0 is unchecked (budgets `check_cap`); the conf layer refuses a 0 at load.
+        if (cap > 0 && length(line) > cap && line !~ /^#/ && line !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/)
           print f ":" uln " (" length(line) " chars > " cap ")\t" m "\t" c "\t" length(line) "\tchars\t" cap
       }
       close(f)

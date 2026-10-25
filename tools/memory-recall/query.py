@@ -1285,7 +1285,7 @@ def read_export_cap(repo: pathlib.Path) -> tuple:
         import budgets  # the policy kit's caps module, found above
         try:
             a = budgets.resolve_caps([f"recall-export=default:{EXPORT_CAP}"], str(repo))["recall-export"]
-            return a.value or EXPORT_CAP, a.mode, a.rule
+            return a.value, a.mode, a.rule
         except budgets.policy.Refusal as exc:
             why = f"the policy reader refused: {exc}"
     except (LookupError, ImportError) as exc:
@@ -1308,11 +1308,11 @@ def export(repo: pathlib.Path, tag: str) -> int:
     # `recall_conf.resolve()` has already refused if it escapes the root (TOOL-aRepatriatedFork-12).
     dest = (repo / CONF.export_dir if CONF.export_dir else common_git_dir(repo) / "recall") \
         / f"recall-traffic-{tag}.md"
-    if size > cap and mode == "warn":
+    if cap and size > cap and mode == "warn":
         # THE SWITCH (TOOL-dGroundRules-9): under `warn` the export writes, and says it is over.
         print(f"BUDGET WARN — recall-export · {dest.as_posix()} · {size} bytes over {cap} · {rule}",
               file=sys.stderr)
-    elif size > cap:
+    elif cap and size > cap:
         # A bound nobody can trip is not a bound. Refuse BEFORE writing, so the oversized file
         # never exists.
         print(
@@ -1324,7 +1324,8 @@ def export(repo: pathlib.Path, tag: str) -> int:
         return 1
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(text, encoding="utf-8", newline="\n")
-    print(f"wrote {dest.as_posix()} ({size:,} B of {cap:,} B)")
+    print(f"wrote {dest.as_posix()} ({size:,} B, unchecked)" if not cap else
+          f"wrote {dest.as_posix()} ({size:,} B of {cap:,} B)")
     return 0
 
 

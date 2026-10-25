@@ -1356,7 +1356,7 @@ check_budget_breach() {
 # measures the same way. The env override exists so the self-test can drive the limit without writing
 # a 25 KiB fixture on every run; it is NOT an adopter escape hatch, and the message says so.
 c7bytes=$(tr -d '\r' < "$MF" | wc -c | tr -d '[:space:]')
-if [ "$c7bytes" -gt "$MAX_MANIFEST_BYTES" ] && ! check_budget_breach manifest-bytes "$c7bytes" bytes "$MAX_MANIFEST_BYTES" "$MF"; then
+if [ "$MAX_MANIFEST_BYTES" -gt 0 ] && [ "$c7bytes" -gt "$MAX_MANIFEST_BYTES" ] && ! check_budget_breach manifest-bytes "$c7bytes" bytes "$MAX_MANIFEST_BYTES" "$MF"; then
   c7over=$((c7bytes - MAX_MANIFEST_BYTES))
   _r=$(read_budget_rule manifest-bytes)
   fail 7 "the manifest is over its size limit and must be trimmed, not have the limit raised: $c7bytes bytes, $c7over over the $MAX_MANIFEST_BYTES-byte limit in $MF${_r:+ ($_r)}"
@@ -1377,7 +1377,7 @@ c8=$(awk -v cap="$MANIFEST_LINE_MAX" '
   inblk { next }
   ln ~ /^[[:space:]]*(```|~~~)/ { fence=!fence; next }
   fence { next }
-  length(ln) > cap+0 { printf "  line %d: %d bytes\n", NR, length(ln); if (length(ln) > m) m = length(ln) }
+  cap+0 > 0 && length(ln) > cap+0 { printf "  line %d: %d bytes\n", NR, length(ln); if (length(ln) > m) m = length(ln) }
   END { if (m) printf "%d\n", m }
 ' "$MF")
 # The awk's last line is the longest offender's length, the switch's measure, and never a finding.
@@ -1582,7 +1582,7 @@ $files
     # out every other section; C11 bounds the ENTRY, which is where accretion actually happens.
     # The awk's last line is the longest offender's length, the switch's measure (TOOL-dGroundRules-9).
     c11=$(awk -v cap="$MANIFEST_TRAP_MAX" '
-      function over() { if (n > 0 && len > cap+0) { printf "  the bullet starting %s is %d bytes\n", head, len; if (len > m) m = len } }
+      function over() { if (n > 0 && cap+0 > 0 && len > cap+0) { printf "  the bullet starting %s is %d bytes\n", head, len; if (len > m) m = len } }
       { ln=$0; sub(/\r$/,"",ln) }
       /^###[[:space:]]+Environment traps/ { intraps=1; next }
       intraps && /^##[^#]/ { intraps=0 }

@@ -491,3 +491,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T08:03:20Z dispatch · item 25f8b03a TOOL-dGroundRules-77 · reason tools/policy/check_policy.py tools/policy/README.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-77.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-10-25T08:03:22Z brief · item TOOL-dGroundRules-77 · reason 1396f7fd3bd6 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-77-spec-brief.md
+
+2026-10-25T08:11:59Z dispatch · item ae266fae TOOL-dGroundRules-75 · reason tools/check-template-size.sh tools/check-template-size.test.sh tools/memory-tree/check-memory-hygiene.sh skills/session-kickoff/manifest-check.sh tools/roles/handoff.py tools/playbook/render_playbook.py tools/memory-recall/query.py tools/policy/check_policy.py memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-75.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-25T08:12:08Z brief · item TOOL-dGroundRules-75 · reason 36424b0c602d memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-75-spec-brief.md
+
+2026-10-25T08:20:36Z dispatch · item ae266fae TOOL-dGroundRules-75 · reason tools/check-template-size.sh tools/check-template-size.test.sh tools/memory-tree/check-memory-hygiene.sh skills/session-kickoff/manifest-check.sh tools/roles/handoff.py tools/playbook/render_playbook.py tools/memory-recall/query.py tools/policy/check_policy.py memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-75.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md

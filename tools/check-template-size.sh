@@ -237,8 +237,9 @@ name=$(basename "$FILE")
 # effect: `${prose:-…}` is empty when the line says `≤27 KB` instead of bytes, an empty string never
 # equals a declared row, so rewriting the prose back to a KB spelling cannot silently disarm the term.
 # One branch covers both cases, which also means one arm satisfies check-arms.py.
+# A value of 0 is unchecked, as the switch's `check_cap` reads it: there is no ceiling for the prose to agree with.
 bline=$(tr -d '\r' < "$FILE" | grep -m1 '^\*\*Budget:')
-if [ -n "$declared" ] && [ -n "$bline" ]; then
+if [ "$MAX_BYTES" -gt 0 ] && [ -n "$declared" ] && [ -n "$bline" ]; then
   prose=$(printf '%s' "$bline" | sed -n 's/^\*\*Budget:[^0-9]*\([0-9][0-9]*\) bytes.*/\1/p')
   if [ "$prose" != "$declared" ]; then
     FAIL_CODE=6
@@ -251,7 +252,7 @@ fi
 # Check 2 obeys the switch. The verdict line is the policy reader's own, so it names the rule that
 # set the mode: `budgets.pinned` or `budgets.enforce`. A second read, and only on a breach.
 WARNED=0
-if [ "$bytes" -gt "$MAX_BYTES" ]; then
+if [ "$MAX_BYTES" -gt 0 ] && [ "$bytes" -gt "$MAX_BYTES" ]; then
   over=$((bytes - MAX_BYTES))
   verdict=$(cd "$ROOT" && "$_py" "$_pk/budgets.py" check "$key=default:49152" "$bytes" 2>&1); _vrc=$?
   if [ "$MODE" = warn ] && [ "$_vrc" = 0 ]; then
@@ -344,4 +345,5 @@ fi
 
 # A warned breach has printed its BUDGET WARN line and exits 0 with no OK line: it is not within budget.
 [ "$WARNED" = 1 ] && exit 0
+[ "$MAX_BYTES" -gt 0 ] || { printf 'template-size OK — %s: %d bytes, unchecked\n' "$name" "$bytes"; exit 0; }
 printf 'template-size OK — %s: %d / %d bytes (%d under, %.1f%%)\n' "$name" "$bytes" "$MAX_BYTES" "$((MAX_BYTES - bytes))" "$(awk "BEGIN{print $bytes/$MAX_BYTES*100}")"

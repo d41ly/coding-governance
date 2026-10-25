@@ -191,7 +191,14 @@ mkfile 100 "$S/AGENTS.md"
 expect_absent "A23 a declared subject with NO budget line is never compared" "check 6" 0 \
   run_gate_in AGENTS.md "" "$TMP/hw-pair"
 
-# --- A1/A2 · the boundary, under each value of the switch ---------------------------------------
+# --- A19e/A19f · a cap of 0 is unchecked (TOOL-dGroundRules-75) --------------------------------
+build_scratch_repo '# no rows\n' "${REFUSE}\"$BM\" = 0\n"
+printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$S/$BM"
+expect_out "A19e a cap of 0 is unchecked under refuse, its budget line never compared" \
+  "BUILD-METHOD.md: 44 bytes, unchecked" 0 run_gate_in "$BM" "" "$TMP/hw-zero"
+expect_absent "A19f ...and the OK line runs no division by the 0" "awk:" 0 run_gate_in "$BM" "" "$TMP/hw-zero"
+
+# --- A1/A2· the boundary, under each value of the switch ---------------------------------------
 build_scratch_repo 'AGENTS.md\t5000\n' "$REFUSE"
 mkfile 5000 "$S/AGENTS.md"
 expect_out "A1 at the limit exits 0" "template-size OK" 0 run_gate_in AGENTS.md

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-75 — a cap of 0 is unchecked in every enforcer, as the budgets switch says
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 
