@@ -73,7 +73,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `e21409c114addd0670226075186e88ba666e2226`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `54dbf66b9df8f4a2de2b31b29a4b8d1d5b22f1df`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -81,7 +81,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `1c1d2e41718d577cfe1c357a2f235e278a4c8f05`
+- rendered at: `dc75b671c5dc4e8c69c52086fa36f5734482a501`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -258,7 +258,7 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 Coverage of dWitnessedBar's 30 clauses and 37 owned nodes, over 42 specs:
 - carried whole: 30; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: none; stale: none; ambiguous: none
+- uncarried: none; stale: cl-dClosedLoop-0341, cl-dClosedLoop-0345, cl-dClosedLoop-0354, cl-dClosedLoop-0359, cl-dClosedLoop-0366; ambiguous: none
 - owned nodes no spec names: none
 - specs derived from no clause: memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-40.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-41.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-42.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-43.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-44.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-45.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-46.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-47.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-48.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-49.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-50.md (PLAY-dClosedLoop-2), memory/builds/dWitnessedBar/spec/2026-10-25-spec-TOOL-dWitnessedBar-51.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0340, cl-dClosedLoop-0341, cl-dClosedLoop-0342, cl-dClosedLoop-0343, cl-dClosedLoop-0348, cl-dClosedLoop-0349, cl-dClosedLoop-0354, cl-dClosedLoop-0355, cl-dClosedLoop-0356, cl-dClosedLoop-0358, cl-dClosedLoop-0359, cl-dClosedLoop-0367
