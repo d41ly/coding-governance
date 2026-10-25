@@ -89,7 +89,8 @@ calls stale at that rewrite.
 The `guard-*` cases are outcome cases of the minimal guard (TOOL-dGroundRules-6): each copies
 `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy, commits a policy file capping a
 tracked `.claude/skills/x/SKILL.md`, whose key carries slashes and a leading dot, and `small.md`, and
-the spec folder's class row (TOOL-dGroundRules-21 S22), stages its plant from `GUARD_PLANTS`, and
+the spec folder's class row (TOOL-dGroundRules-21 S22),
+beside a runtime table setting agents-in-flight to 4, stages its plant from `GUARD_PLANTS`, and
 judges `guard.py --staged` by its exit code and the reasons it prints. `guard-admits-raise` is the one
 plant that must exit 0; `guard-merge-side` concludes a conflicted merge with the branch's side, exit
 0, then with a third text, exit 1. The mirror shape's three (TOOL-dGroundRules-19): `guard-mirror-render`
@@ -2276,8 +2277,11 @@ DECISIONS_REL = "memory/DECISIONS.md"
 # the guard's key handling is proved on the shapes the census holds, not on one-segment names
 # (TOOL-dGroundRules-21 S22).
 BIG_FILE = ".claude/skills/x/SKILL.md"
-GUARD_POLICY = f'[budgets]\n"{BIG_FILE}" = 100\n"small.md" = 50\n"memory/builds/*/spec/" = 10\n'
+# The [runtime] table leads the file: guard-not-budgets raises its count, which sits outside budgets.*,
+# and a row appended at the end, as guard-new-row's is, still lands under [budgets] (TOOL-dGroundRules-77).
+GUARD_POLICY = f'[runtime]\nagents-in-flight = 4\n\n[budgets]\n"{BIG_FILE}" = 100\n"small.md" = 50\n"memory/builds/*/spec/" = 10\n'
 BIG, SMALL, CLASS = f'"{BIG_FILE}" = 100\n', '"small.md" = 50\n', '"memory/builds/*/spec/" = 10\n'
+FLIGHT = "agents-in-flight = 4\n"
 RAISED = (POLICY_REL, lambda t: t.replace(BIG, '# RAISED 100 -> 120, 2026-10-23, TOOL-x-1, measured 118 bytes\n'
                                                  f'"{BIG_FILE}" = 120\n'))
 UNARGUED = (POLICY_REL, lambda t: t.replace(BIG, f'"{BIG_FILE}" = 120\n'))
@@ -2310,17 +2314,23 @@ GUARD_PLANTS = {
         ("deploy", [(DEPLOY_REL, lambda t: t.replace("fixture", "planted"))], 1, [f"refused · {DEPLOY_REL} · "], []),
     ],
     "guard-new-row": [("new row", [(POLICY_REL, lambda t: t + '# RAISED 0 -> 10\n"new.md" = 10\n'), ROW],
-                       1, ["a key was added"], [])],
+                       1, ['a key was added: budgets."new.md"'], [])],
     "guard-removed-row": [("removed row", [(POLICY_REL, lambda t: t.replace(SMALL, "")), ROW],
                            1, ["a key was removed"], [])],
+    "guard-other-line": [("another line", [RAISED, ROW, (POLICY_REL, lambda t: t.replace(CLASS, CLASS + "# planted\n"))],
+                          1, ["another line of the policy file changed"], [])],
+    "guard-not-budgets": [("not budgets", [(POLICY_REL, lambda t: t.replace(FLIGHT, "# RAISED 4 -> 6\nagents-in-flight = 6\n")), ROW],
+                           1, ["only a cap under budgets.*"], [])],
+    "guard-not-a-count": [("not a count", [(POLICY_REL, lambda t: t.replace(SMALL, '"small.md" = "60"\n')), ROW],
+                           1, ["is not a count"], [])],
 }
 
 
 def build_guard_repo():
     """build_repo's fixture with guard.py and its list copied beside the catalogue, a tracked BIG_FILE
     and small.md, a deploy.toml, a decision log holding one row, and a policy file whose [budgets]
-    table sets BIG_FILE to 100, "small.md" to 50 and the class row "memory/builds/*/spec/" to 10, all
-    committed. -> (repo, kit copy)."""
+    table sets BIG_FILE to 100, "small.md" to 50 and the class row "memory/builds/*/spec/" to 10,
+    behind a runtime table setting agents-in-flight to 4, all committed. -> (repo, kit copy)."""
     repo, kit = build_repo(policy.load_catalogue(KIT))
     for f in GUARD_FILES:
         (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))

@@ -490,17 +490,20 @@ no file, and an invalid file over a valid ancestor, `last-valid`. `mirror --chec
 `policy: mirror fresh` at both, each line naming its kind, and the helper, reading the
 rewrite pushed as L, must name L's sha8 as the landed revision with no `{rev}` left.
 
-The eighteen `guard-*` cases copy `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy and commit a
+The twenty-one `guard-*` cases copy `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy and commit a
 policy file whose `[budgets]` table caps a tracked `.claude/skills/x/SKILL.md`, a key with slashes and
 a leading dot, at 100, a tracked `small.md` at 50 and the spec folder's class row
-`memory/builds/*/spec/` at 10 (TOOL-dGroundRules-21 S22), then stage one plant each from
+`memory/builds/*/spec/` at 10 (TOOL-dGroundRules-21 S22), behind a
+runtime table setting agents-in-flight to 4, then stage one plant each from
 `GUARD_PLANTS` and judge `guard.py --staged` by its exit code and reasons. `guard-admits-raise`, that
 dotted, slashed key to 120 with its `RAISED` comment and one decision row, must exit 0. Exit 1, naming the reason: `guard-lowered`, `guard-two-raised`,
 `guard-class-row`, `guard-beside-change` (`budgets.enforce` set beside the raise),
 `guard-beside-path` (a line added to `.governance/deploy.toml` beside it), `guard-no-record`,
 `guard-no-argument`, `guard-no-row` (each naming only what is missing), `guard-other-paths` (the
-mirror, the instruction manifest and `.governance/deploy.toml`, each alone), `guard-new-row` and
-`guard-removed-row`; the mirror plant of `guard-other-paths`, a hand edit, must print
+mirror, the instruction manifest and `.governance/deploy.toml`, each alone), `guard-new-row`,
+`guard-removed-row`, `guard-other-line` (a comment line added away from the cap
+beside an argued raise), `guard-not-budgets` (`runtime.agents-in-flight` raised with its argument)
+and `guard-not-a-count` (a cap set to a string); the mirror plant of `guard-other-paths`, a hand edit, must print
 `differs from its render at HEAD`. `guard-merge-side` concludes a conflicted merge with the branch's
 policy file, exit 0, then with a third text, exit 1. The mirror shape's three commit a catalogue row
 and run `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0 printing

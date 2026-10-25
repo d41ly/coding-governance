@@ -487,3 +487,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T07:53:46Z dispatch · item b8378b2b TOOL-dGroundRules-76 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md help/policy.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-76.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-10-25T07:53:47Z brief · item TOOL-dGroundRules-76 · reason a5493522955a memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-76-spec-brief.md
+
+2026-10-25T08:03:20Z dispatch · item 25f8b03a TOOL-dGroundRules-77 · reason tools/policy/check_policy.py tools/policy/README.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-77.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-25T08:03:22Z brief · item TOOL-dGroundRules-77 · reason 1396f7fd3bd6 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-77-spec-brief.md

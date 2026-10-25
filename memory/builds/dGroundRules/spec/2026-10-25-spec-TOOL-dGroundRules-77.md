@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-77 — guard plants reach the text-shape, key-scope and not-a-count refusals
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 
