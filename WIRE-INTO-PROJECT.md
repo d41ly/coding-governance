@@ -750,6 +750,28 @@ CLI runs by path and reads the repository it is pointed at.
    removal. Then delete the manifest's `branch-reconcile skill wiring` leg row, which the
    `cleanup skill wiring` row replaces with the same `--check`.
 
+<!-- govkit:entry policy -->
+## 3i — Adopt the policy kit (with the review harness)
+
+One file per repository, `.governance/policy.toml`, holds the policy values its gates and hooks
+read, each checked against the kit's catalogue. The kit is not in the default selection. The
+`review-harness` kit requires it, and `govkit` refuses a selection that names a kit without what it
+requires, naming the missing id.
+
+1. Add `policy` to `kits` in `.governance/deploy.toml`, with `memory-tree`, which it requires.
+2. **What the install renders.** The kit's adopter, `bash <prefix>/policy/adopt-policy.sh
+   --scaffold`, runs at install and at every update unless `GOVKIT_RERENDER=0` declines it. It
+   writes the starter policy file only where none exists, and says `kept` otherwise: the file is
+   yours from its first write. It then renders the harness's two concurrency settings in
+   `.claude/settings.json` and the JSON mirror the hooks read, `.governance/policy.json`.
+3. **Commit, then re-run.** The mirror renders a commit, so on install day `--scaffold` prints one
+   line deferring it, ending `commit, then re-run --scaffold`, and exits 0. Commit the install and
+   the policy file, then run `--scaffold` again.
+4. **The leg ships.** The kit's `policy check` leg runs `python <prefix>/policy/check_policy.py`
+   over your policy file, and `adopt-policy.sh --check` runs the same check. Every key, its allowed
+   values and its default are rows of `<prefix>/policy/catalogue.toml`, whose grammar
+   `<prefix>/policy/README.md` gives.
+
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-86 — the records and the runbook this build's code left stale: the kickoff manifest re-audited and re-stamped, dSafePassage-26's Readers clause, the TOOL-dGroundRules-34 ledger's AC32 token, two method-carrier rows and the policy kit's runbook section
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base cae57b1d · streams tooling · order 33
+**Status:** CLOSED · rev-2 · 2026-10-25 · node d · Tier-1 · base cae57b1d · streams tooling · order 33
 
 **Derived:** PLAY-dClosedLoop-2
 

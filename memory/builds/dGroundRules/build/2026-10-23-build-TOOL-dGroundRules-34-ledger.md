@@ -48,7 +48,7 @@ red-first observation of every `New arm:` line of §7.
 - AC29 — `gov_source` — `--fixture adopter-fresh-target` printed `156 assertion(s) executed · 0 wrong`; with `run_govkit` staged to run the source's own deployer past its refusal it printed `WRONG: the receipt's gov_source is 'C:\\Users\\daily-agent\\AppData\\Local\\Temp\\c34-ac29', not the snapshot`.
 - AC30 — `does not admit the writer split:` — owed at the close, through AC6's staging in the workflows render.
 - AC31 — `exited 1 with no reason` — owed at the close, through the workflows render; the fallback reads `the agent-cap hook exited $_ub_rc with no reason` in `tools/workflows/check-protocol-parity.test.sh`.
-- AC32 — `165` — through `TOOL-dGroundRules-43`'s `EVIDENCE`, the build README spelled whole: `git show f4d31452a:memory/builds/dGroundRules/README.md | grep -n "gen:build-order"` printed `165` and `179`.
+- AC32 — `gen:build-order` — through `TOOL-dGroundRules-43`'s `EVIDENCE`, the build README spelled whole: `git show f4d31452a:memory/builds/dGroundRules/README.md | grep -n "gen:build-order"` printed `165` and `179`.
 - AC33 — `run_in_gov` — `grep` printed lines 1193 and 1195, both inside `run_govkit`'s docstring, and `GOVKIT_LINES` printed nothing.
 - AC34 — `suite-invalidated-by-a-commit-under-it` — `gotchas.py --for-paths tools/govkit/govkit.py` named it and `test-oracle-read-from-a-historical-sha`; the `build_source_snapshot` grep printed line 67, the new paragraph.
 - AC35 — `git diff --name-only C~1 C -- "memory/builds/*/README.md"` — at `2999b6394`, the `TOOL-dGroundRules-32` pass commit writing READMEs, it printed the eight §4 names and `memory/builds/dGroundRules/README.md`; its other pass commit `5412bbecd` printed none.

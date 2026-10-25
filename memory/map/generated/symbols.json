@@ -13488,17 +13488,7 @@
       "file": "tools/policy/budgets.py"
     },
     {
-      "id": "read_cap_mode",
-      "kind": "function",
-      "file": "tools/memory-tree/check-memory-hygiene.sh"
-    },
-    {
       "id": "read_cap_modes",
-      "kind": "function",
-      "file": "tools/memory-tree/check-memory-hygiene.sh"
-    },
-    {
-      "id": "read_cap_rule",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.sh"
     },

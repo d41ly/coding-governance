@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.5 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-25T16:58:30+02:00 @ 5e8c8c5e7f8cea640806611b22e860e945e3d168
+last-audit: 2026-10-25T17:40:46+02:00 @ 8b0492fe213c0d54d453c6e7cfc145c10e73e049
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: f221e113556ac8406fcbd834cce37f746c23bd73
+last-body-change: 8b0492fe213c0d54d453c6e7cfc145c10e73e049
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -73,6 +73,7 @@ lives where each bullet points.
 - `tools/unattended/check-unattended.sh` carries raw CR bytes in its awk regexes: edit it in binary mode (`memory/gotchas/text-mode-read-eats-a-bare-cr.md`).
 - The read-path byte budget is retired (`TOOL-dSpentCeiling-1`): check 6's per-class caps are the bound, and a sum is not re-added.
 - A live `RUN.md` is outside check 6 by class (`TOOL-cMendedVintage-13`); a retired one is capped.
+- This repository's policy values live in `.governance/policy.toml`, checked against `tools/policy/catalogue.toml`; the pre-commit guard refuses an agent's change to it but one raised measured-file cap with its record (`help/policy.md`).
 
 ### Pointer map (load the row(s) the task touches)
 
@@ -169,8 +170,10 @@ probe under a hook's `GIT_DIR`; a leg bans it now). The 2026-09-14 eviction is `
 - A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
   is ignored on node `d`, on node `a` at NO scope (2026-09-04): run `git check-ignore -v` on YOURS.
-- The template is under a 48 KiB gate that also WARNS past its recorded high-water. Raising the
-  ceiling is an owner decision, not an edit. Read the margin FROM `bash tools/check-template-size.sh`.
+- Every size cap `tools/policy/caps.toml` classes `switch`, the template's and check 6's among
+  them, warns or refuses as `budgets.enforce` in `.governance/policy.toml` says
+  (`help/size-caps.md`). A run raises the template's row only on the terms in the header of
+  `tools/template-size-limits.txt`. Read the margin FROM `bash tools/check-template-size.sh`.
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
