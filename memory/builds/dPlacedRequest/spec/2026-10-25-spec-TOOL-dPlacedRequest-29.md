@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-29 — the lander's fence survives its own holder's write: a same-holder move re-fences and retries
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

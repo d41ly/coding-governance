@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 36 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 36 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

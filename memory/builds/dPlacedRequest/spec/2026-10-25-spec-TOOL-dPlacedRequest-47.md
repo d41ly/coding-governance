@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-47 — the bounded age walk never compares an unsighted commit with the threshold
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

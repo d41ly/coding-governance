@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-61 — the round-6 promotions' minors: a two-way oracle inventory, one run-fact reader, a claim reader that keeps its normalisation, honest orders, and criteria that can fail
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 33 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 33 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

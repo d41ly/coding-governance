@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-40 — the id-less refusal gates the holder acts by name and lets every other lease act run
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

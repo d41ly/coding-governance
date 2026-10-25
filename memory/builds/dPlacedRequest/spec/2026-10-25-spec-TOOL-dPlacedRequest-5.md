@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 19 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 19 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0503@65f19d46 whole
 

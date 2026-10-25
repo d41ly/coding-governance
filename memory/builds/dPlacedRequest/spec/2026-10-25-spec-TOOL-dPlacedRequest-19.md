@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-19 — the project-level request record: pushed by its content key, its text kept where it was typed
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0137@39b3ef9d whole
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks
 
-**Status:** OPEN · rev-9 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-9 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

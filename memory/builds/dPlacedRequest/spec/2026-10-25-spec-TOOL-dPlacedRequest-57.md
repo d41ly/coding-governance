@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-57 — the version oracle's base is the observing run's own pinned BASE, never a sha a spec pins
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

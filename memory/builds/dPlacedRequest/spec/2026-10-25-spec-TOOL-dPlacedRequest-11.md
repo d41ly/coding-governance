@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-11 — one compare-and-swap writer for every governance ref, each commit parented on the tip it read, and no lock the lander holds
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 1 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 1 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0129@30a0ceda whole
 

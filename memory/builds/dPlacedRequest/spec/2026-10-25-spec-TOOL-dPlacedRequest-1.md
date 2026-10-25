@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0120@5d655f07 whole
 **Carries:** node:record-kind.lease

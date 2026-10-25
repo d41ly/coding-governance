@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-62 — unit 61's criteria read a `###` section from its heading to the next heading
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 34 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 34 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-44 — the version-bump oracle walks the build's side of the prepared merge
 
-**Status:** OPEN · rev-8 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-8 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

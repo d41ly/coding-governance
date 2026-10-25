@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-63 — the round-7 promotions' minors: every inventory row names its base, the sweep places its own criteria, one run-fact clause, a CR the arm can see, and criteria that read what they amend
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 35 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 35 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

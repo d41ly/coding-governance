@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0121@2f58beed whole
 **Carries:** node:record-kind.card

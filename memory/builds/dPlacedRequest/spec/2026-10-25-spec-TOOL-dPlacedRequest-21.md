@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-21 — `entry.claim`: the claim ref, a patch or repeat build's derived plan record, `patch.ratify`, and every refusal routed by its cause
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 20 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 20 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0501@e1101a14 whole
 **Carries:** node:policy-key.patch.ratify

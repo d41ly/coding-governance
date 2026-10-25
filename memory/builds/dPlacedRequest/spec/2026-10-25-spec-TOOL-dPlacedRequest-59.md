@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-59 — the round-5 promotions' minors: every oracle reader passes a base, one claim-line reader, criteria that can fail, and cites by label
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 31 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 31 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

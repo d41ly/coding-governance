@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-7 — the probe program: eight items, the `probe` and `probe-trigger` records, and the four `probe.*` keys
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 15 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 15 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0125@4e0727e5 whole
 **Carries:** node:item.probe.trigger

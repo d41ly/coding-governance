@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-8 — each item's declared code seed: its write set, its scope paths or its question's paths
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0126@b35ab44f whole
 

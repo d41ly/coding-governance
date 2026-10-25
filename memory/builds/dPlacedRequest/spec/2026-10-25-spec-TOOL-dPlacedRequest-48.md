@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-48 — the request-lock race is placed by an announcing stub, not left to the scheduler
 
-**Status:** OPEN · rev-6 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-6 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

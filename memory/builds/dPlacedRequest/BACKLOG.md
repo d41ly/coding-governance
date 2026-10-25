@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · TOOL-dPlacedRequest-22 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dPlacedRequest-22 · until TOOL-dPlacedRequest-64 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dPlacedRequest-64 at order 36 today, closes it (README rule 1)

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-43 — the round-1 promotions' minors: behavioural class checks, honest outcomes, every reader of a changed spelling, and the sizes kept
 
-**Status:** OPEN · rev-7 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-7 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

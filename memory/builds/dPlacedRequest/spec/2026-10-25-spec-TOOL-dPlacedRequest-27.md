@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-27 — the change feed skips only an immediate retry: the append-once test reads the ref's newest event
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

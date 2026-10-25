@@ -147,3 +147,129 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T13:39:11Z rescope · item add TOOL-dPlacedRequest-64 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md findings at MEDIUM ids 1 2 3 7 9 13 19 20 21 and at LOW ids 4 5 6 10 11 12 14 15 18 23
 
 2026-10-25T14:00:59Z review · item dPlacedRequest-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 19 · disposition promote
+
+2026-10-25T14:14:23Z rescope · item defer TOOL-dPlacedRequest-11 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:25Z rescope · item defer TOOL-dPlacedRequest-13 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:27Z rescope · item defer TOOL-dPlacedRequest-1 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:29Z rescope · item defer TOOL-dPlacedRequest-27 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:30Z rescope · item defer TOOL-dPlacedRequest-17 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:32Z rescope · item defer TOOL-dPlacedRequest-23 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:34Z rescope · item defer TOOL-dPlacedRequest-24 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:36Z rescope · item defer TOOL-dPlacedRequest-25 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:38Z rescope · item defer TOOL-dPlacedRequest-16 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:40Z rescope · item defer TOOL-dPlacedRequest-26 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:42Z rescope · item defer TOOL-dPlacedRequest-36 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:43Z rescope · item defer TOOL-dPlacedRequest-37 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:46Z rescope · item defer TOOL-dPlacedRequest-38 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:47Z rescope · item defer TOOL-dPlacedRequest-39 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:49Z rescope · item defer TOOL-dPlacedRequest-41 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:51Z rescope · item defer TOOL-dPlacedRequest-20 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:53Z rescope · item defer TOOL-dPlacedRequest-18 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:56Z rescope · item defer TOOL-dPlacedRequest-28 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:57Z rescope · item defer TOOL-dPlacedRequest-12 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:14:59Z rescope · item defer TOOL-dPlacedRequest-42 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:02Z rescope · item defer TOOL-dPlacedRequest-15 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:03Z rescope · item defer TOOL-dPlacedRequest-19 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:05Z rescope · item defer TOOL-dPlacedRequest-29 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:08Z rescope · item defer TOOL-dPlacedRequest-30 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:10Z rescope · item defer TOOL-dPlacedRequest-31 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:12Z rescope · item defer TOOL-dPlacedRequest-32 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:13Z rescope · item defer TOOL-dPlacedRequest-9 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:15Z rescope · item defer TOOL-dPlacedRequest-2 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:17Z rescope · item defer TOOL-dPlacedRequest-40 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:19Z rescope · item defer TOOL-dPlacedRequest-33 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:22Z rescope · item defer TOOL-dPlacedRequest-8 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:24Z rescope · item defer TOOL-dPlacedRequest-6 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:26Z rescope · item defer TOOL-dPlacedRequest-7 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:28Z rescope · item defer TOOL-dPlacedRequest-4 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:30Z rescope · item defer TOOL-dPlacedRequest-10 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:32Z rescope · item defer TOOL-dPlacedRequest-14 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:34Z rescope · item defer TOOL-dPlacedRequest-5 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:36Z rescope · item defer TOOL-dPlacedRequest-21 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:39Z rescope · item defer TOOL-dPlacedRequest-3 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:42Z rescope · item defer TOOL-dPlacedRequest-34 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:45Z rescope · item defer TOOL-dPlacedRequest-35 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:47Z rescope · item defer TOOL-dPlacedRequest-43 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:49Z rescope · item defer TOOL-dPlacedRequest-46 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:52Z rescope · item defer TOOL-dPlacedRequest-47 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:54Z rescope · item defer TOOL-dPlacedRequest-44 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:56Z rescope · item defer TOOL-dPlacedRequest-45 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:15:58Z rescope · item defer TOOL-dPlacedRequest-48 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:01Z rescope · item defer TOOL-dPlacedRequest-50 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:03Z rescope · item defer TOOL-dPlacedRequest-49 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:05Z rescope · item defer TOOL-dPlacedRequest-51 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:08Z rescope · item defer TOOL-dPlacedRequest-52 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:11Z rescope · item defer TOOL-dPlacedRequest-53 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:13Z rescope · item defer TOOL-dPlacedRequest-54 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:15Z rescope · item defer TOOL-dPlacedRequest-55 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:17Z rescope · item defer TOOL-dPlacedRequest-56 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:20Z rescope · item defer TOOL-dPlacedRequest-57 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:23Z rescope · item defer TOOL-dPlacedRequest-58 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:25Z rescope · item defer TOOL-dPlacedRequest-60 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:27Z rescope · item defer TOOL-dPlacedRequest-59 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:29Z rescope · item defer TOOL-dPlacedRequest-61 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:31Z rescope · item defer TOOL-dPlacedRequest-62 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:33Z rescope · item defer TOOL-dPlacedRequest-63 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T14:16:35Z rescope · item defer TOOL-dPlacedRequest-64 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22

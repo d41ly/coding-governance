@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-25 — a write that opens a holder's tenure renews the lease
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

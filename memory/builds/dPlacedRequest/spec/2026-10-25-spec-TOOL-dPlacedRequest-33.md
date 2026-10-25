@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-33 — the card's remote ref is written by the driver, dark behind `RUN_CLAIMS`
 
-**Status:** OPEN · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-52 — the round-3 promotions' minors: a placed race inside its lock bound, an oracle that answers by status, one walk, and criteria that read what they name
 
-**Status:** OPEN · rev-6 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 27 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-6 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 27 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 

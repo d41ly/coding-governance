@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-20 — a lease acquisition that honours an offer, and the epoch fence on a stale take
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 6 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 6 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0138@b6141505 whole
 **Carries:** node:policy-key.leases.offer-seconds

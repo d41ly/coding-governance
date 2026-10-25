@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-10 — a build's scenarios chosen at `entry.place`, every admission predicate re-evaluated by `placement.check`
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 17 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 17 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0128@e0109d47 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-56 — the round-4 promotions' minors: fresh race attempts, failures staged so they take, one oracle contract, and criteria that read the places they name
 
-**Status:** OPEN · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
