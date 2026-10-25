@@ -25,7 +25,9 @@ touching nothing else, then grades as usual.
       prints one `roles: note:`. A pre-tag (v3.x) charter resolves no tag and prints one note
   R5  a body empty, over its slot's ceiling, carrying a `# `/`## ` line or a token other than
       {{MEMORY_ROOT}}, or spelling the file name of a protocol the charter's Protocols section
-      names; a slot with no ceiling row
+      names; a slot with no ceiling row. The ceiling half obeys the policy kit's size switch for the
+      family cap `role-body` (TOOL-dGroundRules-9): under `warn` it prints a `BUDGET WARN` line and
+      is no defect; with no policy kit, or a refusing reader, it is a defect as before
   R6  a workflow entry with an unknown, missing or repeated key or name, a missing name of the ten,
       a non-integer or negative `stage`, an unknown `driver`, or a `trigger` carrying a newline
   R7  a role whose `workflow` names no entry, or whose entry does not list it
@@ -173,6 +175,7 @@ def check_roles(root, kit_dir, write=False):
         defects.append("roles: %s: %s — %s" % (resolve_display_path(root, path), rule, what))
 
     roles, n_reads, n_rules, n_outputs, n_mandatory, cited = {}, 0, 0, 0, 0, set()
+    body_mode = None  # the `role-body` cap's (mode, rule), asked at the first body over its ceiling
     for p in sorted((kit_dir / "agents").glob("*.agent.md")):
         slot = p.name[:-len(".agent.md")]
         try:
@@ -220,7 +223,16 @@ def check_roles(root, kit_dir, write=False):
         if ceiling is None:
             add_defect(p, "R5", "slot '%s' has no ceiling row in BODY_CEILINGS" % slot)
         elif size > ceiling:
-            add_defect(p, "R5", "body is %d bytes, over its %d-byte ceiling" % (size, ceiling))
+            # THE SWITCH (TOOL-dGroundRules-9): `role-body` is a family cap, so the policy kit is
+            # asked only its mode, once, at the first body over its slot's ceiling. Under `warn` the
+            # breach is a BUDGET WARN line and no defect; R5's other defects never move.
+            if body_mode is None:
+                body_mode = lib.read_cap_answer("role-body", root, kit_dir)[1:]
+            if body_mode[0] == "warn":
+                notes.append("BUDGET WARN — role-body · %s · %d bytes over %d · %s"
+                             % (resolve_display_path(root, p), size, ceiling, body_mode[1]))
+            else:
+                add_defect(p, "R5", "body is %d bytes, over its %d-byte ceiling (%s)" % (size, ceiling, body_mode[1]))
         if not body.strip():
             add_defect(p, "R5", "body is empty")
         if any(ln.startswith(("# ", "## ")) for ln in body.split("\n")):

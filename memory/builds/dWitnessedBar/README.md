@@ -249,27 +249,27 @@ Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 88 spec(s) a
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dWitnessedBar-26` | no |
-| 2 | `TOOL-dWitnessedBar-27`, `TOOL-dWitnessedBar-48`, `TOOL-dWitnessedBar-49` | yes |
-| 3 | `TOOL-dWitnessedBar-13`, `TOOL-dWitnessedBar-50` | yes |
+| 2 | `TOOL-dWitnessedBar-27`, `TOOL-dWitnessedBar-48`, `TOOL-dWitnessedBar-49` | no |
+| 3 | `TOOL-dWitnessedBar-13`, `TOOL-dWitnessedBar-50` | no |
 | 4 | `TOOL-dWitnessedBar-15` | no |
 | 5 | `TOOL-dWitnessedBar-12`, `TOOL-dWitnessedBar-61` | yes |
 | 6 | `TOOL-dWitnessedBar-22`, `TOOL-dWitnessedBar-47` | yes |
 | 7 | `TOOL-dWitnessedBar-19` | no |
 | 8 | `TOOL-dWitnessedBar-11` | no |
 | 9 | `TOOL-dWitnessedBar-14`, `TOOL-dWitnessedBar-45` | yes |
-| 10 | `TOOL-dWitnessedBar-16`, `TOOL-dWitnessedBar-46`, `TOOL-dWitnessedBar-54` | yes |
-| 11 | `TOOL-dWitnessedBar-17`, `TOOL-dWitnessedBar-52`, `TOOL-dWitnessedBar-53` | yes |
+| 10 | `TOOL-dWitnessedBar-16`, `TOOL-dWitnessedBar-46`, `TOOL-dWitnessedBar-54` | no |
+| 11 | `TOOL-dWitnessedBar-17`, `TOOL-dWitnessedBar-52`, `TOOL-dWitnessedBar-53` | no |
 | 12 | `TOOL-dWitnessedBar-18` | no |
 | 13 | `TOOL-dWitnessedBar-20` | no |
 | 14 | `TOOL-dWitnessedBar-24` | no |
 | 15 | `TOOL-dWitnessedBar-10` | no |
 | 16 | `TOOL-dWitnessedBar-9` | no |
 | 17 | `TOOL-dWitnessedBar-4` | no |
-| 18 | `TOOL-dWitnessedBar-25`, `TOOL-dWitnessedBar-40` | yes |
+| 18 | `TOOL-dWitnessedBar-25`, `TOOL-dWitnessedBar-40` | no |
 | 19 | `TOOL-dWitnessedBar-23`, `TOOL-dWitnessedBar-42` | yes |
 | 20 | `TOOL-dWitnessedBar-3` | no |
 | 21 | `TOOL-dWitnessedBar-44`, `TOOL-dWitnessedBar-5` | yes |
-| 22 | `TOOL-dWitnessedBar-41`, `TOOL-dWitnessedBar-55`, `TOOL-dWitnessedBar-8` | yes |
+| 22 | `TOOL-dWitnessedBar-41`, `TOOL-dWitnessedBar-55`, `TOOL-dWitnessedBar-8` | no |
 | 23 | `TOOL-dWitnessedBar-1`, `TOOL-dWitnessedBar-59` | yes |
 | 24 | `TOOL-dWitnessedBar-30` | no |
 | 25 | `TOOL-dWitnessedBar-29` | no |
@@ -280,23 +280,23 @@ Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 88 spec(s) a
 | 30 | `TOOL-dWitnessedBar-28` | no |
 | 31 | `TOOL-dWitnessedBar-51` | no |
 | 32 | `TOOL-dWitnessedBar-56`, `TOOL-dWitnessedBar-57` | yes |
-| 33 | `TOOL-dWitnessedBar-58`, `TOOL-dWitnessedBar-60` | yes |
+| 33 | `TOOL-dWitnessedBar-58`, `TOOL-dWitnessedBar-60` | no |
 | 34 | `TOOL-dWitnessedBar-62` | no |
 | 35 | `TOOL-dWitnessedBar-63` | no |
 | 36 | `TOOL-dWitnessedBar-64` | no |
 | 37 | `TOOL-dWitnessedBar-65` | no |
 | 38 | `TOOL-dWitnessedBar-66` | no |
-| 39 | `TOOL-dWitnessedBar-67`, `TOOL-dWitnessedBar-68`, `TOOL-dWitnessedBar-69`, `TOOL-dWitnessedBar-70` | yes |
-| 40 | `TOOL-dWitnessedBar-71`, `TOOL-dWitnessedBar-72`, `TOOL-dWitnessedBar-74`, `TOOL-dWitnessedBar-75` | yes |
-| 41 | `TOOL-dWitnessedBar-73`, `TOOL-dWitnessedBar-76`, `TOOL-dWitnessedBar-77`, `TOOL-dWitnessedBar-79`, `TOOL-dWitnessedBar-80`, `TOOL-dWitnessedBar-81` | yes |
+| 39 | `TOOL-dWitnessedBar-67`, `TOOL-dWitnessedBar-68`, `TOOL-dWitnessedBar-69`, `TOOL-dWitnessedBar-70` | no |
+| 40 | `TOOL-dWitnessedBar-71`, `TOOL-dWitnessedBar-72`, `TOOL-dWitnessedBar-74`, `TOOL-dWitnessedBar-75` | no |
+| 41 | `TOOL-dWitnessedBar-73`, `TOOL-dWitnessedBar-76`, `TOOL-dWitnessedBar-77`, `TOOL-dWitnessedBar-79`, `TOOL-dWitnessedBar-80`, `TOOL-dWitnessedBar-81` | no |
 | 42 | `TOOL-dWitnessedBar-78`, `TOOL-dWitnessedBar-87` | yes |
-| 43 | `TOOL-dWitnessedBar-82`, `TOOL-dWitnessedBar-83` | yes |
-| 44 | `TOOL-dWitnessedBar-84`, `TOOL-dWitnessedBar-85`, `TOOL-dWitnessedBar-86` | yes |
+| 43 | `TOOL-dWitnessedBar-82`, `TOOL-dWitnessedBar-83` | no |
+| 44 | `TOOL-dWitnessedBar-84`, `TOOL-dWitnessedBar-85`, `TOOL-dWitnessedBar-86` | no |
 | 45 | `TOOL-dWitnessedBar-88` | no |
 | 46 | `TOOL-dWitnessedBar-89` | no |
 | 47 | `TOOL-dWitnessedBar-90` | no |
-| 48 | `TOOL-dWitnessedBar-91`, `TOOL-dWitnessedBar-92` | yes |
-| 49 | `TOOL-dWitnessedBar-93`, `TOOL-dWitnessedBar-94`, `TOOL-dWitnessedBar-95`, `TOOL-dWitnessedBar-96` | yes |
+| 48 | `TOOL-dWitnessedBar-91`, `TOOL-dWitnessedBar-92` | no |
+| 49 | `TOOL-dWitnessedBar-93`, `TOOL-dWitnessedBar-94`, `TOOL-dWitnessedBar-95`, `TOOL-dWitnessedBar-96` | no |
 | 50 | `TOOL-dWitnessedBar-97` | no |
 <!-- /gen:build-order -->
 

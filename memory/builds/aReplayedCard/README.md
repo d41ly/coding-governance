@@ -109,8 +109,8 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aReplayedCard-4` | no |
-| 2 | `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-5` | yes |
-| 3 | `KICK-aReplayedCard-2`, `TOOL-aReplayedCard-1` | yes |
+| 2 | `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-5` | no |
+| 3 | `KICK-aReplayedCard-2`, `TOOL-aReplayedCard-1` | no |
 | 4 | `TOOL-aReplayedCard-2` | no |
 | 5 | `KICK-aReplayedCard-3` | no |
 | 6 | `TOOL-aReplayedCard-3` | no |

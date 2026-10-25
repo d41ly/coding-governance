@@ -76,6 +76,7 @@ import datetime
 import hashlib
 import importlib.util
 import io
+import itertools
 import json
 import os
 import pathlib
@@ -305,6 +306,8 @@ def write_text(path: str, text: str) -> None:
 # an index. The verbs it reads are PERMITTED and never required, so a header carrying neither parses
 # byte-identically to how it parsed before this import existed.
 import backlog  # noqa: E402  a sibling of this file, reached by the path insert above
+# A spec's declared write set and consumed siblings, read by the build-order render (TOOL-dGroundRules-25).
+import design_lib  # noqa: E402  a sibling of this file, reached by the path insert above
 
 
 def load_conf(root: str) -> dict:
@@ -539,6 +542,11 @@ def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
         # renders it, which costs this key and one cell. It is MANDATORY in the header regex, so a
         # unit row always has a value and only the ORDER cell can be empty.
         "tier": hdr.group("tier"),
+        # The build-order render's two inputs (TOOL-dGroundRules-25 S37, S38): the Files touched
+        # words, None where the sub-head is absent, an unknown write set (TOOL-dGroundRules-32 S13), and
+        # the `consumes-from` targets, read through the one edge read (S17).
+        "writes": design_lib.read_spec_writes(text),
+        "consumes": [t for t, _b in design_lib.read_spec_edges(text, "consumes-from")],
     }
 
 
@@ -1713,8 +1721,33 @@ def _wrap_ids(roster: list) -> list:
     return lines
 
 
+def derive_parallel_step(units: list) -> str:
+    """`yes` where one step's units may run concurrently by M6's first two clauses, else `no`: a step
+    of one unit; two units one of which consumes from the other; or two whose write sets meet by
+    `design_lib.check_writes_intersect`, the dispatcher's containment rule, over the words of two or
+    more segments (TOOL-dGroundRules-25 S37, S38; TOOL-dGroundRules-32 S9). `unknown` for a step of two
+    or more units one of which has no Files touched sub-head, whose write set nobody declared
+    (TOOL-dGroundRules-32 S13). `yes` says only that the estimates are disjoint; `--dispatch` still
+    decides."""
+    def pathlike(w):
+        parts = w.rstrip("/").split("/")
+        return len(parts) >= 2 and all(parts)
+    if len(units) < 2:
+        return "no"
+    if any(u.get("writes", ()) is None for u in units):
+        return "unknown"
+    for a, b in itertools.combinations(units, 2):
+        if b["id"] in a.get("consumes", ()) or a["id"] in b.get("consumes", ()):
+            return "no"
+        if design_lib.check_writes_intersect([w for w in a.get("writes", ()) if pathlike(w)],
+                                             [w for w in b.get("writes", ()) if pathlike(w)]):
+            return "no"
+    return "yes"
+
+
 def render_order(build: dict) -> str:
-    """The BUILD ORDER region. Units sharing an `order` value are the parallel group."""
+    """The BUILD ORDER region. Units sharing an `order` value are a step, and `derive_parallel_step`
+    says whether its units may run concurrently."""
     mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-order")
     out = [mo, ""]
     steps = {}
@@ -1729,7 +1762,7 @@ def render_order(build: dict) -> str:
         for n in sorted(steps):
             us = sorted(steps[n], key=lambda x: x["id"])
             ids = ", ".join(f"`{u['id']}`" for u in us)
-            out.append(f"| {n} | {ids} | {'yes' if len(us) > 1 else 'no'} |")
+            out.append(f"| {n} | {ids} | {derive_parallel_step(us)} |")
         # RESIDUAL, stated rather than silently dropped: a unit with no verb is not ordered, and a
         # region that omitted it would read as a complete order while hiding a unit.
         rest = sorted((u["id"] for u in build["units"] if u.get("order") is None))
@@ -2242,8 +2275,42 @@ def measure_slot_sizes(readme_text: str) -> list:
     return out
 
 
+# The `readme-slot` cap's mode, asked of the policy kit ONCE per run (TOOL-dGroundRules-9): None
+# until the first slot over its ceiling asks.
+_SLOT_MODE = None
+
+
+def read_slot_mode(root: str) -> tuple:
+    """`(mode, rule)` of the `readme-slot` cap, a family: its values stay the declared ceilings, and the
+    policy kit's `budgets.resolve_caps` answers only whether a breach warns or refuses, the kit found by
+    `backlog.resolve_kit_dir` from this kit. Asked once per run and kept. No kit, or any refusal of the
+    reader, is `refuse`, as before this unit, and the reason prints once."""
+    global _SLOT_MODE
+    if _SLOT_MODE is not None:
+        return _SLOT_MODE
+    why = ""
+    try:
+        kit = str(backlog.resolve_kit_dir("policy", "budgets.py", pathlib.Path(__file__).resolve().parent))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import budgets  # the policy kit's caps module, found above
+        try:
+            answer = budgets.resolve_caps(["readme-slot"], root)["readme-slot"]
+            _SLOT_MODE = (answer.mode, answer.rule)
+        except budgets.policy.Refusal as exc:
+            why = f"the policy reader refused: {exc}"
+    except (LookupError, ImportError) as exc:
+        why = f"no policy kit answered: {exc}"
+    if _SLOT_MODE is None:
+        _SLOT_MODE = ("refuse", f"{why}; a slot over its ceiling refuses as before")
+        print(f"build-index: {_SLOT_MODE[1]}")
+    return _SLOT_MODE
+
+
 def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
-    """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does."""
+    """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does. A slot over
+    its declared ceiling is hard under the `readme-slot` cap's `refuse` and a `BUDGET WARN` advisory
+    under `warn` (TOOL-dGroundRules-9), `read_slot_mode` deciding."""
     here = resolve_slot_data_dir()
     limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
     if not os.path.exists(limits_p):
@@ -2256,7 +2323,11 @@ def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
     for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
         cap, hw = limits.get(head), highs.get(head)
         if cap is not None and size > cap:
-            hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B")
+            mode, rule = read_slot_mode(root)
+            if mode == "warn":
+                adv.append(f"BUDGET WARN — readme-slot · {rel} `{head}` · {size} bytes over {cap} · {rule}")
+            else:
+                hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B · {rule}")
         elif hw is not None and size > hw:
             adv.append(f"    {rel} — slot `{head}` is {size} B, past its recorded high-water of "
                        f"{hw} B and under its {cap} B ceiling")
@@ -3013,7 +3084,8 @@ def cmd_check_format(root: str, conf: dict) -> int:
     # The advisory prints BEFORE the verdict and never changes it. It also reaches nobody through the
     # runner on a green leg, which is why `--report` exists and why the per-leg log is the other half.
     for line in adv:
-        print("build-index ADVISORY — a slot passed its recorded high-water:")
+        if not line.startswith("BUDGET WARN"):  # a warned breach prints alone (TOOL-dGroundRules-9)
+            print("build-index ADVISORY — a slot passed its recorded high-water:")
         print(line)
     if bad:
         print("build-index FORMAT — authored content outside the slot contract:")
@@ -6703,6 +6775,30 @@ def cmd_selftest() -> int:
             lambda: _read_verbs(" · closes EXMP-aFoo-2 · advances EXMP-aFoo-2"))
         arm("a `closes` with no value REFUSES", "carries `closes` with no value",
             lambda: _read_verbs(" · closes · streams tooling"))
+
+        # TOOL-dGroundRules-25 S37, S38 — a step's Parallel column, from two parsed fixture specs at
+        # one order: `yes` only where their Files touched are disjoint and neither consumes the other.
+        def _render_step(writes_b, edge_b=""):
+            def spec(uid, writes, edge):
+                return (f"# {uid} — a fixture unit\n\n**Status:** SPECCED · rev-1 · 2026-09-14 · node d · "
+                        f"Tier-2 · base abc12345 · order 1\n\n## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n"
+                        f"{edge or 'none'}\n\n## 4. Design\n\n"
+                        + ("" if writes is None else "### Files touched (estimate)\n\n"
+                           + "".join(f"- `{w}`\n" for w in writes)) + "\n## 5. Next\n")
+            units = [parse_spec_text(spec("EXMP-aFoo-1", ["tools/x/a.py"], ""), "a.md", "EXMP"),
+                     parse_spec_text(spec("EXMP-aFoo-2", writes_b, edge_b), "b.md", "EXMP")]
+            return render_order({"units": units}).split("\n")[4]
+        arm("two units whose Files touched name one path render `no`", "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | no |",
+            lambda: _render_step(["tools/x/a.py"]))
+        arm("two units, one declaring a directory over the other's path, render `no`", "| no |",
+            lambda: _render_step(["tools/x/"]))
+        arm("two units with disjoint Files touched render `yes`", "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | yes |",
+            lambda: _render_step(["tools/y/b.py"]))
+        arm("a unit consuming from its step's other unit renders `no`", "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | no |",
+            lambda: _render_step(["tools/y/b.py"], "- **consumes-from** `EXMP-aFoo-1` — its output"))
+        # TOOL-dGroundRules-32 S13: a unit with no Files touched sub-head declared no write set.
+        arm("a unit with no Files touched sub-head renders its step `unknown`",
+            "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | unknown |", lambda: _render_step(None))
 
         # ------------------------------------------- TOOL-dDerivedDocket-7 — the family view
         # ONE fixture repo for every arm below. `_build_backlog_fixture` wipes and restages its memory

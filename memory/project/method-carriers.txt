@@ -33,3 +33,5 @@ coding-governance-agents.template.md · v4.0's memory-tree protocol line points 
 .claude/agents/gov-synthesizer.md · rendered role agent; it cites M6 for the verdicts left to the main loop
 .claude/skills/build/SKILL.md · rendered router Skill; it names the method as the procedure it loads whole, and restates none of it
 tools/roles/SKILL.template.md · the SOURCE the build router Skill is rendered from; it names the method as the procedure the router loads
+tools/policy/caps.toml · the size-cap census row for the rendered method: its name and its limits-file home are the method's path, the subject the cap measures — a row keyed by the file, never a restatement of what the method says
+tools/policy/check_policy.py · the cap census's case table and its budgets-correctness-kept case name the method's path as a size-cap subject they plant into a scratch repository — a path the checker reads, never a restatement of what the method says

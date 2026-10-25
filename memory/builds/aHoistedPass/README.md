@@ -118,7 +118,7 @@ Ids whose spec moved past its audited revision: none — 0 of 10 unit id(s) carr
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aHoistedPass-1`, `TOOL-aHoistedPass-4`, `TOOL-aHoistedPass-8` | yes |
+| 1 | `TOOL-aHoistedPass-1`, `TOOL-aHoistedPass-4`, `TOOL-aHoistedPass-8` | no |
 | 2 | `DEPL-aHoistedPass-1`, `TOOL-aHoistedPass-3` | yes |
 | 3 | `TOOL-aHoistedPass-2` | no |
 | 4 | `TOOL-aHoistedPass-5` | no |

@@ -208,12 +208,12 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 54 spec(s)
 | 2 | `PLAY-dOrderedCharter-16` | no |
 | 3 | `PLAY-dOrderedCharter-17` | no |
 | 4 | `PLAY-dOrderedCharter-19` | no |
-| 5 | `PLAY-dOrderedCharter-10`, `PLAY-dOrderedCharter-44` | yes |
-| 6 | `PLAY-dOrderedCharter-22`, `PLAY-dOrderedCharter-51` | yes |
+| 5 | `PLAY-dOrderedCharter-10`, `PLAY-dOrderedCharter-44` | no |
+| 6 | `PLAY-dOrderedCharter-22`, `PLAY-dOrderedCharter-51` | no |
 | 7 | `PLAY-dOrderedCharter-24` | no |
 | 8 | `PLAY-dOrderedCharter-28` | no |
 | 9 | `PLAY-dOrderedCharter-26` | no |
-| 10 | `PLAY-dOrderedCharter-25`, `PLAY-dOrderedCharter-47`, `PLAY-dOrderedCharter-48`, `PLAY-dOrderedCharter-50` | yes |
+| 10 | `PLAY-dOrderedCharter-25`, `PLAY-dOrderedCharter-47`, `PLAY-dOrderedCharter-48`, `PLAY-dOrderedCharter-50` | no |
 | 11 | `PLAY-dOrderedCharter-53`, `PLAY-dOrderedCharter-7` | yes |
 | 12 | `PLAY-dOrderedCharter-13`, `PLAY-dOrderedCharter-42` | yes |
 | 13 | `PLAY-dOrderedCharter-12` | no |
@@ -221,7 +221,7 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 54 spec(s)
 | 15 | `PLAY-dOrderedCharter-20` | no |
 | 16 | `PLAY-dOrderedCharter-15` | no |
 | 17 | `PLAY-dOrderedCharter-1`, `PLAY-dOrderedCharter-45` | yes |
-| 18 | `PLAY-dOrderedCharter-3`, `PLAY-dOrderedCharter-41`, `PLAY-dOrderedCharter-52` | yes |
+| 18 | `PLAY-dOrderedCharter-3`, `PLAY-dOrderedCharter-41`, `PLAY-dOrderedCharter-52` | no |
 | 19 | `PLAY-dOrderedCharter-6` | no |
 | 20 | `PLAY-dOrderedCharter-2` | no |
 | 21 | `PLAY-dOrderedCharter-11` | no |
@@ -235,7 +235,7 @@ Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 54 spec(s)
 | 29 | `PLAY-dOrderedCharter-29` | no |
 | 30 | `PLAY-dOrderedCharter-23` | no |
 | 31 | `PLAY-dOrderedCharter-32` | no |
-| 32 | `PLAY-dOrderedCharter-33`, `PLAY-dOrderedCharter-46` | yes |
+| 32 | `PLAY-dOrderedCharter-33`, `PLAY-dOrderedCharter-46` | no |
 | 33 | `PLAY-dOrderedCharter-35` | no |
 | 34 | `PLAY-dOrderedCharter-36` | no |
 | 35 | `PLAY-dOrderedCharter-34` | no |

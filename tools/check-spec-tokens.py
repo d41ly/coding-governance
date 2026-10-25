@@ -35,7 +35,8 @@ reads none of them either and mints a fifth population of its own, the backticke
 spec's hands-off bullets, joined to the text of the sibling each one names. The eighth, `size`,
 reads the live specs' own bytes and the two size sidecars, and no token at all. The ninth,
 `carries`, reads none of the live populations: its own is every tracked chain-build spec, at any
-status but WONTDO, with its history.
+status but WONTDO, with its history. The tenth, `packet`, reads no spec: its own is the chain
+builds whose run is live in the tree, each graded by the packet instrument it already ships.
 
   legs   backticked tokens on a `## 7. Gates` LINE THAT IS THE LIST -> a `name` in the manifest.
          A section 7 line carrying prose is not graded: measured, that predicate produced 270
@@ -156,15 +157,42 @@ status but WONTDO, with its history.
          spelling, so a `[path]` waiver row keyed on the same bare string neither swallows a
          claims refusal nor is kept from reading stale by one; waive a claim by that token.
   size   every LIVE spec's bytes, carriage returns stripped as check-template-size.sh strips them
-         -> the CLASS row `memory/builds/*/spec/` of `template-size-limits.txt` beside the leg
-         manifest (TOOL-aMendedFleet-25). The eighth population is the live specs themselves. A
+         -> the CLASS cap `memory/builds/*/spec/`, answered by the policy kit's budgets.py
+         (TOOL-dGroundRules-9): the class row of the template-size limits file, its ONE reader's
+         read at the landed revision, or the policy file's `budgets."memory/builds/*/spec/"`
+         (TOOL-aMendedFleet-25). The eighth population is the live specs themselves. A
          spec over the ceiling is a hit whose token is `size <- <path>`, unless a row keyed by its
          exact path in `template-size-highwater.txt` HOLDS it: held, it may shrink and may not grow,
-         and past its row it is a hit naming both figures. A high-water row under `memory/builds/`
-         naming anything but a live spec over the ceiling is STALE and reds, untracked, terminal or
-         back under. No class row turns the arm off, announced; a non-number class or high-water
-         row refuses. What it does NOT check: a line count, a terminal spec, and growth below the
-         ceiling.
+         and past its row it is a hit naming both figures. BOTH HITS OBEY THE SWITCH: under
+         `budgets.enforce = "warn"` with the cap unpinned, each is printed as a `BUDGET WARN` line
+         and not counted. A high-water row under `memory/builds/` naming anything but a live spec
+         over the ceiling is STALE and reds, untracked, terminal or back under. No class value, or
+         no policy kit beside this checker, turns the arm off, announced; a class row that is not a
+         number, any other refusal of the policy reader, and a non-number high-water row refuse,
+         under `warn` too. What it does NOT check: a line count, a terminal spec, and growth below
+         the ceiling.
+  source the source join: every shell source command, a `.` or `source` word at a command position,
+         a code span's opening word included, in a LIVE spec's acceptance section read WHOLE, fenced
+         blocks included -> a hit when its operand, ending in `.sh`, carries no `/`
+         (TOOL-dGroundRules-46). A bare name resolves against the working directory, not the kit, so
+         such a criterion run from the root cannot define the function it calls. Its line prints on
+         every run, so a join that examined nothing reads as zero examined and not as clean. What it
+         does NOT see: an operand built at runtime or held in a variable, a sourced file whose name
+         does not end in `.sh`, and a source command outside the acceptance section. A prose
+         sentence spelling a dot, a space and a bare `.sh` name at a command position reads as a
+         source; waive it by its operand.
+  packet the packet join: every chain build whose run is LIVE in this tree, one holding a tracked
+         packet `memory/builds/<slug>/prompts/*-prompt-<id>-packet.md` and a `RUN.md` whose last
+         `phase:` line is not LANDED, ABORTED or LANDING -> the packet instrument's own
+         `--check <slug>`, run from the root; any exit but 0 is a hit whose token is the slug and
+         whose reason carries the instrument's summary line, its first line of output
+         (TOOL-dGroundRules-63). The instrument is the one tracked `*-build-<id>-packet.py` under the
+         dClosedLoop build's `build/` folder and `<id>` is read from its name, so no spec id is
+         spelled here. None tracked, the join prints that it is off and grades nothing; more than
+         one refuses. Its line prints on every run. What it does NOT see: a LANDING record's packet,
+         because deriving LANDED asks the remote and a join on an unguarded leg reads no network; a
+         run whose `RUN.md` this tree does not hold, or whose `RUN.md` carries no phase line; and
+         anything the instrument itself does not check, which its own docstring lists.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -260,10 +288,11 @@ LEGS_NAME = "gate-legs.json"
 #: directory; `LEGS` is the repo-relative spelling `main` derives, for its messages.
 LEGS = LEGS_NAME
 HERE = pathlib.Path(__file__).resolve().parent
-# TOOL-aMendedFleet-25: the size join's two sidecars, read from the directory holding the leg
+# TOOL-aMendedFleet-25: the size join's high-water sidecar, read from the directory holding the leg
 # manifest, and the CLASS key its ceiling row carries. The key is a label no measured file's key
 # equals, so check-template-size.sh never reads it; class membership is this checker's LIVE test.
-SIZE_LIMITS_NAME = "template-size-limits.txt"
+# The ceiling itself is the policy kit's to read (TOOL-dGroundRules-9): budgets.py is the limits
+# file's one reader, so this checker never names that file.
 SIZE_HIGHWATER_NAME = "template-size-highwater.txt"
 SIZE_CLASS_KEY = "memory/builds/*/spec/"
 
@@ -286,8 +315,11 @@ SEC = r"^## %s\.[^\n]*\n(.*?)(?=\n## |\Z)"
 TICK = re.compile(r"`([^`\n]+)`")
 CITE = re.compile(r"`([^`\s]+\.[A-Za-z0-9]+):(\d+)(?:-\d+)?`")
 CITE_TAIL = re.compile(r":\d+(-\d+)?$")
-# A deploy-time token or an env assignment is never a path or a leg.
-NOT_A_TOKEN = re.compile(r"^(GATE_|\{\{|\$|~|'|\"|<)")
+# A shell source command, `.` or `source` at a command position — a line or code-span start, after a
+# separator or quote, or after a space — and its operand ending in `.sh`, stopped before a backtick.
+SOURCE_CMD = re.compile(r"(?:^|[;&|('\"`]|\s)(?:\.|source)\s+([^\s;&|'\"()`]+\.sh)\b")
+SOURCE_WHY = ("sources a shell file by bare name, which resolves against the working directory and "
+              "not the kit")
 # A section 7 list carries more than leg names: commands to run, conf keys, and the files a leg
 # grades. The pre-wiring run over 453 specs surfaced all three and they are not defects, so the leg
 # join excludes them by SHAPE rather than by waiver. A leg name is prose: no slash, no leading dot,
@@ -318,11 +350,10 @@ LEGLINE_KEY = "SPEC_LEGLINE_CUTOFF"
 # pattern, `design_lib.SPEC_FILE_DATE` (TOOL-dTrueNorth-16 S32), so this file spells no second copy.
 # TOOL-aDeferredBar-2: the bar join's key, heading pattern and predicate. Blank or absent is OFF.
 DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
-# TOOL-aBlindedTrial-8: the guards join's key and the sub-head it reads. The corpus spells the
-# sub-head both ways (437 with the parenthetical, 21 without at 987c5bec), so the suffix is optional.
-# The section body ends at the NEXT heading of any depth, because the sub-head has siblings.
+# TOOL-aBlindedTrial-8: the guards join's key. The sub-head it reads, spelled both ways in the corpus
+# (437 with the parenthetical, 21 without at 987c5bec), is read by `design_lib.read_spec_writes`
+# (TOOL-dGroundRules-25 S37), its body ending at the NEXT heading of any depth.
 GUARDS_KEY = "SPEC_GUARD_LEGS_CUTOFF"
-FILES_HEAD = re.compile(r"^### Files touched( \(estimate\))?[ \t]*$", re.M)
 # A guard carried by MORE than this many legs is BROAD and leaves the guards join (closing review
 # round 1, R1). Measured on the manifest at 144cd1fb: 5 keeps `<prefix>/hooks/` (5 legs, the motivating
 # case) and `.githooks/` (5) joined and drops `<prefix>/lib/` (30), `<prefix>/` (11), `<prefix>/memory-tree/`
@@ -353,30 +384,23 @@ AC_LABEL = re.compile(r"^(?:[ \t]*[-*][ \t]*)?(?:\*\*)?(AC[0-9]+[a-z]?)(?:\*\*)?
 # `path:line` citation fails the trailing lookahead and stays the cites join's; a grep over a suite
 # FILE has grep at command position and is not a run; the empty assignment is the OFF spelling, and
 # so is the QUOTED empty one, `GATE_FULL=""` — the quote is not a value (closing review F9, where
-# `\S` read it as one while the hook of TOOL-aDeferredBar-3 unquoted it to OFF).
+# `\S` read it as one while the hook of TOOL-aDeferredBar-3 unquoted it to OFF). The policy kit's
+# `check_policy.py --fixture` with no case is a suite, because it runs every case, while naming one
+# case makes it the direct check a criterion may name.
 BAR = re.compile(
     r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
     r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)(?:-X\S*(?:\s+\S+)?|-[A-Za-z]+|-\d+(?:\.\d+)?)\s+)?)?(?:\S*/)?"
-    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|[^\s/*?]*selftest\.py)(?=\s|$)"
+    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|[^\s/*?]*selftest\.py"
+    r"|check_policy\.py\s+--fixture(?:\s+--strict-from\s+\S+)?(?=\s*$|\s*[|;&)]|\s+\d*>))(?=\s|$)"
     r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=[\"']?[^\s\"']")
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
            "run once, after the build is complete")
-# TOOL-dDerivedDocket-37: the hands-off join's key, grammar and refusal. The GRAMMAR IS CHECK 12'S,
-# copied rather than called: the hygiene engine is a copy-installed kit, so an arm there would reach
-# every memory-tree adopter's bar, a shipped surface this unit did not price. Check 12's own lines,
-# cited so a reader can compare them: the uid at
-# <prefix>/memory-tree/check-memory-hygiene.sh:1533-1534, Non-goals and Edges by heading text at :1547
-# and :1549, the marker at :1553, the verb at :1557 and the backticked-or-bare target at :1564-1565.
+# TOOL-dDerivedDocket-37: the hands-off join's key and refusal. Its GRAMMAR IS CHECK 12'S, read through
+# the memory-tree kit's `design_lib.read_spec_edges` (TOOL-dGroundRules-32 S17), which also reads a
+# bullet's two-space continuation lines: a payload wrapped past the house width is still the
+# bullet's promise, and reading only line one would leave every wrapped token ungraded and silent.
 HANDOFF_KEY = "SPEC_HANDOFF_CUTOFF"
-# ONE rule here is WIDER than check 12's, which reads a bullet's first line only: this reads the
-# two-space continuation lines too, the shape the acceptance-bullet loop below already uses. A
-# payload wrapped past the house width is still the bullet's promise, and reading only line one
-# would leave every wrapped token ungraded and silent.
-HANDOFF_BULLET = re.compile(r"^(?:-|\*)[ \t]+\*\*hands-off\*\*[ \t].*(?:\n  .*)*", re.M)
-# `## <n>. Non-goals` by HEADING TEXT and never by ordinal, the read GATES_HEAD and AC_HEAD already
-# have. No end anchor, because the house heading is `## 3. Non-goals (OUT)`.
-NONGOALS_HEAD = re.compile(r"^## [0-9]+[.] Non-goals[^\n]*$", re.M)
 # The uid a spec's H1 carries. BOTH halves of a handoff key are read from this and never from a
 # filename: a spec may legally be family-less, carry a record tail or sit in a sub-folder of
 # `spec/`, and its filename then says nothing about the unit it specs.
@@ -527,6 +551,16 @@ def extract_acceptance(text):
     return rest[:nxt.start()] if nxt else rest
 
 
+def scan_bare_sources(text):
+    """Every operand a shell source command in the acceptance section names with no `/`.
+
+    TOOL-dGroundRules-46. The section is read WHOLE, fenced blocks included, unlike the bullet loop:
+    a criterion literal that sources the kit's library by its bare name cannot define what it calls
+    when run from the root, and that literal sits in a fence as often as in a bullet.
+    """
+    return [op for op in SOURCE_CMD.findall(extract_acceptance(text) or "") if "/" not in op]
+
+
 def extract_files_touched(text, files):
     """The declared write set and the roots it mentions, as `(paths, roots)`. `paths` is every
     path-shaped word inside backticks under the `### Files touched` sub-head, in order and without
@@ -540,54 +574,16 @@ def extract_files_touched(text, files):
     sub-head declaring nothing (TOOL-aBlindedTrial-8). The body closes at the next heading of ANY
     depth, unlike the section readers above, because the sub-head has siblings inside section 4.
     """
-    m = FILES_HEAD.search(text)
-    if not m:
+    words = load_design_lib().read_spec_writes(text)  # the one token read (TOOL-dGroundRules-25 S37)
+    if words is None:
         return None
-    rest = text[m.end():]
-    nxt = re.search(r"^##+ ", rest, re.M)
-    body = rest[:nxt.start()] if nxt else rest
     paths, roots = [], []
-    for tok in TICK.findall(body):
-        for word in tok.split():
-            if len(derive_dir_segments(word)) == 1:
-                if word not in roots:
-                    roots.append(word)
-            elif (check_path_shaped(word, files) or check_dir_shaped(word)) and word not in paths:
-                paths.append(word)
+    for word in words:
+        if len(load_design_lib().derive_dir_segments(word)) == 1:
+            roots.append(word)
+        elif check_path_shaped(word, files) or load_design_lib().check_dir_shaped(word):
+            paths.append(word)
     return paths, roots
-
-
-def derive_dir_segments(tok):
-    """The REAL segments of a `/`-terminated token this join could read, or `[]` for anything else:
-    a token that is not `/`-terminated, opens like a deploy-time token, carries a glob or a space, or
-    has a segment that is empty, `.` or `..` — so `./`, `../` and `tools/./` are nothing, not a path
-    (round 2, R8). `src/` -> `['src']`; `src/app/` -> `['src', 'app']`."""
-    if NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok or not tok.endswith("/"):
-        return []
-    parts = tok.rstrip("/").split("/")
-    return [] if any(x in ("", ".", "..") for x in parts) else parts
-
-
-def check_dir_shaped(tok):
-    """A declared PREFIX: a directory token of TWO OR MORE real segments. A one-segment token is a
-    ROOT (`tools/`), which is how prose names a tree and declares nothing (round 2, R1); round 1's
-    fold kept it and owed every non-broad leg under it. The residual, both directions (round 3,
-    R4): a two-segment directory named in prose is still read as declared, and a one-segment
-    directory that is itself a joined guard (`.githooks/`) declared wholesale declares nothing -
-    its files, or a two-segment child, must be named."""
-    return len(derive_dir_segments(tok)) >= 2
-
-
-def check_guard_trips(path, guard):
-    """Git-pathspec semantics for a manifest guard: the exact path, or anything under it as a
-    directory. Never a bare prefix, so `src/x.sh` does not trip on `src/x.sh.bak`. A declared
-    DIRECTORY (its trailing `/` kept by `extract_files_touched`, two or more segments — a root never
-    reaches here) trips symmetrically: it also trips a guard that sits under it, an exact-file guard
-    included, because `tools/x/` declares `tools/x/y.sh` (R3)."""
-    p, g = path.rstrip("/"), guard.rstrip("/")
-    if p == g or p.startswith(g + "/"):
-        return True
-    return path.endswith("/") and g.startswith(p + "/")
 
 
 def derive_guarded_legs(rows):
@@ -628,7 +624,7 @@ def derive_tripped_legs(path, rows):
     out = []
     for r in rows:
         hit = next((g for g in r.get("guard") or []
-                    if not GLOB_MAGIC.search(g) and check_guard_trips(path, g)), None)
+                    if not GLOB_MAGIC.search(g) and load_design_lib().check_guard_trips(path, g)), None)
         if hit:
             out.append((r["name"], hit, r.get("chunk", "-"), r.get("subject", "-")))
     return out
@@ -803,30 +799,12 @@ def scan_handoffs(root, specs, uids, cutoff):
         if f not in cache:
             cache[f] = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         text = cache[f]
-        head = NONGOALS_HEAD.search(text)
-        if not head:
-            continue
-        rest = text[head.end():]
-        nxt = re.search(r"^## ", rest, re.M)
-        nongoals = rest[:nxt.start()] if nxt else rest
-        sub = re.search(r"^### Edges[ \t]*$", nongoals, re.M)
-        if not sub:
-            continue
-        rest = nongoals[sub.end():]
-        nxt = re.search(r"^### ", rest, re.M)
-        edges = rest[:nxt.start()] if nxt else rest
         uid = SPEC_UID.search(text)
         source = uid.group(1) if uid else ""
         build = f.split("/")[2]
-        for bullet in HANDOFF_BULLET.findall(edges):
-            # Check 12's target rule, on the payload past the marker and the verb: the first
-            # backticked token when the payload opens with one, else its leading word run. Stripping
-            # the MARKER here as well as the verb is what keeps a `*`-and-tab bullet readable.
-            payload = re.sub(r"^(?:-|\*)[ \t]*\*\*[^*]*\*\*[ \t]*", "", bullet.split("\n", 1)[0])
-            if payload.startswith("`"):
-                target = payload[1:].partition("`")[0]
-            else:
-                target = re.match(r"[A-Za-z0-9_-]*", payload).group(0)
+        # The bullets, their continuation lines and check 12's target rule are design_lib's one edge
+        # read (TOOL-dGroundRules-32 S17), the build-order render's consumes read too.
+        for target, bullet in load_design_lib().read_spec_edges(text, "hands-off"):
             if target == "external":
                 continue
             if not source or (build, target) not in uids:
@@ -894,6 +872,10 @@ def load_design_lib():
 # dated joins here and the carries population read one date. A checker copied without the kit binds
 # none, and `main` refuses by name before any join that reads a date.
 SPEC_DATE = load_design_lib().SPEC_FILE_DATE if DESIGN_LIB else None
+# A deploy-time token or an env assignment is never a path or a leg: design_lib's one pattern,
+# which its `derive_dir_segments` reads too (TOOL-dGroundRules-32 S9). Bound like SPEC_DATE, so a
+# checker copied without the kit binds none and `main` refuses before any join reads it.
+NOT_A_TOKEN = load_design_lib().NOT_A_TOKEN if DESIGN_LIB else None
 
 
 def read_carries_specs(root, design, cutoff, files=None, conf=None):
@@ -1245,66 +1227,90 @@ def read_waivers(root):
     return rows
 
 
-def read_size_ceilings(tooldir):
-    """The size join's inputs from the two sidecars beside the leg manifest (TOOL-aMendedFleet-25):
-    `(ceiling, highwater)`, where `ceiling` is the CLASS row's bytes or None when the row is absent
-    (the arm is off) and `highwater` maps each recorded path to its bytes. Parsed the way
-    check-template-size.sh parses them: tab-separated, comment and blank lines skipped, the value
-    stripped of whitespace. A class row or a high-water row whose value is not a number REFUSES:
-    returns None after printing the refusal, never zero and never off."""
-    found = {}
-    for name in (SIZE_LIMITS_NAME, SIZE_HIGHWATER_NAME):
-        p = tooldir / name
-        rows = {}
-        if p.exists():
-            for line in p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").splitlines():
-                if not line.strip() or line.lstrip().startswith("#"):
-                    continue
-                key, _, val = line.partition("\t")
-                rows[key] = "".join(val.split())
-        found[name] = rows
-    limits, highwater = found[SIZE_LIMITS_NAME], found[SIZE_HIGHWATER_NAME]
-    bad = [(SIZE_LIMITS_NAME, SIZE_CLASS_KEY, limits[SIZE_CLASS_KEY])] \
-        if SIZE_CLASS_KEY in limits and not limits[SIZE_CLASS_KEY].isdigit() else []
-    bad += [(SIZE_HIGHWATER_NAME, k, v) for k, v in highwater.items() if not v.isdigit()]
+def read_size_ceilings(tooldir, root):
+    """The size join's inputs (TOOL-aMendedFleet-25, TOOL-dGroundRules-9): `(answer, highwater, judge,
+    off)`. `answer` is the policy kit's CapAnswer for the CLASS cap, read through `resolve_caps` in
+    `root` at its landed revision, or None when the arm is off, `off` then saying why: no class
+    value, or no policy kit beside this checker, found by `resolve_kit_dir`. `judge` is that kit's
+    `check_cap`. `highwater` maps each path the high-water sidecar beside the leg manifest records to
+    its bytes, parsed tab-separated with comment and blank lines skipped and the value stripped of
+    whitespace. A high-water row that is not a number, and every refusal the policy reader makes, a
+    class row that is not a number among them, REFUSE: None after printing the refusal, never zero
+    and never off."""
+    rows = {}
+    p = tooldir / SIZE_HIGHWATER_NAME
+    if p.exists():
+        for line in p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").splitlines():
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            key, _, val = line.partition("\t")
+            rows[key] = "".join(val.split())
+    bad = [(k, v) for k, v in rows.items() if not v.isdigit()]
     if bad:
-        name, key, val = bad[0]
-        print(f"spec-tokens: REFUSING — the size join's row for {key} in {name} is not a number: "
-              f"'{val}'; it would read as zero or as off")
+        print(f"spec-tokens: REFUSING — the size join's row for {bad[0][0]} in {SIZE_HIGHWATER_NAME} is not a "
+              f"number: '{bad[0][1]}'; it would read as zero or as off")
         return None
-    ceiling = int(limits[SIZE_CLASS_KEY]) if SIZE_CLASS_KEY in limits else None
-    return ceiling, {k: int(v) for k, v in highwater.items()}
+    highwater = {k: int(v) for k, v in rows.items()}
+    try:
+        kit = str(resolve_kit_dir("policy", "budgets.py", HERE))
+    except LookupError as exc:
+        return None, highwater, None, f"no policy kit beside this checker to read the ceiling through: {exc}"
+    if kit not in sys.path:
+        sys.path.insert(0, kit)
+    import budgets  # the policy kit's caps module, found above; never at import time, which gen_build_index shares
+    try:
+        answer = budgets.resolve_caps([SIZE_CLASS_KEY], str(root))[SIZE_CLASS_KEY]
+    except budgets.policy.Refusal as exc:
+        print(f"spec-tokens: REFUSING — the size join's ceiling for {SIZE_CLASS_KEY} did not read: {exc}")
+        return None
+    if not answer.value:
+        return None, highwater, None, f"no class value for {SIZE_CLASS_KEY}: {answer.reason}"
+    return answer, highwater, budgets.check_cap, ""
 
 
-def scan_spec_sizes(root, specs, files, ceiling, highwater, hw_rel):
+def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
     """The size join (TOOL-aMendedFleet-25) over the LIVE specs: each measured in bytes with carriage
-    returns stripped, as check-template-size.sh measures. Returns `(hits, stale, held, largest)`.
+    returns stripped, as check-template-size.sh measures. Returns `(hits, stale, held, largest,
+    warned)`.
 
-    A spec over `ceiling` with no high-water row is a hit; one with a row is HELD while it does not
-    exceed the row, and a hit naming both figures once it does. A row keyed under `memory/builds/`
-    that names anything but a live spec over the ceiling is STALE — untracked, terminal or back under
-    it — the rule a waiver row nothing produces already meets. `largest` is the largest unheld spec
-    as `(bytes, path)`, or None. It does not price growth under the ceiling, and it reads no line
-    count: the template gate prices bytes only, and so does this."""
-    hits, stale, held, largest, size = [], [], 0, None, {}
+    A spec over the ceiling, `answer.value`, with no high-water row is a hit; one with a row is HELD
+    while it does not exceed the row, and a hit naming both figures once it does. Each hit carries
+    the verdict `judge(answer, bytes, path)` returns (TOOL-dGroundRules-9): one that does not refuse
+    is printed as its `BUDGET WARN` line, counted in `warned` and never a hit. A row keyed under
+    `memory/builds/` that names anything but a live spec over the ceiling is STALE — untracked,
+    terminal or back under it — the rule a waiver row nothing produces already meets. `largest` is
+    the largest unheld spec as `(bytes, path)`, or None. It does not price growth under the ceiling,
+    and it reads no line count: the template gate prices bytes only, and so does this."""
+    ceiling = answer.value
+    hits, stale, held, largest, size, warned = [], [], 0, None, {}, 0
     for f in specs:
         n = len((root / f).read_bytes().replace(b"\r", b""))
         size[f] = n
         rec = highwater.get(f)
         if n > ceiling and rec is not None:
-            if n > rec:
+            if n <= rec:
+                held += 1
+                continue
+            verdict = judge(answer, n, f)
+            if verdict.refuse:
                 hits.append((f, "size", f"size <- {f}",
                              f"held at its recorded high-water {rec} in {hw_rel} and now {n} bytes "
-                             f"(+{n - rec}); a held spec may shrink and may not grow"))
+                             f"(+{n - rec}); a held spec may shrink and may not grow · {verdict.line}"))
             else:
-                held += 1
+                warned += 1
+                print(f"{verdict.line} · held at its recorded high-water {rec} in {hw_rel}, grown +{n - rec}")
             continue
         if largest is None or n > largest[0]:
             largest = (n, f)
         if n > ceiling:
-            hits.append((f, "size", f"size <- {f}",
-                         f"{n} bytes, {n - ceiling} over the spec ceiling {ceiling}; split the spec "
-                         "or move history out of it"))
+            verdict = judge(answer, n, f)
+            if verdict.refuse:
+                hits.append((f, "size", f"size <- {f}",
+                             f"{n} bytes, {n - ceiling} over the spec ceiling {ceiling}; split the spec "
+                             f"or move history out of it · {verdict.line}"))
+            else:
+                warned += 1
+                print(verdict.line)
     for key in sorted(highwater):
         if not key.startswith("memory/builds/"):
             continue
@@ -1316,7 +1322,7 @@ def scan_spec_sizes(root, specs, files, ceiling, highwater, hw_rel):
         elif size[key] <= ceiling:
             stale.append(("HIGH-WATER", key, f"in {hw_rel} — back under the ceiling "
                                              f"({size[key]} <= {ceiling})"))
-    return hits, stale, held, largest
+    return hits, stale, held, largest, warned
 
 
 def scan_arm_covers(f, text):
@@ -1362,6 +1368,47 @@ def scan_arm_covers(f, text):
                     why = "not a criterion label this spec's Acceptance section defines"
                 hits.append((f, "covers", f"covers <- {f} {tok}", why))
     return hits, len(arms), carriers, graded
+
+
+# THE PACKET JOIN (TOOL-dGroundRules-63). The instrument is DERIVED from the one tracked file this
+# shape matches, and the packet's id from its name: spelling the id would cite a live spec from
+# product source.
+PACKET_INSTRUMENT = re.compile(r"memory/builds/dClosedLoop/build/[^/]*-build-([^/]+)-packet\.py")
+LIVE_EXCLUDED = ("LANDED", "ABORTED", "LANDING")
+RUN_PHASE = re.compile(r"^phase: (\S+)", re.M)
+
+
+def scan_live_packets(root, files):
+    """(hits, live, checked) over every chain build whose run is live, or None with no instrument
+    tracked. More than one instrument tracked is a ValueError: picking one would grade by accident."""
+    inst = sorted(f for f in files if PACKET_INSTRUMENT.fullmatch(f))
+    if not inst:
+        return None
+    if len(inst) > 1:
+        raise ValueError(f"{len(inst)} tracked files match the packet instrument's shape: {', '.join(inst)}")
+    serves = PACKET_INSTRUMENT.fullmatch(inst[0]).group(1)
+    shape = re.compile(rf"memory/builds/([^/]+)/prompts/[^/]*-prompt-{re.escape(serves)}-packet\.md")
+    packets = {}
+    for f in sorted(files):
+        m = shape.fullmatch(f)
+        if m:
+            packets.setdefault(m.group(1), f)
+    hits, live, checked = [], 0, 0
+    for slug, packet in packets.items():
+        run_md = root / "memory" / "builds" / slug / "RUN.md"
+        if not run_md.is_file():
+            continue
+        phases = RUN_PHASE.findall(run_md.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"))
+        if not phases or phases[-1] in LIVE_EXCLUDED:
+            continue
+        live += 1
+        p = subprocess.run([sys.executable, inst[0], "--check", slug], cwd=root, capture_output=True)
+        checked += 1
+        if p.returncode:
+            out = p.stdout.decode("utf-8", "replace").replace("\r\n", "\n").splitlines()
+            summary = out[0] if out else "(no output)"
+            hits.append((packet, "packet", slug, f"packet.py --check exited {p.returncode}: {summary}"))
+    return hits, live, checked
 
 
 def main(argv):
@@ -1418,11 +1465,10 @@ def main(argv):
         print(f"spec-tokens: REFUSING — {LEGS} declares no leg")
         return 1
 
-    sizes = read_size_ceilings(legs_path.parent)
+    sizes = read_size_ceilings(legs_path.parent, root)
     if sizes is None:
         return 1
     tool_rel = legs_path.parent.relative_to(root.resolve()).as_posix()
-    limits_rel = (f"{tool_rel}/" if tool_rel != "." else "") + SIZE_LIMITS_NAME
     hw_rel = (f"{tool_rel}/" if tool_rel != "." else "") + SIZE_HIGHWATER_NAME
 
     waivers = read_waivers(root)
@@ -1461,6 +1507,7 @@ def main(argv):
     g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = 0, 0, 0, 0, 0
     c_runs, c_specs, c_cleared = 0, 0, 0
     cv_lines, cv_specs, cv_carriers, cv_graded = 0, 0, 0, 0
+    so_examined, so_specs, so_bare = 0, 0, 0
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         m = SPEC_DATE.search("/" + f)
@@ -1558,7 +1605,7 @@ def main(argv):
         if declared and extract_gates(text) is None:
             g_nogates += 1
             near += [(f, "guards", p, "no Gates heading, not joined") for p in declared
-                     if any(check_guard_trips(p, g) for _, gs in guarded for g in gs)]
+                     if any(load_design_lib().check_guard_trips(p, g) for _, gs in guarded for g in gs)]
         elif extract_gates(text) is not None:
             if g_armed:
                 g_specs += 1
@@ -1566,7 +1613,7 @@ def main(argv):
             for leg, gs in guarded:
                 if leg in named:
                     continue
-                path = next((p for p in declared if any(check_guard_trips(p, g) for g in gs)), None)
+                path = next((p for p in declared if any(load_design_lib().check_guard_trips(p, g) for g in gs)), None)
                 if path is not None:
                     missing.append((leg, path))
         if g_armed:
@@ -1579,9 +1626,9 @@ def main(argv):
             near += [(f, "guards", f"{leg} <- {path}", where) for leg, path in missing]
         # A path whose only guard matches are BROAD is EXCLUDED, and says so under --list, count and all.
         for p in declared:
-            if any(check_guard_trips(p, g) for _, gs in guarded for g in gs):
+            if any(load_design_lib().check_guard_trips(p, g) for _, gs in guarded for g in gs):
                 continue
-            hit = [g for g in broad if check_guard_trips(p, g)]
+            hit = [g for g in broad if load_design_lib().check_guard_trips(p, g)]
             if hit:
                 near.append((f, "guards", p, "matches only the broad guard(s) "
                              + " ".join(f"{g} ({broad[g]} legs)" for g in hit)
@@ -1611,6 +1658,13 @@ def main(argv):
         cv_specs += 1 if n else 0
         cv_carriers += c
         cv_graded += k
+        # THE SOURCE JOIN (TOOL-dGroundRules-46): the acceptance section whole, fences included.
+        n = len(SOURCE_CMD.findall(extract_acceptance(text) or ""))
+        so_examined += n
+        so_specs += 1 if n else 0
+        so_hits = scan_bare_sources(text)
+        so_bare += len(so_hits)
+        hits += [(f, "source", op, SOURCE_WHY) for op in so_hits]
 
     # The seventh join, over a population the six above never build: one uid map over the live specs,
     # then one read per graded target. It is folded into `hits` before the waiver pass, so a handoff
@@ -1621,11 +1675,11 @@ def main(argv):
 
     # The eighth join (TOOL-aMendedFleet-25): its hits take the waiver pass below like any other, and
     # its stale high-water rows join the stale list, so one exit decision covers both.
-    ceiling, highwater = sizes
-    sz_stale, sz_held, sz_largest = [], 0, None
-    if ceiling is not None:
-        sz_hits, sz_stale, sz_held, sz_largest = scan_spec_sizes(root, specs, files, ceiling,
-                                                                 highwater, hw_rel)
+    sz_answer, highwater, sz_judge, sz_off = sizes
+    sz_stale, sz_held, sz_largest, sz_warned = [], 0, None, 0
+    if sz_answer is not None:
+        sz_hits, sz_stale, sz_held, sz_largest, sz_warned = scan_spec_sizes(
+            root, specs, files, sz_answer, highwater, hw_rel, sz_judge)
         hits += sz_hits
 
     # The ninth join (TOOL-dTrueNorth-2), over a population of its own: the tracked chain-build specs
@@ -1652,6 +1706,15 @@ def main(argv):
             near.append((where, "carries", f"carries <- {arm}:{ref}", f"at the Design exit only, not graded — {why}"))
         else:
             hits.append((where, "carries", f"carries <- {arm}:{ref}", why))
+
+    # The tenth join (TOOL-dGroundRules-63): each live chain run's packet, by its own instrument.
+    try:
+        pk = scan_live_packets(root, files)
+    except ValueError as exc:
+        print(f"spec-tokens: REFUSING — the packet join cannot name its instrument: {exc}")
+        return 1
+    if pk is not None:
+        hits += pk[0]
 
     live = [h for h in hits if h[2] not in waivers]
     for h in hits:
@@ -1707,6 +1770,10 @@ def main(argv):
     # normal state and only the arm-line count tells a join that read nothing from a clean one.
     print(f"spec-tokens: covers join · {cv_lines} New arm line(s) in {cv_specs} live spec(s) · "
           f"{cv_carriers} carry a covers field · {cv_graded} token(s) graded")
+    # The source join's line, on every run: a join that examined nothing reads as zero examined, not
+    # as clean. Its `live spec(s) ·` is the hands-off line's reason: `--dispatch` filters on it.
+    print(f"spec-tokens: source join · {so_examined} sourced file(s) examined in {so_specs} live spec(s) · "
+          f"{so_bare} by bare name")
     # THE UNGRADED POPULATION, which the report used to leave out entirely. A leg join that reads N
     # specs and grades a leg name in far fewer of them looks identical to one that graded them all
     # and found nothing wrong. These two numbers are what separate the cases, and they are kept
@@ -1727,12 +1794,13 @@ def main(argv):
           + (handoff_cut if handoff_cut else "blank (arm off)"))
     # The size join's line, on every run and carrying `live spec(s) ·` for the hands-off line's
     # reason: `--dispatch` filters its refusal diagnosis on that text.
-    if ceiling is None:
-        print(f"spec-tokens: size join · {len(specs)} live spec(s) · no class row in {limits_rel} (arm off)")
+    if sz_answer is None:
+        print(f"spec-tokens: size join · {len(specs)} live spec(s) · {sz_off} (arm off)")
     else:
         big = f"{sz_largest[0]} B {sz_largest[1]}" if sz_largest else "none"
-        print(f"spec-tokens: size join · {len(specs)} live spec(s) · ceiling {ceiling} from {limits_rel} · "
-              f"largest unheld {big} · {sz_held} held at a recorded high-water")
+        print(f"spec-tokens: size join · {len(specs)} live spec(s) · ceiling {sz_answer.value} "
+              f"({sz_answer.source}: {sz_answer.reason}) · mode {sz_answer.mode}, {sz_answer.rule} · "
+              f"largest unheld {big} · {sz_held} held at a recorded high-water · {sz_warned} warned")
     # The carries join's line, ONE shape on every run, off and armed alike, carrying `live spec(s) ·`
     # for the hands-off line's reason: `--dispatch` filters its refusal diagnosis on that text.
     ca_builds = cov.get("builds", {}).values()
@@ -1742,6 +1810,11 @@ def main(argv):
           f"{sum(len(e['nodes']) for e in ca_builds)} owned node(s) · {len(ca_found)} finding(s), "
           f"{sum(1 for f in ca_found if f[1] in CARRIES_EXIT_ARMS)} at the Design exit only · {CARRIES_KEY} "
           + (cov["cutoff"] if cov["state"] == "armed" else "blank (arm off)"))
+    # The packet join's line, on every run, so zero live runs reads as zero and not as clean.
+    if pk is None:
+        print("spec-tokens: packet join · off · no packet instrument")
+    else:
+        print(f"spec-tokens: packet join · {pk[1]} live chain run(s) · {pk[2]} packet(s) checked")
 
     if listing:
         return 0

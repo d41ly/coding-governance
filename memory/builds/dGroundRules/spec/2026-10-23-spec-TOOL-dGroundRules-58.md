@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-58 — the overlap probe sources the unattended library by its tracked path, so its shell column is a verdict and not a load failure
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
+**Status:** WONTDO · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,10 @@
 | [2026-10-23-build-TOOL-dGroundRules-58-deviation-46.md](../build/2026-10-23-build-TOOL-dGroundRules-58-deviation-46.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-58-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-58-1-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dGroundRules-58-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-58-build-brief.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-58-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-58-task.md) | research | TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-64 |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md) | research | TOOL-dGroundRules-52 TOOL-dGroundRules-45 TOOL-dGroundRules-60 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-57 |
+| [2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-59 TOOL-dGroundRules-60 |
 
 <!-- /gen:spec-records -->
 
@@ -53,10 +56,9 @@ run's rounds.
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-45` — `PAIRS_TABLE` and `ROW_ADDED`, and the criteria AC2 and AC3, which S1 to S3 observe with the library's path whole
-- **hands-off** `TOOL-dGroundRules-59` — `PAIRS_TABLE_WHOLE`, through which that unit observes `TOOL-dGroundRules-40` AC1 to AC3 and `TOOL-dGroundRules-43` AC1 (id 13)
-- **hands-off** `TOOL-dGroundRules-60` — `PAIRS_TABLE_WHOLE`, through which that unit observes `TOOL-dGroundRules-52` S5, S12, S21 and AC5 (id 20)
-- **hands-off** `TOOL-dGroundRules-54` — `PAIRS_TABLE_WHOLE`, through which that unit observes `TOOL-dGroundRules-44` AC2 on the trap row, a second witness beside `TRAP_SH_WHOLE` (id 9 of the closing diff review round 1)
+none
+
+Retired WONTDO, superseded: every edge this unit declared is withdrawn.
 
 ## 4. Design
 
@@ -152,6 +154,8 @@ none
   root over a staged two-row table on 2026-10-23.
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-54`, the reciprocal end of id 9's promotion of the
   closing diff review round 1; no scope or criterion moved.
+- rev-3 · 2026-10-24 · §3 · retired WONTDO at `8eab342e0`, so every edge is withdrawn and the Edges block
+  reads `none`: consumes-from `TOOL-dGroundRules-45`, hands-off `TOOL-dGroundRules-59`, hands-off `TOOL-dGroundRules-60`, hands-off `TOOL-dGroundRules-54`. No scope, design or criterion moved.
 
 ## 10. Reuse audit
 

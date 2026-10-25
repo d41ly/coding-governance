@@ -1,6 +1,6 @@
 ---
 name: criterion-asserts-what-its-own-command-cannot-show
-description: an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, a state that holds when the scope item is skipped, or an absence its own records break by quoting the pattern
+description: an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, a state that holds when the scope item is skipped, an absence its own records break by quoting the pattern, or an input respelled shorter to pass a join so it no longer probes what its scope item names
 kind: class
 universal: false
 ---
@@ -10,7 +10,7 @@ universal: false
 ## Symptom
 
 An acceptance criterion looks rigorous — it names a real command, gives a real number, reads like an
-observation. It cannot fail, or cannot pass. Four ways, and a spec set usually has more than one:
+observation. It cannot fail, or cannot pass. Six ways, and a spec set usually has more than one:
 
 - **The command does not print that.** The criterion asserts on a per-subject set or a breakdown the
   named invocation never emits, so nobody can run it as written and the nearest printed total moves
@@ -23,6 +23,14 @@ observation. It cannot fail, or cannot pass. Four ways, and a spec set usually h
 - **Its own records answer it.** A "prints nothing" search with no pathspec spans the spec and the
   ledger that quote its pattern, so it never holds for a correct build, and read loosely it also
   misses a real carrier.
+- **The input was respelled to pass a join.** A criterion's literal argument — a fixture path, a
+  Python literal, a sourced file — was shortened so a join over the spec would pass, and the
+  shortened literal no longer probes what its scope item names: the path a bare basename stands for
+  is not the path the command reads, so the criterion fails on a correct build or passes on nothing.
+- **It reads what the check reads, and never runs the check.** A criterion that names a scope item
+  observes it through a side probe of the table, fixture or file the check grades, so the item is
+  certified while the check's own code never runs. A side probe that misreads the input's spelling
+  prints nothing, and the criterion still reads as an observation.
 
 ## Where it bit
 
@@ -51,6 +59,33 @@ the bar that runs it, and a static count of its arm calls against the pin. It wa
 this leg in TOOL-aLoosenedCeiling-1's review (finding 5), TOOL-aJoinedCanon-1's spec audit round 2
 (H7), and TOOL-dDerivedDocket-37's G6 spec audit round 1 (H1).
 
+The respelled input bit dGroundRules twice. Finding 37 of its round-4 spec audit named two criteria
+whose candidate paths had lost their prefixes, and the unit promoted to close that corruption,
+`TOOL-dGroundRules-34`, was itself committed corrupted: commit `b9f7b5c4e` records in its own
+trailer that fourteen criterion paths were respelled as basenames before the first commit, because
+the paths join of `tools/check-spec-tokens.py` reds a backticked path `git ls-files` cannot resolve.
+Its AC11, AC12, AC15, AC16 and AC32 could then never pass — a sourced library by bare name, a
+Python literal that no longer parsed, a candidate list missing the depth it named — which the
+round-5 audit of units 33 and 34 confirmed as its H3. The join itself is the open ask
+`TOOL-aKeyedAnnotation-9`.
+
+The next round copied it. The round-6 spec audit, of units 35 to 43, confirmed as its H1 (review
+ids 1, 10 and 20) that TOOL-dGroundRules-40, promoted to repair TOOL-dGroundRules-34, promised its
+probes restated whole and copied AC16's stripped PAIRS_SH literal instead: a library sourced by
+bare name and two pairs cut to basenames, so the copy printed 127 twice from the root and could
+never pass. It landed one round after TOOL-dGroundRules-42 recorded the respelled form, and
+TOOL-dGroundRules-43 AC1 inherited it by naming the same literal. Writing a literal whole does not
+repair one copied whole from a corrupted source.
+
+The side read bit dGroundRules at its closing diff review, round 1, as item H1.
+`TOOL-dGroundRules-44` AC3 read `OVERLAP_PAIRS` in Python, through `TRAP_PROBE`, to certify the row
+check of its S2, and never ran the check. On the built tree that read printed nothing because of a
+closing quote: the table was then one single-quoted shell string, so its last line ended in the word
+disjoint with the string's closing quote attached, and a probe that blanked no single quote matched
+no row. The respelled staging was not the cause. The revised `TRAP_PROBE` of `TOOL-dGroundRules-44`
+blanks the single quote and lists the row, and a probe that lists the row still never runs the
+check. `TOOL-dGroundRules-56`, which runs the row check itself, is the repair.
+
 ## The fix
 
 Make the criterion DERIVE rather than ASSERT. Name the invocation that enumerates the set and have
@@ -67,6 +102,22 @@ liveness twin, the same search for the current value, that must list the carrier
 excluded everything would print nothing for both. And a criterion found wrong at build time is
 amended where its spec allows, never only in a commit trailer.
 
+A literal is never shortened to satisfy a join. A criterion's argument the paths join of
+`tools/check-spec-tokens.py` cannot resolve — a fixture path, a path that does not exist yet, a
+Python literal — is spelled whole in a fenced block of the acceptance section of the spec under
+`memory/builds/`, outside every criterion bullet, and the criterion names that block. The house rule
+of citing a kit file by its basename covers prose only, never a command's argument.
+
+Then run it. Every literal a spec's acceptance section spells that only reads is run
+verbatim from the repository root before the spec's commit, and its output is compared with what
+the criterion expects. A literal restated from another spec is re-run the same way and
+never copied on trust, because a copy carries its source's corruption.
+
+A criterion that names a scope item runs the shipped check on a staged break, whether the checker on
+a fixture, a suite function run alone or a `--selftest` flag, and names the suite on a `New arm:`
+line. A side read of the check's input never runs the check, so it may sit beside that observation
+and never stands in for it.
+
 ## Related
 
 [[fixture-passes-by-finding-nothing]] is the same defect one level down, in a test rather than in
@@ -78,4 +129,10 @@ becomes once a sibling criterion contradicts it.
 No machine gate, and it is a documented check by construction: deciding whether a criterion can fail
 needs the criterion's intent. `tools/check-spec-tokens.py` already walks the spec population and is
 where a partial join would go — a backticked leg name or path in a criterion that resolves nowhere
-is the mechanical half — but the four forms above are not reachable that way.
+is the mechanical half — but the forms above are not reachable that way.
+
+No lint ships for the respelled input either, and the reason is measured. A missing-prefix
+predicate over the live specs — a scope-item path ending in `/` plus a criterion token that path
+would end in, with the path itself absent from the criterion — gave 136 hits across 30 specs on
+2026-10-23, nearly all the house basename style, so it cannot tell a respelled literal from a kit
+file named by basename.

@@ -156,8 +156,9 @@ fixture() {
   cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
   : > "$d/${FX}${MT_KIT}/engine.sh"
   printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\nconst MAX_LENSES = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
-  # The hook README states three of the bounds since v4.0 (TOOL-aDistilledCharter-6).
-  printf 'an array LITERAL of <=5 elements\nroute through boundedParallel(thunks, 5)\nany K it cannot resolve to an integer <=5\n' \
+  # The hook README states two of the bounds, the lens-array bound and the resolved-K ceiling, the
+  # latter in the rule-2 sentence its row reads (TOOL-dGroundRules-21 S35, TOOL-dGroundRules-25 S34).
+  printf 'an array LITERAL of <=5 elements\n- Any marker `K` it cannot resolve to an integer <=5, the hook MAX_VERIFIERS\n' \
     | sed 's/<=/≤/g' > "$d/${FX}${HOOKS}/README.md"
   # The registry declares the two kits this fixture plants. `lib` is declared and holds no tracked
   # file, so it is no kit; the registry's own directory is declared nowhere, so it is none either.

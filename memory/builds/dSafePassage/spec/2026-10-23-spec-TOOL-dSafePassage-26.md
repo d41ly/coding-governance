@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-6 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -183,9 +183,10 @@ TOOL-dSafePassage-N, each item naming the unit it amends; cites are at base `370
   just blanks and comments remain, and images the whole file. Witness: no `FANOUT_CAP` assignment in
   `.agent-cap.conf`, or no file. Unit 1's AC12 is read with
   `FANOUT_CAP=abc` alone.
-  **Readers:** by name: `loadDeclaredCap` in `tools/hooks/agent-cap.js` and the files S43's grep
-  prints and disposes · by value: `loadDeclaredCap`'s cap, the fan-out guard's limit, which the up
-  carries to `runtime.agents-in-flight`. Observed by AC29.
+  **Readers:** by name: `read_legacy_fanout` in `tools/policy/policy.py`, whose `FANOUT_LINE` and
+  `LEGACY_FANOUT` spell `FANOUT_CAP` and `.agent-cap.conf`, and the files S43's grep prints and
+  disposes · by value: `derive_lowered_limit`, which lowers `runtime.agents-in-flight` to that
+  line's value where smaller, the value the up carries there. Observed by AC29.
 - S31. id 56. `write_before_image` writes through `write_atomic` (S15); an image that does not
   parse is absent only when no path it lists has changed since; otherwise the up exits 1 naming it.
   Observed by AC30.
@@ -616,6 +617,9 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
 - rev-5 · 2026-10-25 · §1 to §10 · trimmed under the class cap (audit P12), from
   `2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`: §1's table becomes its mapping rule;
   S28 and AC27 read unit 9's `SEED_KEPT_VERDICTS`; trimmed again for the records rows.
+- rev-6 · 2026-10-25 · §2 · S30 · the Readers clause re-applied over the trimmed rev-5, which kept
+  the hook function `TOOL-dGroundRules-10` removed when it moved the agent limit to
+  `tools/policy/policy.py` (hygiene check 25); written by `TOOL-dGroundRules-86`.
 
 ## 10. Reuse audit
 

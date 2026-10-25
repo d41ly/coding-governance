@@ -186,13 +186,13 @@ Ids whose spec moved past its audited revision: none — 0 of 30 unit id(s) carr
 
 | Step | Units | Parallel |
 |---|---|---|
-| 0 | `DEPL-dRetiredFork-8`, `DEPL-dRetiredFork-9`, `TOOL-dRetiredFork-18`, `TOOL-dRetiredFork-19`, `TOOL-dRetiredFork-20` | yes |
-| 1 | `TOOL-dRetiredFork-1`, `TOOL-dRetiredFork-2`, `TOOL-dRetiredFork-3`, `TOOL-dRetiredFork-4`, `TOOL-dRetiredFork-5`, `TOOL-dRetiredFork-6`, `TOOL-dRetiredFork-7`, `TOOL-dRetiredFork-8`, `TOOL-dRetiredFork-9` | yes |
-| 2 | `DEPL-dRetiredFork-7`, `TOOL-dRetiredFork-10`, `TOOL-dRetiredFork-11`, `TOOL-dRetiredFork-12` | yes |
+| 0 | `DEPL-dRetiredFork-8`, `DEPL-dRetiredFork-9`, `TOOL-dRetiredFork-18`, `TOOL-dRetiredFork-19`, `TOOL-dRetiredFork-20` | unknown |
+| 1 | `TOOL-dRetiredFork-1`, `TOOL-dRetiredFork-2`, `TOOL-dRetiredFork-3`, `TOOL-dRetiredFork-4`, `TOOL-dRetiredFork-5`, `TOOL-dRetiredFork-6`, `TOOL-dRetiredFork-7`, `TOOL-dRetiredFork-8`, `TOOL-dRetiredFork-9` | unknown |
+| 2 | `DEPL-dRetiredFork-7`, `TOOL-dRetiredFork-10`, `TOOL-dRetiredFork-11`, `TOOL-dRetiredFork-12` | unknown |
 | 3 | `TOOL-dRetiredFork-13` | no |
-| 4 | `TOOL-dRetiredFork-14`, `TOOL-dRetiredFork-21` | yes |
-| 5 | `TOOL-dRetiredFork-15`, `TOOL-dRetiredFork-16` | yes |
-| 6 | `DEPL-dRetiredFork-1`, `DEPL-dRetiredFork-2`, `DEPL-dRetiredFork-4`, `DEPL-dRetiredFork-5` | yes |
+| 4 | `TOOL-dRetiredFork-14`, `TOOL-dRetiredFork-21` | unknown |
+| 5 | `TOOL-dRetiredFork-15`, `TOOL-dRetiredFork-16` | unknown |
+| 6 | `DEPL-dRetiredFork-1`, `DEPL-dRetiredFork-2`, `DEPL-dRetiredFork-4`, `DEPL-dRetiredFork-5` | unknown |
 | 7 | `DEPL-dRetiredFork-3` | no |
 | 8 | `DEPL-dRetiredFork-6` | no |
 | 9 | `TOOL-dRetiredFork-17` | no |

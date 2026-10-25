@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-9 — one switch over every size cap, each cap's value through the policy reader
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0015@8ce57bfb whole
 
@@ -15,9 +15,14 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-9-deviation-54.md](../build/2026-10-23-build-TOOL-dGroundRules-9-deviation-54.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-9-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-9-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-prompt-TOOL-dGroundRules-9-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-9-build-brief.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dGroundRules-9-close-arms-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-9-close-arms-brief.md) | research | TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 |
+| [2026-10-25-prompt-TOOL-dGroundRules-9-close-arms-researcher.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-9-close-arms-researcher.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
+| [2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md](../reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-52 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70 TOOL-dGroundRules-71 |
 
 <!-- /gen:spec-records -->
 
@@ -318,7 +323,7 @@ reader as its reader. Each enforcer's own suite changes where it set a limit thr
 
 ## 7. Gates
 
-`line-length gate selftest` · `manifest-check self-test` · `scratch-guard self-test` · `memory-hygiene self-test` · `build-index selftest` · `tier2-review self-test` · `lexicon naming predicates` · `govkit acceptance matrix` · `playbook render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `unattended skill size` · `kickoff engine size <=18KiB` · `template size gate selftest` · `line length` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `memory hygiene` · `roles catalogue` · `kit version markers`
+`line-length gate selftest` · `manifest-check self-test` · `scratch-guard self-test` · `memory-hygiene self-test` · `build-index selftest` · `tier2-review self-test` · `lexicon naming predicates` · `govkit acceptance matrix` · `playbook render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `unattended skill size` · `kickoff engine size <=18KiB` · `template size gate selftest` · `line length` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `memory hygiene` · `roles catalogue` · `kit version markers` · `policy fixtures`
 
 New arm: tools/policy/check_policy.py · covers AC4 AC7 · `arm_limits_readers` and `arm_cap_census` over the repository, in the `policy check` leg TOOL-dGroundRules-1 declares, staged by a planted reader of the limits file and a planted unknown cap request · none
 New arm: tools/policy/check_policy.py --fixture · covers AC1 AC2 AC3 AC5 AC6 AC9 AC10 AC11 · the `budgets-` cases in `CASES`, each planted in the temporary repository, the census cases run under both switch values, in the `policy fixtures` leg · none
@@ -385,6 +390,7 @@ AC8 and AC12 are probes the close reads directly.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-17, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-3 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-4 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-62 added, the reciprocal of that unit's **consumes-from** line: the promotion of the spec run's closing diff review's id 8 (item H4), which repairs this unit's S2 read of an unset cap. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-5 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

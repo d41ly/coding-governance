@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-59 — the overlap criteria of units 40 and 43 observed through the whole probe, the raw-compare staging included
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
+**Status:** WONTDO · rev-2 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,8 @@
 | [2026-10-23-build-TOOL-dGroundRules-59-deviation-47.md](../build/2026-10-23-build-TOOL-dGroundRules-59-deviation-47.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-58-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-58-task.md) | research | TOOL-dGroundRules-58 TOOL-dGroundRules-60 TOOL-dGroundRules-64 |
+| [2026-10-23-prompt-TOOL-dGroundRules-59-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-59-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-60 |
 
 <!-- /gen:spec-records -->
 
@@ -50,10 +52,8 @@ consumes `TOOL-dGroundRules-58` at order 17, so it builds at order 18.
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-58` — `PAIRS_TABLE_WHOLE`, the probe S1 and S2 run; without it the criteria route through a probe whose shell column is `127`
 - **consumes-from** `TOOL-dGroundRules-40` — AC1, AC2 and the probe half of AC3, and the `RAW_BOTH` staging, which S1 and S2 observe
 - **consumes-from** `TOOL-dGroundRules-43` — AC1, which S1 observes
-- **consumes-from** `TOOL-dGroundRules-45` — S3's routing of those criteria, which S1 and S2 take through the whole probe
 
 ## 4. Design
 
@@ -136,6 +136,9 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting raw finding id 13 (HIGH, item H2) of the closing diff
   review of the spec run, as the observations `TOOL-dGroundRules-45` S3 routes, taken through the
   whole probe, with the rows and the staging read on 2026-10-23.
+- rev-2 · 2026-10-24 · §3 · retired WONTDO at `8eab342e0`: the consumes-from edges on `TOOL-dGroundRules-58` and
+  `TOOL-dGroundRules-45` are withdrawn, their ends gone; the consumes-from edges on `TOOL-dGroundRules-40` and
+  `TOOL-dGroundRules-43` stay, the reciprocals of those CLOSED records' hands-off lines. No scope, design or criterion moved.
 
 ## 10. Reuse audit
 
