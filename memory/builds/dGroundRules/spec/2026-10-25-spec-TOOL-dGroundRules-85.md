@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-85 — both size-cap enforcers split the budgets answer once with builtins, so the memory-hygiene and manifest-check probes fork within their ceilings again
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base cae57b1d · streams tooling · order 32
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base cae57b1d · streams tooling · order 32
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -543,3 +543,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T14:30:49Z brief · item TOOL-dGroundRules-84 · reason ba6dc59af764 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-84-spec-brief.md
 
 2026-10-25T14:46:55Z dispatch · item 29d460ce TOOL-dGroundRules-84 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-10-25T14:54:55Z dispatch · item 5e8c8c5e TOOL-dGroundRules-85 · reason tools/memory-tree/check-memory-hygiene.sh skills/session-kickoff/manifest-check.sh memory/project/fork-ceilings.txt memory/project/spawn-idiom-sites.txt memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-85.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-25T14:55:10Z brief · item TOOL-dGroundRules-85 · reason 7052617d1d77 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-85-spec-brief.md
+
+2026-10-25T15:00:50Z dispatch · item 5e8c8c5e TOOL-dGroundRules-85 · reason tools/memory-tree/check-memory-hygiene.sh skills/session-kickoff/manifest-check.sh memory/project/fork-ceilings.txt memory/project/spawn-idiom-sites.txt memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-85.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json

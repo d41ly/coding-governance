@@ -140,7 +140,6 @@ tools/memory-tree/adopt-memory-tree.sh	path-subst	3	predates the lint; `${p##*/}
 tools/memory-tree/adopt-memory-tree.sh	pure-fn-subst	3	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: FAMILY_of×3
 tools/memory-tree/adopt-memory-tree.sh	var-pipe	1	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.sh	date-fmt	1	predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
-tools/memory-tree/check-memory-hygiene.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.sh	printf-subst	5	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/check-memory-hygiene.sh	pure-fn-subst	1	callees arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile, drained by a follow-up unit: resolve_live_index_home×1
 tools/memory-tree/check-memory-hygiene.sh	var-pipe	25	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit

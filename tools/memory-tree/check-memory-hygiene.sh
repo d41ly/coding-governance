@@ -297,7 +297,7 @@ done
 # check is arithmetic. The other design's concern was that a BLANK key must never silently disable a
 # bound; the abort above satisfies that more loudly than a fall-forward would.
 M="$MEMORY_ROOT"
-HERE="$(cd "$(dirname "$0")" && pwd)"
+HERE=.; [[ $0 == */* ]] && HERE=${0%/*}; HERE="$(cd "$HERE" && pwd)"
 # codebase-map kit interop: when its MAP_ROOT is a DIRECT child of this tree (e.g. memory/map),
 # carve that subtree into the structure lint + index caps below (prose files only; the map's
 # coverage/freshness gates are its own test file, not this script).
@@ -500,15 +500,23 @@ _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-1
 # kit's own inlined resolver, backlog.py's. No kit, or any refusal, leaves every value as declared and
 # every mode `refuse`, as before, and the reason prints once, at the first breach. The curation-debt
 # partition is unchanged: it runs over both modes' findings before they are split.
+# The answer is split ONCE, with builtins, into CAP_MODE, CAP_RULE and CAP_VALUE, and the conf is
+# read once for the ten `legacy:` tests: a substitution per cap cost 50 forks a run (TOOL-dGroundRules-85).
 CAP_KEYS="guide-bytes:GUIDE_CAP_BYTES guide-lines:GUIDE_CAP_LINES index-bytes:INDEX_CAP_BYTES index-lines:INDEX_CAP_LINES readme-bytes:BUILD_README_CAP_BYTES readme-lines:BUILD_README_CAP_LINES dossier-bytes:DOSSIER_CAP_BYTES dossier-lines:DOSSIER_CAP_LINES entry-chars:ENTRY_CAP_CHARS readme-entry-chars:BUILD_README_ENTRY_CAP_CHARS"
-CAP_ANSWERS="" CAP_NOTE="" CAP_READ=0
+CAP_NOTE="" CAP_READ=0
+declare -A CAP_MODE=() CAP_RULE=() CAP_VALUE=()
 read_cap_modes() {
   [ "$CAP_READ" = 1 ] && return 0
   CAP_READ=1
-  local _reqs=() _p _how _out _v
+  local _reqs=() _p _how _out _v _l _c _r _set=" " _ifs
+  if [ -f "$ROOT/.memory-tree.conf" ]; then
+    while IFS= read -r _l || [ -n "$_l" ]; do
+      [[ $_l =~ ^[[:space:]]*(export[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*)= ]] && _set+="${BASH_REMATCH[2]} "
+    done < "$ROOT/.memory-tree.conf"
+  fi
   for _p in $CAP_KEYS; do
     _how=default
-    grep -qE "^[[:space:]]*(export[[:space:]]+)?${_p#*:}=" "$ROOT/.memory-tree.conf" 2>/dev/null && _how=legacy
+    case "$_set" in *" ${_p#*:} "*) _how=legacy ;; esac
     eval "_reqs+=(\"\${_p%%:*}=\$_how:\${${_p#*:}}\")"
   done
   if _out=$("$_PY" -B -c '
@@ -522,17 +530,23 @@ except LookupError as e:
 sys.path.insert(0, str(kit))
 import budgets
 sys.exit(budgets.main(["resolve", "--explain", *sys.argv[2:]]))' "$HERE" "${_reqs[@]}" 2>&1); then
-    CAP_ANSWERS=$_out
+    _ifs=$IFS; IFS=$'\n'; set -f
+    for _l in $_out; do
+      case "$_l" in
+        'budgets: '*' · '*) _c=${_l#budgets: }; _r=${_c#* · }; CAP_RULE[${_c%% · *}]=${_r%% · *} ;;
+        *$'\t'*)
+          _c=${_l%%$'\t'*}; _r=${_l#*$'\t'}; _v=${_r%%$'\t'*}; _r=${_r#*$'\t'}; CAP_MODE[$_c]=${_r%%$'\t'*}; CAP_VALUE[$_c]=$_v ;;
+      esac
+    done
+    set +f; IFS=$_ifs
     for _p in $CAP_KEYS; do
-      _v=$(printf '%s\n' "$_out" | awk -F'\t' -v c="${_p%%:*}" '$1 == c { print $2 }')
+      _v=${CAP_VALUE[${_p%%:*}]-}
       case "$_v" in ''|*[!0-9]*) ;; *) eval "${_p#*:}=\$_v" ;; esac
     done
   else
     CAP_NOTE="HYGIENE — no policy kit answered the size caps, so a breach refuses as before: $(printf '%s\n' "$_out" | grep -v '^budgets: ' | head -n 1)"
   fi
 }
-read_cap_mode() { local _m; _m=$(printf '%s\n' "$CAP_ANSWERS" | awk -F'\t' -v c="$1" '$1 == c { print $3 }'); printf '%s\n' "${_m:-refuse}"; }
-read_cap_rule() { printf '%s\n' "$CAP_ANSWERS" | awk -F' · ' -v c="budgets: $1" '$1 == c { print $2 }'; }
 # check_cap_findings <check> <findings> — each finding carries `\t<mode>\t<cap>\t<measured>\t<unit>\t<value>`
 # after its text: a `warn` one prints as its BUDGET WARN line, and _CAP_REFUSED keeps the rest, each
 # naming the rule that refused it where the policy kit answered.
@@ -543,7 +557,7 @@ check_cap_findings() {
   while IFS= read -r _l; do
     [ -n "$_l" ] || continue
     IFS=$'\t' read -r _t _mode _cap _n _u _v <<<"$_l"
-    _r=$(read_cap_rule "$_cap")
+    _r=${CAP_RULE[$_cap]-}
     if [ "$_mode" = warn ]; then
       printf 'BUDGET WARN — %s · %s · %s %s over %s · %s · check %s\n' "$_cap" "${_t%%[ :]*}" "$_n" "$_u" "$_v" "$_r" "$1"
     else
@@ -1096,7 +1110,7 @@ if [ -n "$sel6" ]; then
   # The switch's answers (TOOL-dGroundRules-9): the ten values, and one mode per class and axis.
   read_cap_modes
   bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/"           -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES"           -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES"           -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES"           -v dcb="$DOSSIER_CAP_BYTES" -v dcl="$DOSSIER_CAP_LINES"           -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" \
-    -v modes="index-bytes=$(read_cap_mode index-bytes) index-lines=$(read_cap_mode index-lines) guide-bytes=$(read_cap_mode guide-bytes) guide-lines=$(read_cap_mode guide-lines) readme-bytes=$(read_cap_mode readme-bytes) readme-lines=$(read_cap_mode readme-lines) dossier-bytes=$(read_cap_mode dossier-bytes) dossier-lines=$(read_cap_mode dossier-lines)" '
+    -v modes="index-bytes=${CAP_MODE[index-bytes]:-refuse} index-lines=${CAP_MODE[index-lines]:-refuse} guide-bytes=${CAP_MODE[guide-bytes]:-refuse} guide-lines=${CAP_MODE[guide-lines]:-refuse} readme-bytes=${CAP_MODE[readme-bytes]:-refuse} readme-lines=${CAP_MODE[readme-lines]:-refuse} dossier-bytes=${CAP_MODE[dossier-bytes]:-refuse} dossier-lines=${CAP_MODE[dossier-lines]:-refuse}" '
     BEGIN { nm = split(modes, mm, " "); for (j = 1; j <= nm; j++) { split(mm[j], kv, "="); mode[kv[1]] = kv[2] } }
     # THREE streams, told apart by a file counter: `FNR==NR` names only the first. Each is a printf
     # of a captured string, so none is ever zero lines and the counter cannot skip one.
@@ -1210,7 +1224,7 @@ if [ -n "$sel7" ]; then
   esac
   read_cap_modes   # the switch's answers (TOOL-dGroundRules-9), once per run, as check 6 reads them
   bad7=$(env $_c7env awk -v bp="$M/builds/" -v ecc="$ENTRY_CAP_CHARS" -v becc="$BUILD_README_ENTRY_CAP_CHARS" \
-    -v em="$(read_cap_mode entry-chars)" -v bem="$(read_cap_mode readme-entry-chars)" '
+    -v em="${CAP_MODE[entry-chars]:-refuse}" -v bem="${CAP_MODE[readme-entry-chars]:-refuse}" '
     { f = $0; if (f == "") next
       # PER-CLASS WIDTH, both declared. A build README is four rendered regions plus one authored
       # block, and its widest authored lines were MEASURED between 300 and 331 — that measurement is

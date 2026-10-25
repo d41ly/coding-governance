@@ -1336,9 +1336,19 @@ else
 fi
 read_budget_field() { printf '%s\n' "$MB_ANSWERS" | awk -F'\t' -v c="$1" -v k="$2" '$1 == c { print $k }'; }
 read_budget_rule() { printf '%s\n' "$MB_ANSWERS" | awk -F' · ' -v c="budgets: $1" '$1 == c { print $2 }'; }
-_v=$(read_budget_field manifest-bytes 2); case "$_v" in ''|*[!0-9]*) ;; *) MAX_MANIFEST_BYTES=$_v ;; esac
-_v=$(read_budget_field manifest-line 2); case "$_v" in ''|*[!0-9]*) ;; *) MANIFEST_LINE_MAX=$_v ;; esac
-_v=$(read_budget_field manifest-trap 2); case "$_v" in ''|*[!0-9]*) ;; *) MANIFEST_TRAP_MAX=$_v ;; esac
+# The three values from ONE builtin split of the answer, never a substitution per cap (TOOL-dGroundRules-85).
+_mb_ifs=$IFS; IFS=$'\n'; set -f
+for _l in $MB_ANSWERS; do
+  case "$_l" in *$'\t'*) ;; *) continue ;; esac
+  _v=${_l#*$'\t'}; _v=${_v%%$'\t'*}
+  case "$_v" in ''|*[!0-9]*) continue ;; esac
+  case "${_l%%$'\t'*}" in
+    manifest-bytes) MAX_MANIFEST_BYTES=$_v ;;
+    manifest-line) MANIFEST_LINE_MAX=$_v ;;
+    manifest-trap) MANIFEST_TRAP_MAX=$_v ;;
+  esac
+done
+set +f; IFS=$_mb_ifs
 # check_budget_breach <cap> <measured> <unit> <value> <subject> — 0 when the breach WARNS, having printed its
 # line; 1 when it refuses, the caller's check then failing as before.
 check_budget_breach() {
@@ -1461,7 +1471,12 @@ if [ "$BLOCK_OK" = 1 ]; then
          done
          set +f; IFS=$_c6ifs ;;
     esac
-    { [ "$n" -gt 0 ] && [ -z "$_c6q" ]; } || n=$(git ls-files -- "$w" 2>/dev/null | wc -l | tr -d '[:space:]')
+    # A literal the listing counted zero, or any name git quoted, is asked of git alone, its lines
+    # counted by expansion, not by `wc -l` and `tr` (TOOL-dGroundRules-85).
+    if [ "$n" -eq 0 ] || [ -n "$_c6q" ]; then
+      _c6one=$(git ls-files -- "$w" 2>/dev/null); _c6nl=${_c6one//[!$'\n']/}
+      n=0; [ -z "$_c6one" ] || n=$(( ${#_c6nl} + 1 ))
+    fi
     if [ "$n" -eq 0 ]; then
       fail 6 "watch pathspec '$w' matches no tracked file — update the watch list to the restructured paths."
     elif [ "$n" -gt 100 ]; then
