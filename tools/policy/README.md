@@ -319,8 +319,8 @@ reads `policy-file.on-invalid`, and any value but `last-valid` refuses naming th
 reason opens `mirror absent at <L8>` or `mirror stale at <L8>`. The working-tree mirror is never
 opened. The shim carries the remote ladder and the python resolver inline, byte-identical to their
 canonicals, and runs under the bash `readPolicy` finds once per process by running each candidate,
-`GOV_BASH`, the first bash PATH names, then Git for Windows' two and the bare name, kept only where it
-can see the shim; every shim outcome
+`GOV_BASH`, each bash PATH names in PATH order, then Git for Windows' two and the bare name, the first
+that can see the shim kept, and `export GOV_BASH=<path>` names one where none can; every shim outcome
 but exit 0 and its own exit-2 refusal, exit 1 or 127, a null status, a signal or a spawn error, is a
 `PolicyRefusal` naming the status, the signal and the shim's stderr (TOOL-dGroundRules-21 S16).
 Python and shell consumers call the reader, never the mirror.

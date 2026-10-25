@@ -53,17 +53,21 @@ function runGit(cwd, args, input) {
   return spawnSync("git", args, { cwd, env: ENV, input, encoding: "utf8", windowsHide: true });
 }
 
-// The bash that can SEE the shim, by RUNNING each candidate, never by its place on PATH, in the order
-// the policy kit's checker's `resolve_bash` takes: GOV_BASH, then the first `bash` PATH names, then
-// Git for Windows' two paths, then the bare name, each kept only when `test -f` on the shim exits 0
-// under it. On Windows the bare name reaches the System32 WSL launcher, which cannot open a `C:/`
-// path (gotcha subprocess-resolves-a-different-shell). Found once per process.
+// The bash that can SEE the shim. Each candidate is RUN, and the first under which `test -f` on the
+// shim exits 0 is kept, so a bash's place on PATH sets when it is tried, never whether it is taken.
+// The order: GOV_BASH, then each `bash.exe` and `bash` that exists in each PATH directory, taken
+// in PATH order, then Git for Windows' two paths, then the bare name, a repeat tried once. On Windows
+// the first PATH bash can be the System32 WSL launcher, which cannot open a `C:/` path, and the bare
+// name reaches it too (gotcha subprocess-resolves-a-different-shell), so every later PATH bash is
+// tried before Git's fixed paths. The checker's `resolve_bash` holds the same order with one PATH
+// bash, the one `shutil.which("bash")` names, in that slot. Where none can see the shim,
+// `export GOV_BASH=<path>`. Found once per process.
 let BASH;
 function resolveBash() {
   if (BASH !== undefined) return BASH;
   const onPath = (ENV.PATH || ENV.Path || "").split(path.delimiter).filter(Boolean)
     .flatMap((d) => [path.join(d, "bash.exe"), path.join(d, "bash")]).filter((p) => fs.existsSync(p));
-  const cands = [ENV.GOV_BASH, onPath[0], "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"];
+  const cands = [ENV.GOV_BASH, ...onPath,"C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"];
   BASH = null;
   for (const c of [...new Set(cands.filter(Boolean))]) {
     const r = spawnSync(c, ["-c", 'test -f "$1"', "_", SHIM], { env: ENV, windowsHide: true, timeout: 20000 });
@@ -77,7 +81,7 @@ function resolveBash() {
 // shim's stderr. Deny by default: a shim that did not run refuses too.
 function runShim(top, args) {
   const bash = resolveBash();
-  if (!bash) throw new PolicyRefusal(`policy: refused · ${MIRROR_REL}:0 · no bash can see ${SHIM}: GOV_BASH, PATH's bash and Git for Windows' two were each run`);
+  if (!bash) throw new PolicyRefusal(`policy: refused · ${MIRROR_REL}:0 · no bash can see ${SHIM}: GOV_BASH, each bash on PATH in order, Git for Windows' two and the bare name were each run; export GOV_BASH=<path> naming one that can`);
   const r = spawnSync(bash, [SHIM, ...args], { cwd: top, env: ENV, encoding: "utf8", windowsHide: true });
   if (r.status === 0) return r.stdout;
   const err = (r.stderr || "").trim();

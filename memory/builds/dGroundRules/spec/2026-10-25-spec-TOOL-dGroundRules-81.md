@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-81 — policy-mirror.js resolves every PATH bash that can see the shim again, and its comment and refusal say what it does
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base 59f02fde · streams tooling · order 28
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base 59f02fde · streams tooling · order 28
 
 **Derived:** PLAY-dClosedLoop-2
 
