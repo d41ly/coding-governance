@@ -11,6 +11,8 @@
 # `landed` is the reader's `derive_landed_revision`: the remote the ladder names and its branch, else
 # `main`, at refs/remotes/<remote>/<branch>, or refs/heads/<branch> where the ladder names no remote.
 # A ladder refusal, or a ref that names no commit, exits 2 printing the reader's refusal line.
+# Where the ladder named no branch and the `main` fallback names no commit, that line names the
+# fallback and how to name the default branch, byte for byte the reader's (TOOL-dGroundRules-73).
 # `get` runs `policy.py get <key> --json` under the resolved launcher, its stdout, stderr and exit
 # passed through; no launcher exits 2 printing the resolver's own lines.
 #
@@ -102,8 +104,14 @@ case "${1:-}:$#" in
   landed:1)
     resolve_remote_sh || { printf 'policy: refused · .governance/policy.toml:0 · %s\n' "$RR_WHY" >&2; exit 2; }
     if [ -n "$RR_REMOTE" ]; then REF="refs/remotes/$RR_REMOTE/${RR_BRANCH:-main}"; else REF="refs/heads/${RR_BRANCH:-main}"; fi
+    WHY=""
+    if [ -z "$RR_BRANCH" ] && [ -n "$RR_REMOTE" ]; then
+      WHY=", and main is only the fallback: refs/remotes/$RR_REMOTE/HEAD names no branch and GOV_DEFAULT_BRANCH is unset. Name the default branch: git remote set-head $RR_REMOTE -a, or export GOV_DEFAULT_BRANCH=<branch>."
+    elif [ -z "$RR_BRANCH" ]; then
+      WHY=", and main is only the fallback: this clone has no remote and GOV_DEFAULT_BRANCH is unset. Name the local default branch: export GOV_DEFAULT_BRANCH=<branch>."
+    fi
     git rev-parse --verify -q "$REF^{commit}" \
-      || { printf 'policy: refused · .governance/policy.toml:0 · %s names no commit in this repository\n' "$REF" >&2; exit 2; }
+      || { printf 'policy: refused · .governance/policy.toml:0 · %s names no commit in this repository%s\n' "$REF" "$WHY" >&2; exit 2; }
     ;;
   get:2)
     PY=$(resolve_python) || exit 2

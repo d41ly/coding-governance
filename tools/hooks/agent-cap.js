@@ -1773,7 +1773,7 @@ function checkHarnessCall(data, index, root) {
 // workflows kit, and never the working-tree mirror; a hooks kit with no `policy` kit beside it adds no
 // rule. WHAT IT DOES NOT SEE: an environment override of the two variables, which the harness applies
 // and no hook can read. UNVERIFIED: that a session started before a lowering keeps its settings until
-// it restarts. Read: every layer readSettingsLayers returns (TOOL-dGroundRules-61 S1); a cwd in no checkout, or a throw at any step, refuses, naming it (TOOL-dGroundRules-21 S38). null = allow · string = deny.
+// it restarts. Read: every layer readSettingsLayers returns (TOOL-dGroundRules-61 S1); a cwd in no checkout, or a throw at any step, refuses, naming it (TOOL-dGroundRules-21 S38). A refused policy read is no settings fault, so it denies under its own text, printing the reader's line and never the settings remedy (TOOL-dGroundRules-73). null = allow · string = deny.
 const SETTINGS_VARS = ['CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS', 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS']
 
 function checkSettingsInForce(data) {
@@ -1790,13 +1790,17 @@ function checkSettingsInForce(data) {
     `settings this checkout's harness starts from do not hold the landed agent limit.\n${why}\n` +
     `Render them from the policy: ${remedy}, run at ${root.split(path.sep).join('/')}. A session started ` +
     `before the render keeps the settings it started with until it restarts (UNVERIFIED).\n`
+  const renderReadDeny = (why) =>
+    `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the ` +
+    `landed agent limit cannot be read, so the settings in force were not compared, and a rule that ` +
+    `cannot read does not admit. Clear the policy reader's refusal, which names its cause:\n${why}\n`
   checkSettingsInForce.step = `reading the landed limit through ${helper.split(path.sep).join('/')}` // main names the step a throw left
   const { readPolicy, PolicyRefusal } = require(helper)
   let limit
   try {
     limit = readPolicy('runtime.agents-in-flight', { repo: root }).value
   } catch (e) {
-    if (PolicyRefusal && e instanceof PolicyRefusal) return renderSettingsDeny(`  ${e.message}`)
+    if (PolicyRefusal && e instanceof PolicyRefusal) return renderReadDeny(`  ${e.message}`)
     throw e
   }
   if (!Number.isInteger(limit) || limit < 1) return renderSettingsDeny(`  runtime.agents-in-flight reads ${JSON.stringify(limit)}, not a positive integer.`)

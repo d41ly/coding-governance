@@ -77,7 +77,7 @@ parity and readers arms. `mirror-worktree-loosened`, `mirror-stale-last-valid`, 
 and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies policy.py,
 policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
 and asserts what the helper, the hooks kit's agent-cap.js and `arm_mirror_landed` answer there.
-`mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in four ladder states.
+`mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in five ladder states.
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
 at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
@@ -172,6 +172,11 @@ Rule 7 bounds every settings layer it reads (TOOL-dGroundRules-61): `limit-setti
 refuses a project file above the limit beside a declared file at it, `limit-settings-declared-absent`
 refuses a `GOV_SETTINGS_JSON` that names no file, and `limit-settings-elsewhere` plants the project
 file at the limit before its declared file goes above it.
+
+`limit-hook-landed-unread` (TOOL-dGroundRules-73) moves the limit fixture to `master`: with no remote,
+then with one remote and no remote HEAD, rule 7 must deny naming the missing `main` ref and its remedy
+and never `settings --write`, and admit under `GOV_DEFAULT_BRANCH=master`, then after
+`git remote set-head <remote> -a`.
 
 `--live` (S9) is no case: it drives headless `claude -p` sessions in a fixture repository under a
 rendered limit and under a control with none, reads each agent's start and end stamps, and prints
@@ -2262,10 +2267,11 @@ def run_mirror_absent_adopter(name):
 
 
 def run_mirror_landed_parity(name):
-    """The shim's `landed` against the reader's `derive_landed_revision` in four ladder states, each
+    """The shim's `landed` against the reader's `derive_landed_revision` in five ladder states, each
     remote's main a different commit: two remotes with GOV_REMOTE naming the second; two without;
-    one remote; no remote. The same sha, or both refusing, in each. The shim runs under the bash
-    `resolve_bash` finds able to see it, whatever PATH puts first, and the case names it."""
+    one remote; no remote; no remote, on master. The same sha in each, or both refusing with the same
+    whole line (TOOL-dGroundRules-73). The shim runs under the bash `resolve_bash` finds able to see
+    it, whatever PATH puts first, and the case names it."""
     repo, kit, bare = build_landed_repo(policy.load_catalogue(KIT))
     checks = []
     try:
@@ -2279,21 +2285,24 @@ def run_mirror_landed_parity(name):
         run_fixture_git(repo, "remote", "add", FIXTURE_SECOND, repo.as_posix())
         run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_SECOND}/main", "HEAD~1")
         for state, drop, gov in (("two remotes, GOV_REMOTE", None, FIXTURE_SECOND), ("two remotes", None, None),
-                                 ("one remote", FIXTURE_SECOND, None), ("no remote", FIXTURE_REMOTE, None)):
+                                 ("one remote", FIXTURE_SECOND, None), ("no remote", FIXTURE_REMOTE, None),
+                                 ("no remote, on master", None, None)):
             if drop:
                 run_fixture_git(repo, "remote", "remove", drop)
+            if state == "no remote, on master":
+                run_fixture_git(repo, "branch", "-m", "main", "master")
             if gov:
                 os.environ["GOV_REMOTE"] = gov
             try:
-                want, why = policy.derive_landed_revision(repo)[0], ""
+                want, why, line = policy.derive_landed_revision(repo)[0], "", ""
             except policy.Refusal as exc:
-                want, why = None, exc.why
+                want, why, line = None, exc.why, str(exc)
             finally:
                 os.environ.pop("GOV_REMOTE", None)
             checks.append(check_run(
                 state, f"policy-shim.sh landed against derive_landed_revision ({want[:8] if want else 'refused: ' + why})",
                 [bash, (kit / "policy-shim.sh").as_posix(), "landed"],
-                lambda rc, o, e, want=want: rc == 0 and o.strip() == want if want else rc == 2 and not o and e.startswith("policy: refused · "),
+                lambda rc, o, e, want=want, line=line: rc == 0 and o.strip() == want if want else rc == 2 and not o and e.strip() == line,
                 cwd=repo, env={**os.environ, **({"GOV_REMOTE": gov} if gov else {})}))
     finally:
         remove_repo(repo)
@@ -2988,6 +2997,29 @@ def run_limit_case(name):
             write_settings(repo, render_limit_env(3))
             remove_repo(kit)
             checks.append(check_hook_call("settings at 3, the policy kit absent", "a Workflow call", hook, call, admits))
+        elif name == "limit-hook-landed-unread":
+            # TOOL-dGroundRules-73: a default branch other than main with no remote HEAD refuses with its own
+            # remedy, under rule 7's refused-read denial, never the settings remedy.
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            write_settings(repo, render_limit_env(2))
+            run_fixture_git(repo, "branch", "-m", "master")
+            call = render_workflow(repo, "const r = await agent('one')\n")
+            unread = lambda *needles: lambda rc, err: has(*needles)(rc, err) and "settings --write" not in err  # noqa: E731
+            checks += [
+                check_hook_call("no remote, on master", "a Workflow call", hook, call, unread(
+                    "rule 7", "the landed agent limit cannot be read", "refs/heads/main names no commit",
+                    "export GOV_DEFAULT_BRANCH=<branch>")),
+                check_hook_call("no remote, GOV_DEFAULT_BRANCH=master", "a Workflow call", hook, call, admits,
+                                env={**os.environ, "GOV_DEFAULT_BRANCH": "master"})]
+            bare = t / "o.git"
+            bare.mkdir()
+            run_fixture_git(bare, "init", "-q", "--bare")
+            run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, bare.as_posix())
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "master")
+            checks.append(check_hook_call("one remote, no remote HEAD", "a Workflow call", hook, call, unread(
+                f"refs/remotes/{FIXTURE_REMOTE}/main names no commit", f"git remote set-head {FIXTURE_REMOTE} -a")))
+            run_fixture_git(repo, "remote", "set-head", FIXTURE_REMOTE, "-a")
+            checks.append(check_hook_call("after remote set-head -a", "a Workflow call", hook, call, admits))
         elif name == "limit-hook-local-over":
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
             write_settings(repo, render_limit_env(2))
@@ -3134,7 +3166,7 @@ def run_limit_case(name):
 LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed", "limit-conf-mirror",
                "limit-conf-last-valid", "limit-settings-render",
                "limit-hook-admits-eight", "limit-hook-six-spawns", "limit-hook-rules-kept", "limit-hook-env-cap",
-               "limit-hook-settings-over", "limit-hook-local-over", "limit-hook-writer-split",
+               "limit-hook-settings-over", "limit-hook-landed-unread", "limit-hook-local-over", "limit-hook-writer-split",
                "limit-settings-elsewhere", "limit-hook-settings-malformed", "limit-hook-reader-throws",
                "limit-fresh-target-spawn", "limit-settings-env-stale",
                "limit-settings-elsewhere-project-over", "limit-settings-declared-absent")

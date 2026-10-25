@@ -472,15 +472,31 @@ def derive_landed_revision(repo):
     """-> (full sha, how it was found). The remote is the ladder's alone, `resolve_remote` being this
     module's one `git remote` read: the landed ref is refs/remotes/<remote>/<branch>, the branch the
     ladder's else main, and with no remote at all the local refs/heads/<branch>. A ladder refusal, or
-    a ref that names no commit, is a Refusal."""
+    a ref that names no commit, is a Refusal. Where the ladder named no branch and the `main` fallback
+    names no commit, the Refusal names that fallback and how to name the default branch
+    (TOOL-dGroundRules-73)."""
     with run_without_git_env():  # the ladder's block is canonical and inherits this process's environment
         remote, branch, _observed, refusal = resolve_remote(repo)
     if refusal:
         raise Refusal(POLICY_REL, 0, refusal)
+    fallback = not branch
     branch = branch or "main"
+    ref = f"refs/remotes/{remote}/{branch}" if remote else f"refs/heads/{branch}"
+    try:
+        sha = resolve_commit(repo, ref)
+    except Refusal as exc:
+        if not fallback:
+            raise
+        if remote:
+            raise Refusal(POLICY_REL, 0, f"{exc.why}, and main is only the fallback: refs/remotes/{remote}/HEAD "
+                          f"names no branch and GOV_DEFAULT_BRANCH is unset. Name the default branch: "
+                          f"git remote set-head {remote} -a, or export GOV_DEFAULT_BRANCH=<branch>.") from None
+        raise Refusal(POLICY_REL, 0, f"{exc.why}, and main is only the fallback: this clone has no remote and "
+                      f"GOV_DEFAULT_BRANCH is unset. Name the local default branch: "
+                      f"export GOV_DEFAULT_BRANCH=<branch>.") from None
     if remote:
-        return resolve_commit(repo, f"refs/remotes/{remote}/{branch}"), f"{remote}/{branch}, the landed revision"
-    return resolve_commit(repo, f"refs/heads/{branch}"), f"local {branch}: this clone has no remote"
+        return sha, f"{remote}/{branch}, the landed revision"
+    return sha, f"local {branch}: this clone has no remote"
 
 
 def read_policy_text(repo, rev):

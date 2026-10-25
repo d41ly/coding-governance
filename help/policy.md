@@ -28,8 +28,12 @@ allowed values and every check.
 
 - **Read a key:** `python tools/policy/policy.py get budgets.enforce` prints the key's value: a
   string as itself, a number or `true`/`false` as TOML spells it, a list one member per line. It
-  reads the file **as committed at the landed revision**: the tip of the remote's default branch,
-  or, in a clone with no remote, your local `main`. It never reads your working tree, so an edit
+  reads the file **as committed at the landed revision**: the tip of the branch
+  `refs/remotes/<remote>/HEAD` names. A clone sets that ref, and `git remote set-head <remote> -a`
+  sets it after a first push; `export GOV_DEFAULT_BRANCH=<branch>` names the branch outright. In a
+  clone with no remote it is the local branch `GOV_DEFAULT_BRANCH` names. When neither names one,
+  `main` is the fallback, and a repository with no `main` refuses, naming the missing ref and these
+  remedies. It never reads your working tree, so an edit
   you have not committed and pushed does not change what it prints, and once a gate reads its
   policy through it, an uncommitted edit cannot change what that gate enforces.
   - `--rev <rev>` reads the file at that commit instead, `--rev HEAD` for your last commit.
@@ -40,6 +44,7 @@ allowed values and every check.
     it cannot fall back from (below), and a key whose catalogue row carries no default when the
     file does not set it.
   - With several remotes and none chosen it refuses too: `export GOV_REMOTE=<remote>` names one.
+  - With no default branch named and no `main` it refuses naming the missing ref: `git remote set-head <remote> -a`, or `export GOV_DEFAULT_BRANCH=<branch>`, names one.
   - The file is parsed as TOML and never run, so a line in it cannot execute anything.
 - **Where a value comes from:** every key resolves in one order, `RESOLUTION_ORDER` in
   `tools/policy/policy.py`: the value the file sets, else the catalogue default. `--explain` says

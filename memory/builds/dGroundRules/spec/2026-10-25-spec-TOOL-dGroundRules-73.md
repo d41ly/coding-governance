@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-73 — a missing default-branch ref refuses with its own remedy, never rule 7's settings remedy
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -73,3 +73,15 @@ because it reads the landed limit, never the branch's. Remove a hand-set value f
 not read, so a value there runs past the limit unrefused: a file passed with the `--settings` flag,
 the managed-policy layer an administrator installs, and an exported environment variable that sets
 either harness variable. A set `AGENT_CAP` changes nothing.
+
+A refused policy read is not a settings refusal. When the policy reader cannot read the landed limit,
+rule 7 prints the reader's refusal under its own header, and `policy.py settings --write` does not
+clear it. In a repository whose default branch is not `main` and that names it nowhere, it reads:
+
+```
+BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this Agent call — the landed agent limit cannot be read, so the settings in force were not compared, and a rule that cannot read does not admit. Clear the policy reader's refusal, which names its cause:
+  policy: refused · .governance/policy.toml:0 · refs/remotes/origin/main names no commit in this repository, and main is only the fallback: refs/remotes/origin/HEAD names no branch and GOV_DEFAULT_BRANCH is unset. Name the default branch: git remote set-head origin -a, or export GOV_DEFAULT_BRANCH=<branch>.
+```
+
+To clear it, run `git remote set-head <remote> -a` so the remote's HEAD names its default branch, or
+`export GOV_DEFAULT_BRANCH=<branch>`; with no remote, the export alone names the local default branch.

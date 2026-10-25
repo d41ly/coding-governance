@@ -475,8 +475,9 @@ with a reason opening `mirror stale at`; `mirror-stale-refuse` lands the same un
 must refuse naming `.governance/policy.json:0` and red `arm_mirror_landed`; `mirror-absent-refuse`
 lands no mirror, refused under `refuse` and read as the reader reads it under `last-valid`. Every
 other outcome case must leave `arm_mirror_landed` green. `mirror-landed-parity` runs the shim's
-`landed` beside `derive_landed_revision` with two remotes and `GOV_REMOTE`, two without, one, and
-none: the same sha, or both refusing, in each. `mirror-commit-rewrite` runs `mirror --write` at a
+`landed` beside `derive_landed_revision` in five states, with two remotes and `GOV_REMOTE`, two
+without, one, none, and none on `master`: the same sha, or both refusing with the same whole line, in
+each (TOOL-dGroundRules-73). `mirror-commit-rewrite` runs `mirror --write` at a
 commit, commits the mirror, and rewrites that commit with `git commit-tree` over its tree and
 parents, once per reason kind (TOOL-dGroundRules-25 S1): a file setting the key, a file without it,
 no file, and an invalid file over a valid ancestor, `last-valid`. `mirror --check` must print
@@ -572,6 +573,12 @@ step, and a cwd in no checkout too; `limit-fresh-target-spawn` admits an adopter
 `--scaffold`; `budgets-zero-cap` reads a cap of 0 as valid and unchecked; `budgets-reader-refused`
 refuses over a ladder refusal, saying it once, and with no launcher; `limits-reader-docstring` leaves
 a docstring and a comment unread and reds a line that opens the file.
+
+`limit-hook-landed-unread` (TOOL-dGroundRules-73) moves the limit fixture to `master` and sends one
+Workflow call through rule 7 four times: with no remote it must deny naming `refs/heads/main` and
+`export GOV_DEFAULT_BRANCH=<branch>`, and admit under `GOV_DEFAULT_BRANCH=master`; pushed to one bare
+remote with no remote HEAD it must deny naming that remote's `main` and `git remote set-head`, and
+admit after `git remote set-head <remote> -a`. Neither denial may name `settings --write`.
 
 The second minors batch's cases (TOOL-dGroundRules-25), each an outcome case:
 `legacy-homes-withheld-install` runs `govkit.py plan` over a target the deployer is about to install,

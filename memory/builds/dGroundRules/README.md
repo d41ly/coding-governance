@@ -210,7 +210,7 @@ ids TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGrou
 | [TOOL-dGroundRules-70 — the unattended suite's reader-count arm counts the readers that reach the shared derivation through read_open_passes](spec/2026-10-25-spec-TOOL-dGroundRules-70.md) | 24 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-71 — the hygiene suite's check-7 arms read the finding line with the cap rule it now carries](spec/2026-10-25-spec-TOOL-dGroundRules-71.md) | 25 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-72 — the pre-commit policy guard reads the index git hands the hook, so `git commit -a` and `git commit <path>` are graded](spec/2026-10-25-spec-TOOL-dGroundRules-72.md) | 26 | 1 | CLOSED | rev-2 | 2026-10-25 |
-| [TOOL-dGroundRules-73 — a missing default-branch ref refuses with its own remedy, never rule 7's settings remedy](spec/2026-10-25-spec-TOOL-dGroundRules-73.md) | 26 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-73 — a missing default-branch ref refuses with its own remedy, never rule 7's settings remedy](spec/2026-10-25-spec-TOOL-dGroundRules-73.md) | 26 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-74 — the writer-split fallback arm the closed specs TOOL-dGroundRules-25, -30 and -34 claim](spec/2026-10-25-spec-TOOL-dGroundRules-74.md) | 26 | 1 | CLOSED | rev-2 | 2026-10-25 |
 | [TOOL-dGroundRules-75 — a cap of 0 is unchecked in every enforcer, as the budgets switch says](spec/2026-10-25-spec-TOOL-dGroundRules-75.md) | 26 | 1 | DEFERRED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-76 — `policy.py lists --check` grades the legacy-homes list by the gate arm's rule](spec/2026-10-25-spec-TOOL-dGroundRules-76.md) | 26 | 1 | DEFERRED | rev-1 | 2026-10-25 |

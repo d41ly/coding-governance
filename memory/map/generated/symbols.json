@@ -16558,6 +16558,11 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderReadDeny",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderRerunTail",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
