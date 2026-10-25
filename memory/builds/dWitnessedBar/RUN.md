@@ -112,3 +112,15 @@ base: cdfbd1cf9c5e31cc8620af362be33a66db61a076
 2026-10-25T07:10:47Z rescope · item add TOOL-dWitnessedBar-72 · reason spec-audit round1 of units 66-67 finding id 20 at HIGH, report item H4
 
 2026-10-25T07:10:47Z rescope · item add TOOL-dWitnessedBar-73 · reason spec-audit round1 of units 66-67 minors batch, MEDIUM ids 3 4 15 16 17 18 21 22 23 24 25 26 and LOW ids 2 5 6 7 8 9 12 13 14 27 28
+
+2026-10-25T08:22:46Z rescope · item add TOOL-dWitnessedBar-74 · reason spec-audit round1 of units 68-73 finding id 10 at HIGH, report item H1 shared with id 24
+
+2026-10-25T08:22:46Z rescope · item add TOOL-dWitnessedBar-75 · reason spec-audit round1 of units 68-73 finding id 24 at HIGH, report item H1 shared with id 10
+
+2026-10-25T08:22:47Z rescope · item add TOOL-dWitnessedBar-76 · reason spec-audit round1 of units 68-73 finding id 9 at HIGH, report item H2 shared with id 25
+
+2026-10-25T08:22:48Z rescope · item add TOOL-dWitnessedBar-77 · reason spec-audit round1 of units 68-73 finding id 25 at HIGH, report item H2 shared with id 9
+
+2026-10-25T08:22:48Z rescope · item add TOOL-dWitnessedBar-78 · reason spec-audit round1 of units 68-73 minors batch, MEDIUM ids 1 2 5 11 18 19 20 26 27 and LOW ids 4 6 7 8 12 13 14 17 21 22 23
+
+2026-10-25T08:41:11Z review · item dWitnessedBar-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 20 · disposition promote
