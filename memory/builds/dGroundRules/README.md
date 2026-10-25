@@ -128,7 +128,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 69 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** CLOSED · 69 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14
 ids TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28
 ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42
@@ -207,7 +207,7 @@ ids TOOL-dGroundRules-71 TOOL-dGroundRules-100 TOOL-dGroundRules-101 TOOL-dGroun
 | [TOOL-dGroundRules-68 — the writer-split arms of the hook suite run inside a scratch checkout whose settings hold the stub limit, so rule 7 reads before it admits](spec/2026-10-25-spec-TOOL-dGroundRules-68.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-69 — the strict case's source under the policy fixtures guard, so the leg's full run traces no read outside it](spec/2026-10-25-spec-TOOL-dGroundRules-69.md) | 23 | 1 | CLOSED | rev-2 | 2026-10-25 |
 | [TOOL-dGroundRules-70 — the unattended suite's reader-count arm counts the readers that reach the shared derivation through read_open_passes](spec/2026-10-25-spec-TOOL-dGroundRules-70.md) | 24 | 1 | CLOSED | rev-1 | 2026-10-25 |
-| [TOOL-dGroundRules-71 — the hygiene suite's check-7 arms read the finding line with the cap rule it now carries](spec/2026-10-25-spec-TOOL-dGroundRules-71.md) | 25 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-71 — the hygiene suite's check-7 arms read the finding line with the cap rule it now carries](spec/2026-10-25-spec-TOOL-dGroundRules-71.md) | 25 | 1 | CLOSED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
 Records: 377 bound to this build, across 4 record folder(s).

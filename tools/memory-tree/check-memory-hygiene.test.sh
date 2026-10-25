@@ -1506,12 +1506,14 @@ n=$((n+1))
 hit  'HYGIENE check 7 FAILED'
 # The finding now NAMES THE CAP it was measured against. With a per-class width (300 for an index,
 # 350 for a build README) "419 chars" alone does not tell an operator whether that is a violation.
-n7=$(grep -cE '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\)$' <<<"$out")
+# ...and after ` · `, the rule that refused it (TOOL-dGroundRules-9). No fixture here has a landed
+# revision, so the policy reader refuses and the rule is budgets.py's READER_REFUSED.
+n7=$(grep -cE '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\) · [^[:cntrl:]]+$' <<<"$out")
 [ "$n7" = 2 ] || { echo "FAIL check 7 emitted $n7 findings, expected exactly 2 (fence, comment and separator are exempt; the 300-byte row is under the cap)"; st=1; }
 n=$((n+1))
-hitl 'memory/backlog/ARCH.md:7 (301 chars > 300)'
+hitl 'memory/backlog/ARCH.md:7 (301 chars > 300) · the policy reader refused, so a breach refuses as before'
 miss 'memory/backlog/ARCH.md:6 ('
-c7line=$(grep -E '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\)$' <<<"$out" | head -1)
+c7line=$(grep -E '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\) · [^[:cntrl:]]+$' <<<"$out" | head -1)
 case "$c7line" in 'memory/backlog/ARCH.md:5 ('*) ;;
   *) echo "FAIL check 7 reported '$c7line'; expected the offending row at UNFENCED line 5 (raw line 8)"; st=1;; esac
 

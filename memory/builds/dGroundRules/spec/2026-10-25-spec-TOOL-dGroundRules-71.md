@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-71 — the hygiene suite's check-7 arms read the finding line with the cap rule it now carries
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base 2b758400 · streams tooling · order 25
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base 2b758400 · streams tooling · order 25
 
 **Derived:** PLAY-dClosedLoop-2
 
