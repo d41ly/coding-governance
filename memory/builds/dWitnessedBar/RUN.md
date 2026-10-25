@@ -9,11 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dWitnessedBar-31=DEFERRED TOOL-dWitnessedBar-32=DEFERRED TOOL-dWitnessedBar-33=DEFERRED TOOL-dWitnessedBar-34=DEFERRED TOOL-dWitnessedBar-35=DEFERRED TOOL-dWitnessedBar-36=DEFERRED TOOL-dWitnessedBar-37=DEFERRED TOOL-dWitnessedBar-38=DEFERRED TOOL-dWitnessedBar-39=DEFERRED
+units-at-landing: TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97
+gates-run: unattended-179294799387367132478-1209 59471356
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 814bcd4a627cce7c83e658a54e385af80002c361
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -352,3 +355,7 @@ base: cdfbd1cf9c5e31cc8620af362be33a66db61a076
 2026-10-25T15:26:28Z rescope · item defer TOOL-dWitnessedBar-96 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
 
 2026-10-25T15:26:29Z rescope · item defer TOOL-dWitnessedBar-97 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T17:20:12Z override · item specs-audited · reason the owner stopped the spec-audit chain at round 14 ('No more review rounds', memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-owner-review-stop.md), so round 14's promotions TOOL-dWitnessedBar-93 to -97 close with no audit naming them, as M4 provides when a chain ends
+
+2026-10-25T17:20:12Z override · item closing-review-recorded · reason the spec run's closing diff review is not run: this run's whole diff is specs and records, already read by fourteen spec-audit rounds, and the owner stopped spec review ('No more review rounds', memory/builds/dWitnessedBar/prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-owner-review-stop.md); the build run's closing diff review over its code meets it
