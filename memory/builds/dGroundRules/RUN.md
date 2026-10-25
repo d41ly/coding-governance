@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dGroundRules-12=CLOSED TOOL-dGroundRules-13=OPEN TOOL-dGroundRules-100=OPEN TOOL-dGroundRules-101=OPEN TOOL-dGroundRules-102=OPEN TOOL-dGroundRules-103=OPEN TOOL-dGroundRules-104=OPEN TOOL-dGroundRules-105=OPEN TOOL-dGroundRules-106=OPEN TOOL-dGroundRules-107=OPEN TOOL-dGroundRules-108=OPEN TOOL-dGroundRules-109=OPEN TOOL-dGroundRules-110=OPEN TOOL-dGroundRules-111=OPEN
+units-at-landing: TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-16 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-24 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-66 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-65 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-55 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-61 TOOL-dGroundRules-64 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70 TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-84 TOOL-dGroundRules-85 TOOL-dGroundRules-86
+hold-run: 
+hold-streak: 1 · at 198f2c66
+resume-owed: none · owner
+held-at: 2026-10-25T19:51:34Z
+hold-reason: every unit is built and the close's bar is green on 71 of 72 legs at 263d31d59 (the run branch merged onto origin/main 462d20f35); the one red is spec tokens over its 180s ceiling, CONTENDED, twice: its packet join runs dClosedLoop's carries.py --report dGroundRules, which spawns git show once per chain spec revision (4095 spawns, 143s here; the leg is 5s at origin/main because the chain is live only during this close). The fix batches those reads through one git cat-file --batch, but carries.py is a pinned packet instrument and only the owner moves a pin (packet.py --repin); the alternatives are an owner-raised leg ceiling or landing by hand. specs-audited was overridden on the record for units 44 to 86
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-17929556253724163601-3729818 263d31d5
 parked-surfaced: yes, 7 surfaced
 keepalive-reaped: yes
-refreshed-at: 3c2b69be4652ade1ec267f0ce0e3d99389531633 · park · 0 touching
+refreshed-at: 462d20f3510072a1dddb5b948370937cfd3bbe0e · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 82d3643cc585a63aabe47c5a467fec6d0cfdad6a
-phase: VERIFYING
+witness: 198f2c66449f9472ae4ddad48b0ebdf532acc6e8
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -556,3 +566,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T15:39:38Z dispatch · item 8b0492fe TOOL-dGroundRules-86 · reason memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-86.md memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-34-ledger.md memory/project/method-carriers.txt WIRE-INTO-PROJECT.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-10-25T15:39:46Z brief · item TOOL-dGroundRules-86 · reason 2cff35878ae5 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-86-rev2-brief.md
+
+2026-10-25T19:51:38Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dGroundRules && bash tools/push-main.sh --land --slug dGroundRules && bash tools/unattended/unattended.sh --settle dGroundRules
+
+2026-10-25T19:51:38Z hold · item owner-decision · reason until owner · reaped 6e52b18d · resume none(owner)

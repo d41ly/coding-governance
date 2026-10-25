@@ -227,7 +227,7 @@ ids TOOL-dGroundRules-111
 | [TOOL-dGroundRules-86 — the records and the runbook this build's code left stale: the kickoff manifest re-audited and re-stamped, dSafePassage-26's Readers clause, the TOOL-dGroundRules-34 ledger's AC32 token, two method-carrier rows and the policy kit's runbook section](spec/2026-10-25-spec-TOOL-dGroundRules-86.md) | 33 | 1 | CLOSED | rev-2 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 428 bound to this build, across 4 record folder(s).
+Records: 429 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
