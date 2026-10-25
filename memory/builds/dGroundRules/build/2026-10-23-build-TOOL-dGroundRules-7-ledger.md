@@ -24,3 +24,5 @@ Owed at the close, observed by no command in this pass:
 
 - The New arm line of §7, `tools/policy/check_policy.py`'s `--fixture legacy-homes`: RED on a staged break of `check_legacy_homes` and GREEN restored.
 - The §7 legs over the built tree, and the `policy check` and `policy fixtures` legs. `adopter-fresh-target` reds on `arm_legacy_homes` in the fresh adopter until TOOL-dGroundRules-17, as the README's "Each arm in an adopter" row says. A probe of `run_arm(arm_legacy_homes, ".", KIT)` on gov's own tree found no finding: "115 row(s) derived from the legacy homes · no landed list at ed497191, so this one seeds the baseline".
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture legacy-homes, check_legacy_homes growth check skipped -> `case growth: green · lists --check · WRONG: exit 0` and `lists --write · WRONG: exit 0 ... the list CHANGED` (2 of 11), reds AC6. GREEN `82 assertion(s) executed · 0 wrong`.

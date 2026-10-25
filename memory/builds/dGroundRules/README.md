@@ -222,7 +222,7 @@ ids TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGrou
 | [TOOL-dGroundRules-82 — a parity row holds policy-mirror.js's bash candidate order against the canonical resolve_bash](spec/2026-10-25-spec-TOOL-dGroundRules-82.md) | 29 | 1 | CLOSED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 401 bound to this build, across 4 record folder(s).
+Records: 410 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

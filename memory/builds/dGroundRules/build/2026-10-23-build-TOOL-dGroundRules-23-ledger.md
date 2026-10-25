@@ -19,3 +19,5 @@ Owed at the close, observed by no command in this pass:
 
 - The `New arm:` line of §7, `--fixture budgets-ships-join`, RED on one shipped row's `installed` staged off its resolved destination and on one row's `kit` staged to another entry, GREEN restored, in the tree the close runs.
 - The §7 legs over the built tree, `policy fixtures` and `spec tokens (a spec's own names resolve)` among them; the latter grades the new waiver row against the guards join's one hit on TOOL-aScoutedSeam-1, which this pass observed only through `--dispatch`'s green run.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture budgets-ships-join. installed staged to {prefix}/moved/check-line-length.sh -> `WRONG: row: kit check-line-length · installed {prefix}/moved/check-line-length.sh` (1 wrong); kit staged to memory-tree -> `WRONG: row: kit memory-tree` (1 wrong). GREEN `134 assertion(s) executed · 0 wrong`.

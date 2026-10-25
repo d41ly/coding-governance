@@ -44,3 +44,5 @@ exported to paths that do not exist, it still built a snapshot whose parent was 
 
 The red-first observation of the `New arm:` line, and the `policy fixtures` leg itself, are left for
 the close.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture adopter-fresh-target. one-byte adopt-policy.sh break -> `WRONG: the deployer's apply --kits policy,run-gates,memory-tree exited 1`; e7c07b5a3^ check_policy.py over the committed-deletion setup -> `WRONG: govkit.py apply --kits policy,memory-tree exited 1, so nothing was installed to grade`. GREEN `223 assertion(s) executed · 0 wrong`.

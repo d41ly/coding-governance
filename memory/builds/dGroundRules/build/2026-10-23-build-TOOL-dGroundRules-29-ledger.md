@@ -20,3 +20,5 @@ Owed at the close, observed by no command in this pass:
 
 - The `New arm:` line of §7, `--fixture census-receiptless-target`, RED with `derive_census_tree` staged to answer `source` for every receipt-less tree, GREEN restored, in the tree the close runs.
 - The §7 legs `memory hygiene`, `recall floor`, `recall floor arms` and `policy fixtures`.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture census-receiptless-target. derive_census_tree staged to `return "source", ""` -> `WRONG: 0 announced` (1 wrong). GREEN `71 assertion(s) executed · 0 wrong`.

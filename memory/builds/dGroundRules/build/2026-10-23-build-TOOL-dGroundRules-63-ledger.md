@@ -31,3 +31,5 @@ legs.
 - AC12 — `grep -c "TOOL-dGroundRules-46" memory/gotchas/observation-before-the-last-fold-of-the-same-commit.md` printed `1`, and `python tools/memory-tree/gotchas.py --check` exited 0.
 - AC13 — `grep -c "id range" memory/gotchas/two-answers-to-one-question.md` printed `1`.
 - AC14 — `grep -c "scan_live_packets" memory/map/generated/symbols.json` printed `1` on the regenerated map, committed in this pass commit, and `python tools/codebase-map/gen_map.py --check` exited 0.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the suites, observed by the main loop in scratch clones of `df4912bda`, `4f76c4b39` or `3d86915cf`, each break staged alone and restored: same run: `arm FAIL  TOOL-dGroundRules-63 a live chain run whose packet check exits 1 REDS as [packet] naming the build` and the LANDED arm FAIL; GREEN `arm ok`.

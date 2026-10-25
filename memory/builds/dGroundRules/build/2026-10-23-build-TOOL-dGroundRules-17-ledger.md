@@ -42,3 +42,5 @@ observation for both cases, and the `policy check` and `policy fixtures` legs, a
   observation on `caps.toml` is the close's. The `policy fixtures` guard already named
   `{prefix}/govkit/registry.toml`, added by `TOOL-dGroundRules-24`, so `tools/gate-legs.json` is
   unchanged.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: legacy-homes.txt staged deleted -> `legacy-homes-present · ... · WRONG: absent in .../tools/policy` (1 wrong); caps.toml row ships=false->true -> budgets-ships-join `WRONG: Refusal: policy: refused · tools/policy/caps.toml:32 · ... ships and lacks kit, installed` (reds by the census refusal TOOL-dGroundRules-23 added, before the join compares). GREEN 69 and 134 assertions, 0 wrong.

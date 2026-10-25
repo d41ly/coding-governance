@@ -26,3 +26,5 @@ the `New arm:` line, and the `policy fixtures` leg itself, are left for the clos
   printed "WRONG: no deployer to install with: looked for govkit.py at
   <copy>/tools/govkit/govkit.py, under this kit's tool root": 7 assertions, 1 wrong, exit 1. No
   target was installed.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture adopter-fresh-target. stray plant -> `WRONG: tools/stray-planted.txt is under the tool root and is no receipt row's path (stray)`; govkit.py deleted -> `WRONG: no govkit kit holding govkit.py in this install`. GREEN `223 assertion(s) executed · 0 wrong`.

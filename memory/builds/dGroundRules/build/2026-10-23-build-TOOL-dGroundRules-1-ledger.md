@@ -46,3 +46,5 @@ removed.
 - AC11 — `lists --check` — `grep -n "policy.md" help/README.md` found the link at line 7, and the
   page counts two lines for `governance/policy.toml`, two for `check_policy.py` and one for
   `lists --check`.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: (1) arm_schema: `harnesses = []` under [runtime] -> `policy-check: arm_schema · 1 finding(s)` / `runtime.harnesses: [] is refused: this set is never empty`; GREEN `0 finding(s)`. (2) --fixture CASES line: no rollback exists (c9bd97720 created tools/policy/); observed only through each case's own plant: 16 schema-empty-*, shape-*, summary-new-key, usage-new-key, list-grew, usage-out-of-set each `RED as planted` then `green unplanted`, `0 wrong`. No break of the cases' judges staged.

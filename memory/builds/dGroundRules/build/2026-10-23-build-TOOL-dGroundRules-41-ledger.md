@@ -17,3 +17,5 @@ red-first observation (AC2, AC3).
 - AC3 — `HELP_MOVED`, the line moved under `## How to use it`, then the AC1 command in the clone — `INSTALL_LINES` there printed `0`, and the case printed the same `WRONG` naming `help/policy.md` and carrying the printed `adopt-policy: mirror deferred` line; `1 wrong`, exit 1.
 - AC4 — `INSTALL_LINES` — printed `1` on the built tree; this diff writes neither side of it.
 - AC5 — `HELP_LEGS` — printed `policy fixtures <- help/policy.md [selftests/kit]`.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: adopter-fresh-target: HELP_DRIFT and HELP_MOVED each -> `WRONG: help/policy.md has no line under `## Install` holding the deferral line ...`. GREEN `help/policy.md:103 carries the deferral line`, 0 wrong.

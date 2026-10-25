@@ -21,3 +21,5 @@ tree, the `New arm:` line's red-first observation, and each staged criterion's `
 - AC4 — the arm's whole case printed the `source join ·` count line; the walk derived 0 sourced files examined in 0 live specs on the built tree. The line on the built tree is owed at the close.
 - AC5 — `DOC_JOIN` on the built tree — printed `3`.
 - AC6 — `PLANT_TICK` in memory, then `scan_bare_sources` — returned `['helper.sh']`; the arm's code-span case printed a `[source]` hit for `helper.sh` and exit 1.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the suites, observed by the main loop in scratch clones of `df4912bda`, `4f76c4b39` or `3d86915cf`, each break staged alone and restored: check-spec-tokens.test.sh with check-spec-tokens.py at 78f700dac^: `arm FAIL  TOOL-dGroundRules-46 a bare-name source in a fenced acceptance literal REDS as [source]`, the slash-path arm and the code-span arm FAIL; GREEN all three `arm ok`.

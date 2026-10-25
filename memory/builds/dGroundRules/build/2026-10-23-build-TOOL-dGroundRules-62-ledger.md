@@ -21,3 +21,5 @@ AC3's staged breaks on a scratch copy of the kit.
 - AC6 — `TYPE_PROBE` printed `212:class DerivedDefault(Refusal):`, `CATCH_PROBE` printed `1` and `TEXT_PROBE` printed `0`.
 - AC7 — `grep -c "TOOL-dGroundRules-62" memory/gotchas/amendment-leaves-its-other-half-standing.md` printed `2`, and `python tools/memory-tree/gotchas.py --check` exited 0 after `--write` regenerated `memory/gotchas/INDEX.md` byte-identical.
 - AC8 — `python tools/codebase-map/gen_map.py --check` exited 0 after `--write` added `DerivedDefault` to `memory/map/generated/symbols.json`.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: budgets.py at 7f3ba9aa1^ -> budgets-unset-derived (b) `WRONG: exit 0 ... the policy reader refused`, (c) same (2 wrong); read_key answering every refusal -> (a) `WRONG: exit 0 · said 0 time(s) · budgets.enforce is None`. GREEN (a)/(b)/(c) as specced, `71 assertion(s) executed · 0 wrong`.

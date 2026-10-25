@@ -25,3 +25,5 @@ line's red-first observation, are owed to the close, as is AC1 with every unit b
 - AC3 — `ARMS` — the same arm staged into `ARMS` with no README row printed `WRONG` naming
   `arm_always_red` as `(unlisted)`; a row `arm_gone` staged into the table printed `WRONG` naming
   `arm_gone` as `(stale)`: `1 wrong`, exit 1.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture adopter-fresh-target: arm_staged_red staged into ARMS -> `WRONG: with the install staged: arm_staged_red 1 finding(s)` (6 wrong); arm_staged_unlisted -> `WRONG: arm_staged_unlisted is in ARMS with no row in README.md` (1 wrong). GREEN `223 assertion(s) executed · 0 wrong`.

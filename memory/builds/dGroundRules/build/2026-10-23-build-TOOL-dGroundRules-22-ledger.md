@@ -44,3 +44,5 @@ and printed no line for `arm_cap_census`, so it graded clean or announced there;
 reds on five other arms, `arm_mirror_parity`, `arm_mirror_landed`, `arm_mirror_readers`,
 `arm_reader_coverage` and `arm_limits_readers`, the adopter gaps the README's table assigns to
 later units, none of which this change touches.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture census-adopter-receipt. Break 2 (derive_census_tree staged to `return "source", ""`) reds 3 of 3 checks (`vendor/gov/manifest-check.sh deleted · red naming manifest-bytes and its installed path · WRONG:`). Break 1 (case's own plant) NOT observed: cd0a70507 budgets.py+caps.toml rollback crashed (`AttributeError: 'Cap' object has no attribute 'kit'`). GREEN `75 assertion(s) executed · 0 wrong`.

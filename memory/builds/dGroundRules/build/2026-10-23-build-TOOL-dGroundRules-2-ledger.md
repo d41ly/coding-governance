@@ -64,3 +64,5 @@ that edit because the unit was already CLOSED, so the arm is still owed.
   the same four paths printed 0 bytes.
 - AC9 — `policy.py get` — `grep -n 'policy.py get'` over `policy.md` under `help/` printed lines 8 and 24.
   `grep -n 'policy.md' help/README.md` printed line 7.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: (1) --fixture reader-landed: read_revision reads local HEAD in place of derive_landed_revision -> 5 of 11 lines WRONG (e.g. `remote · get budgets.enforce · WRONG: exit 0`, two-remote `WRONG: exit 2`), reds AC1 AC5 AC6; AC2 AC4 stay green; GREEN 11 lines none WRONG. (2) --fixture reader-parsed: text run through bash -> `marker · no line of either file ran · WRONG: the marker exists`; GREEN `the marker does not exist`. Single-case runs exit 1 on the guard-trace "no source read was traced" line at HEAD too (not a case line).

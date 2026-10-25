@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-25-build-TOOL-dGroundRules-75-ledger.md](../build/2026-10-25-build-TOOL-dGroundRules-75-ledger.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dGroundRules-75-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-75-1-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dGroundRules-75-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-75-spec-brief.md) | research | — |
 | [2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md](../reviews/2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md) | diff-review | TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 |

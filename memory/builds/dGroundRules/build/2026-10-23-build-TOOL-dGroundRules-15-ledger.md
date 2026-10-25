@@ -22,3 +22,5 @@ Owed at the close, observed by no command in this pass:
 
 - The `New arm:` line of §7, `--fixture limit-conf-mirror limit-conf-last-valid`, RED with the lowering staged back into the `resolve` wrapper and GREEN restored.
 - The §7 legs over the built tree, `policy fixtures` among them, which now runs the two new cases and `limit-conf-malformed`'s added `mirror --print` refusal.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture limit-conf-mirror, limit-conf-last-valid, lowering moved back into resolve: each `policy-mirror.js get runtime.agents-in-flight --explain · WRONG: exit 0 · stdout '6'` (1 wrong each). GREEN stdout '2' and '3', `76 assertion(s) executed · 0 wrong`.

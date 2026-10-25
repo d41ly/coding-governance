@@ -19,3 +19,5 @@ Owed at the close, observed by no command in this pass:
 
 - The `New arm:` line of §7, `--fixture fixtures-guard-census`, RED on one census enforcer staged out of the guard and GREEN restored, in the tree the close runs.
 - The §7 legs over the built tree, `policy fixtures` and `spec tokens (a spec's own names resolve)` among them; the latter grades the four waiver rows against the guards join's eight hits, which this pass observed only through `--dispatch`'s green run.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture fixtures-guard-census, check-line-length.sh removed from the policy fixtures guard -> `WRONG: tools/check-line-length.sh is run by budgets-cap-line-length and trips no policy fixtures guard` + guard-trace WRONG (2 wrong). GREEN `151 assertion(s) executed · 0 wrong`.

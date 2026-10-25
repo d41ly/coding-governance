@@ -46,3 +46,5 @@ and the case reran over the copy.
 - AC7 — `grep -n 'RESOLUTION_ORDER\|catalogue default'` — run over `help/policy.md`, it printed lines
   39, 40, 43, 44 and 46. These are the "Where a value comes from" paragraph, which states the order
   and gives the reason `--explain` prints for the `file` source and for each `default` case.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the `policy check` and `policy fixtures` legs, observed by a researcher in scratch clones of `4f76c4b39`: --fixture resolution-order, RESOLUTION_ORDER = (read_default_value, read_file_value) -> file-sets and preset-overridden `get budgets.enforce --rev HEAD --explain · WRONG: exit 0 · stdout 'warn'` (2 of 6), reds AC1 AC4. GREEN `76 assertion(s) executed · 0 wrong`.

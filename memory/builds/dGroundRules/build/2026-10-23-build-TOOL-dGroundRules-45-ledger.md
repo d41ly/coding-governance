@@ -19,3 +19,5 @@ row respelled `policy/a.py policy/ab.py disjoint` it printed `arm FAIL ... not a
 - AC1 — `ROW_COUNT` on the built tree — printed `2`.
 - AC2 — `PAIRS_TABLE` on the built tree — printed exactly the two lines of `PAIRS_WANT`: `tools/policy/ tools/policy/x.py intersect True 0` and `tools/policy tools/policy-x.py disjoint False 1`.
 - AC3 — `ROW_ADDED` in the `%TEMP%/gr45` copy, then `PAIRS_TABLE` there — printed three lines, the third `tools/docs tools/docs-x.md disjoint False 1`.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Under the suites, observed by the main loop in scratch clones of `df4912bda`, `4f76c4b39` or `3d86915cf`, each break staged alone and restored: check-spec-tokens.test.sh with the trap row's want staged to intersect -> `arm FAIL ... [row policy policy-x.py intersect: check_writes_intersect False] [row policy policy-x.py intersect: overlaps exit 1]`; GREEN `arm ok`.
