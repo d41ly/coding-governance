@@ -60,3 +60,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Carried from earlier passes
 
 - TOOL-dSafePassage-15 rev-2 (spec writer, 2026-10-26) flagged, unchecked: in your `kill` case at the schema step the killed state's receipt still records the pin while the files are at the tip, so "a rollback from the killed state reaches release-0's digest" may not hold, and no spec says what that rollback does. If it does not hold, that is a DIVERGENCE hand-back.
+
+## Carried from TOOL-dSafePassage-11 (ed135af16)
+
+- The floor step `lib/python-floor-3.15`'s down refuses on gov's own tree today: two lines that landed under the old floor do not compile under 3.11 — `tools/govkit/upgrade_steps.py:2864` (`b'v2
+'` inside an f-string's braces) and `tools/memory-recall/check-recall.py:394` (`'#'` inside one). If your criteria walk that step's down on gov's tree, and rewriting those two lines is outside your spec's Files touched, that is a DIVERGENCE hand-back, never a silent fixture exclusion.
+- `python_floor.py check` run from a hook does not drop `GIT_ENV_LEAKS` (`run_git`); the step runner strips them, so a step's down is safe.

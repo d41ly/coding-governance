@@ -56,3 +56,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## Carried from TOOL-dSafePassage-11 (ed135af16)
+
+- The floor step `lib/python-floor-3.15`'s down refuses on gov's own tree today: two lines that landed under the old floor do not compile under 3.11 — `tools/govkit/upgrade_steps.py:2864` (`b'v2
+'` inside an f-string's braces) and `tools/memory-recall/check-recall.py:394` (`'#'` inside one). If your criteria walk that step's down on gov's tree, and rewriting those two lines is outside your spec's Files touched, that is a DIVERGENCE hand-back, never a silent fixture exclusion.
+- `python_floor.py check` run from a hook does not drop `GIT_ENV_LEAKS` (`run_git`); the step runner strips them, so a step's down is safe.
