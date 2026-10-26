@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-36 — the kits' own suites out of the call-site scan on every target: a `project-owned` file or a `*.test.sh` under a kit home spells the retired keys on purpose and is never an adopter's call site
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 8c395e3c · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +55,8 @@ sort.
 
 - **consumes-from** `TOOL-dFurnishedOrders-25` — `derive_call_sites` and its scan line, to which S1 and S2 add the suite subtraction (id 25)
 - **consumes-from** `TOOL-dFurnishedOrders-35` — the kit homes its `kit.toml` rule reads, and the kit-file subtraction S1 runs before (ids 10 and 25)
+- **hands-off** `TOOL-dFurnishedOrders-40` — S1's kit home on a receipt target, which unit 40 S1 to S3 define from the kit's declaration (id 28 of the third audit)
+- **hands-off** `TOOL-dFurnishedOrders-41` — S1's suite subtraction, its descriptor read and AC2, which unit 41 S3 and S7 to S11 settle (ids 10, 15, 17, 24, 33, 8 of the third audit)
 
 ## 4. Design
 
@@ -156,6 +160,7 @@ New arm: tools/govkit/selftest.py · covers AC1 · a receipt target carrying a k
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the spec audit of the round-1 promotions, id 25
   (HIGH, item H4, shared with id 10).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-40, TOOL-dFurnishedOrders-41, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

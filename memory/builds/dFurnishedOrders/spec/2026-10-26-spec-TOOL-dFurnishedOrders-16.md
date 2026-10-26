@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-16 — owner questions asked live while the build is attended, never decided at raise, and a late answer placed as an amendment that re-enters its item
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 20 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 2193e25d · streams tooling · order 20 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0207@770af750 whole
 
@@ -129,6 +129,7 @@ the owner attends, and places a late answer as an amendment re-entering the item
 - **hands-off** `TOOL-dFurnishedOrders-28` — `derive_attended`'s `unread` row and its `turns` read, which unit 28 decides inside a run's window and bounds (id 52)
 - **hands-off** `TOOL-dFurnishedOrders-29` — `derive_attended`, which unit 29 S29 gives a transcripts root (id 60)
 - **hands-off** `TOOL-dFurnishedOrders-30` — S11's asked-live Skill line, which unit 30 S5 fits under the Skill's size row (id 41)
+- **hands-off** `TOOL-dFurnishedOrders-42` — the `turns` verb's AC2 and its selftest arm, which unit 42 S6 amends for the `untimed` line (id 22 of the third audit)
 
 ## 4. Design
 
@@ -334,6 +335,7 @@ observed RED then GREEN at the close as M8 owes, and its suite's clean reading i
   TOOL-dDeclaredLoop-16, -19, -30 and -31, TOOL-dPlacedRequest-3, -4 and -14, and the driver, the
   renderer and runlog at base `2193e25d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-26, TOOL-dFurnishedOrders-27, TOOL-dFurnishedOrders-28, TOOL-dFurnishedOrders-29, TOOL-dFurnishedOrders-30, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-42, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

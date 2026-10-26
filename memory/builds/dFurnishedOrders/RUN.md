@@ -66,3 +66,15 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-26T21:28:02Z rescope · item add TOOL-dFurnishedOrders-37 · reason spec-audit round1 of the round-1 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 4 5 14 6 11 34 12 36 18 13 23 20 21 41 22 40 26 27 31 32 28 33 35 38 39 37 43 (items M1-M22) and LOW ids 7 8 9 17 15 16 19 24 29 42 (items L1-L9)
 
 2026-10-26T21:59:12Z review · item dFurnishedOrders-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 37 · disposition promote
+
+2026-10-26T22:40:09Z rescope · item add TOOL-dFurnishedOrders-38 · reason spec-audit round1 of the round-2 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) finding id 29 at HIGH, report item H1, related to id 1 at MEDIUM: unit 37 AC3's adopt-unattended arm cannot fail, because git grep -n output never opens with hit
+
+2026-10-26T22:40:10Z rescope · item add TOOL-dFurnishedOrders-39 · reason spec-audit round1 of the round-2 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) finding id 27 at HIGH, report item H2, related to id 21 at MEDIUM: the single bounded runner does not bound a child whose descendant holds stdout open on Windows
+
+2026-10-26T22:40:11Z rescope · item add TOOL-dFurnishedOrders-40 · reason spec-audit round1 of the round-2 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) finding id 28 at HIGH, report item H3, related to id 15 at MEDIUM: unit 36 takes a receipt kit home from merged and seed rows that land at the repo root
+
+2026-10-26T22:40:18Z rescope · item add TOOL-dFurnishedOrders-41 · reason spec-audit round1 of the round-2 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) minors batched, the govkit upgrade-step half: MEDIUM ids 9 10 32 14 19 34 15 17 24 33 31 (items M8 M12 M13 M14 M15 M19 M20 M21) and LOW id 8 (item L1)
+
+2026-10-26T22:40:18Z rescope · item add TOOL-dFurnishedOrders-42 · reason spec-audit round1 of the round-2 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) minors batched, the roles runlog unattended and kickoff half, a write set disjoint from TOOL-dFurnishedOrders-41 by M6: MEDIUM ids 1 2 23 3 22 4 5 6 25 7 11 12 13 21 26 30 35 (items M1-M7 M9-M11 M16-M18 M22) and LOW ids 16 20 (items L2 L3)
+
+2026-10-26T22:58:20Z review · item dFurnishedOrders-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 31 · disposition promote

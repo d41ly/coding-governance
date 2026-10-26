@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-35 — the call-site scan's kit files defined on every target kind: gov's own kit source, a receipt, or the directories a `kit.toml` homes, so gov's own update walk passes
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 8c395e3c · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 |
 
 <!-- /gen:spec-records -->
 
@@ -65,6 +67,8 @@ repairs `TOOL-dFurnishedOrders-25` and builds one step after it (order 6).
 - **consumes-from** `TOOL-dFurnishedOrders-25` — `derive_call_sites`, its population and its scan line, which S1 to S3 give a kit-file rule for every target kind, and AC5, which S4 replaces (id 10)
 - **hands-off** `TOOL-dFurnishedOrders-36` — the kit homes S2 reads from `kit.toml` directories, which unit 36's suite subtraction reads beside a receipt's rows (ids 10 and 25)
 - **hands-off** `TOOL-dFurnishedOrders-37` — the step's by-path load of `govkit.py`, through which unit 37 S8 and S34 read the conf (ids 36, 19)
+- **hands-off** `TOOL-dFurnishedOrders-40` — the step's by-path `gov_govkit` load, through which unit 40 S1 reads gov's descriptors (id 28 of the third audit)
+- **hands-off** `TOOL-dFurnishedOrders-41` — S1's kit-source test, S2's `kit.toml` homes and AC2, which unit 41 S1, S2 and S4 to S6 settle (ids 9, 32, 14, 19, 34 of the third audit)
 
 ## 4. Design
 
@@ -182,6 +186,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC3 · a copy-install target, an
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the spec audit of the round-1 promotions, id 10
   (HIGH, item H4, shared with id 25).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-40, TOOL-dFurnishedOrders-41, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-34 — the posture read's failures named and bounded: a `breakpoints.py list` that fails, hangs or prints no `attendance —` line, and a policy read that fails, each an unreadable posture with its cause
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 8c395e3c · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-37 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +57,7 @@ id sort.
 - **consumes-from** `TOOL-dFurnishedOrders-28` — the 10-second bound of S3 and the turn-side cause list, which S1 and S2 extend to the posture half (id 30)
 - **consumes-from** `TOOL-dFurnishedOrders-33` — the posture-unreadable row inside a window, which each cause of S1 and S2 answers through (ids 3 and 30)
 - **hands-off** `TOOL-dFurnishedOrders-37` — the bounded posture read, which unit 37 S12 re-points through `run_slot_reader` (id 20)
+- **hands-off** `TOOL-dFurnishedOrders-42` — the posture read, whose encoding, descendant bound and runner unit 42 S14, S16 and S19 settle (ids 12, 21, 20 of the third audit)
 
 ## 4. Design
 
@@ -145,6 +148,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · stub posture reade
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the spec audit of the round-1 promotions, id 30
   (HIGH, item H3, shared with id 3).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-42, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

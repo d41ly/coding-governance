@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-29 — the round-1 audit's 35 roles, hooks and runlog minors: one reader per value, bounded slot readers, the verifier hooks' failure paths and registries, and fixtures that read only what they plant
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -193,6 +193,8 @@ named once below and closed by its scope item; `TOOL-dFurnishedOrders-30` takes 
 - **consumes-from** `TOOL-dFurnishedOrders-24` — the outcome branches, which S12 keeps out of `validate_return`'s own evaluation (id 32)
 - **consumes-from** `TOOL-dFurnishedOrders-31` — S30 whole, the outcome filter of `derive_return_arms` and `establishes:list` on the template line, landed by unit 31 at order 10, which this pass finds present and records as closed (id 1 of the second audit)
 - **hands-off** `TOOL-dFurnishedOrders-37` — AC5's import grep, `run_slot_reader`'s bound and class, the answered-call guard, the broken-index branch and the `FACT_RE` widening, which unit 37 S2, S3, S12, S24 to S26 and S32 settle, and the kickoff manifest re-stamp S17 makes after this unit's `tools/gate-legs.json` edit (ids 5, 14, 20, 38, 39, 37, 15, 26 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-39` — `run_slot_reader`'s body, which unit 39 S3 runs through the canonical file-backed block (id 27 of the third audit)
+- **hands-off** `TOOL-dFurnishedOrders-42` — `load_kit_module` and `run_slot_reader`, through which unit 42 S7 loads `budgets.py` and S17 lowers the bound (ids 4, 26 of the third audit)
 
 ## 4. Design
 
@@ -393,6 +395,7 @@ New arm: tools/runlog/selftest.py · covers AC4 AC6 · a labelled log line, a li
 - rev-1 · 2026-10-26 · initial draft, the round-1 spec audit's roles, hooks and runlog minors batched.
 - rev-2 · 2026-10-26 · §3 · a consumes-from edge to unit 31, which lands S30 at order 10, and a
   hands-off edge to unit 37 (ids 1, 5, 14, 20, 38, 39, 37, 15 and 26 of the second audit).
+- rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-39, TOOL-dFurnishedOrders-42, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

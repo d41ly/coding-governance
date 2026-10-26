@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-32 — a reviewer's subject read from the roster present at the pass: the merged reviewer's subject is the first slot of a `subject-reads` group its work order hands, so its criterion stays non-exempt
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 8c395e3c · streams tooling · order 13 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 13 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +71,7 @@ step after it (order 13), after `TOOL-dFurnishedOrders-23`, which shares unit 22
 - **consumes-from** `TOOL-dFurnishedOrders-22` — `subject-reads`, its R3 check and its index entry, which S1 and S2 extend with the group form, and AC1 whose reviewer rows S5 re-reads from the roster (id 2)
 - **consumes-from** `TOOL-dFurnishedOrders-23` — `checkAnsweredCall`'s subject comparison and the index-drawn arm, which S3 and S5 extend to a group, and AC1 and AC2 whose reviewer rows S5 re-reads from the roster (id 2)
 - **hands-off** `TOOL-dFurnishedOrders-37` — the group entry, whose members unit 37 S27 checks for `?` (id 43)
+- **hands-off** `TOOL-dFurnishedOrders-42` — S1's duplicate-member case and AC2's fixture, which unit 42 S9 and S10 settle (ids 6, 25 of the third audit)
 
 ## 4. Design
 
@@ -201,6 +204,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · the roster-read re
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the spec audit of the round-1 promotions, id 2
   (HIGH, item H2).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-42, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-31 — a field table is no outcome arm: `derive_return_arms` yields only tables carrying `outcome`, so every branch of the per-order schema names an outcome from the step unit 24 builds at
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 8c395e3c · streams tooling · order 10 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 10 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +59,7 @@ after it (order 10).
 
 - **consumes-from** `TOOL-dFurnishedOrders-24` — `render_return_schema`'s one branch per arm, which S1 stops a field table from entering (id 1)
 - **hands-off** `TOOL-dFurnishedOrders-29` — S30, landed here whole at order 10, which unit 29's pass finds present and records as closed (id 1)
+- **hands-off** `TOOL-dFurnishedOrders-42` — S2's template-line render and AC1's arm assertions, which unit 42 S12 grounds and S13 completes (ids 11, 35 of the third audit)
 
 ## 4. Design
 
@@ -156,6 +159,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · the shipped role s
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the spec audit of the round-1 promotions, id 1
   (HIGH, item H1).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-42, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 
