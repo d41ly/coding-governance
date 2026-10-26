@@ -229,7 +229,7 @@ ids TOOL-dGroundRules-109 TOOL-dGroundRules-110 TOOL-dGroundRules-111 TOOL-dGrou
 | [TOOL-dGroundRules-88 — packet.py's `--repin` guard admits an owner at a console inside a live chain run, refuses every agent and unattended caller, and records the admitted repin in each packet's Pins](spec/2026-10-25-spec-TOOL-dGroundRules-88.md) | 34 | 2 | CLOSED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 433 bound to this build, across 4 record folder(s).
+Records: 434 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
