@@ -9,10 +9,18 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at 96e9dd87
+resume-owed: none · owner
+held-at: 2026-10-26T17:36:43Z
+hold-reason: TOOL-dSafePassage-11 raises the interpreter floor to Python 3.15 and node a resolves only 3.14.6; provisioning (AP-31) is the owner's. Units 8 and 12 consume 11, and --dispatch's order gate refuses every order-4+ unit while order-3 units stand, so no carried unit can build. 13 of 59 units built; 61 waits on TOOL-dGroundRules-13
+hold-until: owner
+hold-code: host-owner-action
+held-from: BUILDING
 refreshed-at: c8d46e188985ce49caad48cf874934661ad3fc7c · park · 43 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7f9df190edf29fffd43d3114277eeb851aedf3d0
-phase: BUILDING
+witness: 96e9dd879f4ba64877af8a2ec36b276f4010421e
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -95,3 +103,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-26T17:15:51Z dispatch · item a182f2c2 TOOL-dSafePassage-24 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-24.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-24-ledger.md memory/builds/dSafePassage/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-10-26T17:15:57Z brief · item TOOL-dSafePassage-24 · reason 367133729cff memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-24-build-brief.md
+
+2026-10-26T17:36:47Z hold · item host-owner-action · reason until owner · reaped 6e25bf31 · resume none(owner)
