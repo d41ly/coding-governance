@@ -1,6 +1,6 @@
 # KICK-dKeptSession-51 — the act's place in the message id is the ninth field, after the recipient and the content key, in every text that states it
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

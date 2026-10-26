@@ -1,6 +1,6 @@
 # KICK-dKeptSession-34 — the reader's preset step answers None for a row the preset leaves unassigned, so a derived default reads with source default under every preset
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 4 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 4 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

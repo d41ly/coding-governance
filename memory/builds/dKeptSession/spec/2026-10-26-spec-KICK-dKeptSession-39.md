@@ -1,6 +1,6 @@
 # KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

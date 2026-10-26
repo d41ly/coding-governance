@@ -1,6 +1,6 @@
 # KICK-dKeptSession-48 — the mixed-window limit stated, and a 200k session on a 1M-observed model read against its own window by the harness's variable
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 14 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 14 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-4 — the preset asked once at govkit intake and written into the scaffolded policy file
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0142@816ff525 whole
 

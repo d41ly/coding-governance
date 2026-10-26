@@ -1,6 +1,6 @@
 # KICK-dKeptSession-37 — the card-fixture verdict records the version of the claude binary the fixture launched, never the session's environment
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

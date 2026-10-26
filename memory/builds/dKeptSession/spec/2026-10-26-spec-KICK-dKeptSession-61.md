@@ -1,6 +1,6 @@
 # KICK-dKeptSession-61 — the session chain read over every row on the parent's refs, so a parent with two dependents is placed
 
-**Status:** OPEN · rev-4 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 27 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 27 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

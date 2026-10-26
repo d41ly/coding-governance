@@ -1,6 +1,6 @@
 # KICK-dKeptSession-26 — the card showing the build's remaining rework budget beside its pointers
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 10 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 10 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0163@709e57f9 whole
 

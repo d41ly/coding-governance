@@ -1,6 +1,6 @@
 # KICK-dKeptSession-35 — every dependency notice posted per dependent and per Design exit, so each one lands as its own message
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

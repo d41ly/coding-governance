@@ -1,6 +1,6 @@
 # KICK-dKeptSession-22 — each message's id derived from what it says, never from its sender's session, and a retried post refused across the build's session refs
 
-**Status:** OPEN · rev-5 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 15 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 15 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0160@3e3e0128 whole
 

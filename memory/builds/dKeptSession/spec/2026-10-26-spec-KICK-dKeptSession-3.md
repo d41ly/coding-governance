@@ -1,6 +1,6 @@
 # KICK-dKeptSession-3 — the charter's preset section: the posture and only the keys that differ
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 4 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 4 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0141@4d07a3de whole
 

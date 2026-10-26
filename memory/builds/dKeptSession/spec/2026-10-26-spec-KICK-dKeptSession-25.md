@@ -1,6 +1,6 @@
 # KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 21 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 21 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0504@b051ecfa whole
 **Carries:** node:item.mailbox.answer

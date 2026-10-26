@@ -1,6 +1,6 @@
 # KICK-dKeptSession-15 — a compaction's summary read as a lead, never a source
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 11 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 11 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0153@9a9b7d43 whole
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition
 
-**Status:** OPEN · rev-7 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 16 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-7 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 16 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0143@cafeb575 whole
 **Carries:** node:record-kind.mailbox-message

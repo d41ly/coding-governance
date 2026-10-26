@@ -1,6 +1,6 @@
 # KICK-dKeptSession-23 — every mail write appended to the change feed once its ref update lands, inside the feed's census
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0161@10c6cad1 whole
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-19 — the catalogue's reader join, and the shrink-only list factory it extracts
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 2 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 2 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0157@7d569b91 whole
 

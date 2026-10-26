@@ -1,6 +1,6 @@
 # KICK-dKeptSession-50 — the mirror's upgrade path observed on a pre-unit mirror: re-rendered by the kit's update, and refused by its check where the update skips it
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 5 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

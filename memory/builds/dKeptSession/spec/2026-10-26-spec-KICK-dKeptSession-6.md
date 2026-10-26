@@ -1,6 +1,6 @@
 # KICK-dKeptSession-6 — live delivery where the harness has it: the post's tail rings the channels `deps.messaging` picks, with only the ref and the id
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 23 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 23 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0144@c41201f3 whole
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-31 — the message id derived over its recipient and its content key, so two legitimate notices never share one id
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 16 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 16 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 

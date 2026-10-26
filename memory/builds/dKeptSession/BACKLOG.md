@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · KICK-dKeptSession-29 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · KICK-dKeptSession-29 · until KICK-dKeptSession-65 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, KICK-dKeptSession-65 at order 36 today, closes it (README rule 1)

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-21 — news shown as `mailbox.notice` says: one bounded fetch at each item boundary, a tool-call hook reading the local copy, and the live ring's payload
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 22 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 22 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0159@ad40c608 whole
 **Carries:** node:policy-key.mailbox.notice

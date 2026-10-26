@@ -1,6 +1,6 @@
 # KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0146@a9c32df5 whole
 **Carries:** node:policy-key.actions.free

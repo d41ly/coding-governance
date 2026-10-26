@@ -1,6 +1,6 @@
 # KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 27 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 27 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0155@6d913746 whole
 **Carries:** node:policy-key.attendance

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0147@9a464fcd whole
 **Carries:** node:policy-key.orient.budget

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 8 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 8 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0150@1c3b5ca1 whole
 

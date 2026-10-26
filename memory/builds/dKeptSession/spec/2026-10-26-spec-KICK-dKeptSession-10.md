@@ -1,6 +1,6 @@
 # KICK-dKeptSession-10 — the mailbox read at every item boundary: `mailbox.reads` arming the position engine's mail interrupt, with the `intake` kind
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 20 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 20 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0148@ab3d7b8c whole
 **Carries:** node:policy-key.mailbox.reads

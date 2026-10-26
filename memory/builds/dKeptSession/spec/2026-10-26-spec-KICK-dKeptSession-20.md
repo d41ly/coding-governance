@@ -1,6 +1,6 @@
 # KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 6 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 6 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0158@19d3fbd9 whole
 

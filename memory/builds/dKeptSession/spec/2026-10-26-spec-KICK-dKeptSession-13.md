@@ -1,6 +1,6 @@
 # KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0151@32b6ed5a whole
 **Carries:** node:policy-key.card.pointers

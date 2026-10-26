@@ -1,6 +1,6 @@
 # KICK-dKeptSession-27 — each message carrying its session's sequence number, a take-over its predecessor, and an interface notice its content key
 
-**Status:** OPEN · rev-4 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 18 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 18 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0164@148f5fda whole
 
