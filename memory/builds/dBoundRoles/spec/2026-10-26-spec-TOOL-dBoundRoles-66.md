@@ -419,8 +419,7 @@ two `New arm:` lines, carrying the bound S5 adds.
   `tools/roles/adopt-roles.test.sh:73-76` into them, and have AC8 grep for the old form. (a) leaves AC8
   parsing free prose, where "NOT in the floor" beside "+1 for arm 6" already states arm 6's status two
   ways. (b) gives one form a probe can join to the skip echoes (S12). Both stay in the file S20 writes.
-  RESOLVED (agent, 2026-10-26, delegated): (b), rung 3, the most feature-rich survivor. widens: none ·
-  relaxes: none
+  RESOLVED (agent, 2026-10-26, delegated): (b), rung 3, the most feature-rich survivor. widens: none · relaxes: none
 
 ## 9. Revision log
 

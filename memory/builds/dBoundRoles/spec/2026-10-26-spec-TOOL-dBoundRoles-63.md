@@ -293,8 +293,7 @@ line when it renames the leg. This unit adds no arm: each criterion is a grep or
 - **F3 — The observation tree: a detached worktree, or `git init` in the extraction (id 20)?** Options: (a)
   `git worktree add --detach` at the parent of the pickaxe's commit; (b) `git archive` plus `git init` and
   one commit. (b) leaves no history for the pickaxe and a repository the module's pin read never saw.
-  RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the most feature-rich survivor. widens: none ·
-  relaxes: none
+  RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the most feature-rich survivor. widens: none · relaxes: none
 
 ## 9. Revision log
 

@@ -552,8 +552,7 @@ F9 and F14 moved to `TOOL-dBoundRoles-44` with S31 and S42.
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes: none
 - **F8 — A re-key mode in the one writer, or a second door (id 37)?** Options: (a) a mode of
   `write_overlay_units`; (b) a sibling function; (c) the step's own edit; (b) and (c) are second writers
-  PLAY-dOrderedCharter-32 S8 rules out. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  PLAY-dOrderedCharter-32 S8 rules out. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes: none
 - **F10 — Name the heading, or require exactly one (id 54)?** Options: (a) the heading in the `boundaries`
   slot, a name unit 23 owns; (b) one heading outside every fence, deny on more. RESOLVED (agent, 2026-10-26,
   delegated): (b), rung 3, on `TOOL-dBoundRoles-38`'s walker. widens: none · relaxes: none

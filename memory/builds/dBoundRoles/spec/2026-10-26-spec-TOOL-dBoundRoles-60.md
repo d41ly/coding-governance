@@ -379,8 +379,7 @@ S20's guard is not an arm: AC12 observes it directly, red before the edit and gr
   (agent, 2026-10-26, delegated): (b), rung 3, fewest follow-ups. widens: none · relaxes: none
 - **F3 — 46 AC3: the guard at unit 46's pass, or AC3 re-pointed (id 3)?** Options: (a) 46's pass adds the
   guard; (b) AC3 names the moved file. Unit 46 builds at order 12, before this unit, so (a) is out of
-  reach. RESOLVED (agent, 2026-10-26, delegated): (b), the report's second sound option. widens: none ·
-  relaxes: none
+  reach. RESOLVED (agent, 2026-10-26, delegated): (b), the report's second sound option. widens: none · relaxes: none
 - **F4 — 57 AC1: run the suite, or lift the invariant (id 34)?** Options: (a) one suite run read by line;
   (b) S22's undecorated function loaded by `ast`. (a) runs a self-test suite inside a pass, which M6
   refuses. RESOLVED (agent, 2026-10-26, delegated): (b). widens: none · relaxes: none

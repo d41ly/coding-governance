@@ -487,8 +487,7 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC2 AC7 AC8 · the floor comp
 - **F3 — Unit 61 in restated AC15: required on every branch, or only where its pass added the cases (id
   20)?** Options: (a) a conditional entry; (b) unit 61's no-code branch still adds the two inverted cases and
   their term. (a) leaves the negative case unbuilt on that branch and 61's own AC4 red there; (b) closes
-  both. RESOLVED (agent, 2026-10-26, delegated): (b), rung 3, the most feature-rich survivor. widens: none ·
-  relaxes: none
+  both. RESOLVED (agent, 2026-10-26, delegated): (b), rung 3, the most feature-rich survivor. widens: none · relaxes: none
 - **F4 — The adopter suite's arms whose arm lines moved no floor: in this unit, or out?** Options: (a) S33
   applies §4's rule to that suite too; (b) a non-goal, left for a later audit. No finding names it, and it
   is the defect of ids 1 and 19 on the suite restated AC15 covers beside the spawn guard's. (a) adds no
