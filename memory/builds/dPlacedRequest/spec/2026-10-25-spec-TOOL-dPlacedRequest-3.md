@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-3 — the entry step's five items: the card's orientation, the three placing items and the claim
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 21 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 21 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0122@938c9643 whole
 
@@ -22,8 +22,14 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-3-deviation-31.md](../build/2026-10-25-build-TOOL-dPlacedRequest-3-deviation-31.md) | deviation | — |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-3-deviation-32.md](../build/2026-10-26-build-TOOL-dPlacedRequest-3-deviation-32.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-3-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-3-1-spec-reviewer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-3-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-3-2-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 |
 
 <!-- /gen:spec-records -->
@@ -42,7 +48,8 @@ orders a session to re-derive the git state its card already printed, a median 6
 
 - **S1** — `item.entry.orient`: one `[[item]]` row in `tools/loop/loop.toml` in TOOL-dDeclaredLoop-12's
   row shape, actor `role:gov-orienter`, `needs = []`, its outcomes the three values of `placement`
-  (v2:1170), each routed to the placing item that value selects, its witness the build card unit 2
+  (v2:1170), each routed to the placing item that value selects, and `probe` (TOOL-dPlacedRequest-7
+  S8), its witness the build card unit 2
   keeps at `refs/gov/builds/<slug>/card`. Observed by AC1, AC2 and AC3.
 - **S2** — `item.entry.place`, `item.entry.place-check` and `item.entry.place-owner`: three rows, each
   needing `item.entry.orient`, each with `outcomes = "dispositions"` (TOOL-dDeclaredLoop-16 S1, the
@@ -82,6 +89,10 @@ orders a session to re-derive the git state its card already printed, a median 6
   -33's, called and never re-specced.
 - No `entry.intake` row: dWellOiledMachine's hook item, with `gap-rt-14`. Until it lands,
   `entry.orient` needs nothing and records an absent intake, as flow-steps.md:122 routes it.
+  TOOL-dDeclaredLoop-24's `[[fixed-row]]` trigger names this build, "`entry.intake` gains its fixed
+  row when dPlacedRequest declares it as an item" (its §4 "The schema", §8 F4), while
+  dWellOiledMachine declares the item, so as written that floor item's fixed row is never armed.
+  Who owns it is §8 F8, open for the owner.
 - No `next`, no unit holders and no `build.unit-holders`: dWellOiledMachine's. A `unit` disposition is
   refused as under `driver-only` (flow-steps.md:144-145).
 - No `kickoff.runs` key: dRankedPlan's (v2:1172). S5 is the default's stand-in only.
@@ -115,13 +126,14 @@ tag = "item.entry.orient"
 step = "none"
 actor = "role:gov-orienter"
 needs = []                       # item.entry.intake joins when dWellOiledMachine declares it
-outcomes = ["agent-places", "declared-checked", "owner-places"]   # the value `placement` reads
+outcomes = ["agent-places", "declared-checked", "owner-places", "probe"]   # placement's values, and probe
 witness = { class = "history", by = "the build card at refs/gov/builds/<slug>/card, its keys recomputing" }
 owner = "dPlacedRequest"
 [item.routes]
 agent-places = "item.entry.place"
 declared-checked = "item.entry.place-check"
 owner-places = "item.entry.place-owner"
+probe = "item.probe.trigger"
 
 [[item]]
 tag = "item.entry.place-check"
@@ -142,7 +154,7 @@ owner = "dPlacedRequest"
 | `item.entry.orient` | `role:gov-orienter` | none | the build card at `refs/gov/builds/<slug>/card`, its keys recomputing | the `orient` workflow (`tools/roles/workflows.toml:13-20`) running kickoff, and unit 2's card resolved through `manifest-check.sh --card --path` |
 | `item.entry.place` | `role:gov-orienter` | `item.entry.orient` | `placement.check` over the return's facts: `placement.py check` passing the newest placement block | the scout's return of unit 4's `disposition` with its `reason`, taken by `python tools/loop/placement.py place --request <content key> --return <file>`, and unit 10's `select_scenarios` over its facts |
 | `item.entry.place-check` | `command:entry.place-check` | `item.entry.orient` | `placement.check` over the declared placement | unit 4's `placement.py place --declared <word> [<build>]`, then `placement.py check` |
-| `item.entry.place-owner` | `owner` | `item.entry.orient` | the owner's disposition record, `record-kind.disposition`, naming `item.entry.place-owner` | TOOL-dDeclaredLoop-16 S4's door, `build_records.py new disposition --item item.entry.place-owner`, read by unit 4's `placement.py place --owner <record path>` |
+| `item.entry.place-owner` | `owner` | `item.entry.orient` | the owner's disposition record, `record-kind.disposition`, naming `item.entry.place-owner` | the record factory's writer, passed `--build <slug> --unit <id> --item item.entry.place-owner --disposition <word> --channel <channel>` (TOOL-dDeclaredLoop-16 S4), its verb re-grounded on the landed factory, read by unit 4's `placement.py place --owner <record path>` |
 | `item.entry.claim` | `command:entry.claim` | `item.entry.orient` | the claim ref `refs/gov/claims/<slug>` on the remote; on `patch` or `repeat` the lease record and the derived plan record too | unit 21's claim, written through `write_gov_ref` |
 
 `item.entry.place-owner` and `item.entry.claim` are non-role rows, so each declares `inputs`,
@@ -152,7 +164,7 @@ content key, writes `records` and returns the claim ref. A `returns` naming no r
 and joins nothing, as a prose input does (TOOL-dDeclaredLoop-24 §4 "Records at a version"); it becomes
 a record kind when dWellOiledMachine's intake kind lands.
 
-`entry.orient`'s outcome is computed, never typed: it is the value `python tools/policy/policy.py get
+`entry.orient`'s placing outcome is computed, never typed: it is the value `python tools/policy/policy.py get
 placement` returns at the item boundary (I24), the catalogue default `agent-places` until
 dGroundRules' reader lands. One outcome per value is how a policy that chooses an item's successor is
 declared (flow-steps.md:34).
@@ -173,9 +185,12 @@ outcomes". A failed `placement.check` is the item's refusal, which routes by def
 | `ask` | `stand-in:tools/memory-tree/gen_build_index.py`, the ask surface | flow-steps.md:124 |
 | `none` | `stand-in:skills/session-kickoff/manifest-check.sh`, the answer on the card's `## open` | flow-steps.md:124 |
 
-The role rows also carry the `probe` outcome every role item takes, routed to `item.probe.trigger`
-(flow-steps.md:35, :124), in the form unit 7's landed spec gives a role row; this unit adds nothing
-beyond what that rule asks.
+`item.entry.orient` carries `probe`, routed to `item.probe.trigger` (flow-steps.md:35, :124), as unit
+7 S8 gives every role row whose `outcomes` is a list. `item.entry.place` carries none: its set is the
+reference `dispositions`, which TOOL-dDeclaredLoop-12 S3 admits only whole, so it cannot also hold
+`probe`, and unit 7 S8 adds `probe` to listed sets alone. Its probe route lives in its body: unit 4
+S6's `placement.py place` opens `probe.py trigger --at item.entry.place` for each observation the
+return claims, before the placement (§8 F7).
 
 ### The claim's outcomes
 
@@ -187,7 +202,11 @@ beyond what that rule asks.
 | `refused` | `stand-in:tools/memory-tree/gen_build_index.py`, an ask filed naming the slug | `tombstone`, `terminal`, `epoch-fence`, and `offline` under `refuse` or `follow-leases` |
 
 `awaiting` declares `deadline` and `on-deadline` as TOOL-dDeclaredLoop-33 S5's `wait` rule asks, and
-`slug-taken` carries `draws` so the `counted` rule (S4 there) reads the self-route as counted.
+`slug-taken` carries `draws` so the `counted` rule (S4 there) reads that self-route as counted.
+`awaiting`'s self-route carries no `draws`, and cannot: it is contention, which never draws on the
+budget (`cl-dClosedLoop-0115`; `cl-dClosedLoop-0501`'s live holder "waited for as contention within
+`flow.wait-ceiling`"). TOOL-dDeclaredLoop-33 S4 sets aside only counted edges and owner edges, so its
+`counted` rule reads this self-route as an uncounted cycle. §8 F9 holds the ask, open for the owner.
 
 ### The kickoff text (S5, S6)
 
@@ -243,14 +262,14 @@ Live on landing: the parents' legs read the rows at the next bar.
 ## 5. Production-readiness checklist
 
 - security — the rows only declare; every write is a sibling's verb behind its own boundary, and the
-  owner row's record goes through the record factory's door.
+  owner row's record is written by the record factory.
 - perf / scale — five rows composed with about seventy others; Step 1 drops from five git reads to
   one on a carded session.
 - error / empty / loading states — an absent intake is recorded absent; a card whose key moved is
   re-derived, never trusted.
 - observability — each route names its target, and a stand-in route names its tool by path.
 - risks — the rows rest on six unbuilt parent units; the build pass re-grounds each field against
-  their landed code (§8 F2, F3).
+  their landed code (§8 F2, F3); two rest on asks open for the owner (§8 F8, F9).
 - testing — staged breaks of the rows under the parents' checks (§6).
 - migration — S4's prune only.
 - user docs — `help/loop.md` (S7); the kickoff text is the skill itself.
@@ -266,8 +285,9 @@ Live on landing: the parents' legs read the rows at the next bar.
   Red when: an entry row's route goes unresolved and the program check passes.
 - **AC3** — When `python loop_items.py check` runs on the built tree, the kind gate exits 0 over the
   composition holding the five rows, and `python -c` printing `read_outcome_set` for each placing tag
-  prints the nine words of `dispositions` three times.
-  Red when: a placing row types its own outcome list instead of the reference.
+  prints the nine words of `dispositions` three times, and for `item.entry.orient` the three values of
+  `placement` and `probe`.
+  Red when: a placing row types its own outcome list instead of the reference, or `probe` beside it.
 - **AC4** — When `python loop_lib.py --check` prints the declaration check, `role:gov-orienter` on
   `item.entry.orient` and `item.entry.place` reads resolved, never `pending`, and the owner and
   command rows read their declared `inputs`, `allowance` and `returns`.
@@ -277,9 +297,12 @@ Live on landing: the parents' legs read the rows at the next bar.
   with no `stand-in dPlacedRequest` beside it, and `python loop_table.py check` exits 0.
   Red when: the stand-in row for `item.entry.claim` survives, or the declared row is not routed
   `transition` on `claimed`.
-- **AC6** — When `python termination.py check` runs on the built tree, it prints no finding naming an
-  `item.entry.*` item; with `deadline` cut from `item.entry.claim` in a scratch copy, it prints a `wait`
-  finding naming it, and with `draws` cut from the `slug-taken` route, a `counted` finding.
+- **AC6** — When `python termination.py check` runs on the built tree with §8 F9's ask landed, it
+  prints no finding naming an `item.entry.*` item. In a scratch copy, with `deadline` cut from
+  `item.entry.claim` it prints a `wait` finding naming it and a `counted` finding naming the `awaiting`
+  self-route, no longer set aside; with `draws` cut from the `slug-taken` route, a `counted` finding.
+  Until the ask lands, the built tree prints one `counted` finding, the `awaiting` self-route, and no
+  other naming an `item.entry.*` item.
   Red when: an entry wait or self-route escapes the termination check.
 - **AC7** — When `grep -n "now —" SKILL.md` runs in `skills/session-kickoff/`, it finds Step 1's
   sentence taking HEAD, branch and dirty count from the replay line, and `grep -c "never its branch or
@@ -337,6 +360,30 @@ transition tables and termination legs that TOOL-dDeclaredLoop-1, -24, -13 and -
   skill, leaving the gap open against the build's goal. RESOLVED (agent, 2026-10-25, delegated): (a),
   rung 3, grants: PLAY-dClosedLoop-3 kickoff Step 1 takes the card's cells while its key holds, and the
   `no-ready-card` stand-in.
+- **F7 — Where does `item.entry.place` carry its `probe` outcome, when its set is the reference
+  `dispositions`?** Options: (a) the nine words and `probe` typed as its list, AC3 checking the ten;
+  (b) no `probe` on the row, its probe route in its body, unit 4 S6's `place` opening
+  `item.probe.trigger` for each claimed observation. (a) types TOOL-dDeclaredLoop-16's set a second
+  time, so a member added there misses this row. RESOLVED (agent, 2026-10-26, delegated): (b), rung 1,
+  TOOL-dDeclaredLoop-12 S3 at `783f1ad3a` admitting a list or the reference, never both, and
+  TOOL-dPlacedRequest-7 S8 adding `probe` to listed sets alone.
+- **F8 — Who writes `item.entry.intake`'s `[[fixed-row]]`, when TOOL-dDeclaredLoop-24 waits for
+  dPlacedRequest to declare an item dWellOiledMachine declares?** Options: (a) the ask on
+  TOOL-dDeclaredLoop-24 §4 "The schema" and §8 F4, the trigger re-worded to "when dWellOiledMachine
+  declares it", so the pass that declares the floor item writes its fixed row; (b) this build declares
+  the row now, an item whose witness no hook writes until dWellOiledMachine lands; (c) this unit
+  appends the fixed row to `tools/loop/item-schema.toml` ahead of the item, a parent's file and a fixed
+  row naming no declared item. (b) and (c) each make this build carry another build's item.
+  Recommendation: (a). The ask the build run would file is that re-wording, on TOOL-dDeclaredLoop-24.
+  OPEN for the owner.
+- **F9 — How does `item.entry.claim`'s `awaiting` self-route pass the `counted` rule?** Options: (a) a
+  `draws` cause on the route; (b) the ask on TOOL-dDeclaredLoop-33 S4 and §4 "Counted and owner edges":
+  a route carrying `deadline` and `on-deadline` set aside beside counted and owner edges, bounded by
+  the `wait` rule (S5) as an owner edge is; (c) `awaiting` routed straight to unit 4's owner item, with
+  no self-route. (a) spends the rework budget on contention, which `cl-dClosedLoop-0115` forbids, and
+  no I19 cause names a wait; (c) makes a live holder an owner item at once, against
+  `cl-dClosedLoop-0501`'s wait within `flow.wait-ceiling`. Recommendation: (b). The ask the build run
+  would file is that set-aside, on TOOL-dDeclaredLoop-33. OPEN for the owner.
 
 ## 9. Revision log
 
@@ -346,12 +393,18 @@ transition tables and termination legs that TOOL-dDeclaredLoop-1, -24, -13 and -
   each the mirror of that promoted unit's own edge.
 - rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-43.
+- rev-4 · 2026-10-26 · §2 S1 · §3 · §4 The rows, The placing route table, The claim's outcomes · §5 ·
+  §6 AC3, AC6 · §8 F7, F8, F9 · §10 · re-grounded on dDeclaredLoop at `783f1ad3a` and dOrderedCharter
+  at `462d20f35` by the cross-check record
+  `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, rows 13, 15, 20 and 22:
+  `probe` sits on `item.entry.orient` only; the owner row names the factory's flags, not a door;
+  `entry.intake`'s fixed row and the `awaiting` self-route are asks open for the owner.
 
 ## 10. Reuse audit
 
 The seams are the parents' specced mechanisms, each cited above: TOOL-dDeclaredLoop-12's `[[item]]`
 rows and `check_program`, -9's actor grammar and role defaults, -16's `dispositions` reference and
-disposition record door, -13's build rows B1 to B3 and `[[stand-in]]` list, -24's kind gate and -33's
+disposition record kind, -13's build rows B1 to B3 and `[[stand-in]]` list, -24's kind gate and -33's
 `wait` and `counted` rules; and in the tree, `check_card_route`'s R6 predicate on `READY — none yet`
 (`skills/session-kickoff/manifest-check.sh:1054`, verified at base) and the card's `tree —` cell
 (`render_tree_cell`, :742-746) and `now —` line (`print_replay`, :721-725). `python

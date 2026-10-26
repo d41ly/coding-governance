@@ -97,7 +97,7 @@ ids TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64
 |---|---|---|---|---|---|
 | [TOOL-dPlacedRequest-11 — one compare-and-swap writer for every governance ref, each commit parented on the tip it read, and no lock the lander holds](spec/2026-10-25-spec-TOOL-dPlacedRequest-11.md) | 1 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dPlacedRequest-13 — the change feed: every governance ref write appended once on its node, replayable and rebuilt equal from git](spec/2026-10-25-spec-TOOL-dPlacedRequest-13.md) | 2 | 2 | DEFERRED | rev-4 | 2026-10-25 |
-| [TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys](spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md) | 3 | 2 | DEFERRED | rev-4 | 2026-10-25 |
+| [TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys](spec/2026-10-25-spec-TOOL-dPlacedRequest-1.md) | 3 | 2 | DEFERRED | rev-5 | 2026-10-26 |
 | [TOOL-dPlacedRequest-27 — the change feed skips only an immediate retry: the append-once test reads the ref's newest event](spec/2026-10-25-spec-TOOL-dPlacedRequest-27.md) | 3 | 2 | DEFERRED | rev-1 | 2026-10-25 |
 | [TOOL-dPlacedRequest-17 — every lease deadline judged by the observer clock: expiry, an offer's deadline and a tombstone's prune age](spec/2026-10-25-spec-TOOL-dPlacedRequest-17.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dPlacedRequest-23 — a strict claim read stays strict: `leases.offline` never reaches the preflight, a take-over or the close](spec/2026-10-25-spec-TOOL-dPlacedRequest-23.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-25 |
@@ -121,20 +121,20 @@ ids TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64
 | [TOOL-dPlacedRequest-30 — a request whose words key alike but differ is refused, never merged](spec/2026-10-25-spec-TOOL-dPlacedRequest-30.md) | 11 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dPlacedRequest-31 — consent is bound to the bytes a session typed](spec/2026-10-25-spec-TOOL-dPlacedRequest-31.md) | 11 | 2 | DEFERRED | rev-3 | 2026-10-25 |
 | [TOOL-dPlacedRequest-32 — an absent session is no identity: no consent, and no lease held on session alone](spec/2026-10-25-spec-TOOL-dPlacedRequest-32.md) | 11 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dPlacedRequest-9 — the kickoff manifest's facts as level-2 instruction units the card reads](spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md) | 11 | 2 | DEFERRED | rev-2 | 2026-10-25 |
-| [TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build](spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md) | 12 | 2 | DEFERRED | rev-4 | 2026-10-25 |
+| [TOOL-dPlacedRequest-9 — the kickoff manifest's facts as level-2 instruction units the card reads](spec/2026-10-25-spec-TOOL-dPlacedRequest-9.md) | 11 | 2 | DEFERRED | rev-3 | 2026-10-26 |
+| [TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build](spec/2026-10-25-spec-TOOL-dPlacedRequest-2.md) | 12 | 2 | DEFERRED | rev-5 | 2026-10-26 |
 | [TOOL-dPlacedRequest-40 — the id-less refusal gates the holder acts by name and lets every other lease act run](spec/2026-10-25-spec-TOOL-dPlacedRequest-40.md) | 12 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dPlacedRequest-33 — the card's remote ref is written by the driver, dark behind `RUN_CLAIMS`](spec/2026-10-25-spec-TOOL-dPlacedRequest-33.md) | 13 | 2 | DEFERRED | rev-5 | 2026-10-25 |
 | [TOOL-dPlacedRequest-8 — each item's declared code seed: its write set, its scope paths or its question's paths](spec/2026-10-25-spec-TOOL-dPlacedRequest-8.md) | 13 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dPlacedRequest-6 — the items' declarations of the `map` slot and their unfolds](spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-25 |
-| [TOOL-dPlacedRequest-7 — the probe program: eight items, the `probe` and `probe-trigger` records, and the four `probe.*` keys](spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md) | 15 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dPlacedRequest-4 — the placement predicate and its check: a disposition for every request, recorded with its reason](spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-25 |
+| [TOOL-dPlacedRequest-6 — the items' declarations of the `map` slot and their unfolds](spec/2026-10-25-spec-TOOL-dPlacedRequest-6.md) | 14 | 2 | DEFERRED | rev-3 | 2026-10-26 |
+| [TOOL-dPlacedRequest-7 — the probe program: eight items, the `probe` and `probe-trigger` records, and the four `probe.*` keys](spec/2026-10-25-spec-TOOL-dPlacedRequest-7.md) | 15 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dPlacedRequest-4 — the placement predicate and its check: a disposition for every request, recorded with its reason](spec/2026-10-25-spec-TOOL-dPlacedRequest-4.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dPlacedRequest-10 — a build's scenarios chosen at `entry.place`, every admission predicate re-evaluated by `placement.check`](spec/2026-10-25-spec-TOOL-dPlacedRequest-10.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dPlacedRequest-14 — the pre-claim budget: placement loops before `entry.claim` drawing on a budget keyed to the request's content key](spec/2026-10-25-spec-TOOL-dPlacedRequest-14.md) | 18 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`](spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md) | 19 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dPlacedRequest-21 — `entry.claim`: the claim ref, a patch or repeat build's derived plan record, `patch.ratify`, and every refusal routed by its cause](spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md) | 20 | 2 | DEFERRED | rev-4 | 2026-10-25 |
-| [TOOL-dPlacedRequest-3 — the entry step's five items: the card's orientation, the three placing items and the claim](spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md) | 21 | 2 | DEFERRED | rev-3 | 2026-10-25 |
-| [TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks](spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md) | 22 | 2 | DEFERRED | rev-9 | 2026-10-25 |
+| [TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`](spec/2026-10-25-spec-TOOL-dPlacedRequest-5.md) | 19 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dPlacedRequest-21 — `entry.claim`: the claim ref, a patch or repeat build's derived plan record, `patch.ratify`, and every refusal routed by its cause](spec/2026-10-25-spec-TOOL-dPlacedRequest-21.md) | 20 | 2 | DEFERRED | rev-5 | 2026-10-26 |
+| [TOOL-dPlacedRequest-3 — the entry step's five items: the card's orientation, the three placing items and the claim](spec/2026-10-25-spec-TOOL-dPlacedRequest-3.md) | 21 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks](spec/2026-10-25-spec-TOOL-dPlacedRequest-34.md) | 22 | 2 | DEFERRED | rev-10 | 2026-10-26 |
 | [TOOL-dPlacedRequest-35 — the bounded age walk ends a tail at its tenure before it reads an age](spec/2026-10-25-spec-TOOL-dPlacedRequest-35.md) | 23 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 | [TOOL-dPlacedRequest-43 — the round-1 promotions' minors: behavioural class checks, honest outcomes, every reader of a changed spelling, and the sizes kept](spec/2026-10-25-spec-TOOL-dPlacedRequest-43.md) | 24 | 2 | DEFERRED | rev-7 | 2026-10-25 |
 | [TOOL-dPlacedRequest-46 — the bounded age walk stops on a `renews: -` commit before any threshold test](spec/2026-10-25-spec-TOOL-dPlacedRequest-46.md) | 24 | 2 | DEFERRED | rev-3 | 2026-10-25 |
@@ -160,7 +160,7 @@ ids TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 116 bound to this build, across 4 record folder(s).
+Records: 136 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
