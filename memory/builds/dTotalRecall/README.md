@@ -193,7 +193,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 151 bound to this build, across 4 record folder(s).
+Records: 152 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
