@@ -55,3 +55,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## Carried from earlier passes
+
+- TOOL-dSafePassage-43 (c1593a52) admits a down-stop `failure` on an `applied` row by `DOWN_STOP_PREFIXES`, but could not fix two texts after its spec closed: the module docstring at `tools/govkit/upgrade_steps.py:48-49` still says `failure` belongs only on a failed row, and `help/upgrade-steps.md` still lists `failure` only under `failed`. Your pass touches both; make them say what the reader now admits.
+- TOOL-dSafePassage-43's AC3 (the `fixture rollback --plant down-fails` / `--plant witness-stays` half) is handed to your pass by its §3.
