@@ -48,13 +48,24 @@ starts it:
 - **Your repository's own config is read first, and can refuse the step.** Git has no switch that
   drops a repository's config, and a step editing your repository needs it, so before every phase
   gov reads it, `include.path` files included, and refuses the step, spawning nothing, when it
-  declares a key git runs as a program or sends as a credential: `filter.<x>.clean`, `smudge` or
-  `process`, `core.fsmonitor` set to anything but false, `diff.external`, `diff.<x>.textconv` or
-  `command`, `core.sshCommand`, `core.askPass`, `http.extraheader` or `http.<url>.extraheader`
-  (which actions/checkout persists), and any `credential.<anything>`. The refusal names each key
-  and the file declaring it. A repository with a filter it relies on, Git LFS's say, has every step
-  refused: remove the key for the run, or run the step attended. Not covered: `merge.<driver>.driver`,
-  since a step never merges, and a key git adds later as a program until gov lists it.
+  declares a key git runs as a program or sends as a credential. The refused keys are that whole
+  class as git itself documents it: every key `git help --config` lists whose name says it runs
+  something (a `program`, `command`, `cmd`, `editor`, `path`, `driver`, `helper`, `pager` and the
+  like), and gov's self-test re-reads that list on every run, so a key a later git adds fails the
+  test until gov classifies it. Among them: `filter.<x>.clean`, `smudge` or `process`,
+  `core.fsmonitor` set to anything but false, `diff.external`, `diff.<x>.textconv` or `command`,
+  `core.sshCommand`, `core.askPass`, `http.extraheader` or `http.<url>.extraheader` (which
+  actions/checkout persists), any `credential.<anything>`, `gpg.program` (run by a signed commit),
+  `core.editor`, `sequence.editor`, `core.gitProxy`, `remote.<x>.uploadpack` and `receivepack`,
+  `hook.<x>.command`, a `submodule.<x>.update` or `alias.<x>` beginning with `!`, and the trailer,
+  difftool, mergetool, browser, man, guitool and send-email commands. The refusal names each key
+  and the file declaring it. A repository with a filter it relies on, Git LFS's say, or a local
+  `core.editor` or difftool, has every step refused: remove the key for the run, or run the step
+  attended. Seven keys of that shape are not refused: `merge.<driver>.driver`, since a step never
+  merges and gov's own checkout declares two; `core.hooksPath`, since the setting gov passes
+  outranks it; `core.pager`, since git pages only to a terminal and a step's output is captured;
+  `color.pager` and `column.clean`, which run nothing; and `include.path` and
+  `includeIf.<condition>.path`, since the files they include are read and graded themselves.
 
 A step that needs your repository's own code or hooks declares `needs-target = true`. The runner
 spawns nothing for such a step and reads it `attended`: a person runs it. The `update` walk still

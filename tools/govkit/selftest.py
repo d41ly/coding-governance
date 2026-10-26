@@ -3424,7 +3424,8 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     four verdicts, the unknown-token refusal, and the callers probe green over the shipped files and
     red over a planted spawn of `row["up"]`. The phase-without-argv refusal is reached in process.
     TOOL-dSafePassage-24 AC1 to AC4 ride the same fixture: the four `local-*` plants refused, their
-    `-stub` twins red naming the executor's canary."""
+    `-stub` twins red naming the executor's canary; TOOL-dSafePassage-29 AC1, AC2 and AC4 add
+    `local-gpg`, `local-hook` and the class arm over `git help --config`."""
     us_py = HERE / "upgrade_steps.py"
 
     def fixture(py: pathlib.Path, *plant: str) -> tuple[int, str]:
@@ -3437,7 +3438,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
                      "GIT_CONFIG_COUNT 2 · core.hooksPath holds []", "sys.flags.isolated 1",
                      "fixture/clean · isolated")),
             (("hook",), 0, ("hook canary: absent",)),
-            (("hook-stub",), 1, ("hook canary: present · hook-post-index-change",)),
+            (("hook-stub",), 1, ("hook canary: present · ", "hook-post-index-change", "hook-pre-commit")),
             (("module",), 0, ("module canary: absent",)),
             (("module-stub",), 1, ("module canary: present · module-json.py, module-sitecustomize.py",)),
             (("credential",), 0, ("credential canary: absent", "token: absent", "credential.helper reads ['']")),
@@ -3472,7 +3473,15 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("local-fsmonitor-stub", (), ("fixture/clean · up · ok", "fsmonitor canary: present · fsmonitor")),
             ("local-include", ("a credential, filter.canary.clean in ", "/included.gitconfig, so nothing was spawned"),
              ("include canary: absent",)),
-            ("local-include-stub", (), ("fixture/clean · up · ok", "include canary: present · filter-clean"))):
+            ("local-include-stub", (), ("fixture/clean · up · ok", "include canary: present · filter-clean")),
+            # TOOL-dSafePassage-29 AC1 and AC2: the step commits, so a signing program and a
+            # config-declared hook are reached where the check is skipped.
+            ("local-gpg", ("a credential, gpg.program in .git/config, so nothing was spawned",),
+             ("gpg canary: absent",)),
+            ("local-gpg-stub", (), ("fixture/clean · up · ok", "gpg canary: present · gpg-program")),
+            ("local-hook", ("a credential, hook.canary.command in .git/config, so nothing was spawned",),
+             ("hook canary: absent",)),
+            ("local-hook-stub", (), ("fixture/clean · up · ok", "hook canary: present · hook-command"))):
         rc, out = fixture(us_py, plant)
         line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
         check(f"[dSP-24] fixture isolation {plant} exits 1, "
@@ -3480,6 +3489,30 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               + f"and names {', '.join(needles)}",
               rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
               and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+
+    # TOOL-dSafePassage-29 S3 and AC4, the class arm: every executor-shaped key `git help --config`
+    # lists matches a `STEP_REFUSED_KEYS` or a `STEP_UNREFUSED_KEYS` row, the counts re-derived on
+    # every run; an empty listing reds, and a table copy missing `gpg.program` names it.
+    us = govkit_module().upgrade_steps
+    names = ("program", "command", "cmd", "editor", "gitproxy", "uploadpack", "receivepack", "driver", "clean",
+             "smudge", "process", "textconv", "external", "fsmonitor", "sshcommand", "askpass", "helper",
+             "hookspath", "pager", "path", "update", "extraheader")
+    hp = subprocess.run(["git", "help", "--config"], capture_output=True, text=True, encoding="utf-8",
+                        errors="replace", timeout=120)
+    kept = [k for k in (ln.strip() for ln in hp.stdout.splitlines()) if k
+            and (k.rsplit(".", 1)[-1].lower() in names or k.lower().endswith(("command", "cmd")))]
+    matched = lambda table: [k for k in kept if any(  # noqa: E731
+        _re.fullmatch(_re.sub(r"<[^>]+>", ".+", _re.escape(r[0])), k, _re.I) for r in table)]
+    refused, unrefused = matched(us.STEP_REFUSED_KEYS), matched(us.STEP_UNREFUSED_KEYS)
+    neither = [k for k in kept if k not in refused and k not in unrefused]
+    check(f"[dSP-29 AC4] git help --config: {len(kept)} executor-shaped key(s) kept, {len(refused)} matching "
+          f"STEP_REFUSED_KEYS and {len(unrefused)} STEP_UNREFUSED_KEYS, none matching neither",
+          hp.returncode == 0 and bool(kept) and not neither,
+          f"git help --config exits {hp.returncode}; matching neither: {neither or 'none'}"
+          + ("; the listing kept no key" if not kept else ""))
+    less = [r for r in us.STEP_REFUSED_KEYS if r[0] != "gpg.program"]
+    check("[dSP-29 AC4] with the gpg.program row taken out of a copy of the table, the arm names gpg.program",
+          bool(kept) and [k for k in kept if k not in matched(less) and k not in unrefused] == ["gpg.program"])
 
     # AC6's red: the shipped pair copied, a direct spawn of `row["up"]` planted into the copy.
     planted = tmp / "callers"
@@ -3491,7 +3524,6 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     check("[dSP-7] AC6 a planted spawn of row[\"up\"] reds the callers probe, naming its line",
           rc == 1 and f"upgrade_steps.py:{len(text.splitlines())}, in planted_spawn" in out, out)
 
-    us = govkit_module().upgrade_steps
     row = us.StepRow("fixture/x", ["python", "-c", "pass"], ["python", "-c", "pass"], ["python", "-c", "pass"],
                      "atomic", [], False, "fixture", 1, None)
     try:

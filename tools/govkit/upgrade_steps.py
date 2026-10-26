@@ -62,8 +62,8 @@ from gov's checkout root, under an environment built from the `STEP_ENV_KEEP` al
 from a copy of the parent's, home and temp in a fresh scratch, git's system and global config
 unread, `core.hooksPath` an empty directory and `credential.helper` empty through
 `GIT_CONFIG_COUNT`, and a leading `python` run `-I`. The target's own config, which that leaves
-live, refuses the step before any spawn where it declares a key `TARGET_CONFIG_REFUSED` matches
-(TOOL-dSafePassage-24). A row declaring `needs-target = true` is
+live, refuses the step before any spawn where it declares a key a `STEP_REFUSED_KEYS` row matches
+(TOOL-dSafePassage-24, TOOL-dSafePassage-29). A row declaring `needs-target = true` is
 `attended` and spawns nothing. `check_needs_target` runs a row beside planted target hooks and
 modules and reads `isolated`, `breach`, `needs-target` or `attended`; `fixture isolation` observes
 all of it, a `-stub` plant swapping one half of the contract inside the fixture process only.
@@ -176,15 +176,62 @@ CLIENT_HOOKS = ("applypatch-msg", "pre-applypatch", "post-applypatch", "pre-comm
 FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "credential-stub",
                   "needs-target", "breach", "token", "callers", "local-filter", "local-filter-stub",
                   "local-process", "local-process-stub", "local-fsmonitor", "local-fsmonitor-stub",
-                  "local-include", "local-include-stub")
-# The target's own config keys git runs as a program or sends as a credential (TOOL-dSafePassage-24,
-# its §4 "Data model"), matched case-insensitively on the key git prints; `core.fsmonitor` only
-# where its value is not a git false. NOT covered: `merge.<driver>.driver`, which a step never
-# merges into and gov's own checkout declares, and a key git adds later as an executor until it is
-# listed here.
-TARGET_CONFIG_REFUSED = re.compile(r"filter\..+\.(?:clean|smudge|process)|core\.fsmonitor|diff\.external"
-                                   r"|diff\..+\.(?:textconv|command)|core\.(?:sshcommand|askpass)"
-                                   r"|http\.(?:.+\.)?extraheader|credential\..+", re.I)
+                  "local-include", "local-include-stub", "local-gpg", "local-gpg-stub",
+                  "local-hook", "local-hook-stub")
+# The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
+# git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
+# pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
+# value rule is `any`, `not a git false` or `begins with !`. selftest's class arm holds it, with
+# `STEP_UNREFUSED_KEYS`, to every executor-shaped key `git help --config` lists.
+STEP_REFUSED_KEYS = (
+    ("filter.<x>.clean", "any", "add, checkout, status"),
+    ("filter.<x>.smudge", "any", "add, checkout, status"),
+    ("filter.<x>.process", "any", "add, checkout, status"),
+    ("core.fsmonitor", "not a git false", "an index refresh"),
+    ("diff.external", "any", "diff, log -p"),
+    ("diff.<x>.textconv", "any", "diff, log -p"),
+    ("diff.<x>.command", "any", "diff, log -p"),
+    ("core.sshCommand", "any", "a fetch or a push"),
+    ("core.askPass", "any", "a fetch or a push"),
+    ("http.extraHeader", "any", "sent as a credential"),
+    ("http.<x>.extraHeader", "any", "sent as a credential"),
+    ("credential.<x>", "any", "a helper, or a credential setting"),
+    ("gpg.program", "any", "a signed commit or tag, log --show-signature, verify-commit"),
+    ("gpg.<x>.program", "any", "a signed commit or tag, log --show-signature, verify-commit"),
+    ("gpg.ssh.defaultKeyCommand", "any", "a signed commit or tag, log --show-signature, verify-commit"),
+    ("core.editor", "any", "commit, tag or rebase without a message"),
+    ("sequence.editor", "any", "commit, tag or rebase without a message"),
+    ("core.gitProxy", "any", "a git:// fetch"),
+    ("remote.<x>.uploadpack", "any", "a local or ssh fetch or push"),
+    ("remote.<x>.receivepack", "any", "a local or ssh fetch or push"),
+    ("core.alternateRefsCommand", "any", "a fetch or a push"),
+    ("submodule.<x>.update", "begins with !", "submodule update"),
+    ("hook.<x>.command", "any", "the hook event its hook.<x>.event names"),
+    ("alias.<x>", "begins with !", "git <alias>"),
+    ("alias.<x>.command", "any", "git <alias>"),
+    ("trailer.<x>.cmd", "any", "commit --trailer, interpret-trailers"),
+    ("trailer.<x>.command", "any", "commit --trailer, interpret-trailers"),
+    ("difftool.<x>.cmd", "any", "difftool, mergetool"),
+    ("difftool.<x>.path", "any", "difftool, mergetool"),
+    ("mergetool.<x>.cmd", "any", "difftool, mergetool"),
+    ("mergetool.<x>.path", "any", "difftool, mergetool"),
+    ("browser.<x>.cmd", "any", "help -w, web--browse, gui"),
+    ("browser.<x>.path", "any", "help -w, web--browse, gui"),
+    ("man.<x>.cmd", "any", "help -w, web--browse, gui"),
+    ("man.<x>.path", "any", "help -w, web--browse, gui"),
+    ("guitool.<x>.cmd", "any", "help -w, web--browse, gui"),
+    ("sendemail.ccCmd", "any", "send-email"),
+    ("sendemail.toCmd", "any", "send-email"),
+    ("sendemail.headerCmd", "any", "send-email"))
+# The executor-shaped keys the check does not refuse (TOOL-dSafePassage-29 S2), as (key pattern, why).
+STEP_UNREFUSED_KEYS = (
+    ("merge.<driver>.driver", "a step does not merge, and gov's own checkout declares two (TOOL-dSafePassage-24 §3)"),
+    ("core.hooksPath", "TOOL-dSafePassage-7's command-scope pair outranks it"),
+    ("core.pager", "git runs a pager only when stdout is a terminal, and a step's output is captured"),
+    ("color.pager", "a boolean; it runs nothing"),
+    ("column.clean", "a layout option; it runs nothing"),
+    ("include.path", "read by --includes, so the included file's own keys are graded"),
+    ("includeIf.<condition>.path", "read by --includes, so the included file's own keys are graded"))
 GIT_FALSE = ("false", "no", "off", "0", "")
 # How much later than a lock's `started` a census row of its pid may estimate its creation and still
 # be the holder (TOOL-dSafePassage-22 S3). It covers the census's rounding of `age_s` to whole
@@ -837,14 +884,19 @@ def read_target_local_config(target) -> list[tuple[str, str, str | None]] | str:
 
 
 def check_target_local_config(target) -> list[str]:
-    """Each kept row of `read_target_local_config` whose key `TARGET_CONFIG_REFUSED` matches, as
-    `<key> in <file>`, a `core.fsmonitor` holding a git false excepted (S2); a read that failed is
-    the one entry, naming git's exit."""
+    """Each kept row of `read_target_local_config` that a `STEP_REFUSED_KEYS` row matches, its key
+    by the pattern and its value by the row's rule (a bare key holds git's true), as
+    `<key> in <file>` (TOOL-dSafePassage-24 S2, TOOL-dSafePassage-29 S1); a read that failed is the
+    one entry, naming git's exit."""
     rows = read_target_local_config(target)
     if isinstance(rows, str):
         return [f"`git config --list` {rows}"]
-    return [f"{key} in {origin}" for origin, key, value in rows if TARGET_CONFIG_REFUSED.fullmatch(key)
-            and not (key.lower() == "core.fsmonitor" and value is not None and value.strip().lower() in GIT_FALSE)]
+    return [f"{key} in {origin}" for origin, key, value in rows
+            if any(re.fullmatch(re.sub(r"<[^>]+>", ".+", re.escape(pattern)), key, re.I)
+                   and (rule == "any"
+                        or (rule == "not a git false" and (value is None or value.strip().lower() not in GIT_FALSE))
+                        or (rule == "begins with !" and value is not None and value.startswith("!")))
+                   for pattern, rule, _runs in STEP_REFUSED_KEYS)]
 
 
 def run_step_isolated(row: StepRow, phase: str, target, gov_root) -> dict:
@@ -1523,6 +1575,8 @@ FIXTURE_STEPS = {
         "target, prefix, reports = sys.argv[1:4]\n"
         "open(os.path.join(target, 'stepped.txt'), 'w').close()\n"
         "add = subprocess.run(['git', '-C', target, 'add', 'stepped.txt'], capture_output=True)\n"
+        "commit = subprocess.run(['git', '-C', target, '-c', 'user.name=gk-step', '-c', 'user.email=gk-step@invalid',\n"
+        "                         'commit', '-q', '-m', 'step'], capture_output=True, timeout=60)\n"
         "cred = subprocess.run(['git', 'credential', 'fill'], capture_output=True, timeout=60,\n"
         "                      input=b'protocol=https\\nhost=gk-step.invalid\\n\\n')\n"
         "helpers = subprocess.run(['git', '-C', target, 'config', '--get-all', 'credential.helper'],\n"
@@ -1533,7 +1587,7 @@ FIXTURE_STEPS = {
         "               'key0': os.environ.get('GIT_CONFIG_KEY_0'),\n"
         "               'hooks': sorted(os.listdir(hooks)) if os.path.isdir(hooks) else None,\n"
         "               'isolated': sys.flags.isolated, 'cwd': os.getcwd(), 'prefix': prefix,\n"
-        "               'add': add.returncode, 'cred': cred.returncode,\n"
+        "               'add': add.returncode, 'commit': commit.returncode, 'cred': cred.returncode,\n"
         "               'helpers': helpers.stdout.splitlines()}, f)\n"),
     "reaches.py": "import sys\nopen(sys.argv[1], 'w').close()\nimport adopter_only\n",
     "opens.py": "import sys\nsys.path.insert(0, sys.argv[1])\nimport adopter_only\n",
@@ -1712,29 +1766,38 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         expect(not report.exists(), "the row holding {unknown} spawned")
         rc = 1
     elif plant.startswith("local-"):
-        # TOOL-dSafePassage-24 S4: an executor in the target's own config, each canary naming itself.
+        # TOOL-dSafePassage-24 S4 and TOOL-dSafePassage-29 S4: an executor in the target's own config,
+        # each canary naming itself; clean.py commits what it stages, so a signing program and a
+        # config-declared pre-commit hook are reached.
         kind = plant.removeprefix("local-").removesuffix("-stub")
         canaries.mkdir()
 
         def runs(name: str, then: str = "") -> str:
             return f"\": > '{(canaries / name).as_posix()}'{then}\""
 
-        cfg, included = target / ".git" / "config", tmp / "included.gitconfig"
+        cfg, included, gpg = target / ".git" / "config", tmp / "included.gitconfig", tmp / "gpg-canary.sh"
+        if kind == "gpg":
+            gpg.write_text(f"#!/bin/sh\n: > '{(canaries / 'gpg-program').as_posix()}'\nexit 1\n",
+                           encoding="utf-8", newline="\n")
+            gpg.chmod(0o755)
         planted = {"filter": f"[filter \"canary\"]\n\tclean = {runs('filter-clean', '; cat')}\n",
                    "process": f"[filter \"canary\"]\n\tprocess = {runs('filter-process')}\n",
-                   "fsmonitor": f"[core]\n\tfsmonitor = {runs('fsmonitor')}\n"}
+                   "fsmonitor": f"[core]\n\tfsmonitor = {runs('fsmonitor')}\n",
+                   "gpg": f"[commit]\n\tgpgsign = true\n[gpg]\n\tprogram = {gpg.as_posix()}\n",
+                   "hook": f"[hook \"canary\"]\n\tcommand = {runs('hook-command')}\n\tevent = pre-commit\n"}
         if kind == "include":
             included.write_text(planted["filter"], encoding="utf-8", newline="\n")
             cfg.write_text(f"[include]\n\tpath = {included.as_posix()}\n", encoding="utf-8", newline="\n")
         else:
             with cfg.open("a", encoding="utf-8", newline="\n") as f:
                 f.write(planted[kind])
-        if kind != "fsmonitor":
+        if kind in ("filter", "process", "include"):
             (target / ".gitattributes").write_text("*.txt filter=canary\n", encoding="utf-8", newline="\n")
         if plant.endswith("-stub"):
             g["check_target_local_config"] = lambda t: []
         key = {"filter": "filter.canary.clean", "process": "filter.canary.process",
-               "fsmonitor": "core.fsmonitor", "include": "filter.canary.clean"}[kind]
+               "fsmonitor": "core.fsmonitor", "include": "filter.canary.clean", "gpg": "gpg.program",
+               "hook": "hook.canary.command"}[kind]
         where = included.as_posix() if kind == "include" else ".git/config"
         try:
             run_clean()
