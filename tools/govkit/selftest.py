@@ -3260,21 +3260,28 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     check("[dSP-1 AC10] ...and its witness exits 0 after, where it exited 1 before",
           w0.returncode == 1 and w1.returncode == 0, w0.stdout + w1.stdout)
 
+    image = pathlib.Path(".governance", "steps", "agent-cap", "fanout-cap-to-agents-in-flight.before.json").as_posix()
     t = build_capped("fs-ac11", b"\xef\xbb\xbfFANOUT_CAP=\"3\"\r\n")
     pre = read_tree(t)
-    up, down = run_step("up", t), run_step("down", t)
+    up = run_step("up", t)
+    mid = read_tree(t)
+    check("[dSP-1 AC11] LIVENESS the up over a BOM-led CRLF conf really moved it: the file gone, the key 3, an image",
+          up.returncode == 0 and ".agent-cap.conf" not in mid and image in mid
+          and b"agents-in-flight = 3\n" in mid.get(".governance/policy.toml", b""), up.stdout + up.stderr)
+    down = run_step("down", t)
     check("[dSP-1 AC11] a down after the up leaves a BOM-led CRLF conf and the policy file byte-identical",
-          up.returncode == 0 and down.returncode == 0 and read_tree(t) == pre
-          and not (t / ".governance" / "steps" / "agent-cap").exists(), up.stderr + down.stdout + down.stderr)
+          down.returncode == 0 and read_tree(t) == pre
+          and not (t / ".governance" / "steps" / "agent-cap").exists(), down.stdout + down.stderr)
 
     t = build_capped("fs-ac11k", b"FANOUT_CAP=2\n")
     pre = read_tree(t)
     run_step("up", t)
     for rel, data in pre.items():
         (t / rel).write_bytes(data)  # back to the before state with the image kept: an up killed after it
+    killed = read_tree(t)
     down = run_step("down", t)
     check("[dSP-1 AC11] a down after an up killed once its before-image was written exits 0 and leaves the before state",
-          down.returncode == 0 and read_tree(t) == pre, down.stdout + down.stderr)
+          image in killed and down.returncode == 0 and read_tree(t) == pre, down.stdout + down.stderr)
 
     t = build_capped("fs-ac11e", b"FANOUT_CAP=2\n")
     run_step("up", t)
