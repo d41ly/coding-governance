@@ -34,3 +34,6 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-32](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | AN ASK FILED IN ANOTHER BUILD'S FAMILY CAN TAKE AN ID THAT BUILD HAS… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dOrderedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [PLAY-dOrderedCharter-56](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SLOTS NAME dBoundRoles AS THEIR RENDERER. PLAY-dOrderedCharter-17's… |
+| [PLAY-dOrderedCharter-57](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE LOAD SET TAKES NO FEATURE SELECTION. TOOL-dFurnishedOrders-18… |
+| [PLAY-dOrderedCharter-58](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE FEATURE SELECTOR NAMES THE WRONG ARMING BUILD.… |
