@@ -139,7 +139,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field](spec/2026-10-23-spec-TOOL-dSafePassage-7.md) | 2 | 2 | CLOSED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step](spec/2026-10-23-spec-TOOL-dSafePassage-11.md) | 3 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dSafePassage-12 — gov's remote CI at the interpreter floor, read from its one declaration, with the floor's preflight as the bar's first step](spec/2026-10-23-spec-TOOL-dSafePassage-12.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-15 — the walk persists no step row below schema 4, so a schema-3 receipt reaches the schema step](spec/2026-10-23-spec-TOOL-dSafePassage-15.md) | 3 | 2 | DEFERRED | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-15 — the walk persists no step row below schema 4, so a schema-3 receipt reaches the schema step](spec/2026-10-23-spec-TOOL-dSafePassage-15.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-18 — the reverse walk writes no row once a down leaves the receipt below schema 4](spec/2026-10-23-spec-TOOL-dSafePassage-18.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-19 — a rollback past the schema step stamps schema 3 with no `steps`, finishes its record, and converges after a kill](spec/2026-10-23-spec-TOOL-dSafePassage-19.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-22 — the lock reclaim reads its clock before the census, so a slow census errs toward live](spec/2026-10-23-spec-TOOL-dSafePassage-22.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
@@ -161,7 +161,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-33 — a missing before-image means "never ran" only for a row the forward walk applied by witness alone, recorded as such](spec/2026-10-23-spec-TOOL-dSafePassage-33.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dSafePassage-36 — the config check walks the target worktree's own git directory for submodules, so a linked worktree's submodules are graded](spec/2026-10-23-spec-TOOL-dSafePassage-36.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dSafePassage-37 — the refused-key predicate keeps every key named as a hook, and the step environment closes the `ext::` transport by one command-scope pair](spec/2026-10-23-spec-TOOL-dSafePassage-37.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | DEFERRED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | DEFERRED | rev-7 | 2026-10-26 |
 | [TOOL-dSafePassage-39 — the step row's `via` mark survives every rewrite that keeps the row `applied`, so the reverse walk's own records cannot erase it](spec/2026-10-23-spec-TOOL-dSafePassage-39.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-40 — the forward walk marks a row `via: witness` only when nothing records that its up ever ran](spec/2026-10-23-spec-TOOL-dSafePassage-40.md) | 6 | 2 | DEFERRED | rev-1 | 2026-10-23 |
@@ -190,17 +190,17 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 231 bound to this build, across 4 record folder(s).
+Records: 233 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61.
 
-Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1 TOOL-dSafePassage-19@rev-1
-TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1 TOOL-dSafePassage-29@rev-1
-TOOL-dSafePassage-3@rev-1 TOOL-dSafePassage-30@rev-1 TOOL-dSafePassage-31@rev-1 TOOL-dSafePassage-32@rev-1 TOOL-dSafePassage-33@rev-1 TOOL-dSafePassage-34@rev-1 TOOL-dSafePassage-35@rev-1 TOOL-dSafePassage-36@rev-1 TOOL-dSafePassage-37@rev-1 TOOL-dSafePassage-38@rev-1 TOOL-dSafePassage-39@rev-1
-TOOL-dSafePassage-4@rev-1 TOOL-dSafePassage-41@rev-1 TOOL-dSafePassage-42@rev-1 TOOL-dSafePassage-43@rev-1 TOOL-dSafePassage-44@rev-1 TOOL-dSafePassage-45@rev-1 TOOL-dSafePassage-46@rev-1 TOOL-dSafePassage-47@rev-1 TOOL-dSafePassage-48@rev-1 TOOL-dSafePassage-49@rev-2 TOOL-dSafePassage-5@rev-1
-TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-51@rev-1 TOOL-dSafePassage-52@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1.
+Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-15@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1
+TOOL-dSafePassage-19@rev-1 TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1
+TOOL-dSafePassage-29@rev-1 TOOL-dSafePassage-3@rev-1 TOOL-dSafePassage-30@rev-1 TOOL-dSafePassage-31@rev-1 TOOL-dSafePassage-32@rev-1 TOOL-dSafePassage-33@rev-1 TOOL-dSafePassage-34@rev-1 TOOL-dSafePassage-35@rev-1 TOOL-dSafePassage-36@rev-1 TOOL-dSafePassage-37@rev-1 TOOL-dSafePassage-38@rev-1
+TOOL-dSafePassage-39@rev-1 TOOL-dSafePassage-4@rev-1 TOOL-dSafePassage-41@rev-1 TOOL-dSafePassage-42@rev-1 TOOL-dSafePassage-43@rev-1 TOOL-dSafePassage-44@rev-1 TOOL-dSafePassage-45@rev-1 TOOL-dSafePassage-46@rev-1 TOOL-dSafePassage-47@rev-1 TOOL-dSafePassage-48@rev-1 TOOL-dSafePassage-49@rev-2
+TOOL-dSafePassage-5@rev-1 TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-51@rev-1 TOOL-dSafePassage-52@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->

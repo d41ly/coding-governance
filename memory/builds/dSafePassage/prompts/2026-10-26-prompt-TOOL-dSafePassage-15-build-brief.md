@@ -56,3 +56,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## From the first dispatch
+
+- The first builder handed AC4 back (byte-identical receipts cannot survive `carry`); rev-2 excludes `carry` and requires it to be the only difference. Its work in progress, a diff of `tools/govkit/upgrade_steps.py` against 414b0cb91 holding S1, S2 and the S5 plants, is at `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dsafepassage-567339/c5f50d22-89c6-41d7-84e5-2382dcd49faa/scratchpad/TOOL-dSafePassage-15-wip.patch`: read it and apply what still fits rather than redoing it. The selftest arm, ledger and `symbols.json` were not written.

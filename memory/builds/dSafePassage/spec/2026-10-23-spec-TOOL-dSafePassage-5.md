@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 whole
 
@@ -183,8 +183,8 @@ clone's tip, `update --target <t> --to <tip> --write`, committed after, as an ad
 | `reup` | no | after `down`, the walk again; the digest equals `up`'s |
 | `plants` | no | after `up`, each `[[plant]]` carried by its observation, or ordered |
 | `skip` | yes | step k's first `witness` call answers `ok`, so the walk passes it unrun; k is load-bearing when the digest differs from `up`'s or k's real witness then exits non-zero; under k's `[[condition]]` the walk without the skip stops at k and with it gets past k |
-| `kill` | yes | step k's `up` runs on a shadow copy of the target, its first write is applied to the target, and the child exits by `os._exit(137)`; the killed state holds the lock with a dead pid and k's row `failed` with `interrupted:`; a re-run's digest equals `up`'s, and from a copy of the killed state `update --rollback --to <pin> --write` reaches release-0's digest |
-| `fail` | yes | step k's `up` answers `{"verdict": "failed", "rc": 1, "tail": "upgrade-walk: planted exit 1"}`; the walk exits 1, every step before k reads `applied`, the last `applied` row is k-1 (none for the first), k reads `failed` with `exit 1`, and no later step is recorded |
+| `kill` | yes | step k's `up` runs on a shadow copy of the target, its first write is applied to the target, and the child exits by `os._exit(137)`; the killed state holds the lock with a dead pid and k's row `failed` with `interrupted:`, except the schema step on release-0's schema-3 receipt, which holds no row for k (TOOL-dSafePassage-15 S4); a re-run's digest equals `up`'s, except that for the schema step `.governance/install.json` is compared parsed, with `carry` removed from every `files` row, as TOOL-dSafePassage-15 AC4 does; and from a copy of the killed state `update --rollback --to <pin> --write` reaches release-0's digest |
+| `fail` | yes | step k's `up` answers `{"verdict": "failed", "rc": 1, "tail": "upgrade-walk: planted exit 1"}`; the walk exits 1, every step before k reads `applied`, the last `applied` row is k-1 (none for the first), k reads `failed` with `exit 1`, and no later step is recorded; the schema step on release-0's schema-3 receipt records no row, its step line ends `(not recorded: receipt below schema 4)` and the receipt's bytes are release-0's (TOOL-dSafePassage-15 S2, AC2) |
 | `shims` | no | the clone holds no tag; `read_releases` over it returns none; `check_shim_windows` holds every row `read_shim_rows` reads; each forwarder whose `from` the receipt installs is in the walked target; zero rows prints `shims: 0 declared`, counted as measured-nothing |
 | `isolation` | yes | `check_needs_target` over a scratch copy of release-0 returns `isolated` or `attended`; `breach` or `needs-target` is a red naming the step |
 
@@ -334,6 +334,9 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
 - **AC7** — When `python "tools/govkit/upgrade_walk.py" --case kill` runs, each step's killed state
   shows a lock whose pid is dead and the step `failed` with `interrupted:`, the re-run's digest
   equals the `up` digest, the rollback from the killed state reaches release-0's, and it exits 0;
+  for `govkit/receipt-schema-4` the killed state holds no row for the step, and the re-run matches
+  `up` on every path but `.governance/install.json`, whose two receipts are equal once `carry` is
+  removed from every `files` row (TOOL-dSafePassage-15 S4 and AC4, DEPL-dCarriedReceipt-9 S2);
   with `--inject witness-first`, and separately with `--inject not-rerunnable`, it exits 1 naming
   the arm.
   Red when: the kill lands before the step's first write or after the walk returns, so no partial
@@ -341,7 +344,8 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
   cost: the longest case, tens of minutes over every step.
 - **AC8** — When `python "tools/govkit/upgrade_walk.py" --case fail` runs, for each step k the receipt
   names step k-1 as its last `applied` row and k `failed` with `exit 1`, no later step is
-  recorded, and it exits 0.
+  recorded, and it exits 0; for `govkit/receipt-schema-4` the receipt's bytes are release-0's and
+  the step line ends `(not recorded: receipt below schema 4)` (TOOL-dSafePassage-15 AC2).
   Red when: the walk records a step after the failed one, or advances past k.
 - **AC9** — When `python "tools/govkit/upgrade_walk.py" --case shims` runs, it prints that the clone
   holds no tag and that `read_releases` returned none, and exits 0, printing `shims: 0 declared`
@@ -451,6 +455,11 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   TOOL-dSafePassage-1 to TOOL-dSafePassage-61 at that unit's §8 F8 stop, so its `size-limits`
   condition row moves there and the consumes-from names the fan-out step's id alone, by
   `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`.
+- rev-5 · 2026-10-26 · §4 cases table · AC7 · AC8 · the `kill` and `fail` cases at the schema step
+  agree with TOOL-dSafePassage-15 rev-2: release-0's schema-3 receipt takes no `interrupted:` or
+  `exit 1` row for it, and the killed re-run's receipt is compared without `carry`, the only key
+  allowed to differ, by
+  `2026-10-26-prompt-TOOL-dSafePassage-15-1-spec-writer.md`.
 
 ## 10. Reuse audit
 

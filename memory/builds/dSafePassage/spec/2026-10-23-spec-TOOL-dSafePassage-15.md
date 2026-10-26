@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-15 — the walk persists no step row below schema 4, so a schema-3 receipt reaches the schema step
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-15-deviation-61.md](../build/2026-10-23-build-TOOL-dSafePassage-15-deviation-61.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-prompt-TOOL-dSafePassage-15-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-15-1-spec-writer.md) | research | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-15-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-15-2-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-15-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-15-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-21 TOOL-dSafePassage-26 |
 
@@ -61,6 +63,9 @@ receipt is at schema 4.
 - A row for a step that ran on a schema-3 receipt and failed. The receipt cannot hold one, so the
   verdict is output and a finding only; the next run's witness is its recovery.
 - The step program's up, down and witness, which stay TOOL-dSafePassage-3's.
+- `update`'s receipt writes and the semantics of a `files` row's `carry`, which stay
+  DEPL-dCarriedReceipt-9's: a killed `update` re-run below schema 4 records a different `carry`, and
+  AC4 compares around it.
 
 ### Edges
 
@@ -156,9 +161,16 @@ sequences those passes by M6's disjointness rule.
 - **AC4** — When `python3 "tools/govkit/upgrade_steps.py" fixture update --plant schema-3-update`
   runs, the scratch gov's `govkit.py update --target <t> --write` over a target whose receipt `apply`
   wrote and the fixture forced to schema 3 exits 0, and the receipt reads schema 4 with the schema
-  step `applied`; run again with the schema step killed during its up, the re-run exits 0 with the
-  same receipt bytes.
-  Red when: any pre-spawn write refuses on the schema-3 receipt.
+  step `applied` first. Over a second such target, `update --write` is killed during the schema
+  step's up and run again: the re-run exits 0, and its receipt, parsed, equals the uninterrupted
+  run's once `carry` is removed from every `files` row of both, so `carry` is the only key whose value
+  may differ. `carry` is excluded because DEPL-dCarriedReceipt-9 S2 makes it output, recomputed on
+  every run and popped when the run carried nothing (`tools/govkit/govkit.py:10164-10172`), and below
+  schema 4 the killed run persisted no receipt (S1), so the re-run's write loop meets files already
+  at B under the pre-run rows and records a different `carry`.
+  Red when: any pre-spawn write refuses on the schema-3 receipt, or the re-run's receipt differs from
+  the uninterrupted run's in any key but `carry`, a dropped step row or a different `gov_commit`
+  among them.
 
 ## 7. Gates
 
@@ -174,6 +186,11 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 1 (BLOCKER, item
   D-1, shared with id 50).
+- rev-2 · 2026-10-26 · §3 · AC4 · the builder's DIVERGENCE hand-back: below schema 4 a killed `update`
+  persists no receipt, so the re-run's `carry` differs from the uninterrupted run's. AC4 now compares
+  the two receipts without `carry`, the only key allowed to differ, by DEPL-dCarriedReceipt-9 S2, and
+  §3 puts `carry` and `update`'s receipt writes out, by
+  `2026-10-26-prompt-TOOL-dSafePassage-15-1-spec-writer.md`.
 
 ## 10. Reuse audit
 

@@ -56,3 +56,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## Carried from earlier passes
+
+- TOOL-dSafePassage-15 rev-2 (spec writer, 2026-10-26) flagged, unchecked: in your `kill` case at the schema step the killed state's receipt still records the pin while the files are at the tip, so "a rollback from the killed state reaches release-0's digest" may not hold, and no spec says what that rollback does. If it does not hold, that is a DIVERGENCE hand-back.
