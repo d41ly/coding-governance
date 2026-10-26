@@ -123,7 +123,7 @@ ids TOOL-dLinkedLibrary-26 TOOL-dLinkedLibrary-27 TOOL-dLinkedLibrary-28 TOOL-dL
 | [TOOL-dLinkedLibrary-23 — `adopt.instructions`: an adopter's own instruction files kept verbatim as a legacy block, every harness file wired at once, each paragraph ruled once](spec/2026-10-26-spec-TOOL-dLinkedLibrary-23.md) | 25 | 2 | OPEN | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 3 record folder(s).
+Records: 17 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
