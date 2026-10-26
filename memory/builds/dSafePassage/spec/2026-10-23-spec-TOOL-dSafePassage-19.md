@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-19 — a rollback past the schema step stamps schema 3 with no `steps`, finishes its record, and converges after a kill
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-19-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-19-1-spec-writer.md) | research | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-19-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-19-2-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-19-3-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-19-3-spec-writer.md) | research | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-19-4-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-19-4-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-19-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-19-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-21 TOOL-dSafePassage-26 |
 
@@ -30,19 +32,27 @@ from a killed state cannot pass. This unit is id 52's promotion, the run's half 
 `update --rollback --write` does after a reverse walk whose last down lowered the receipt.
 `TOOL-dSafePassage-18`, id 2's promotion, keeps the walk itself from writing the row.
 
+S1, S2's outcome and S3 already hold at HEAD, by TOOL-dSafePassage-4 (commit `264862061`) and
+TOOL-dSafePassage-18, so this unit builds the two `rollback-update` plants, their `schema.block-after`
+trigger, the `[dSP-19]` self-test rows that run them, and its acceptance ledger.
+
 ## 2. Scope (IN)
 
-- **S1** — The re-read drops what the disk dropped. TOOL-dSafePassage-2's post-spawn re-read of
+- **S1** — The re-read keeps no key the disk no longer holds. TOOL-dSafePassage-2's post-spawn re-read of
   `schema` and `steps` takes a key the receipt on disk no longer holds out of the in-memory receipt,
-  so a `steps` list the down removed is not written back by any later write of the run. Observed by
-  AC1.
+  so a `steps` list the down took out is not written back by any later write of the run. It holds at
+  HEAD: `run_step_reread` pops each of `schema` and `steps` the disk lacks
+  (`tools/govkit/upgrade_steps.py:985-989`). Observed by AC1.
 - **S2** — The stamp. After the write loop of a `--rollback --write` run whose reverse walk ended
-  below schema 4, the stamp sets `gov_commit` to `--to`, keeps `schema` 3 (TOOL-dSafePassage-3 S5's
-  `max(schema, 3)`) and writes no `steps` key, asking `test_steps_recordable` and adding nothing the
-  predicate rejects. Observed by AC1.
+  below schema 4, the stamp sets `gov_commit` to `--to` (`tools/govkit/govkit.py:12723`) and keeps
+  the schema the downs left, 3, since the rollback branch reads `receipt.get("schema", schema)` and
+  never raises it (TOOL-dSafePassage-4 S5, `tools/govkit/govkit.py:12688-12689`). It adds no key and
+  asks no predicate: the `steps` the schema step's down took out stays out because S1's re-read
+  took it out of the in-memory receipt the stamp writes (`tools/govkit/govkit.py:12726`). It holds
+  at HEAD. Observed by AC1.
 - **S3** — The record. `write_rollback_record` (TOOL-dSafePassage-4 S6) names each down from the
   verdict list `TOOL-dSafePassage-18` returns, the schema step `rolled-back` among them, and finishes
-  with `gov_commit: moved to <to8>`. Observed by AC1.
+  with `gov_commit: moved to <to8>`. It holds at HEAD. Observed by AC1.
 - **S4** — A kill after the schema step's down has written schema 3 and before the write loop moves a
   file row. The receipt then reads schema 3, no `steps`, `gov_commit` unmoved, and the record reads
   `not finished` with no `down` line, since `write_rollback_record` rewrites it only when the run
@@ -67,9 +77,9 @@ from a killed state cannot pass. This unit is id 52's promotion, the run's half 
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-2` — the post-spawn re-read of the receipt, which S1 changes for a key the disk no longer holds; without it the run would write the dropped list back
+- **consumes-from** `TOOL-dSafePassage-2` — the post-spawn re-read of the receipt, which drops a key the disk no longer holds (S1); without it the run would write the dropped list back
 - **consumes-from** `TOOL-dSafePassage-4` — `update --rollback`, `check_rollback_vintage`, the stamp under `--rollback`, `write_rollback_record` and the `rollback-update` fixture family; without them there is no run to finish
-- **consumes-from** `TOOL-dSafePassage-16` — the predicate the stamp asks before it writes; without it the stamp would copy the writer's schema test
+- **consumes-from** `TOOL-dSafePassage-16` — the predicate the reverse walk asks after each down, whose false answer at schema 3 leaves no row for the stamp to carry; this unit adds no call of it, and without it the walk would refuse at the writer
 - **consumes-from** `TOOL-dSafePassage-18` — the verdict list the record is written from; without it the record cannot name a row the receipt no longer holds
 - **hands-off** `TOOL-dSafePassage-5` — the rollback of the release-0 tree to release-0's digest, from a whole walk and from a killed one
 - **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which adds the shipped-shape plant of the kill-before-stamp re-run and reads its second downs
@@ -94,8 +104,15 @@ gov_commit: moved to <to8>
 
 ### Inventory
 
-Minted: the `rollback-update` plants `schema-step` and `schema-step-kill-before-stamp`. No function,
-conf key, gate leg or policy key.
+Minted, all fixture or self-test names: the `rollback-update` plants `schema-step` and
+`schema-step-kill-before-stamp`, added to `ROLLBACK_UPDATE_PLANTS`
+(`tools/govkit/upgrade_steps.py:1715`); the `schema.block-after` trigger, a branch of the
+`os.replace` entry of `FIXTURE_SCHEMA_STEP_PLANTS` (`tools/govkit/upgrade_steps.py:1746-1759`) that
+blocks the schema step's down after its rename, as `fx.py`'s `<slug>.block-after` blocks after its
+first file; and the `[dSP-19]` tag on this unit's rows of `check_step_rollback`
+(`tools/govkit/selftest.py:3558`). That function tags every plant starting `schema-step` `dSP-18`
+(`tools/govkit/selftest.py:3611`), so the two rows are tagged `dSP-19` explicitly. No product
+function, conf key, gate leg or policy key.
 
 ### Migration
 
@@ -103,15 +120,18 @@ None.
 
 ### Rollout
 
-Live at landing, reached only through `--rollback`. It builds at order 3, after TOOL-dSafePassage-2,
+No product behaviour changes: S1 to S3 are live at HEAD, reached only through `--rollback`, and this
+unit lands the plants and rows that observe them. It builds at order 3, after TOOL-dSafePassage-2,
 TOOL-dSafePassage-4 and `TOOL-dSafePassage-16` (order 2), and within order 3 after
-`TOOL-dSafePassage-18`, whose verdict list it reads.
+`TOOL-dSafePassage-18`, whose verdict list the record is written from.
 
 ### Files touched (estimate)
 
-- `tools/govkit/upgrade_steps.py`
-- `tools/govkit/govkit.py`
-- `tools/govkit/selftest.py`
+- `tools/govkit/upgrade_steps.py` — the two plants in `run_rollback_update_fixture`, which builds
+  its gov with `schema3=True` for them, and the `schema.block-after` trigger
+- `tools/govkit/selftest.py` — the `[dSP-19]` rows
+- `memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-19-ledger.md` — the
+  acceptance ledger
 
 ### Alternatives rejected
 
@@ -120,10 +140,14 @@ TOOL-dSafePassage-4 and `TOOL-dSafePassage-16` (order 2), and within order 3 aft
   release-0, which TOOL-dSafePassage-5 asserts.
 - **A receipt field recording the rollback.** TOOL-dSafePassage-4 §8 F1 refused it: the schema step's
   down removes any such field.
+- **The stamp asks `test_steps_recordable` (rev-3's S2).** Each answer at the stamp breaks one
+  section. Dropping `steps` where the predicate rejects would remove the stale list a broken re-read
+  kept, so §7's staged break could never turn the arm red (charter [gate]). Refusing there is a
+  refusal no section names. And the outcome is already HEAD's without the call.
 
 ## 5. Production-readiness checklist
 
-- security: no new write path; the stamp writes the keys it writes today, `steps` excepted.
+- security: no new write path and no product change; the stamp is HEAD's.
 - perf / scale: unchanged.
 - error / empty / loading states: a killed run leaves a `not finished` record and a schema-3 receipt
   the re-run converges from.
@@ -187,14 +211,24 @@ none
   `skipped (nothing applied)` lines and says why. The kill is placed before the write loop moves a
   file row, which is the builder's reading, so `carry` is compared too. By
   `2026-10-26-prompt-TOOL-dSafePassage-19-1-spec-writer.md`.
+- rev-4 · 2026-10-26 · S1 · S2 · S3 · §1 · §3 · §4 · §5 · §10 · S2 asks no predicate. The stamp adds
+  no key, and S1's re-read keeps the dropped `steps` out, so §7's staged break can still turn the arm
+  red. §1 states that S1, S2's outcome and S3 hold at HEAD. §4's Inventory and Files touched shrink to
+  the two plants, their `schema.block-after` trigger, the `[dSP-19]` rows and the ledger, and
+  `govkit.py` leaves the estimate. The stamp's schema is cited as TOOL-dSafePassage-4 S5's
+  `receipt.get("schema", schema)`, not TOOL-dSafePassage-3 S5's `max(schema, 3)`. The
+  TOOL-dSafePassage-16 edge is reworded. By `2026-10-26-prompt-TOOL-dSafePassage-19-4-spec-writer.md`.
 
 ## 10. Reuse audit
 
-The seams extended are TOOL-dSafePassage-4's rollback run (its S5, S6 and §4 "The order of one
-rollback run") and TOOL-dSafePassage-2's post-spawn re-read (its S3), with the predicate of
-`TOOL-dSafePassage-16`. `python tools/codebase-map/reuse_lookup.py "skip persisting a progress row
+The seams extended are TOOL-dSafePassage-4's `rollback-update` fixture family
+(`run_rollback_update_fixture`), with `build_update_gov`'s `schema3` gov and the schema step's
+fixture plants of TOOL-dSafePassage-15 (`FIXTURE_SCHEMA_STEP_PLANTS`), and TOOL-dSafePassage-4's
+`check_step_rollback` self-test arm. The behaviour observed is TOOL-dSafePassage-4's rollback run
+(its S5, S6 and §4 "The order of one rollback run") and TOOL-dSafePassage-2's post-spawn re-read
+(its S3). `python tools/codebase-map/reuse_lookup.py "skip persisting a progress row
 when the receipt schema is too old to hold it"` ranked `rows`, `row`, `skip` and `extract_row`,
-name-token matches, so no existing seam fits beyond those specs; the stamp's own site is
-`tools/govkit/govkit.py:12407` at the base, the line TOOL-dSafePassage-3 S5 caps.
+name-token matches, so no existing seam fits beyond those specs. The stamp's own site is
+`tools/govkit/govkit.py:12688-12689` at HEAD, the rollback branch TOOL-dSafePassage-4 S5 wrote.
 
 Recall terms used: `python tools/memory-recall/query.py "how were spec audit findings promoted into repair units placed beside the unit they repair" --terms "spec audit promoted unit repair blocker high minors batch disposal order edges rescope"`
