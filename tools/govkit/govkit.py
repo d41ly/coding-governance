@@ -7095,6 +7095,13 @@ IN_PROGRESS_MARKERS = ("MERGE_HEAD", "REBASE_HEAD", "CHERRY_PICK_HEAD")
 # One spelling of where the lock lives. Both verbs take it and the refusal prints it, so a second
 # literal would be a second answer to the same question.
 WRITE_LOCK_REL = ".governance/outbox/.update.lock"
+# TOOL-dSafePassage-2 S7 and S8. Beside the lock: the guard a reclaim holds while it replaces a dead
+# holder's lock, and the staging journal, one `{"path", "oid"}` line appended before each index write,
+# so the run that reclaims a killed holder's lock can tell that holder's staging from an operator's.
+RECLAIM_GUARD_SUFFIX = ".reclaim"
+STAGING_JOURNAL_REL = WRITE_LOCK_REL + ".staged"
+# S5. The order an `attended` step's stop writes, keyed by `render_order_slug` of the step id.
+ATTENDED_ORDER_PREFIX = "update-attended-step-"
 
 # The lock THIS process created, and nothing else. A run that REFUSED on somebody else's lock must
 # never unlink the file it just refused over, which is the one way a lock becomes an amplifier.
@@ -7154,8 +7161,14 @@ def demand_index_resolved(target: pathlib.Path, verb: str) -> None:
 
 def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
                         landed_oids: dict[str, str] | None = None,
-                        region_owned: dict[str, tuple[str, str]] | None = None) -> list[str]:
+                        region_owned: dict[str, tuple[str, str]] | None = None,
+                        journal: dict[str, str | None] | None = None) -> list[str]:
     """S4, and the DEFINITION of dirty for this whole build, implemented in one place.
+
+    `journal` (TOOL-dSafePassage-2 S8) is a reclaimed dead holder's staging journal, `{path: the
+    last oid it staged there, None for a deletion}`. It widens carve-out 3 by exactly those entries:
+    an index blob equal to the journaled oid, or a staged deletion journaled as one, is that killed
+    run's staging. A different blob at a journaled path stays dirty.
 
     A claimed path is dirty when it differs index-versus-HEAD or worktree-versus-index — `git diff
     --cached` and `git diff` over that path, and deliberately NOT `git status --porcelain`, which
@@ -7258,11 +7271,13 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
     # Carve-out 3 needs the index BLOBS, not just the names, and only for paths that could take it:
     # staged, not unstaged, and carrying a recorded oid. Read once, and skipped entirely when the
     # caller passed no oids — which is every caller that has no receipt in hand.
+    landed_oids, journal = landed_oids or {}, journal or {}
     ours = {p for p in staged
-            if p not in unstaged and (landed_oids or {}).get(p)}
+            if p not in unstaged and (landed_oids.get(p) or journal.get(p))}
     if ours:
         _idx, _ = index_read(target, sorted(ours))
-        ours = {p for p in ours if _idx.get(p, (None, None))[1] == landed_oids[p]}
+        ours = {p for p in ours
+                if _idx.get(p, (None, None))[1] in {landed_oids.get(p), journal.get(p)} - {None}}
 
     region = region_owned or {}
 
@@ -7347,7 +7362,7 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
         if path not in in_index:
             if (target / path).exists():
                 continue                        # carve-out 2 — `-7` S4 owns this tree
-            if path in in_head:
+            if path in in_head and not (path in journal and journal[path] is None):
                 dirty.append(f"{path} (deleted from the index, still in HEAD)")
             continue                            # carve-out 1 — a committed deletion is not dirty
         if path in ours:
@@ -7376,7 +7391,8 @@ def derive_graded_rows(receipt: dict | None) -> list[dict]:
             if UPDATE_ROLE.get(row.get("role", "engine")) in WRITING_DISPOSITIONS]
 
 
-def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
+def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | None,
+                               journal: dict[str, str | None] | None = None) -> None:
     """S4's refusal, scoped to the receipt's own population.
 
     A deployer that refuses over an unrelated edit in a repository it does not own is a deployer
@@ -7440,7 +7456,8 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
         target, [row.get("path") for row in _rows],
         {row["path"]: row["oid"] for row in _rows if row.get("path") and row.get("oid")},
         {row["path"]: (_om, _cm) for row in _rows
-         if row.get("path") and UPDATE_ROLE.get(row.get("role", "engine")) == "pins"})
+         if row.get("path") and UPDATE_ROLE.get(row.get("role", "engine")) == "pins"},
+        journal)
     if dirty:
         raise Refusal(
             f"{len(dirty)} path(s) this target's receipt claims are DIRTY: " + ", ".join(dirty)
@@ -7450,54 +7467,81 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
 
 
 def describe_write_lock(lock: pathlib.Path) -> str:
-    """Who holds the lock and for how long — or the fact that the file cannot say.
+    """Who holds the lock, on which host and for how long — or the fact that the file cannot say.
 
     An unreadable lock is reported as unreadable rather than described as anonymous: a stale lock
-    an operator cannot diagnose is indistinguishable from a live run they must wait for.
+    an operator cannot diagnose is indistinguishable from a live run they must wait for. A lock an
+    older govkit wrote names no host, and is judged on this one (TOOL-dSafePassage-2 S6).
     """
     try:
         held = json.loads(lock.read_text(encoding="utf-8"))
         age = int(max(0.0, time.time() - float(held.get("started") or 0.0)))
-        return (f"pid {held.get('pid', '?')} running `{held.get('verb', '?')}`, started "
-                f"{held.get('started_utc', '?')}, {age}s ago")
-    except (OSError, ValueError, TypeError):
-        return "its lock file records no readable pid or start time, so it is almost certainly stale"
+        return (f"pid {held.get('pid', '?')} on host {held.get('host', '(unrecorded)')} running "
+                f"`{held.get('verb', '?')}`, started {held.get('started_utc', '?')}, {age}s ago")
+    except (OSError, ValueError, TypeError, AttributeError):
+        return "its lock file records no readable pid or start time"
 
 
-def take_write_lock(target: pathlib.Path, verb: str) -> None:
+def take_write_lock(target: pathlib.Path, verb: str) -> dict[str, str | None] | None:
     """S5. `O_EXCL`, so the CREATION is the acquisition rather than a check followed by a create.
 
     Per TARGET, not per (target, verb): `apply` and `update` both write the receipt, so letting the
-    two interleave is the case this exists for. The file records who holds it and since when,
+    two interleave is the case this exists for. The file records who holds it, where and since when,
     because a lock that refuses without saying who holds it is a mystery rather than an error.
+
+    TOOL-dSafePassage-2 S7. A lock already there goes to `write_reclaimed_lock`, which takes it over
+    only from a holder the process census proves dead on this host; then the take returns that
+    holder's staging journal, for the dirty precondition to read its staging as gov's own (S8).
+    A live, unjudgeable or contended holder refuses, naming the holder. A fresh take returns None
+    and clears a journal no lock stands beside, so no stale line can vouch for anything.
     """
     global _HELD_LOCK
     lock = target.joinpath(*WRITE_LOCK_REL.split("/"))
+    journal_path = target.joinpath(*STAGING_JOURNAL_REL.split("/"))
     lock.parent.mkdir(parents=True, exist_ok=True)
+    record = {"pid": os.getpid(), "verb": verb, "started": time.time(),
+              "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+              "host": upgrade_steps.THIS_HOST}
     try:
         fd = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError:
-        raise Refusal(
-            f"another govkit write holds {lock.as_posix()} — {describe_write_lock(lock)}. Two "
-            f"writing runs against one target interleave on the receipt, which is exactly what "
-            f"this lock exists to prevent, so `{verb}` is refusing rather than joining in. Wait "
-            f"for that run to finish; if that process is gone the lock is STALE and `rm "
-            f"{lock.as_posix()}` clears it") from None
+        held = describe_write_lock(lock)
+        verdict, holder, why = upgrade_steps.write_reclaimed_lock(lock, record)
+        if verdict != "reclaimed":
+            remedy = {
+                "live": "Wait for that run to finish. A lock whose holder has ended is reclaimed by "
+                        "the next run on this host, by itself",
+                "busy": "Re-run once it settles: a lock whose holder has ended is reclaimed by the "
+                        "next run on this host, by itself",
+            }.get(verdict, "Nothing proves its holder gone, so it is not reclaimed: once you know "
+                           f"that run has ended, delete {lock.as_posix()} by hand. A lock whose "
+                           f"holder is gone from this host's process table is reclaimed by the next "
+                           f"run without that")
+            raise Refusal(
+                f"another govkit write holds {lock.as_posix()} — {held}. Two writing runs against "
+                f"one target interleave on the receipt, which is exactly what this lock exists to "
+                f"prevent, so `{verb}` is refusing rather than joining in: {verdict}, {why}. "
+                f"{remedy}") from None
+        print(f"govkit {verb} — reclaimed {lock.as_posix()}: its holder, {held}, {why}")
+        _HELD_LOCK = lock
+        return upgrade_steps.read_staging_journal(target)
     with os.fdopen(fd, "w", newline="\n") as fh:
-        fh.write(json.dumps({"pid": os.getpid(), "verb": verb, "started": time.time(),
-                             "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())},
-                            indent=2) + "\n")
+        fh.write(json.dumps(record, indent=2) + "\n")
     _HELD_LOCK = lock
+    journal_path.unlink(missing_ok=True)
+    return None
 
 
 def release_write_lock() -> None:
     """Run by every exit path of both writing verbs, refusals included — it is a `finally`, never a
     line at the bottom of a success branch. A lock only a clean run releases is a lock that survives
-    the first refusal and then blocks every run after it."""
+    the first refusal and then blocks every run after it. The staging journal goes first, so a
+    release cut short leaves a lock with no journal, whose reclaim then vouches for nothing."""
     global _HELD_LOCK
     if _HELD_LOCK is None:
         return
     try:
+        _HELD_LOCK.with_name(_HELD_LOCK.name + ".staged").unlink(missing_ok=True)
         _HELD_LOCK.unlink()
     except OSError:
         pass
@@ -7505,17 +7549,21 @@ def release_write_lock() -> None:
 
 
 def demand_writable_target(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
-    """Steps 1 and 2 of the build's precondition order, in that order, for a run that WILL write.
+    """Steps 1 and 2 of the build's precondition order, for a run that WILL write.
 
     A read-only run does not come here, on purpose: taking the lock creates `.governance/outbox/`
     and a file inside it, and a read-only verb that leaves a byte behind is the whole risk
     `update`'s default guards against. There is nothing for these preconditions to protect on a run
     that writes nothing.
+
+    THE LOCK IS TAKEN BEFORE THE DIRTY-PATH TEST since TOOL-dSafePassage-2 S8: a reclaimed dead
+    holder's staging journal is that test's input, and the reclaim is what reads it. A refusal
+    after the take still releases the lock, through the caller's `finally`.
     """
     demand_no_operation_in_progress(target, verb)
     demand_index_resolved(target, verb)
-    demand_claimed_paths_clean(target, verb, receipt)
-    take_write_lock(target, verb)
+    journal = take_write_lock(target, verb)
+    demand_claimed_paths_clean(target, verb, receipt, journal)
 
 
 def demand_forward_vintage(root: pathlib.Path, base_commit: str | None, to_commit: str) -> None:
@@ -9052,6 +9100,7 @@ def land_through_index(root: pathlib.Path, target: pathlib.Path, path: str, src:
     entry = index.get(entry_path or path)
     mode = resolve_landed_mode(entry[0] if entry else None,
                                gov_tree_mode(root, to_commit, src) if src else None)
+    upgrade_steps.write_staging_line(target, path, oid)  # TOOL-dSafePassage-2 S8, before the index write
     up = subprocess.run(["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
                          f"{mode},{oid},{path}"], capture_output=True, text=True, check=False)
     if up.returncode != 0:
@@ -9351,6 +9400,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         claimed = receipt["kits"]
         _deploy_w = add_deploy_kits(target, gained)
         if _deploy_w:
+            upgrade_steps.write_staging_line(target, _deploy_w)  # S8: each index write journals first
             subprocess.run(["git", "-C", str(target), "add", "--", _deploy_w], capture_output=True)
             print(f"govkit update — default-gained: appended {', '.join(gained)} to {_deploy_w}'s kits")
     elif gained:
@@ -10326,6 +10376,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             print(f"govkit update —   would land {_p0}")
         for _p0, _why0 in _pv_ref:
             print(f"govkit update —   would REFUSE {_p0}: {_why0}")
+        # TOOL-dSafePassage-2 S4, F2. The pending steps are NAMED and nothing is spawned, a witness
+        # included: a witness is step code over the target, and this run writes no byte.
+        _sw_pending = upgrade_steps.derive_pending_steps(root, receipt, to_commit)
+        if kits:
+            print(f"govkit update — steps: not walked — a --kits run walks no step, since a subset "
+                  f"would run a later step before an earlier one · {len(_sw_pending)} pending")
+        else:
+            print(f"govkit update — steps: {len(_sw_pending)} pending")
+            for _sw_row in _sw_pending:
+                print(f"govkit update —   would walk {_sw_row.id}")
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
         return r.emit()
 
@@ -10385,6 +10445,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # the failure this whole unstage exists to prevent, arriving through the one input that
         # cannot be tested by the absence of a diff. The file is gov's own output and gov has just
         # deleted it, so there is nothing of the operator's to lose.
+        upgrade_steps.write_staging_line(target, f".governance/outbox/{_stale_order.name}", None)
         subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached", "--ignore-unmatch",
                         "--", f".governance/outbox/{_stale_order.name}"],
                        capture_output=True, check=False)
@@ -10519,6 +10580,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             if pins_path.is_file() else None
         _pw_new, _pw_mode = write_block(_pw_cur, _pw_om, _pw_cm, _pw_text, "append")
         pins_path.write_text(_pw_new, encoding="utf-8", newline="\n")
+        upgrade_steps.write_staging_line(target, _pw_row["path"])
         subprocess.run(["git", "-C", str(target), "add", "--", _pw_row["path"]],
                        capture_output=True, check=False)
         # THE RECEIPT ROW FOLLOWS THE BYTES. `mode` and `block_sha256` describe what is on disk, and
@@ -10561,6 +10623,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _pd_lines = _pd_cur.split("\n")
             pins_path.write_text("\n".join(_pd_lines[:_pd_span[0]] + _pd_lines[_pd_span[1] + 1:]),
                                  encoding="utf-8", newline="\n")
+            upgrade_steps.write_staging_line(target, pins_drop["path"])
             subprocess.run(["git", "-C", str(target), "add", "--", pins_drop["path"]],
                            capture_output=True, check=False)
             _ga_removed = True
@@ -10629,6 +10692,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # those. The entry keeps the blob the target already holds; only its mode moves, and the
         # working file gains the execute bits so a POSIX `git add` does not take them away again.
         if a.get("mode_to") and v not in TOUCHING_VERDICTS:
+            upgrade_steps.write_staging_line(target, row["path"], c["ours_oid"])
             _mup = subprocess.run(["git", "-C", str(target), "update-index", "--cacheinfo",
                                    f"{a['mode_to']},{c['ours_oid']},{row['path']}"],
                                   capture_output=True, text=True, check=False)
@@ -10791,6 +10855,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             mv_err: str | None = None
             try:
                 ndp.parent.mkdir(parents=True, exist_ok=True)
+                upgrade_steps.write_staging_line(target, old_path, None)
+                upgrade_steps.write_staging_line(target, new_dest,
+                                                 (index0.get(old_path) or (None, "worktree"))[1])
                 mv = subprocess.run(["git", "-C", str(target), "mv", "--", old_path, new_dest],
                                     capture_output=True, text=True, check=False)
                 if mv.returncode != 0:
@@ -10966,6 +11033,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # not round-trip exactly would replace gov's blob with a near-miss nobody asked for. The staging
     # this verb owes is done, and it is done from the blob rather than from the disk.
     if deleted:
+        for _sw_p in deleted:
+            upgrade_steps.write_staging_line(target, _sw_p, None)
         git_pathspec(target, ["rm", "-q", "--ignore-unmatch"], deleted)
 
     # ---- DEPL-dSealedTally-1 S2. MOVED HERE, AND THE BLOCK IS SPLIT ------------------------
@@ -11223,6 +11292,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # tracked — and every LATER `update` then refused the install forever, blaming the
             # operator: *present in the WORKTREE and absent from its INDEX*. One `--write` wedged
             # the adopter permanently, with no adversary and no tampering.
+            upgrade_steps.write_staging_line(target, _dest)
             _add0 = git_pathspec(target, ["add"], [_dest])
             if _add0.returncode != 0:
                 # F6. THE ROW GOES BACK TOO. It is minted above, BEFORE this stage, so a
@@ -11295,6 +11365,30 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     for _eid_h, _paths_h in sorted(_held_kits.items()):
         print(f"govkit update — HELD BACK {_eid_h}: {len(_paths_h)} row(s) refused "
               f"({', '.join(_paths_h)}), so none of this kit's writes from this run will stand")
+
+    # ======================= TOOL-dSafePassage-2 S4 — THE UPGRADE-STEP WALK =======================
+    # HERE, after the write loop and before the re-render, so a step meets the new vintage's files
+    # and the renders, hook wiring and per-kit verify below meet the migrated tree. Oldest first,
+    # each step skipped where its witness holds, the receipt advanced per step on disk; a failed or
+    # killed step stops the walk with its failure recorded and the steps before it left applied, and
+    # no down runs, here or in the verify rollback below. Only on an unscoped run that has no finding
+    # yet (§8 F3): a subset of the steps would run a later one before an earlier one out of scope.
+    # A stopped walk is a finding, so the `gov_commit` stamp below is withheld.
+    _sw_pending = upgrade_steps.derive_pending_steps(root, receipt, to_commit)
+    if kits or r.problems:
+        print(f"govkit update — steps: not walked — "
+              + ("a --kits run walks no step, since a subset would run a later step before an "
+                 "earlier one" if kits else f"this run already has {len(r.problems)} finding(s)")
+              + f" · {len(_sw_pending)} pending")
+    else:
+        _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _sw_pending,
+                                               to_commit)
+        print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
+              f"· {_sw_walk['skipped']} skipped · stopped at {_sw_walk['stopped'] or 'none'}")
+        if _sw_walk["stopped"]:
+            r.fail(f"the upgrade-step walk stopped at {_sw_walk['stopped']}: {_sw_walk['failure']}"
+                   + (f" — {_sw_walk['order']} says what to run by hand" if _sw_walk["order"] else "")
+                   + ". The steps before it stay applied; the next `update --write` resumes there")
 
     # ======================= DEPL-dRetiredFork-3 S1 + S2 — RE-RENDER AND REGENERATE =============
     # BYTES LANDING IS NOT AN UPDATE FINISHING. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
@@ -11836,6 +11930,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         # `absent` before the write. The bytes at this path are ones this run put
                         # there — a rename destination, or a `missing` restore — so unstaging and
                         # unlinking returns the target to what it had, which was nothing.
+                        upgrade_steps.write_staging_line(target, p, None)
                         rmv = subprocess.run(
                             ["git", "-C", str(target), "rm", "-q", "--cached", "--ignore-unmatch",
                              "--", p], capture_output=True, text=True, check=False)
@@ -11851,6 +11946,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         restored.append(p)
                         continue
                     mode, oid = entry
+                    upgrade_steps.write_staging_line(target, p, oid)
                     upx = subprocess.run(
                         ["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
                          f"{mode},{oid},{p}"], capture_output=True, text=True, check=False)
@@ -11991,6 +12087,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _now_b = (target / p).read_bytes() if (target / p).is_file() else None
                 if _now_b == _was_b:
                     continue
+                upgrade_steps.write_staging_line(target, p, None if _was_i is None else _was_i[1])
                 if _was_i is None:
                     subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached",
                                     "--ignore-unmatch", "--", p], capture_output=True, check=False)
@@ -12185,6 +12282,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _cand = outbox / _stale.stem
             if _cand.is_dir():
                 for _cf in _cand.iterdir():
+                    upgrade_steps.write_staging_line(
+                        target, f".governance/outbox/{_stale.stem}/{_cf.name}", None)
                     _cf.unlink()
                 _cand.rmdir()
                 subprocess.run(["git", "-C", str(target), "rm", "-r", "-q", "-f", "--cached",
@@ -12194,6 +12293,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # records in full: a target that COMMITS its outbox otherwise hands the renormalize
             # below a pinned path missing from the worktree, and gov refuses over its own deletion.
             _reaped.add(f".governance/outbox/{_stale.name}")
+            upgrade_steps.write_staging_line(target, f".governance/outbox/{_stale.name}", None)
             subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached",
                             "--ignore-unmatch", "--", f".governance/outbox/{_stale.name}"],
                            capture_output=True, check=False)
@@ -12259,6 +12359,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"renormalize rather than folding somebody's work-in-progress into an index "
                        f"gov does not own")
             elif _rn_lf:
+                for _sw_p in _rn_lf:
+                    upgrade_steps.write_staging_line(target, _sw_p)
                 git_pathspec(target, ["add", "--renormalize"], _rn_lf)
                 print(f"govkit update — renormalize: re-staged {len(_rn_lf)} pinned path(s)")
             else:
@@ -12503,7 +12605,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
     # TOOL-dSafePassage-3 S5: the re-stamp lifts a schema-1 or schema-2 receipt to 3 and never past
     # it, because schema 4 carries `steps` and only the step govkit/receipt-schema-4 writes that.
-    receipt["schema"] = max(schema, 3)
+    # TOOL-dSafePassage-2 S3: read off the receipt, not the local taken at load — the walk re-read
+    # a step's `schema` into it, and the stamp never writes over a field a step wrote.
+    receipt["schema"] = max(receipt.get("schema", schema), 3)
     # DEPL-dGaugedVintage-8 S1. THE STAMP MUST NOT OUTRUN THE ROWS THIS RUN NEVER GRADED. An
     # `evidence: "unattributed"` row is skipped above (`how == "table"` branch) before
     # `classify_row`, by DEPL-dCarriedReceipt-13's ratified design, and it is graded against the

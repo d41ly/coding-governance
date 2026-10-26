@@ -47,7 +47,8 @@ starts it:
   the working directory.
 
 A step that needs your repository's own code or hooks declares `needs-target = true`. The runner
-spawns nothing for such a step and reads it `attended`: a person runs it. To check a step's declaration,
+spawns nothing for such a step and reads it `attended`: a person runs it. The `update` walk still
+runs its witness, under this same contract, to see whether that person already has. To check a step's declaration,
 gov runs it beside planted hooks and modules in a scratch copy and reads one verdict:
 
 - `isolated` — it ran clean and touched none of your code;
@@ -94,6 +95,52 @@ python tools/govkit/steps/receipt_schema_4.py witness <repo>  # exit 0 at schema
 python tools/govkit/steps/receipt_schema_4.py down <repo>     # schema 4 -> 3
 ```
 
+## What `update` does with steps
+
+`govkit.py update --target <repo> --write` walks the steps after it lands the files and before it
+re-renders, so a step meets the new files and the renders meet the moved ones:
+
+- **The order.** Every step row in `--to`'s tree, in the order `list` prints, minus each step the
+  receipt's `steps` records `applied`. A step landed after `--to` is not walked.
+- **The skip.** Each step's witness runs first. Where it holds, the step is recorded `applied` and
+  its up never runs: `step <id> · skipped (witness holds)`.
+- **A step that runs** is recorded `failed`, `interrupted: started <utc>, no exit recorded`, before
+  its up starts, and `applied` once the up exits 0 and the witness holds. Its writes and its
+  before-image under `.governance/steps/` are staged, never committed.
+- **A stopped walk.** An up that exits non-zero (`exit <rc>: <its last stderr line>`), or a witness
+  that still fails after it (`witness does not hold after up`), stops the walk. The steps before it
+  stay applied, no down runs, the run exits 1, and the receipt's `gov_commit` does not move.
+- **An attended step** (`needs-target = true`) stops the walk before its up, recorded `failed` with
+  `attended: the step needs the target's code`, and writes
+  `.governance/outbox/update-attended-step-<slug>.md`, naming the step and the command to run. Run
+  it yourself; the next `update --write` skips the step once its witness holds.
+- **Read-only, and `--kits`.** Without `--write`, `update` prints `would walk <id>` for each pending
+  step and runs none of them, witnesses included. A `--kits` run walks none and prints `steps: not
+  walked` with the pending count; the next run without `--kits` walks them.
+
+Every write run prints one line with every count, zeros included:
+`govkit update — steps: <n> pending · <a> applied · <s> skipped · stopped at <id|none>`.
+
+**After a kill.** A killed run leaves its write lock, `.governance/outbox/.update.lock`, which names
+the holder's pid and host. The next writing run on that host reclaims it by itself once the pid is
+gone from the process table, or names a process started after the lock, and prints `reclaimed`. A
+lock from another host, one it cannot read, or one it cannot judge because the process census cannot
+run is not reclaimed: the refusal names the holder, and you delete the lock by hand once you know
+that run has ended. Before each index write a run appends the path and the blob it stages to
+`.governance/outbox/.update.lock.staged`; the run that reclaims the lock reads that journal, so the
+paths the killed run staged are not refused as dirty, while a different blob you staged at one of
+them still is. The step the kill interrupted reads `failed` with its `interrupted:` text, and the
+next walk runs it again, or runs the row's `resume` command where it declares one.
+
+To see it on this machine:
+
+```sh
+python tools/govkit/upgrade_steps.py fixture walk                       # s1 to s4 applied, in order
+python tools/govkit/upgrade_steps.py fixture walk --plant kill-step     # killed, re-run, converges
+python tools/govkit/upgrade_steps.py fixture lock --plant lock-dead     # reclaimed
+python tools/govkit/upgrade_steps.py fixture update --plant kill-walk   # update killed mid-step
+```
+
 ## What `update` does with a retired kit
 
 `govkit.py update --target <repo>` reads the target's receipt. A claimed kit that is still a registry
@@ -116,9 +163,9 @@ The agent limit is the policy key `runtime.agents-in-flight` in `.governance/pol
 ([the agent limit](agent-limit.md)). A `FANOUT_CAP=<n>` line in `.agent-cap.conf` only lowers it.
 The step `agent-cap/fanout-cap-to-agents-in-flight` retires the file: its up writes `<n>` into the key
 when the line lowers it (and leaves the policy file alone when it does not), then removes the file,
-so the limit reads the same before and after. Its down puts both files back byte-for-byte. Until the
-deployer runs steps itself, run it by hand, from this checkout, against a repository whose
-`.agent-cap.conf` and policy file are committed:
+so the limit reads the same before and after. Its down puts both files back byte-for-byte.
+`update --write` runs it as one of its steps; to run it by hand, from this checkout, against a
+repository whose `.agent-cap.conf` and policy file are committed:
 
 ```sh
 python tools/govkit/steps/fanout_cap.py up <repo>       # exit 1, writing nothing, on a bad value

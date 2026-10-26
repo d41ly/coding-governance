@@ -1948,6 +1948,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "build_fixture_env",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "build_fixture_r3",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -3121,6 +3126,11 @@
       "id": "build_walk",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "build_walk_gov",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "build_windows_rows",
@@ -4513,6 +4523,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_holder_dead",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "check_holder_worktree",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -5659,6 +5674,11 @@
     },
     {
       "id": "check_step_isolation",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_step_walk",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
@@ -7923,6 +7943,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_pending_steps",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "derive_phase",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -8506,6 +8531,11 @@
       "id": "derive_statuses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "derive_step_context",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "derive_step_mode",
@@ -14768,6 +14798,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_lock_holder",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_log",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -15211,6 +15246,11 @@
       "id": "read_receipt_rows",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "read_receipt_steps",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_recipe",
@@ -15738,6 +15778,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_staging_journal",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_stale_dossiers",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -15836,6 +15881,11 @@
       "id": "read_sweep_expectations",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_target_bytes",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_target_kit_version",
@@ -16461,6 +16511,11 @@
       "id": "remove_scratch_worktree",
       "kind": "function",
       "file": "tools/run-gates/lib-attribute.sh"
+    },
+    {
+      "id": "remove_shared_file",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "remove_stubs",
@@ -17141,6 +17196,11 @@
       "id": "render_fixture",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "render_fixture_row",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "render_gate_line",
@@ -18806,6 +18866,11 @@
       "id": "resolve_landed_mode",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_landed_ref",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "resolve_landing_at",
@@ -20475,6 +20540,11 @@
     {
       "id": "run_fixture_git",
       "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_fixture_git",
+      "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
     {
@@ -20753,6 +20823,11 @@
       "file": "tools/unattended/resume-tick.sh"
     },
     {
+      "id": "run_killed",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "run_kit_check",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -20866,6 +20941,11 @@
       "id": "run_ln_rotation",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_lock_fixture",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "run_main",
@@ -21383,6 +21463,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "run_step_walk",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "run_stop",
       "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
@@ -21493,6 +21578,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "run_update_fixture",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "run_used_after_worktree_removed",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -21501,6 +21591,11 @@
       "id": "run_vr_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_walk_fixture",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "run_wave",
@@ -25713,6 +25808,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "write_attended_order",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "write_b1_receipt",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -26298,6 +26398,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "write_reclaimed_lock",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "write_record",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -26531,6 +26636,11 @@
       "id": "write_staged",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_staging_line",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "write_stale_index",

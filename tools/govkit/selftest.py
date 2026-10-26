@@ -3463,6 +3463,81 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
           == {"verdict": "attended", "rc": None, "tail": ""})
 
 
+def check_step_walk() -> None:
+    """TOOL-dSafePassage-2 AC1 to AC9 — `upgrade_steps.py fixture walk|lock|update` with every plant:
+    the walk's order, skip, stop, kill and resume, its attended stop, the lock's reclaim of a dead or
+    reused holder and its refusal of a live, foreign or unreadable one, the guard's race and its dead
+    holder, and the walk inside `update` with its staging journal across a kill. Each plant's failing
+    case is staged by the plant; the fixture prints `<family>: FAILED` on any unmet expectation."""
+    us_py = HERE / "upgrade_steps.py"
+    for family, plant, want, needles in (
+            ("walk", None, 0, ("step fx/s1 · applied\nstep fx/s2 · applied\nstep fx/s3 · applied\n"
+                               "step fx/s4 · applied", "walk: fx/s3 introduced at M")),
+            ("walk", "not-pending", 0, ("walk: canaries of s2 and s5: none",)),
+            ("walk", "witness-holds", 0, ("step fx/s2 · skipped (witness holds)",
+                                          "walk: fx/s2 up canary absent · row applied")),
+            ("walk", "fail-k", 1, ("step fx/s3 · failed · exit 1: fx: s3 up fails by its plant",
+                                   "walk: 4 pending · 2 applied · 0 skipped · stopped at fx/s3")),
+            ("walk", "kill-step", 0, ("last applied ['fx/s2'] · fx/s3 failed · interrupted: started ",
+                                      "walk: the re-run's target and receipt equal an uninterrupted walk's",
+                                      "walk: fx/s3 up spawned 2 time(s) · resume not spawned")),
+            ("walk", "resume", 0, ("step fx/s3 · applied · by its resume",
+                                   "walk: fx/s3 up spawned 1 time(s) · resume spawned")),
+            ("walk", "attended", 1, ("step fx/s2 · failed · attended: the step needs the target's code",
+                                     "up canary absent", "step fx/s2 · skipped (witness holds)")),
+            ("lock", "lock-dead", 0, ("govkit update — reclaimed ", "lock: taken")),
+            ("lock", "lock-reused", 0, ("a reused pid", "lock: taken")),
+            ("lock", "lock-live", 1, ("refusing rather than joining in: live, ", "reclaimed by the next run")),
+            ("lock", "lock-foreign-host", 1, ("unknown, it was taken on host 'gk-elsewhere.invalid'",
+                                              "is reclaimed by the next run")),
+            ("lock", "lock-unreadable", 1, ("unknown, its record names no readable pid",
+                                            "is reclaimed by the next run")),
+            ("lock", "lock-race", 0, ("busy, ",)),
+            ("lock", "guard-dead", 0, ("busy, cleared the guard .update.lock.reclaim",
+                                       "lock: first take exits 1 · guard cleared · lock unchanged")),
+            ("update", None, 0, ("govkit update — steps: 2 pending · 2 applied · 0 skipped · stopped at none",)),
+            ("update", "read-only", 0, ("govkit update —   would walk fx/s1\ngovkit update —   would walk fx/s2",
+                                        "update: step canaries none")),
+            ("update", "scoped", 0, ("govkit update — steps: not walked — a --kits run walks no step",
+                                     "update: step canaries none")),
+            ("update", "update-fail", 1, ("govkit update — steps: 2 pending · 1 applied · 0 skipped · stopped at fx/s2",
+                                          "update: gov_commit A · steps {'fx/s1': 'applied', 'fx/s2': 'failed'}")),
+            ("update", "kill-walk", 0, ("govkit update — reclaimed ", "update: the re-run's bytes equal an "
+                                        "uninterrupted run's")),
+            ("update", "kill-walk-edit", 2, ("DIRTY: tools/demo/one.txt",))):
+        p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+        out = p.stdout + p.stderr
+        check(f"[dSP-2] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
+              p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
+
+    # The walk's two refusals, in process: a step that leaves the receipt unreadable, and a step's
+    # writes git will not stage (the target here is no repository).
+    us = govkit_module().upgrade_steps
+    seen = ["python", "-c", "import pathlib, sys; sys.exit(not (pathlib.Path(sys.argv[1]) / 'x.txt').is_file())",
+            "{target}"]
+    writes = ["python", "-c", "import json, pathlib, sys; t = pathlib.Path(sys.argv[1]); (t / 'x.txt').write_text('x'); "
+              "i = t / '.governance/steps/fx/x.before.json'; i.parent.mkdir(parents=True, exist_ok=True); "
+              "i.write_text(json.dumps({'step': 'fx/x', 'paths': {'x.txt': {'before': None, 'after': None}}}))",
+              "{target}"]
+    spoils = ["python", "-c", "import sys; open(sys.argv[1], 'w').write('not json')", "{target}/.governance/install.json"]
+    for case, witness, up, needle in (("spoiled", spoils, writes, "does not read back after the spawn"),
+                                      ("unstaged", seen, writes, "refused the step's writes")):
+        with tempfile.TemporaryDirectory(prefix="gk-walk-ref-") as td:
+            t = pathlib.Path(td)
+            (t / ".governance").mkdir()
+            rp = t / ".governance" / "install.json"
+            rp.write_text('{"schema": 4, "steps": []}\n', encoding="utf-8")
+            row = us.StepRow("fx/x", up, ["python", "-c", "pass"], witness, None, [], False, "fx", 1, None)
+            try:
+                us.run_step_walk(HERE.parent.parent, t, rp, json.loads(rp.read_text(encoding="utf-8")), [row], "HEAD")
+                refused = ""
+            except us.Refusal as e:
+                refused = str(e)
+            check(f"[dSP-2] S2 the walk refuses a {case} step, naming it", "fx/x" in refused and needle in refused,
+                  refused)
+
+
 def check_receipt_schema(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-3 AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 — the receipt's schema 4: the
     back-fill pinned below 3, who writes 4, the step `govkit/receipt-schema-4`, and the `steps`
@@ -3852,6 +3927,7 @@ def main() -> int:
         check_receipt_schema(tmp / "drs")
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")
+        check_step_walk()
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
@@ -8281,8 +8357,9 @@ user_skills = "/tmp/gk-fake-skills"
             check("[-12] AC5 the second concurrent update --write refuses ON THE LOCK",
                   _second.returncode == 2 and ".update.lock" in _second.stderr
                   and "another govkit write holds" in _second.stderr, _second.stderr)
-            check("[-12] AC5 the refusal names the holder and how to clear a stale lock",
-                  "pid " in _second.stderr and "rm " in _second.stderr, _second.stderr)
+            # TOOL-dSafePassage-2 S6: the remedy names the reclaim, in place of a hand `rm`.
+            check("[-12] AC5 the refusal names the holder and how a stale lock is reclaimed",
+                  "pid " in _second.stderr and "reclaimed by the next run" in _second.stderr, _second.stderr)
             check("[-12] AC5 and the first run completed", _first_rc == 0, _first_out)
         check("[-12] AC5 after both runs the lock file is gone", not _lk.exists(), "")
 

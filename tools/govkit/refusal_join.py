@@ -38,7 +38,13 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 310    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 314    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 310 -> 314 at TOOL-dSafePassage-2, BY THE MEASURED DELTA: the matcher read 380 at that unit's base
+# `5aac6409` and 384 on the tree it left. One is `update`'s `r.fail` on a stopped upgrade-step walk,
+# reached by `check_step_walk`'s `fixture update --plant update-fail`; three are `run_step_walk`'s
+# two refusals, a receipt that does not read back after a spawn (counted twice: it sits in the nested
+# `spawn`, which `ast.walk` reaches from both functions) and a step's writes git will not stage, both
+# reached by that arm in process. `take_write_lock`'s refusal was rewritten in place, not added.
 # 308 -> 310 at TOOL-dSafePassage-7, BY THE MEASURED DELTA: the matcher's two shapes read 46 in
 # `upgrade_steps.py` at that unit's base `0becfe7d` and 48 on the tree it left, by an AST probe of
 # that file alone. The two are the isolation contract's: `resolve_step_argv`'s refusal of a token

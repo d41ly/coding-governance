@@ -6,6 +6,8 @@ frozen-row check, and the two helpers a step program writes through (TOOL-dSafeP
     python <prefix>/govkit/upgrade_steps.py list --window      # each translation-window member
     python <prefix>/govkit/upgrade_steps.py frozen [--base <rev>]   # the `step-rows-frozen` leg
     python <prefix>/govkit/upgrade_steps.py fixture isolation [--plant <case>]   # the contract, observed
+    python <prefix>/govkit/upgrade_steps.py fixture walk|update [--plant <case>]  # the walk, observed
+    python <prefix>/govkit/upgrade_steps.py fixture lock --plant <case>          # the lock's reclaim
 
 THE ROWS. A kit descriptor's `[[upgrade]]` rows, rows of the same grammar in
 `<prefix>/govkit/steps.toml` for surfaces no descriptor owns, and the registry's `[[retired]]`
@@ -60,9 +62,19 @@ unread, `core.hooksPath` an empty directory and `credential.helper` empty throug
 modules and reads `isolated`, `breach`, `needs-target` or `attended`; `fixture isolation` observes
 all of it, a `-stub` plant swapping one half of the contract inside the fixture process only.
 
+THE WALK (TOOL-dSafePassage-2). `update --write` calls `run_step_walk` over `derive_pending_steps`,
+the rows `read_steps` reads at `--to` less those the receipt records applied: each step's witness,
+then for one not holding an `interrupted:` row persisted before its up, its up (or its `resume`
+after a failed record), its witness again, its writes staged, and `applied`; the first failure stops
+the walk and no down runs. A killed run's lock is reclaimed by the next once `check_holder_dead`
+reads its holder dead through the process-monitor census, under the guard `<lock>.reclaim`, and the
+staging journal `write_staging_line` appends before every index write tells that run's staging from
+an operator's. `fixture walk|lock|update` observe it in scratch repositories.
+
 Exit 0 clean, 1 a frozen-row finding or no base to compare against, 2 a refused row, an unreadable
 revision or a usage error. `fixture isolation` exits 0 green and 1 on a red, a `-stub` plant's,
-`needs-target`'s, `breach`'s and `token`'s by design.
+`needs-target`'s, `breach`'s and `token`'s by design; `fixture walk|lock|update` exit as the walk,
+the take or `update` exits, and 1 with `<family>: FAILED` on an unmet expectation.
 """
 
 from __future__ import annotations
@@ -75,10 +87,14 @@ import json
 import os
 import pathlib
 import re
+import shlex
 import shutil
+import signal
+import socket
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 from typing import NamedTuple
 
@@ -106,6 +122,10 @@ STEP_STATES = ("applied", "failed", "rolled-back")
 DOWN_STOP_PREFIXES = ("down interrupted:", "down exit ", "witness still holds after down",
                       "reverted check exits ")
 SHA_RE = re.compile(r"[0-9a-f]{40}")
+OID_RE = re.compile(r"[0-9a-f]{40}(?:[0-9a-f]{24})?")  # a blob oid, sha-1 or sha-256
+# The host a write lock and a reclaim guard name (TOOL-dSafePassage-2 S6): a holder is judged dead
+# only on the host whose process table can see it.
+THIS_HOST = socket.gethostname()
 # THE ISOLATION CONTRACT's allowlist (TOOL-dSafePassage-7): the names process creation and Python's
 # start-up need, none carrying a credential. Every other name, `GIT_ENV_LEAKS` and every token
 # variable included, falls out because nothing copies it in; a name joins by a reviewed edit.
@@ -724,6 +744,19 @@ def resolve_step_argv(argv, ctx: dict[str, str], step_id: str = "a step") -> lis
     return gk.resolve_shell_argv(out)
 
 
+def derive_step_context(row: StepRow, target, gov_root) -> dict[str, str]:
+    """The placeholder answers a step argv resolves against: `{gov}` gov's tool root, `{target}`
+    the target, and `{prefix}` the target's install prefix where it has a `deploy.toml`. One
+    derivation for the spawn and for the attended order that names the argv a person runs."""
+    gk = load_govkit()
+    target, gov_root = pathlib.Path(target).resolve(), pathlib.Path(gov_root).resolve()
+    tr = gk.derive_tool_root(gov_root)
+    ctx = {"gov": (gov_root / tr if tr else gov_root).as_posix(), "target": target.as_posix()}
+    if (target / ".governance" / "deploy.toml").is_file():
+        ctx["prefix"] = gk.target_context(target, gk.load_deploy(target), row.id.split("/", 1)[0], {})["prefix"]
+    return ctx
+
+
 def derive_step_mode(row: StepRow) -> str:
     """`attended` for a row declaring `needs-target = true`, which no runner spawns, else
     `isolated`: the row runs under the contract."""
@@ -743,12 +776,8 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root) -> dict:
         return {"verdict": "attended", "rc": None, "tail": ""}
     if phase not in STEP_PHASES or not isinstance(getattr(row, phase), list):
         raise Refusal(f"{row.id}: no `{phase}` argv to run; a step runs one of {', '.join(STEP_PHASES)}")
-    gk = load_govkit()
-    target, gov_root = pathlib.Path(target).resolve(), pathlib.Path(gov_root).resolve()
-    tr = gk.derive_tool_root(gov_root)
-    ctx = {"gov": (gov_root / tr if tr else gov_root).as_posix(), "target": target.as_posix()}
-    if (target / ".governance" / "deploy.toml").is_file():
-        ctx["prefix"] = gk.target_context(target, gk.load_deploy(target), row.id.split("/", 1)[0], {})["prefix"]
+    gov_root = pathlib.Path(gov_root).resolve()
+    ctx = derive_step_context(row, target, gov_root)
     with tempfile.TemporaryDirectory(prefix="gk-step-", ignore_cleanup_errors=True) as td:
         for d in ("home", "tmp", "hooks"):
             (pathlib.Path(td) / d).mkdir()
@@ -840,6 +869,264 @@ def check_needs_target(row: StepRow, tree, gov_root) -> str:
     return "isolated"
 
 
+def derive_pending_steps(gov_root, receipt: dict, to_commit: str) -> list[StepRow]:
+    """The steps `update` walks toward `to_commit` (TOOL-dSafePassage-2 S1): every row `read_steps`
+    reads in that commit's tree, in the order it returns, minus each id the receipt's `steps`
+    records `applied`. A row landed after `to_commit` is not in its tree, so it is not read; a
+    receipt with no `steps` has every row pending. No order is derived here."""
+    done = {r["id"] for r in read_step_states(receipt) if r["state"] == "applied"}
+    return [r for r in read_steps(gov_root, to_commit, resolve_landed_ref(gov_root) or "")
+            if r.id not in done]
+
+
+def write_staging_line(target, path: str, oid: str | None = "worktree") -> None:
+    """Append `{"path", "oid"}` to the staging journal beside the write lock, BEFORE the call that
+    writes that index entry (TOOL-dSafePassage-2 S8): `oid` the blob about to be staged, None for a
+    deletion, or by default `"worktree"`, a `git add` of the working file, whose blob is hashed here
+    through the path's own filters, None where the file is absent. A hash git refuses journals
+    nothing, so that path reads dirty after a kill, the safe direction."""
+    target = pathlib.Path(target)
+    if oid == "worktree":
+        oid = None
+        if (target / path).is_file():
+            out = run_git(target, "hash-object", "--", path)
+            if not out:
+                return
+            oid = out.decode("utf-8").strip()
+    journal = target.joinpath(*load_govkit().STAGING_JOURNAL_REL.split("/"))
+    journal.parent.mkdir(parents=True, exist_ok=True)
+    with open(journal, "a", encoding="utf-8", newline="\n") as fh:
+        fh.write(json.dumps({"path": path, "oid": oid}) + "\n")
+
+
+def read_staging_journal(target) -> dict[str, str | None]:
+    """The staging journal at `target`, `{path: the last line's oid}` (S8). A line that is not one
+    `{"path", "oid"}` object, a torn last line from a kill included, vouches for nothing and is
+    skipped; no journal is the empty mapping."""
+    journal = pathlib.Path(target).joinpath(*load_govkit().STAGING_JOURNAL_REL.split("/"))
+    out: dict[str, str | None] = {}
+    try:
+        lines = journal.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return out
+    for ln in lines:
+        try:
+            d = json.loads(ln)
+        except ValueError:
+            continue
+        if (isinstance(d, dict) and set(d) == {"path", "oid"} and isinstance(d["path"], str)
+                and (d["oid"] is None or (isinstance(d["oid"], str) and OID_RE.fullmatch(d["oid"])))):
+            out[d["path"]] = d["oid"]
+    return out
+
+
+def write_attended_order(target, gov_root, row: StepRow, phase: str = "up") -> pathlib.Path:
+    """Write the outbox order an `attended` stop leaves (S5),
+    `.governance/outbox/update-attended-step-<slug>.md`, the slug `render_order_slug` of the step id:
+    the step, its resolved `phase` argv, why it is attended, and what the next walk does. Returns
+    its path."""
+    gk = load_govkit()
+    argv = resolve_step_argv(getattr(row, phase), derive_step_context(row, target, gov_root), row.id)
+    order = (pathlib.Path(target) / ".governance" / "outbox"
+             / f"{gk.ATTENDED_ORDER_PREFIX}{gk.render_order_slug(row.id)}.md")
+    order.parent.mkdir(parents=True, exist_ok=True)
+    order.write_text(
+        f"# An attended upgrade step: {row.id}\n\n"
+        f"`govkit update --write` stopped before this step's `{phase}`. Its row declares "
+        f"`needs-target = true`: its code needs the target's own code, which the isolation contract "
+        f"keeps from every step govkit spawns, so govkit runs none of it.\n\n"
+        f"Read it, then run it yourself:\n\n    {shlex.join(argv)}\n\n"
+        f"The next `govkit update --write` runs the step's witness first, skips the step once that "
+        f"witness holds, and walks the steps after it.\n", encoding="utf-8", newline="\n")
+    return order
+
+
+def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[StepRow],
+                  to_commit: str) -> dict:
+    """Walk `rows`, the pending steps in order, over `target` (TOOL-dSafePassage-2 S2), every spawn
+    through `run_step_isolated`. Per step: (1) its witness; exit 0 records `applied`, its up never
+    spawned; (2) a row needing target code records `failed` (`attended: ...`), writes the attended
+    order and stops; (3) records `failed` (`interrupted: started <utc>, no exit recorded`) BEFORE
+    the spawn, so a walk killed with its step leaves that failure; (4) runs the row's `resume` argv
+    where the receipt held a `failed` row for it when this walk began and `resume` is an argv, else
+    its up; a non-zero exit records `exit <rc>: <last stderr line>` and stops; (5) the witness
+    again: exit 0 stages the step's writes and records `applied`, anything else records `witness
+    does not hold after up` and stops. No down runs, and the steps before a stop stay applied.
+
+    Each record goes through `set_step_state` into `receipt`, the caller's, and onto `receipt_path`
+    in one atomic write (S3); after each spawn `schema` and `steps` are re-read from disk, since a
+    step may rewrite them. Returns `{"pending", "applied", "skipped", "stopped", "failure",
+    "order"}`, `applied` counting the ups run and `skipped` the steps passed by their witness."""
+    gk = load_govkit()
+    target, receipt_path = pathlib.Path(target).resolve(), pathlib.Path(receipt_path)
+    began_failed = {r["id"] for r in read_step_states(receipt) if r["state"] == "failed"}
+    out = {"pending": len(rows), "applied": 0, "skipped": 0, "stopped": None, "failure": None,
+           "order": None}
+
+    def persist(row: StepRow, state: str, failure: str | None = None) -> None:
+        set_step_state(receipt, row.id, row.introduced, state, failure)
+        gk.write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
+
+    def spawn(row: StepRow, phase: str) -> dict:
+        got = run_step_isolated(row, phase, target, gov_root)
+        try:
+            disk = json.loads(receipt_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as e:
+            raise Refusal(f"{row.id} {phase}: the receipt {receipt_path.as_posix()} does not read back "
+                          f"after the spawn ({e}), so the walk records nothing over it") from None
+        for k in ("schema", "steps"):
+            if k in disk:
+                receipt[k] = disk[k]
+        return got
+
+    def stop(row: StepRow, failure: str) -> dict:
+        persist(row, "failed", failure)
+        print(f"step {row.id} · failed · {failure}")
+        out.update(stopped=row.id, failure=failure)
+        return out
+
+    for row in rows:
+        # THE WITNESS RUNS EVEN FOR A ROW THAT NEEDS TARGET CODE, under the same contract as any
+        # step's: it is how the next walk passes an attended step a person ran by hand (S5, AC5).
+        # Its up is what the attended mode keeps from spawning, and move 2 below keeps it so.
+        seen = row._replace(needs_target=False)
+        if spawn(seen, "witness")["verdict"] == "ok":
+            persist(row, "applied")
+            print(f"step {row.id} · skipped (witness holds)")
+            out["skipped"] += 1
+            continue
+        if derive_step_mode(row) == "attended":
+            out["order"] = write_attended_order(target, gov_root, row).relative_to(target).as_posix()
+            return stop(row, "attended: the step needs the target's code")
+        persist(row, "failed", f"interrupted: started "
+                f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded")
+        phase = "resume" if row.id in began_failed and isinstance(row.resume, list) else "up"
+        got = spawn(row, phase)
+        if got["verdict"] != "ok":
+            return stop(row, f"exit {got['rc']}: {(got['tail'].splitlines() or [''])[-1]}")
+        if spawn(seen, "witness")["verdict"] != "ok":
+            return stop(row, "witness does not hold after up")
+        # S11. `update` stages what it writes and never commits, a step's writes included: each
+        # path the before-image lists, and the image, journaled first (S8).
+        image = derive_image_path(target, row.id)
+        if image.is_file():
+            paths = sorted(json.loads(image.read_text(encoding="utf-8"))["paths"])
+            paths.append(image.relative_to(target).as_posix())
+            for p in paths:
+                write_staging_line(target, p)
+            for argv, group in ((["add"], [p for p in paths if (target / p).is_file()]),
+                                (["rm", "-q", "--cached", "--ignore-unmatch"],
+                                 [p for p in paths if not (target / p).is_file()])):
+                if group and gk.git_pathspec(target, argv, group).returncode != 0:
+                    raise Refusal(f"{row.id}: `git {argv[0]}` refused the step's writes "
+                                  f"({', '.join(group)}), so they are not staged; the step stays "
+                                  f"recorded interrupted and the next walk runs it again")
+        persist(row, "applied")
+        print(f"step {row.id} · applied" + (" · by its resume" if phase == "resume" else ""))
+        out["applied"] += 1
+    return out
+
+
+def read_lock_holder(lock) -> tuple[bytes | None, dict | None]:
+    """(the lock file's bytes, None when absent; its record, None where it is not a JSON object
+    naming an integer `pid` and a numeric `started`), the reading `check_holder_dead` judges and
+    the bytes a reclaim compares (TOOL-dSafePassage-2 S7)."""
+    try:
+        raw = pathlib.Path(lock).read_bytes()
+    except OSError:
+        return None, None
+    try:
+        rec = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return raw, None
+    ok = (isinstance(rec, dict) and type(rec.get("pid")) is int
+          and isinstance(rec.get("started"), (int, float)) and not isinstance(rec.get("started"), bool))
+    return raw, rec if ok else None
+
+
+def check_holder_dead(record: dict | None) -> tuple[str, str]:
+    """(`dead`, `live` or `unknown`, why) for a lock or guard holder (S7). `dead`: its `host` is this
+    host or absent, and the process-monitor census holds no row with its pid, or one created more
+    than two seconds after its `started`, a reused pid; `live`: a row with that pid created no later
+    than that; `unknown`: an unreadable record, another host, or a census that cannot run. The
+    clock is read BEFORE the census, so a slow census makes a holder look older, toward `live`."""
+    if record is None:
+        return "unknown", "its record names no readable pid and start time"
+    host = record.get("host")
+    if host is not None and host != THIS_HOST:
+        return "unknown", f"it was taken on host {host!r}, and this host's process table cannot speak for that one"
+    pid, now = record["pid"], time.time()
+    try:
+        pm_dir = load_govkit().resolve_kit_dir("process-monitor", "census.py", HERE)
+        spec = importlib.util.spec_from_file_location("gk_lock_census", pm_dir / "census.py")
+        census = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(census)
+        rows, _counts = census.scan_processes()
+    except Exception as e:  # ponytail: any census failure proves nothing, and `unknown` refuses
+        return "unknown", f"the process census could not run ({type(e).__name__}: {e})"
+    born = [now - float(r["age_s"]) for r in rows if r.get("winpid") == pid]
+    if any(b <= record["started"] + 2 for b in born):
+        return "live", f"pid {pid} is still running and was started before it took the lock"
+    if born:
+        return "dead", f"pid {pid} now names a process started after the lock was taken, a reused pid"
+    return "dead", f"no process on this host has pid {pid} any more"
+
+
+def write_reclaimed_lock(lock, record: dict) -> tuple[str, dict | None, str]:
+    """Take over `lock` from a dead holder, writing `record` (S7): `("reclaimed", holder, why)`, or
+    the verdict that refused it, `live`, `unknown` or `busy`, with the holder and why.
+
+    Only `dead` is reclaimed, under the guard `<lock>.reclaim` taken with `O_EXCL`: its holder
+    re-reads the lock and unlinks it only where the bytes equal the ones it judged, then re-makes it
+    with `O_EXCL`, so of two racers exactly one holds the lock and the other reads `busy`. A guard
+    whose own holder is dead is cleared and that call reads `busy`, so no call both clears a guard
+    and takes one."""
+    lock = pathlib.Path(lock)
+    raw, holder = read_lock_holder(lock)
+    if raw is None:
+        return "busy", None, "the lock was released while this run judged it"
+    verdict, why = check_holder_dead(holder)
+    if verdict != "dead":
+        return verdict, holder, why
+    guard = lock.with_name(lock.name + load_govkit().RECLAIM_GUARD_SUFFIX)
+    try:
+        fd = os.open(str(guard), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except (FileExistsError, PermissionError):  # Windows: a guard pending deletion refuses the create
+        g_raw, g_holder = read_lock_holder(guard)
+        if g_raw is not None and check_holder_dead(g_holder)[0] == "dead" and read_lock_holder(guard)[0] == g_raw:
+            remove_shared_file(guard)
+            return "busy", holder, (f"cleared the guard {guard.name}, whose holder, pid "
+                                    f"{g_holder['pid']}, is no longer running; the next take reclaims")
+        return "busy", holder, f"another run holds the guard {guard.name} and is reclaiming this lock"
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps({"pid": os.getpid(), "started": time.time(), "host": THIS_HOST}) + "\n")
+        if read_lock_holder(lock)[0] != raw:
+            return "busy", holder, "the lock changed while this run judged it: another run took it"
+        remove_shared_file(lock)
+        try:
+            fd = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except (FileExistsError, PermissionError):
+            return "busy", holder, "another run took the lock first"
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as fh:
+            fh.write(json.dumps(record, indent=2) + "\n")
+        return "reclaimed", holder, why
+    finally:
+        remove_shared_file(guard)
+
+
+def remove_shared_file(path) -> None:
+    """Unlink `path`, retrying for up to two seconds while another process has it open: on Windows
+    an open handle refuses the unlink, and a racer reading a lock or its guard is exactly that."""
+    for _ in range(40):
+        try:
+            pathlib.Path(path).unlink(missing_ok=True)
+            return
+        except PermissionError:
+            time.sleep(0.05)
+    pathlib.Path(path).unlink(missing_ok=True)
+
+
 def load_govkit():
     """The deployer beside this file: the running module where it is the program, else imported by
     its path. Only the CLI asks for it — the remote ladder and the push base are govkit's."""
@@ -855,17 +1142,23 @@ def load_govkit():
     return mod
 
 
+def resolve_landed_ref(root) -> str | None:
+    """The default branch a row's introducing commit is derived along: the remote ladder's
+    `<remote>/<branch>`, else the local `<branch>`, `main` where nothing names one; None when
+    neither resolves, and then every row reads unlanded."""
+    remote, branch, _observed, refusal = load_govkit().resolve_remote(root)
+    if refusal:
+        raise Refusal(refusal)
+    branch = branch or "main"
+    return next((ref for ref in ((f"{remote}/{branch}", branch) if remote else (branch,))
+                 if run_git(root, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}")), None)
+
+
 def cmd_list(root, window: bool) -> int:
     """`list [--window]`: every row in order with its introducing commit and declaring file, the
     succession rows after them; or, under `--window`, each home a step row's `surfaces` declares,
     `open` or `closed by <step id>`. The landed ref is the remote ladder's default branch."""
-    gk = load_govkit()
-    remote, branch, _observed, refusal = gk.resolve_remote(root)
-    if refusal:
-        raise Refusal(refusal)
-    branch = branch or "main"
-    landed = next((ref for ref in ((f"{remote}/{branch}", branch) if remote else (branch,))
-                   if run_git(root, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}")), None)
+    landed = resolve_landed_ref(root)
     rows = read_steps(root, None, landed or "")
     retired = read_retired(root, None, landed or "")
     if window:
@@ -1136,6 +1429,590 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
     return 1 if fails else rc
 
 
+# THE WALK'S FIXTURES (TOOL-dSafePassage-2 S9). Their step program, `fx.py`, writes `<slug>.txt` into
+# the target through the before-image helper; its witness tests that file. It keeps its canaries
+# in `<target>.fx`, a sibling of the target, one file per step and verb with a line per spawn, and
+# reads its plants there: `<slug>.fail` exits 1 before any write, `<slug>.block` writes the image,
+# then the pid and `<slug>.blocking`, and waits to be killed.
+FIXTURE_WALK_STEP = r'''import importlib.util, os, pathlib, sys, time
+verb, target, slug = sys.argv[1], pathlib.Path(sys.argv[2]), sys.argv[3]
+reports = target.with_name(target.name + ".fx")
+reports.mkdir(exist_ok=True)
+with open(reports / f"{slug}.{verb}", "a", encoding="utf-8") as f:
+    f.write(f"{os.getpid()}\n")
+if verb == "witness":
+    sys.exit(0 if (target / f"{slug}.txt").is_file() else 1)
+spec = importlib.util.spec_from_file_location("upgrade_steps", pathlib.Path(__file__).resolve().parents[1] / "upgrade_steps.py")
+steps = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(steps)
+if verb == "down":
+    steps.write_from_before_image(target, f"fx/{slug}")
+    sys.exit(0)
+if (reports / f"{slug}.fail").exists():
+    sys.stderr.write(f"fx: {slug} {verb} fails by its plant\n")
+    sys.exit(1)
+after = steps.write_before_image(target, f"fx/{slug}", lambda before: {f"{slug}.txt": f"{slug}\n".encode()})
+if (reports / f"{slug}.block").exists():
+    (reports / f"{slug}.pid").write_text(str(os.getpid()), encoding="utf-8")
+    (reports / f"{slug}.blocking").touch()
+    for _ in range(600):
+        time.sleep(0.5)
+for p, data in after.items():
+    (target / p).write_bytes(data)
+'''
+# One walk, as `update` runs it, in a child process the `kill-*` plants can kill.
+FIXTURE_WALK_CHILD = r'''import importlib.util, json, pathlib, sys
+sys.stdout.reconfigure(encoding="utf-8")
+spec = importlib.util.spec_from_file_location("upgrade_steps", sys.argv[1])
+us = importlib.util.module_from_spec(spec)
+sys.modules["upgrade_steps"] = us
+spec.loader.exec_module(us)
+gov, target, to = pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3]), sys.argv[4]
+rp = target / ".governance" / "install.json"
+receipt = json.loads(rp.read_text(encoding="utf-8"))
+out = us.run_step_walk(gov, target, rp, receipt, us.derive_pending_steps(gov, receipt, to), to)
+print(f"walk: {out['pending']} pending · {out['applied']} applied · {out['skipped']} skipped · stopped at {out['stopped'] or 'none'}")
+sys.exit(1 if out["stopped"] else 0)
+'''
+# One take of a target's write lock through govkit's `take_write_lock`, held until `<release>`
+# exists; `<gate>` makes two racers start together. `-` waits for neither.
+FIXTURE_LOCK_CHILD = r'''import importlib.util, os, pathlib, sys, time
+sys.stdout.reconfigure(encoding="utf-8")
+spec = importlib.util.spec_from_file_location("upgrade_steps", sys.argv[1])
+us = importlib.util.module_from_spec(spec)
+sys.modules["upgrade_steps"] = us
+spec.loader.exec_module(us)
+gk = us.load_govkit()
+print(f"lock: taker pid {os.getpid()}", flush=True)
+deadline = time.time() + 300
+while sys.argv[3] != "-" and not pathlib.Path(sys.argv[3]).exists() and time.time() < deadline:
+    time.sleep(0.01)
+try:
+    gk.take_write_lock(pathlib.Path(sys.argv[2]), "update")
+except us.Refusal as e:
+    print(f"lock: refused · {e}", flush=True)
+    sys.exit(1)
+print("lock: taken", flush=True)
+while sys.argv[4] != "-" and not pathlib.Path(sys.argv[4]).exists() and time.time() < deadline:
+    time.sleep(0.05)
+'''
+WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending")
+LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-unreadable",
+               "lock-race", "guard-dead")
+UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit")
+
+
+def build_fixture_env(**extra: str) -> dict[str, str]:
+    """`build_tree_git_env` with a fixed commit identity: no `GIT_*` name of the caller's, no global
+    or system config, so every fixture repository is the same on every node."""
+    return {**build_tree_git_env(), "GIT_AUTHOR_NAME": "fx", "GIT_AUTHOR_EMAIL": "fx@e",
+            "GIT_COMMITTER_NAME": "fx", "GIT_COMMITTER_EMAIL": "fx@e", **extra}
+
+
+def run_fixture_git(cwd, *args: str, date: int | None = None) -> str:
+    """`git -C <cwd> <args>` under `build_fixture_env`, its stdout; `date` pins both commit dates."""
+    env = build_fixture_env(**({"GIT_AUTHOR_DATE": f"{date} +0000", "GIT_COMMITTER_DATE": f"{date} +0000"}
+                               if date else {}))
+    return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", env=env).stdout.strip()
+
+
+def render_fixture_row(slug: str, resume: bool = False, needs: bool = False) -> str:
+    """One `[[upgrade]]` row of the fixture step `fx/<slug>`, its argvs calling `fx.py`."""
+    def argv(verb: str) -> str:
+        return json.dumps(["python", "{gov}/govkit/steps/fx.py", verb, "{target}", slug])
+    return (f'[[upgrade]]\nid = "fx/{slug}"\nup = {argv("up")}\ndown = {argv("down")}\n'
+            f'witness = {argv("witness")}\n' + (f'resume = {argv("resume")}\n' if resume else "")
+            + f'surfaces = []\nneeds-target = {"true" if needs else "false"}\n\n')
+
+
+def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, dict[str, str]]:
+    """The `walk` family's scratch gov: A, a side branch from A introducing `s3`, B introducing `s1`
+    and `s2`, the side branch merged at M, C introducing `s4`, and for `not-pending` D introducing
+    `s5`. The side commit is dated before B, so only the first-parent order puts `s3` at M."""
+    gov = tmp / "gov"
+    gkd = gov / "tools" / HERE.name
+    (gkd / "steps").mkdir(parents=True)
+    run_fixture_git(gov.parent, "init", "-q", "-b", "main", gov.name)
+    (gkd / REGISTRY_FILE).write_text("", encoding="utf-8")
+    shutil.copy2(HERE / "upgrade_steps.py", gkd / "upgrade_steps.py")
+    (gkd / "steps" / "fx.py").write_text(FIXTURE_WALK_STEP, encoding="utf-8", newline="\n")
+    steps = gkd / STEPS_FILE
+    row = {s: render_fixture_row(s, resume=(plant == "resume" and s == "s3"),
+                                 needs=(plant == "attended" and s == "s2")) for s in ("s1", "s2", "s3", "s4", "s5")}
+    sha: dict[str, str] = {}
+
+    def commit(name: str, date: int, *rows: str) -> None:
+        if rows:
+            steps.write_text("".join(row[s] for s in rows), encoding="utf-8", newline="\n")
+        run_fixture_git(gov, "add", "-A")
+        run_fixture_git(gov, "commit", "-qm", name, date=date)
+        sha[name] = run_fixture_git(gov, "rev-parse", "HEAD")
+
+    commit("A", 1_700_000_000)
+    run_fixture_git(gov, "checkout", "-q", "-b", "side")
+    commit("S", 1_700_000_010, "s3")
+    run_fixture_git(gov, "checkout", "-q", "main")
+    commit("B", 1_700_000_020, "s1", "s2")
+    run_fixture_git(gov, "merge", "-q", "--no-ff", "--no-commit", "side")
+    commit("M", 1_700_000_030, "s1", "s2", "s3")
+    commit("C", 1_700_000_040, "s1", "s2", "s3", "s4")
+    if plant == "not-pending":
+        commit("D", 1_700_000_050, "s1", "s2", "s3", "s4", "s5")
+    return gov, sha
+
+
+def read_target_bytes(t: pathlib.Path) -> dict[str, bytes]:
+    """Every file under `t` but `.git`, by its relative path, and the index as `:index`: the bytes
+    two runs are compared on."""
+    out = {p.relative_to(t).as_posix(): p.read_bytes() for p in sorted(t.rglob("*"))
+           if p.is_file() and ".git" not in p.relative_to(t).parts}
+    out[":index"] = run_fixture_git(t, "ls-files", "-s").encode("utf-8")
+    return out
+
+
+def run_killed(argv: list[str], reports: pathlib.Path, slug: str, env: dict) -> str | None:
+    """Run `argv` until step `slug` blocks, then kill that process and the step's: None, or what
+    went wrong. The kill is TerminateProcess on Windows and SIGKILL elsewhere, so no `finally` runs."""
+    p = subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=env)
+    marker, deadline = reports / f"{slug}.blocking", time.time() + 300
+    while not marker.exists() and p.poll() is None and time.time() < deadline:
+        time.sleep(0.05)
+    if not marker.exists():
+        p.kill()
+        p.wait()
+        return f"{slug} never blocked (the run exited {p.returncode})"
+    step_pid = int((reports / f"{slug}.pid").read_text(encoding="utf-8"))
+    p.kill()
+    p.wait()
+    os.kill(step_pid, getattr(signal, "SIGKILL", signal.SIGTERM))
+    time.sleep(1)  # ponytail: the killed step's handles close asynchronously on Windows
+    return None
+
+
+def read_receipt_steps(t: pathlib.Path) -> list[dict]:
+    """The `steps` rows of the receipt at `t`."""
+    return json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8")).get("steps") or []
+
+
+def run_walk_fixture(plant: str | None) -> int:
+    """`fixture walk [--plant <case>]` (S9): AC1 to AC5 over a scratch gov and target under the temp
+    root. An unmet expectation prints `walk: FAILED`; otherwise the exit is the walk's own,
+    `fail-k`'s and `attended`'s 1 by design."""
+    with tempfile.TemporaryDirectory(prefix="gk-walk-", ignore_cleanup_errors=True) as td:
+        tmp = pathlib.Path(td)
+        gov, sha = build_walk_gov(tmp, plant)
+        env = build_fixture_env()
+        fails: list[str] = []
+
+        def expect(ok: bool, what: str) -> None:
+            if not ok:
+                fails.append(what)
+
+        def build_target(name: str, steps: list | None = None, files: dict | None = None) -> pathlib.Path:
+            t = tmp / name
+            (t / ".governance").mkdir(parents=True)
+            run_fixture_git(tmp, "init", "-q", "-b", "main", name)
+            for rel, body in (files or {}).items():
+                (t / rel).write_text(body, encoding="utf-8", newline="\n")
+            (t / ".governance" / "install.json").write_text(json.dumps(
+                {"schema": 4, "gov_commit": sha["A"], "kits": [], "files": [], "steps": steps or []},
+                indent=2) + "\n", encoding="utf-8", newline="\n")
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-qm", "base")
+            return t
+
+        def walk(t: pathlib.Path) -> tuple[int, str]:
+            p = subprocess.run([sys.executable, "-c", FIXTURE_WALK_CHILD, str(HERE / "upgrade_steps.py"),
+                                str(gov), str(t), sha["C"]], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", env=env, timeout=600)
+            print(p.stdout + p.stderr, end="")
+            return p.returncode, p.stdout + p.stderr
+
+        def lines_of(out: str) -> list[str]:
+            return [ln for ln in out.splitlines() if ln.startswith("step fx/")]
+
+        def canaries(t: pathlib.Path) -> list[str]:
+            r = t.with_name(t.name + ".fx")
+            return sorted(p.name for p in r.iterdir()) if r.is_dir() else []
+
+        def killed_walk(t: pathlib.Path) -> None:
+            argv = [sys.executable, "-c", FIXTURE_WALK_CHILD, str(HERE / "upgrade_steps.py"), str(gov), str(t), sha["C"]]
+            why = run_killed(argv, t.with_name(t.name + ".fx"), "s3", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            rows = read_receipt_steps(t)
+            last = [r["id"] for r in rows if r["state"] == "applied"][-1:]
+            s3 = next((r for r in rows if r["id"] == "fx/s3"), {})
+            print(f"walk: after the kill · last applied {last} · fx/s3 {s3.get('state')} · {s3.get('failure')}")
+            expect(last == ["fx/s2"], "the receipt does not read s2 as the last applied row after the kill")
+            expect(s3.get("state") == "failed" and str(s3.get("failure", "")).startswith("interrupted: started "),
+                   "the kill left no interrupted failure for s3: the pre-spawn row was not persisted")
+
+        t = tmp / "t"
+        rc = 0
+        if plant in (None, "not-pending"):
+            pre = [{"id": "fx/s2", "introduced": sha["B"], "state": "applied"}] if plant else []
+            t = build_target("t", pre)
+            rc, out = walk(t)
+            want = ["fx/s1", "fx/s3", "fx/s4"] if plant else ["fx/s1", "fx/s2", "fx/s3", "fx/s4"]
+            expect(lines_of(out) == [f"step {s} · applied" for s in want],
+                   f"the step lines are not {want} in that order, each applied")
+            expect([(r["id"], r["state"]) for r in read_receipt_steps(t)] == [(s, "applied") for s in
+                   (["fx/s2"] if plant else []) + want], "the receipt's steps do not list the walk so")
+            intro = {r["id"]: r["introduced"] for r in read_receipt_steps(t)}
+            expect(intro.get("fx/s3") == sha["M"], "s3's introducing commit is not the merge M")
+            print(f"walk: fx/s3 introduced at {'M' if intro.get('fx/s3') == sha['M'] else intro.get('fx/s3')}")
+            if plant:
+                spawned = [c for c in canaries(t) if c.startswith(("s2.", "s5."))]
+                print(f"walk: canaries of s2 and s5: {spawned or 'none'}")
+                expect(not spawned, "a step outside the pending set spawned")
+            expect(rc == 0, f"the walk exited {rc}")
+        elif plant == "witness-holds":
+            t = build_target("t", files={"s2.txt": "s2\n"})
+            rc, out = walk(t)
+            row = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s2"), {})
+            print(f"walk: fx/s2 up canary {'present' if 's2.up' in canaries(t) else 'absent'} · row {row.get('state')}")
+            expect("step fx/s2 · skipped (witness holds)" in lines_of(out), "s2 is not skipped by its witness")
+            expect("s2.up" not in canaries(t), "s2's up ran over a holding witness")
+            expect(row.get("state") == "applied" and rc == 0, "s2 does not read applied, or the walk failed")
+        elif plant == "fail-k":
+            t = build_target("t")
+            t.with_name("t.fx").mkdir()
+            (t.with_name("t.fx") / "s3.fail").touch()
+            rc, out = walk(t)
+            got = {r["id"]: r for r in read_receipt_steps(t)}
+            s3 = got.get("fx/s3", {})
+            print(f"walk: fx/s3 {s3.get('state')} · {s3.get('failure')} · canaries {canaries(t)}")
+            expect(got.get("fx/s1", {}).get("state") == "applied" and got.get("fx/s2", {}).get("state") == "applied",
+                   "s1 and s2 do not stay applied")
+            expect(s3.get("state") == "failed" and s3.get("failure") == "exit 1: fx: s3 up fails by its plant",
+                   "s3's failure does not name exit 1 and its stderr line")
+            expect("s4.up" not in canaries(t) and not [c for c in canaries(t) if c.endswith(".down")],
+                   "the walk went on past the failure, or a down ran")
+            expect(rc == 1, f"the walk exited {rc}, not 1")
+        elif plant in ("kill-step", "resume"):
+            t, t2 = build_target("t"), build_target("t2")
+            t.with_name("t.fx").mkdir()
+            (t.with_name("t.fx") / "s3.block").touch()
+            killed_walk(t)
+            (t.with_name("t.fx") / "s3.block").unlink()
+            rc, out = walk(t)
+            rc2, _out2 = walk(t2)
+            same = read_target_bytes(t) == read_target_bytes(t2)
+            print(f"walk: the re-run's target and receipt {'equal' if same else 'DIFFER from'} an uninterrupted walk's")
+            expect(same, "the re-run did not converge to an uninterrupted walk's bytes")
+            expect("step fx/s3 · applied" + (" · by its resume" if plant == "resume" else "") in lines_of(out),
+                   "the re-run did not apply s3")
+            ups = (t.with_name("t.fx") / "s3.up").read_text(encoding="utf-8").split()
+            resumed = (t.with_name("t.fx") / "s3.resume").is_file()
+            print(f"walk: fx/s3 up spawned {len(ups)} time(s) · resume {'spawned' if resumed else 'not spawned'}")
+            if plant == "resume":
+                expect(resumed and len(ups) == 1, "the re-run spawned s3's up, not its declared resume")
+            else:
+                expect(len(ups) == 2 and not resumed, "the re-run did not spawn s3's up again")
+            expect(rc == 0 and rc2 == 0, f"the re-run exited {rc}, the uninterrupted walk {rc2}")
+        elif plant == "attended":
+            t = build_target("t")
+            rc, out = walk(t)
+            s2 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s2"), {})
+            orders = sorted((t / ".governance" / "outbox").glob("update-attended-step-*.md"))
+            text = orders[0].read_text(encoding="utf-8") if orders else ""
+            print(f"walk: fx/s2 {s2.get('state')} · {s2.get('failure')} · order "
+                  f"{orders[0].name if orders else 'absent'} · up canary {'present' if 's2.up' in canaries(t) else 'absent'}")
+            expect(s2.get("failure") == "attended: the step needs the target's code", "s2 is not failed attended")
+            expect("fx/s2" in text and "fx.py up" in text.replace("'", ""), "the order does not name s2 and its up argv")
+            expect("s2.up" not in canaries(t) and rc == 1, "the attended step spawned, or the walk did not exit 1")
+            # The person's turn: s2's up by hand, outside the walk.
+            subprocess.run([sys.executable, str(gov / "tools" / HERE.name / "steps" / "fx.py"), "up", str(t), "s2"],
+                           capture_output=True, env=env, timeout=600)
+            rc2, out2 = walk(t)
+            expect(lines_of(out2) == ["step fx/s2 · skipped (witness holds)", "step fx/s3 · applied",
+                                      "step fx/s4 · applied"] and rc2 == 0,
+                   "the re-run does not pass s2 by its witness and apply s3 and s4")
+        for f in fails:
+            print(f"walk: FAILED · {f}")
+        return 1 if fails else rc
+
+
+def run_lock_fixture(plant: str) -> int:
+    """`fixture lock --plant <case>` (S9): AC7 and AC8, each take a child process calling govkit's
+    `take_write_lock` over a scratch target whose lock the plant wrote. An unmet expectation prints
+    `lock: FAILED`; otherwise the exit is the take's, the refusing plants' 1 by design."""
+    with tempfile.TemporaryDirectory(prefix="gk-lock-", ignore_cleanup_errors=True) as td:
+        tmp = pathlib.Path(td)
+        t = tmp / "t"
+        gk = load_govkit()
+        lock = t.joinpath(*gk.WRITE_LOCK_REL.split("/"))
+        guard = lock.with_name(lock.name + gk.RECLAIM_GUARD_SUFFIX)
+        lock.parent.mkdir(parents=True)
+        env = build_fixture_env()
+        fails: list[str] = []
+        sleeper = None
+
+        def expect(ok: bool, what: str) -> None:
+            if not ok:
+                fails.append(what)
+
+        def dead_pid() -> int:
+            p = subprocess.Popen([sys.executable, "-c", "pass"])
+            p.wait()
+            return p.pid
+
+        def plant_lock(pid: int, started: float, host: str | None = THIS_HOST) -> bytes:
+            rec = {"pid": pid, "verb": "update", "started": started,
+                   "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(started))}
+            if host:
+                rec["host"] = host
+            lock.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+            return lock.read_bytes()
+
+        def take(gate: str = "-", release: str = "-", out_file: pathlib.Path | None = None):
+            argv = [sys.executable, "-c", FIXTURE_LOCK_CHILD, str(HERE / "upgrade_steps.py"), str(t), gate, release]
+            if out_file is None:
+                p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                   env=env, timeout=600)
+                print(p.stdout + p.stderr, end="")
+                return p.returncode, p.stdout + p.stderr
+            return subprocess.Popen(argv, stdout=open(out_file, "w", encoding="utf-8"),
+                                    stderr=subprocess.STDOUT, env=env)
+
+        def taker_pid(out: str) -> int | None:
+            m = re.search(r"lock: taker pid (\d+)", out)
+            return int(m[1]) if m else None
+
+        def held() -> dict:
+            return read_lock_holder(lock)[1] or {}
+
+        try:
+            rc = 0
+            if plant in ("lock-dead", "lock-reused", "lock-live", "lock-foreign-host", "lock-unreadable"):
+                if plant == "lock-dead":
+                    holder = dead_pid()
+                    before = plant_lock(holder, time.time() - 30)
+                elif plant in ("lock-reused", "lock-live"):
+                    sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)"])
+                    holder = sleeper.pid
+                    time.sleep(0.5)
+                    before = plant_lock(holder, time.time() - (600 if plant == "lock-reused" else 0))
+                elif plant == "lock-foreign-host":
+                    holder = dead_pid()
+                    before = plant_lock(holder, time.time() - 30, "gk-elsewhere.invalid")
+                else:
+                    holder = None
+                    lock.write_text("not a lock\n", encoding="utf-8", newline="\n")
+                    before = lock.read_bytes()
+                rc, out = take()
+                if plant in ("lock-dead", "lock-reused"):
+                    rec = held()
+                    print(f"lock: held by pid {rec.get('pid')} · host {rec.get('host')}")
+                    expect(rc == 0 and f"reclaimed {lock.as_posix()}" in out and f"pid {holder} " in out,
+                           f"the dead holder pid {holder} was not reclaimed, naming it")
+                    expect(rec.get("pid") == taker_pid(out) and rec.get("host") == THIS_HOST,
+                           "the lock does not name the taker's pid and this host")
+                else:
+                    print(f"lock: the planted lock {'unchanged' if lock.read_bytes() == before else 'CHANGED'}")
+                    expect(rc == 1 and "another govkit write holds" in out and "reclaim" in out,
+                           "the take did not refuse with the holder described and the remedy naming the reclaim")
+                    expect(lock.read_bytes() == before, "a refusing take changed the lock")
+                    expect({"lock-live": f"pid {holder} ", "lock-foreign-host": "gk-elsewhere.invalid",
+                            "lock-unreadable": "no readable pid"}[plant] in out, "the refusal does not describe the holder")
+            elif plant == "lock-race":
+                plant_lock(dead_pid(), time.time() - 30)
+                gate, release = tmp / "go", tmp / "release"
+                outs = [tmp / "r1.out", tmp / "r2.out"]
+                racers = [take(str(gate), str(release), o) for o in outs]
+                time.sleep(1)
+                gate.touch()
+                deadline = time.time() + 300
+
+                def settled(i: int) -> bool:
+                    text = outs[i].read_text(encoding="utf-8", errors="replace")
+                    return "lock: taken" in text or "lock: refused" in text or racers[i].poll() is not None
+                while not all(settled(i) for i in (0, 1)) and time.time() < deadline:
+                    time.sleep(0.1)
+                pid_held = held().get("pid")
+                release.touch()
+                codes = [r.wait(timeout=300) for r in racers]
+                texts = [o.read_text(encoding="utf-8", errors="replace") for o in outs]
+                print("".join(texts), end="")
+                won = [i for i in (0, 1) if codes[i] == 0]
+                print(f"lock: racers exit {codes} · the lock names pid {pid_held}")
+                expect(len(won) == 1, "not exactly one racer took the lock")
+                if len(won) == 1:
+                    expect(pid_held == taker_pid(texts[won[0]]), "the lock does not name the winner")
+                    expect("busy" in texts[1 - won[0]], "the losing racer did not refuse busy")
+            elif plant == "guard-dead":
+                before = plant_lock(dead_pid(), time.time() - 30)
+                guard.write_text(json.dumps({"pid": dead_pid(), "started": time.time() - 10, "host": THIS_HOST}) + "\n",
+                                 encoding="utf-8", newline="\n")
+                rc1, out1 = take()
+                print(f"lock: first take exits {rc1} · guard {'present' if guard.exists() else 'cleared'} · "
+                      f"lock {'unchanged' if lock.read_bytes() == before else 'CHANGED'}")
+                expect(rc1 == 1 and "busy" in out1 and "cleared the guard" in out1 and not guard.exists()
+                       and lock.read_bytes() == before, "the first take did not clear the dead guard and refuse busy")
+                rc, out = take()
+                expect(rc == 0 and "reclaimed" in out and held().get("pid") == taker_pid(out),
+                       "the second take did not reclaim the lock")
+        finally:
+            if sleeper is not None:
+                sleeper.kill()
+                sleeper.wait()
+        for f in fails:
+            print(f"lock: FAILED · {f}")
+        return 1 if fails else rc
+
+
+def run_update_fixture(plant: str | None) -> int:
+    """`fixture update [--plant <case>]` (S9): AC6 and AC9 through a scratch gov holding copies of
+    this checkout's `govkit.py`, `upgrade_steps.py` and the process-monitor census, a `demo` kit, and
+    at B the steps `fx/s1` and `fx/s2`; a target installed at A is moved to B. An unmet expectation
+    prints `update: FAILED`; otherwise the exit is `update`'s, `update-fail`'s 1 by design."""
+    with tempfile.TemporaryDirectory(prefix="gk-upd-", ignore_cleanup_errors=True) as td:
+        tmp = pathlib.Path(td)
+        gov = tmp / "gov"
+        gkd, demo = gov / "tools" / HERE.name, gov / "tools" / "demo"
+        for d in (gkd, demo, gov / "tools" / "process-monitor"):
+            d.mkdir(parents=True)
+        for name in ("govkit.py", "upgrade_steps.py", "adopters.toml"):
+            shutil.copy2(HERE / name, gkd / name)
+        pm = load_govkit().resolve_kit_dir("process-monitor", "census.py", HERE)
+        shutil.copy2(pm / "census.py", gov / "tools" / "process-monitor" / "census.py")
+        (gkd / REGISTRY_FILE).write_text(
+            '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
+            '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+            '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n\n'
+            '[[exempt]]\npath = "{prefix}/process-monitor"\nwhy = "the census a lock reclaim reads"\n',
+            encoding="utf-8", newline="\n")
+        (demo / "kit.toml").write_text('id = "demo"\nhome = "demo"\n[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                                       '[adopt]\nargv = []\nmutates_index = false\n', encoding="utf-8", newline="\n")
+        (demo / "one.txt").write_text("v1\n", encoding="utf-8", newline="\n")
+        run_fixture_git(tmp, "init", "-q", "-b", "main", "gov")
+        run_fixture_git(gov, "add", "-A")
+        run_fixture_git(gov, "commit", "-qm", "A")
+        sha_a = run_fixture_git(gov, "rev-parse", "HEAD")
+        env = build_fixture_env(GOVKIT_NO_REMOTE_PROBE="1")
+        fails: list[str] = []
+
+        def expect(ok: bool, what: str) -> None:
+            if not ok:
+                fails.append(what)
+
+        def govkit(*args: str) -> tuple[int, str]:
+            p = subprocess.run([sys.executable, str(gkd / "govkit.py"), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", env=env, timeout=600)
+            return p.returncode, p.stdout + p.stderr
+
+        def build_target(name: str) -> pathlib.Path:
+            t = tmp / name
+            (t / ".governance").mkdir(parents=True)
+            run_fixture_git(tmp, "init", "-q", "-b", "main", name)
+            (t / "README.md").write_text("target\n", encoding="utf-8", newline="\n")
+            (t / ".governance" / "deploy.toml").write_text('gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n',
+                                                           encoding="utf-8", newline="\n")
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-qm", "base")
+            rc, out = govkit("apply", "--target", str(t))
+            if rc != 0:
+                fails.append(f"the scratch install of {name} failed ({rc}): {out[-600:]}")
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-qm", "install")
+            return t
+
+        targets = {n: build_target(n) for n in (("t", "t2") if plant in ("kill-walk", "kill-walk-edit") else ("t",))}
+        (gkd / "steps").mkdir()
+        (gkd / "steps" / "fx.py").write_text(FIXTURE_WALK_STEP, encoding="utf-8", newline="\n")
+        (gkd / STEPS_FILE).write_text(render_fixture_row("s1") + render_fixture_row("s2"), encoding="utf-8", newline="\n")
+        (demo / "one.txt").write_text("v2\n", encoding="utf-8", newline="\n")
+        run_fixture_git(gov, "add", "-A")
+        run_fixture_git(gov, "commit", "-qm", "B")
+        sha_b = run_fixture_git(gov, "rev-parse", "HEAD")
+        t = targets["t"]
+        reports = t.with_name("t.fx")
+
+        def receipt_of(tt: pathlib.Path) -> dict:
+            return json.loads((tt / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+        def canaries() -> list[str]:
+            return sorted(p.name for p in reports.iterdir()) if reports.is_dir() else []
+
+        def staged(tt: pathlib.Path) -> set[str]:
+            return set(run_fixture_git(tt, "diff", "--cached", "--name-only").splitlines())
+
+        rc = 0
+        if fails:
+            pass
+        elif plant is None:
+            rc, out = govkit("update", "--target", str(t), "--to", sha_b, "--write")
+            print(out, end="")
+            lines = out.splitlines()
+            at = [i for i, ln in enumerate(lines) if ln.startswith("step fx/")]
+            land = [i for i, ln in enumerate(lines) if "tools/demo/one.txt" in ln]
+            rerender = [i for i, ln in enumerate(lines) if ln.startswith("govkit update — re-render")]
+            print(f"update: write-loop lines end at {max(land, default=None)} · step lines {at} · re-render begins at "
+                  f"{min(rerender, default=None)}")
+            expect(len(at) == 2 and land and rerender and max(land) < min(at) and max(at) < min(rerender),
+                   "the step lines are not after the write loop's and before the re-render block's")
+            expect("govkit update — steps: 2 pending · 2 applied · 0 skipped · stopped at none" in lines,
+                   "the summary line does not read 2 pending · 2 applied · 0 skipped · stopped at none")
+            expect(receipt_of(t).get("gov_commit") == sha_b and rc == 0, "the stamp did not move to B")
+            want = {"s1.txt", "s2.txt", ".governance/steps/fx/s1.before.json", ".governance/steps/fx/s2.before.json"}
+            print(f"update: staged step writes: {sorted(want & staged(t))}")
+            expect(want <= staged(t), "a step's write is left unstaged")
+        elif plant in ("read-only", "scoped"):
+            rc, out = govkit("update", "--target", str(t), "--to", sha_b,
+                             *(("--kits", "demo", "--write") if plant == "scoped" else ()))
+            print(out, end="")
+            print(f"update: step canaries {canaries() or 'none'}")
+            if plant == "read-only":
+                expect([ln.strip() for ln in out.splitlines() if "would walk" in ln]
+                       == ["govkit update —   would walk fx/s1".strip(), "govkit update —   would walk fx/s2".strip()],
+                       "the read-only run does not print `would walk` for each of the two steps")
+            else:
+                expect(any(ln.startswith("govkit update — steps: not walked") and ln.endswith("· 2 pending")
+                           for ln in out.splitlines()), "the scoped run does not print `steps: not walked` with 2 pending")
+            expect(not canaries(), "a step spawned on a read-only or scoped run")
+        elif plant == "update-fail":
+            reports.mkdir()
+            (reports / "s2.fail").touch()
+            rc, out = govkit("update", "--target", str(t), "--to", sha_b, "--write")
+            print(out, end="")
+            got = {r["id"]: r["state"] for r in receipt_of(t).get("steps") or []}
+            print(f"update: gov_commit {'A' if receipt_of(t).get('gov_commit') == sha_a else receipt_of(t).get('gov_commit')} · "
+                  f"steps {got} · tools/demo/one.txt {(t / 'tools' / 'demo' / 'one.txt').read_bytes()!r}")
+            expect(rc == 1 and receipt_of(t).get("gov_commit") == sha_a, "a stopped walk let the stamp move")
+            expect(got == {"fx/s1": "applied", "fx/s2": "failed"}, "s1 is not applied and s2 failed")
+            expect((t / "tools" / "demo" / "one.txt").read_bytes() == b"v2\n", "the file rows did not land")
+            expect(not [c for c in canaries() if c.endswith(".down")], "a down ran")
+        else:
+            reports.mkdir()
+            (reports / "s1.block").touch()
+            argv = [sys.executable, str(gkd / "govkit.py"), "update", "--target", str(t), "--to", sha_b, "--write"]
+            why = run_killed(argv, reports, "s1", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            (reports / "s1.block").unlink()
+            journal = set(read_staging_journal(t))
+            print(f"update: after the kill · journal {sorted(journal)} · staged {sorted(staged(t))}")
+            expect(journal and journal == staged(t), "the staging journal's paths do not equal the staged set")
+            if plant == "kill-walk-edit":
+                (t / "tools" / "demo" / "one.txt").write_text("operator edit\n", encoding="utf-8", newline="\n")
+                run_fixture_git(t, "add", "tools/demo/one.txt")
+            rc, out = govkit("update", "--target", str(t), "--to", sha_b, "--write")
+            print(out, end="")
+            if plant == "kill-walk-edit":
+                expect(rc != 0 and "DIRTY: tools/demo/one.txt" in out,
+                       "the re-run did not refuse the operator's different blob at a journaled path as dirty")
+            else:
+                rc2, _out2 = govkit("update", "--target", str(targets["t2"]), "--to", sha_b, "--write")
+                a, b = read_target_bytes(t), read_target_bytes(targets["t2"])
+                print(f"update: the re-run's bytes {'equal' if a == b else 'DIFFER from'} an uninterrupted run's"
+                      + ("" if a == b else f": {sorted(k for k in set(a) | set(b) if a.get(k) != b.get(k))}"))
+                expect(rc == 0 and "reclaimed" in out and a == b and rc2 == 0,
+                       "the re-run did not reclaim the lock and converge to an uninterrupted run's bytes")
+        for f in fails:
+            print(f"update: FAILED · {f}")
+        return 1 if fails else rc
+
+
 def main(argv: list[str]) -> int:
     root = next((p for p in HERE.parents if (p / ".git").exists()), HERE.parent.parent)
     try:
@@ -1146,8 +2023,17 @@ def main(argv: list[str]) -> int:
         if argv[:2] == ["fixture", "isolation"] and (
                 len(argv) == 2 or (len(argv) == 4 and argv[2] == "--plant" and argv[3] in FIXTURE_PLANTS)):
             return run_isolation_fixture(argv[3] if len(argv) == 4 else None)
+        for family, plants, run, bare in (("walk", WALK_PLANTS, run_walk_fixture, True),
+                                          ("lock", LOCK_PLANTS, run_lock_fixture, False),
+                                          ("update", UPDATE_PLANTS, run_update_fixture, True)):
+            if argv[:2] == ["fixture", family] and ((bare and len(argv) == 2) or (
+                    len(argv) == 4 and argv[2] == "--plant" and argv[3] in plants)):
+                return run(argv[3] if len(argv) == 4 else None)
         sys.stderr.write(f"usage: python upgrade_steps.py list [--window] | frozen [--base <rev>] | "
-                         f"fixture isolation [--plant {'|'.join(FIXTURE_PLANTS)}]\n")
+                         f"fixture isolation [--plant {'|'.join(FIXTURE_PLANTS)}] | "
+                         f"fixture walk [--plant {'|'.join(WALK_PLANTS)}] | "
+                         f"fixture lock --plant {'|'.join(LOCK_PLANTS)} | "
+                         f"fixture update [--plant {'|'.join(UPDATE_PLANTS)}]\n")
         return 2
     except Refusal as e:
         sys.stderr.write(f"upgrade-steps: {e}\n")
