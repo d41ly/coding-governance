@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-12 — the work order's `map` slot for the roles `memory.project-map` names, with each item's unfolds
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 15 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 15 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0203@325cbb22 whole
 **Carries:** node:policy-key.memory.project-map
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
 
@@ -81,6 +82,7 @@ kit's dossier map, not the project map (scout B, row 12). The delivery the owner
 - **hands-off** `TOOL-dFurnishedOrders-17` — `derive_role_set`, which unit 17 reads for `memory.code-roles` and whose `structural-roles` row it extends with the researcher
 - **consumes-from** external — TOOL-dBoundRoles-1 (the roster's slots and `acts-as`), TOOL-dBoundRoles-3 S1 (the item's declaration at render), TOOL-dPlacedRequest-6 S1 and S2 (`map`, `unfolds`), TOOL-dTotalRecall-14 S2 and S6 (`gov_map.py` and its budget), PLAY-dOrderedCharter-19 S2 (`namespaces.toml`); DEFERRED at base
 - **hands-off** external — TOOL-dTotalRecall-14's renderer fills the slot this unit declares; its §3 line 96 and PLAY-dOrderedCharter-17:72 give the delivery to dBoundRoles, which the clause gives here
+- **hands-off** `TOOL-dFurnishedOrders-29` — `derive_role_set`, the map slot's key reads, its unfolds and its renderer, which unit 29 S25, S9, S11, S8 and S24 settle (ids 59, 29, 31, 26, 57)
 
 ## 4. Design
 
@@ -248,6 +250,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 · each `memory.proje
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 12, the brief's J1, J4, J16 and D2,
   scout B's row 12, project-map.md PM-1, PM-6 and `[delivery]`, and the source at `1a3ce03d`.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

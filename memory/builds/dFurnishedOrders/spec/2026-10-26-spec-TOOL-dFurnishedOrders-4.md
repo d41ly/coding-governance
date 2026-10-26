@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-4 — the work order's optional slots in three states, and bug classes as a core field the spec names
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 4 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 4 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0195@d3ad9dda whole
 
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 |
+| [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
 
@@ -128,6 +129,9 @@ their readers inventoried by value and an upgrade step for each.
 - **hands-off** `TOOL-dFurnishedOrders-18` — `render_slot`, through which the code-notes slot's delivery and the `instructions` slot render
 - **consumes-from** `TOOL-dFurnishedOrders-8` — `doc.build-method#m6-passes-commits-parallelism`, the slice `gov-builder` carries, so S6's edit to M6 re-renders that role's file
 - **consumes-from** external — TOOL-dBoundRoles-3's work order and TOOL-dBoundRoles-23's `boundaries` frame slot, PLAY-dOrderedCharter-17 S9's slot grammar and TOOL-dSafePassage-1's `[[upgrade]]` rows and `upgrade_steps.py`, each specced and unbuilt at base
+- **hands-off** `TOOL-dFurnishedOrders-25` — `retired_dispatch_args.py` and the two `[[upgrade]]` rows, whose `witness` and `up` scan unit 25 bounds to executable call sites (id 50)
+- **hands-off** `TOOL-dFurnishedOrders-29` — `render_slot`, `ORDER_SLOTS` and the `--for-names` lookup, whose reader unit 29 S24 bounds and whose slot list S26 holds once (ids 57, 10)
+- **hands-off** `TOOL-dFurnishedOrders-30` — the retired dispatch keys, their step ids, the Skill's per-pass line and the gotchas contract, which unit 30 S1, S2, S4 and S10 settle (ids 6, 20, 49, 11, 21, 40, 46)
 
 ## 4. Design
 
@@ -369,6 +373,7 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC5 AC6 · the `preb
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 4, the brief's J4, J5, J21 and D3,
   scout B's row 4, and the source at `1a3ce03d`.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-25, TOOL-dFurnishedOrders-29, TOOL-dFurnishedOrders-30, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

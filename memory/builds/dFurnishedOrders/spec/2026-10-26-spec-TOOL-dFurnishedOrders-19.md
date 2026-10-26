@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-19 — every role return declaring the rows it establishes, and each work order's return schema rendered from its own rows, so a dropped, invented or doubled row fails the return and is retried
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0210@c44de500 whole
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-19-deviation-191.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-19-deviation-191.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 |
+| [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
 
@@ -105,6 +106,9 @@ per-order schema to the other (TOOL-dDeclaredLoop-29 §3, TOOL-dBoundRoles-5 §3
 - **hands-off** `TOOL-dFurnishedOrders-7` — `render_return_schema`, through which a return's `repair` rows are declared and an order's handed repairs are each required once
 - **hands-off** `TOOL-dFurnishedOrders-20` — `render_return_schema`, through which the problems handed as `problem#<problem id>` rows are allowed values each required once
 - **consumes-from** external — TOOL-dDeclaredLoop-29 S3 to S6 (the row grammar, the `### upstream:rows` block, `join_upstream`) and TOOL-dBoundRoles-5 S1, S3 and S6 (`validate_return`, the retry, `spawnWithRetries`), specced and DEFERRED at base `2193e25d`
+- **hands-off** `TOOL-dFurnishedOrders-24` — `render_return_schema`, `check_return_schema` and `SCHEMA_KEYWORDS`, which unit 24 extends with one branch per outcome (id 4)
+- **hands-off** `TOOL-dFurnishedOrders-29` — `validate_return`'s schema evaluation and the establishes arm, which unit 29 S12, S13 and S30 settle (ids 32, 33, 5)
+- **hands-off** `TOOL-dFurnishedOrders-30` — `returnRows` and `addUpstreamSchema`, whose rows unit 30 S9 checks in-script (id 28)
 
 ## 4. Design
 
@@ -300,6 +304,7 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC9 · the unit harn
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 19, the brief's J3 and J18 and D5,
   scout B's row for cl-0210, night-pass-two.md's point 4, the prior art's probe 1, and the source at
   `2193e25d`.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-24, TOOL-dFurnishedOrders-29, TOOL-dFurnishedOrders-30, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-1 — the orientation scout composing the card in a sidechain at session start, its recall re-verified once at entry and a moved-source record handed as stale
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 5 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 5 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0192@e52307f5 whole
 
@@ -16,9 +16,11 @@
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-1-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-1-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-1-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-2-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-2-reuse-scout.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dFurnishedOrders-1-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-2-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-3-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-3-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md) | research | TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 |
+| [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
 
@@ -109,6 +111,8 @@ and `:314-316`).
 - **hands-off** `TOOL-dFurnishedOrders-7` — `stale=`, the fact line's stale attribute, which a repaired fact carries once a source its repairing return read moves
 - **hands-off** `TOOL-dFurnishedOrders-14` — `stale=`, the fact line's stale attribute, which the repaired fact handed while its ask is open carries when its source moves
 - **consumes-from** external — TOOL-dBoundRoles-13's fact line, `FACT_RE`, its JavaScript copy and `render_handoff`'s fact cut, specced and DEFERRED at base `2193e25d`
+- **hands-off** `TOOL-dFurnishedOrders-29` — the fact-line recall run of S6, whose verb resolution and `stale=unchecked` failure form unit 29 S23 adds (id 56)
+- **hands-off** `TOOL-dFurnishedOrders-30` — the `RECALL — ` annotation lines of S4, which unit 30 S7 keeps under their rows when the map cell is lifted (id 55)
 
 ## 4. Design
 
@@ -309,6 +313,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC7 · a render of a scratch 
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 1, the brief's J6 and J7, scout A's
   row for cl-0192, P29 items 3 and 8, and the source at `2193e25d`.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-29, TOOL-dFurnishedOrders-30, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

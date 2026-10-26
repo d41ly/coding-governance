@@ -19,7 +19,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 24 | 2026-10-21 | active | 0 |
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 107 | 2026-10-26 | active | 0 |
 | [dFairHearing](builds/dFairHearing/README.md) | DEFERRED | d | 2026-10-21 | tooling | 40 | 2026-10-23 | active | 0 |
-| [dFurnishedOrders](builds/dFurnishedOrders/README.md) | OPEN | d | 2026-10-21 | tooling | 21 | 2026-10-26 | active | 0 |
+| [dFurnishedOrders](builds/dFurnishedOrders/README.md) | OPEN | d | 2026-10-21 | tooling | 30 | 2026-10-26 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-10-26 | active | 0 |
 | [dKeptSession](builds/dKeptSession/README.md) | DEFERRED | d | 2026-10-21 | kickoff | 65 | 2026-10-26 | active | 0 |
 | [dLinkedLibrary](builds/dLinkedLibrary/README.md) | OPEN | d | 2026-10-21 | tooling | 26 | 2026-10-21 | active | 0 |

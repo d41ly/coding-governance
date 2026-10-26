@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-6 — the answered-call hook: a role agent's call its work order already answers refused, warned or recorded by `roles.answered-calls`, a verifier's read of its subject exempt, and each hook failure recorded
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 11 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 11 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0197@ced122c4 whole
 **Carries:** node:policy-key.roles.answered-calls
@@ -14,6 +14,7 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 |
+| [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
 
@@ -107,6 +108,8 @@ cover. Below CLI 2.1.295, where a rule on an ungated tool stays open when its ho
 - **consumes-from** `TOOL-dFurnishedOrders-14` — `match_answered_range`, spelled `checkAnsweredRange` in the hook (that unit's §8 F2), with `deriveCallRead` and `readHandedRanges`
 - **hands-off** `TOOL-dFurnishedOrders-10` — `read_answered_calls`, the one reader of the hook's records, which the role metrics count by verdict
 - **consumes-from** external — TOOL-dBoundRoles-7 S4 (`readWorkOrderAllowance`'s transcript locator), TOOL-dBoundRoles-13 (the `cmd:` key), TOOL-dBoundRoles-17 S1 (`item=`), TOOL-dBoundRoles-25 S2 (the pack layout), TOOL-dBoundRoles-5 S5 (the roles arm of `check-wiring.sh`), each specced and unbuilt at base `2193e25d`
+- **hands-off** `TOOL-dFurnishedOrders-23` — `checkAnsweredCall`'s exemption step and the suite's `### input:claim` plant, which unit 23 keys on `subject-reads` and replaces with the shipped population (id 48)
+- **hands-off** `TOOL-dFurnishedOrders-29` — `answered-calls.js`, its suite and its leg, whose broken-index path, version fold, registries, guard and sibling reach unit 29 S1, S2 and S18 to S20 settle (ids 2, 23, 43, 44, 45)
 
 ## 4. Design
 
@@ -332,6 +335,7 @@ New arm: tools/check-wiring.test.sh · covers AC9 · a fixture settings file lac
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 6, the brief's J12 and D1, scout A's row
   for cl-0197, `layer-roles.md` `[trust]` item 10 and F3-2, `layer-runtime.md:175-185`, and the source
   at `2193e25d`.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-23, TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

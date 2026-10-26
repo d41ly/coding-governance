@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-16 — owner questions asked live while the build is attended, never decided at raise, and a late answer placed as an amendment that re-enters its item
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 20 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 20 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0207@770af750 whole
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-c.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-c.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-15 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 |
 
 <!-- /gen:spec-records -->
 
@@ -123,6 +124,11 @@ the owner attends, and places a late answer as an amendment re-entering the item
 
 - **consumes-from** external — TOOL-dBoundRoles-11 S5 and S6 (`resolve_owner_question`, the door, the FORKED case), TOOL-dBoundRoles-21 S1 (`read_policy_setting`), KICK-dKeptSession-17 S2, S4 and S6 (`attendance`, `breakpoints.py list`, `ATTENDANCE_INTERACTIONS`), TOOL-dDeclaredLoop-16 S4, -19 S6, -30 S3 and -31 S6 (the disposition record, the gate hold, `record_draw`, `check_owner_disposition`), TOOL-dPlacedRequest-4 S1, S4 and S7 (`placement.py`, its block, `record`) and -19 (`request_content_key`); each specced and unbuilt at base
 - **hands-off** external — dWellOiledMachine: the deadline and silence that end a hold, a late answer to a silence-decided item, and the mailbox channel that writes a disposition record
+- **hands-off** `TOOL-dFurnishedOrders-26` — `derive_attended`, the `turns` read and the `owner-question` door, which unit 26 gives the run's window (id 3)
+- **hands-off** `TOOL-dFurnishedOrders-27` — the two driver paths that ask the `owner-question` door, which unit 27 routes through one helper carrying the run's window (id 19)
+- **hands-off** `TOOL-dFurnishedOrders-28` — `derive_attended`'s `unread` row and its `turns` read, which unit 28 decides inside a run's window and bounds (id 52)
+- **hands-off** `TOOL-dFurnishedOrders-29` — `derive_attended`, which unit 29 S29 gives a transcripts root (id 60)
+- **hands-off** `TOOL-dFurnishedOrders-30` — S11's asked-live Skill line, which unit 30 S5 fits under the Skill's size row (id 41)
 
 ## 4. Design
 
@@ -327,6 +333,7 @@ observed RED then GREEN at the close as M8 owes, and its suite's clean reading i
   brief's J22 and D9, scout C's row for cl-0207, TOOL-dBoundRoles-11, KICK-dKeptSession-17,
   TOOL-dDeclaredLoop-16, -19, -30 and -31, TOOL-dPlacedRequest-3, -4 and -14, and the driver, the
   renderer and runlog at base `2193e25d`.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-26, TOOL-dFurnishedOrders-27, TOOL-dFurnishedOrders-28, TOOL-dFurnishedOrders-29, TOOL-dFurnishedOrders-30, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 
