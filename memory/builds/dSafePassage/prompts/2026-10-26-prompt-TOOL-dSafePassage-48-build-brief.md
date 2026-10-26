@@ -41,6 +41,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 ## Traps this repository has already paid for
 
+- `--dispatch` takes ONE `--writes <path>` per path (`--writes a --writes b`); a space-joined list is refused by check 49, and the verb then re-runs the 3-5 min spec-token check. Your Tier-2 spec is `DEFERRED`: move it to `INPROGRESS` before your first product write, as the units before you did, and commit it only as `CLOSED`.
 - `git commit` here runs a pre-commit hook that can take minutes: give the Bash call a 600000 ms timeout.
 - Python written through a bash heredoc loses a level of backslashes; write scripts to a file under your scratch.
 - A subprocess `bash` from Python is WSL's, blind to this worktree's git; call `git` directly.
