@@ -72,8 +72,10 @@ which is what `breach` reports.
 The receipt, `.governance/install.json`, declares its `schema`. Schema 4 adds `steps`, one row per
 step that has run on this repository: its `id`, the commit that `introduced` it (`null` for a step
 that ran before its row landed), and its `state`, one of `applied`, `failed` (with the `failure`
-text) or `rolled-back`. The last `applied` row is the last step completed. `govkit.py check`
-reports a malformed `steps` field as a problem naming the row.
+text) or `rolled-back` (with none). An `applied` row carries a `failure` only where a rollback's
+down stopped on it, and that text opens with `down interrupted:`, `down exit `, `witness still holds
+after down` or `reverted check exits `. The last `applied` row is the last step completed.
+`govkit.py check` reports a malformed `steps` field as a problem naming the row.
 
 A first install, by `apply` or `adopt`, is born at schema 4 with an empty `steps`. An existing
 receipt at schema 4 keeps its schema and its `steps` across a re-apply, an `adopt --re-adopt` or an
@@ -139,6 +141,52 @@ python tools/govkit/upgrade_steps.py fixture walk                       # s1 to 
 python tools/govkit/upgrade_steps.py fixture walk --plant kill-step     # killed, re-run, converges
 python tools/govkit/upgrade_steps.py fixture lock --plant lock-dead     # reclaimed
 python tools/govkit/upgrade_steps.py fixture update --plant kill-walk   # update killed mid-step
+```
+
+## Rolling back
+
+`update` refuses a `--to` older than the commit the receipt records: a downgrade is not an update.
+When you do mean to go back, ask for it by name:
+
+```sh
+python tools/govkit/govkit.py update --target <repo> --rollback --to <rev>          # preview
+python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --write  # perform
+```
+
+- **When.** `<rev>` must be an ancestor of the receipt's `gov_commit`. A receipt with no
+  `gov_commit`, a `<rev>` that is not an ancestor, `--rollback` with `--kits`, and a `<rev>` equal to
+  the receipt's commit with no step to undo are each refused, naming why. Without `--to`,
+  `--rollback` does nothing.
+- **What runs, in what order.** Every step introduced after `<rev>` that the receipt records
+  `applied` or `failed`, or records nowhere, runs its `down`, newest first, so
+  `govkit/receipt-schema-4` comes last. A step recorded nowhere, or `rolled-back`, runs its witness
+  first and is skipped where the witness does not hold: `step <id> · skipped (nothing applied)`. A
+  step that runs its down is marked `down interrupted: started <utc>, no exit recorded` before it
+  starts, and reads `rolled-back` once the down exits 0 and its witness no longer holds; what the
+  down restored is staged. All of this happens before any file moves; then the files return to
+  `<rev>`'s bytes as any `update --to <rev>` moves them, and the receipt's `gov_commit` is set to
+  `<rev>`, its `schema` left as the downs left it. Without `--write` it prints `would roll back
+  <id>` for each step and runs none.
+- **A stopped rollback.** A down that exits non-zero (`down exit <rc>: <its last stderr line>`), or a
+  witness that still holds after it (`witness still holds after down`), stops the rollback with that
+  step's state kept: no file moves, `gov_commit` does not move, and the run exits 1. Fix the cause
+  and run the same command again; it resumes at that step.
+- **A failed `update` never rolls back by itself.** A stopped walk leaves the steps before it
+  applied and runs no down; only `update --rollback` runs downs.
+- **The record.** A `--write` rollback writes `.governance/outbox/update-reverted-<from8>-<to8>.md`
+  before its first down, naming both commits and the start, and finishes it before it returns: each
+  step's verdict, the file counts, and whether `gov_commit` moved. A rollback killed partway leaves
+  the record of what it began, `not finished`.
+- **Files gov added after `<rev>`** read as withdrawals, as for any `update`: reported, with an order
+  under `.governance/outbox/`, and deleted only under `--write-withdrawals`. A kit the receipt
+  gained after `<rev>` stays claimed.
+
+To see it on this machine:
+
+```sh
+python tools/govkit/upgrade_steps.py fixture rollback                         # s4 to s1 rolled back
+python tools/govkit/upgrade_steps.py fixture rollback --plant down-fails      # stops at s3, resumes
+python tools/govkit/upgrade_steps.py fixture rollback-update                  # update --rollback --to A
 ```
 
 ## What `update` does with a retired kit

@@ -38,7 +38,16 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 314    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 319    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 314 -> 319 at TOOL-dSafePassage-4, BY THE MEASURED DELTA: the matcher read 384 at that unit's base
+# `f8262323` and 389 on the tree it left. Five are in the engine: `check_rollback_vintage`'s three
+# (no gov_commit, a --to that is not an ancestor, nothing to roll back), reached in process by
+# `check_step_rollback` and the first two by its `fixture rollback-update` plants too; `update`'s
+# refusal of `--rollback --kits`, reached by `--plant scoped`; and its `r.fail` on a stopped reverse
+# walk, reached by the base plant's first run. `upgrade_steps.py` stays at 51: `derive_reverse_steps`'
+# refusal of a row HEAD no longer declares (reached in process) is one more, and lifting the walk's
+# receipt re-read out of its nested `spawn` into `run_step_reread` counts it once where it counted
+# twice; the staging refusal moved into `write_step_staged` unchanged.
 # 310 -> 314 at TOOL-dSafePassage-2, BY THE MEASURED DELTA: the matcher read 380 at that unit's base
 # `5aac6409` and 384 on the tree it left. One is `update`'s `r.fail` on a stopped upgrade-step walk,
 # reached by `check_step_walk`'s `fixture update --plant update-fail`; three are `run_step_walk`'s

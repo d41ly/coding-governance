@@ -68,3 +68,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-26T13:28:53Z brief · item TOOL-dSafePassage-2 · reason 26a49c296f4d memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-2-build-brief.md
 
 2026-10-26T13:32:45Z dispatch · item 5aac6409 TOOL-dSafePassage-2 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-2.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-2-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-10-26T14:24:38Z dispatch · item f8262323 TOOL-dSafePassage-4 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-4.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-4-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-10-26T14:24:43Z brief · item TOOL-dSafePassage-4 · reason 7d3491cc41cd memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-4-build-brief.md

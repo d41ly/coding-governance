@@ -3088,6 +3088,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "build_update_gov",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "build_usage",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -3129,6 +3134,11 @@
     },
     {
       "id": "build_walk_gov",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "build_walk_target",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
     },
@@ -5358,6 +5368,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_rollback_vintage",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "check_root_shape",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -5674,6 +5689,11 @@
     },
     {
       "id": "check_step_isolation",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_step_rollback",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
@@ -8116,6 +8136,11 @@
       "id": "derive_rev_prefix",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
+    },
+    {
+      "id": "derive_reverse_steps",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "derive_review_exit",
@@ -14503,6 +14528,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_image_paths",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_index",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -15391,6 +15421,11 @@
       "id": "read_rev",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_reverse_walk_callers",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_review_records",
@@ -20313,6 +20348,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_callers_probe",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "run_cap_case",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -20538,6 +20578,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "run_fixture_child",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "run_fixture_git",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -20551,6 +20596,11 @@
       "id": "run_fixture_git",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "run_fixture_govkit",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "run_fixtures_guard_census",
@@ -21223,6 +21273,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_reverse_walk",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "run_rm",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -21236,6 +21291,16 @@
       "id": "run_role_bash",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "run_rollback_fixture",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_rollback_update_fixture",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "run_rollup",
@@ -21459,6 +21524,11 @@
     },
     {
       "id": "run_step_isolated",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_step_reread",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
     },
@@ -26488,6 +26558,11 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "write_rollback_record",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "write_rounds_line",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -26646,6 +26721,16 @@
       "id": "write_stale_index",
       "kind": "function",
       "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "write_step_record",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "write_step_staged",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "write_su_aborted",

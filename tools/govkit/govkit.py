@@ -7585,8 +7585,30 @@ def demand_forward_vintage(root: pathlib.Path, base_commit: str | None, to_commi
             f"is not an ancestor of it. A DOWNGRADE IS NOT AN UPDATE: every clean row takes the raw "
             f"arm rather than the three-way, so it would be rewound to the older bytes, and the "
             f"receipt would be re-stamped backwards so that nothing afterwards records it happened. "
-            f"Pass a --to that descends from {base_commit}, or re-install deliberately if a "
-            f"rollback is really what you want")
+            f"Pass a --to that descends from {base_commit}, or roll back deliberately with "
+            f"`update --rollback --to {to_commit}`, which runs each later upgrade step's down "
+            f"first and records the rollback (TOOL-dSafePassage-4)")
+
+
+def check_rollback_vintage(root: pathlib.Path, base_commit: str | None, to_commit: str,
+                           reverse_rows: list) -> None:
+    """TOOL-dSafePassage-4 S2. `demand_forward_vintage`'s place under `update --rollback`: `--to`
+    must be an ANCESTOR of the vintage the receipt records, the ancestry test reversed. It refuses a
+    receipt with no `gov_commit`, which names nothing to roll back from; a `--to` that is not an
+    ancestor of it; and a `--to` equal to it with no step to down, which is nothing to roll back."""
+    if not base_commit:
+        raise Refusal("--rollback: this target's receipt records no gov_commit, so there is no vintage "
+                      "to roll back from; a rollback moves an install back from the commit its receipt "
+                      "names")
+    ok = subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor",
+                         to_commit, base_commit], capture_output=True).returncode == 0
+    if not ok:
+        raise Refusal(f"--rollback: --to resolves to {to_commit}, which is not an ancestor of "
+                      f"{base_commit}, the commit this target's receipt records. A rollback only "
+                      f"moves an install back; `update` without --rollback moves it forward")
+    if to_commit == base_commit and not reverse_rows:
+        raise Refusal(f"--rollback: --to is the receipt's own commit {base_commit[:8]} and no upgrade "
+                      f"step introduced after it is applied, so there is nothing to roll back")
 
 
 def demand_published_vintage(root: pathlib.Path, to_commit: str) -> None:
@@ -9254,22 +9276,32 @@ def render_hole_verdict(eid: str, hid: str, verdict: str, detail: str, why: str,
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                write_withdrawals: bool = False,
-               kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
+               kits: list[str] | None = None, accept_role_moves: bool = False,
+               rollback: bool = False) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write, write_withdrawals, kits, accept_role_moves)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals, kits, accept_role_moves,
+                           rollback)
     finally:
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                 write_withdrawals: bool = False,
-                kits: list[str] | None = None, accept_role_moves: bool = False) -> int:
+                kits: list[str] | None = None, accept_role_moves: bool = False,
+                rollback: bool = False) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
     operator owns and gov does not, and the muscle-memory invocation must not be the destructive one.
+
+    `rollback` (TOOL-dSafePassage-4) moves it BACK to an ancestor: `check_rollback_vintage` in
+    `demand_forward_vintage`'s place, each later step's down before any file row moves, the
+    ordinary write loop toward `--to`, and a stamp that keeps the `schema` the downs left.
     """
+    if rollback and kits:
+        raise Refusal("--rollback moves the whole receipt back, every kit and every step with it, so "
+                      "it takes no --kits; run it unscoped")
     r = Report()
     reg = load_registry(root)
     descs = read_descriptors(root, reg, r)
@@ -9339,7 +9371,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # downgrade is a preview of something that will never be allowed to happen.
     if write:
         demand_writable_target(target, "update", receipt)
-    demand_forward_vintage(root, base_commit, to_commit)
+    # TOOL-dSafePassage-4 S2, S3. Under --rollback the ancestry test is reversed and the reverse
+    # set is read here, so a refusal of it lands before any write; only this one refusal is lifted.
+    _rb_rows: list = []
+    if rollback:
+        _rb_rows = upgrade_steps.derive_reverse_steps(root, receipt, to_commit)
+        check_rollback_vintage(root, base_commit, to_commit, _rb_rows)
+    else:
+        demand_forward_vintage(root, base_commit, to_commit)
     demand_published_vintage(root, to_commit)
 
     claimed = receipt.get("kits") or []
@@ -10378,9 +10417,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         for _p0, _why0 in _pv_ref:
             print(f"govkit update —   would REFUSE {_p0}: {_why0}")
         # TOOL-dSafePassage-2 S4, F2. The pending steps are NAMED and nothing is spawned, a witness
-        # included: a witness is step code over the target, and this run writes no byte.
-        _sw_pending = upgrade_steps.derive_pending_steps(root, receipt, to_commit)
-        if kits:
+        # included: a witness is step code over the target, and this run writes no byte. Under
+        # --rollback the steps named are the reverse set's, in down order (TOOL-dSafePassage-4 S5).
+        _sw_pending = [] if rollback else upgrade_steps.derive_pending_steps(root, receipt, to_commit)
+        if rollback:
+            print(f"govkit update — steps: {len(_rb_rows)} to roll back")
+            for _sw_row in _rb_rows:
+                print(f"govkit update —   would roll back {_sw_row.id}")
+        elif kits:
             print(f"govkit update — steps: not walked — a --kits run walks no step, since a subset "
                   f"would run a later step before an earlier one · {len(_sw_pending)} pending")
         else:
@@ -10389,6 +10433,33 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 print(f"govkit update —   would walk {_sw_row.id}")
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
         return r.emit()
+
+    # ======================= TOOL-dSafePassage-4 S5, S6 — THE REVERSE WALK ========================
+    # HERE, after the preview and before the pre-write snapshot, so every down meets the tree its up
+    # left and no file row moves before the downs; the write loop below then moves the rows to --to
+    # as for any --to. The record is begun before the first down, so a killed rollback leaves what
+    # it began, and `_rb_finish` rewrites it at each return below. A stopped reverse walk ends the
+    # run here with its finding, gov_commit unmoved; a re-run resumes at the row it stopped at.
+    def _rb_finish(stamp: str) -> None:
+        if rollback:
+            upgrade_steps.write_rollback_record(
+                target, base_commit, to_commit, _rb_started, _rb_walk["downs"],
+                (len(changed), len(renamed) // 2, len(deleted), withheld, conflicts), stamp)
+
+    if rollback:
+        _rb_started = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        _rb_record = upgrade_steps.write_rollback_record(target, base_commit, to_commit, _rb_started)
+        print(f"govkit update — rollback: {len(_rb_rows)} step(s) to roll back · record "
+              f"{_rb_record.relative_to(target).as_posix()}")
+        _rb_walk = upgrade_steps.run_reverse_walk(root, target, receipt_path, receipt, _rb_rows)
+        if _rb_walk["stopped"]:
+            r.fail(f"the rollback's reverse walk stopped at {_rb_walk['stopped']}: {_rb_walk['failure']}. "
+                   f"No file row moved and gov_commit is unmoved; the next `update --rollback --to "
+                   f"{to_commit[:8]} --write` resumes there")
+            upgrade_steps.write_rollback_record(
+                target, base_commit, to_commit, _rb_started, _rb_walk["downs"], (0, 0, 0, 0, 0),
+                f"not moved, the reverse walk stopped at {_rb_walk['stopped']}")
+            return r.emit()
 
     # DEPL-dSealedTally-1 S1. THE WRITE PATH'S OWN CALL, and it has to be here rather than
     # reusing the preview above: that call sits inside `if not write:` and the branch RETURNS,
@@ -11375,8 +11446,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # no down runs, here or in the verify rollback below. Only on an unscoped run that has no finding
     # yet (§8 F3): a subset of the steps would run a later one before an earlier one out of scope.
     # A stopped walk is a finding, so the `gov_commit` stamp below is withheld.
-    _sw_pending = upgrade_steps.derive_pending_steps(root, receipt, to_commit)
-    if kits or r.problems:
+    _sw_pending = [] if rollback else upgrade_steps.derive_pending_steps(root, receipt, to_commit)
+    if rollback:
+        # TOOL-dSafePassage-4 S5: the reverse walk above took the steps back; none walks forward.
+        print("govkit update — steps: not walked — a rollback walks no step forward")
+    elif kits or r.problems:
         print(f"govkit update — steps: not walked — "
               + ("a --kits run walks no step, since a subset would run a later step before an "
                  "earlier one" if kits else f"this run already has {len(r.problems)} finding(s)")
@@ -12602,13 +12676,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
               f"stamp would tell the next run that guards which fired here have already been passed")
+        _rb_finish(f"not moved, this run had {len(r.problems)} finding(s)")
         return r.emit()
 
     # TOOL-dSafePassage-3 S5: the re-stamp lifts a schema-1 or schema-2 receipt to 3 and never past
     # it, because schema 4 carries `steps` and only the step govkit/receipt-schema-4 writes that.
     # TOOL-dSafePassage-2 S3: read off the receipt, not the local taken at load — the walk re-read
     # a step's `schema` into it, and the stamp never writes over a field a step wrote.
-    receipt["schema"] = max(receipt.get("schema", schema), 3)
+    # TOOL-dSafePassage-4 S5: under --rollback it never raises a schema either, so a receipt a
+    # down lowered keeps the schema the downs left.
+    receipt["schema"] = (receipt.get("schema", schema) if rollback
+                         else max(receipt.get("schema", schema), 3))
     # DEPL-dGaugedVintage-8 S1. THE STAMP MUST NOT OUTRUN THE ROWS THIS RUN NEVER GRADED. An
     # `evidence: "unattributed"` row is skipped above (`how == "table"` branch) before
     # `classify_row`, by DEPL-dCarriedReceipt-13's ratified design, and it is graded against the
@@ -12639,6 +12717,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         write_atomic(target / ".governance" / "install.sums",
                      "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
         write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
+        _rb_finish(f"not moved, {ungraded} row(s) carry evidence unattributed")
         return r.emit()
 
     receipt["gov_commit"] = to_commit
@@ -12650,6 +12729,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
           f"deleted {len(deleted)}, withheld {withheld}, "
           f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}")
+    _rb_finish(f"moved to {to_commit[:8]}")
     return r.emit()
 
 
@@ -13826,7 +13906,7 @@ USAGE = """usage:
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
-  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals] [--accept-role-moves]
+  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals] [--accept-role-moves] [--rollback]
   govkit.py adopt  --target <path> [--to <rev>] [--pin <path>=<rev> ...] [--re-adopt] [--write]
                    [--staged] [--suggest-pins]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
@@ -13855,7 +13935,10 @@ stamp is withheld, and `govkit adopt --re-adopt --pin <path>=<rev> --write` is w
 the pin is the operator asserting the vintage the adoption walk could not find, and a re-adopt
 without one re-measures the same bytes to the same answer. The default is read-only because that verb's failure mode is silent data loss in a
 repository the operator owns and gov does not, and the muscle-memory invocation must not be the
-destructive one. `intake` writes the target descriptor
+destructive one. `update --rollback --to <rev>` moves an install BACK to an ancestor of its receipt's
+commit: each upgrade step introduced after `<rev>` runs its down, newest first, before any file row
+moves, and the run leaves `.governance/outbox/update-reverted-<from8>-<to8>.md`; it takes no `--kits`,
+and does nothing without `--to`. A failed `update` never rolls back by itself. `intake` writes the target descriptor
 ONCE and refuses to overwrite one that exists — a subcommand that parses and does
 nothing looks exactly like one that works, from the outside, and this unit exists because that class
 of silence ships broken installs.
@@ -13888,6 +13971,9 @@ def parse_args(argv: list[str]) -> tuple:
     # DEPL-aRepatriatedFork-17 S5, S6, S9. All three opt-in scope flags: each enables a narrower
     # class of action, defaults OFF and overrides no refusal.
     staged = accept_role_moves = suggest_pins = False
+    # TOOL-dSafePassage-4 S1. `update --rollback --to <rev>`: a scope flag on `update` that lifts the
+    # downgrade refusal for a recorded rollback only. It does nothing without an explicit `--to`.
+    rollback = to_given = False
     i = 1
     while i < len(argv):
         a = argv[i]
@@ -13945,8 +14031,11 @@ def parse_args(argv: list[str]) -> tuple:
             emit_declines = True
             i += 1
         elif a == "--to" and i + 1 < len(argv):
-            to_rev = argv[i + 1]
+            to_rev, to_given = argv[i + 1], True
             i += 2
+        elif a == "--rollback":
+            rollback = True
+            i += 1
         elif a == "--all":
             mode = "all"
             i += 1
@@ -13957,7 +14046,7 @@ def parse_args(argv: list[str]) -> tuple:
             raise Refusal(f"unknown or incomplete argument: {a}")
     return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
             pins, re_adopt, coverage, emit_declines, run_discharge, staged, accept_role_moves,
-            suggest_pins)
+            suggest_pins, rollback and to_given)
 
 
 # ======================= DEPL-dRetiredFork-6 — `contribute` ====================================
@@ -14317,7 +14406,7 @@ def main(argv: list[str]) -> int:
             return cmd_mint(repo_root(), opts["--base"], opts.get("--head"))
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
-         SUGGEST_PINS) = parse_args(argv)
+         SUGGEST_PINS, ROLLBACK) = parse_args(argv)
         root = repo_root()
         if verb == "contribute":
             if target is None:
@@ -14345,7 +14434,7 @@ def main(argv: list[str]) -> int:
                 # byte-identical to the unscoped run, with nothing saying the scope was ignored.
                 return cmd_update(root, target, TO_REV, write=WRITE,
                                   write_withdrawals=WRITE_WD, kits=kits,
-                                  accept_role_moves=ACCEPT_ROLE_MOVES)
+                                  accept_role_moves=ACCEPT_ROLE_MOVES, rollback=ROLLBACK)
             if verb == "adopt":
                 return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE,
                                  staged=STAGED, suggest_pins=SUGGEST_PINS)

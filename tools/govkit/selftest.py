@@ -3540,6 +3540,87 @@ def check_step_walk() -> None:
                   refused)
 
 
+def check_step_rollback() -> None:
+    """TOOL-dSafePassage-4 AC1 to AC7 — `upgrade_steps.py fixture rollback|rollback-update` with every
+    plant: the reverse order, a partial `--to`, the downs after a kill and after a failed up, the
+    stop at a failed down and its resume, the stop over a witness that still holds, an unrecorded
+    row downed, the one caller, and `update --rollback` with its preview, record, stamp and four
+    refusals. Each plant's failing case is staged by the plant; the fixture prints `<family>: FAILED`
+    on any unmet expectation. TOOL-dSafePassage-43's AC3 is the `down-fails` and `witness-stays` rows."""
+    us_py = HERE / "upgrade_steps.py"
+    rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
+    same = "rollback: the target's bytes equal their bytes before the walk"
+    for family, plant, want, needles in (
+            ("rollback", None, 0, (rolled, same)),
+            ("rollback", "partial-to", 0, ("step fx/s4 · rolled-back\nstep fx/s3 · rolled-back\nrollback: 2 reached",
+                                           "rollback: s1.txt and s2.txt present")),
+            ("rollback", "after-kill", 0, ("rollback: after the kill · fx/s3 failed · s3.txt present",
+                                           "step fx/s4 · skipped (nothing applied)\nstep fx/s3 · rolled-back", same)),
+            ("rollback", "after-fail", 0, ("rollback: down canaries before the reverse walk: none",
+                                           "step fx/s4 · skipped (nothing applied)\nstep fx/s3 · rolled-back", same)),
+            ("rollback", "down-fails", 1, ("step fx/s3 · STOPPED · down exit 1: fx: s3 down fails by its plant",
+                                           "stop text opens with an entry of DOWN_STOP_PREFIXES: yes",
+                                           "rollback: the re-run · s4 downed 1 time(s) in all · bytes equal")),
+            ("rollback", "witness-stays", 1, ("step fx/s2 · STOPPED · witness still holds after down",
+                                              "stop text opens with an entry of DOWN_STOP_PREFIXES: yes")),
+            ("rollback", "unrecorded", 0, (rolled, same)),
+            ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
+                                        "in planted_caller\n")),
+            ("rollback-update", None, 0, ("rollback-update: the stopped run exits 1 · file rows and gov_commit held at B",
+                                          "rollback-update: s1's down found tools/demo/one.txt at B, before the write loop moved it",
+                                          "rollback-update: record · down fx/s1: rolled-back",
+                                          "rollback-update: record · gov_commit: moved to ")),
+            ("rollback-update", "read-only", 0, ("govkit update —   would roll back fx/s1\n",
+                                                 "rollback-update: step spawns during the read-only run: none")),
+            ("rollback-update", "refused", 1, ("roll back deliberately with `update --rollback --to ",
+                                               "rollback-update: refused · update exits 2 · receipt unchanged")),
+            ("rollback-update", "descendant", 1, ("rollback-update: descendant · update exits 2 · receipt unchanged",
+                                                  "which is not an ancestor of")),
+            ("rollback-update", "scoped", 1, ("rollback-update: scoped · update exits 2 · receipt unchanged",
+                                              "so it takes no --kits")),
+            ("rollback-update", "no-base", 1, ("rollback-update: no-base · update exits 2 · receipt unchanged",
+                                               "receipt records no gov_commit"))):
+        p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+        out = p.stdout + p.stderr
+        check(f"[dSP-4] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
+              p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
+
+    # The refusals no fixture plant reaches, in process: a receipt row HEAD no longer declares, and
+    # a --to equal to the receipt's commit with nothing to roll back.
+    gk = govkit_module()
+    us = gk.upgrade_steps
+    try:
+        us.derive_reverse_steps(HERE.parent.parent, {"schema": 4, "steps": [
+            {"id": "gone/step", "introduced": None, "state": "applied"}]}, "HEAD")
+        refused = ""
+    except us.Refusal as e:
+        refused = str(e)
+    check("[dSP-4] S3 the reverse set refuses a receipt row HEAD no longer declares, naming it",
+          "gone/step" in refused and "no longer declares" in refused, refused)
+    head = subprocess.run(["git", "-C", str(HERE), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+    for case, base, rows, needle in (("no base", None, [], "records no gov_commit"),
+                                     ("a descendant", f"{head}~1", [], "is not an ancestor of"),
+                                     ("nothing to roll back", head, [], "nothing to roll back")):
+        base = subprocess.run(["git", "-C", str(HERE), "rev-parse", base], capture_output=True,
+                              text=True).stdout.strip() if base else None
+        try:
+            gk.check_rollback_vintage(HERE.parent.parent, base, head, rows)
+            refused = ""
+        except gk.Refusal as e:
+            refused = str(e)
+        check(f"[dSP-4] S2 check_rollback_vintage refuses {case}", needle in refused, refused)
+    try:
+        gk.check_rollback_vintage(HERE.parent.parent, head, f"{head}", ["a row"])
+        gk.check_rollback_vintage(HERE.parent.parent, head, subprocess.run(
+            ["git", "-C", str(HERE), "rev-parse", f"{head}~1"], capture_output=True, text=True).stdout.strip(), [])
+        refused = ""
+    except gk.Refusal as e:
+        refused = str(e)
+    check("[dSP-4] S2 check_rollback_vintage passes an ancestor, and its own commit with a step to down",
+          refused == "", refused)
+
+
 def check_receipt_schema(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-3 AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 — the receipt's schema 4: the
     back-fill pinned below 3, who writes 4, the step `govkit/receipt-schema-4`, and the `steps`
@@ -3930,6 +4011,7 @@ def main() -> int:
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")
         check_step_walk()
+        check_step_rollback()
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO

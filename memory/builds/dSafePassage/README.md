@@ -134,7 +134,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-16 — the step record's precondition, one predicate beside its one writer, and the schema-4 bootstrap it answers](spec/2026-10-23-spec-TOOL-dSafePassage-16.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left](spec/2026-10-23-spec-TOOL-dSafePassage-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-20 — the reader's `unlanded` is recorded as `null` at the step record's one writer](spec/2026-10-23-spec-TOOL-dSafePassage-20.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-26 |
-| [TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal](spec/2026-10-23-spec-TOOL-dSafePassage-4.md) | 2 | 2 | DEFERRED | rev-5 | 2026-10-23 |
+| [TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal](spec/2026-10-23-spec-TOOL-dSafePassage-4.md) | 2 | 2 | CLOSED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-43 — the step row's one writer admits a stopped down's failure on an `applied` row, by one declared prefix set, and refuses every other](spec/2026-10-23-spec-TOOL-dSafePassage-43.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field](spec/2026-10-23-spec-TOOL-dSafePassage-7.md) | 2 | 2 | CLOSED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step](spec/2026-10-23-spec-TOOL-dSafePassage-11.md) | 3 | 2 | DEFERRED | rev-4 | 2026-10-24 |
@@ -190,7 +190,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 230 bound to this build, across 4 record folder(s).
+Records: 231 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
