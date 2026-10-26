@@ -3554,7 +3554,7 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
     for label, call, why in (
             ("`state` done", lambda: us.set_step_state(r4, "a/two", None, "done"), "is not one of"),
             ("a failed row with no `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed"), "carries the keys"),
-            ("a `failure` on an applied row", lambda: us.set_step_state(r4, "a/two", None, "applied", "x"), "carries the keys"),
+            ("a `failure` on an applied row that is no down stop", lambda: us.set_step_state(r4, "a/two", None, "applied", "x"), "opens with none of the down stops"),
             ("an empty `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed", ""), "non-empty string"),
             ("an id that is not a string", lambda: us.set_step_state(r4, 7, None, "applied"), "`id` is not"),
             ("an `introduced` that is not a commit", lambda: us.set_step_state(r4, "a/two", "abc", "applied"), "neither a 40-hex")):
@@ -3566,6 +3566,24 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
     check("[dSP-3 AC7] a second call for an id moves its row to the end, and None keeps a known commit",
           [r["id"] for r in r4["steps"]] == ["a/two", "a/one"] and r4["steps"][-1]["introduced"] == "0" * 40
           and r4["steps"][0]["failure"] == "the up exited 1", str(r4))
+    # ---- TOOL-dSafePassage-43 AC1: §4's six rows through the one writer. An `applied` row admits
+    # every full down-stop text and no other `failure`; `failed` needs one, `rolled-back` takes none.
+    stops43 = ("down interrupted: started 2026-10-23T00:00:00Z, no exit recorded", "down exit 1: boom",
+               "witness still holds after down", "witness still holds after down; before-image a.txt absent",
+               "reverted check exits 1")
+    for state43, text43, admit43 in ([("applied", None, True), ("failed", "the up exited 1", True)]
+                                     + [("applied", t, True) for t in stops43]
+                                     + [("applied", "interrupted: started 2026-10-23T00:00:00Z, no exit recorded", False),
+                                        ("applied", "exit 1: x", False), ("rolled-back", "down exit 1: boom", False),
+                                        ("failed", None, False)]):
+        r43 = {"schema": 4, "steps": []}
+        got43 = refused(lambda: us.set_step_state(r43, "a/one", None, state43, text43))
+        check(f"[dSP-43 AC1] the writer {'admits' if admit43 else 'refuses'} a {state43} row with "
+              + (f"`failure` {text43!r}" if text43 else "no `failure`"),
+              (not got43 and r43["steps"] == [{"id": "a/one", "introduced": None, "state": state43}
+                                               | ({"failure": text43} if text43 else {})]) if admit43
+              else ("'a/one'" in got43 and (state43 != "applied" or repr(text43) in got43) and r43["steps"] == []),
+              got43 or str(r43))
     # ---- ...and the one reader's refusals.
     for label, rec, why in (
             ("a `steps` field below schema 4", {"schema": 3, "steps": []}, "the field is schema 4's"),
@@ -3578,16 +3596,23 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
           us.read_step_states({"schema": 2}) == [], "")
 
     # ---- AC8: `check` counts a malformed field as a problem naming the row, and a valid one as none.
-    for tag, rows, bad in (("rs-ac8a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "done"}], True),
-                           ("rs-ac8b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied"}], False)):
+    # TOOL-dSafePassage-43 AC2: the reader inherits the writer's rule, so `check` counts a down stop
+    # on an applied row as none and any other `failure` there as one problem naming the row.
+    for tag, rows, bad in (("rs-ac8a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "done"}], "'done'"),
+                           ("rs-ac8b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied"}], None),
+                           ("rs-43a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
+                                        "failure": "down exit 1: boom"}], None),
+                           ("rs-43b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
+                                        "failure": "exit 1: boom"}], "'exit 1: boom'")):
         t, _p = installed(tag)
         plant(t, lambda rec, _r=rows: rec.__setitem__("steps", _r))
         p = run("check", "--target", str(t))
         out = p.stdout + p.stderr
         hit = [ln for ln in out.splitlines() if "step record is malformed" in ln]
-        check(f"[dSP-3 AC8] `check` over a {'malformed' if bad else 'valid'} `steps` "
+        check(f"[{'dSP-43 AC2' if tag.startswith('rs-43') else 'dSP-3 AC8'}] `check` over a "
+              f"{'malformed' if bad else 'valid'} `steps` ({tag}) "
               + ("counts a problem naming the row" if bad else "counts none for the field"),
-              (any("'govkit/receipt-schema-4'" in ln and "'done'" in ln for ln in hit) and p.returncode == 1)
+              (len(hit) == 1 and "'govkit/receipt-schema-4'" in hit[0] and bad in hit[0] and p.returncode == 1)
               if bad else not hit, out[-600:])
 
     # ---- AC14: a re-run keeps an existing receipt's schema and `steps`, by either verb.

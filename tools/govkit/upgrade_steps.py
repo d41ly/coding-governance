@@ -86,6 +86,10 @@ STEPS_FILE = "steps.toml"
 REGISTRY_FILE = "registry.toml"
 IMAGE_DIR = ".governance/steps"
 STEP_STATES = ("applied", "failed", "rolled-back")
+# The openings of a stopped down's `failure`, the one `failure` an `applied` row may carry
+# (TOOL-dSafePassage-43); every down-stop text is built from an entry here, never retyped.
+DOWN_STOP_PREFIXES = ("down interrupted:", "down exit ", "witness still holds after down",
+                      "reverted check exits ")
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 
 
@@ -507,8 +511,10 @@ def read_step_states(receipt: dict) -> list[dict]:
 
     A receipt below schema 4 has no rows and may carry no field; one at schema 4 or above must carry
     a list of `{"id", "introduced", "state"}` objects, `state` one of STEP_STATES, a `failed` row
-    adding a non-empty `failure` and no other row carrying one, `introduced` a 40-hex commit or
-    null. Anything else is a refusal naming the row, and nothing is repaired."""
+    adding a non-empty `failure`, an `applied` row a down stopped on adding one that opens with an
+    entry of DOWN_STOP_PREFIXES (TOOL-dSafePassage-43), a `rolled-back` row carrying none,
+    `introduced` a 40-hex commit or null. Anything else is a refusal naming the row, and nothing
+    is repaired."""
     schema = receipt.get("schema", 1)
     at4 = isinstance(schema, int) and not isinstance(schema, bool) and schema >= 4
     if not at4:
@@ -525,15 +531,20 @@ def read_step_states(receipt: dict) -> list[dict]:
         if not isinstance(row, dict):
             raise Refusal(f"{at} is {type(row).__name__}, not an object")
         state = row.get("state")
-        want = {"id", "introduced", "state"} | ({"failure"} if state == "failed" else set())
+        stopped = state == "applied" and "failure" in row
+        want = {"id", "introduced", "state"} | ({"failure"} if state == "failed" or stopped else set())
         if set(row) != want:
             raise Refusal(f"{at} carries the keys {sorted(row)}, where a {state!r} row carries {sorted(want)}")
         if not isinstance(row["id"], str) or not row["id"]:
             raise Refusal(f"{at}: `id` is not a non-empty string")
         if state not in STEP_STATES:
             raise Refusal(f"{at}: `state` {state!r} is not one of {', '.join(STEP_STATES)}")
-        if state == "failed" and not (isinstance(row["failure"], str) and row["failure"]):
-            raise Refusal(f"{at}: a failed row's `failure` is a non-empty string")
+        fail = row.get("failure")
+        if (state == "failed" or stopped) and not (
+                isinstance(fail, str) and fail and (not stopped or fail.startswith(DOWN_STOP_PREFIXES))):
+            raise Refusal(f"{at}: an applied row's `failure` {fail!r} opens with none of the down stops "
+                          f"{', '.join(map(repr, DOWN_STOP_PREFIXES))}, and an applied row carries only "
+                          f"a stopped down's" if stopped else f"{at}: a failed row's `failure` is a non-empty string")
         intro = row["introduced"]
         if intro is not None and not (isinstance(intro, str) and SHA_RE.fullmatch(intro)):
             raise Refusal(f"{at}: `introduced` {intro!r} is neither a 40-hex commit nor null")
