@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-19 — a rollback past the schema step stamps schema 3 with no `steps`, finishes its record, and converges after a kill
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-19-deviation-65.md](../build/2026-10-23-build-TOOL-dSafePassage-19-deviation-65.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-prompt-TOOL-dSafePassage-19-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-19-1-spec-writer.md) | research | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-19-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-19-2-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-19-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-19-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-21 TOOL-dSafePassage-26 |
 
@@ -41,12 +43,20 @@ from a killed state cannot pass. This unit is id 52's promotion, the run's half 
 - **S3** — The record. `write_rollback_record` (TOOL-dSafePassage-4 S6) names each down from the
   verdict list `TOOL-dSafePassage-18` returns, the schema step `rolled-back` among them, and finishes
   with `gov_commit: moved to <to8>`. Observed by AC1.
-- **S4** — A kill after the schema step's down and before the stamp. The receipt then reads schema 3,
-  no `steps`, `gov_commit` unmoved, and the record reads `not finished`. A re-run of the same
+- **S4** — A kill after the schema step's down has written schema 3 and before the write loop moves a
+  file row. The receipt then reads schema 3, no `steps`, `gov_commit` unmoved, and the record reads
+  `not finished` with no `down` line, since `write_rollback_record` rewrites it only when the run
+  returns (TOOL-dSafePassage-4 S6, `tools/govkit/govkit.py:10443-10461` and `:12679-12732`). A re-run of the same
   `update --rollback --to <rev> --write` passes `check_rollback_vintage`, finds every reverse row
-  recorded nowhere and witness-probes each (TOOL-dSafePassage-4 S4 move 1), skips those whose witness
-  does not hold, moves the file rows, stamps and finishes the record, converging to the bytes of an
-  uninterrupted run. Observed by AC2.
+  recorded nowhere and witness-probes each (TOOL-dSafePassage-4 S4 move 1). None holds: each row the
+  killed run downed went out with `steps`, each other row's down took away what its witness reads,
+  and the schema step's witness exits 1 at schema 3 (`tools/govkit/steps/receipt_schema_4.py:71-75`).
+  So `run_reverse_walk` returns every row `skipped (nothing applied)`
+  (`tools/govkit/upgrade_steps.py:1143-1147`) and downs nothing. The run then moves the file rows,
+  stamps and finishes the record. It converges on an uninterrupted run in the receipt's bytes, the
+  target's bytes and the record's finished shape, and its `down` lines read
+  `skipped (nothing applied)` where the uninterrupted run's read `rolled-back`, since no verdict of
+  the killed run survives the kill. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -135,11 +145,25 @@ TOOL-dSafePassage-4 and `TOOL-dSafePassage-16` (order 2), and within order 3 aft
   `down govkit/receipt-schema-4: rolled-back` and `gov_commit: moved to`.
   Red when: the run raises `Refusal` after the down, the receipt keeps a `steps` key, or the record
   is not finished.
-- **AC2** — When the same family runs with `--plant schema-step-kill-before-stamp`, the fixture kills
-  the run after the schema step's down and before the stamp; the receipt reads schema 3 with
-  `gov_commit` unmoved and the record `not finished`, and the re-run exits 0 with the receipt and the
-  record bytes, its times aside, equal to AC1's.
-  Red when: the re-run refuses, downs a row a second time, or leaves `gov_commit` unmoved.
+- **AC2** — When the same family runs with `--plant schema-step-kill-before-stamp`, the fixture
+  installs two targets from one scratch gov (`build_update_gov` takes several target names,
+  `tools/govkit/upgrade_steps.py:2197-2205`), so both receipts name the same commits. It rolls the
+  twin back uninterrupted, as AC1 does. It kills the other target's run after the schema step's down
+  has written schema 3 and before the write loop moves a file row. The killed receipt reads schema 3,
+  no `steps` and `gov_commit` unmoved, and the record reads `not finished` with no `down` line. The
+  re-run exits 0, and these three things match the twin: (1) the receipt's bytes are equal, `carry`
+  included; (2) the target's bytes are equal on every path outside `.git/` and `.governance/outbox/`;
+  (3) the record has the finished shape: `finished` and no `not finished`, the twin's `files:` line,
+  and `gov_commit: moved to <to8>`. Its `down` lines read `down fx/s1: skipped (nothing applied)`,
+  then `down govkit/receipt-schema-4: skipped (nothing applied)`, where the twin's read `rolled-back`.
+  That is because both rows went out with `steps` and neither witness still holds, so the re-run
+  downs neither (S4). `carry` needs no exclusion here, unlike TOOL-dSafePassage-15 rev-2's AC4. The
+  killed run moved no file row, so the re-run's write loop meets the same target bytes as the twin's,
+  and it recomputes `carry` from them rather than reading it back (DEPL-dCarriedReceipt-9 S2,
+  `tools/govkit/govkit.py:10164-10172`).
+  Red when: the re-run refuses, downs a row a second time, leaves `gov_commit` unmoved or the record
+  `not finished`, differs from the twin in the receipt's or the target's bytes, or prints a `down`
+  line other than the two `skipped (nothing applied)` lines.
 
 ## 7. Gates
 
@@ -156,6 +180,13 @@ none
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 52 (HIGH, item
   D-3, shared with id 2).
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-35`; no other section moved.
+- rev-3 · 2026-10-26 · S4 · AC2 · the builder's DIVERGENCE hand-back (`wf_7efb05c8-043`): after the
+  kill, the re-run skips both reverse rows, so its record's `down` lines can never equal AC1's
+  `rolled-back`. AC2 now compares the receipt's bytes, the target's bytes and the record's finished
+  shape against an uninterrupted twin from the same scratch gov. It requires the two
+  `skipped (nothing applied)` lines and says why. The kill is placed before the write loop moves a
+  file row, which is the builder's reading, so `carry` is compared too. By
+  `2026-10-26-prompt-TOOL-dSafePassage-19-1-spec-writer.md`.
 
 ## 10. Reuse audit
 
