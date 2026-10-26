@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 whole
 
@@ -109,7 +109,7 @@ research's losing test for its candidate E (`research-supersession.md`, section 
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-1` — `read_steps` and `StepRow` in `tools/govkit/upgrade_steps.py`, the step population and the ids `agent-cap/fanout-cap-to-agents-in-flight` and `govkit/template-size-limits-to-budgets`; without them there is nothing to walk and the leg exits 2
+- **consumes-from** `TOOL-dSafePassage-1` — `read_steps` and `StepRow` in `tools/govkit/upgrade_steps.py`, the step population and the id `agent-cap/fanout-cap-to-agents-in-flight`; without them there is nothing to walk and the leg exits 2
 - **consumes-from** `TOOL-dSafePassage-2` — `run_step_walk` inside `update --write`, its `interrupted:` row written before each spawn, the reclaim of a dead holder's lock, and the receipt's `steps` it records through TOOL-dSafePassage-3's writer, read back by `read_step_states`; without them a killed walk leaves nothing a re-run can recover and no case can name the last completed step
 - **consumes-from** `TOOL-dSafePassage-4` — `update --rollback --to <rev> --write` and its `update-reverted` record under `.governance/outbox/`, which is why S4 leaves that directory out
 - **consumes-from** `TOOL-dSafePassage-7` — `run_step_isolated`, its result `{"verdict", "rc", "tail"}`, and `check_needs_target`, named at module level in `tools/govkit/upgrade_steps.py` so S5's child can rebind the runner
@@ -127,6 +127,7 @@ order, which the `edited-retired` plant expects.
 - **consumes-from** `TOOL-dSafePassage-18` — the reverse walk past the schema step writing no row; without it the rollback to release-0 refuses after its last down
 - **consumes-from** `TOOL-dSafePassage-19` — the stamp and the record after the schema step's down, and the re-run after a kill; without them the rollback cases end unspecified
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
+- **hands-off** `TOOL-dSafePassage-61` — the `size-limits` `[[condition]]` row of `tools/govkit/fixtures/release-0/plants.toml`, added with the step it names, which joins the population when that unit lands
 
 ## 4. Design
 
@@ -169,7 +170,6 @@ The rows at this pass, each path re-read against the pin's tree when the row is 
 | `edited-retired` | plant | one line appended to the file `withdraw-one` withdraws | ordered |
 | `withdraw-one` | gov plant | one installed file dropped from its descriptor's `[[files]]` at the tip | — |
 | `floor-below` | condition | `lib/python-floor-3.15`, fakes `python3`, `python` and `py` printing `3.14` | — |
-| `size-limits` | condition | `govkit/template-size-limits-to-budgets`, `tools/template-size-limits.txt` created with one row | — |
 
 ### The cases
 
@@ -407,7 +407,8 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   adopter cannot exit 0 at the pin with the seed is taken out by a `kits` line and a rev bump of this
   spec naming the kit and its refusal, never silently. widens: none · relaxes: none
 - **F4 — A step that writes nothing on an adopter's tree.** `lib/python-floor-3.15`'s up and witness
-  are a preflight, and `govkit/template-size-limits-to-budgets` exits 0 with no legacy file.
+  are a preflight, and the size-limits step, TOOL-dSafePassage-61's since 2026-10-26, exits 0 with
+  no legacy file.
   Options: (a) red each as not load-bearing; (b) exempt steps with no tree effect; (c) a declared
   `[[condition]]` under which the step is load-bearing. (a) reds two steps whose load is real, the
   floor step's by TOOL-dSafePassage-11's hand-off ("a planted below-floor interpreter stops the walk
@@ -446,6 +447,10 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   as its working directory, so the target needs no reader of its own, and it gains `absent`. The
   `fanout-cap` row and AC5 require `.agent-cap.conf` absent. The Edges gain dGroundRules as an
   external consumes-from. §8 F8 is unchanged.
+- rev-4 · 2026-10-26 · §3 Edges · §4 plants table · §8 F4 · the size-limits step moved from
+  TOOL-dSafePassage-1 to TOOL-dSafePassage-61 at that unit's §8 F8 stop, so its `size-limits`
+  condition row moves there and the consumes-from names the fan-out step's id alone, by
+  `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`.
 
 ## 10. Reuse audit
 

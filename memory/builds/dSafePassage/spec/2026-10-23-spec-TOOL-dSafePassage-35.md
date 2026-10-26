@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-35 — the round-1 audit of units 15 to 26: its 39 minors, one filtered population, one plan source, pinned plants and the texts that cite them
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -165,11 +165,9 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 
 ### The downs with no image (D-25, D-29, D-26, D-30)
 
-- **S17** — id 41. TOOL-dSafePassage-17's AC5 runs both legacy-home downs: also
-  `python tools/govkit/steps/template_size_limits.py down <t> tools` on a target with no limits file
-  and no image under `.governance/steps/govkit/` exits 0 and leaves `git -C <t> status --porcelain`
-  empty. Code in that program that refuses before the shared helper is fixed in this pass.
-  Observed by AC15.
+- **S17** — id 41. Moved to TOOL-dSafePassage-61, its S3, on 2026-10-26: it observes only the
+  size-limits step's down, which left TOOL-dSafePassage-1 at that unit's §8 F8 stop. NOT OBSERVED
+  here — TOOL-dSafePassage-61's AC7 observes it.
 - **S18** — id 10. TOOL-dSafePassage-18's Inventory is read with `schema-step-early` among its minted
   `rollback` plants, beside `schema-step` and `schema-step-kill`. Observed by AC16.
 - **S19** — id 42. The `rollback-update` family gains `schema-step-kill-shipped-rows`: the reverse set
@@ -299,6 +297,7 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 - **consumes-from** `TOOL-dSafePassage-33` — the no-record branch of the down's verdict, which S19 and S20 rest on
 - **hands-off** `TOOL-dSafePassage-38` — S8's credential rows restated as one predicate over keys and values, and every refusal line's keys redacted, the repair of finding 30 of the spec audit of units 27 to 35
 - **hands-off** `TOOL-dSafePassage-42` — findings 25, 3, 13 and 19 of the spec audit of units 27 to 35, AC9 counting code lines and `remove_new_untracked` calling `write_untracked_snapshot`; finding 11, AC12's population as the parity arm's own; finding 12, S24's moved set as its ast closure, `demand_safe_token` and eight constants included; findings 4 and 15, AC18 read as a regression guard; and finding 16, the `BRANCH_PIN` and filter cites
+- **hands-off** `TOOL-dSafePassage-61` — S17 (id 41) and its criterion, the size-limits step's down with no image, built there with that step
 - **hands-off** `TOOL-dSafePassage-44` — S8's `remote.<x>.url` and `remote.<x>.pushurl` rows, which that unit's pass removes in favour of `test_credential_bearing` and its ssh exemption, finding 3 of the spec audit of units 43 to 46
 
 ## 4. Design
@@ -361,7 +360,6 @@ do not split into two disjoint write sets by M6.
 - `tools/govkit/upgrade_steps.py`
 - `tools/govkit/step_gate.py`
 - `tools/govkit/selftest.py`
-- `tools/govkit/steps/template_size_limits.py`
 - `tools/govkit/refusal_join.py`
 - `tools/gate-legs.json`
 - `tools/push-main.sh`
@@ -397,6 +395,9 @@ TOOL-dSafePassage-26's spec joins this unit's `--dispatch --writes` when S25 edi
 - user docs: `help/upgrade-steps.md` (S8, S14, S26).
 
 ## 6. Acceptance criteria
+
+The criterion AC15 moved to TOOL-dSafePassage-61 on 2026-10-26, as its AC7, with S17; the label is
+not reused here.
 
 - **AC1** — When a `python -c` probe imports `tools/govkit/govkit.py` by path and calls
   `read_plan_destinations` on gov's root, no destination starts with `.gitattributes:` and each is the
@@ -455,10 +456,6 @@ TOOL-dSafePassage-26's spec joins this unit's `--dispatch --writes` when S25 edi
   `def test_steps_recordable`, one call of it inside `set_step_state`, and no `Compare` node in
   `set_step_state` reading `schema`.
   Red when: the writer keeps a schema comparison of its own beside the predicate.
-- **AC15** — When `python tools/govkit/steps/template_size_limits.py down <t> tools` runs on a scratch
-  target with no limits file and no image under `.governance/steps/govkit/`, it exits 0 and
-  `git -C <t> status --porcelain` prints nothing.
-  Red when: the program refuses before the shared helper for want of an image.
 - **AC16** — When `git grep -n -F "schema-step-early" -- tools/govkit/upgrade_steps.py` runs, it prints
   the plant's definition in the `rollback` family.
   Red when: the criterion's plant is not built.
@@ -551,6 +548,9 @@ New arm: tools/lib/resolve-python.test.sh · covers AC26 · every launcher faked
   MEDIUM and 19 LOW findings, one scope item per raw id.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-38`, `TOOL-dSafePassage-42`; no other section moved.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-44`; no other section moved.
+- rev-4 · 2026-10-26 · S17 · §3 Edges · §4 Files touched · AC15 · S17 and AC15 moved to
+  TOOL-dSafePassage-61, since the size-limits step they observe left TOOL-dSafePassage-1 at its §8 F8
+  stop, by `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`.
 
 ## 10. Reuse audit
 

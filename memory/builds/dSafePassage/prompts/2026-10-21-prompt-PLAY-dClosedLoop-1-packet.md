@@ -64,7 +64,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `0a000b4060e34b6109758dc94d9abb5e5e3cdb7f`
+- rendered at: `830d5813c8b3f0fc9d334b7481b43c18645f92a4`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -181,6 +181,7 @@ The opened README's roster, every unit with its row:
 - unit id `TOOL-dSafePassage-57` · README:115 | 56 | `TOOL-dSafePassage-57` | **Derived:** PLAY-dClosedLoop-2 | TOOL-52 AC1 reads the arm: its guard taken from the suite by content, evaluated after the scan and alone under `set -u` |
 - unit id `TOOL-dSafePassage-58` · README:116 | 57 | `TOOL-dSafePassage-58` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 51 and 52, its ten minors on TOOL-52: the arm probe staged, the placement anchored on the block's `fi`, the abort's real exit, and the render's four outputs |
 - unit id `TOOL-dSafePassage-59` · README:117 | 58 | `TOOL-dSafePassage-59` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them |
+- unit id `TOOL-dSafePassage-61` · README:118 | 59 | `TOOL-dSafePassage-61` | **Derived:** TOOL-dSafePassage-1 | the size-limits step and gov's own migration, moved out of TOOL-dSafePassage-1 at its F8 stop and held until the guard admits a value-preserving write |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -204,8 +205,8 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dSafePassage`:
 
-Coverage of dSafePassage's 13 clauses and 5 owned nodes, over 58 specs:
-- carried whole: 13; carried in parts: 0 (none)
+Coverage of dSafePassage's 13 clauses and 5 owned nodes, over 59 specs:
+- carried whole: 12; carried in parts: 1 (cl-dClosedLoop-0018)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0018, cl-dClosedLoop-0028, cl-dClosedLoop-0030; ambiguous: none
 - owned nodes no spec names: none

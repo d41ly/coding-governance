@@ -1,8 +1,8 @@
 # TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows
 
-**Status:** DEFERRED · rev-10 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14 · ratified 2026-10-24
+**Status:** DEFERRED · rev-11 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14 · ratified 2026-10-24
 
-**Carries:** cl-dClosedLoop-0018@d4cade33 whole
+**Carries:** cl-dClosedLoop-0018@d4cade33 part 1/2
 
 <!-- gen:spec-records -->
 
@@ -40,6 +40,7 @@
 | [2026-10-25-prompt-TOOL-dSafePassage-1-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-1-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md) | research | TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-26 |
 | [2026-10-26-prompt-TOOL-dSafePassage-1-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-1-build-brief.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md) | research | TOOL-dSafePassage-61 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -48,9 +49,10 @@
 
 Give gov a declared upgrade-step kind: a kit descriptor's `[[upgrade]]` row and the registry's
 `[[retired]]` succession row, one reader for both, `update` and `check` that carry a retired kit to
-its successor instead of refusing the whole run, the first two steps (`.agent-cap.conf`'s
-`FANOUT_CAP` into `runtime.agents-in-flight`, and `template-size-limits.txt`'s rows into
-`budgets.*`), and a leg that keeps every landed step row frozen. It closes `gap-deploy-15` (a receipt
+its successor instead of refusing the whole run, the first step (`.agent-cap.conf`'s `FANOUT_CAP`
+into `runtime.agents-in-flight`), and a leg that keeps every landed step row frozen. The clause's
+second step, the size-limits file's rows into `budgets.*` with gov's own migration, is
+TOOL-dSafePassage-61's since §8 F8's stop fired. It closes `gap-deploy-15` (a receipt
 naming a retired kit refuses the whole update, and `check` reds on it) and `gap-deploy-16` (no
 upgrade-step kind: a moved conf key is only reported).
 
@@ -78,10 +80,10 @@ upgrade-step kind: a moved conf key is only reported).
   **Readers:** by name: `tools/govkit/govkit.py:9237`; no test asserts the text · by value:
   NO VALUE READERS — a raise and a report line.
 - **S5** — The translation window. Its population is the homes the step rows' `surfaces` declare,
-  read from the rows and never retyped, `.agent-cap.conf` and `template-size-limits.txt` among them.
-  dGroundRules' `legacy-homes.txt` holds neither and is withheld from installs (its units 7 and 17),
-  so S5 does not read it. A member's window closes when its step lands, and
-  `upgrade_steps.py list --window` prints each member `open` or `closed by <step id>`. Observed by AC16.
+  read from the rows and never retyped, `.agent-cap.conf` among them, and the size-limits file once
+  TOOL-dSafePassage-61's row joins. dGroundRules' `legacy-homes.txt` holds neither and is withheld
+  from installs (its units 7 and 17), so S5 does not read it. A member's window closes when its step
+  lands, and `upgrade_steps.py list --window` prints each member `open` or `closed by <step id>`. Observed by AC16.
 - **S6** — The step `agent-cap/fanout-cap-to-agents-in-flight`, an `[[upgrade]]` row in
   `tools/hooks/kit.toml` whose program is `tools/govkit/steps/fanout_cap.py`. Its up moves
   `.agent-cap.conf`'s `FANOUT_CAP` into `runtime.agents-in-flight` and retires the file, so the limit
@@ -94,43 +96,12 @@ upgrade-step kind: a moved conf key is only reported).
   `tools/hooks/agent-cap.test.sh`, `tools/workflows/check-protocol-parity.test.sh` and
   `tools/workflows/check-verifier-fanout.test.sh`, as at base 3957a8958 · by value: `policy.py get runtime.agents-in-flight`, whose `read_legacy_fanout` reads the file as a
   legacy home while it exists (`cl-dClosedLoop-0016`).
-- **S7** — The step `govkit/template-size-limits-to-budgets`, a row of `tools/govkit/steps.toml` whose
-  program is `tools/govkit/steps/template_size_limits.py`. Its up moves every row of
-  `<prefix>/template-size-limits.txt` into `budgets.*` in `.governance/policy.toml`, each row's
-  comment block carried above its key and the file's header (the four raise
-  conditions) carried above the table, and retires the file; its down restores both files
-  byte-identical. Observed by AC13 and AC14. The file's by-name readers at the base are those
-  `git grep -l -F 'template-size-limits' -- ':!memory/builds' ':!memory/ledger'` prints, the backlog
-  index row aside, and S8 disposes each.
-  **Readers:** by name: `tools/check-template-size.sh`, `tools/check-spec-tokens.py`,
-  `tools/check-spec-tokens.test.sh`, `tools/govkit/registry.toml`, `.gitattributes`,
-  `.memory-tree.conf`, `memory/project/method-carriers.txt`, `tools/line-length-limits.txt`,
-  `tools/memory-recall/extract.py`, `tools/run-gates/gate-profiles.txt`,
-  `memory/map/features/build-method.md` and `memory/map/features/playbook.md` · by value:
-  `budgets.py resolve`, which reads the file as its `limits:` home until the step
-  (`cl-dClosedLoop-0015`), and through it the template-size gate and `tools/check-spec-tokens.py`'s
-  size join (dGroundRules unit 9, S5).
-- **S8** — Gov migrated first. This unit's pass runs S7's up on gov's tree first, so
-  `tools/template-size-limits.txt` leaves gov in the unit's commit. Every
-  by-name reader S7's `git grep` prints at the build run's base is disposed in that commit: the
-  `[[exempt]]` row and its three `why` mentions in `tools/govkit/registry.toml`, the `.gitattributes`
-  eol row and the `RECALL_EXTRA_SOURCES` member in `.memory-tree.conf` are removed or re-pointed to
-  `.governance/policy.toml`. `budgets.py`'s `limits:` branch retires and this unit adds the
-  `policy` form, `HOME_FORMS` swapping `limits` for it to read
-  `("policy", "file", "conf", "constant")`; `tools/policy/caps.toml`'s seven `limits:` rows read
-  `home = "policy:"`, no locator, the value held only under `budgets.<name>`, which `resolve_caps`
-  reads as a file value, refusing a `legacy:` handed in for it as for `limits:`. `arm_cap_census`
-  exempts a `policy:` row from naming its cap as it did a `limits:` one, its limits-file half goes
-  (`check_budgets` already finds a `budgets.<cap>` no row names), and the seven `budgets-cap-` plants
-  set `budgets.<name>` where they copied the file. `arm_limits_readers`' row of `arm_single_reader`
-  and the cases planting the file go, and `budgets-two-homes` is re-planted on a `conf:` home, since
-  gov's is the only tree that ever held the file (an `[[exempt]]` path, shipped to no adopter). Each
-  prose mention names `budgets.*`, the dossiers' cards re-rendered by
-  `python tools/codebase-map/gen_map.py --write`. The mirror, `policy.py mirror --write`, is a
-  second commit: it refuses while the policy file differs from HEAD, and the guard admits a mirror
-  only when that file and the catalogue equal HEAD (dGroundRules units 5 S2, 19 S1). Observed by AC13, AC15 and AC19.
-  **Readers:** by name: the readers S7 lists · by value: `budgets.py resolve`, whose `limits:`
-  branch this item retires; no reader compares or counts the file's path itself.
+- **S7** — Moved to TOOL-dSafePassage-61, its S1, on 2026-10-26, when §8 F8's stop fired: the
+  size-limits step's row and program. NOT OBSERVED here — TOOL-dSafePassage-61's AC1 and AC2
+  observe it.
+- **S8** — Moved to TOOL-dSafePassage-61, its S4, on 2026-10-26, when §8 F8's stop fired: gov's own
+  migration of the size-limits file. NOT OBSERVED here — TOOL-dSafePassage-61's AC3 and AC4
+  observe it.
 - **S9** — Frozen landed rows. `check_frozen` compares every `[[upgrade]]` and `[[retired]]` row
   present at a base on the default branch with the same id at the head: a removed row reds unless a
   `[[retired]]` row at the head names it; an edited `up`, `down`, `witness`, `resume` or `surfaces`
@@ -146,8 +117,8 @@ upgrade-step kind: a moved conf key is only reported).
 
 ## 3. Non-goals (OUT)
 
-- The walk, `TOOL-dSafePassage-2`'s, ordering aside (S3): until it lands, S6 and S7 run only by
-  their own argv.
+- The walk, `TOOL-dSafePassage-2`'s, ordering aside (S3): until it lands, S6 runs only by its own
+  argv.
 - The receipt's `steps` field and the schema-4 step (`TOOL-dSafePassage-3`), down steps in reverse
   and the recorded rollback (`TOOL-dSafePassage-4`), the isolated runner and its `-I` contract
   (`TOOL-dSafePassage-7`), gov's source-mode receipt (`TOOL-dSafePassage-8`), the surface class
@@ -156,31 +127,31 @@ upgrade-step kind: a moved conf key is only reported).
 - `plan` and `apply` given `--kits` naming a retired id: they still refuse it as unknown.
 - `TOOL-dRetiredFork-38`'s scoped re-stamp (`update --write --kits <one>`), which this unit
   neither fixes nor widens.
-- Any legacy home other than the two S6 and S7 retire; dConvergedCharter folds the kit conf keys.
+- Any legacy home other than the one S6 retires. The size-limits file is TOOL-dSafePassage-61's, and
+  dConvergedCharter folds the kit conf keys.
 
 ### Edges
 
 - **consumes-from** external — dGroundRules, landed first: `.governance/policy.toml` and its schema
-  (`cl-dClosedLoop-0007`), `policy.py get` (`cl-dClosedLoop-0008`), `budgets.*` with
-  `budgets.py resolve` and `caps.toml` (`cl-dClosedLoop-0015`), `runtime.agents-in-flight` with
-  `read_legacy_fanout` (`cl-dClosedLoop-0016`), the mirror and the guard, without which S6 to S8
-  have no key to write
+  (`cl-dClosedLoop-0007`), `policy.py get` (`cl-dClosedLoop-0008`), `runtime.agents-in-flight` with
+  `read_legacy_fanout` (`cl-dClosedLoop-0016`), without which S6 has no key to write
 - **hands-off** `TOOL-dSafePassage-2` — walking the ordered rows, running each by its argv, and
   staging every path a step writes, its before-image included
 - **hands-off** `TOOL-dSafePassage-3` — the receipt step's row, first in the steps file
 - **hands-off** `TOOL-dSafePassage-4` — the reverse walk, each applied row's `down` argv restoring
   from its up's before-image
 - **hands-off** `TOOL-dSafePassage-7` — an argv's interpreter and placeholders, under isolation
-- **hands-off** `TOOL-dSafePassage-8` — these two steps in gov's receipt, their witnesses holding
-  since gov migrated first
+- **hands-off** `TOOL-dSafePassage-8` — the fan-out step in gov's receipt, its witness holding on gov,
+  which tracks no `.agent-cap.conf`
 - **hands-off** `TOOL-dSafePassage-10` — the class registry `surfaces` member ids are spelled from
 - **hands-off** `TOOL-dSafePassage-11` — the floor step's row, second in the steps file
-- **hands-off** `TOOL-dSafePassage-5` — these two steps walked up, down and up over the release-0
+- **hands-off** `TOOL-dSafePassage-5` — the fan-out step walked up, down and up over the release-0
   fixture
 - **hands-off** external — dWitnessedBar's append-only factory, which the frozen rows join
 - **hands-off** `TOOL-dSafePassage-17` — the per-row reverted rule and no-image down this unit's grammar and restore helper gain (finding 51)
 - **hands-off** `TOOL-dSafePassage-20` — the one spelling of the unlanded value this unit's reader returns, recorded as null at the writer (finding 3)
 - **hands-off** `TOOL-dSafePassage-26` — the round-1 spec audit's minors batch, repairing this unit's findings once every unit is built
+- **hands-off** `TOOL-dSafePassage-61` — the size-limits step and gov's own migration, moved out at §8 F8's stop; that step reads rows through `read_steps` and writes through `write_before_image` and `render_policy_text`
 
 ## 4. Design
 
@@ -212,7 +183,7 @@ The order is total: landed rows by their introducing commit's first-parent posit
 rows; within one commit `tools/govkit/steps.toml` first, then descriptors in registry entry order
 (§8 F7); within one file, row order.
 
-The two steps this unit ships:
+The step this unit ships:
 
 ```toml
 # tools/hooks/kit.toml
@@ -223,16 +194,10 @@ down = ["python", "{gov}/govkit/steps/fanout_cap.py", "down", "{target}"]
 witness = ["python", "{gov}/govkit/steps/fanout_cap.py", "witness", "{target}"]
 surfaces = ["conf-key:.agent-cap.conf#FANOUT_CAP"]
 needs-target = false
-
-# tools/govkit/steps.toml
-[[upgrade]]
-id = "govkit/template-size-limits-to-budgets"
-up = ["python", "{gov}/govkit/steps/template_size_limits.py", "up", "{target}", "{prefix}"]
-down = ["python", "{gov}/govkit/steps/template_size_limits.py", "down", "{target}", "{prefix}"]
-witness = ["python", "{gov}/govkit/steps/template_size_limits.py", "witness", "{target}", "{prefix}"]
-surfaces = ["file:{prefix}/template-size-limits.txt"]
-needs-target = false
 ```
+
+`tools/govkit/steps.toml` lands holding its header comment and no row; TOOL-dSafePassage-3's row is
+its first.
 
 **The before-image.** Each up first writes `.governance/steps/<entry>/<slug>.before.json` at the
 target: every path it will write or remove, with its bytes (base64, `null` for absent) and the sha256
@@ -257,15 +222,7 @@ at HEAD. Where `policy.py get runtime.agents-in-flight --rev HEAD --explain` giv
 `lowered to <n> by FANOUT_CAP`, it sets `runtime.agents-in-flight` to `<n>`; else the file lowers
 nothing and the key is left (§8 F10). It then removes the file. Witness: `.agent-cap.conf` is absent.
 
-**S7's up.** No `<prefix>/template-size-limits.txt`: exit 0. Otherwise it splits the file into its
-header comment block and its rows, each with the comment block above it; runs `budgets.py resolve`
-for each row's cap at the landed revision, its CLI's only one (unit 9, S2), exiting 1 where that
-exits 2 or prints source `file` with another value; renders the `[budgets]` table into
-`.governance/policy.toml`, the header above the table and each comment block above its key,
-verbatim; and removes the file. Witness: the file is absent and each `budgets.<cap>` the policy text
-parses to holds its before-image row's value.
-
-**Writing the policy file.** dGroundRules lands no writer, so both steps write through
+**Writing the policy file.** dGroundRules lands no writer, so S6 writes through
 `render_policy_text` in `tools/govkit/upgrade_steps.py`, a line editor setting one key in one table
 that refuses its own output unless `tomllib` reads the value back (§8 F9).
 
@@ -276,8 +233,8 @@ that refuses its own output unless `tomllib` reads the value back (§8 F9).
 | `read_steps(root, rev, landed_ref)`, `read_retired(root, rev, landed_ref)`, `derive_introduced`, `resolve_claim(eid, entry_ids, retired)`, `check_frozen(root, base, head)`, `write_before_image`, `write_from_before_image`, `render_policy_text`, `main`, `cmd_list`, `cmd_frozen` | `tools/govkit/upgrade_steps.py` | `py.function` snake, verbs read, derive, resolve, check, write, render, main, cmd |
 | `StepRow`, `RetiredRow` | `tools/govkit/upgrade_steps.py` | `py.type` pascal |
 | `derive_push_base(root, base)`, extracted from `cmd_epoch` | `tools/govkit/govkit.py` | `py.function` snake |
-| `cmd_up`, `cmd_down`, `cmd_witness`, `main` | `tools/govkit/steps/fanout_cap.py`, `tools/govkit/steps/template_size_limits.py` | `py.function` snake |
-| the step ids `agent-cap/fanout-cap-to-agents-in-flight`, `govkit/template-size-limits-to-budgets` | the rows above | — |
+| `cmd_up`, `cmd_down`, `cmd_witness`, `main` | `tools/govkit/steps/fanout_cap.py` | `py.function` snake |
+| the step id `agent-cap/fanout-cap-to-agents-in-flight` | the row above | — |
 | the leg `step-rows-frozen` | `tools/gate-legs.json`, chunk `declarations`, subject `repo`, no guard (it reads every descriptor, which live anywhere under the tool root), ceiling measured at build | — |
 
 `Refusal` moves from `tools/govkit/govkit.py:115` into `tools/govkit/upgrade_steps.py` and
@@ -293,7 +250,8 @@ second instance, `cmd_frozen`, rather than copied (charter `[reuse]`).
 
 Additive: a descriptor's new table changes nothing until `update` reads it, and `read_descriptors`
 (`tools/govkit/govkit.py:13238-13253`) loads a descriptor whole, so it reaches no other reader. Gov's
-tree is migrated by S8, after §8 F9's re-ground.
+tree needs no migration here: it tracks no `.agent-cap.conf`, so S6's up exits 0 on it and writes no
+guarded path. Gov's size-limits file is TOOL-dSafePassage-61's (§8 F8).
 
 ### Rollout
 
@@ -305,7 +263,6 @@ The leg is live in the landing that adds it. Its first base has no step rows, so
 - `tools/govkit/upgrade_steps.py`
 - `tools/govkit/steps.toml`
 - `tools/govkit/steps/fanout_cap.py`
-- `tools/govkit/steps/template_size_limits.py`
 - `tools/govkit/govkit.py`
 - `tools/govkit/registry.toml`
 - `tools/govkit/selftest.py`
@@ -313,21 +270,6 @@ The leg is live in the landing that adds it. Its first base has no step rows, so
 - `tools/hooks/kit.toml`
 - `tools/hooks/README.md`
 - `tools/gate-legs.json`
-- `tools/template-size-limits.txt` (removed)
-- `.governance/policy.toml`, `.governance/policy.json`
-- `tools/policy/budgets.py` (`HOME_FORMS` and `resolve_caps` gain `policy`), `tools/policy/caps.toml`,
-  `tools/policy/check_policy.py` (`arm_cap_census`'s join and the plants), `help/size-caps.md`
-- `.gitattributes`
-- `.memory-tree.conf`
-- `memory/project/method-carriers.txt`
-- `tools/check-template-size.sh`
-- `tools/check-spec-tokens.py`
-- `tools/check-spec-tokens.test.sh`
-- `tools/line-length-limits.txt`
-- `tools/memory-recall/extract.py`
-- `tools/run-gates/gate-profiles.txt`
-- `memory/map/features/build-method.md`
-- `memory/map/features/playbook.md`
 - `help/upgrade-steps.md`
 - `help/README.md`
 
@@ -347,17 +289,21 @@ The leg is live in the landing that adds it. Its first base has no step rows, so
   with their counts; a malformed row exits 2 naming file, row and key.
 - observability — `list` prints each row's order, id, introducing commit and file; `update` one line
   per succession.
-- risks — `cl-dClosedLoop-0012`'s guard may refuse S8's write (§8 F8); an imported helper is not
-  frozen (§7).
+- risks — the pass stages no guarded path, since the write the guard refuses moved to
+  TOOL-dSafePassage-61 (§8 F8); an imported helper is not frozen (§7).
 - testing — `tools/govkit/selftest.py` arms over scratch gov trees and targets.
 - migration — §4 Migration.
 - user docs — `help/upgrade-steps.md` (S10), and `tools/hooks/README.md`'s section on the file.
 
 ## 6. Acceptance criteria
 
+The criteria AC13, AC14, AC15 and AC19 moved to TOOL-dSafePassage-61 on 2026-10-26, as its AC1
+to AC4, and the size-limits half of AC16 as its AC5; the labels are not reused here.
+
 - **AC1** — When `python tools/govkit/upgrade_steps.py list` runs on gov's tree after the build, it
-  prints `govkit/template-size-limits-to-budgets` before `agent-cap/fanout-cap-to-agents-in-flight`,
-  each with its declaring file and `unlanded` or its introducing commit.
+  prints `agent-cap/fanout-cap-to-agents-in-flight` with its declaring file `tools/hooks/kit.toml` and
+  `unlanded` or its introducing commit; over a scratch gov tree whose one commit adds a
+  `tools/govkit/steps.toml` row and a descriptor row, it prints the steps-file row first.
   Red when: the reader skips descriptor rows, and the `tools/hooks/kit.toml` row is absent.
 - **AC2** — When a scratch gov tree plants, one per run, an unknown key, an authored `introduced`, a
   `{bogus}` placeholder, `argv[0]` of `node`, a `{gov}/` program that is not tracked, a duplicate id,
@@ -407,28 +353,9 @@ The leg is live in the landing that adds it. Its first base has no step rows, so
 - **AC12** — When `.agent-cap.conf` holds `FANOUT_CAP=abc`, or a second assignment `OTHER=1`, S6's up
   exits 1 naming the file and writes no byte, before-image included.
   Red when: the up exits 0, or any file under the target changes.
-- **AC13** — When S7's `up` argv runs on a remote-less scratch clone of gov's tree at the build run's
-  base and commits on `main`, the clone's `python budgets.py resolve` prints each row's cap of
-  `tools/template-size-limits.txt` with its base value, the file is gone, each comment block stands
-  above its key (`grep -n -F 'RAISED from 32768' .governance/policy.toml`), and the header's four
-  raise conditions stand above the table.
-  Red when: a planted row whose comment block contains a tab-separated line reads a different cap
-  after the step.
-  fixture: needs the landed `budgets.*` and `budgets.py`, as AC10.
-- **AC14** — When S7's `down` argv runs after its up on that copy, `tools/template-size-limits.txt`
-  and `.governance/policy.toml` are byte-identical to the base.
-  Red when: a byte differs.
-- **AC15** — When the unit is committed, `git ls-files tools/template-size-limits.txt` prints nothing,
-  S7's `witness` argv exits 0 on gov's tree, and `git grep -c -F 'template-size-limits' --
-  ':!memory/builds' ':!memory/ledger' ':!memory/backlog' ':!tools/govkit/steps.toml'
-  ':!tools/govkit/steps/template_size_limits.py'
-  ':!.governance/steps/govkit/template-size-limits-to-budgets.before.json'` prints only
-  `.governance/policy.toml:1`. The exclusions are the step's own row, program and image; that line is the
-  header its up carries, and any other path a reader S8 left.
-  Red when: the grep prints another line or a higher count.
 - **AC16** — When `python tools/govkit/upgrade_steps.py list --window` runs on gov's tree after the
-  unit lands on `main`, it prints `.agent-cap.conf` and `template-size-limits.txt` closed by their
-  step ids; on a branch adding a step whose `surfaces` names a third home, it prints that home `open`.
+  unit lands on `main`, it prints `.agent-cap.conf` closed by its step id; on a branch adding a step
+  whose `surfaces` names a second home, it prints that home `open`.
   Red when: the unlanded step's home prints `closed`.
 - **AC17** — When `tools/gate-legs.json` is read, a row named `step-rows-frozen` carries the argv
   `python {prefix}/govkit/upgrade_steps.py frozen`, and `tools/govkit/registry.toml` carries an
@@ -437,13 +364,6 @@ The leg is live in the landing that adds it. Its first base has no step rows, so
 - **AC18** — When `help/README.md` is read, it links `help/upgrade-steps.md`, and that page names
   `[[upgrade]]`, `[[retired]]` and `runtime.agents-in-flight`.
   Red when: the page is missing or names none of the three.
-- **AC19** — When `python tools/policy/budgets.py resolve AGENTS.md` runs on gov's tree after S8, it
-  prints `AGENTS.md` with the value `budgets."AGENTS.md"` holds in `.governance/policy.toml` and
-  source `file`, its census row reading `home = "policy:"`; and `python tools/policy/check_policy.py`
-  prints `policy-check: arm_cap_census ·` with no finding line under it.
-  Red when: the census refuses the home as opening with none of `HOME_FORMS`, or `arm_cap_census`
-  reds a `policy:` row's enforcer for never naming its cap.
-
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `recall floor` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `memory-hygiene self-test` · `build-index selftest` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `dead-path carriers (deleted files still named)` · `method carriers (every pointer declared)` · `template size <=48KiB` · `leg ceilings clear their evidenced maximum` · `every held leg is budgeted, every budget row resolves` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
@@ -451,7 +371,7 @@ The leg is live in the landing that adds it. Its first base has no step rows, so
 The new leg `step-rows-frozen` is off the line above until this unit builds it; AC4 observes it red
 and AC5 green.
 
-New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 AC13 AC14 AC16 · each case staged by its own scratch gov tree or target, one planted row, receipt or file per arm · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
+New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 AC16 · each case staged by its own scratch gov tree or target, one planted row, receipt or file per arm · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
 
 What the frozen leg does not check: what a step program imports. S9 freezes the bytes of each program
 a landed argv names, not its imports, so a landed step can still change through an import; the
@@ -510,6 +430,12 @@ purpose. Nor whether a correction step reverses its defect, or any row the defau
   `memory/builds/dGroundRules/BACKLOG.md`.
   RESOLVED (agent, 2026-10-23, delegated): (a) · widens: none · relaxes: none
   The build run's first pass reads whether the landed guard grants it, and stops S8 if not.
+  F8's stop fired, 2026-10-26: the landed guard refuses; S8 and S7 moved to TOOL-dSafePassage-61.
+  The guard's `check_raise_shape` refuses S8's seven-key write (`tools/policy/guard.py:150-151`).
+  S7's row moved too: declared in a landing without gov's migration, TOOL-dSafePassage-8's gov-first
+  walk would run its up on gov in the prepared merge and commit the same refused shape through
+  `commit-tree` (`tools/push-main.sh:921`), where no hook fires. S6 stays: gov tracks no
+  `.agent-cap.conf`, so its up exits 0 on gov and writes nothing.
 - **F9 — What does this unit do while its parent is unbuilt?** dGroundRules is specced and DEFERRED,
   its clauses (§3's first edge) this unit's contract. (a) The build run re-grounds against the landed
   parent first, takes its module paths, table layout, writer and legacy-home parser as spelled, and
@@ -532,6 +458,7 @@ purpose. Nor whether a correction step reverses its defect, or any row the defau
   re-planted on a `conf:` home. (b) The rows keep `limits:` naming an absent file, the arm's reader
   directory moving to `tools/govkit/steps/`: a home and an arm over a file no tree holds.
   Recommendation (a), charter `[yagni]`. Rung 3. RESOLVED (owner, 2026-10-24): (a).
+  Moved with S8 to TOOL-dSafePassage-61, its §8 F2, on 2026-10-26.
 
 ## 9. Revision log
 
@@ -550,6 +477,10 @@ purpose. Nor whether a correction step reverses its defect, or any row the defau
   `2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`: S8 adds the `policy:` home to `HOME_FORMS`,
   `resolve_caps` and `arm_cap_census`, observed by AC19; §7 states the import gap; prose trimmed, and
   trimmed again for the records rows.
+- rev-11 · 2026-10-26 · §1 · S5 · S7 · S8 · §3 · §4 · §5 · AC1 · AC13 · AC14 · AC15 · AC16 · AC19 · §7 ·
+  §8 F8 · F12 · S7, S8, AC13, AC14, AC15, AC19 and the size-limits halves of S5 and AC16 moved to
+  TOOL-dSafePassage-61 at F8's stop, by `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`;
+  the clause is carried in two parts.
 
 ## 10. Reuse audit
 
