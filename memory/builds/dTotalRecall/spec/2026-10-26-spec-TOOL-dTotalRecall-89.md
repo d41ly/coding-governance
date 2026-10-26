@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-89 — unit 88's AC13 is answered on both arms of unit 83's decision, so no record of unit 59 is written or kept to satisfy a count the decision rules out
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

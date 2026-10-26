@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-47 — the cause backfill is a verb run at the tip after the step-17 group, so no record written between the seed and the writers' change stays causeless
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 18 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 18 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

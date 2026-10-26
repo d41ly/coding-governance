@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-91 — unit 69's AC1 is answered only from a read in which C5 ran, classified by the read's exit status and the checks that failed before it
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-84 — unit 74's `s1-46` count is re-read at the verified parent of unit 46's pass, and its S4 record of unit 70's reading is made from that count
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

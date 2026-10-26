@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-1 — the record-kind registry, the memory contract's one declaration of every kind
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 1 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 1 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0212@121cf0ba whole
 **Carries:** node:system.memory-structure

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-14 — the level-0 project map: its renderer and gov map, derived from the one index, held to its budget without losing a node
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 23 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 23 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0225@db15491d whole
 **Carries:** node:system.project-map

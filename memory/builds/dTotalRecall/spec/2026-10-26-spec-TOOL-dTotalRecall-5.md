@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader
 
-**Status:** OPEN · rev-5 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 7 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0216@f8936b35 whole
 **Carries:** node:policy-key.builds.slug-words

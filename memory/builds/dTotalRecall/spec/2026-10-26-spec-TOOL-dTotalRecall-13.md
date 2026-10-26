@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-13 — the shared extraction primitive in `tools/lib`, which the map and the lexicon each call
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 2 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 2 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0224@bfb0a85c whole
 

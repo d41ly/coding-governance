@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-97 — the C5 classifier's input is extracted from unit 80's ledger by a stated rule, and every read line it cannot place is counted
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

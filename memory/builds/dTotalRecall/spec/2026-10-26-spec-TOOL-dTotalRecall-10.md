@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-10 — derived anchors suffixed for a repeated heading
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 15 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 15 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0221@5746ccbd whole
 

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-24 — every landed commit that touches a record appended to the change feed
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 20 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0235@dba1fb83 whole
 

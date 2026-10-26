@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-59 — the merged legacy registration is judged at the run's real compare base, a first seed, and the `absorbs` read that base can never feed is cut
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

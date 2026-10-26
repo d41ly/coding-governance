@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-26 — the atlas under `help/atlas/`: generated Markdown and Mermaid pages from the one index's node table, refused when stale
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 25 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 25 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0237@0c51b12a whole
 **Carries:** node:policy-key.help.atlas

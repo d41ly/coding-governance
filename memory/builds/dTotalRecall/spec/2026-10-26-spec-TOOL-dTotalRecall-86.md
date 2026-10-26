@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-86 — unit 76's S5 and S6 reads of unit 70's table and unit 46's strings are made again at verified revisions, so an unresolved pass is a red and never a count
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

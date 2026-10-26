@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-95 — a record of unit 59's absorbs departure carries one key, `pass(59)` with the string, whichever unit writes it, so every counter of it counts the same records
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

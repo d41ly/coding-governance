@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-98 — the restore lists every deleted record with rename detection off, so a record deleted beside a near-copy is put back
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 40 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 40 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-79 — the ratchet leg's red spans are derived from the corrected sweep by a derivation seen to find a known red, and unit 76's AC13 certification is recorded against them
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

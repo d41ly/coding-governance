@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population
 
-**Status:** OPEN · rev-5 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0230@63f11811 whole
 

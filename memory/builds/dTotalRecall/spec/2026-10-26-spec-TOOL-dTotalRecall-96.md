@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-96 — unit 69's AC1 is answered again by a C5 classifier whose exit status must agree with the read's failure lines, so a read in which the checker never ran is never passed
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

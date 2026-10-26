@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-99 — the tip scan is graded only on a full read: it exits 0, counts the records it read against the folder, and its `by` lines sum to the live records
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 40 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 40 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

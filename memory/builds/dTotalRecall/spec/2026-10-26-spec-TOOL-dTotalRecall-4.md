@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 8 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0215@10676c23 whole
 **Carries:** node:record-kind.build-readme

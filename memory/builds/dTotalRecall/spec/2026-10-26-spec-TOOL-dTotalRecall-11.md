@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-11 — the shape-run kind, the parsed view of the review-shape line
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0222@bc317ce6 whole
 

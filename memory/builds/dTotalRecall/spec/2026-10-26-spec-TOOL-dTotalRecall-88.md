@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-88 — the round-7 minors: each reading of units 71 to 76 that observed nothing or two things is made once at the tip, and each gap it hid is closed
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

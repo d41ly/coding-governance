@@ -15,6 +15,7 @@
 ## Dispositions
 
 - SEV · TOOL-dTotalRecall-27 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dTotalRecall-27 · until TOOL-dTotalRecall-100 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dTotalRecall-100 at order 41 today, closes it (README rule 1)
 - SEV · TOOL-dTotalRecall-28 · LOW · two builds may each build a record-kind factory or each leave it
 - DEFERRED · TOOL-dTotalRecall-28 · until TOOL-dTotalRecall-1 · TOOL-dTotalRecall-1's build run lands `record-kinds.toml` as the record-kind factory per its §8 F1, so the factory has one home there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dTotalRecall-29 · MED · a pruned claim ref lets two clones mint one slug

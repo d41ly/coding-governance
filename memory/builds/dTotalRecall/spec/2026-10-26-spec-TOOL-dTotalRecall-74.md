@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-74 — unit 70's backticked strings are re-read at step 34 by a probe no shell quotes, and the departure unit 70's S3 owed for unit 59 is written
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

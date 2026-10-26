@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-16 — the registry's `purpose` field, and every existing node's purpose reviewed as `memory.map-purpose` says
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 5 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 5 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0227@b1bcbcb9 whole
 **Carries:** node:policy-key.memory.map-purpose

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-15 — the map's three-way completeness check and the map leg pack
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 24 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 24 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0226@0bd15de1 whole
 

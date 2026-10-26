@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-83 — unit 74's `s1-59` count is re-read at the verified parent of unit 59's pass, and the deviation record of unit 59 it decides is written once
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

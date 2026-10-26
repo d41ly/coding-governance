@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-87 — the memory root `resolve_kept_registration` joins is resolved once, normalised to a repo-relative path, and refused when blank, absolute or leaving the tree
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

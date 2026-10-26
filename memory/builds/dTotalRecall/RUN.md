@@ -178,3 +178,185 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T08:54:50Z rescope · item add TOOL-dTotalRecall-100 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) the 20 confirmed minors batched into one unit: 14 MEDIUM, ids 3 4 6 7 13 14 19 21 23 24 25 26 31 32 (items M1 to M9), and 6 LOW, ids 9 10 11 16 17 22 (items L1 to L5); lands on several units, so repairs no unit in particular, landing at order 41
 
 2026-10-26T09:18:12Z review · item dTotalRecall-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 20 · disposition promote
+
+2026-10-26T09:42:48Z rescope · item defer TOOL-dTotalRecall-1 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:49Z rescope · item defer TOOL-dTotalRecall-2 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:49Z rescope · item defer TOOL-dTotalRecall-3 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:50Z rescope · item defer TOOL-dTotalRecall-4 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:51Z rescope · item defer TOOL-dTotalRecall-5 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:52Z rescope · item defer TOOL-dTotalRecall-6 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:52Z rescope · item defer TOOL-dTotalRecall-7 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:53Z rescope · item defer TOOL-dTotalRecall-8 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:54Z rescope · item defer TOOL-dTotalRecall-9 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:55Z rescope · item defer TOOL-dTotalRecall-10 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:55Z rescope · item defer TOOL-dTotalRecall-11 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:56Z rescope · item defer TOOL-dTotalRecall-12 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:57Z rescope · item defer TOOL-dTotalRecall-13 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:57Z rescope · item defer TOOL-dTotalRecall-14 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:58Z rescope · item defer TOOL-dTotalRecall-15 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:59Z rescope · item defer TOOL-dTotalRecall-16 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:42:59Z rescope · item defer TOOL-dTotalRecall-17 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:00Z rescope · item defer TOOL-dTotalRecall-18 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:01Z rescope · item defer TOOL-dTotalRecall-19 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:02Z rescope · item defer TOOL-dTotalRecall-20 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:02Z rescope · item defer TOOL-dTotalRecall-21 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:03Z rescope · item defer TOOL-dTotalRecall-22 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:04Z rescope · item defer TOOL-dTotalRecall-23 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:04Z rescope · item defer TOOL-dTotalRecall-24 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:05Z rescope · item defer TOOL-dTotalRecall-25 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:06Z rescope · item defer TOOL-dTotalRecall-26 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:07Z rescope · item defer TOOL-dTotalRecall-36 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:07Z rescope · item defer TOOL-dTotalRecall-37 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:08Z rescope · item defer TOOL-dTotalRecall-38 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:09Z rescope · item defer TOOL-dTotalRecall-39 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:10Z rescope · item defer TOOL-dTotalRecall-40 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:10Z rescope · item defer TOOL-dTotalRecall-41 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:11Z rescope · item defer TOOL-dTotalRecall-42 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:12Z rescope · item defer TOOL-dTotalRecall-43 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:12Z rescope · item defer TOOL-dTotalRecall-44 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:13Z rescope · item defer TOOL-dTotalRecall-45 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:14Z rescope · item defer TOOL-dTotalRecall-46 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:15Z rescope · item defer TOOL-dTotalRecall-47 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:15Z rescope · item defer TOOL-dTotalRecall-48 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:16Z rescope · item defer TOOL-dTotalRecall-49 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:17Z rescope · item defer TOOL-dTotalRecall-50 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:18Z rescope · item defer TOOL-dTotalRecall-51 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:18Z rescope · item defer TOOL-dTotalRecall-52 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:19Z rescope · item defer TOOL-dTotalRecall-53 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:20Z rescope · item defer TOOL-dTotalRecall-54 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:20Z rescope · item defer TOOL-dTotalRecall-55 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:21Z rescope · item defer TOOL-dTotalRecall-56 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:22Z rescope · item defer TOOL-dTotalRecall-57 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:22Z rescope · item defer TOOL-dTotalRecall-58 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:23Z rescope · item defer TOOL-dTotalRecall-59 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:24Z rescope · item defer TOOL-dTotalRecall-60 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:25Z rescope · item defer TOOL-dTotalRecall-61 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:25Z rescope · item defer TOOL-dTotalRecall-62 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:26Z rescope · item defer TOOL-dTotalRecall-63 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:27Z rescope · item defer TOOL-dTotalRecall-64 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:28Z rescope · item defer TOOL-dTotalRecall-65 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:28Z rescope · item defer TOOL-dTotalRecall-66 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:29Z rescope · item defer TOOL-dTotalRecall-67 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:30Z rescope · item defer TOOL-dTotalRecall-68 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:31Z rescope · item defer TOOL-dTotalRecall-69 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:32Z rescope · item defer TOOL-dTotalRecall-70 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:32Z rescope · item defer TOOL-dTotalRecall-71 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:33Z rescope · item defer TOOL-dTotalRecall-72 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:34Z rescope · item defer TOOL-dTotalRecall-73 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:34Z rescope · item defer TOOL-dTotalRecall-74 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:35Z rescope · item defer TOOL-dTotalRecall-75 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:36Z rescope · item defer TOOL-dTotalRecall-76 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:37Z rescope · item defer TOOL-dTotalRecall-77 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:37Z rescope · item defer TOOL-dTotalRecall-78 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:38Z rescope · item defer TOOL-dTotalRecall-79 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:39Z rescope · item defer TOOL-dTotalRecall-80 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:39Z rescope · item defer TOOL-dTotalRecall-81 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:40Z rescope · item defer TOOL-dTotalRecall-82 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:41Z rescope · item defer TOOL-dTotalRecall-83 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:42Z rescope · item defer TOOL-dTotalRecall-84 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:42Z rescope · item defer TOOL-dTotalRecall-85 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:43Z rescope · item defer TOOL-dTotalRecall-86 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:44Z rescope · item defer TOOL-dTotalRecall-87 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:45Z rescope · item defer TOOL-dTotalRecall-88 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:45Z rescope · item defer TOOL-dTotalRecall-89 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:46Z rescope · item defer TOOL-dTotalRecall-90 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:47Z rescope · item defer TOOL-dTotalRecall-91 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:48Z rescope · item defer TOOL-dTotalRecall-92 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:48Z rescope · item defer TOOL-dTotalRecall-93 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:49Z rescope · item defer TOOL-dTotalRecall-94 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:50Z rescope · item defer TOOL-dTotalRecall-95 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:50Z rescope · item defer TOOL-dTotalRecall-96 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:51Z rescope · item defer TOOL-dTotalRecall-97 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:52Z rescope · item defer TOOL-dTotalRecall-98 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:53Z rescope · item defer TOOL-dTotalRecall-99 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T09:43:53Z rescope · item defer TOOL-dTotalRecall-100 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27

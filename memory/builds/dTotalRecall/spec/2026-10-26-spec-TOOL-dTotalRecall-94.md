@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-94 — the write-once probe is seen to count the real records: a census over every unit holding one, seen red on unit 90's probe, and a fixture of the records' own shape
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 

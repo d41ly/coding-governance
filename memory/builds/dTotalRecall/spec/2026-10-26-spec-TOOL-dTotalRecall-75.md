@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-75 — the kickoff manifest's `last-body-change` is advanced after §B is re-read, so manifest-check's C9 stall count is under ten from step 33
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
