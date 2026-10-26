@@ -165,12 +165,12 @@ def write_sparse_checkout(tree, sha: str) -> None:
         raise Refusal(f"cannot check {tree.as_posix()} out at {sha[:8]}: {p.stderr.strip()}")
 
 
-def rmtree_writable(path) -> None:
+def remove_scratch_tree(path) -> None:
     """`path` removed, a read-only file (git's objects on Windows) made writable first."""
-    def chmod_retry(func, p, _exc):
+    def remove_read_only(func, p, _exc):
         os.chmod(p, 0o700)
         func(p)
-    shutil.rmtree(path, onexc=chmod_retry)
+    shutil.rmtree(path, onexc=remove_read_only)
 
 
 def read_base_population(root, sha: str, classes: list[dict]) -> set[str]:
@@ -186,7 +186,7 @@ def read_base_population(root, sha: str, classes: list[dict]) -> set[str]:
     finally:
         run_git_text(root, "worktree", "remove", "--force", str(tree))
         if tmp.exists():
-            rmtree_writable(tmp)
+            remove_scratch_tree(tmp)
         run_git_text(root, "worktree", "prune")
 
 
@@ -453,11 +453,11 @@ def write_conf_plant(clone) -> str:
                 if f and seen.get(f"{f}#{k}") == 1:
                     q = re.escape(json.dumps(k))
 
-                    def drop(t, lk=lk, q=q):
+                    def remove_conf_key(t, lk=lk, q=q):
                         m = re.search(rf"^{lk}\s*=\s*\[[^\]]*\]", t, re.M)
                         span = re.sub(rf"{q}\s*,\s*|,\s*{q}|{q}", "", m[0], count=1)
                         return t[:m.start()] + span + t[m.end():]
-                    write_plant_edit(clone, dpath, drop)
+                    write_plant_edit(clone, dpath, remove_conf_key)
                     return f"conf:{f}#{k}"
     raise Refusal("the conf plant found no required conf key one descriptor alone declares")
 
@@ -507,13 +507,13 @@ def write_entry_plant(clone) -> str:
     reg = gk.derive_registry_path(clone).relative_to(clone).as_posix()
     want = f"id = {json.dumps(pick['id'])}"
 
-    def drop(t):
+    def remove_entry_row(t):
         lines = t.splitlines(keepends=True)
         i = next(k for k in range(1, len(lines)) if lines[k].strip() == want and lines[k - 1].strip() == "[[entry]]")
         j = next((k for k in range(i + 1, len(lines)) if not lines[k].strip() or lines[k].startswith("[")), len(lines))
         j += j < len(lines) and not lines[j].strip()
         return "".join(lines[:i - 1] + lines[j:])
-    write_plant_edit(clone, reg, drop)
+    write_plant_edit(clone, reg, remove_entry_row)
     run_git_staged(clone, "rm", "-q", "--", pick["descriptor"])
     return f"entry:{pick['id']}"
 
@@ -621,7 +621,7 @@ def run_step_gate_fixture(root, case: str, with_row: bool) -> int:
         sys.stdout.write(out)
         return rc
     finally:
-        rmtree_writable(tmp)
+        remove_scratch_tree(tmp)
 
 
 def main(argv: list[str]) -> int:
