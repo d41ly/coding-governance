@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-59 — unit 53's read check folds each `reads` entry through `roles_lib.parse_read_key`, so the tag spelling unit 14 writes passes and the read-key grammar keeps one owner
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 |
+| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
 | [2026-10-26-build-TOOL-dBoundRoles-59-round4-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-59-round4-fix-return.md) | research | TOOL-dBoundRoles-60 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-59-round4-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-59-round4-fix-brief.md) | research | TOOL-dBoundRoles-60 |
+| [2026-10-26-review-TOOL-dBoundRoles-59-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-59-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-60 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +70,8 @@ it. It repairs `TOOL-dBoundRoles-53` and builds one step after it (order 23).
 - **consumes-from** `TOOL-dBoundRoles-14` — `parse_read_key` and the tag-spelled `reads:` lines of S7, which S1 folds each entry through (id 21)
 - **hands-off** `TOOL-dBoundRoles-58` — the folded `assert_role_reads`, which 58 S2 and AC2 call on every render of 47's case (id 21)
 - **hands-off** `TOOL-dBoundRoles-60` — the folded helper, under which unit 60's item for id 2 stages 53 AC3's refusal-only break with a passing control render (ids 2 and 21)
+- **hands-off** `TOOL-dBoundRoles-61` — the folded `assert_role_reads` and its slice, which unit 61 fails on any non-zero exit, and S1, §4, §5 and §6, which its pass restates (id 19 of the round-1 audit of units 59 and 60)
+- **hands-off** `TOOL-dBoundRoles-63` — S1, S4, §4 and AC4, which unit 63 restates: the exit status read, 53's OBSERVED answers, every spelling of the retired citation, 53's §10 seam and the ledger in the write set (ids 7, 9, 11, 14, 17 and 18 of the round-1 audit of units 59 and 60)
 
 ## 4. Design
 
@@ -179,6 +182,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · the folded read ch
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 52 to 58, id 21
   (HIGH, item H1), on the report's fix.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-61 and TOOL-dBoundRoles-63, the HIGH promotion and the minors batch of the round-1 audit of units 59 and 60; nothing else moved.
 
 ## 10. Reuse audit
 
