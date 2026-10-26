@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-3 — attribution deciding what blocks
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0341@65d333f3 whole
 **Carries:** node:item.test.route
@@ -18,8 +18,13 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-3-deviation-31.md](../build/2026-10-25-build-TOOL-dWitnessedBar-3-deviation-31.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
+| [2026-10-26-build-TOOL-dWitnessedBar-3-deviation-32.md](../build/2026-10-26-build-TOOL-dWitnessedBar-3-deviation-32.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-3-1-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-3-1-spec-reviewer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-3-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-3-2-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -93,8 +98,13 @@ policy is `INHERITED_RED=park|land`, which only knows `INHERITED`; it is retired
   route this unit names.
 - Spawning the tester and acting on `next`: the loop's engine runs the item the route names; today's
   stand-ins are the unattended driver's existing fix pass and a new unit added by its `--rescope`.
-- An owner exception excusing a blocking `DEAD PROBE` or `INHERITED` red: PLAY-dOrderedCharter-7 S9's
-  `core.exceptions`, which the `probe-repair` and `fix-unit` routes name as the alternative.
+- An owner exception: PLAY-dOrderedCharter-7 S9's register excuses only a core gate's red whose
+  principle and part match an admitted record, read by `core.py exceptions` and by the core gate
+  itself, which prints `excepted`; a leg is core when its `enforces` is non-empty (that unit's §4
+  Alternatives rejected). No reader of this unit, the hook or the driver reads the register, so the
+  `probe-repair` and `fix-unit` routes name an exception as the alternative only for a core-gate leg.
+  Under `core.exceptions = owner-only-expiring` no record is admitted until PLAY-dOrderedCharter-15's
+  owner-proof check lands (S9 again), and under `none` never.
 - The per-tree verdict and its hook reader: `TOOL-dWitnessedBar-4`'s.
 
 ### Edges
@@ -104,6 +114,7 @@ policy is `INHERITED_RED=park|land`, which only knows `INHERITED`; it is retired
 - **hands-off** `TOOL-dWitnessedBar-8` — `verdict.blocks` and the routing record, into which the nondeterministic route to `test.flakes` is written ahead of the class routes
 - **hands-off** `TOOL-dWitnessedBar-30` — `verdict.blocks` and the `quiet-rerun` route a blocking `CONTENDED` red takes, which that unit arms
 - **consumes-from** external — dGroundRules' `policy.py get` (TOOL-dGroundRules-2 S7) and its catalogue rows for `verdict.blocks` and `verdict.red-route`, and TOOL-dSafePassage-1's step rows
+- **consumes-from** external — TOOL-dDeclaredLoop-12's `item.test.attribute` row, which `judge` reads through a `loop_lib.py` read verb run as a subprocess, the verb §8 F6 asks for
 - **hands-off** `TOOL-dWitnessedBar-44` — the step script `inherited_red.py`, whose reads and value mapping unit 44 widens to both policy files and every value (id 62)
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 19 and 39: the undeclared path's witness line, and the protocol edit's byte budget, each a scope item of that unit
 
@@ -170,15 +181,18 @@ dir>/routing`, TAB rows: leg · class · blocks · route · judgment · next, th
 |---|---|---|
 | `OWN`, `MIXED` | block | `attribute`, the tester's `test.attribute` |
 | `CONTENDED` | block | `quiet-rerun` (`TOOL-dWitnessedBar-30`) |
-| `DEAD PROBE`, `-` | block | `probe-repair`: the probe repaired, or an owner exception |
-| `INHERITED` | block | `fix-unit`: a fix unit through Design, or an owner exception |
+| `DEAD PROBE`, `-` | block | `probe-repair`: the probe repaired, or on a core gate an exception record (§3) |
+| `INHERITED` | block | `fix-unit`: a fix unit through Design, or on a core gate an exception record (§3) |
 | any | pass | `ask`, filed by the driver's `write_inherited_asks` |
 
 The routes are a closed tuple `ROUTES` in `verdict_flow.py`, and `route` prints one line per row,
-`route  <leg>  <class> · <blocks> · <route>`. `judge` reads `verdict.red-route` through
-dGroundRules-2's `resolve("verdict.red-route")`, imported by `resolve_kit_dir("policy", "policy.py",
-here)`, and reads `item.test.attribute`'s outcomes from `tools/loop/loop.toml` through
-TOOL-dDeclaredLoop-12's `read_items`; a missing loop kit refuses `judge` with exit 2 naming it.
+`route  <leg>  <class> · <blocks> · <route>`. A kit imports no sibling kit (TOOL-dGroundRules-1 §4;
+TOOL-dDeclaredLoop-12 S4), so `judge` reaches both siblings by subprocess, each found through the
+inline `resolve_kit_dir` block that `tools/run-gates/measure_legs.py:116-153` already carries under
+the `resolve_kit_dir` parity row: `policy.py get verdict.red-route` for the value, and for
+`item.test.attribute`'s outcomes in `tools/loop/loop.toml` the `loop_lib.py` read verb of §8 F6.
+`loop_lib.py` has only `--check` and `--fixture` (TOOL-dDeclaredLoop-12 AC1, AC2), so until that verb
+lands `judge` exits 2 naming it; a missing loop kit refuses `judge` with exit 2 naming the kit.
 
 ### Policy reads
 
@@ -252,8 +266,8 @@ catalogue default at R, `own-only`, which v2 chose (walk T1) and the step's `lan
   KF3 like the classifier.
 - perf / scale — one `case` per red leg; `route` reads two run-dir files.
 - error / empty / loading states — no attribution record reads every red `-`, which blocks; a refused
-  policy read reads `every-red`, said on the hook's line; `judge` on a row not routed `attribute`
-  exits 2.
+  policy read reads `every-red`, said on the hook's line; `judge` on a row not routed `attribute`, or
+  with the loop kit or its read verb absent, exits 2 naming which.
 - observability — the `GATE attr` line, the summary's blocking count and the routing record.
 - risks — v2's default `own-only` lets a `MIXED` red land on an adopter that never set
   `INHERITED_RED`; the step maps a declared `land` to `own-mixed-contended`, gov's value, and the
@@ -290,8 +304,11 @@ catalogue default at R, `own-only`, which v2 chose (walk T1) and the step's `lan
   fixture: two run dirs under the scratch path, each a `verdict` and an `attribution` file.
 - **AC5** — When `python verdict_flow.py --fixture red-route` runs, under `fix-pass-or-design` it
   prints `code-miss -> fix-pass` and `spec-wrong -> new-unit`, under `always-new-unit` both
-  `-> new-unit`, and `judge --judgment maybe` exits 2 naming the outcome set.
-  Red when: `judge` accepts a word outside `item.test.attribute`'s outcomes.
+  `-> new-unit`, and `judge --judgment maybe` exits 2 naming the outcome set, the fixture's `here`
+  holding a stub loop kit that answers §8 F6's verb; with no loop kit, and with one whose `loop_lib.py`
+  lacks the verb, `judge` exits 2 naming the kit or the verb; and
+  `git grep -nwE '(import|from) (loop_lib|policy)' -- tools/run-gates` prints nothing.
+  Red when: `judge` accepts a word outside `item.test.attribute`'s outcomes, or imports a sibling kit.
 - **AC6** — When `git grep -nwE "(GATE_)?INHERITED_RED" -- .githooks tools .unattended.conf` runs
   after the pass, it prints only lines of the step's own script, `inherited_red.py`, and the
   run-gates README's migration note.
@@ -340,6 +357,19 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
   cl-dClosedLoop-0341's text, so the as-built view hashes it `65d333f3` where the baseline hashed `0f53eec5`.
   RESOLVED (agent, 2026-10-25, delegated): rung 1, the line pins `cl-dClosedLoop-0341@65d333f3`, the view's hash,
   moved by deviation 31. widens: none · relaxes: none
+- **F6 — How does `judge` read `item.test.attribute`'s outcomes, when `loop_lib.py` has no read verb?**
+  A kit imports no sibling kit (TOOL-dDeclaredLoop-12 S4), and `read_items` is a function that
+  `loop_lib.py` offers only to its own `--check` and `--fixture` (its AC1, AC2). Options: (a) an ask to
+  dDeclaredLoop: `loop_lib.py` gains `items --tag <tag>`, printing the row's `outcomes` one per line
+  and exiting 2 on an unknown tag, run by `judge` as a subprocess; (b) a declared `requires_if` row on
+  `tools/run-gates/kit.toml` naming `loop`, `judge` importing `read_items` in process, which the rule
+  admits only as a declaration `govkit selfcheck` grades and that installs nothing, the shape of
+  `tools/memory-tree/kit.toml:8`; (c) `judge` parsing `loop.toml` itself, a second reader of one row.
+  (a) keeps the call in the shape dDeclaredLoop uses for its own sibling reads (its S4 and §8 F5); its
+  cost is a wait, since live `judge` exits 2 until the ask lands. (b) needs no parent change but makes
+  run-gates the one in-process consumer of a module its owner runs by subprocess; (c) is a second fact.
+  Recommendation (a). Open for the owner: the ask the build run files is "TOOL-dDeclaredLoop-12:
+  `loop_lib.py items --tag <tag>` prints the item row's `outcomes`, one per line".
 
 ## 9. Revision log
 
@@ -348,6 +378,11 @@ this landing by the README's self-test waiver rule, its clean reading owed with 
   and driver read at base `cdfbd1cf`.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-44, TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; the `**Carries:**` line re-pinned to `65d333f3`, deviation 31's amended text, with §8 F5; nothing else moved.
+- rev-3 · 2026-10-26 · §3 · §3 Edges · §4 The routes · §5 · AC5 · §8 F6 · re-grounded on the cross-check
+  record `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck`, rows 4 and 6: the owner exception
+  narrowed to a core gate's red matched by principle and part, none admitted under
+  `owner-only-expiring` until PLAY-dOrderedCharter-15's check lands; `judge` reaches the loop and
+  policy kits by subprocess, with F6 open for the loop read verb.
 
 ## 10. Reuse audit
 
