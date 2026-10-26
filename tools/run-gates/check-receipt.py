@@ -36,9 +36,10 @@ everyone who did not write it.
     the blob; that is what the receipt records, and the summary line names its schema for it.
 
 NO RECEIPT IS A SKIP, AND IT SAYS SO. A tree that never adopted anything has nothing to verify, and
-a skip that looks like a pass is indistinguishable from coverage. gov's own tree holds no receipt, so
-that is the path this takes on gov's bar, and the fixture arms below are what give the leg a verdict
-here rather than a permanent silence.
+a skip that looks like a pass is indistinguishable from coverage. gov's own tree holds no receipt, or
+a SOURCE-mode one whose unhashed rows are the same named skip (`derive_source_rows`), so that is the
+path this takes on gov's bar, and the fixture arms below are what give the leg a verdict here rather
+than a permanent silence.
 """
 import contextlib
 import hashlib
@@ -158,6 +159,19 @@ def resolve_clean_oids(tree, paths):
     return dict(zip(paths, oids)), None
 
 
+def derive_source_rows(receipt):
+    """`(the rows this reader grades, the unhashed rows it skips)` (TOOL-dSafePassage-8 S6).
+
+    A SOURCE-mode receipt is gov's own: its rows record gov's planned destinations with no hash,
+    because gov's files are their own sources, graded by gov's own gates. Those rows are a named
+    skip, as no receipt is. A source row that DOES carry a `sha256` is graded as any row is, so the
+    mode silences no hash it records. Every other receipt is graded whole."""
+    rows = receipt.get("files") or []
+    if receipt.get("mode") != "source":
+        return rows, []
+    return [r for r in rows if r.get("sha256")], [r for r in rows if not r.get("sha256")]
+
+
 def print_unattributed(rows):
     """A NOTE naming how many rows `govkit update` will never grade, or silence when there are none.
 
@@ -254,6 +268,21 @@ def check_fixtures():
         with contextlib.redirect_stdout(buf):
             print_unattributed(json.loads((tree / RECEIPT).read_text(encoding="utf-8"))["files"])
         results.append(("no `unattributed` row prints nothing at all", buf.getvalue() == ""))
+
+        # TOOL-dSafePassage-8 S6: a source-mode receipt's unhashed row is skipped even with its file
+        # absent, and the same row carrying a `sha256` is graded and reds as missing.
+        src_row = {"path": "a.txt", "kit": "k", "role": "engine", "source": "a.txt"}
+        tree = write_fixture(base, "source", [dict(src_row)], drop_file=True)
+        graded_rows, unhashed = derive_source_rows({"mode": "source", "files": [dict(src_row)]})
+        findings, graded, _ = check_engine_rows(tree, graded_rows)
+        results.append(("a source-mode receipt's unhashed row is skipped, its file absent",
+                        len(unhashed) == 1 and not findings and graded == 0))
+        graded_rows, unhashed = derive_source_rows({"mode": "source",
+                                                    "files": [dict(src_row, sha256="0" * 64)]})
+        findings, graded, _ = check_engine_rows(tree, graded_rows)
+        results.append(("a source-mode row carrying a sha256 is graded: its absent file is MISSING",
+                        not unhashed and graded == 1 and len(findings) == 1
+                        and findings[0].startswith("MISSING") and "a.txt" in findings[0]))
 
         # The no-`.git` guard of `resolve_clean_oids`: CRLF bytes under a receipt naming the LF
         # bytes. Spawns nothing, so without the guard git would grade it through the HOST's filter.
@@ -433,10 +462,18 @@ def main(argv):
         return 1 if bad else 0
 
     rows = receipt.get("files") or []
-    findings, graded, eol_only = check_engine_rows(tree, rows)
+    graded_rows, unhashed = derive_source_rows(receipt)
+    if unhashed:
+        print(f"SKIP  {len(unhashed)} unhashed row(s) of a source-mode receipt — gov's own files are "
+              f"their own sources, graded by gov's own gates, so there is no installed hash here to "
+              f"verify them against")
+    findings, graded, eol_only = check_engine_rows(tree, graded_rows)
     print(f"receipt: schema {receipt.get('schema')} · {len(rows)} row(s) read · "
           f"{graded} engine row(s) graded · eol-only {eol_only}")
 
+    if not graded and unhashed:
+        print_unattributed(rows)
+        return 1 if bad else 0
     if not graded:
         print("DEAD PROBE  the receipt parsed and yielded ZERO gradeable engine rows, so a clean "
               "report here would describe nothing that was looked at. Refusing to call this tree "

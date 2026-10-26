@@ -1511,8 +1511,22 @@ def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> 
         "kit_id": eid,
         "kit": kit,
     }
+    # TOOL-dSafePassage-8 S3. An `[answers]` value is graded and entered only where THIS entry's own
+    # descriptor names its `{token}`: one no template of the entry names never reaches a substitution
+    # here, and gov's own charter answers carry `—`, `;` and `<` for the renderer alone. Every value
+    # that can reach an argv, a destination or a pattern of the entry is still graded by its class.
+    named: set[str] = set()
+    _todo: list = [desc]
+    while _todo:
+        _v = _todo.pop()
+        if isinstance(_v, dict):
+            _todo += _v.values()
+        elif isinstance(_v, list):
+            _todo += _v
+        elif isinstance(_v, str):
+            named.update(TOKEN_RX.findall(_v))
     for k, v in (deploy.get("answers") or {}).items():
-        if isinstance(v, str):
+        if isinstance(v, str) and k in named:
             ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
     for k, v in per_kit.items():
         if k == OPT_IN_ALL:
@@ -4028,6 +4042,7 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
     written.
     """
     commit = git(root, "rev-parse", "HEAD").strip()
+    source = test_source_target(root, target)
     out: list[dict] = []
     for eid in selection:
         d, _dpath = descs[eid]
@@ -4059,6 +4074,10 @@ def planned_writes(root: pathlib.Path, target: pathlib.Path, deploy: dict,
             # write. Measured on the lexicon kit before this changed: plan 3, apply 12.
             for src in resolve_rule_pool(root, d, rule, ctx, home):
                 for resolved, missing in resolve_dests(d, rule, src, ctx, home):
+                    if missing and source:
+                        # TOOL-dSafePassage-8 S3. In gov's own tree the row's bytes already sit
+                        # where they are read from, so an unanswered destination is its source.
+                        resolved, missing = src, []
                     for k in missing:
                         r.fail(f"entry '{eid}' needs answer '{k}' to resolve a destination for "
                                f"'{src}', and the target descriptor supplies none — refusing before "
@@ -9275,6 +9294,12 @@ def render_hole_verdict(eid: str, hid: str, verdict: str, detail: str, why: str,
             f"confirmed — {why}")
 
 
+def test_source_target(root: pathlib.Path, target: pathlib.Path) -> bool:
+    """True where `target` resolves to `root`, the gov checkout running the verb: SOURCE MODE
+    (TOOL-dSafePassage-8 S1). An adopter cannot reach it, since its target is never gov's own tree."""
+    return pathlib.Path(root).resolve() == pathlib.Path(target).resolve()
+
+
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                write_withdrawals: bool = False,
                kits: list[str] | None = None, accept_role_moves: bool = False,
@@ -9308,8 +9333,66 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     descs = read_descriptors(root, reg, r)
     if r.problems:
         return r.emit()
-    if pathlib.Path(root).resolve() == target.resolve():
-        raise Refusal("--target resolves to the gov checkout itself")
+    if test_source_target(root, target):
+        # ---- TOOL-dSafePassage-8 S1. SOURCE MODE: gov's own tree, as the lander runs it at every
+        # ---- landing. The receipt records gov's planned destinations and its steps and grades no
+        # ---- row: gov's files are their own sources. No vintage: the merge it lands in is rewritten
+        # ---- after the walk, so the `steps` list is the vintage, a step pending until listed applied.
+        if rollback or kits:
+            raise Refusal("on gov's own tree `update` walks every declared step in source mode, so it "
+                          "takes no --kits and no --rollback")
+        receipt_path = target / ".governance" / "install.json"
+        prior = (json.loads(receipt_path.read_text(encoding="utf-8")) if receipt_path.is_file()
+                 else None)
+        if prior is not None and (not isinstance(prior, dict) or prior.get("mode") != "source"):
+            raise Refusal(f"{receipt_path.as_posix()} is on gov's own tree and is not a source-mode "
+                          f"receipt (\"mode\": \"source\"); refusing to walk over it")
+        out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", f"{to_rev}^{{commit}}"],
+                             capture_output=True, text=True)
+        if out.returncode != 0:
+            raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
+        to_commit = out.stdout.strip()
+        if not write:
+            _src_pending = upgrade_steps.derive_pending_steps(root, prior or {}, to_commit)
+            print(f"govkit update — source mode on gov's own tree · steps: {len(_src_pending)} pending")
+            for _sw_row in _src_pending:
+                print(f"govkit update —   would walk {_sw_row.id}")
+            print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
+            return r.emit()
+        # The write preconditions apply. No file row is claimed: source mode writes none, so the
+        # dirty-path test, which guards a row write, has no population here.
+        demand_writable_target(target, "update", None)
+        deploy = load_deploy(target)
+        selection = resolve_selection(reg, descs, "default", [], deploy)
+        _plan = planned_writes(root, target, deploy, descs, selection, r)
+        if r.problems:
+            return r.emit()
+        _files: dict[str, dict] = {}
+        for _pw in _plan:
+            if not _pw["missing"]:
+                _files.setdefault(_pw["dest"], {"path": _pw["dest"], "kit": _pw["kit"],
+                                                "role": _pw["role"], "source": _pw["src"]})
+        receipt = {"schema": RECEIPT_SCHEMA, "mode": "source", "gov_source": ".",
+                   "prefix": str(deploy.get("prefix") or "tools"), "kits": list(deploy.get("kits") or []),
+                   "files": list(_files.values()), **derive_receipt_schema(prior)}
+        _text = json.dumps(receipt, indent=2) + "\n"
+        if prior is None or json.dumps(prior, indent=2) + "\n" != _text:
+            receipt_path.parent.mkdir(parents=True, exist_ok=True)
+            write_atomic(receipt_path, _text)
+        print(f"govkit update — source mode on gov's own tree · {len(receipt['files'])} file row(s) "
+              f"recorded, never graded · {to_commit[:8]}")
+        _src_pending = upgrade_steps.derive_pending_steps(root, receipt, to_commit)
+        _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _src_pending,
+                                               to_commit)
+        print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
+              f"· {_sw_walk['skipped']} skipped · stopped at {_sw_walk['stopped'] or 'none'}")
+        if _sw_walk["stopped"]:
+            r.fail(f"the upgrade-step walk stopped at {_sw_walk['stopped']} on gov's own tree: "
+                   f"{_sw_walk['failure']}")
+        _declared = upgrade_steps.read_steps(root, to_commit, None)
+        for _miss in upgrade_steps.check_gov_first(receipt, _declared, target):
+            r.fail(f"gov first: {_miss}")
+        return r.emit()
 
     receipt_path = target / ".governance" / "install.json"
     if not receipt_path.is_file():

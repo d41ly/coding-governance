@@ -4418,6 +4418,11 @@
       "file": "tools/process-monitor/reap.py"
     },
     {
+      "id": "check_gov_first",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "check_grant",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -5611,6 +5616,11 @@
       "id": "check_slug_shape",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_source_mode",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_sp_value",
@@ -8536,6 +8546,11 @@
       "id": "derive_source_paths",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "derive_source_rows",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "derive_source_top",
@@ -20748,6 +20763,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "run_gov_first",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "run_gov_git",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -25281,6 +25301,11 @@
       "id": "test_source_cited_ids",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_source_target",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "test_spec_h1_anchors_the_id_it_defines",

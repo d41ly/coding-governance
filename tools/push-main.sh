@@ -934,6 +934,38 @@ run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 th
   return 1
 }
 
+# ---- GOV FIRST, at the landing — TOOL-dSafePassage-8 --------------------------------------------
+# `run_gov_first` runs the deployer's `update --target <this tree> --write` in its SOURCE mode: every
+# upgrade step this landing declares walks on gov's own tree before any adopter meets it, recorded in
+# gov's source-mode receipt in the WORKING TREE, and the deployer's landing check re-runs each applied
+# step's witness; the caller commits the receipt. Found the way the minter finds the deployer. No
+# deployer beside the lander, which is every adopter, prints one line and returns 0. A deployer with
+# no python REFUSES: no later gate runs a step on gov, so a skip would land a step gov never ran. The
+# walk's lines go to stdout on success; on a refusal to stderr, and this returns 1.
+run_gov_first() {  # -> 0 walked or announced-skipped · 1 a step, the landing check or the resolver refused
+  local py dir out rc
+  if ! py=$(resolve_python 2>/dev/null); then
+    if [ -f "$self_dir/govkit/govkit.py" ] || [ -f "$self_dir/../govkit/govkit.py" ]; then
+      echo "push-main: the upgrade steps could NOT be run on gov first — a govkit deployer is beside this lander and no usable python launcher runs it, and no later gate runs a step on gov." >&2
+      return 1
+    fi
+    echo "push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree."
+    return 0
+  fi
+  if ! dir=$(resolve_kit_dir "$py" govkit govkit.py "$self_dir" 2>/dev/null) || [ ! -f "$top/$dir/govkit.py" ]; then
+    echo "push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree."
+    return 0
+  fi
+  out=$("$py" "$top/$dir/govkit.py" update --target "$top" --write 2>&1); rc=$?
+  if [ "$rc" -eq 0 ]; then
+    printf '%s\n' "$out"
+    return 0
+  fi
+  echo "push-main: the upgrade steps REFUSED on gov first (exit $rc):" >&2
+  printf '%s\n' "$out" | sed 's/^/  /' >&2
+  return 1
+}
+
 # `read_mint_unit <range>` prints the unit id the attended mint commit names (TOOL-aRoutedQuill-3
 # S11): the newest one <range>'s own commits attribute, by the memory-tree kit's routed-commits
 # reading, so the commit its pre-push leg grades names a unit like every other routed commit. Found
@@ -1019,9 +1051,19 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     echo "push-main: the kit versions this landing owes could not be minted (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
+  # GOV FIRST INTO THE MERGE (TOOL-dSafePassage-8 S4): after the mint and before the regeneration,
+  # so gov's receipt joins the one rewritten merge. The snapshot is taken before it, so a refused
+  # regeneration below also cleans the receipt it created.
+  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
+  if ! run_gov_first; then
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    rm -f "$rgsnap"
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
   # REGENERATE INTO THE MERGE (TOOL-aPrimedIndex-4): after the mint, because a minted version can
   # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
-  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
   if ! run_regen; then
     git reset -q --hard "$t" >/dev/null 2>&1 || true
     remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
@@ -1205,6 +1247,22 @@ while [ "$attempt" -le "$max" ]; do
     mint_unit=$(read_mint_unit "$mt..HEAD")
     if ! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}${mint_unit:+ for $mint_unit}" -m "Pass: none"; then
       echo "push-main: could not commit the minted versions. Aborted (no push)." >&2
+      exit 1
+    fi
+  fi
+
+  # GOV FIRST, on every attempt, after the mint (TOOL-dSafePassage-8 S4): its own commit, named and
+  # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike.
+  if ! run_gov_first; then
+    git reset -q --hard HEAD >/dev/null 2>&1 || true
+    echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Aborted (no push)." >&2
+    exit 1
+  fi
+  if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
+    git add -A
+    gf_unit=$(read_mint_unit "$mt..HEAD")
+    if ! git commit -q --no-verify -m "steps: gov first onto $remote/$def at ${mt:0:8}${gf_unit:+ for $gf_unit}" -m "Pass: none"; then
+      echo "push-main: could not commit gov's receipt of the upgrade steps. Aborted (no push)." >&2
       exit 1
     fi
   fi

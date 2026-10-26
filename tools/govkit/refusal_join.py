@@ -38,7 +38,14 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 320    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 324    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 320 -> 324 at TOOL-dSafePassage-8, BY THE MEASURED DELTA: the matcher's two shapes read 46 in
+# `_cmd_update` at that unit's base `208c2260` and 50 on the tree it left, by an AST probe of
+# `govkit.py`; `upgrade_steps.py` stays at 54, since `check_gov_first` returns its misses. Five are
+# source mode's: its refusals of `--kits` or `--rollback`, of a receipt not in source mode and of an
+# unresolvable `--to`, and its two `r.fail`s on a stopped walk and on a gov-first miss, each reached
+# by `check_source_mode`. One went: `update`'s refusal of the gov checkout as its target, which
+# source mode replaces.
 # 319 -> 320 at TOOL-dSafePassage-24, BY THE MEASURED DELTA: the matcher's two shapes read 53 in
 # `upgrade_steps.py` at that unit's base `a182f2c2` and 54 on the tree it left, by an AST probe of
 # that file alone. The one is `run_step_isolated`'s refusal of a target whose own git config

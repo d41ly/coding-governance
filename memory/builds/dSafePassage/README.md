@@ -144,7 +144,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-19 — a rollback past the schema step stamps schema 3 with no `steps`, finishes its record, and converges after a kill](spec/2026-10-23-spec-TOOL-dSafePassage-19.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-26 |
 | [TOOL-dSafePassage-22 — the lock reclaim reads its clock before the census, so a slow census errs toward live](spec/2026-10-23-spec-TOOL-dSafePassage-22.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-24 — a step is refused when the target's own git config declares an executor or a credential](spec/2026-10-23-spec-TOOL-dSafePassage-24.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-26 |
-| [TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt](spec/2026-10-23-spec-TOOL-dSafePassage-8.md) | 3 | 2 | DEFERRED | rev-5 | 2026-10-26 |
+| [TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt](spec/2026-10-23-spec-TOOL-dSafePassage-8.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip](spec/2026-10-23-spec-TOOL-dSafePassage-10.md) | 4 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dSafePassage-17 — a down is judged by its row's declared `reverted` rule, and a down with no before-image by its exit](spec/2026-10-23-spec-TOOL-dSafePassage-17.md) | 4 | 2 | DEFERRED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-23 — the resolver keeps an override's own name, and prefers the direct executable only for the launcher names](spec/2026-10-23-spec-TOOL-dSafePassage-23.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
@@ -190,7 +190,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 248 bound to this build, across 4 record folder(s).
+Records: 250 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

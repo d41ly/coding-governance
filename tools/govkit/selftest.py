@@ -3923,6 +3923,132 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
                   + (p.stdout + p.stderr)[-400:])
 
 
+def check_source_mode(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-8 AC1 to AC4, AC8 and AC9 — gov first, on gov's own tree. `plan --target`
+    gov's checkout exits 0 and writes nothing (AC1); a scratch target carrying gov's own deploy file
+    refuses a metacharacter in an answer a template interpolates and ignores one in an answer none
+    does (AC2). A clone of this checkout, carrying this suite's govkit and upgrade_steps, updated in
+    source mode writes a schema-4 source receipt whose steps are the declared ids, applied, and whose
+    files are the plan's destinations, unhashed (AC3); a re-run runs no up and leaves its bytes (AC8);
+    check-wiring and check-install-prefix read it as no receipt (AC9); `check_gov_first` names an
+    applied step whose witness is planted red, and a planted row whose witness never holds stops the
+    walk (AC4); and source mode's three refusals each name their case."""
+    tmp.mkdir(parents=True, exist_ok=True)
+    us = govkit_module().upgrade_steps
+
+    def gitc(repo, *args):
+        return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+
+    def gk_run(gk, *args, cwd=None):
+        return subprocess.run([sys.executable, str(gk), *args], capture_output=True, text=True,
+                              encoding="utf-8", errors="replace", cwd=str(cwd) if cwd else None, timeout=900)
+
+    # AC1 — gov's own deploy file, planned in place.
+    st0 = gitc(GOV_ROOT, "status", "--porcelain").stdout
+    p = gk_run(GOVKIT, "plan", "--target", str(GOV_ROOT))
+    check("[dSP-8] AC1 plan --target gov's own checkout exits 0 and writes nothing",
+          p.returncode == 0 and "NOTHING was written" in p.stdout
+          and gitc(GOV_ROOT, "status", "--porcelain").stdout == st0, (p.stdout + p.stderr)[-2000:])
+
+    # AC2 — a scratch target with gov's deploy file: an interpolated answer is graded, another is not.
+    base = (GOV_ROOT / ".governance" / "deploy.toml").read_text(encoding="utf-8")
+    base = "".join(ln for ln in base.splitlines(keepends=True) if not ln.startswith("stream_ownership"))
+    t2 = tmp / "t2"
+    (t2 / ".governance").mkdir(parents=True)
+    gitc(t2, "init", "-q")
+    outs = {}
+    for case, line in (("memory_root", 'memory_root = "x; touch PWNED"\n'),
+                       ("without", ""), ("stream_ownership", 'stream_ownership = "a; b"\n')):
+        (t2 / ".governance" / "deploy.toml").write_text(base.replace("[answers]\n", "[answers]\n" + line, 1),
+                                                        encoding="utf-8", newline="\n")
+        outs[case] = gk_run(GOVKIT, "plan", "--target", str(t2))
+    q = outs["memory_root"]
+    check("[dSP-8] AC2 a metacharacter in an interpolated answer refuses plan, naming answers.memory_root",
+          q.returncode == 2 and "answers.memory_root" in q.stderr and not (t2 / "PWNED").exists(), q.stderr[-2000:])
+    a, b = outs["without"], outs["stream_ownership"]
+    check("[dSP-8] AC2 a metacharacter in an answer no template names leaves plan as it is without it",
+          (a.returncode, a.stdout, a.stderr) == (b.returncode, b.stdout, b.stderr), b.stderr[-2000:])
+
+    # AC3 — a source-mode clone with no receipt.
+    clone = tmp / "gf"
+    gitc(tmp, "clone", "-q", str(GOV_ROOT), str(clone))
+    kit = clone / PFX / HERE.name
+    for name in ("govkit.py", "upgrade_steps.py"):
+        shutil.copyfile(HERE / name, kit / name)
+    gk, rp = kit / "govkit.py", clone / ".governance" / "install.json"
+    p = gk_run(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    rec = json.loads(rp.read_text(encoding="utf-8")) if rp.is_file() else {}
+    declared = us.read_steps(clone, "HEAD", None)
+    states = {r.get("id"): r.get("state") for r in rec.get("steps") or []}
+    pl = gk_run(gk, "plan", "--target", str(clone), cwd=clone)
+    dests = {d for m, d in _extract_plan_rows("\n".join(ln for ln in pl.stdout.splitlines() if "[hole" not in ln))
+             if m != "UNRES."}
+    files = [f for f in rec.get("files") or []]
+    check("[dSP-8] AC3 update --write on a clone of gov exits 0 and writes a schema-4 source receipt, no gov_commit",
+          p.returncode == 0 and rec.get("schema") == 4 and rec.get("mode") == "source" and "gov_commit" not in rec,
+          (p.stdout + p.stderr)[-2000:])
+    check("[dSP-8] AC3 its steps are the declared ids both ways, each applied",
+          bool(declared) and states == {r.id: "applied" for r in declared}, f"{states}")
+    check("[dSP-8] AC3 its files are the destinations plan lists, none carrying sha256, oid or gov_oid",
+          bool(files) and {f.get("path") for f in files} == dests
+          and not any(k in f for f in files for k in ("sha256", "oid", "gov_oid")),
+          f"{len(files)} rows, {len(dests)} destinations")
+    check("[dSP-8] AC3 no path under .governance/outbox/ is left, the lock included",
+          gitc(clone, "status", "--porcelain", "--untracked-files=all", "--", ".governance/outbox").stdout == ""
+          and not (clone / ".governance" / "outbox" / ".update.lock").exists())
+
+    # AC8 — the re-run runs no up and leaves the receipt's bytes.
+    was = rp.read_bytes() if rp.is_file() else b""
+    p = gk_run(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    check("[dSP-8] AC8 a second source walk runs no step and leaves the receipt's bytes",
+          p.returncode == 0 and "steps: 0 pending · 0 applied · 0 skipped" in p.stdout and rp.read_bytes() == was,
+          (p.stdout + p.stderr)[-2000:])
+
+    # AC4, second half — the landing check re-runs each applied witness rather than trusting the row.
+    red = declared[-1].id if declared else ""
+    misses = us.check_gov_first(rec, [r._replace(witness=["python", "-c", "raise SystemExit(1)"])
+                                      if r.id == red else r for r in declared], clone)
+    check("[dSP-8] AC4 check_gov_first names an applied step whose witness is planted red, and only it",
+          misses == [f"{red}: listed applied, and its witness does not hold on gov's tree"], f"{misses}")
+
+    # AC9 — two row readers print the same lines and exit the same way with the receipt and without.
+    seen = []
+    for _ in ("with", "without"):
+        seen.append([(r.returncode, r.stdout, r.stderr) for r in (
+            subprocess.run(["bash", str(clone / PFX / leg)], capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", cwd=str(clone), timeout=900)
+            for leg in ("check-wiring.sh", "check-install-prefix.sh"))])
+        if rp.is_file():
+            rp.replace(tmp / "gf-receipt.json")
+    (tmp / "gf-receipt.json").replace(rp)
+    check("[dSP-8] AC9 check-wiring and check-install-prefix read the source receipt as no receipt",
+          seen[0] == seen[1], f"{[s[0] for s in seen[0]]} vs {[s[0] for s in seen[1]]}")
+
+    # AC4, first half — a planted row whose up exits 0 and whose witness never holds stops the walk.
+    with open(kit / "steps.toml", "a", encoding="utf-8", newline="\n") as fh:
+        fh.write('\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\n'
+                 'down = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\n'
+                 'surfaces = []\nneeds-target = false\n')
+    gitc(clone, "-c", "user.name=gk", "-c", "user.email=gk@invalid", "commit", "-q", "--no-verify", "-m", "plant",
+         "--", f"{PFX}{HERE.name}/steps.toml")
+    p = gk_run(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    after = {r.get("id"): r.get("state") for r in json.loads(rp.read_text(encoding="utf-8")).get("steps") or []}
+    check("[dSP-8] AC4 a planted witness that never holds stops the walk, the steps before it applied",
+          p.returncode == 1 and "govkit/planted-witness-fails · failed · witness does not hold after up" in p.stdout
+          and "gov first: govkit/planted-witness-fails" in p.stdout
+          and all(after.get(r.id) == "applied" for r in declared), (p.stdout + p.stderr)[-2000:])
+
+    # Source mode's refusals, each before a write.
+    for label, args, needle in (("--kits", ("--kits", "memory-tree"), "takes no --kits and no --rollback"),
+                                ("an unresolvable --to", ("--to", "gk-no-such-rev"), "does not resolve"),
+                                ("a receipt not in source mode", (), "is not a source-mode receipt")):
+        if not args:
+            rp.write_text('{"schema": 3, "files": []}\n', encoding="utf-8", newline="\n")
+        p = gk_run(gk, "update", "--target", str(clone), "--write", *args, cwd=clone)
+        check(f"[dSP-8] S1 source mode refuses {label}", p.returncode == 2 and needle in p.stderr, p.stderr[-2000:])
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -4082,6 +4208,7 @@ def main() -> int:
         check_step_isolation(tmp / "dsi")
         check_step_walk()
         check_step_rollback()
+        check_source_mode(tmp / "dgf")
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO

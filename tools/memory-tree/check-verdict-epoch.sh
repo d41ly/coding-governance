@@ -518,7 +518,8 @@ fi
 # every scanned file with `oid` = its blob at HEAD = `gov_oid`, and the engine row's version is the
 # constant at HEAD, these are gov's unmodified bytes at a vintage gov's lander dated, so the range has
 # nothing of its own to date. A local edit moves a blob off the receipt and falls through to the rule.
-# gov has no receipt, so gov's own verdict never takes this path.
+# gov's own receipt is a source-mode one whose rows record no `oid`, so every scanned file fails the
+# test below and gov's own verdict never takes this path.
 # WHAT THIS DOES NOT CHECK: that the receipt is honest. A hand-edited row claiming gov's blob for a
 # local edit passes here; the receipt is govkit's record and is graded there.
 check_receipt_vintage() {  # -> 0 when the receipt at HEAD vouches for every scanned blob at version $now

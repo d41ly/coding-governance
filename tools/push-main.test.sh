@@ -905,9 +905,11 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
   case "$out25" in *"no lexicon kit beside this lander"*) l25=1 ;; *) l25=0 ;; esac
   case "$out25" in *"no govkit deployer beside this lander"*) g25=1 ;; *) g25=0 ;; esac
   case "$out25" in *"DEAD PROBE"*|*"REFUSED"*) x25=1 ;; *) x25=0 ;; esac
-  [ "$l25$g25$x25" = 110 ] \
-    && ok "25 a tree without the lexicon and govkit files skips both checks by name, with no DEAD PROBE or REFUSED" \
-    || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 $out25"
+  # TOOL-dSafePassage-8 AC6: the same prepare names the skipped gov-first walk once, with its reason.
+  f25=$(printf '%s\n' "$out25" | grep -c 'steps were NOT run on gov first — no govkit deployer beside this lander')
+  [ "$l25$g25$x25$f25" = 1101 ] \
+    && ok "25 a tree without the lexicon and govkit files skips both checks and the gov-first walk by name, with no DEAD PROBE or REFUSED" \
+    || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 gov-first-skip-lines=$f25 $out25"
 else
   echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
 fi
@@ -1229,5 +1231,67 @@ if [ -n "$_rg_k" ]; then
 else
   echo "  skip — 28-32 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
 fi
+
+# 34 — TOOL-dSafePassage-8 AC5: --prepare walks every declared upgrade step on gov's own tree first,
+#      into the prepared merge. A clone of this repository at its committed HEAD, pushed to a bare
+#      remote as main: a branch with one unit commit prepares a merge whose tree holds gov's
+#      source-mode receipt, every declared step applied; a branch whose steps file carries a planted
+#      row with a failing witness is refused naming it, the branch unmoved. Needs gov's deployer
+#      beside the lander; an install without one says so. Staged red by dropping the call to
+#      `run_gov_first` from cmd_prepare.
+if [ -n "$_mt_gk" ] && _py34=$(resolve_python 2>/dev/null); then
+  out34=$(
+    build_regen_fixture "$tmp/remote14.git" "$tmp/work14" || exit 1
+    git checkout -q -b feat
+    git commit -q --no-verify --allow-empty -m "TOOL-tFix-34: a unit"
+    unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tGovFirst >/dev/null 2>&1; echo "clean-rc=$?"
+    git show HEAD:.governance/install.json > "$tmp/gf34.json" 2>/dev/null && "$_py34" - "${KIT_REL}$_mt_gk" "$tmp/gf34.json" <<'PY' && echo applied=all
+import json, pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import upgrade_steps as u
+r = json.loads(pathlib.Path(sys.argv[2]).read_text(encoding="utf-8"))
+want = {x.id for x in u.read_steps(".", "HEAD", None)}
+got = {x["id"] for x in r.get("steps") or [] if x.get("state") == "applied"}
+sys.exit(0 if r.get("mode") == "source" and want and got == want and len(r["steps"]) == len(want) else 1)
+PY
+    git checkout -q -b plant main
+    printf '\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\ndown = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\nsurfaces = []\nneeds-target = false\n' >> "${KIT_REL}$_mt_gk/steps.toml"
+    git commit -q --no-verify -am "TOOL-tFix-34: a planted step whose witness never holds"
+    B34=$(git rev-parse HEAD)
+    bash "$lander" --prepare --slug tGovFirstPlant 2>&1 >/dev/null; echo "plant-rc=$?"
+    [ "$(git rev-parse refs/heads/plant)" = "$B34" ] && echo unmoved=1
+  )
+  case "$out34" in
+    *"clean-rc=0"*"applied=all"*"govkit/planted-witness-fails"*"plant-rc=1"*"unmoved=1"*)
+      ok "34 --prepare walks every declared step on gov first into the prepared merge, and refuses a step whose witness never holds, the branch unmoved" ;;
+    *) bad "34 the prepared merge lacks gov's receipt of every applied step, or a failing step was not refused with the branch unmoved: $out34" ;;
+  esac
+else
+  echo "  skip — 34 no govkit deployer beside this lander or no python launcher, so the gov-first arm did not run"
+fi
+
+# 35 — TOOL-dSafePassage-8 AC6: `run_gov_first` cut from the lander. No deployer beside it, with or
+#      without a python, is one `steps were NOT run on gov first` line and exit 0; a deployer beside it
+#      with the resolver refusing is exit 1, because no later gate runs a step on gov. Staged red by
+#      making the no-python branch return 0 whatever is beside the lander.
+out35=$(
+  eval "$(sed -n '/^run_gov_first() {/,/^}/p' "$lander")"
+  top="$tmp/gf35"; self_dir="$top/kits"; mkdir -p "$self_dir"
+  resolve_python() { return 1; }
+  printf 'nopy-absent=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
+  resolve_python() { echo bash; }
+  resolve_kit_dir() { return 1; }
+  printf 'py-absent=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
+  mkdir -p "$self_dir/govkit"; : > "$self_dir/govkit/govkit.py"
+  resolve_python() { return 1; }
+  printf 'nopy-present=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
+)
+n35=$(printf '%s\n' "$out35" | grep -c 'steps were NOT run on gov first — no govkit deployer beside this lander')
+case "$out35" in
+  *"nopy-absent=["*"rc=0]"*"py-absent=["*"rc=0]"*"nopy-present=["*"no usable python launcher"*"rc=1]"*)
+    [ "$n35" = 2 ] && ok "35 no deployer beside the lander is one skip line and exit 0; a deployer with no python refuses" \
+      || bad "35 the skip line was printed $n35 time(s) over two absent-deployer runs: $out35" ;;
+  *) bad "35 run_gov_first skipped a deployer it could not run, or refused an adopter's landing: $out35" ;;
+esac
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

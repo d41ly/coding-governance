@@ -84,6 +84,10 @@ before the row reads `rolled-back`; the first stop ends the walk, and a re-run r
 `write_rollback_record` begins `.governance/outbox/update-reverted-<from8>-<to8>.md` before the
 first down and finishes it before `update` returns. `fixture rollback|rollback-update` observe it.
 
+GOV FIRST (TOOL-dSafePassage-8). `update --target <gov's own checkout> --write` runs in SOURCE mode:
+the same walk over gov's tree, recorded in gov's source-mode receipt, then `check_gov_first`, which
+refuses a declared id the receipt does not list and an `applied` step whose witness no longer holds.
+
 Exit 0 clean, 1 a frozen-row finding or no base to compare against, 2 a refused row, an unreadable
 revision or a usage error. `fixture isolation` exits 0 green and 1 on a red, a `-stub` plant's,
 `needs-target`'s, `breach`'s, `token`'s and every `local-*` plant's by design; `fixture walk|lock|update|rollback|
@@ -1142,6 +1146,31 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
         print(f"step {row.id} · applied" + (" · by its resume" if phase == "resume" else "") + unrecorded)
         out["applied"] += 1
     return out
+
+
+def check_gov_first(receipt: dict, declared: list[StepRow], target) -> list[str]:
+    """The landing's check over gov's own SOURCE-mode receipt, after the walk (TOOL-dSafePassage-8
+    S2): one problem line per id that misses. The `steps` ids must equal `declared`'s both ways, a
+    listed id no row declares passing only as the old id of a `[[retired]]` succession row; and
+    every step listed `applied` must have its witness hold NOW on gov's tree, re-run under
+    `run_step_isolated` rather than trusted from the record. `target` is gov's own checkout, so it
+    is the step's gov root too. Returns [] when gov holds every declared step."""
+    target = pathlib.Path(target).resolve()
+    rows = {r["id"]: r for r in read_step_states(receipt)}
+    by_id = {r.id: r for r in declared}
+    problems = [f"{sid}: declared, and gov's receipt does not list it" for sid in by_id if sid not in rows]
+    old_ids = {r.id for r in read_retired(target, None, None)}
+    problems += [f"{sid}: listed in gov's receipt, and no row declares it nor retires it"
+                 for sid in rows if sid not in by_id and sid not in old_ids]
+    for sid, rec in rows.items():
+        if sid not in by_id:
+            continue
+        if rec["state"] != "applied":
+            problems.append(f"{sid}: listed {rec['state']} in gov's receipt, not applied")
+            continue
+        if run_step_isolated(by_id[sid]._replace(needs_target=False), "witness", target, target)["verdict"] != "ok":
+            problems.append(f"{sid}: listed applied, and its witness does not hold on gov's tree")
+    return problems
 
 
 def derive_reverse_steps(gov_root, receipt: dict, to_commit: str) -> list[StepRow]:
