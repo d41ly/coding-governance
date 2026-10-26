@@ -94,3 +94,7 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T05:15:49Z rescope · item add TOOL-dBoundRoles-63 · reason spec-audit round1 of units 59 and 60 minors batched in one unit (BUILD-METHOD M4, no disjoint split by M6): MEDIUM ids 2 10 15 22 9 3 4 5 13 16 17 20 (items M1-M9) and LOW ids 6 7 8 11 12 14 18 (items L1-L7)
 
 2026-10-26T05:27:25Z review · item dBoundRoles-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 19 · disposition promote
+
+2026-10-26T06:04:01Z rescope · item add TOOL-dBoundRoles-64 · reason spec-audit round1 of units 61 62 and 63 minors batched in one unit (BUILD-METHOD M4, no disjoint split by M6): MEDIUM ids 1 19 2 9 25 3 10 4 22 30 11 31 12 16 32 20 24 33 (items M1-M10) and LOW ids 13 5 14 6 7 21 8 23 15 29 17 26 27 28 (items L1-L10)
+
+2026-10-26T06:21:06Z review · item dBoundRoles-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 32 · disposition promote

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-61 — unit 59's read check fails on its slice's exit status, so a slice that crashes can no longer pass for a read it never checked
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 24 · advances TOOL-dBoundRoles-27
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 24 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
+| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 |
 | [2026-10-26-build-TOOL-dBoundRoles-61-round5-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-61-round5-fix-return.md) | research | TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-61-round5-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-61-round5-fix-brief.md) | research | TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
+| [2026-10-26-review-TOOL-dBoundRoles-61-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-61-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
 
 <!-- /gen:spec-records -->
 
@@ -67,6 +68,7 @@ It repairs `TOOL-dBoundRoles-59` and builds one step after it (order 24).
 - **consumes-from** `TOOL-dBoundRoles-59` — the folded `assert_role_reads`, its slice, S1, §4, §5 and §6, which S1 extends and S4 restates (id 19)
 - **hands-off** `TOOL-dBoundRoles-62` — S5's `+<n>` term naming this unit on the adopter suite's floor, which unit 62's restated AC15 of spec 60 requires (ids 19 and 21)
 - **hands-off** `TOOL-dBoundRoles-63` — the exit check and spec 59's bump, which unit 63's item for id 9 records rather than rebuilds (ids 9 and 19)
+- **hands-off** `TOOL-dBoundRoles-64` — S1, S4, S5, §4 "The capture", §7, AC1 and AC4, which unit 64 restates: the in-suite negative case inverted with its +2 term, the cases on every branch and the driver's `$TMP_ROOT` (ids 4, 8, 20, 22, 23 and 30 of the round-1 audit of units 61 to 63)
 
 ## 4. Design
 
@@ -181,6 +183,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · the missing-slot c
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 59 and 60, id 19
   (HIGH, item H1), on the report's fix.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
 
 ## 10. Reuse audit
 
