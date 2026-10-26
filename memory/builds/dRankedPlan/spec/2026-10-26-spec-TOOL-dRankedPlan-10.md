@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-10 — `plan.exit` falls back to the owner gate while the intake is not installed for the harness
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0378@ed811c10 whole
 **Carries:** node:item.plan.exit
@@ -9,9 +9,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-15 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -100,6 +101,11 @@ the capability read it rests on, and the arming of `item.plan.exit`, whose witne
 - **consumes-from** `TOOL-dRankedPlan-9` — `read_plan_ratification`, the one predicate S3 asks under every value, and its `ratify.py --fixture` S7 joins; without it no ratification witness exists to count, and every exit falls to the owner gate
 - **consumes-from** external — dDeclaredLoop, built before this build run: `read_items` (TOOL-dDeclaredLoop-12 S1), `write_transition` and `TRANSITION_FIELDS` (-3 S1, S5), the `[[stand-in]]` row (-13 S8), `derive_breakpoints` and `check_owner_gates` (-19 S1, S6), the pre-placement exemption (-53 S2), `check_disposition_record` (-16 S5) and `check_owner_disposition` (-31 S6)
 - **hands-off** external — dWellOiledMachine: the `item.entry.intake` row, the capability table `tools/loop/adapters.toml` with each harness's measured `[[adapter]]` row, the `--harness` its executor passes, and readers that accept a `ratification=intake-not-installed` witness from an adapter lacking `prompt-submit` (`cl-dClosedLoop-0283`)
+- **hands-off** `TOOL-dRankedPlan-19` — `check_plan_exit`, which that unit gives the precondition of a witnessed plan record (round-1 spec audit, id 1)
+- **hands-off** `TOOL-dRankedPlan-21` — S5's `ratification` and `harness` fields on the `plan.exit` move, which that unit reads back as the durable fact of a ratified row (round-1 spec audit, id 3)
+- **hands-off** `TOOL-dRankedPlan-25` — `check_plan_exit`'s disposition admission, which that unit bounds to the current crossing (round-1 spec audit, id 5)
+- **hands-off** `TOOL-dRankedPlan-26` — `check_plan_exit`'s disposition admission, which that unit holds on a disposition of `ask` or `none` (round-1 spec audit, id 39)
+- **hands-off** `TOOL-dRankedPlan-29` — `check_plan_exit`'s harness and the capability reader, which that unit's S15 and S38 correct (round-1 spec audit, ids 18, 48)
 
 ## 4. Design
 
@@ -343,6 +349,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 · the plan gate unde
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 10, v2:433-436 and :1779, flow-steps.md
   :164-194, flow-roles.md:173-199, layer-runtime.md:827-844, TOOL-dDeclaredLoop-3, -12, -13, -16, -19,
   -31 and -53 at base, and scout B's row -10.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-19`, the hands-off edge to `TOOL-dRankedPlan-21`, the hands-off edge to `TOOL-dRankedPlan-25`, the hands-off edge to `TOOL-dRankedPlan-26`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

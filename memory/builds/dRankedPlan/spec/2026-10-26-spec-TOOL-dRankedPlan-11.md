@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-11 — each role item's memory read set sized at Plan, as `id#tag` keys
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0379@f1807fe1 whole
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -89,6 +90,7 @@ before Design and a work order can be handed exactly those keys.
 - **hands-off** `TOOL-dRankedPlan-12` — `requires_if`, the memory-tree kit's `loop` row S5 adds, whose `why` that unit extends with `probe.py`
 - **consumes-from** external — dTotalRecall: `check_read_set`, `record show` and the section tags (TOOL-dTotalRecall-9 S1, S2, S5, S6); dDeclaredLoop: `read_items` and the item rows' `actor` and `step` (TOOL-dDeclaredLoop-12 S1, S2); the `id#tag` form (PLAY-dOrderedCharter-24); each DEFERRED at base and re-grounded on its landed code
 - **hands-off** external — a work order's renderer reads `plan_fields.py reads` and passes each key as `render_handoff --read`; the caller that launches each item is dWellOiledMachine's executor
+- **hands-off** `TOOL-dRankedPlan-29` — the watched-file change of this unit's pass, which that unit's S27 re-stamp covers (round-1 spec audit, id 32)
 
 ## 4. Design
 
@@ -240,6 +242,7 @@ New arm: tools/memory-tree/plan_fields.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · t
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 11, research-memory-structure-b.md:126,
   v2:800, TOOL-dTotalRecall-9 S1, S2, S5, S6 and S8, TOOL-dDeclaredLoop-12 S1 and its data model,
   PLAY-dOrderedCharter-24's form table, and scout A's row 4.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-12 — `plan.record` declaring the probes owed before Design
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0380@1e2f59a7 whole
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-11 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -89,6 +90,8 @@ the plan record's check refusing, so `plan.exit` cannot pass, while an owed prob
 - **consumes-from** `TOOL-dRankedPlan-11` — `requires_if`, the memory-tree kit's `loop` row whose `why` S6 extends
 - **consumes-from** external — dPlacedRequest: `probe.py trigger`, the `probe` and `probe-trigger` record kinds and their fields, and `probe.raise` (TOOL-dPlacedRequest-7 S3, S4, S6, S9); the record-file factory's reader (PLAY-dOrderedCharter-7 S7); each DEFERRED at base and re-grounded on its landed code
 - **hands-off** external — dWellOiledMachine's executor runs `plan_fields.py probes <slug> --trigger` at `plan.record`'s outcome and launches the program's items `next` returns
+- **hands-off** `TOOL-dRankedPlan-19` — the `Probes owed` check, whose refusal that unit makes hold `plan.exit` through the plan record's witness (round-1 spec audit, id 1)
+- **hands-off** `TOOL-dRankedPlan-29` — the `Probes owed` check's entry split, which that unit's S39 corrects (round-1 spec audit, id 49)
 
 ## 4. Design
 
@@ -230,6 +233,7 @@ New arm: tools/memory-tree/plan_fields.py · covers AC1 AC2 AC3 AC4 AC5 · the f
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 12, night-pass.md:118-175 (point 2),
   flow-steps.md:180-190 and :604-675, TOOL-dPlacedRequest-7 S3, S4, S6 and S9 and its refusal table,
   and scout A's row 5.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-19`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-9 — the ratification predicate: the session's owner-origin intake read as the plan's ratification by `plan.ratification`
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0377@a78b3ac9 whole
 **Carries:** node:policy-key.plan.ratification
@@ -9,12 +9,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md) | research | TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 |
-| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-9-deviation-91.md](../build/2026-10-26-build-TOOL-dRankedPlan-9-deviation-91.md) | deviation | — |
-| [2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md) | research | TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 |
+| [2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -99,6 +100,10 @@ request record stands in, and every witness says so.
 - **consumes-from** external — dPlacedRequest: `read_claim_body` (TOOL-dPlacedRequest-21 S2), `--request-consent` (TOOL-dPlacedRequest-5 S3), the request files (TOOL-dPlacedRequest-19 S2, S5; TOOL-dPlacedRequest-31 S2)
 - **consumes-from** external — dDeclaredLoop and dOrderedCharter: the disposition record and `check_disposition_record` (TOOL-dDeclaredLoop-16 S4, S5), the factory's `read_record` (PLAY-dOrderedCharter-7 S7)
 - **consumes-from** external — dGroundRules: the policy reader `resolve` and `plan.ratification`'s catalogue row
+- **hands-off** `TOOL-dRankedPlan-22` — `read_plan_ratification` and its CLI form, whose callers that unit bounds to the act they ratify (round-1 spec audit, id 37)
+- **hands-off** `TOOL-dRankedPlan-24` — the `terminal-command` arm and `ratify.py --fixture`, which that unit re-points to the bounded `read_item_disposition` (round-1 spec audit, id 21)
+- **hands-off** `TOOL-dRankedPlan-26` — the `terminal-command` arm, which that unit holds on a disposition of `ask` or `none` (round-1 spec audit, id 39)
+- **hands-off** `TOOL-dRankedPlan-29` — `read_plan_ratification`'s policy read and its fixture, which that unit's S14 corrects (round-1 spec audit, id 16)
 
 ## 4. Design
 
@@ -255,6 +260,7 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · `ratify.py 
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 9, the brief's I6 and I7, scout B's row -9,
   FR-1, v2:401 and v2:1224, and TOOL-dPlacedRequest-5, -19, -21 and -31.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-22`, the hands-off edge to `TOOL-dRankedPlan-24`, the hands-off edge to `TOOL-dRankedPlan-26`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

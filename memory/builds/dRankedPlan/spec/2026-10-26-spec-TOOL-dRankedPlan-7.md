@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-7 — kickoff reads the plan as `plan.kickoff` says, and the attended brief is gated
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dRankedPlan-17
 **Carries:** cl-dClosedLoop-0375@33084fbd whole
 **Carries:** node:policy-key.plan.kickoff
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-8 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 |
 
 <!-- /gen:spec-records -->
 
@@ -130,6 +131,7 @@ record rules a run-built brief meets.
 - **consumes-from** external — TOOL-dPlacedRequest-2's `read_card_policy` (S11) and
   `card-store.fixture.sh` (S12), built before this build run because dPlacedRequest is a parent of
   dTotalRecall and dBoundRoles; this unit's dispatch is refused while either is absent at its base.
+- **hands-off** `TOOL-dRankedPlan-29` — `read_plan_next`, `render_plan_cell` and the `READER_SHAPES` row, which that unit's S4, S5, S9 and S23 correct (round-1 spec audit, ids 8, 10, 26, 43)
 
 ## 4. Design
 
@@ -339,6 +341,7 @@ re-observe AC8's equivalence at the close; they are not a new arm.
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 7, the spec brief's I2, I5, I14 and
   I15, walkthrough P4 and planned unit 8 (walkthrough:351),
   night-pass point 1 item 7 (night-pass:111), and scout A's row 2 and forks F7a-c.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

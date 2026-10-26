@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-13 — the plan record's intent fields: affected systems derived from the `code` record and checked, open questions as fork tags
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0381@634c7b47 whole
 
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -120,6 +121,8 @@ tag `fork.<build>.<name>` in a registered `fork` namespace, so Design's forks ca
 - **consumes-from** external — dTotalRecall: the `code` record, `code_file` and `code_meta` (TOOL-dTotalRecall-8 S6, S7, S9); the record-file factory's reader (PLAY-dOrderedCharter-7 S7); the namespace registry and the tag grammar (PLAY-dOrderedCharter-19 S1, S2); each DEFERRED at base and re-grounded on its landed code
 - **consumes-from** external — dPlacedRequest: `resolve_item_seed` and its `scope-paths` arm (TOOL-dPlacedRequest-8 S4), which that spec hands to this build to arm
 - **hands-off** external — dCalibratedLens' scope drift reads `Affected systems`; dIndexedDesign's `design.decompose` cites the `fork.*` tags
+- **hands-off** `TOOL-dRankedPlan-19` — S9's call of `check_plan_fields` inside `check_plan_record`, which carries the field refusals into the witness that unit's gate reads (round-1 spec audit, id 1)
+- **hands-off** `TOOL-dRankedPlan-29` — the `Scope` check, the `scope` verb and the `plan-fields selftest` leg, which that unit's S19, S25, S34 and S39 correct (round-1 spec audit, ids 23, 30, 41, 49)
 
 ## 4. Design
 
@@ -323,6 +326,7 @@ New arm: tools/loop/loop_lib.py · covers AC7 · TOOL-dPlacedRequest-8's `seed-s
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 13, night-pass.md:340-403 (point 6, S3
   and S4), flow-steps.md:180-190, TOOL-dRankedPlan-16 S3, S4 and S9, TOOL-dTotalRecall-8 S6, S7, S9
   and S11, TOOL-dPlacedRequest-8 S4, PLAY-dOrderedCharter-19 S1, S2 and §4, and scout A's row 6.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-19`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

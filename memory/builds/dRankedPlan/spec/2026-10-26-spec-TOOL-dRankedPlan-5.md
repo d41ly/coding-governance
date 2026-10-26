@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-5 — the live-build mapping carried out: each live build kept or absorbed, recorded per build
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0373@f1eb8c00 whole
 
@@ -9,13 +9,14 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-26-build-TOOL-dRankedPlan-1-fix-return.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-fix-return.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
-| [2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md) | research | TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 |
-| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-5-deviation-51.md](../build/2026-10-26-build-TOOL-dRankedPlan-5-deviation-51.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
-| [2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md) | research | TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 |
+| [2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -78,6 +79,7 @@ absorbed, and the plan view showing each.
 - **consumes-from** `TOOL-dRankedPlan-4` — `LIVE_DORMANT_DAYS`, read through `gen_build_index.py --dormant`, which names the dormant kept builds whose track S5 confirms
 - **consumes-from** `TOOL-dRankedPlan-9` — `read_plan_ratification`, the witness S4 requires before any mapping record is written
 - **consumes-from** external — dDeclaredLoop's disposition record and `check_disposition_record` (TOOL-dDeclaredLoop-16 S4, S5); dPlacedRequest's `item.entry.place-owner` row (TOOL-dPlacedRequest-3 S2)
+- **hands-off** `TOOL-dRankedPlan-29` — the mapping records, AC1 and `derive_mapping`, which that unit's S1 to S3, S29 and S30 correct (round-1 spec audit, ids 6, 7, 14, 35, 42)
 
 ## 4. Design
 
@@ -224,6 +226,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC5 · the `plan-mapping
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 5, v2:1787-1792, v1:147-177,
   walkthrough:356 and :362-363, TOOL-dDeclaredLoop-16, TOOL-dPlacedRequest-3 S2, and scout B's row -5.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-8 — the full kickoff only where `kickoff.runs` says: a `kickoff —` line beside the card
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 15 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 15 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0376@f1c33063 whole
 **Carries:** node:policy-key.kickoff.runs
@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-7 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -76,6 +77,7 @@ stand-in's paragraph reading that line instead of its fixed predicate.
 - **hands-off** `TOOL-dRankedPlan-7` — `render_card`, the card whose cell list this unit leaves as it is, so unit 7's `plan —` cell joins it beside `live —`, while the computed `kickoff —` line follows the card it describes
 - **consumes-from** external — dPlacedRequest, built before this build run: `read_card_policy`, the lookup, the replay's re-key and `card-store.fixture.sh` with its stub policy kit (TOOL-dPlacedRequest-2 S6, S7, S11, S12), and the stand-in paragraph S4 arms (TOOL-dPlacedRequest-3 S5)
 - **hands-off** external — dPlacedRequest: `read_card_policy <key>` reads counted by `check_policy.py`'s reader coverage, the ask of §8 F6
+- **hands-off** `TOOL-dRankedPlan-29` — the computed `kickoff —` line and §8 F6, which that unit's S9 and S23 align with TOOL-dRankedPlan-7 (round-1 spec audit, ids 10, 26)
 
 ## 4. Design
 
@@ -248,6 +250,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC2 AC3 AC4
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 8, OR-2
   (orientation.md:259-263), v2:1172, TOOL-dPlacedRequest-2 S6, S7, S11 and S12,
   TOOL-dPlacedRequest-3 S5, and scout A's row for this unit.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

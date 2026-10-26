@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-1 — `priority:` beside `parents:`, and the generated plan view `PLAN.md`
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0369@9f2afd12 whole
 **Carries:** node:policy-key.plan.unplaced
@@ -10,14 +10,18 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-26-build-TOOL-dRankedPlan-1-fix-return.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-fix-return.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-repin-return.md) | research | TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md) | research | TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-1-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-1-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-2-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-2-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-3-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-3-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-4-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-4-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md) | research | TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -107,6 +111,7 @@ is generated from those declarations. This unit adds the `priority:` key, render
 - **hands-off** `TOOL-dRankedPlan-7` — `PLAN.md`, whose first placed row is the plan's next item and whose `## Unplaced` heading ends the placed rows
 - **consumes-from** external — dTotalRecall: `FRONT_MATTER_KEYS` and its value types (TOOL-dTotalRecall-4 S1, S2), the `build-readme` row (TOOL-dTotalRecall-1 S3)
 - **consumes-from** external — dGroundRules: the policy reader `resolve` and the catalogue row of `plan.unplaced`
+- **hands-off** `TOOL-dRankedPlan-29` — `read_new_build_args`, `cmd_new_build` and the plan view's generated row and docs, which that unit's S13, S24, S28, S31, S35 and S37 correct (round-1 spec audit, ids 15, 29, 34, 36, 45, 47)
 
 ## 4. Design
 
@@ -284,6 +289,7 @@ New arm: tools/memory-tree/check-memory-hygiene.sh · covers AC8 · the memory-h
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 1, the brief's I1 and I2, scout A's row 1,
   walkthrough P1 and P2, flow-steps.md:186, and the probe of §8 F2.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

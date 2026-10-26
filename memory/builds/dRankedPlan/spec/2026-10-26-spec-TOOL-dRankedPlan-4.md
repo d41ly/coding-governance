@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-4 — dormancy disposal: a dormant build moved by the owner's disposition, shown in the plan view
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0372@5c733981 whole
 
@@ -8,9 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -75,6 +76,8 @@ showing the disposed state where they showed `dormant`. The one threshold stays 
 - **hands-off** `TOOL-dRankedPlan-5` — `LIVE_DORMANT_DAYS`, the one threshold, read through `gen_build_index.py --dormant`, by which the mapping names the dormant builds whose track it confirms
 - **consumes-from** external — dDeclaredLoop, built before this build run: `write_transition` and `loop_transition.py record` (TOOL-dDeclaredLoop-3 S5), the `transition` record kind (-3 S2), `derive_move` and rows B19, T11 and T12 (-13 S5, -15), `derive_position` (-7 S1), and the disposition record (-16 S4)
 - **hands-off** external — dTendedCadence: `maintain.fixes`' `defer dormant`, S2 and S3 its two halves, by the ask of §8 F3
+- **consumes-from** `TOOL-dRankedPlan-24` — `read_item_disposition`, the one bounded reader S3's `read_build_disposition` is built on, so its "added after its newest transition" rule is spelled once (round-1 spec audit, id 21)
+- **hands-off** `TOOL-dRankedPlan-29` — the `paused`, `withdrawn` and `superseded` Activity words, which that unit's S4, S20 and S21 read (round-1 spec audit, ids 8, 24, 33)
 
 ## 4. Design
 
@@ -239,6 +242,7 @@ New arm: tools/loop/loop_transition.py · covers AC3 AC4 AC5 · the four `dispos
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 4, walkthrough:346-347, v2:1321,
   TOOL-dDeclaredLoop-13 B19 and B20, TOOL-dDeclaredLoop-15 T11 and T12, TOOL-dRankedPlan-1 S3, and
   scout B's row -4.
+- rev-2 · 2026-10-27 · §3 · gains the consumes-from edge to `TOOL-dRankedPlan-24`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

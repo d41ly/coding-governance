@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18
+ids: TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29
 spec-audit: 2026-10-21
 parents: dDeclaredLoop dTotalRecall dBoundRoles
 may: PLAY-dClosedLoop-3
@@ -76,44 +76,55 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 16 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 27 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15
-ids TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18
+ids TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dRankedPlan-16 — the artifact levels: one plan record per build, and a brief that renders it and never types it](spec/2026-10-26-spec-TOOL-dRankedPlan-16.md) | 1 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-1 — `priority:` beside `parents:`, and the generated plan view `PLAN.md`](spec/2026-10-26-spec-TOOL-dRankedPlan-1.md) | 2 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-9 — the ratification predicate: the session's owner-origin intake read as the plan's ratification by `plan.ratification`](spec/2026-10-26-spec-TOOL-dRankedPlan-9.md) | 3 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-10 — `plan.exit` falls back to the owner gate while the intake is not installed for the harness](spec/2026-10-26-spec-TOOL-dRankedPlan-10.md) | 4 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-2 — the planner and triager role, the Plan workflow, and the plan's order as `plan.authority` says](spec/2026-10-26-spec-TOOL-dRankedPlan-2.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-14 — the plan record's scenario field, set from the placement and re-picked at Plan with its reason](spec/2026-10-26-spec-TOOL-dRankedPlan-14.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-13 — the plan record's intent fields: affected systems derived from the `code` record and checked, open questions as fork tags](spec/2026-10-26-spec-TOOL-dRankedPlan-13.md) | 7 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-11 — each role item's memory read set sized at Plan, as `id#tag` keys](spec/2026-10-26-spec-TOOL-dRankedPlan-11.md) | 8 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-12 — `plan.record` declaring the probes owed before Design](spec/2026-10-26-spec-TOOL-dRankedPlan-12.md) | 9 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest](spec/2026-10-26-spec-TOOL-dRankedPlan-3.md) | 10 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-4 — dormancy disposal: a dormant build moved by the owner's disposition, shown in the plan view](spec/2026-10-26-spec-TOOL-dRankedPlan-4.md) | 11 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-5 — the live-build mapping carried out: each live build kept or absorbed, recorded per build](spec/2026-10-26-spec-TOOL-dRankedPlan-5.md) | 12 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-15 — the plan revision record: a fork the goal cannot survive moves the build back to planning, and Design re-enters on the ratified revision](spec/2026-10-26-spec-TOOL-dRankedPlan-15.md) | 13 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-6 — Plan Review: the plan record a review subject, run with the lenses of the preset `review.pin` passes until dCalibratedLens's Plan lenses land](spec/2026-10-26-spec-TOOL-dRankedPlan-6.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-8 — the full kickoff only where `kickoff.runs` says: a `kickoff —` line beside the card](spec/2026-10-26-spec-TOOL-dRankedPlan-8.md) | 15 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dRankedPlan-7 — kickoff reads the plan as `plan.kickoff` says, and the attended brief is gated](spec/2026-10-26-spec-TOOL-dRankedPlan-7.md) | 16 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-16 — the artifact levels: one plan record per build, and a brief that renders it and never types it](spec/2026-10-26-spec-TOOL-dRankedPlan-16.md) | 1 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-1 — `priority:` beside `parents:`, and the generated plan view `PLAN.md`](spec/2026-10-26-spec-TOOL-dRankedPlan-1.md) | 2 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-27 — the roles vocabulary admits the `plan:` reads keys gov-spec-writer gains](spec/2026-10-26-spec-TOOL-dRankedPlan-27.md) | 2 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-9 — the ratification predicate: the session's owner-origin intake read as the plan's ratification by `plan.ratification`](spec/2026-10-26-spec-TOOL-dRankedPlan-9.md) | 3 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-10 — `plan.exit` falls back to the owner gate while the intake is not installed for the harness](spec/2026-10-26-spec-TOOL-dRankedPlan-10.md) | 4 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-24 — one reader of a build's disposition records for an item, bounded to the current crossing](spec/2026-10-26-spec-TOOL-dRankedPlan-24.md) | 4 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-2 — the planner and triager role, the Plan workflow, and the plan's order as `plan.authority` says](spec/2026-10-26-spec-TOOL-dRankedPlan-2.md) | 5 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-25 — `plan.exit`'s owner disposition counts only for the crossing it was written for](spec/2026-10-26-spec-TOOL-dRankedPlan-25.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-26 — a disposition of `ask` or `none` keeps `plan.exit` shut](spec/2026-10-26-spec-TOOL-dRankedPlan-26.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-14 — the plan record's scenario field, set from the placement and re-picked at Plan with its reason](spec/2026-10-26-spec-TOOL-dRankedPlan-14.md) | 6 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-21 — a plan row is ratified by the recorded crossing of its build's `plan.exit`, read in any session](spec/2026-10-26-spec-TOOL-dRankedPlan-21.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-22 — the session-scoped ratification predicate is asked only at the act it ratifies, gated over the tree](spec/2026-10-26-spec-TOOL-dRankedPlan-22.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-13 — the plan record's intent fields: affected systems derived from the `code` record and checked, open questions as fork tags](spec/2026-10-26-spec-TOOL-dRankedPlan-13.md) | 7 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-20 — a plan record's `Scenario: none` reads as no re-pick, and a build that never enters `planning` pins on its first transition](spec/2026-10-26-spec-TOOL-dRankedPlan-20.md) | 7 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-11 — each role item's memory read set sized at Plan, as `id#tag` keys](spec/2026-10-26-spec-TOOL-dRankedPlan-11.md) | 8 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-12 — `plan.record` declaring the probes owed before Design](spec/2026-10-26-spec-TOOL-dRankedPlan-12.md) | 9 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-19 — `plan.exit` admits a move only over a witnessed plan record](spec/2026-10-26-spec-TOOL-dRankedPlan-19.md) | 10 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest](spec/2026-10-26-spec-TOOL-dRankedPlan-3.md) | 10 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-28 — the `triage` and `dupes` record kinds join the binding reader, the factory table and the HYGIENE kind list](spec/2026-10-26-spec-TOOL-dRankedPlan-28.md) | 11 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-4 — dormancy disposal: a dormant build moved by the owner's disposition, shown in the plan view](spec/2026-10-26-spec-TOOL-dRankedPlan-4.md) | 11 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-5 — the live-build mapping carried out: each live build kept or absorbed, recorded per build](spec/2026-10-26-spec-TOOL-dRankedPlan-5.md) | 12 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-15 — the plan revision record: a fork the goal cannot survive moves the build back to planning, and Design re-enters on the ratified revision](spec/2026-10-26-spec-TOOL-dRankedPlan-15.md) | 13 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-23 — `show` reports a revision's ratification from the record of how the re-entering move was admitted](spec/2026-10-26-spec-TOOL-dRankedPlan-23.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dRankedPlan-6 — Plan Review: the plan record a review subject, run with the lenses of the preset `review.pin` passes until dCalibratedLens's Plan lenses land](spec/2026-10-26-spec-TOOL-dRankedPlan-6.md) | 14 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-8 — the full kickoff only where `kickoff.runs` says: a `kickoff —` line beside the card](spec/2026-10-26-spec-TOOL-dRankedPlan-8.md) | 15 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-7 — kickoff reads the plan as `plan.kickoff` says, and the attended brief is gated](spec/2026-10-26-spec-TOOL-dRankedPlan-7.md) | 16 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-29 — the round-1 spec audit's 39 medium and low findings, closed in one batch](spec/2026-10-26-spec-TOOL-dRankedPlan-29.md) | 17 | 2 | OPEN | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 3 record folder(s).
+Records: 30 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dRankedPlan-1 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6
-TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9.
+Ids no `spec-audit` record has ever named: TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29.
 
-Ids whose spec moved past its audited revision: none — 0 of 16 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: TOOL-dRankedPlan-1@rev-1 TOOL-dRankedPlan-10@rev-1 TOOL-dRankedPlan-11@rev-1 TOOL-dRankedPlan-12@rev-1 TOOL-dRankedPlan-13@rev-1 TOOL-dRankedPlan-14@rev-1 TOOL-dRankedPlan-15@rev-1 TOOL-dRankedPlan-16@rev-1 TOOL-dRankedPlan-2@rev-1
+TOOL-dRankedPlan-3@rev-1 TOOL-dRankedPlan-4@rev-1 TOOL-dRankedPlan-5@rev-1 TOOL-dRankedPlan-6@rev-1 TOOL-dRankedPlan-7@rev-1 TOOL-dRankedPlan-8@rev-1 TOOL-dRankedPlan-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 16 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 27 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 16
 - carried in parts: 0 (none)
@@ -122,7 +133,9 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 16 spec(s) at 
 - stale: 0 (none)
 - ambiguous: 0 (none)
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: `spec/2026-10-26-spec-TOOL-dRankedPlan-19.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dRankedPlan-20.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dRankedPlan-21.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dRankedPlan-22.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dRankedPlan-23.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dRankedPlan-24.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dRankedPlan-25.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-TOOL-dRankedPlan-26.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dRankedPlan-27.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dRankedPlan-28.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dRankedPlan-29.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0372, cl-dClosedLoop-0382, cl-dClosedLoop-0497, cl-dClosedLoop-0498
 <!-- /gen:build-coverage -->
 
@@ -131,21 +144,22 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 16 spec(s) at 
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dRankedPlan-16` | no |
-| 2 | `TOOL-dRankedPlan-1` | no |
+| 2 | `TOOL-dRankedPlan-1`, `TOOL-dRankedPlan-27` | yes |
 | 3 | `TOOL-dRankedPlan-9` | no |
-| 4 | `TOOL-dRankedPlan-10` | no |
-| 5 | `TOOL-dRankedPlan-2` | no |
-| 6 | `TOOL-dRankedPlan-14` | no |
-| 7 | `TOOL-dRankedPlan-13` | no |
+| 4 | `TOOL-dRankedPlan-10`, `TOOL-dRankedPlan-24` | no |
+| 5 | `TOOL-dRankedPlan-2`, `TOOL-dRankedPlan-25`, `TOOL-dRankedPlan-26` | no |
+| 6 | `TOOL-dRankedPlan-14`, `TOOL-dRankedPlan-21`, `TOOL-dRankedPlan-22` | no |
+| 7 | `TOOL-dRankedPlan-13`, `TOOL-dRankedPlan-20` | yes |
 | 8 | `TOOL-dRankedPlan-11` | no |
 | 9 | `TOOL-dRankedPlan-12` | no |
-| 10 | `TOOL-dRankedPlan-3` | no |
-| 11 | `TOOL-dRankedPlan-4` | no |
+| 10 | `TOOL-dRankedPlan-19`, `TOOL-dRankedPlan-3` | no |
+| 11 | `TOOL-dRankedPlan-28`, `TOOL-dRankedPlan-4` | yes |
 | 12 | `TOOL-dRankedPlan-5` | no |
 | 13 | `TOOL-dRankedPlan-15` | no |
-| 14 | `TOOL-dRankedPlan-6` | no |
+| 14 | `TOOL-dRankedPlan-23`, `TOOL-dRankedPlan-6` | no |
 | 15 | `TOOL-dRankedPlan-8` | no |
 | 16 | `TOOL-dRankedPlan-7` | no |
+| 17 | `TOOL-dRankedPlan-29` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

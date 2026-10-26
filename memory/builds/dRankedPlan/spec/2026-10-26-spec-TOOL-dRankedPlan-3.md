@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0371@3ec4f25f whole
 **Carries:** node:policy-key.plan.triage
@@ -13,9 +13,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
+| [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -131,6 +132,8 @@ by its labels (walkthrough:380-383).
 - **consumes-from** external — dDeclaredLoop: the eleven Plan item rows (TOOL-dDeclaredLoop-12 S2) and the `[[stand-in]]` rule (TOOL-dDeclaredLoop-13 §4, S8) S11 follows
 - **consumes-from** external — dTotalRecall, built before this build run: `record_kinds.py new` (TOOL-dTotalRecall-1 S9) and `gov_record.py new` with `write_new_record` (TOOL-dTotalRecall-2 S1)
 - **consumes-from** external — dGroundRules, landed: `policy.py get` and `policy.py lists --write`
+- **hands-off** `TOOL-dRankedPlan-28` — the `triage` and `dupes` rows of `record-kinds.toml`, which that unit registers in the binding reader, the factory table and the HYGIENE kind list (round-1 spec audit, id 28)
+- **hands-off** `TOOL-dRankedPlan-29` — `triage.py`'s policy read and its row writer, which that unit's S6 to S8 and S17 correct (round-1 spec audit, ids 9, 17, 20, 44)
 
 ## 4. Design
 
@@ -425,6 +428,7 @@ New arm: tools/loop/plan_items.py · covers AC12 · the `triage-witness` plant b
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 3, walkthrough P3 and its revision
   (:350-353, :380-383), flow-steps.md:164-190, TOOL-dDeclaredLoop-15 T4 to T6, scout B's row -3, and
   TOOL-dRankedPlan-2's hand-off of `check_plan_dupes` and the three items to arm (its §8 F7).
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-28`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

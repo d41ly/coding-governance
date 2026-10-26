@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-16 — the artifact levels: one plan record per build, and a brief that renders it and never types it
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0498@e9d43f26 whole
 **Carries:** node:record-kind.plan
@@ -15,6 +15,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 |
+| [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
 
@@ -127,6 +128,10 @@ that types a plan field.
 - **consumes-from** external — dTotalRecall: `record_kinds.py new` and `--check` (TOOL-dTotalRecall-1 S3, S4, S9), the door `gov_record.py new` (TOOL-dTotalRecall-2 S1 to S4)
 - **consumes-from** external — dOrderedCharter: `TYPED_RECORD_KINDS` and the file-name join (PLAY-dOrderedCharter-42 S1 to S3), the factory `build_records.py` and its `FIELD` (PLAY-dOrderedCharter-7 S7)
 - **consumes-from** external — dPlacedRequest: `--placed-build` and `render_placed_build_readme` (TOOL-dPlacedRequest-21 S4)
+- **hands-off** `TOOL-dRankedPlan-19` — `plan_record.py check`, `item.plan.record`'s witness line that unit's gate requires before Plan's exit (round-1 spec audit, id 1)
+- **hands-off** `TOOL-dRankedPlan-20` — S8's patch and repeat plan record, whose `Scenario: none` that unit's plants feed to the scenario reader (round-1 spec audit, id 2)
+- **hands-off** `TOOL-dRankedPlan-27` — S7's `plan:` keys on `gov-spec-writer`'s `reads:` line, which that unit admits to the roles vocabulary (round-1 spec audit, id 27)
+- **hands-off** `TOOL-dRankedPlan-29` — `plan_record.py`, the handoff's `plan:` render and the `[[level]]` marker, which that unit's S10, S16, S22 and S33 correct (round-1 spec audit, ids 11, 19, 25, 40)
 
 ## 4. Design
 
@@ -358,6 +363,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the `--selftest` 
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 16, the brief's I3 to I5, scout A's row 8,
   flow.md:98-145, flow-steps.md:127 and :184, and the two probes of §8 F3 and F5.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-19`, the hands-off edge to `TOOL-dRankedPlan-20`, the hands-off edge to `TOOL-dRankedPlan-27`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 
