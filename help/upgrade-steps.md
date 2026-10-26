@@ -30,6 +30,42 @@ the row, and a row the default branch has not landed reads `unlanded`. A kit tha
   row runs, or removes a landed row with no `[[retired]]` row naming it. It does not check what a
   step program imports.
 
+## What a step can reach
+
+A step is gov's code run over your repository, so it runs under one contract, whichever command
+starts it:
+
+- **From gov's checkout**, never yours: a relative path in a step names gov's file.
+- **A clean environment.** Only the names a process needs to start (`PATH`, `SYSTEMROOT`, `LANG`
+  and the like) are copied in; everything else, every token and credential variable included, is
+  left out. Home and temp point at a fresh scratch directory that is removed after the step.
+- **No git config of yours or the machine's, no hooks, no credentials.** Git reads no system or
+  global config and never prompts, and two settings passed through `GIT_CONFIG_COUNT`, which
+  outrank your repository's own config, point `core.hooksPath` at an empty directory and set
+  `credential.helper` to nothing. A step's `git add` or `git mv` fires none of your hooks.
+- **Python runs isolated (`-I`)**: it ignores `PYTHONPATH` and imports nothing from your tree or
+  the working directory.
+
+A step that needs your repository's own code or hooks declares `needs-target = true`. The runner
+spawns nothing for such a step and reads it `attended`: a person runs it. To check a step's declaration,
+gov runs it beside planted hooks and modules in a scratch copy and reads one verdict:
+
+- `isolated` — it ran clean and touched none of your code;
+- `needs-target` — it failed and touched none of your code, so it needs it: declare
+  `needs-target = true`;
+- `breach` — it ran your code anyway, named in the line; fix the step;
+- `attended` — it already declares `needs-target = true`, and nothing ran.
+
+To see the contract hold on this machine:
+
+```sh
+python tools/govkit/upgrade_steps.py fixture isolation                  # exit 0
+python tools/govkit/upgrade_steps.py fixture isolation --plant hook     # hook canary: absent
+```
+
+The contract is not a sandbox: a step that opens a path into your tree on purpose is not stopped,
+which is what `breach` reports.
+
 ## What the receipt records about steps
 
 The receipt, `.governance/install.json`, declares its `schema`. Schema 4 adds `steps`, one row per

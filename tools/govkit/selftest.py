@@ -3402,6 +3402,64 @@ def check_steps_recordable() -> None:
               "as the predicate reads", ok, str(rec))
 
 
+def check_step_isolation(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-7 AC1 to AC7 — `upgrade_steps.py fixture isolation` with every plant: each
+    half of the contract green, each `-stub` plant red naming its canary, the needs-target check's
+    four verdicts, the unknown-token refusal, and the callers probe green over the shipped files and
+    red over a planted spawn of `row["up"]`. The phase-without-argv refusal is reached in process."""
+    us_py = HERE / "upgrade_steps.py"
+
+    def fixture(py: pathlib.Path, *plant: str) -> tuple[int, str]:
+        p = subprocess.run([sys.executable, str(py), "fixture", "isolation", *(("--plant", *plant) if plant else ())],
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+        return p.returncode, p.stdout + p.stderr
+
+    for plant, want, needles in (
+            ((), 0, ("fixture/clean · up · ok", "outside the allowlist and the contract: none",
+                     "GIT_CONFIG_COUNT 2 · core.hooksPath holds []", "sys.flags.isolated 1",
+                     "fixture/clean · isolated")),
+            (("hook",), 0, ("hook canary: absent",)),
+            (("hook-stub",), 1, ("hook canary: present", "hook-post-index-change")),
+            (("module",), 0, ("module canary: absent",)),
+            (("module-stub",), 1, ("module canary: present", "module-sitecustomize.py")),
+            (("credential",), 0, ("credential canary: absent", "token: absent", "credential.helper reads ['']")),
+            (("credential-stub",), 1, ("credential canary: present · credential-helper",
+                                       "token: present · GH_TOKEN")),
+            (("needs-target",), 1, ("fixture/reaches · needs-target", "declare needs-target = true",
+                                    "fixture/reaches-attended · attended", "reaches-attended · own canary absent")),
+            (("breach",), 1, ("fixture/opens · breach", "adopter_only")),
+            (("token",), 1, ("fixture/token · refused", "{unknown}", "nothing was spawned")),
+            (("callers",), 0, ("one spawn site of a step argv, inside run_step_isolated",))):
+        rc, out = fixture(us_py, *plant)
+        check(f"[dSP-7] fixture isolation {' '.join(plant) or '(base)'} exits {want} and names "
+              f"{', '.join(needles)}", rc == want and "isolation: FAILED" not in out
+              and all(n in out for n in needles), out)
+
+    # AC6's red: the shipped pair copied, a direct spawn of `row["up"]` planted into the copy.
+    planted = tmp / "callers"
+    planted.mkdir(parents=True)
+    shutil.copy(HERE / "govkit.py", planted / "govkit.py")
+    text = us_py.read_text(encoding="utf-8") + '\n\ndef planted_spawn(row):\n    return subprocess.run(row["up"])\n'
+    (planted / "upgrade_steps.py").write_text(text, encoding="utf-8", newline="\n")
+    rc, out = fixture(planted / "upgrade_steps.py", "callers")
+    check("[dSP-7] AC6 a planted spawn of row[\"up\"] reds the callers probe, naming its line",
+          rc == 1 and f"upgrade_steps.py:{len(text.splitlines())}, in planted_spawn" in out, out)
+
+    us = govkit_module().upgrade_steps
+    row = us.StepRow("fixture/x", ["python", "-c", "pass"], ["python", "-c", "pass"], ["python", "-c", "pass"],
+                     "atomic", [], False, "fixture", 1, None)
+    try:
+        us.run_step_isolated(row, "resume", tmp, tmp)
+        refused = ""
+    except us.Refusal as e:
+        refused = str(e)
+    check("[dSP-7] S3 a phase with no argv is refused, naming the step and the phase",
+          "fixture/x: no `resume` argv" in refused, refused)
+    check("[dSP-7] S3 a row declaring needs-target is attended and spawns nothing",
+          us.run_step_isolated(row._replace(needs_target=True), "up", tmp, tmp)
+          == {"verdict": "attended", "rc": None, "tail": ""})
+
+
 def check_receipt_schema(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-3 AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 — the receipt's schema 4: the
     back-fill pinned below 3, who writes 4, the step `govkit/receipt-schema-4`, and the `steps`
@@ -3790,6 +3848,7 @@ def main() -> int:
         check_fanout_step(tmp / "dfs")
         check_receipt_schema(tmp / "drs")
         check_steps_recordable()
+        check_step_isolation(tmp / "dsi")
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO

@@ -2938,6 +2938,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "build_step_env",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "build_steps_gov",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -4868,6 +4873,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_needs_target",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "check_node_merge_arm",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -5641,6 +5651,11 @@
       "id": "check_stderr",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "check_step_isolation",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_steps_recordable",
@@ -8486,6 +8501,11 @@
       "id": "derive_statuses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "derive_step_mode",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "derive_stream_verdict",
@@ -15053,6 +15073,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_plant_canaries",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_pm_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -15731,6 +15756,11 @@
       "id": "read_stem",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_step_spawn_sites",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_step_states",
@@ -19658,6 +19688,11 @@
       "file": "tools/runlog/extract.py"
     },
     {
+      "id": "resolve_step_argv",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "resolve_template_path",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -20693,6 +20728,16 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_isolation_case",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_isolation_fixture",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "run_kill",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -21326,6 +21371,11 @@
       "id": "run_sr_defer",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_step_isolated",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "run_stop",
@@ -26501,6 +26551,11 @@
       "id": "write_t1_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_target_plants",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "write_task_register",

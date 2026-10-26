@@ -38,7 +38,12 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 308    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 310    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 308 -> 310 at TOOL-dSafePassage-7, BY THE MEASURED DELTA: the matcher's two shapes read 46 in
+# `upgrade_steps.py` at that unit's base `0becfe7d` and 48 on the tree it left, by an AST probe of
+# that file alone. The two are the isolation contract's: `resolve_step_argv`'s refusal of a token
+# the run does not answer, reached by `check_step_isolation`'s `--plant token` run, and
+# `run_step_isolated`'s refusal of a phase with no argv, reached by that arm in process.
 # 307 -> 308 at TOOL-dSafePassage-20, BY THE MEASURED DELTA: the matcher read 377 at that unit's base
 # `c4fc7de1` and 378 on the tree it left. The one is `resolve_recorded_introduced`'s refusal of an
 # `introduced` that is neither a 40-hex commit, the reader's `unlanded` nor null, in

@@ -5,6 +5,7 @@ frozen-row check, and the two helpers a step program writes through (TOOL-dSafeP
     python <prefix>/govkit/upgrade_steps.py list               # every row, ordered, with its commit
     python <prefix>/govkit/upgrade_steps.py list --window      # each translation-window member
     python <prefix>/govkit/upgrade_steps.py frozen [--base <rev>]   # the `step-rows-frozen` leg
+    python <prefix>/govkit/upgrade_steps.py fixture isolation [--plant <case>]   # the contract, observed
 
 THE ROWS. A kit descriptor's `[[upgrade]]` rows, rows of the same grammar in
 `<prefix>/govkit/steps.toml` for surfaces no descriptor owns, and the registry's `[[retired]]`
@@ -50,20 +51,34 @@ THE RECEIPT'S `steps` (TOOL-dSafePassage-3). A schema-4 receipt records each ste
 `set_step_state` is the only code that mutates the field and `read_step_states` the only code that
 parses it; the writer persists nothing.
 
+WHAT A STEP CAN REACH (TOOL-dSafePassage-7). `run_step_isolated` is the one spawn of a step argv:
+from gov's checkout root, under an environment built from the `STEP_ENV_KEEP` allowlist and never
+from a copy of the parent's, home and temp in a fresh scratch, git's system and global config
+unread, `core.hooksPath` an empty directory and `credential.helper` empty through
+`GIT_CONFIG_COUNT`, and a leading `python` run `-I`. A row declaring `needs-target = true` is
+`attended` and spawns nothing. `check_needs_target` runs a row beside planted target hooks and
+modules and reads `isolated`, `breach`, `needs-target` or `attended`; `fixture isolation` observes
+all of it, a `-stub` plant swapping one half of the contract inside the fixture process only.
+
 Exit 0 clean, 1 a frozen-row finding or no base to compare against, 2 a refused row, an unreadable
-revision or a usage error.
+revision or a usage error. `fixture isolation` exits 0 green and 1 on a red, a `-stub` plant's,
+`needs-target`'s, `breach`'s and `token`'s by design.
 """
 
 from __future__ import annotations
 
+import ast
 import base64
 import hashlib
 import importlib.util
 import json
+import os
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import tomllib
 from typing import NamedTuple
 
@@ -91,6 +106,23 @@ STEP_STATES = ("applied", "failed", "rolled-back")
 DOWN_STOP_PREFIXES = ("down interrupted:", "down exit ", "witness still holds after down",
                       "reverted check exits ")
 SHA_RE = re.compile(r"[0-9a-f]{40}")
+# THE ISOLATION CONTRACT's allowlist (TOOL-dSafePassage-7): the names process creation and Python's
+# start-up need, none carrying a credential. Every other name, `GIT_ENV_LEAKS` and every token
+# variable included, falls out because nothing copies it in; a name joins by a reviewed edit.
+STEP_ENV_KEEP = ("PATH", "PATHEXT", "SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "COMSPEC", "OS",
+                 "PROCESSOR_ARCHITECTURE", "NUMBER_OF_PROCESSORS", "LANG", "LC_ALL", "TZ")
+STEP_PHASES = ("up", "down", "witness", "resume")
+# Where `check_needs_target` gathers canaries: inside the scratch tree it is handed, so a target
+# module planted beside the plants can name its own canary by its own path.
+CANARY_DIR = ".gk-canaries"
+# Every client-side hook name git runs; a name git adds later is unplanted until it is listed here.
+CLIENT_HOOKS = ("applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit",
+                "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase",
+                "post-checkout", "post-merge", "pre-push", "pre-auto-gc", "post-rewrite",
+                "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist",
+                "p4-post-changelist", "p4-pre-submit", "post-index-change", "reference-transaction")
+FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "credential-stub",
+                  "needs-target", "breach", "token", "callers")
 
 
 class Refusal(RuntimeError):
@@ -657,6 +689,150 @@ def render_policy_text(text: str | None, table: str, key: str, value) -> str:
     return out
 
 
+def build_step_env(scratch) -> dict[str, str]:
+    """The environment a step runs under (TOOL-dSafePassage-7, S1): a NEW dict of the
+    `STEP_ENV_KEEP` names present in the parent, plus the contract's own. Home and temp point into
+    `scratch`; git reads no system or global config and prompts for nothing, and through
+    `GIT_CONFIG_COUNT`, which outranks the target's own config, runs hooks from the empty
+    `<scratch>/hooks` and holds the empty credential helper."""
+    scratch = pathlib.Path(scratch)
+    env = {k: os.environ[k] for k in STEP_ENV_KEEP if k in os.environ}
+    env.update(dict.fromkeys(("HOME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "XDG_CONFIG_HOME"),
+                             str(scratch / "home")))
+    env.update(dict.fromkeys(("TMP", "TEMP", "TMPDIR"), str(scratch / "tmp")))
+    env.update({"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_TERMINAL_PROMPT": "0",
+                "GCM_INTERACTIVE": "never", "GIT_CONFIG_COUNT": "2",
+                "GIT_CONFIG_KEY_0": "core.hooksPath", "GIT_CONFIG_VALUE_0": str(scratch / "hooks"),
+                "GIT_CONFIG_KEY_1": "credential.helper", "GIT_CONFIG_VALUE_1": ""})
+    return env
+
+
+def resolve_step_argv(argv, ctx: dict[str, str], step_id: str = "a step") -> list[str]:
+    """`argv` resolved for the contract (S2): `{gov}`, `{target}` and `{prefix}` from `ctx` through
+    govkit's `resolve_tokens`, a leading `python` as govkit's own interpreter and `-I`, a leading
+    `bash` through `resolve_shell_argv`. A token `ctx` does not answer is a refusal naming the step
+    and the token, before any spawn."""
+    gk, out = load_govkit(), []
+    for tok in argv:
+        got, missing = gk.resolve_tokens(tok, ctx)
+        if missing:
+            raise Refusal(f"{step_id}: '{tok}' holds {', '.join('{' + m + '}' for m in missing)}, which "
+                          f"this run does not answer, so nothing was spawned")
+        out.append(got)
+    if out and out[0] == "python":
+        return [sys.executable, "-I", *out[1:]]
+    return gk.resolve_shell_argv(out)
+
+
+def derive_step_mode(row: StepRow) -> str:
+    """`attended` for a row declaring `needs-target = true`, which no runner spawns, else
+    `isolated`: the row runs under the contract."""
+    return "attended" if row.needs_target else "isolated"
+
+
+def run_step_isolated(row: StepRow, phase: str, target, gov_root) -> dict:
+    """Run `phase` of `row` under the contract: the step kind's ONE spawn of a step argv (S3), so the
+    walk, the reverse walk, gov first and the leg inherit the contract by calling it.
+
+    From gov's checkout root, with `build_step_env` over a scratch made for the call and cleared
+    after it, and `resolve_step_argv`'s argv; output decoded as `run_target_argv` decodes it.
+    Returns `{"verdict": "ok" | "failed" | "attended", "rc", "tail"}`, `tail` stderr's last 20
+    lines. A row that needs target code is `attended` and spawns nothing; a spawn error is
+    `failed` with `rc` None; a phase with no argv is a refusal."""
+    if derive_step_mode(row) == "attended":
+        return {"verdict": "attended", "rc": None, "tail": ""}
+    if phase not in STEP_PHASES or not isinstance(getattr(row, phase), list):
+        raise Refusal(f"{row.id}: no `{phase}` argv to run; a step runs one of {', '.join(STEP_PHASES)}")
+    gk = load_govkit()
+    target, gov_root = pathlib.Path(target).resolve(), pathlib.Path(gov_root).resolve()
+    tr = gk.derive_tool_root(gov_root)
+    ctx = {"gov": (gov_root / tr if tr else gov_root).as_posix(), "target": target.as_posix()}
+    if (target / ".governance" / "deploy.toml").is_file():
+        ctx["prefix"] = gk.target_context(target, gk.load_deploy(target), row.id.split("/", 1)[0], {})["prefix"]
+    with tempfile.TemporaryDirectory(prefix="gk-step-", ignore_cleanup_errors=True) as td:
+        for d in ("home", "tmp", "hooks"):
+            (pathlib.Path(td) / d).mkdir()
+        try:
+            p = subprocess.run(resolve_step_argv(getattr(row, phase), ctx, row.id), cwd=str(gov_root),
+                               env=build_step_env(td), stdin=subprocess.DEVNULL, capture_output=True,
+                               text=True, encoding="utf-8", errors="replace")
+        except OSError as e:
+            return {"verdict": "failed", "rc": None, "tail": f"{row.id} {phase}: could not spawn: {e}"}
+    return {"verdict": "ok" if p.returncode == 0 else "failed", "rc": p.returncode,
+            "tail": "\n".join(p.stderr.splitlines()[-20:])}
+
+
+def write_target_plants(tree, canary_dir) -> list[str]:
+    """Plant in `tree`, a SCRATCH COPY of a target, code that names itself in `canary_dir` when it
+    runs (S4), and return the planted paths: a hook under every `CLIENT_HOOKS` name in the tree's
+    effective hooks directory (its own `core.hooksPath`, else `git rev-parse --git-path hooks`; none
+    where git reads no repository), and at its root `sitecustomize.py`, which an interpreter whose
+    path holds the tree runs at start-up, and `json.py`, which shadows the standard module."""
+    tree, canary_dir = pathlib.Path(tree).resolve(), pathlib.Path(canary_dir).resolve()
+    canary_dir.mkdir(parents=True, exist_ok=True)
+    # The tree's own config only: a global `core.hooksPath` is the node's, never the target's.
+    env = {**os.environ, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+    hooks = None
+    for args in (("config", "--local", "--get", "core.hooksPath"), ("rev-parse", "--git-path", "hooks")):
+        p = subprocess.run(["git", "-C", str(tree), *args], capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        if p.returncode == 0 and p.stdout.strip():
+            # ponytail: planted where the tree's config points, which is the caller's scratch copy's
+            hooks = tree / p.stdout.strip()
+            break
+    planted = []
+    if hooks is not None:
+        hooks.mkdir(parents=True, exist_ok=True)
+        for name in CLIENT_HOOKS:
+            h = hooks / name
+            h.write_text(f"#!/bin/sh\n: > '{(canary_dir / f'hook-{name}').as_posix()}'\n",
+                         encoding="utf-8", newline="\n")
+            h.chmod(0o755)
+            planted.append(h.as_posix())
+    for mod in ("sitecustomize.py", "json.py"):
+        m = tree / mod
+        m.write_text(f"open({(canary_dir / f'module-{mod}').as_posix()!r}, 'w').close()\n",
+                     encoding="utf-8", newline="\n")
+        planted.append(m.as_posix())
+    return planted
+
+
+def read_plant_canaries(canary_dir) -> list[str]:
+    """The canaries present in `canary_dir`, sorted: each names the planted code that ran."""
+    d = pathlib.Path(canary_dir)
+    return sorted(p.name for p in d.iterdir()) if d.is_dir() else []
+
+
+def check_needs_target(row: StepRow, tree, gov_root) -> str:
+    """Run `row`'s up, then its witness, under the contract beside `write_target_plants`' plants in
+    `tree`, a scratch copy of a target, and print and return one verdict with the step id (S5):
+    `isolated` (both exit 0, no canary ran), `breach` (a canary ran: the step reached target code),
+    `needs-target` (a phase failed and no canary ran; the remedy is `needs-target = true`), or
+    `attended` (the row declares it, and nothing is spawned)."""
+    if derive_step_mode(row) == "attended":
+        print(f"isolation: {row.id} · attended · it declares needs-target = true, so nothing ran")
+        return "attended"
+    canaries = pathlib.Path(tree) / CANARY_DIR
+    shutil.rmtree(canaries, ignore_errors=True)
+    write_target_plants(tree, canaries)
+    failed = None
+    for phase in ("up", "witness"):
+        r = run_step_isolated(row, phase, tree, gov_root)
+        if r["verdict"] != "ok":
+            failed = f"its {phase} exits {r['rc']}"
+            break
+    ran = read_plant_canaries(canaries)
+    if ran:
+        print(f"isolation: {row.id} · breach · target code ran under the contract: {', '.join(ran)}")
+        return "breach"
+    if failed:
+        print(f"isolation: {row.id} · needs-target · {failed} under the contract and no canary ran, "
+              f"so it needs target code: declare needs-target = true, under which it is attended")
+        return "needs-target"
+    print(f"isolation: {row.id} · isolated · its up and witness exit 0 and no canary ran")
+    return "isolated"
+
+
 def load_govkit():
     """The deployer beside this file: the running module where it is the program, else imported by
     its path. Only the CLI asks for it — the remote ladder and the push base are govkit's."""
@@ -719,6 +895,238 @@ def cmd_frozen(root, base: str | None) -> int:
     return 1 if problems else 0
 
 
+def read_step_spawn_sites(paths) -> list[tuple[str, int, str]]:
+    """(file name, line, enclosing function) of each `subprocess.run`, `subprocess.Popen` or
+    `run_target_argv` call in `paths` whose argv expression reads a step row's phase: a subscript or
+    attribute named `up`, `down`, `witness` or `resume`, or a `getattr` whose name is one of them or
+    is not a literal at all. WHAT IT DOES NOT SEE: an argv read into a local first, which no
+    dataflow here follows, so the one sanctioned site keeps its read inside the call."""
+    def reads_phase(n) -> bool:
+        if isinstance(n, ast.Subscript):
+            return isinstance(n.slice, ast.Constant) and n.slice.value in STEP_PHASES
+        if isinstance(n, ast.Attribute):
+            return n.attr in STEP_PHASES
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "getattr" and len(n.args) > 1:
+            return not isinstance(n.args[1], ast.Constant) or n.args[1].value in STEP_PHASES
+        return False
+
+    sites = []
+    for path in map(pathlib.Path, paths):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        fns = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+        for call in (n for n in ast.walk(tree) if isinstance(n, ast.Call)):
+            f = call.func
+            name = f.attr if isinstance(f, ast.Attribute) else f.id if isinstance(f, ast.Name) else ""
+            if not (name == "run_target_argv" or (name in ("run", "Popen") and isinstance(f, ast.Attribute)
+                                                  and isinstance(f.value, ast.Name) and f.value.id == "subprocess")):
+                continue
+            argv = call.args[0] if call.args else next((k.value for k in call.keywords if k.arg == "args"), None)
+            if argv is None or not any(reads_phase(n) for n in ast.walk(argv)):
+                continue
+            owner = min((fn for fn in fns if fn.lineno <= call.lineno <= fn.end_lineno),
+                        key=lambda fn: fn.end_lineno - fn.lineno, default=None)
+            sites.append((path.name, call.lineno, owner.name if owner else "<module>"))
+    return sites
+
+
+# The fixture's three step programs and its target-only module (S6, §4 "The check's fixture steps").
+FIXTURE_STEPS = {
+    "clean.py": (
+        "import json, os, subprocess, sys\n"
+        "target, prefix, reports = sys.argv[1:4]\n"
+        "open(os.path.join(target, 'stepped.txt'), 'w').close()\n"
+        "add = subprocess.run(['git', '-C', target, 'add', 'stepped.txt'], capture_output=True)\n"
+        "cred = subprocess.run(['git', 'credential', 'fill'], capture_output=True, timeout=60,\n"
+        "                      input=b'protocol=https\\nhost=gk-step.invalid\\n\\n')\n"
+        "helpers = subprocess.run(['git', '-C', target, 'config', '--get-all', 'credential.helper'],\n"
+        "                         capture_output=True, text=True)\n"
+        "hooks = os.environ.get('GIT_CONFIG_VALUE_0', '')\n"
+        "with open(os.path.join(reports, 'clean.json'), 'w', encoding='utf-8') as f:\n"
+        "    json.dump({'env': sorted(os.environ), 'count': os.environ.get('GIT_CONFIG_COUNT'),\n"
+        "               'key0': os.environ.get('GIT_CONFIG_KEY_0'),\n"
+        "               'hooks': sorted(os.listdir(hooks)) if os.path.isdir(hooks) else None,\n"
+        "               'isolated': sys.flags.isolated, 'cwd': os.getcwd(), 'prefix': prefix,\n"
+        "               'add': add.returncode, 'cred': cred.returncode,\n"
+        "               'helpers': helpers.stdout.splitlines()}, f)\n"),
+    "reaches.py": "import sys\nopen(sys.argv[1], 'w').close()\nimport adopter_only\n",
+    "opens.py": "import sys\nsys.path.insert(0, sys.argv[1])\nimport adopter_only\n",
+}
+FIXTURE_ADOPTER_ONLY = (
+    "import os\n"
+    f"d = os.path.join(os.path.dirname(os.path.abspath(__file__)), {CANARY_DIR!r})\n"
+    "os.makedirs(d, exist_ok=True)\n"
+    "open(os.path.join(d, 'adopter_only'), 'w').close()\n")
+
+
+def run_isolation_fixture(plant: str | None) -> int:
+    """`fixture isolation [--plant <case>]` (S6): a scratch gov directory holding `FIXTURE_STEPS`
+    and a scratch target repository under the temp root, and S1 to S5 observed over them. A `-stub`
+    plant swaps one half of the contract in THIS process's globals only, so its red is observed with
+    no switch in shipped code. An unmet expectation prints `isolation: FAILED`."""
+    if plant == "callers":
+        sites = read_step_spawn_sites([pathlib.Path(__file__).resolve(), HERE / "govkit.py"])
+        for f, line, fn in sites:
+            print(f"isolation: callers · a spawn of a step argv at {f}:{line}, in {fn}")
+        if len(sites) == 1 and sites[0][0] == "upgrade_steps.py" and sites[0][2] == "run_step_isolated":
+            print("isolation: callers · one spawn site of a step argv, inside run_step_isolated")
+            return 0
+        print(f"isolation: FAILED · callers · {len(sites)} spawn site(s) of a step argv, where the one "
+              f"sanctioned site is inside run_step_isolated" + ("; the probe read nothing" if not sites else ""))
+        return 1
+    g, saved_env = globals(), dict(os.environ)
+    saved = {k: g[k] for k in ("build_step_env", "resolve_step_argv")}
+    try:
+        with tempfile.TemporaryDirectory(prefix="gk-iso-", ignore_cleanup_errors=True) as td:
+            return run_isolation_case(pathlib.Path(td), plant)
+    finally:
+        g.update(saved)
+        os.environ.clear()
+        os.environ.update(saved_env)
+
+
+def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
+    """One `fixture isolation` case over the fresh scratch `tmp`; `run_isolation_fixture` restores
+    what a `-stub` plant swapped."""
+    g = globals()
+    gov, target, reports, canaries = tmp / "gov", tmp / "t", tmp / "reports", tmp / "canaries"
+    (gov / "tools" / "steps").mkdir(parents=True)
+    (gov / "tools" / HERE.name).mkdir()
+    (gov / "tools" / HERE.name / REGISTRY_FILE).write_text("", encoding="utf-8")
+    for name, text in FIXTURE_STEPS.items():
+        (gov / "tools" / "steps" / name).write_text(text, encoding="utf-8", newline="\n")
+    reports.mkdir()
+    quiet = {**os.environ, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+    subprocess.run(["git", "init", "-q", str(target)], env=quiet, capture_output=True, check=True)
+    (target / ".governance").mkdir()
+    (target / ".governance" / "deploy.toml").write_text('prefix = "tools"\n', encoding="utf-8")
+    (target / "adopter_only.py").write_text(FIXTURE_ADOPTER_ONLY, encoding="utf-8", newline="\n")
+    witness = ["python", "-c", "import os, sys; sys.exit(not os.path.isfile(sys.argv[1]))", "{target}/stepped.txt"]
+
+    def row(slug: str, up: list, needs: bool = False) -> StepRow:
+        return StepRow(f"fixture/{slug}", up, ["python", "-c", "pass"], witness, "atomic", [], needs,
+                       "fixture", 1, None)
+
+    clean = row("clean", ["python", "{gov}/steps/clean.py", "{target}", "{prefix}", reports.as_posix()])
+    report = reports / "clean.json"
+    fails: list[str] = []
+
+    def expect(ok: bool, what: str) -> None:
+        if not ok:
+            fails.append(what)
+
+    def run_clean() -> dict:
+        r = run_step_isolated(clean, "up", target, gov)
+        print(f"isolation: {clean.id} · up · {r['verdict']}" + (f" · rc {r['rc']}: {r['tail']}" if r["verdict"] != "ok" else ""))
+        try:
+            return json.loads(report.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return {}  # no report, or one a shadowed `json` left empty: read as nothing reported
+
+    def drop_pair(env: dict, key: str) -> dict:
+        pairs = [(env.pop(f"GIT_CONFIG_KEY_{i}"), env.pop(f"GIT_CONFIG_VALUE_{i}"))
+                 for i in range(int(env.pop("GIT_CONFIG_COUNT")))]
+        pairs = [p for p in pairs if p[0] != key]
+        for i, (k, v) in enumerate(pairs):
+            env[f"GIT_CONFIG_KEY_{i}"], env[f"GIT_CONFIG_VALUE_{i}"] = k, v
+        env["GIT_CONFIG_COUNT"] = str(len(pairs))
+        return env
+
+    contract_env = saved_build = g["build_step_env"]
+    rc = 0
+    if plant is None:
+        rep = run_clean()
+        # The contract's own names are what the builder returns over an EMPTY parent: a builder
+        # that copies the parent adds nothing there, so the oracle is not the code under test.
+        held = dict(os.environ)
+        os.environ.clear()
+        try:
+            allowed = set(STEP_ENV_KEEP) | set(contract_env(tmp))
+        finally:
+            os.environ.update(held)
+        extra = sorted(set(rep.get("env", [])) - allowed)
+        print(f"isolation: {clean.id} · env names outside the allowlist and the contract: {extra or 'none'}")
+        print(f"isolation: {clean.id} · GIT_CONFIG_COUNT {rep.get('count')} · {rep.get('key0')} holds "
+              f"{rep.get('hooks')} · sys.flags.isolated {rep.get('isolated')} · cwd {rep.get('cwd')}")
+        expect(bool(rep) and rep.get("add") == 0, "clean's report is missing, or its git add failed")
+        expect(not extra, f"names outside the allowlist reached the step: {extra}")
+        expect(rep.get("count") == "2" and rep.get("key0") == "core.hooksPath" and rep.get("hooks") == [],
+               "GIT_CONFIG_COUNT is not 2 with core.hooksPath naming an empty directory")
+        expect(rep.get("isolated") == 1, "the leading python ran without -I")
+        expect(bool(rep) and pathlib.Path(rep["cwd"]).resolve() == gov.resolve(), "the working directory is not gov's root")
+        expect(rep.get("prefix") == "tools", "{prefix} did not resolve to the target's install prefix")
+        expect(check_needs_target(clean, target, gov) == "isolated", "clean does not read isolated")
+    elif plant in ("hook", "hook-stub"):
+        subprocess.run(["git", "-C", str(target), "config", "core.hooksPath", ".githooks"], env=quiet, check=True)
+        planted = write_target_plants(target, canaries)
+        expect(all(any(p.endswith(f".githooks/{h}") for p in planted) for h in ("post-index-change", "pre-commit")),
+               "no post-index-change and pre-commit planted under the target's own core.hooksPath")
+        if plant == "hook-stub":
+            g["build_step_env"] = lambda scratch: drop_pair(saved_build(scratch), "core.hooksPath")
+        rep = run_clean()
+        expect(rep.get("add") == 0, "clean's git add did not run")
+        hit = [c for c in read_plant_canaries(canaries) if c.startswith("hook-")]
+        print(f"isolation: hook canary: {'present · ' + ', '.join(hit) if hit else 'absent'}")
+        rc = 1 if hit else 0
+    elif plant in ("module", "module-stub"):
+        write_target_plants(target, canaries)
+        os.environ["PYTHONPATH"] = str(target)
+        if plant == "module-stub":
+            saved_argv = g["resolve_step_argv"]
+            g["build_step_env"] = lambda scratch: dict(os.environ)
+            g["resolve_step_argv"] = lambda argv, ctx, step_id="a step": [
+                a for a in saved_argv(argv, ctx, step_id) if a != "-I"]
+        run_clean()
+        hit = [c for c in read_plant_canaries(canaries) if c.startswith("module-")]
+        print(f"isolation: module canary: {'present · ' + ', '.join(hit) if hit else 'absent'}")
+        rc = 1 if hit else 0
+    elif plant in ("credential", "credential-stub"):
+        canaries.mkdir()
+        cfg = tmp / "planted.gitconfig"
+        cfg.write_text(f"[credential]\n\thelper = \"!f() {{ : > '{(canaries / 'credential-helper').as_posix()}'; }}; f\"\n",
+                       encoding="utf-8", newline="\n")
+        os.environ.update({"GIT_CONFIG_GLOBAL": str(cfg), "GH_TOKEN": "gk-planted-token"})
+        if plant == "credential-stub":
+            g["build_step_env"] = lambda scratch: {**drop_pair(saved_build(scratch), "credential.helper"),
+                                                   "GIT_CONFIG_GLOBAL": os.environ["GIT_CONFIG_GLOBAL"],
+                                                   "GH_TOKEN": os.environ["GH_TOKEN"]}
+        rep = run_clean()
+        hit = read_plant_canaries(canaries)
+        token = "GH_TOKEN" in rep.get("env", [])
+        print(f"isolation: credential canary: {'present · ' + ', '.join(hit) if hit else 'absent'}")
+        print(f"isolation: token: {'present · GH_TOKEN reached the step' if token else 'absent'}")
+        print(f"isolation: git credential fill exits {rep.get('cred')} · credential.helper reads {rep.get('helpers')}")
+        expect(bool(rep) and rep.get("cred") != 0, "git credential fill did not exit non-zero")
+        if plant == "credential":
+            expect(rep.get("helpers") == [""], "credential.helper does not read only the empty value")
+        rc = 1 if hit or token else 0
+    elif plant == "needs-target":
+        ran = reports / "ran-reaches-attended"
+        reaches = row("reaches", ["python", "{gov}/steps/reaches.py", (reports / "ran-reaches").as_posix()])
+        attended = row("reaches-attended", ["python", "{gov}/steps/reaches.py", ran.as_posix()], True)
+        expect(check_needs_target(reaches, target, gov) == "needs-target", "reaches does not read needs-target")
+        expect((reports / "ran-reaches").is_file(), "reaches never ran, so its needs-target reads nothing")
+        expect(check_needs_target(attended, target, gov) == "attended", "the declaring copy does not read attended")
+        print(f"isolation: {attended.id} · own canary {'present: it spawned' if ran.exists() else 'absent'}")
+        expect(not ran.exists(), "an attended row spawned")
+        rc = 1
+    elif plant == "breach":
+        opens = row("opens", ["python", "{gov}/steps/opens.py", "{target}"])
+        expect(check_needs_target(opens, target, gov) == "breach", "opens does not read breach")
+        rc = 1
+    elif plant == "token":
+        tok = row("token", ["python", "{gov}/steps/clean.py", "{unknown}", "{prefix}", reports.as_posix()])
+        try:
+            run_step_isolated(tok, "up", target, gov)
+            expect(False, "a row holding {unknown} was not refused")
+        except Refusal as e:
+            print(f"isolation: {tok.id} · refused · {e}")
+        expect(not report.exists(), "the row holding {unknown} spawned")
+        rc = 1
+    for f in fails:
+        print(f"isolation: FAILED · {f}")
+    return 1 if fails else rc
+
+
 def main(argv: list[str]) -> int:
     root = next((p for p in HERE.parents if (p / ".git").exists()), HERE.parent.parent)
     try:
@@ -726,7 +1134,11 @@ def main(argv: list[str]) -> int:
             return cmd_list(root, argv[1:] == ["--window"])
         if argv and argv[0] == "frozen" and (argv[1:] == [] or (len(argv) == 3 and argv[1] == "--base")):
             return cmd_frozen(root, argv[2] if len(argv) == 3 else None)
-        sys.stderr.write("usage: python upgrade_steps.py list [--window] | frozen [--base <rev>]\n")
+        if argv[:2] == ["fixture", "isolation"] and (
+                len(argv) == 2 or (len(argv) == 4 and argv[2] == "--plant" and argv[3] in FIXTURE_PLANTS)):
+            return run_isolation_fixture(argv[3] if len(argv) == 4 else None)
+        sys.stderr.write(f"usage: python upgrade_steps.py list [--window] | frozen [--base <rev>] | "
+                         f"fixture isolation [--plant {'|'.join(FIXTURE_PLANTS)}]\n")
         return 2
     except Refusal as e:
         sys.stderr.write(f"upgrade-steps: {e}\n")
