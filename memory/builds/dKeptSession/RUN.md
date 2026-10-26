@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 5c2390bb3b7e4c08faaf63a8aaebf06f1cfa372e
 phase: REVIEWING
@@ -110,3 +111,9 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T06:35:54Z rescope · item add KICK-dKeptSession-64 · reason spec-audit round1 of the round-4 minors batch KICK-dKeptSession-63, minors batch, MEDIUM ids 1 2 3 4 5 11 12 13 14 15 19 20 21 and LOW ids 6 7 8 9 10 17 18
 
 2026-10-26T07:02:31Z review · item dKeptSession-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 20 · disposition promote
+
+2026-10-26T07:47:36Z rescope · item add KICK-dKeptSession-65 · reason spec-audit round1 of the round-5 minors batch KICK-dKeptSession-64, minors batch, MEDIUM ids 1 2 3 4 9 10 11 15 16 20 21 23 24 and LOW ids 5 6 7 8 12 13 14 17 18 19 22 25 26
+
+2026-10-26T07:59:05Z review · item dKeptSession-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 26 · disposition promote
+
+2026-10-26T08:00:08Z decision · item Should this build's spec-audit promotion chain stop at the first round confirming no BLOCKER and no HIGH, as the owner ruled for dPlacedRequest (2026-10-25) and dDeclaredLoop (2026-10-24)? Rounds 4 to 6 confirmed 0 highs and 26, 20, 26 minors at precision 0.84 to 0.95, each minors batch breeding the next, so M4's precision bound does not end it. · reason options: (a) continue M4 as written, one full audit round per minors batch until a round's precision falls under 0.5; (b) stop the chain and close the last batches under a recorded override of specs-audited citing an owner ruling. Taken: (a), because (b) moves M4's bound, a governance carrier, which veto 2 reserves to the owner and no ruling for this build exists; the run keeps auditing and the owner may rule (b) at any turn.

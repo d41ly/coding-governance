@@ -1,6 +1,6 @@
 # KICK-dKeptSession-64 — the round-4 minors batch's audit's 20 minor findings, closed after the batch they land on is built
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 35 · advances KICK-dKeptSession-29
+**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 35 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 |
+| [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-64-deviation-641.md](../build/2026-10-26-build-KICK-dKeptSession-64-deviation-641.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-64-promoted-fix-return.md](../build/2026-10-26-build-KICK-dKeptSession-64-promoted-fix-return.md) | research | — |
 | [2026-10-26-prompt-KICK-dKeptSession-64-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-64-promoted-fix-brief.md) | research | — |
+| [2026-10-26-review-KICK-dKeptSession-64-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-64-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -182,6 +183,7 @@ AC17).
 - **consumes-from** `KICK-dKeptSession-62` — S19, S31, §5's "seven definitions" and S15 and §4's ack-chain sketch, whose ledger answers S4 reads (id 1)
 - **consumes-from** external — TOOL-dPlacedRequest-13 S3's success exit and S4's `add_feed_sightings`, and TOOL-dPlacedRequest-11 S1's input shapes, which the amended ask row names (S13, S18)
 - **hands-off** external — the amended ask row in `memory/builds/dPlacedRequest/BACKLOG.md`, for dPlacedRequest to build (S13, S18)
+- **hands-off** `KICK-dKeptSession-65` — the batched `--mail ack`'s skip and order, S5's retirement, S7's and S9's reconcile rules, S10's scrub, S13's and S18's ask row, S14's marker lead, S16's reword, S17's citations, §3's left-shift bullet, §4's Evidence and sketch and AC5, AC8 to AC11, AC17 and AC18, which the batch amends (all 26 ids of the round-5 minors batch's audit)
 
 ## 4. Design
 
@@ -400,6 +402,8 @@ New arm: tools/lib/resolve-python.test.sh · covers AC14 · a `// >>>` block cou
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, the round-4 minors batch's audit's minors batch.
+- rev-2 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-65` mirrored, the other ends of
+  the edges the round-5 minors batch's audit's disposal declared
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-63 — the round-3 promotions' audit's 26 minor findings, closed after every unit they land on is built
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 34 · advances KICK-dKeptSession-29
+**Status:** OPEN · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 34 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-64 |
+| [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-63-deviation-631.md](../build/2026-10-26-build-KICK-dKeptSession-63-deviation-631.md) | deviation | — |
 | [2026-10-26-review-KICK-dKeptSession-63-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-63-spec-audit.md) | spec-audit | — |
 
@@ -168,6 +168,7 @@ and that unit's acceptance ledger answers the superseded text (AC27).
 - **consumes-from** external — TOOL-dPlacedRequest-13 S3's `write_gov_ref` success exit appending one feed line per first-parent commit it landed, the ask §8 F1 files
 - **hands-off** external — the ask row for dPlacedRequest that S16 needs, filed in `memory/builds/dPlacedRequest/BACKLOG.md` (§8 F1)
 - **hands-off** `KICK-dKeptSession-64` — the batched `--mail ack`, the `cache` and `sent` read, S9's population, S13's and S17's rules, S14's scrub, S24's reword, S25's marker lead and §8 F1's ask row, which the batch amends (all 20 ids of the round-4 minors batch's audit)
+- **hands-off** `KICK-dKeptSession-65` — AC14's `build_arm_env` clause, §7's runlog arm line and the `unattended.test.sh` arm whose count the batch's S9 derives (ids 2, 3)
 
 ## 4. Design
 
@@ -412,6 +413,8 @@ New arm: tools/lib/resolve-python.test.sh · covers AC25 · a second `//` block 
 - rev-1 · 2026-10-26 · initial draft, the round-3 promotions' audit's minors batch.
 - rev-2 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-64` mirrored, the other ends of
   the edges the round-4 minors batch's audit's disposal declared
+- rev-3 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-65` mirrored, the other ends of
+  the edges the round-5 minors batch's audit's disposal declared
 
 ## 10. Reuse audit
 
