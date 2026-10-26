@@ -94,6 +94,7 @@ adapter (P33, P36; memory-plan `[sessions]`).
 - **consumes-from** `TOOL-dWellOiledMachine-14` — `[[capability]]`, the `live-inbox` row that admits a live post
 - **consumes-from** external — PLAY-dOrderedCharter-28's `[[native]]` table, `runs-in` and `after` rows; PLAY-dOrderedCharter-19's resolver and `build_index`; TOOL-dDeclaredLoop-23's `read_commits`; KICK-dKeptSession-5's `read_mailbox`, -6's `run_mail_ring` and -13's `render_pointers`
 
+- **hands-off** `TOOL-dWellOiledMachine-27` — `[[native]]`, the `act` and `session` classes a drained root's `Caused-by` may name
 ## 4. Design
 
 ### Evidence

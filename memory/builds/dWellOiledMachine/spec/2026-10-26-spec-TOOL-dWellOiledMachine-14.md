@@ -121,6 +121,8 @@ declaring them (gap-rt-19, gap-register:284). This unit registers each harness a
 - **hands-off** `TOOL-dWellOiledMachine-37` — `[[capability]]`, read through `read_capability`, where the trusted-hook store's row lands
 - **hands-off** `TOOL-dWellOiledMachine-56` — `[[capability]]`, read through `read_capability`, holding each adapter's `credential-read` row
 
+- **hands-off** `TOOL-dWellOiledMachine-25` — `[[capability]]`, read through `read_capability`, whose spike rows S4 decides the host from
+- **hands-off** `TOOL-dWellOiledMachine-43` — `[[capability]]`, the four rows read through `read_capability`
 ## 4. Design
 
 ### Evidence

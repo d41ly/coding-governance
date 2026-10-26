@@ -239,7 +239,7 @@ case, `write_gov_ref` and `read_commits` installed from their parents.
 - **AC8** — When `bash push-main.sh --carry --slug fx` runs in AC7's clone, it prints the check's lines
   after the carry lines and exits 1, and in AC4's clone C it exits 0.
   Red when: the landing passes over a `not-local` or `no act` commit.
-- **AC9** — When `bash resolve-python.test.sh` reads `PARITY_ROWS`, it holds rows for `bindings.sh`'s
+- **AC9** — When `grep -n -A60 PARITY_ROWS` reads the resolver suite §4 names, its parity table holds rows for `bindings.sh`'s
   `gov_ref_sh` block and `bindings.py`'s `remote_ladder_py` and `commit_trailers_py` blocks.
   Red when: a block in either file drifts from its canonical copy and no row names it.
 

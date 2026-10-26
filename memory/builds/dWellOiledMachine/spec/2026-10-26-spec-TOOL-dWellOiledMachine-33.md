@@ -117,7 +117,7 @@ SA-4; memory-plan `[doors]`).
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-32` — `act`, the act record and act id the binding names, which the trailers carry
-- **consumes-from** `TOOL-dWellOiledMachine-39` — `refs/gov/bindings`, through `read_binding`, `check_bindings`, `read_act_commits` and `derive_act_range`, which S7 and S8 call
+- **consumes-from** `TOOL-dWellOiledMachine-39` — `refs/gov/bindings`, the commit-key leg reading it through `bindings.py --check`, and through `read_binding`, `check_bindings`, `read_act_commits` and `derive_act_range`, which S7 and S8 call
 - **consumes-from** `TOOL-dWellOiledMachine-11` — `commit_queue`, the serial queue whose commits S2 trailers
 - **consumes-from** `TOOL-dWellOiledMachine-12` — `session-bindings`, the I17 record whose `owner` field S1 and S4 read
 - **hands-off** `TOOL-dWellOiledMachine-35` — `Gov-Act:` and `Gov-Session`, the trailers that join a commit to its act and session

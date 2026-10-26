@@ -233,7 +233,7 @@ lease reader.
   hand-made worktree under `.claude/worktrees/`, `sweep_workspaces` reaps the first, third and fourth,
   keeps the live and the dirty ones with a `sweep — kept` line, and never names the hand-made one.
   Red when: a leased, dirty or hand-made workspace is reaped.
-- **AC7** — When `python selftest.py` runs branch-reconcile's arm over a merged worktree a record under
+- **AC7** — When `python branch_reconcile.py` reports in a fixture repo over a merged worktree a record under
   `gov/workspaces/` names, its action reads `keep (a leased workspace)`, and without the record it reads
   `remove worktree`.
   Red when: branch-reconcile reaps a leased workspace.

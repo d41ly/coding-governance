@@ -159,6 +159,8 @@ restarted by the node tick leaves exactly one act session on the item (layer-run
 - **hands-off** `TOOL-dWellOiledMachine-29` — `point.command-adapters`, where `visual.capture` registers
 - **consumes-from** external — TOOL-dDeclaredLoop-7's `derive_position`, TOOL-dPlacedRequest-1's lease record, `--claims` and `renews` rule, and dBoundRoles' work-order renderer
 
+- **hands-off** `TOOL-dWellOiledMachine-26` — `supervise.py`, whose launch S4 precedes with the announcement and whose beat S5 reads attendance at
+- **hands-off** `TOOL-dWellOiledMachine-45` — `supervise.py`, which gains the session executor and whose launches go through `admit`
 ## 4. Design
 
 ### Evidence

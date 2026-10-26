@@ -110,6 +110,7 @@ TOOL-dWellOiledMachine-15's node facts, and reads them for `runtime.binary` and
 - **consumes-from** `TOOL-dWellOiledMachine-14` — `[[capability]]`, the table S4 writes and `read_capability` reads back
 - **consumes-from** `TOOL-dWellOiledMachine-15` — `write_node_fact`, through which S4 writes each binary's row
 
+- **hands-off** `TOOL-dWellOiledMachine-29` — `derive_conformance_rows`, which gains the `browser` case live and offline
 ## 4. Design
 
 ### Evidence
@@ -215,7 +216,7 @@ that reader's key set if it refuses unknown keys).
   reads `ran-after-edit`.
   fixture: synthetic until a node with Codex records one; its `source` file says so.
   Red when: the skipped hook reads as ran.
-- **AC5** — When the replay's `hook-bash` log names Git's `usr/bin/bash.exe` with a PATH holding no
+- **AC5** — When the replay's `hook-bash` log names Git for Windows' bundled `bash.exe` with a PATH holding no
   `sed`, the row records that bash and lists `sed` among the tools that did not resolve.
   Red when: the missing tool is not listed.
 - **AC6** — When the node facts hold conforming claude binaries at 2.1.292 and 2.1.299, `python
@@ -247,7 +248,7 @@ that reader's key set if it refuses unknown keys).
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit selftest` · `policy fixtures` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit selftest` · `policy fixtures` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `check-wiring self-test` · `govkit acceptance matrix` · `playbook render selftest`
 
 New arm: tools/runtime/selftest.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC9 AC11 · the recorded and synthetic replay directories with each doctored copy, fixture facts and policy files, staged against a `derive_conformance_rows` stubbed to copy the record's claims and a `resolve_binary` ignoring `conforms` · none
 

@@ -398,6 +398,7 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-34](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-26 | 2026-10-26 | TOOL-dDeclaredLoop-14's REFUSAL ROW CARRIES NO REMEDY OR ACTOR.… |
 | [TOOL-dBoundRoles-35](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-12 | 2026-10-26 | TOOL-dPlacedRequest-4's place --return READS AN UNCHECKED RETURN.… |
 | [TOOL-dBoundRoles-36](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-2 | 2026-10-26 | TOOL-dWitnessedBar-23 WRITES THE TESTER IN THE RETIRING ROLE SHAPE. Its… |
+| [TOOL-dBoundRoles-75](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE BREAKER'S BUDGET DRAW HAS NO DRAWER. cl-dClosedLoop-0327 has an act… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
@@ -481,6 +482,8 @@ Cite ids, never line numbers.
 | [TOOL-dPlacedRequest-65](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE RESUME OVERRIDE READS THE IMPORT LINE, NOT THE FIXTURE.… |
 | [TOOL-dPlacedRequest-66](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE FEED CENSUS SEES ONLY LEASE-SHAPED PUSHES. TOOL-dPlacedRequest-13… |
 | [TOOL-dPlacedRequest-67](../builds/dPlacedRequest/BACKLOG.md) | OPEN | HIGH | — | 2026-10-26 | A DECLARED WAIT DOES NOT RENEW ITS LEASE. Under leases.renewal:… |
+| [TOOL-dPlacedRequest-70](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE CLOSE'S FOLLOW WRITES A SECOND TERMINAL CARD.… |
+| [TOOL-dPlacedRequest-71](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | AN OFFER NAMES A NODE, NEVER A SESSION. TOOL-dPlacedRequest-20 S1… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |
@@ -552,6 +555,8 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-34](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-20 | 2026-10-26 | THE SHIM KINDS HAVE NO VERB. TOOL-dTotalRecall-20 forwards --new-build… |
 | [TOOL-dTotalRecall-35](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-12 | 2026-10-26 | THE SLICE CHANNEL HAS NO PRODUCER. TOOL-dTotalRecall-12 counts the work… |
 | [TOOL-dTotalRecall-101](../builds/dTotalRecall/BACKLOG.md) | OPEN | HIGH | — | 2026-10-26 | held red: suite policy fixtures red at 60d90cb7 on the daily held job,… |
+| [TOOL-dTotalRecall-105](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE SHAPE-RUN KIND HAS NO ACT FORM. TOOL-dTotalRecall-11 admits only a… |
+| [TOOL-dTotalRecall-106](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE CAUSES CHECK READS NO BINDING. TOOL-dTotalRecall-19 S8's… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTrueNorth-21](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-dPinnedHandoff-2 | 2026-10-21 | TWO LIVE SPECS OF dPinnedHandoff OMIT TWO LEGS THEIR FILES TRIP. Since… |

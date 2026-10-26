@@ -102,6 +102,7 @@ owner binding's proof, which a claiming node checks before it acquires the reque
 - **hands-off** `TOOL-dWellOiledMachine-48` — `scan_payload`, which the notification channel runs under `adapter` before it pushes an owner item
 - **consumes-from** external — TOOL-dPlacedRequest-19's `--request`, local text, `.typed` file, `check_request_consent`, root record and request lease, -11's `build_gov_commit` and `write_gov_ref`, and -14's rows on the request ref
 
+- **hands-off** `TOOL-dWellOiledMachine-27` — `check_request_proof`, the owner binding's proof a mailbox intake must carry to ratify
 ## 4. Design
 
 ### Evidence
@@ -227,7 +228,7 @@ Each case runs `python door_fixture.py --case <name>` over the fixture's clones,
 
 ## 7. Gates
 
-`unattended kit gate` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms`
 
 The unattended kit's self-test suites are waived for this build's landing (README rule 8).
 

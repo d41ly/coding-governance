@@ -108,6 +108,7 @@ each line keyed by `act=` or `session=`, and prunes every journal at the node ti
 - **hands-off** `TOOL-dWellOiledMachine-47` — `write_journal_line`, with the `deadline-passed` and `stall` classes
 - **hands-off** `TOOL-dWellOiledMachine-49` — `write_journal_line`, with the `refusal` and `breaker-open` classes
 
+- **hands-off** `TOOL-dWellOiledMachine-53` — `write_journal_line`, with the `ledger-refused` class this unit adds
 ## 4. Design
 
 ### A runtime line

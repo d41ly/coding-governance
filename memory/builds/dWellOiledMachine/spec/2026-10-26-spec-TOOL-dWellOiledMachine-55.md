@@ -108,6 +108,7 @@ retention and region (P40; the owner's CL-1).
 - **hands-off** `TOOL-dWellOiledMachine-54` — `point.offer-sources`, the point whose built-in `node-pick` row names that unit's pick
 - **consumes-from** external — TOOL-dPlacedRequest-1's lease verbs and `derive_lease_ref`, -11's `write_gov_ref`, -15's `check_fence_beat`, -16's tombstone; KICK-dKeptSession-6's ring point and -21's payload rule
 
+- **hands-off** `TOOL-dWellOiledMachine-44` — `check_value`'s registry arm, which admits `memory.mirror`'s registered names once S2 names the point
 ## 4. Design
 
 ### Evidence

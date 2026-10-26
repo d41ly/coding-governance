@@ -102,6 +102,10 @@ registry (I4) that the `point` extractor reads and every later point and adapter
 - **hands-off** `TOOL-dWellOiledMachine-6` — `points.toml`, where `point.command-adapters` and its adapter rows register
 - **consumes-from** external — PLAY-dOrderedCharter-19's `namespaces.toml`, `tag_index.py` and `gov_tag.py check`, and PLAY-dOrderedCharter-16's `layers.toml`; specced and unbuilt at this base
 
+- **hands-off** `TOOL-dWellOiledMachine-19` — `points.toml`, where S3 adds the `point.role-harnesses` row and its three adapter rows
+- **hands-off** `TOOL-dWellOiledMachine-25` — `points.toml`, where S6 adds the `point.actor-kinds` row
+- **hands-off** `TOOL-dWellOiledMachine-48` — `points.toml`, where S7 adds the `point.notification-adapters` row
+- **hands-off** `TOOL-dWellOiledMachine-59` — `points.toml`, where S1 adds the `point.cadence-items` row and its adapter rows register
 ## 4. Design
 
 ### Data model

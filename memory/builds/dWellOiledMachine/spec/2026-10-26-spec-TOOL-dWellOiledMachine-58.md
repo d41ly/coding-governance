@@ -291,7 +291,7 @@ fixture's clones, never `gov_record.py door` itself.
 
 ## 7. Gates
 
-`unattended kit gate` · `push-main self-test` · `memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `push-main self-test` · `memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms`
 
 The unattended kit's self-test suites are waived for this build's landing (README rule 8); the
 fixture is this unit's own observation and the arm below its home.

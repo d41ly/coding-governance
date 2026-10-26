@@ -157,6 +157,9 @@ hardens the git hooks and the lander (layer-runtime `[enforce]`, :592-717; RT-2,
 - **hands-off** `TOOL-dWellOiledMachine-12` — `dispatch.js`, whose pack fields the session-binding and PreCompact fragments carry
 - **hands-off** `TOOL-dWellOiledMachine-6` — `commit-witness.log`, the commit witness the supervisor reads, and the lander's adapter row at the command-adapter point, registered with the point that unit declares (§8 F3)
 
+- **hands-off** `TOOL-dWellOiledMachine-45` — `dispatch.js`, whose entries' timeout S8 renders from the packs' `budget-ms`
+- **hands-off** `TOOL-dWellOiledMachine-49` — `dispatch.js`, whose refusal path runs S2 and whose pack runner S7's probe reuses
+- **hands-off** `TOOL-dWellOiledMachine-8` — `dispatch.js`, on whose `SubagentStop` entry the returns pack registers, and the `SubagentStop` row of `witnesses.toml`
 ## 4. Design
 
 ### Evidence

@@ -112,6 +112,7 @@ say, and makes the run log's closed-schema leg read the same key.
 - **hands-off** `TOOL-dWellOiledMachine-53` — `act`, the act whose launch admission charges
 - **consumes-from** external — TOOL-dTotalRecall-2's `gov_record.py new` and `record-kinds.toml`, TOOL-dTotalRecall-9's `record find`, TOOL-dDeclaredLoop-7's instance key and TOOL-dDeclaredLoop-3's anchor rule, specced and unbuilt at base `0689e7fa`
 
+- **hands-off** `TOOL-dWellOiledMachine-34` — `act`, the act records whose `node`, `cause` and `transcript=` the trace and the why chain read
 ## 4. Design
 
 ### Evidence

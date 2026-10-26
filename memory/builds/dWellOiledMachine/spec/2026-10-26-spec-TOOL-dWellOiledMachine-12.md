@@ -125,6 +125,10 @@ summary drops; and the card is held under the harness's re-attachment cap (night
 - **hands-off** `TOOL-dWellOiledMachine-6` — `session-bindings`: the supervisor launches each act session with `GOV_ACT=<act>` so `bind` writes `owner: <act>`
 - **consumes-from** external — TOOL-dPlacedRequest-2 S6 `--card --lookup`, PLAY-dOrderedCharter-9, -15 and -43 for the keep-list unit, and TOOL-dDeclaredLoop-7's `position.py`
 
+- **hands-off** `TOOL-dWellOiledMachine-33` — `session-bindings`, the I17 record whose `owner` field S1 and S4 read
+- **hands-off** `TOOL-dWellOiledMachine-4` — `session-bindings`, whose `owner` field decides whether a prompt is the owner's
+- **hands-off** `TOOL-dWellOiledMachine-48` — `session-bindings`, whose `owner` and `transcript` fields `check_owner_present` reads
+- **hands-off** `TOOL-dWellOiledMachine-53` — `hold_lock`, the lock every ledger write holds
 ## 4. Design
 
 ### Evidence
