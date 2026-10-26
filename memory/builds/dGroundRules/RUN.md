@@ -9,8 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-asks-at-landing: TOOL-dGroundRules-12=CLOSED TOOL-dGroundRules-13=OPEN TOOL-dGroundRules-100=OPEN TOOL-dGroundRules-101=OPEN TOOL-dGroundRules-102=OPEN TOOL-dGroundRules-103=OPEN TOOL-dGroundRules-104=OPEN TOOL-dGroundRules-105=OPEN TOOL-dGroundRules-106=OPEN TOOL-dGroundRules-107=OPEN TOOL-dGroundRules-108=OPEN TOOL-dGroundRules-109=OPEN TOOL-dGroundRules-110=OPEN TOOL-dGroundRules-111=OPEN
-units-at-landing: TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-16 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-24 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-66 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-65 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-55 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-61 TOOL-dGroundRules-64 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70 TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-84 TOOL-dGroundRules-85 TOOL-dGroundRules-86
+asks-at-landing: TOOL-dGroundRules-12=CLOSED TOOL-dGroundRules-13=OPEN TOOL-dGroundRules-100=OPEN TOOL-dGroundRules-101=OPEN TOOL-dGroundRules-102=OPEN TOOL-dGroundRules-103=OPEN TOOL-dGroundRules-104=OPEN TOOL-dGroundRules-105=OPEN TOOL-dGroundRules-106=OPEN TOOL-dGroundRules-107=OPEN TOOL-dGroundRules-108=OPEN TOOL-dGroundRules-109=OPEN TOOL-dGroundRules-110=OPEN TOOL-dGroundRules-111=OPEN TOOL-dGroundRules-112=OPEN
+units-at-landing: TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-16 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-24 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-66 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-65 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-55 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-61 TOOL-dGroundRules-64 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70 TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-84 TOOL-dGroundRules-85 TOOL-dGroundRules-86 TOOL-dGroundRules-87 TOOL-dGroundRules-88
 hold-run: 
 hold-streak: 1 · at 399ec42d
 resume-owed: none · owner
@@ -19,13 +19,13 @@ hold-reason: TOOL-dGroundRules-88 (399ec42de) moved packet.py's own blob by desi
 hold-until: owner
 hold-code: host-owner-action
 held-from: BUILDING
-gates-run: unattended-17929556253724163601-3729818 263d31d5
+gates-run: unattended-179297996565957711033-3991150 253cb7b7
 parked-surfaced: yes, 8 surfaced
 keepalive-reaped: yes
 refreshed-at: 462d20f3510072a1dddb5b948370937cfd3bbe0e · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 64c85a9891d6d41bba5a7565db1488b1cd36f164
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -588,3 +588,5 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-26T00:05:45Z dispatch · item 0d9b531f TOOL-dGroundRules-87 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-87.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-10-26T00:05:48Z brief · item TOOL-dGroundRules-87 · reason ac7d79aa7519 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-87-spec-brief.md
+
+2026-10-26T02:28:38Z override · item specs-audited · reason units 44 onward were added after the declared spec audit converged: promotions of that audit's own findings, the closing review's promotions (72 to 82), the close's bar and suite fixes (83 to 86), and the hand-off's owner-ordered units (87, the spec tokens ceiling, and 88, packet.py's --repin caller guard); each spec was written by a gov-spec-writer and graded by check-spec-tokens and hygiene check 12 before its build, and the two closing-review rounds covered the cumulative diff through unit 79; a spec-audit round naming units 44 to 88 would meet it
