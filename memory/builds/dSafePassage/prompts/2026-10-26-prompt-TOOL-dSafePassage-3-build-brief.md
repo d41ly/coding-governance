@@ -55,3 +55,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## From the first dispatch (2026-10-26, handed back at the write gate before any code)
+
+- The main loop now appends this unit's `## route` to the session card before dispatch; you do not append one.
+- At HEAD a4aa6a5b every govkit.py line the spec cites has moved: `RECEIPT_SCHEMA` :50, the receipt comment :7712, `apply`'s receipt write :8015, `update`'s schema read :9209, the back-fill comment and `if schema < RECEIPT_SCHEMA` :9377-9387, the integrity message :9441-9445 (split across string pieces, so AC3's grep needs it rejoined), the re-stamp :12475, `adopt`'s receipt :13098, `check`'s read :5449. Selftest sites :3546, :8678, :8880, :9795 (the stale `3 == GK9.RECEIPT_SCHEMA`); matrix's schema forcing `tools/govkit/matrix.py:484-486`.
+- `tools/govkit/steps.toml` has no rows yet, so this unit's row is the first; `tools/govkit/steps/fanout_cap.py` is the shape to follow. `upgrade_steps.py` defines no `set_step_state` or `read_step_states` yet.
+- Check before you build: `adopt --re-adopt` carries five install-record keys forward from the old receipt, while S5 has `adopt` write `"steps": []`, so a re-adopt of a schema-4 receipt may drop its step rows. If the spec as written loses them, that is a DIVERGENCE hand-back.
