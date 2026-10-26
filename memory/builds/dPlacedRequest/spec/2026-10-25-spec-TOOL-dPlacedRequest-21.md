@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-21 — `entry.claim`: the claim ref, a patch or repeat build's derived plan record, `patch.ratify`, and every refusal routed by its cause
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 20 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 20 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0501@e1101a14 whole
 **Carries:** node:policy-key.patch.ratify
@@ -13,8 +13,12 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-19 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 |
 | [2026-10-25-build-TOOL-dPlacedRequest-21-deviation-211.md](../build/2026-10-25-build-TOOL-dPlacedRequest-21-deviation-211.md) | deviation | — |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-21-deviation-212.md](../build/2026-10-26-build-TOOL-dPlacedRequest-21-deviation-212.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -79,8 +83,14 @@ plan record or a ratification (scout B's row for this unit).
   patch.ratify`), its catalogue row written by dGroundRules-1 S3, v2's default `auto` (v2:1333) the stand-in
   until the reader lands. Under `auto` the patch's derived plan record stands. Under `owner` the verb prints
   `owner item: ratify <slug>`, and `check_patch_ratified(slug)` in `tools/loop/claim.py` answers held until
-  the patch build's folder holds an owner's disposition record (TOOL-dDeclaredLoop-16 S4) whose `Item` is
-  `item.entry.claim` and whose `Disposition` is `ratified`; `rejected` holds it for good. TOOL-dDeclaredLoop-3's
+  the patch build's folder holds an owner's disposition record (TOOL-dDeclaredLoop-16 S4),
+  `<date>-build-<unit id>-disposition-<n>.md` served as `**Serves:** disposition <unit id>`, whose `Item` is
+  `item.entry.claim` and whose `Disposition` is `ratified`; `rejected` holds it for good. Before Design the
+  build defines no spec, so its `<unit id>` is `<FAMILY>-<slug>-1`, the anchor its first spec will define
+  (TOOL-dDeclaredLoop-3 S2), as §8 F6 recommends, open for the owner. The owner passes the factory
+  `--build <slug> --unit <FAMILY>-<slug>-1 --item item.entry.claim --disposition ratified --channel
+  <channel>`; this unit claims no `new disposition` door, and the build run re-grounds the call on the
+  landed factory. TOOL-dDeclaredLoop-3's
   `write_transition` calls `check_patch_ratified` before it writes a record into `designing` for a build whose
   claim body reads `disposition: patch`, and refuses naming `patch.ratify` and the owner item while it is held.
   Observed by AC1.
@@ -92,7 +102,16 @@ plan record or a ratification (scout B's row for this unit).
   for it. Observed by AC7.
 - **S8** — The fixture plants of §6, `python tools/loop/claim.py --fixture`, against a bare scratch remote,
   the leg `loop claim fixtures` in `tools/gate-legs.json`, argv `python {prefix}/loop/claim.py --fixture`,
-  declared in `tools/loop/kit.toml`. Observed by AC1 to AC7.
+  declared in `tools/loop/kit.toml`, with the rows a new leg owes, `enforces` among them:
+  PLAY-dOrderedCharter-7 S3's meta-check reds a leg with no `enforces`, and its pending list only shrinks
+  after that unit's pass. The tag is §8 F7's, since no v2 `[enforcement]` row names this unit's clause
+  `cl-dClosedLoop-0501`. Where the pending list holds a `principle` row for that tag, this pass deletes it,
+  as the meta-check reds it stale. Observed by AC1 to AC8.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of the
+  playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells the row of
+  F7's tag at this spec's base; once that unit lands, the meta-check is the one reader, and it reds the row as
+  stale once a leg enforces its tag · by value: NO VALUE READERS — a pending row's value is its arming build,
+  which the meta-check prints only in its pending count.
 
 ## 3. Non-goals (OUT)
 
@@ -168,7 +187,7 @@ reads the newest commit's keys over the first's.
 | `--placed-build`, `render_placed_build_readme` | flag and function, `tools/memory-tree/gen_build_index.py` |
 | `refs/gov/claims/<slug>` | ref namespace, the claim (shared interface I23) |
 | `claimant-key`, `content-key`, `origin-slug`, `origin-sha`, `wait-since`, `overlap` | claim body keys |
-| `loop claim fixtures` | gate leg |
+| `loop claim fixtures` | gate leg, with `enforces` |
 
 Each function name is put to `python tools/lexicon/lexicon.py --suggest <name>` with its cell in the build pass.
 The exit codes 4 (waiting) and 5 (fresh slug owed) are the verb's own, printed by name beside the code.
@@ -188,7 +207,8 @@ reads only builds whose claim body says `patch`.
 - `tools/loop/claim.py` (new)
 - `tools/loop/loop_transition.py`: `write_transition` calling `check_patch_ratified`
 - `tools/loop/kit.toml`: the module and its leg declared
-- `tools/gate-legs.json`: the leg `loop claim fixtures`
+- `tools/gate-legs.json`: the leg `loop claim fixtures`, with `enforces` holding §8 F7's tag
+- `tools/playbook/core-pending.txt`: the stale row of F7's tag, where it holds one
 - `tools/unattended/unattended.sh`: `--entry-claim` and `run_entry_claim`
 - `tools/unattended/VERBS.template.md`: the verb's line
 - `memory/guides/UNATTENDED-VERBS.md`: its render
@@ -223,7 +243,9 @@ reads only builds whose claim body says `patch`.
 - **AC1** — When `python claim.py --fixture --plant patch-owner-unratified` claims a patch under
   `patch.ratify` = `owner` and then asks `write_transition` for its record into `designing`, the write is
   refused naming `patch.ratify` and the owner item, and `--plant patch-owner-ratified`, whose folder holds the
-  owner's disposition record `ratified` for `item.entry.claim`, writes it.
+  owner's disposition record `ratified` for `item.entry.claim`, written as
+  `<date>-build-TOOL-dFixPatch-1-disposition-1.md` served as `**Serves:** disposition TOOL-dFixPatch-1`
+  (§8 F6), writes it.
   Red when: a patch under `owner` reaches Design unratified.
 - **AC2** — When `python claim.py --fixture --plant tombstone-warn` replays a take against a build whose lease
   ref holds a terminal tombstone, under `leases: warn`, the verb exits 1 naming `tombstone`, prints one `ask:`
@@ -248,6 +270,11 @@ reads only builds whose claim body says `patch`.
 - **AC7** — When `python claim.py --fixture --plant first-record` claims a `repeat`, the build's first
   transition record is into `designing` and carries `scenario=scenario.playbook-run`.
   Red when: the claimed build has no first record, so its scenario falls back to the default.
+- **AC8** — When `grep -n '"loop claim fixtures"' tools/gate-legs.json` runs, it finds the leg row and its
+  argv naming `claim.py`, and `python -m json.tool tools/gate-legs.json` read for that row shows a non-empty
+  `enforces` list holding §8 F7's tag.
+  Red when: the leg row is absent, names another command, or carries no `enforces`, so the bar never runs the
+  plants or the core meta-check reds it.
 
 ## 7. Gates
 
@@ -285,6 +312,22 @@ New arm: tools/unattended/unattended.test.sh · covers AC2 AC4 · the `--entry-c
   seam the writer already lives in. grants: PLAY-dClosedLoop-3 the --entry-claim verb and its line in
   tools/unattended/VERBS.template.md and its render memory/guides/UNATTENDED-VERBS.md · widens: none ·
   relaxes: none
+- **F6 — What unit id does the owner's ratification record carry, when the patch build defines no spec
+  before Design?** TOOL-dDeclaredLoop-16 S4 names the record `<date>-build-<unit id>-disposition-<n>.md`,
+  served as `disposition <unit id>`. Options: (a) `<FAMILY>-<slug>-1`, the anchor TOOL-dDeclaredLoop-3 S2
+  gives a build-level record, the family the derived plan record's `roster` names; (b) S4 also writes the
+  build's first spec at `OPEN`, so the id is defined before the owner disposes; (c) the ratification after
+  the first spec exists. (c) lets a patch reach Design unratified, the case `cl-dClosedLoop-0501` is seen red
+  on; (b) mints a spec with no design in it; (a) leaves memory hygiene check 21 naming the record, an id no
+  spec in the tree defines, until Design writes that spec. Recommendation: (a), the parent's anchor rule and
+  no new write path; the ask the build run would file is TOOL-dDeclaredLoop-16's, that S4 state the id a
+  pre-spec disposition record carries. Open for the owner.
+- **F7 — Which principle does `loop claim fixtures` enforce?** No v2 `[enforcement]` row names
+  `cl-dClosedLoop-0501` (v2:1823-1864). Options: (a) `principle.p39`, every wait expires and every refusal
+  names a remedy, which the plants `tombstone-warn`, `live-holder` and `slug-taken` check; (b)
+  `principle.p5`, concurrency by lease, since the claim and the lease are the act; (c) `principle.p40`, a
+  unit claims its own work. (b) and (c) name what the act is, while (a) is what most of the leg's cases
+  check. Recommendation: (a). Open for the owner, who owns the `[enforcement]` table.
 
 ## 9. Revision log
 
@@ -298,6 +341,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC2 AC4 · the `--entry-c
   each the mirror of that promoted unit's own edge.
 - rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-43.
+- rev-5 · 2026-10-26 · §2 S6, S8 · §4 Inventory, Files touched · §6 AC1, AC8 · §8 F6, F7 · re-grounded on
+  dDeclaredLoop at `783f1ad3a` and dOrderedCharter at `462d20f35` by the cross-check record
+  `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, rows 72, 73 and 78: the
+  ratification record serves as `disposition <unit id>`, its pre-spec id F6's, written through the
+  factory's flags with no door claimed; the leg carries `enforces`, its tag F7's.
 
 ## 10. Reuse audit
 

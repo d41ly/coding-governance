@@ -515,6 +515,96 @@ def read_design_keys(root, conf):
     return values
 
 
+# A spec's declared write set and its consumed siblings (TOOL-dGroundRules-25 S37, S38): the one read
+# the spec-token checker's guards join and the build-order render share.
+FILES_TOUCHED_HEAD = re.compile(r"^### Files touched( \(estimate\))?[ \t]*$", re.M)
+TICKED = re.compile(r"`([^`\n]+)`")
+EDGE_BULLET = re.compile(r"^(?:-|\*)[ \t]*\*\*([^*]+)\*\*[ \t]+(.*)$")
+# A deploy-time token or an env assignment is never a path or a leg: the spec-token checker binds
+# this one, read here by `derive_dir_segments` (TOOL-dGroundRules-32 S9).
+NOT_A_TOKEN = re.compile(r"^(GATE_|\{\{|\$|~|'|\"|<)")
+
+
+def read_spec_writes(text):
+    """Every word inside backticks under a spec's `### Files touched` sub-head, in order and without
+    repeats, or None when the spec has no such sub-head. The body closes at the next heading of any
+    depth, because the sub-head has siblings inside section 4. No shape filter: each caller keeps its own."""
+    m = FILES_TOUCHED_HEAD.search(text)
+    if not m:
+        return None
+    rest = text[m.end():]
+    nxt = re.search(r"^##+ ", rest, re.M)
+    out = []
+    for tok in TICKED.findall(rest[:nxt.start()] if nxt else rest):
+        out += [w for w in tok.split() if w not in out]
+    return out
+
+
+def read_spec_edges(text, verb):
+    """`[(target, bullet text)]`, in order, for each `**<verb>**` bullet under `### Edges` in a spec's
+    Non-goals section, by check 12's grammar in `check-memory-hygiene.sh`: the target is the first
+    backticked token after the verb, else its leading run of `[A-Za-z0-9_-]`, and the text is the
+    bullet's line with each continuation line indented two spaces under it (TOOL-dGroundRules-32 S17).
+    The build-order render's consumes read and the spec-token checker's hands-off join both read
+    edges here, so neither holds a grammar of its own."""
+    out, in3, edges, cur = [], False, False, None
+    for line in text.replace("\r", "").split("\n"):
+        if cur is not None and line.startswith("  "):
+            cur[1] += "\n" + line
+            continue
+        cur = None
+        if line.startswith("## "):
+            in3, edges = bool(re.match(r"## [0-9]+[.] Non-goals", line)), False
+        elif line.startswith("### "):
+            edges = in3 and bool(re.match(r"### Edges[ \t]*$", line))
+        elif edges and (m := EDGE_BULLET.match(line)) and m[1] == verb:
+            t = re.match(r"`([^`]*)`|([A-Za-z0-9_-]*)", m[2])
+            cur = [t[1] if t[1] is not None else t[2], line]
+            out.append(cur)
+    return [tuple(x) for x in out]
+
+
+def derive_dir_segments(tok):
+    """The REAL segments of a `/`-terminated token this join could read, or `[]` for anything else:
+    a token that is not `/`-terminated, opens like a deploy-time token, carries a glob or a space, or
+    has a segment that is empty, `.` or `..` — so `./`, `../` and `tools/./` are nothing, not a path
+    (round 2, R8). `src/` -> `['src']`; `src/app/` -> `['src', 'app']`. Moved here from the spec-token
+    checker so the build-order render reads the same trip rule (TOOL-dGroundRules-32 S9)."""
+    if NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok or not tok.endswith("/"):
+        return []
+    parts = tok.rstrip("/").split("/")
+    return [] if any(x in ("", ".", "..") for x in parts) else parts
+
+
+def check_dir_shaped(tok):
+    """A declared PREFIX: a directory token of TWO OR MORE real segments. A one-segment token is a
+    ROOT (`tools/`), which is how prose names a tree and declares nothing (round 2, R1); round 1's
+    fold kept it and owed every non-broad leg under it. The residual, both directions (round 3,
+    R4): a two-segment directory named in prose is still read as declared, and a one-segment
+    directory that is itself a joined guard (`.githooks/`) declared wholesale declares nothing -
+    its files, or a two-segment child, must be named."""
+    return len(derive_dir_segments(tok)) >= 2
+
+
+def check_guard_trips(path, guard):
+    """Git-pathspec semantics for a manifest guard: the exact path, or anything under it as a
+    directory. Never a bare prefix, so `src/x.sh` does not trip on `src/x.sh.bak`. A declared
+    DIRECTORY (its trailing `/` kept by `extract_files_touched`, two or more segments — a root never
+    reaches here) trips symmetrically: it also trips a guard that sits under it, an exact-file guard
+    included, because `tools/x/` declares `tools/x/y.sh` (R3)."""
+    p, g = path.rstrip("/"), guard.rstrip("/")
+    if p == g or p.startswith(g + "/"):
+        return True
+    return path.endswith("/") and g.startswith(p + "/")
+
+
+def check_writes_intersect(a, b):
+    """True when some path of write set `a` and some path of write set `b` meet: `check_guard_trips`
+    holds in either direction, the containment the dispatcher's `overlaps` tests, so the build-order
+    render and `--dispatch` hold one overlap rule (TOOL-dGroundRules-32 S9)."""
+    return any(check_guard_trips(p, q) or check_guard_trips(q, p) for p in a for q in b)
+
+
 def read_spec_revisions(root, paths, memory_root="memory"):
     """`{path: [(sha, before, after)]}`, oldest first, for every path of `paths` (S10, S12): one entry per
     non-merge commit that changed it, `before` its text at that commit's first parent, None at its

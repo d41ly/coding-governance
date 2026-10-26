@@ -14,13 +14,15 @@ export const meta = {
 
 // gov:kit drift-audit@1.30
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
-// BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
-// The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
-// guard and as a knob to the runtime — so a caller raised this harness's own agent count past the cap
-// with every gate green. agent-cap.js now RESOLVES the bound and refuses that binder form outright.
+// BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS IN THE RENDER, and neither is
+// caller-settable. The retired form bound each of them from an `<expr> || 5` fallback, which read as a
+// constant to the guard and as a knob to the runtime — so a caller raised this harness's own agent
+// count past the cap with every gate green. agent-cap.js RESOLVES the verify total and refuses that
+// binder form outright; `CAP` is the agent limit, `runtime.agents-in-flight`, which the harness's own
+// settings enforce (TOOL-dGroundRules-10).
 // (The spelling itself is paraphrased here on purpose: the acceptance grep for it is repo-wide and
 // would match the comment explaining it.)
-const CAP = 5
+const CAP = 6
 // TOOL-dRetiredFork-6, taken from adopter ic's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
 // hand-written ternary with THREE outcomes that conflated TWO of them: `!synth` gave UNVERIFIED,
 // anything non-zero gave PARTIAL, and everything else gave the bare string `complete` — so "nothing
@@ -94,6 +96,8 @@ const skepticOpts = a.workerType ? { agentType: a.workerType } : {}
 const OUT = a.outDir || `${REPO}/memory`
 const MEM = a.memoryRoot || 'memory'
 const CHARTER = a.charter || 'AGENTS.md'
+// The verify total is the agent-cap hook's own MAX_VERIFIERS, the review protocol's, and never the
+// agent limit `CAP` renders, which bounds how many run at once (TOOL-dGroundRules-10 F3).
 const MAX_VERIFIERS = 5
 
 const COMMON = `

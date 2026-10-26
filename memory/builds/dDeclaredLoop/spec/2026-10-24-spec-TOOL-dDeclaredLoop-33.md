@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-33 — the static termination check on every composition, at the push and at each step boundary
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0118@4c8ef789 whole
 
@@ -10,11 +10,14 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-33-deviation-331.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-33-deviation-331.md) | deviation | — |
+| [2026-10-25-build-TOOL-dDeclaredLoop-33-deviation-332.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-33-deviation-332.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 |
 
 <!-- /gen:spec-records -->
@@ -34,10 +37,11 @@ the push and at each step boundary a build moves. Today nothing checks that a fl
 
 - **S1** — `check_termination(composition)` in `tools/loop/termination.py`, returning one finding per broken
   rule, each naming its rule, its row or item and why, and the CLI `python tools/loop/termination.py check
-  [--build <slug>]`, which composes as `TOOL-dDeclaredLoop-28` S6 composes a build, dOrderedCharter-35's
-  `compose_rows` over gov's packs, the overlay, the scenarios `compose_scenarios` (`TOOL-dDeclaredLoop-27`)
-  places and the build's applied changes, prints every finding and the pending count, and exits 1 on a
-  finding. Observed by AC1 to AC12.
+  [--build <slug>]`, which composes through `TOOL-dDeclaredLoop-26`'s `compose_at`, at `HEAD` and, with
+  `--build`, at that build's pin (that unit's §8 F4 and F5): dOrderedCharter-35's `compose_rows` over
+  gov's packs, the overlay, the scenarios `compose_scenarios` (`TOOL-dDeclaredLoop-27`) places and the
+  build's applied changes (`TOOL-dDeclaredLoop-28` S6). It prints every finding and the pending count,
+  and exits 1 on a finding. Observed by AC1 to AC12.
 - **S2** — Rule `terminal`: every state of the build, feature and unit transition tables reaches a terminal
   state, by reverse reachability from the terminal set; an empty state set is a finding and never passes.
   Observed by AC2, AC4.
@@ -64,9 +68,12 @@ the push and at each step boundary a build moves. Today nothing checks that a fl
   a loosening: its `rescope · flow-state` row reading `applied` under `flow.adapt` is a finding, and
   `held` passes. The four populations are the budget (`route-back-count`), a round count, a retry count and
   a deadline. Observed by AC7.
-- **S8** — Rule `widening`: a raise of a loop-bound field in the overlay appears in the composition's widening
-  list, dOrderedCharter-36's `derive_widenings`, so the overlay's update report names it; a raise the list
-  lacks is a finding. Observed by AC8.
+- **S8** — Rule `widening`: a loop-bound field of a row kind, a row field whose value is a count or a
+  deadline the catalogue's bound rule types (S7), such as an item's `deadline` (S5), declares the
+  direction §8 F4 settles, since dOrderedCharter-36 S5 classifies a patch from a declared direction alone
+  and refuses an open field with none. A patch of such a field that the classifier reads `widens` is then
+  listed by dOrderedCharter-36's `derive_widenings`, so the overlay's update report names it, and one the
+  list lacks is a finding. Observed by AC8.
 - **S9** — Rule `decline`: every approval item holding a loosening for the owner, a `rescope · flow-state`
   row reading `held · class loosening` (`TOOL-dDeclaredLoop-28` S5), recommends the decline; a held loosening
   recommending anything else, or nothing, is a finding. `apply_changes` gains the field ` · recommend decline`
@@ -130,7 +137,7 @@ the push and at each step boundary a build moves. Today nothing checks that a fl
 | `wait` | every row or item whose outcomes hold `awaiting` | no `deadline` or no `on-deadline`; a stale pending row |
 | `scenario` | each scenario's successor | a successor cycle |
 | `raise` | the build's recorded changes, the catalogue's bounds | a raise applied without the owner |
-| `widening` | the overlay's loop-bound fields, `derive_widenings` | a raise the widening list lacks |
+| `widening` | the overlay's loop-bound fields, `derive_widenings` | a patch read `widens` that the widening list lacks |
 | `decline` | each held loosening's recommendation | a held loosening not recommending `decline` |
 
 Each rule is one function, `check_<rule>(composition)`, so each is its own arm and a fixture that breaks one
@@ -304,6 +311,18 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 ·
   on `TOOL-dDeclaredLoop-28`'s `rescope · flow-state` row, written `decline` for a held loosening; (b) the
   owner item's text. (b) is prose no check can read. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3.
   grants: PLAY-dClosedLoop-3 the loop termination gate leg, the deadline, on-deadline and recommend fields and the termination-pending list
+- **F4 — Which direction does a loop-bound field declare?** dOrderedCharter-36 S5 offers `add` and
+  `remove` on a set and an ordered list of values on a scalar, and refuses an open field with no
+  declared direction; none of the three orders an unbounded number. Options: (a) each such field
+  declares `widens` an ordered list of its admitted values, smallest first, in its kind's schema
+  (`TOOL-dDeclaredLoop-24`'s `tools/loop/item-schema.toml` for `deadline`), a value off the list
+  refused; (b) an ask to dOrderedCharter for a numeric direction on a scalar, such as `widens = "raise"`
+  over numbers and durations, a policy-tag value compared at its value; (c) every such field left
+  undeclared, so fixed (dOrderedCharter-36 S2) and every patch of one refused. (a) closes each field to
+  a typed list and cannot place a policy-tag deadline such as `policy.flow.wait-ceiling`, the value
+  gov's own waits declare (S5), among numbers. (c) refuses the raise the clause has the update report
+  name as a widening. Recommendation: (b), the one form that orders the values these fields hold. The
+  ask the build run would file is that direction on dOrderedCharter-36 S1 and S5. OPEN for the owner.
 
 ## 9. Revision log
 
@@ -314,6 +333,11 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 ·
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
+- rev-4 · 2026-10-25 · S1 S8 · §4 The rules · §8 F4 · re-grounded on dOrderedCharter's specs at
+  `462d20f35` per `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md` rows 112
+  and 114: `check --build` composes through TOOL-dDeclaredLoop-26's `compose_at` at the build's pin
+  (its §8 F4); a loop-bound field's widening direction is F4 here, open for the owner, since unit 36
+  S5 orders no unbounded number.
 
 ## 10. Reuse audit
 

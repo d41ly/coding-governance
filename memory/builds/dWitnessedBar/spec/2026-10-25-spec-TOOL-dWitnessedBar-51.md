@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-51 — the round-1 spec audit's 50 minors, batched: owed widen rows and record bindings, one reader each, honest failure states, and the observations that read the wrong verb
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,10 +14,13 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-51-deviation-512.md](../build/2026-10-25-build-TOOL-dWitnessedBar-51-deviation-512.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-51-round10-size-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-51-round10-size-return.md) | research | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
+| [2026-10-26-build-TOOL-dWitnessedBar-51-deviation-513.md](../build/2026-10-26-build-TOOL-dWitnessedBar-51-deviation-513.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-51-round10-size-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-51-round10-size-brief.md) | research | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-43 |
 
 <!-- /gen:spec-records -->
@@ -62,9 +65,9 @@ S7, L13 (id 56) is S50.
 - **S6** — id 37. The rename's scoped grep holds and `dead-path carriers (deleted files still named)`
   stays green on the built tree. Observed by AC3.
 - **S7** — id 2. The flake record (`TOOL-dWitnessedBar-8` S3) and the gate-health record
-  (`TOOL-dWitnessedBar-1` S4) bind as `**Serves:** journal <unit id>`, the kind kept in the file name and
-  the factory's kind row, since `journal` is a member of `RECORD_KIND_TOKENS`
-  (`tools/memory-tree/tree_lib.py:406`) and `flake` and `gate-health` are not. Observed by AC4.
+  (`TOOL-dWitnessedBar-1` S4) serve as their own kinds, `flake` and `gate-health`, which units 8 and 1
+  join to `TYPED_RECORD_KINDS` and HYGIENE's closed kind list (PLAY-dOrderedCharter-42 S2, S3, S5).
+  Observed by AC4.
 - **S8** — id 3. `leg_factory.py --conform`'s gate table gains the arm `purpose presence`: an absent
   `purpose` on a declaration whose name is no row of `leg-purpose-pending`, and a pending row for a leg
   that carries one or has left the manifest. The population's registration names `leg = "gate-leg
@@ -359,9 +362,9 @@ Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD`
   the eol pin.
   Red when: a carrier still names a retired basename.
 - **AC4** — When `python gen_build_index.py --print-bindings` runs in `tools/memory-tree/` over a fixture
-  build holding one flake record and one gate-health record, both bind as `journal` with no `malformed`
-  line.
-  Red when: either record binds with a kind outside `RECORD_KIND_TOKENS`.
+  build holding one flake record and one gate-health record, it prints an `S` row for each, of kind
+  `flake` and `gate-health`, and no `A` row.
+  Red when: either serves as `journal`, which PLAY-dOrderedCharter-42 S3 reads as malformed.
 - **AC5** — When `python leg_factory.py --conform` runs in a scratch clone holding a declaration with no
   `purpose` and no `leg-purpose-pending` row, it exits 1 naming the arm `purpose presence`; with a pending
   row for a leg that carries a `purpose`, it exits 1 naming that row.
@@ -544,6 +547,9 @@ New arm: tools/run-gates/keep_tails.py · covers AC30 · a tail holding a fence,
   prose compressed for the size ceiling.
 - rev-3 · 2026-10-25 · §3 · the hands-off bullet for TOOL-dWitnessedBar-62.
   Prose of §1, §4, §8 and §9 trimmed for the size ceiling; nothing else moved.
+- rev-4 · 2026-10-26 · S7 · AC4 · re-grounded by
+  `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`, row 100: the two records serve
+  as their own kinds, not `journal`.
 
 ## 10. Reuse audit
 

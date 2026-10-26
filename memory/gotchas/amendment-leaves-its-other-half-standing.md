@@ -86,6 +86,13 @@ HYGIENE item and the kit README took the new rule; the hygiene engine's header k
 whose own staged trigger landed beside it. TOOL-dTrueNorth-26 S12 to S14 rewrote the header to point at the
 two block comments, so the rule is stated once and the header carries no second copy to strand.
 
+It bit again in dGroundRules' spec run, 2026-10-23
+(memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-62.md, from the closing diff review's H4).
+TOOL-dGroundRules-21 S12 changed what `read_default_value` returns for one case, a derived default, from a value
+to a refusal; TOOL-dGroundRules-9's consumes-from edge on the reader still expected an unset `budgets.<cap>` to
+read as no file value, source `default`. Both units were built, and every cap read `refuse` until
+TOOL-dGroundRules-62 typed the refusal and the caps module answered that type alone as unset.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth
@@ -117,6 +124,11 @@ fates check grew from six arms to twelve findings. The fold brought the record's
 line, and left the per-point sections, written before it, saying "Test runs the set check (dWitnessedBar)" and "Six
 arms hold every kit to a row". Those sections were what the owner would read first. Grep the record for the old
 owner and the old count before calling a fold done.
+
+**Checklist line: a later unit that changes a shared function's return for a case greps every
+consumes-from edge naming that function**, and restates each consumer's expectation in its own spec:
+kept, or changed with the consumer's code in the same unit. The earlier unit's edge is the other half,
+and it reads fine until both are built.
 
 There is **no machine gate** for this class today, and the two arms above are filed as
 `TOOL-dTieredTribunal-24` rather than built here. Saying so plainly matters more than usual for this

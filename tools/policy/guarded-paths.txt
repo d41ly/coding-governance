@@ -1,0 +1,8 @@
+# guarded-paths.txt - the one spelling of the paths the policy guard refuses an agent's commit to
+# change (TOOL-dGroundRules-6). One repo-relative path per line; `#` comments and blank lines are
+# dropped. guard.py and the pre-commit hook both read this list AT HEAD, never the working tree, so
+# a line removed here guards nothing only from the commit after the one that removes it.
+.governance/policy.toml
+.governance/policy.json
+.governance/instructions.toml
+.governance/deploy.toml

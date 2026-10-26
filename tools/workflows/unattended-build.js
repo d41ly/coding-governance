@@ -134,7 +134,7 @@ export const meta = {
 // worktree while this call is outstanding meets git's index lock, which the stage reports as
 // `committed: false`.
 
-// --- cap-5 fan-out, INLINED FROM THE SIBLING REVIEW HARNESS (TOOL-aStagedLane-3 S2) ----------
+// --- cap-6 fan-out, INLINED FROM THE SIBLING REVIEW HARNESS (TOOL-aStagedLane-3 S2) ----------
 // NOT A REUSE — A COPY, and the difference cost this spec two review rounds. `boundedParallel` was
 // never in this file: it lives at that harness's line 17 and the copies elsewhere are in the two
 // drift-audit workflows. Workflow scripts cannot import, so a second marked copy is the only shape
@@ -147,7 +147,7 @@ export const meta = {
 // treats any line carrying it as a marked one, so a comment ABOUT the marker is read as a marker
 // claiming a bound over nothing, and denies the whole file. Learned here. Grammar:
 // the hooks kit's own README.
-async function boundedParallel(thunks, cap = 5) {
+async function boundedParallel(thunks, cap = 6) {
   const out = []
   for (let i = 0; i < thunks.length; i += cap)
     out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
@@ -939,7 +939,7 @@ const GROUND =
 // equality — and the headline property is that a writer holds ITS OWN group's briefs and nothing
 // outside it, never that it holds exactly one slice.
 phase('Spec')
-const SPEC_WRITERS = 5 // the cap `tier2-review.js` owns; this copy carries the same value
+const SPEC_WRITERS = 6 // the cap `tier2-review.js` owns; this copy carries the same value
 const sliceKeys = []
 for (const u of ordered) {
   const k = Number.isInteger(u.order) ? String(u.order) : 'unordered'
@@ -950,9 +950,11 @@ const slices = sliceKeys.map(function (k) {
     return (Number.isInteger(u.order) ? String(u.order) : 'unordered') === k
   })
 })
-// gov:fixed-verifiers — the bounded receiver. `chunk(x, Math.ceil(x.length / K))` with a resolvable
-// K is the sanctioned spelling; the group COUNT is what stands still while the batch grows.
-const specGroups = chunk(slices, Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers
+// gov:fixed-writers — the bounded receiver, judged against the agent limit and not the verify total:
+// writers are no verify stage, and this stage runs as wide as the limit the owner sets (TOOL-dGroundRules-18).
+// `chunk(x, Math.ceil(x.length / K))` with a resolvable K is the sanctioned spelling; the group COUNT is
+// what stands still while the batch grows.
+const specGroups = chunk(slices, Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-writers
 log('spec stage: ' + ordered.length + ' unit(s) in ' + slices.length + ' slice(s) -> ' +
     specGroups.length + ' writer(s), each holding only its own group')
 // S7 — a unit with no `specBriefPath` falls back to the shared prompt, and SAYS SO. A silent

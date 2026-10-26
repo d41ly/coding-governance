@@ -490,6 +490,32 @@ def _cell(s: str) -> str:
 
 
 # ------------------------------------------------------------------------------------------- checks
+def read_universal_cap(root: str, conf: dict) -> tuple:
+    """`(value, mode, rule)` of the census cap `universal-gotchas` (TOOL-dGroundRules-9): the policy
+    kit's `budgets.resolve_caps`, handed UNIVERSAL_BUDGET as `legacy:` where the conf sets it, so a
+    `budgets.universal-gotchas` in the policy file takes its place where it does not, and a value in
+    both refuses. The kit is found by this kit's inlined resolver, backlog.py's. No kit, or any
+    refusal of the reader, keeps the conf's value under `refuse`, as before, the rule saying why; a
+    value of none is unchecked."""
+    raw = (conf.get("UNIVERSAL_BUDGET") or "").strip()
+    held = int(raw) if raw.isdigit() else None
+    request = "universal-gotchas" + (f"=legacy:{held}" if held is not None else "")
+    try:
+        import backlog  # the kit's own module beside this file, carrying resolve_kit_dir inline
+        kit = str(backlog.resolve_kit_dir("policy", "budgets.py", pathlib.Path(__file__).resolve().parent))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import budgets  # the policy kit's caps module, found above
+        try:
+            a = budgets.resolve_caps([request], root)["universal-gotchas"]
+            return a.value, a.mode, a.rule
+        except budgets.policy.Refusal as exc:
+            why = f"the policy reader refused: {exc}"
+    except (LookupError, ImportError) as exc:
+        why = f"no policy kit answered: {exc}"
+    return held, "refuse", f"{why}; a breach refuses as before"
+
+
 def cmd_check(root: str, conf: dict) -> int:
     m = conf["MEMORY_ROOT"]
     recs = records(root, m)
@@ -540,12 +566,14 @@ def cmd_check(root: str, conf: dict) -> int:
             elif r["anchors"] and inert_only(r, paths, m, ao):
                 bad.append(f"check 19: {r['path']} has INERT anchors — every path they reach is "
                            f"append-only, so the record is reachable on paper and dead in practice")
-        budget = conf.get("UNIVERSAL_BUDGET", "")
+        budget, mode, rule = read_universal_cap(root, conf)
         if budget:
             n = sum(1 for r in recs if r["kind"] == "class" and r["universal"])
-            if n > int(budget):
+            if n > budget and mode == "warn":
+                notes.append(f"BUDGET WARN — universal-gotchas · {m}/gotchas · {n} count over {budget} · {rule}")
+            elif n > budget:
                 bad.append(f"check 19: {n} universal record(s) against a budget of {budget} — every one "
-                           f"is emitted on EVERY checklist, so raise the budget in a commit that says why")
+                           f"is emitted on EVERY checklist, so raise the budget in a commit that says why ({rule})")
         # 19 — the DEAD-ANCHOR advisory. One line, never the exit status (TOOL-aMendedFleet-23).
         dead = scan_dead_anchors(recs, paths, m)
         if dead:
@@ -816,7 +844,10 @@ def _rec(name, desc, body, kind=None, universal=None, indent=False):
 
 def _scratch(tmp: str, recs: dict, extra=None):
     PFX = derive_install_prefix()   # TOOL-aRepatriatedFork-28
-    run("git", "init", "-q", "--template=", ".", cwd=tmp)
+    # On master, PINNED (TOOL-dGroundRules-9): check 19's universal budget obeys the policy kit's size
+    # switch, read at the landed revision, which with no remote is local main, so a fixture with no
+    # main refuses as before whatever the node's init.defaultBranch says.
+    run("git", "-c", "init.defaultBranch=master", "init", "-q", "--template=", ".", cwd=tmp)
     write(os.path.join(tmp, ".memory-tree.conf"),
           'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nUNIVERSAL_BUDGET="1"\n')
     write(os.path.join(tmp, "memory", "HYGIENE.md"), "sentinel\n")

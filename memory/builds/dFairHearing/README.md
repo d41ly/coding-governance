@@ -173,16 +173,16 @@ Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 38 spec(s) at
 | 9 | `TOOL-dFairHearing-11` | no |
 | 10 | `TOOL-dFairHearing-8` | no |
 | 11 | `TOOL-dFairHearing-16` | no |
-| 12 | `TOOL-dFairHearing-10`, `TOOL-dFairHearing-22` | yes |
+| 12 | `TOOL-dFairHearing-10`, `TOOL-dFairHearing-22` | no |
 | 13 | `TOOL-dFairHearing-12` | no |
 | 14 | `TOOL-dFairHearing-14` | no |
-| 15 | `TOOL-dFairHearing-1`, `TOOL-dFairHearing-21` | yes |
+| 15 | `TOOL-dFairHearing-1`, `TOOL-dFairHearing-21` | no |
 | 16 | `TOOL-dFairHearing-15` | no |
 | 17 | `TOOL-dFairHearing-17` | no |
 | 18 | `TOOL-dFairHearing-18` | no |
-| 19 | `TOOL-dFairHearing-20`, `TOOL-dFairHearing-23` | yes |
+| 19 | `TOOL-dFairHearing-20`, `TOOL-dFairHearing-23` | no |
 | 20 | `TOOL-dFairHearing-25`, `TOOL-dFairHearing-26` | yes |
-| 21 | `TOOL-dFairHearing-27`, `TOOL-dFairHearing-28`, `TOOL-dFairHearing-29`, `TOOL-dFairHearing-30` | yes |
+| 21 | `TOOL-dFairHearing-27`, `TOOL-dFairHearing-28`, `TOOL-dFairHearing-29`, `TOOL-dFairHearing-30` | no |
 | 22 | `TOOL-dFairHearing-31`, `TOOL-dFairHearing-35` | yes |
 | 23 | `TOOL-dFairHearing-32`, `TOOL-dFairHearing-33`, `TOOL-dFairHearing-34` | yes |
 | 24 | `TOOL-dFairHearing-36`, `TOOL-dFairHearing-37` | yes |

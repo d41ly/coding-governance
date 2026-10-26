@@ -24,7 +24,7 @@ import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.8"
+KIT_ROLES_VERSION = "1.9"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
@@ -131,6 +131,31 @@ def resolve_kit_dir(home, anchor, here):
     raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
+
+
+def read_cap_answer(request, root, kit_dir):
+    """`(value, mode, rule)` the policy kit answers for ONE census cap (TOOL-dGroundRules-9), `request`
+    in its CLI grammar, `<cap>[=default:<n>]`, read in the repository at `root`. The kit is found by
+    `resolve_kit_dir` from `kit_dir`, and its `budgets.resolve_caps` answers: a value is the policy
+    file's where it sets one, else what was handed in, None for a family. No kit, or any refusal of
+    the reader, answers the handed-in value under `refuse`, as before that unit, the rule saying why.
+    The roles kit's one reach into the policy kit, which `check_roles` and `handoff` share."""
+    import sys
+    cap, _eq, how = request.partition("=")
+    held = int(how.split(":", 1)[1]) if how.startswith("default:") else None
+    try:
+        kit = str(resolve_kit_dir("policy", "budgets.py", kit_dir))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import budgets  # the policy kit's caps module, found above
+        try:
+            a = budgets.resolve_caps([request], str(root))[cap]
+            return a.value, a.mode, a.rule
+        except budgets.policy.Refusal as exc:
+            why = "the policy reader refused: %s" % exc
+    except (LookupError, ImportError) as exc:
+        why = "no policy kit answered: %s" % exc
+    return held, "refuse", "%s; a breach refuses as before" % why
 
 
 def load_text(path):

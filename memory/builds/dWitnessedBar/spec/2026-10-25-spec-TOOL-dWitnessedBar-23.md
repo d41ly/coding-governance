@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-23 — a minimal tester agent in today's roles kit
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 19 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 19 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0361@59790344 whole
 **Carries:** node:item.test.attribute
@@ -14,8 +14,11 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-23-deviation-231.md](../build/2026-10-25-build-TOOL-dWitnessedBar-23-deviation-231.md) | deviation | — |
+| [2026-10-26-build-TOOL-dWitnessedBar-23-deviation-232.md](../build/2026-10-26-build-TOOL-dWitnessedBar-23-deviation-232.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -53,8 +56,11 @@ wrong-spec judgment, until dBoundRoles re-founds it with the other roles (WK-1).
   Observed by AC3.
 - **S7** — The judgment set as one fact: the `item.test.attribute` row of `tools/loop/loop.toml`
   (TOOL-dDeclaredLoop-12 S2) carries `actor = "role:gov-tester"` and `outcomes = ["code-miss",
-  "spec-wrong"]`, amended in place where the seeded row spells either otherwise; the role file's
-  `returns` line names the row as the set's home. Observed by AC6.
+  "spec-wrong"]`, amended in place where the seeded row spells either otherwise. The same edit re-keys
+  the row's `[item.routes]` to exactly those two words, each keeping the target its seeded outcome
+  routed to, since the program check requires `routes` to hold exactly the outcomes as keys
+  (TOOL-dDeclaredLoop-12 §4 "The program check"). The role file's `returns` line names the row as the
+  set's home. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -214,10 +220,13 @@ the descriptor rules that already cover the other ten.
   role arm.
   Red when: the index carries a `gates` list for the slot, or a `writes` value other than `none`.
 - **AC6** — When
-  `python -c "import sys, tomllib; r = [i for i in tomllib.load(open(sys.argv[1], 'rb'))['item'] if i['tag'] == 'item.test.attribute'][0]; print(r['actor'], r['outcomes'])" loop.toml`
-  runs in the loop kit's directory, it prints `role:gov-tester ['code-miss', 'spec-wrong']`, and
-  TOOL-dDeclaredLoop-9's check no longer prints `role:gov-tester` among its `pending` roles.
-  Red when: the row keeps a bare `tester` actor or an outcome set other than the two words.
+  `python -c "import sys, tomllib; r = [i for i in tomllib.load(open(sys.argv[1], 'rb'))['item'] if i['tag'] == 'item.test.attribute'][0]; print(r['actor'], r['outcomes'], sorted(r['routes']))" loop.toml`
+  runs in the loop kit's directory, it prints
+  `role:gov-tester ['code-miss', 'spec-wrong'] ['code-miss', 'spec-wrong']`, `python loop_lib.py
+  --check` run there exits 0, and TOOL-dDeclaredLoop-9's check no longer prints `role:gov-tester`
+  among its `pending` roles.
+  Red when: the row keeps a bare `tester` actor or an outcome set other than the two words, or its
+  routes keep a seeded outcome word, which the program check refuses.
   fixture: the loop definition `loop.toml` exists only once dDeclaredLoop's build run has landed,
   which the chain runs before this build's build run.
 
@@ -252,6 +261,9 @@ The pass adds no leg: `roles catalogue` and `roles render wiring` grade the slot
   table, scout A's row for cl-0361, and the roles kit read at base `cdfbd1cf`.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · S7 · AC6 · re-grounded on the cross-check record
+  `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck`, row 69: S7 re-keys `[item.routes]` in
+  the same edit that changes the outcomes, and AC6 also runs `python loop_lib.py --check`, exit 0.
 
 ## 10. Reuse audit
 

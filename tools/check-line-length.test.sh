@@ -135,6 +135,10 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 _rkd_py=$(resolve_python) || { echo "check-line-length.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
 LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib lib-selftest.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
+# The policy kit, whose budgets.py answers the switch (TOOL-dGroundRules-9): copied into the fixture
+# by the one arm that runs the gate WITH it, under its resolved name.
+POLICY_DIR=$(resolve_kit_dir "$_rkd_py" policy budgets.py "$HERE") || exit 2
+POLICY="${POLICY_DIR##*/}"
 ROOT=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "check-line-length.test: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
@@ -145,7 +149,7 @@ GATE="$HERE/check-line-length.sh"
 
 # THE SUITE STILL DECLARES ITS OWN ARM COUNT. The floor moved into the harness so eighteen ported
 # suites do not carry eighteen copies of the guard, but the NUMBER is this suite's and stays here.
-SELFTEST_FLOOR=18
+SELFTEST_FLOOR=20
 
 # build_line <char> <n> — <n> copies of <char>, in builtins. `printf -v` and parameter expansion
 # cost no process; this one function is where the 31 python spawns went. It is UTF-8 safe by construction:
@@ -171,6 +175,10 @@ build_repo() {
   # The interpreter dies AFTER the resolver's probe accepted it — the shape a resolver cannot catch.
   printf '#!/usr/bin/env bash\n[ "$1" = "-c" ] && exit 0\nexit 4\n' > deadpy
   chmod +x deadpy
+  # The policy kit's reader and a policy file at `warn`, staged aside: only the switch arm moves them in.
+  mkdir -p P/kit P/gov || return 2
+  for f in budgets.py policy.py caps.toml catalogue.toml; do cp "$ROOT/$POLICY_DIR/$f" P/kit/ || return 2; done
+  printf '[budgets]\nenforce = "warn"\n' > P/gov/policy.toml
 }
 build_fixture build_repo || exit 2
 
@@ -183,6 +191,19 @@ arm "control · a short subject passes" 0 "0 over 450" \
 # its only proof.
 arm "an over-length line reds naming the line and its length" 1 "a subject carries line(s) over its limit of" \
     'cat L/y451 >> subject.md' 'bash '"${PFX}check-line-length.sh"''
+
+# THE SWITCH (TOOL-dGroundRules-9). The gate copy has no policy kit beside it in the fixture, so a
+# breach refuses as it did before and says why once; the arm after it moves the policy kit in beside
+# the copy and commits a policy file at `warn` on main, the landed revision of a repository with no
+# remote, and the same breach prints BUDGET WARN and passes.
+arm "with no policy kit beside the gate a breach refuses as before, saying so" 1 \
+    "no policy kit answered, so a breach refuses as before" \
+    'cat L/y451 >> subject.md' 'bash '"${PFX}check-line-length.sh"''
+
+arm "under budgets.enforce warn an over-length line prints BUDGET WARN and passes" 0 \
+    "BUDGET WARN — line-length · subject.md · 451 chars over 450" \
+    'cat L/y451 >> subject.md && mkdir -p .governance '"${PFX}${POLICY}"' && cp P/kit/* '"${PFX}${POLICY}"'/ && cp P/gov/policy.toml .governance/ && git symbolic-ref HEAD refs/heads/main && git add -A && git commit -qm landed --no-verify' \
+    'bash '"${PFX}check-line-length.sh"''
 
 arm "exactly at the limit passes" 0 "0 over 450" \
     'cat L/y450 >> subject.md' 'bash '"${PFX}check-line-length.sh"''

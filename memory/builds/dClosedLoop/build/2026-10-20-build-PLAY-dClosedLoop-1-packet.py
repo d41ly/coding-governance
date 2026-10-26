@@ -44,7 +44,8 @@ Usage (from the worktree root):
       it owns, every parent, every `[owed]` line naming it, every roster unit, every open ask); and the pin arm,
       separate from the byte compare: each pinned instrument's blob against `git rev-parse HEAD:<path>`
   python packet.py --repin <instrument>
-      the owner's re-pin: that instrument's pin set to its blob at HEAD in every chain build's packet, each re-rendered
+      the owner's re-pin: that instrument's pin set to its blob at HEAD in every chain build's packet, each re-rendered;
+      inside a chain run it admits only an owner at a console, and records the repin in each packet's Pins
   python packet.py --fixture [--build <slug>] [--plant <case>] [--control no-pin-arm|repin]
       the checks over a packet rendered in memory from the tree (default dTrueNorth), every arm's population seeded
       where the tree holds none, damaged one way: clause, gap, parent, owed, roster or ask (that item dropped from
@@ -53,8 +54,12 @@ Usage (from the worktree root):
       drop the pin arm, or re-pin on write); run-live and run-landed (a chain build's `RUN.md` at a live and at a
       terminal phase, read by the guard --repin and a first render share); run-pushed, run-unpushed and run-dirty (a
       `RUN.md` at LANDING in a scratch clone of a scratch remote, its close commit pushed to the default branch,
-      committed and never pushed, or pushed and then edited, read by the guard's real LANDED derivation)
-A first render and --repin refuse inside a chain run: a chain build's `RUN.md` whose phase is not terminal. A LANDING
+      committed and never pushed, or pushed and then edited, read by the guard's real LANDED derivation);
+      run-live-owner, run-live-agent and run-live-detached (the live `RUN.md`, read by the caller test with an owner
+      at a console, an agent, and a caller with no terminal on stdin; the owner's render carries its repin record)
+A first render refuses inside a chain run: a chain build's `RUN.md` whose phase is not terminal. Inside a chain run
+--repin admits only an owner at a console: no `AI_AGENT` or `CLAUDECODE` in its environment, a terminal on stdin, and
+`yes` typed at the prompt; any other caller is refused, and one it cannot classify is refused by default. A LANDING
 record counts as terminal when the guard derives it LANDED as `unattended.sh --landed` does under an in-place landing,
 which writes LANDED nowhere: committed as it stands, its close commit on the default branch the remote advertises
 (PLAY-dClosedLoop-26).
@@ -66,7 +71,8 @@ read; a source-reading defect the renderer and the arms share, since both read t
 and not committed, since the pin arm reads HEAD; whether v2's `Baseline:` line agrees with the pin, which
 `deviations.py` lists as a member and `asbuilt.py --check` reports; and a hand edit of a pin line or of this file,
 which only the owner's landing-diff check guards until a chain unit's merge-bar check (the execution plan's
-`[cannot]`).
+`[cannot]`); and a caller that unsets both agent markers and types `yes` through a pseudo-terminal, which the caller
+test cannot tell from the owner.
 """
 import argparse
 import copy
@@ -103,8 +109,11 @@ ROW = re.compile(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| ([^|]+) \|$"
 STANDIN = r"stand(s|ing)?[- ]in|until {o}|before {o}|{o}'s [\w-]+ (lands|land)"     # the probe's pattern
 PIN = re.compile(r"^- instrument: `([^`]+)` blob `([0-9a-f]{40,64})`$", re.M)
 AT = re.compile(r"^- rendered at: `([0-9a-f]{40,64})`$", re.M)
+REPIN = re.compile(r"^- repinned inside a live chain run: `([^`]+)` blob `([0-9a-f]{40,64})` at `([0-9a-f]{40,64})` "
+                   r"by an owner at a console, over (.+)$", re.M)
+AGENT_MARKERS = ("AI_AGENT", "CLAUDECODE")   # set in every tool shell Claude Code starts
 PLANTS = ("clause", "gap", "parent", "owed", "roster", "ask", "hand-edit", "pin", "run-live", "run-landed",
-          "run-pushed", "run-unpushed", "run-dirty")
+          "run-pushed", "run-unpushed", "run-dirty", "run-live-owner", "run-live-agent", "run-live-detached")
 CONTROLS = ("no-pin-arm", "repin")
 UTF8 = dict(os.environ, PYTHONIOENCODING="utf-8")
 
@@ -335,8 +344,9 @@ def derive_sources(slug):
             "v2_blob": t["v2_blob"], "view_blob": t["view_blob"], "version": t["version"]}
 
 
-def render_text(src, pins, at):
-    """The packet's bytes, from its sources, the instrument pins it keeps and the HEAD it was rendered at."""
+def render_text(src, pins, at, repins=None):
+    """The packet's bytes, from its sources, the instrument pins it keeps, the HEAD it was rendered at, and the
+    owner's repin records it carries, each rendered only while its blob is that instrument's pin."""
     s, stage = src["slug"], src["stage"]
     ticks = lambda xs: ", ".join(f"`{x}`" for x in xs)   # noqa: E731
     out = [f"# Packet — {s}: the {stage} build of the dClosedLoop chain", "",
@@ -397,6 +407,11 @@ def render_text(src, pins, at):
             f"- as-built view: `{asbuilt.OUT}` "
             + (f"blob `{src['view_blob']}`" if src["view_blob"] else "absent at HEAD")]
     out += [f"- instrument: `{p}` blob `{pins[p]}`" for p in sorted(pins, key=lambda p: (order.get(p, len(order)), p))]
+    for p in INSTRUMENTS:
+        b, h, over = (repins or {}).get(p) or (None, None, None)
+        if b and b == pins.get(p):
+            out.append(f"- repinned inside a live chain run: `{p}` blob `{b}` at `{h}` by an owner at a console, "
+                       f"over {over}")
     out += [f"- rendered at: `{at}`", f"- generator: `{SELF}` " + (f"version `{src['version']}`, its blob at HEAD"
                                                                     if src["version"] else "untracked at HEAD"), "",
             "### Owned nodes", ""] + ([f"- `{n}`" for n in src["nodes"]] or ["- none"]) + ["", "### Parents", ""]
@@ -452,6 +467,12 @@ def read_pins(text):
     sec = handoff.extract_brief_section(text, "pins") or ""
     m = AT.search(sec)
     return dict(PIN.findall(sec)), m.group(1) if m else None
+
+
+def read_repins(text):
+    """{instrument: (blob, head, over)} of the owner's repin records in a packet's Pins section."""
+    sec = handoff.extract_brief_section(text, "pins") or ""
+    return {p: (b, h, over) for p, b, h, over in REPIN.findall(sec)}
 
 
 def check_complete(text, src):
@@ -556,6 +577,28 @@ def scan_live_run(chain, read, landed=read_landed_derivation):
     return live
 
 
+def derive_caller(env, tty, answer):
+    """(kind, why) of a --repin caller inside a chain run, kind `owner`, `agent` or `unknown`, from its arguments
+    alone; the first match wins, and `answer` is called only once the marker and terminal tests have passed."""
+    found = [k for k in AGENT_MARKERS if k in env]      # presence, so an empty value is still an agent
+    if found:
+        return "agent", f"an agent's call ({', '.join(found)} set in its environment)"
+    if not tty:
+        return "unknown", "no terminal on stdin, so no owner typed this (refused by default)"
+    if answer().strip() != "yes":
+        return "unknown", "the owner's confirmation was not typed (want yes; refused by default)"
+    return "owner", "an owner at a console: no agent marker, a terminal on stdin, and yes typed"
+
+
+def read_confirmation(name, live):
+    """The line the caller types at the repin prompt, or "" at end of input (NUL and a closed stdin give that)."""
+    try:
+        return input(f"packet: --repin {name} inside the live chain run {'; '.join(live)}; type yes to move the pin "
+                     "in every chain packet: ")
+    except EOFError:
+        return ""
+
+
 def run_landing_fixture(slug, plant):
     """A LANDING record in a scratch clone of a scratch remote, read by the real derivation: its close commit pushed
     to the default branch (run-pushed), committed after the pushed tip and never pushed (run-unpushed), or pushed and
@@ -609,8 +652,9 @@ def render_packet(slug):
         pins, at = read_pins(old)
         if not pins:
             raise Refusal(f"{found[0].as_posix()} carries no instrument pin, and only a first render or --repin pins")
-        kept = render_text(src, pins, at or head)
-        return found[0].as_posix(), old if kept == old else render_text(src, pins, head)
+        repins = read_repins(old)
+        kept = render_text(src, pins, at or head, repins)
+        return found[0].as_posix(), old if kept == old else render_text(src, pins, head, repins)
     live = scan_live_run(src["chain"], read_file)
     if live:
         raise Refusal("a first render pins every instrument, and a chain run never pins: " + "; ".join(live))
@@ -650,7 +694,7 @@ def cmd_check(slug):
     except UnicodeDecodeError as e:
         raise Refusal(f"{found[0].as_posix()} is not UTF-8: {e}")
     pins, at = read_pins(text)
-    findings, summary = check_text(text, render_text(src, pins, at or ""), src, read_head_blob)
+    findings, summary = check_text(text, render_text(src, pins, at or "", read_repins(text)), src, read_head_blob)
     print(f"packet: {slug} · {found[0].as_posix()} · {summary}")
     for f in findings:
         print(f"  {f}")
@@ -661,7 +705,10 @@ def cmd_repin(name):
     chain = list(read_tree()["rows"])
     live = scan_live_run(chain, read_file)
     if live:
-        raise Refusal("--repin is the owner's, and never runs inside a chain run: " + "; ".join(live))
+        kind, why = derive_caller(os.environ, sys.stdin.isatty(), lambda: read_confirmation(name, live))
+        if kind != "owner":
+            raise Refusal(f"--repin is the owner's, and inside a chain run only an owner at a console runs it: {why}: "
+                          + "; ".join(live))
     inst = resolve_instrument(name)
     blob = read_head_blob(inst)
     if not blob:
@@ -675,13 +722,19 @@ def cmd_repin(name):
     if not packets:
         raise Unmeasured("no chain build has a packet, so there is nothing to re-pin")
     head = run_git("rev-parse", "HEAD").strip()
+    if live:
+        print(f"packet: owner repin inside a live chain run, recorded in each packet's Pins: {'; '.join(live)}")
     for s, path in packets:
-        pins, _at = read_pins(path.read_bytes().decode("utf-8"))
+        text = path.read_bytes().decode("utf-8")
+        pins, _at = read_pins(text)
         if not pins:
             raise Refusal(f"{path.as_posix()} carries no instrument pin to keep")
+        repins = read_repins(text)
+        if live:
+            repins[inst] = (blob, head, "; ".join(live))
         old = pins.get(inst)
         pins[inst] = blob
-        write_packet(path.as_posix(), render_text(derive_sources(s), pins, head))
+        write_packet(path.as_posix(), render_text(derive_sources(s), pins, head, repins))
         print(f"packet: {s} · {inst} pinned {(old or 'nothing')[:12]} -> {blob[:12]} · {path.as_posix()}")
     return 0
 
@@ -706,16 +759,40 @@ def run_fixture(slug, plant, control):
     full = seed_fixture(derive_sources(slug))
     label = (f"packet: fixture {slug}" + (f" · plant {plant}" if plant else "")
              + (f" · control {control}" if control else ""))
-    if plant in ("run-live", "run-landed"):
-        phase = "BUILDING" if plant == "run-live" else "LANDED"
-        tree = {f"memory/builds/{slug}/RUN.md": f"# {slug} - run state\n\n## Run facts\nphase: {phase}\n"}
-        live = scan_live_run(full["chain"], tree.get)
-        print(f"{label} · --repin " + (f"refused: {'; '.join(live)}" if live else "not refused: no live chain run"))
-        return 1 if live else 0
-    if plant in ("run-pushed", "run-unpushed", "run-dirty"):
-        live = run_landing_fixture(slug, plant)
-        print(f"{label} · --repin " + (f"refused: {'; '.join(live)}" if live else "not refused: no live chain run"))
-        return 1 if live else 0
+    if plant and plant.startswith("run-"):
+        def read_forbidden_answer():
+            raise AssertionError("the caller test prompted a caller it must refuse unasked")
+        callers = {"run-live-owner": ({}, True, lambda: "yes"),
+                   "run-live-agent": ({"AI_AGENT": "claude-code_0-0-0_agent"}, True, read_forbidden_answer),
+                   "run-live-detached": ({}, False, read_forbidden_answer)}
+        if plant in ("run-pushed", "run-unpushed", "run-dirty"):
+            live = run_landing_fixture(slug, plant)
+        else:
+            phase = "LANDED" if plant == "run-landed" else "BUILDING"
+            tree = {f"memory/builds/{slug}/RUN.md": f"# {slug} - run state\n\n## Run facts\nphase: {phase}\n"}
+            live = scan_live_run(full["chain"], tree.get)
+        if not live:
+            print(f"{label} · --repin not refused: no live chain run")
+            return 0
+        kind, why = derive_caller(*callers.get(plant, callers["run-live-agent"]))
+        if kind != "owner":
+            print(f"{label} · --repin refused: " + (f"{why}: " if plant in callers else "") + "; ".join(live))
+            return 1
+        head = run_git("rev-parse", "HEAD").strip()
+        pins = {p: b for p in INSTRUMENTS if (b := read_head_blob(p))}
+        record = (pins[SELF], head, "; ".join(live))
+        written = render_text(full, pins, head, {SELF: record})
+        repins = read_repins(written)
+        pins_w, at_w = read_pins(written)
+        findings, summary = check_text(written, render_text(full, pins_w, at_w, repins), full, read_head_blob)
+        moved = derive_blob(subprocess.run(["git", "show", f"HEAD:{SELF}"], capture_output=True).stdout + b"#")
+        kept = SELF in read_repins(render_text(full, dict(pins, **{SELF: moved}), head, repins))
+        back = repins.get(SELF) == record
+        print(f"{label} · --repin admitted: {why} · {summary} · record read back: {'yes' if back else 'no'} · "
+              f"record once the pin moves: {'kept' if kept else 'none'}")
+        for f in findings:
+            print(f"  {f}")
+        return 0 if back and not kept and not findings else 1
     head = run_git("rev-parse", "HEAD").strip()
     pins = {p: b for p in INSTRUMENTS if (b := read_head_blob(p))}
     blob_of = read_head_blob

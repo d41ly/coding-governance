@@ -58,6 +58,16 @@ A `--local` clone is cheap, the suite runs against a HEAD nothing can move, and 
 free for other work. It is also the only form in which two runs are comparable, which is what makes
 a baseline possible at all.
 
+**A frozen `--local` clone grades HEAD, not the working tree.** The clone above is right for a suite
+whose verdict is a statement about a commit. A suite whose verdict is recorded against the working
+tree, as a gate runner records a leg's green, must not take it: `_cmd_apply` in
+`tools/govkit/govkit.py` installs and stamps its own checkout's HEAD, so an uncommitted edit is never
+installed and the green certifies bytes the run never read, a false green rather than this record's
+false red. `run_in_gov` in `tools/govkit/matrix.py` drives its targets from exactly such a clone.
+Commit the working tree in a scratch clone instead, as `build_source_snapshot` in
+`tools/policy/check_policy.py` does (TOOL-dGroundRules-26), and run the deployer from that clone.
+[[test-oracle-read-from-a-historical-sha]] holds the oracle side of the same HEAD read.
+
 The suite could defend itself, and does not: it prints its vintage pin on the first line, and nothing
 re-checks that pin against HEAD at the end. **One assertion — HEAD is the same at exit as at import,
 else the run is UNSOUND rather than failed** — turns twenty silent minutes into a named refusal in

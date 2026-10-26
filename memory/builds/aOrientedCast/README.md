@@ -156,7 +156,7 @@ Ids whose spec moved past its audited revision: none — 0 of 33 unit id(s) carr
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `KICK-aOrientedCast-1`, `TOOL-aOrientedCast-1` | yes |
+| 1 | `KICK-aOrientedCast-1`, `TOOL-aOrientedCast-1` | no |
 | 2 | `TOOL-aOrientedCast-2` | no |
 | 3 | `TOOL-aOrientedCast-3` | no |
 | 4 | `TOOL-aOrientedCast-4` | no |

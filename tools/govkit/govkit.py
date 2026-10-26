@@ -13280,6 +13280,17 @@ def resolve_descriptor_paths(desc: dict, tool_root: str) -> dict:
     return desc
 
 
+def read_shipped_descriptors(root: pathlib.Path) -> dict[str, tuple[dict, str]]:
+    """TOOL-dGroundRules-32 S8 — the registry's descriptors as `cmd_shipped` reads them, or a Refusal
+    naming every problem the read recorded, one per line: a reader must not grade a narrowed registry
+    as the whole one. `cmd_shipped` and the policy kit's ships join read the registry through this."""
+    r = Report()
+    descs = read_descriptors(root, load_registry(root), r)
+    if r.problems:
+        raise Refusal("\n".join(r.problems))
+    return descs
+
+
 def cmd_shipped(root: pathlib.Path, epoch: bool = False) -> int:
     """TOOL-aRepatriatedFork-16 S1 — what THIS repo ships, as ONE derivation.
 
@@ -13292,10 +13303,10 @@ def cmd_shipped(root: pathlib.Path, epoch: bool = False) -> int:
     `EPOCH_ROLES`, the filter `derive_epoch_state` applies to these same survivors, so "this kit
     moved" has one answer for the version-bump rule and for the run-gates held-tier selection.
     """
-    r = Report()
-    descs = read_descriptors(root, load_registry(root), r)
-    if r.problems:
-        for p in r.problems:
+    try:
+        descs = read_shipped_descriptors(root)
+    except Refusal as exc:
+        for p in str(exc).split("\n"):
             sys.stderr.write(f"govkit: {p}\n")
         return 1
     rows = {f"{eid}\t{row['role']}\t{row['src']}"

@@ -750,6 +750,28 @@ CLI runs by path and reads the repository it is pointed at.
    removal. Then delete the manifest's `branch-reconcile skill wiring` leg row, which the
    `cleanup skill wiring` row replaces with the same `--check`.
 
+<!-- govkit:entry policy -->
+## 3i — Adopt the policy kit (with the review harness)
+
+One file per repository, `.governance/policy.toml`, holds the policy values its gates and hooks
+read, each checked against the kit's catalogue. The kit is not in the default selection. The
+`review-harness` kit requires it, and `govkit` refuses a selection that names a kit without what it
+requires, naming the missing id.
+
+1. Add `policy` to `kits` in `.governance/deploy.toml`, with `memory-tree`, which it requires.
+2. **What the install renders.** The kit's adopter, `bash <prefix>/policy/adopt-policy.sh
+   --scaffold`, runs at install and at every update unless `GOVKIT_RERENDER=0` declines it. It
+   writes the starter policy file only where none exists, and says `kept` otherwise: the file is
+   yours from its first write. It then renders the harness's two concurrency settings in
+   `.claude/settings.json` and the JSON mirror the hooks read, `.governance/policy.json`.
+3. **Commit, then re-run.** The mirror renders a commit, so on install day `--scaffold` prints one
+   line deferring it, ending `commit, then re-run --scaffold`, and exits 0. Commit the install and
+   the policy file, then run `--scaffold` again.
+4. **The leg ships.** The kit's `policy check` leg runs `python <prefix>/policy/check_policy.py`
+   over your policy file, and `adopt-policy.sh --check` runs the same check. Every key, its allowed
+   values and its default are rows of `<prefix>/policy/catalogue.toml`, whose grammar
+   `<prefix>/policy/README.md` gives.
+
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:
@@ -963,26 +985,26 @@ is reported `not wired`, never refused. The manual steps below are for a project
   ```
   The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression,
   and not two blocks. `Workflow` is where the hook reads a script; `Agent` is the direct-spawn
-  modality, which carries no script and is COUNTED instead: each spawn claims a numbered slot with
-  `O_EXCL` under a session+prompt-keyed directory in the git common dir (`<common>/agent-cap/`, so
-  git never tracks it), and the budget resets on the next user prompt. `<prefix>/check-wiring.sh` asserts
+  modality, which carries no script. `<prefix>/check-wiring.sh` asserts
   this matcher VALUE, not merely that the file mentions `agent-cap.js`: a group left at `Workflow`
   alone contains the string and used to report ok.
-  It DENIES any `Workflow` script that calls raw `parallel(`/`pipeline(` instead of the bounded
-  `boundedParallel`/`boundedPipeline` helpers, and it READS the number: the cap argument at each call
-  site, the helper's own default parameter, and the width a `gov:bounded-fanout` line claims. The 5 is
-  a file constant — there is no environment override, and a set `AGENT_CAP` is refused with a message
-  rather than silently ignored. This is the
-  mechanical enforcement of the review protocol's TWO rules: route fan-out through the bounded
-  helpers, AND a review's verify stage spawns at most the total the hook resolves. A wide fan-out
-  trips the server rate
+  The review protocol's TWO rules have two enforcers since TOOL-dGroundRules-10. How
+  many agents run AT ONCE is the policy key `runtime.agents-in-flight`: the policy kit renders it into
+  the harness's own two concurrency settings in `.claude/settings.json` (`python <prefix>/policy/policy.py
+  settings --write`, which every landing re-runs), the harness enforces them, and the hook refuses
+  any call whose checkout's settings are absent or above the landed limit. Run that render once at
+  install, after the policy kit, or the hook refuses every spawn. A review's verify stage spawning
+  at most the hook's `MAX_VERIFIERS` agents TOTAL is the hook's own rule, read from a `Workflow`
+  script. A `FANOUT_CAP` line in `.agent-cap.conf` lowers the limit through the policy reader and
+  never raises it; the hook reads no conf and no environment variable. A wide fan-out trips the
+  server rate
   limiter. The binding rules ship as `<prefix>/workflows/REVIEW-PROTOCOL.template.md` — install it at
   `<MEMORY_ROOT>/guides/REVIEW-PROTOCOL.md` (the path `check-protocol-parity.test.sh` treats as LIVE)
   and cite THAT copy from your manifest, not this runbook.
 - Copy the kit dir in as `<project>/<prefix>/workflows/` for a ready consolidated review harness
   (`tier2-review.js`): five finder lenses, then at most five BATCHED verifiers, then one synthesis
-  pass — 7–11 agents over the whole run, all within the verify-stage and concurrency bounds
-  `<prefix>/hooks/agent-cap.js` resolves.
+  pass — 7–11 agents over the whole run, all within the verify-stage bound
+  `<prefix>/hooks/agent-cap.js` resolves and the agent limit the policy kit renders.
 - Then run `bash <project>/<prefix>/workflows/check-protocol-parity.test.sh --render` once. The kit
   ships the unattended build harness as `unattended-build.template.js`, and this writes
   `unattended-build.js` beside it with your install paths filled in, and the protocol copy with it.

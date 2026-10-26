@@ -1,0 +1,83 @@
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
+# Contract: memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-1.md
+
+id = "policy"
+home = "policy"
+scope = "repo"
+# The kit's version constant; README.md's first line carries the marker that equals it
+# (TOOL-dGroundRules-21 S3), which govkit selfcheck 5 and 5c and `check-kit-versions.sh` read.
+version_from = { file = "policy.py", pattern = "^KIT_POLICY_VERSION = " }
+# A sibling kit is reached through the inlined `resolve_kit_dir` and a declared `requires`, and a miss
+# refuses: reader coverage reads the memory-tree kit's `tree_lib` (TOOL-dGroundRules-21 S26).
+requires = ["memory-tree"]
+
+# Everything the kit ships is engine, overwritten on every update: the catalogue, the shrink-only list
+# beside it, the module, the checker and the adopter; the legacy-home list alone is withheld, below. A repository's own policy is the file the
+# adopter scaffolds OUTSIDE this directory, `.governance/policy.toml`, which no update rewrites.
+[[files]]
+include = "**"
+role = "engine"
+
+# THE LEGACY-HOME LIST IS WITHHELD (TOOL-dGroundRules-17). Its rows are gov's own legacy homes, so in
+# an adopter every row would read as stale and every adopter key as a new home. Withheld by claiming
+# the destination as `project-owned`, the mechanism the runlog descriptor explains: govkit has no
+# `exclude` key and `apply` never writes a project-owned file. Where the list is absent the
+# `arm_legacy_homes` arm announces itself not graded, and `lists --write` never creates it.
+[[files]]
+include = ["legacy-homes.txt"]
+role = "project-owned"
+
+# `--scaffold` writes the starter policy file only where none exists, and says "kept" otherwise, then
+# renders the harness's settings wherever HEAD resolves.
+[adopt]
+argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold"]
+mutates_index = false
+
+# `--scaffold` IS the re-render: on every update, unless GOVKIT_RERENDER=0 is exported, it re-runs
+# the settings render over a kept policy file, so a changed renderer reaches every adopter
+# (TOOL-dGroundRules-21 S37).
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold"]
+
+[check]
+argv = ["bash", "{kit}/adopt-policy.sh", "--check"]
+
+# The JSON mirror the hooks read, rendered from the policy file at HEAD. The run-gates kit's
+# `regen.py --write` runs `write` in every landing the lander makes, so the landed revision carries
+# the render of its own policy file, and the bar's preflight runs `check` before its first leg.
+# Stage 2: it reads no other generated output, and the map at stage 3 reads the tree after it.
+[[generated]]
+path = ".governance/policy.json"
+generator = "policy.py"
+why = "the policy file's JSON mirror the hooks read, rendered at each landing (TOOL-dGroundRules-5)"
+write = ["python", "{kit}/policy.py", "mirror", "--write"]
+check = ["python", "{kit}/policy.py", "mirror", "--check"]
+stage = 2
+
+# The harness's two concurrency settings in `.claude/settings.json`, rendered from the agent limit
+# `runtime.agents-in-flight` resolves at HEAD (TOOL-dGroundRules-10), so a policy write and its render
+# land in one landing. Both argvs name the tracked file, so an exported GOV_SETTINGS_JSON cannot steer
+# the landing's render away from it (TOOL-dGroundRules-25 S32). Stage 1: it reads no other generated output.
+[[generated]]
+path = ".claude/settings.json"
+generator = "policy.py"
+why = "the harness's concurrency settings, rendered from runtime.agents-in-flight at each landing (TOOL-dGroundRules-10)"
+write = ["python", "{kit}/policy.py", "settings", "--write", ".claude/settings.json"]
+check = ["python", "{kit}/policy.py", "settings", "--check", ".claude/settings.json"]
+stage = 1
+
+[[outcome]]
+code = 0
+probe = { must_exist = ".governance/policy.toml" }
+means = "adopted"
+
+# THE POLICY LEG SHIPS. Its subject is the target's own policy file, which goes wrong with nobody
+# editing this kit, so a failure means the REPOSITORY's policy is wrong. The `policy fixtures` leg is
+# gov's alone, carried by an [[exempt_leg]] row in the deployer's registry: its subject is the code
+# in this directory.
+[[gate_leg]]
+name = "policy check"
+subject = "repo"
+argv = ["python", "{kit}/check_policy.py"]
+guard = []
+ceiling = 120

@@ -118,12 +118,12 @@ Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carr
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `DEPL-aFrugalTurnstile-1`, `PLAY-aFrugalTurnstile-1`, `TOOL-aFrugalTurnstile-1`, `TOOL-aFrugalTurnstile-10` | yes |
-| 2 | `TOOL-aFrugalTurnstile-2`, `TOOL-aFrugalTurnstile-3`, `TOOL-aFrugalTurnstile-5` | yes |
-| 3 | `TOOL-aFrugalTurnstile-11`, `TOOL-aFrugalTurnstile-4` | yes |
-| 4 | `TOOL-aFrugalTurnstile-6`, `TOOL-aFrugalTurnstile-7` | yes |
+| 2 | `TOOL-aFrugalTurnstile-2`, `TOOL-aFrugalTurnstile-3`, `TOOL-aFrugalTurnstile-5` | no |
+| 3 | `TOOL-aFrugalTurnstile-11`, `TOOL-aFrugalTurnstile-4` | no |
+| 4 | `TOOL-aFrugalTurnstile-6`, `TOOL-aFrugalTurnstile-7` | no |
 | 5 | `TOOL-aFrugalTurnstile-8`, `TOOL-aFrugalTurnstile-9` | yes |
-| 6 | `TOOL-aFrugalTurnstile-12`, `TOOL-aFrugalTurnstile-14`, `TOOL-aFrugalTurnstile-17` | yes |
-| 7 | `TOOL-aFrugalTurnstile-13`, `TOOL-aFrugalTurnstile-15` | yes |
+| 6 | `TOOL-aFrugalTurnstile-12`, `TOOL-aFrugalTurnstile-14`, `TOOL-aFrugalTurnstile-17` | no |
+| 7 | `TOOL-aFrugalTurnstile-13`, `TOOL-aFrugalTurnstile-15` | no |
 | 8 | `TOOL-aFrugalTurnstile-16` | no |
 <!-- /gen:build-order -->
 
