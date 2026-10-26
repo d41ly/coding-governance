@@ -19,20 +19,20 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: c8d46e188985ce49caad48cf874934661ad3fc7c · park · 43 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 96e9dd879f4ba64877af8a2ec36b276f4010421e
-phase: HELD
+witness: 4cbd011d59e15a76f53cbaf53b25146b658d0db8
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dsafepassage-567339
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-26T08:36:02Z
+lease-utc: 2026-10-26T18:23:28Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 23020
 session: c5f50d22-89c6-41d7-84e5-2382dcd49faa
-keepalive: 6e25bf31
+keepalive: 94fa87dd
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 anchor-ref: refs/heads/main
@@ -105,3 +105,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-26T17:15:57Z brief · item TOOL-dSafePassage-24 · reason 367133729cff memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-24-build-brief.md
 
 2026-10-26T17:36:47Z hold · item host-owner-action · reason until owner · reaped 6e25bf31 · resume none(owner)
+
+2026-10-26T18:23:36Z resume · item dSafePassage · reason held · keepalive 94fa87dd · manual
