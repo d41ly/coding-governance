@@ -9,13 +9,15 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-17930203704799228613-192741 023c5b29
+asks-at-landing: KICK-dKeptSession-29=DEFERRED
+units-at-landing: KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-33 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-4 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-20 KICK-dKeptSession-32 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-30 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-22 KICK-dKeptSession-31 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-51 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-43 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 KICK-dKeptSession-17 KICK-dKeptSession-61 KICK-dKeptSession-18 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65
+gates-run: unattended-17930237966129261149-272420 105ae5c0
 parked-surfaced: yes, 65 surfaced
 keepalive-reaped: yes
 refreshed-at: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 85eb778a0729203280a8edfec633debdabb582c2
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -248,3 +250,7 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T08:34:17Z rescope · item defer KICK-dKeptSession-64 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
 
 2026-10-26T08:34:21Z rescope · item defer KICK-dKeptSession-65 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 4's first no-high exit by the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md); the build run after this one builds it, advancing KICK-dKeptSession-29
+
+2026-10-26T14:36:32Z override · item specs-audited · reason the owner ruled 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md) that this build's spec-audit chain stops at the first round confirming no BLOCKER and no HIGH, round 4, and that the remaining minors batches close under this override; KICK-dKeptSession-65, round 6's minors batch, is the one spec no spec-audit record names, its round 7 stopped in its lens stage by that ruling
+
+2026-10-26T14:36:32Z override · item closing-review-recorded · reason a spec run writes no code, so its diff is specs and records only; the owner's ruling of 2026-10-26 (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md) takes the six-round spec-audit chain as the review of this spec-only diff, as for dPlacedRequest; the build run's closing diff review over the code is unaffected and stays owed
