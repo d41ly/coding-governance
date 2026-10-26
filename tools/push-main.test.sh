@@ -1262,11 +1262,20 @@ PY
     B34=$(git rev-parse HEAD)
     bash "$lander" --prepare --slug tGovFirstPlant 2>&1 >/dev/null; echo "plant-rc=$?"
     [ "$(git rev-parse refs/heads/plant)" = "$B34" ] && echo unmoved=1
+    # TOOL-dSafePassage-25 AC1/AC2: the refusal leaves nothing the walk made, and the retry without
+    # the plant prepares a merge whose .governance (receipt, steps, outbox) is the clean run's.
+    st34=$(git status --porcelain); [ -z "$st34" ] && echo plant-clean=1 || echo "plant-left=[$st34]"
+    git checkout -q main -- "${KIT_REL}$_mt_gk/steps.toml"
+    git commit -q --no-verify -m "TOOL-tFix-34: the planted step removed"
+    bash "$lander" --prepare --slug tGovFirstRetry >/dev/null 2>&1; echo "retry-rc=$?"
+    gf34a=$(git ls-tree -r --name-only HEAD -- .governance)
+    gf34b=$(git ls-tree -r --name-only refs/heads/feat -- .governance)
+    [ "$gf34a" = "$gf34b" ] && echo retry-merge=clean || echo "retry-merge=[$gf34a] clean-run=[$gf34b]"
   )
   case "$out34" in
-    *"clean-rc=0"*"applied=all"*"govkit/planted-witness-fails"*"plant-rc=1"*"unmoved=1"*)
-      ok "34 --prepare walks every declared step on gov first into the prepared merge, and refuses a step whose witness never holds, the branch unmoved" ;;
-    *) bad "34 the prepared merge lacks gov's receipt of every applied step, or a failing step was not refused with the branch unmoved: $out34" ;;
+    *"clean-rc=0"*"applied=all"*"govkit/planted-witness-fails"*"plant-rc=1"*"unmoved=1"*"plant-clean=1"*"retry-rc=0"*"retry-merge=clean"*)
+      ok "34 --prepare walks every declared step on gov first into the prepared merge, and refuses a step whose witness never holds, the branch unmoved and no file of the walk left behind, so the retry's merge holds none" ;;
+    *) bad "34 the prepared merge lacks gov's receipt of every applied step, or a failing step was not refused with the branch unmoved and the tree clean, or the retry folded the refused walk's leftovers: $out34" ;;
   esac
 else
   echo "  skip — 34 no govkit deployer beside this lander or no python launcher, so the gov-first arm did not run"

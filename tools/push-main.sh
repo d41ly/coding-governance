@@ -1055,11 +1055,12 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
   fi
   # GOV FIRST INTO THE MERGE (TOOL-dSafePassage-8 S4): after the mint and before the regeneration,
   # so gov's receipt joins the one rewritten merge. The snapshot is taken before it, so a refused
-  # regeneration below also cleans the receipt it created.
+  # walk (TOOL-dSafePassage-25) and a refused regeneration below both clean the receipt, the
+  # before-images and the orders the walk created, which the reset leaves untracked.
   rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
   if ! run_gov_first; then
     git reset -q --hard "$t" >/dev/null 2>&1 || true
-    rm -f "$rgsnap"
+    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
@@ -1254,12 +1255,16 @@ while [ "$attempt" -le "$max" ]; do
   fi
 
   # GOV FIRST, on every attempt, after the mint (TOOL-dSafePassage-8 S4): its own commit, named and
-  # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike.
+  # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike. A
+  # refusal cleans what the walk created against a snapshot taken before it (TOOL-dSafePassage-25).
+  gfsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$gfsnap"
   if ! run_gov_first; then
     git reset -q --hard HEAD >/dev/null 2>&1 || true
+    remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
     echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Aborted (no push)." >&2
     exit 1
   fi
+  rm -f "$gfsnap"
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
     git add -A
     gf_unit=$(read_mint_unit "$mt..HEAD")
