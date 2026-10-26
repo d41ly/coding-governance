@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-15 — code purposes: derived first from docstrings and headers, an agent's pass for the rest as `memory.code-enrich` says, keyed to body hashes and joined both ways with a pending population
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 18 · advances TOOL-dLinkedLibrary-26
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 18 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0252@5aa0f94b whole
 **Carries:** node:policy-key.memory.code-enrich
@@ -10,10 +10,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md) | journal | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
-| [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-c.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-c.md) | research | TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 |
+| [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-c.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-c.md) | research | TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
 
@@ -112,6 +113,9 @@ dGroundRules' `resolve` (`tools/policy/policy.py:752`). All but `resolve` are DE
 - **consumes-from** `TOOL-dLinkedLibrary-14` — `gov_code.py`, whose `show` line S8 extends with the purpose
 - **consumes-from** `TOOL-dLinkedLibrary-4` — `parse_note_line`, the one parser of a `gov:note` line, read under `in-code-notes`
 - **consumes-from** external — TOOL-dTotalRecall-8 S2, S7 and S10 (the record, `code_row.hash`, `policy_value.py`), TOOL-dTotalRecall-16 §4 (`derive_purpose`'s text rules), TOOL-dWitnessedBar-13 S1, S2, S4 and S10 (the ledger factory) and PLAY-dOrderedCharter-19 S4 (`build_index`), DEFERRED at base and built before this unit's pass
+- **hands-off** `TOOL-dLinkedLibrary-46` — `code record selftest`, the leg that runs `code_enrich.py --selftest`; this unit's ledger names it for the arm line (id 49)
+- **hands-off** `TOOL-dLinkedLibrary-52` — `derive_source_purpose`, whose header unit 52 reads through `extract_comment_spans` (id 39)
+- **hands-off** `TOOL-dLinkedLibrary-53` — `code-purpose-pending.txt` and the purposes file, whose merge lines unit 53 writes (id 76)
 
 ## 4. Design
 
@@ -280,6 +284,7 @@ New arm: tools/memory-tree/code_enrich.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · `
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 15, NP-11 (night-pass.md:531, :659),
   night pass point 3 item 3, research-code-orientation.md:87-92, TOOL-dTotalRecall-8 S7 and S10,
   TOOL-dTotalRecall-16 §4, TOOL-dWitnessedBar-13 and scout C's row for cl-0252.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-46, TOOL-dLinkedLibrary-52, TOOL-dLinkedLibrary-53, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 
 ## 10. Reuse audit
 

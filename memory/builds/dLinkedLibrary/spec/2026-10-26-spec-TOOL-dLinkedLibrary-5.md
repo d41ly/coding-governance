@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-5 — the generated views: the decision log's holds-now view and the reuse view
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 9 · advances TOOL-dLinkedLibrary-26
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 9 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0242@866cebbc whole
 
@@ -12,6 +12,7 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
 
@@ -82,6 +83,8 @@ and relation graph, which it reads by linking to them and never renders again.
 - **consumes-from** `TOOL-dLinkedLibrary-1` — `reuse.toml`, the entries `read_reuse_entries` returns, with their states, for the reuse view
 - **consumes-from** `TOOL-dLinkedLibrary-22` — `decides`, the targets each holding row's `<decides>` cell renders
 - **consumes-from** external — PLAY-dOrderedCharter-18 S1's `id_grammar.py` (`extract_records`, `extract_supersessions`, `derive_supersession_map`); TOOL-dTotalRecall-4 S5 and -6 S7, the README regions the build cell links to; each DEFERRED at base and built before this build run
+- **hands-off** `TOOL-dLinkedLibrary-52` — the holds-now view's `<build>` cell, which unit 52 links only where the README is tracked (id 23)
+- **hands-off** `TOOL-dLinkedLibrary-53` — the §7 leg line, which unit 53 completes with `policy fixtures` unless this unit's pass adds it first (id 56)
 
 ## 4. Design
 
@@ -248,6 +251,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC3 AC4 AC5 · the `
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 5, layer-memory `[views]` and
   `[decisions]` item 2, PLAY-dOrderedCharter-18 S1, TOOL-dTotalRecall-4 S5 and -6 S7, and scout A's
   row 5.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-52, TOOL-dLinkedLibrary-53, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 
 ## 10. Reuse audit
 

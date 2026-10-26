@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-8 — retrofit's record kinds, the `origin` field, and the `adopt` program the core's own command runs
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 20 · advances TOOL-dLinkedLibrary-26
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 20 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0245@2d7af537 whole
 **Carries:** node:record-kind.baseline
@@ -20,9 +20,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md) | journal | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
-| [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md) | research | TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-23 |
+| [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md) | research | TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
 
@@ -155,6 +156,10 @@ module `tools/memory-tree/decision_rubric.py` with `CLASSES`, `RUBRIC`, its labe
 - **hands-off** `TOOL-dLinkedLibrary-10` — `baseline`, the kind whose records are the ledger's population files, whose progress the cell reports
 - **hands-off** `TOOL-dLinkedLibrary-23` — `origin`, the `imported:<path>` value its paragraph proposals carry, beside the `adopt` dispatcher whose `instructions` verb it adds and the census class `instruction-file`
 - **consumes-from** external — TOOL-dTotalRecall-1, -2 and -18, PLAY-dOrderedCharter-7 and -15, TOOL-dDeclaredLoop-12 and -23, TOOL-dWitnessedBar-13 and -15, DEFERRED at base and built before this unit's pass
+- **hands-off** `TOOL-dLinkedLibrary-37` — `adopt_program.py decisions --rate` and the door's `--imported-from`, through which unit 37 mints its two planted records (id 58)
+- **hands-off** `TOOL-dLinkedLibrary-47` — `adopt program selftest`, the leg unit 47 adds to run this unit's plants; this unit's ledger names it for the arm line (id 50)
+- **hands-off** `TOOL-dLinkedLibrary-51` — `CI_REFUSE_PATTERNS` and the `ci-job` class, which unit 51 widens (id 67)
+- **hands-off** `TOOL-dLinkedLibrary-52` — `adopt_program.py`'s `split` plant, which unit 52 resizes so AC3 can pass; this unit's ledger answers AC3 AMENDED (ids 5, 24, 38)
 
 ## 4. Design
 
@@ -401,6 +406,7 @@ New arm: tools/memory-tree/adopt_program.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 8, retrofit.md `[seed]`, `[origin]`,
   `[practices]` and RF-3, RF-4 (:343-372, :445-470, :471-484, :579-582), flow-steps.md `[adopt]`
   (:702-718), layer-memory.md:463-465, and scout D's row for cl-0245.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-37, TOOL-dLinkedLibrary-47, TOOL-dLinkedLibrary-51, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 
 ## 10. Reuse audit
 

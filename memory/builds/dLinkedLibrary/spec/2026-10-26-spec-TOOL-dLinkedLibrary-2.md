@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-2 — the reuse scout's house index, delivered through the task card's `**Reuse:**` field and accepted on aScoutedSeam's benchmark
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 23 · advances TOOL-dLinkedLibrary-26
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 23 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0239@36d4c1c8 whole
 **Carries:** node:policy-key.reuse.delivery
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
 
@@ -130,6 +131,8 @@ the contract over dGroundRules' `resolve` (`tools/policy/policy.py:752`).
 - **consumes-from** external — dFairHearing, built before this build run: `replay_scorer.py`'s `scouted-seam` instance and `--experiment` (TOOL-dFairHearing-12 S4, -14 S1)
 - **consumes-from** external — dOrderedCharter: `read_policy_value` (PLAY-dOrderedCharter-7 §4)
 - **hands-off** external — dBoundRoles: the bench declared as an `experiment` workflow entry once that kind lands
+- **hands-off** `TOOL-dLinkedLibrary-42` — `house_index.py`, the codebase-map CLI `MAP_CLI` names from unit 42 on (id 8)
+- **hands-off** `TOOL-dLinkedLibrary-52` — `house_index.py`, whose manifest read, conf keys and slot unit 52 re-points and caps (ids 29, 41, 54, 81)
 
 ## 4. Design
 
@@ -328,6 +331,7 @@ New arm: tools/codebase-map/selftest.py · covers AC1 AC2 AC3 AC6 AC9 · the cor
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 2, layer-memory `[reuse]` :716-744, the
   M1c trial and arm, TOOL-dFairHearing-12 and -14, TOOL-aScoutedSeam-1 S10, I24 and scout A's row
   for this unit.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-42, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 
 ## 10. Reuse audit
 

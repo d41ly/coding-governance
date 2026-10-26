@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-9 — the origin check: each record's `origin` re-derived from history, shown in every slice and ranked in the reuse digest
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 21 · advances TOOL-dLinkedLibrary-26
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 21 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0246@96afa172 whole
 
@@ -9,9 +9,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md) | journal | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
-| [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-23 |
+| [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 |
 
 <!-- /gen:spec-records -->
 
@@ -95,6 +96,8 @@ and the `origin` field with its three values, written by the door (TOOL-dLinkedL
 - **consumes-from** `TOOL-dLinkedLibrary-8` — `origin`, the field and its three values (I20) the door writes on every record kind; without it the check has no stored value to compare and stays unarmed
 - **hands-off** `TOOL-dLinkedLibrary-2` — `reconstructed`, ranked last by `origin_rank`, the order the reuse digest sorts its records and entries by
 - **consumes-from** external — dTotalRecall, built before this build run: `read_header_edges` (TOOL-dTotalRecall-19 S1), the record door (TOOL-dTotalRecall-2 S1 to S5), and `record find` and `record show` (TOOL-dTotalRecall-9 S3, S5)
+- **hands-off** `TOOL-dLinkedLibrary-37` — `derive_origin` and its table, whose provenance rows unit 37 rewrites, and the `reconstructed-but-written` plant it renames (id 58)
+- **hands-off** `TOOL-dLinkedLibrary-52` — the two legs, which unit 52 declares through `leg_factory.py new` with their meta rows (ids 37, 45)
 
 ## 4. Design
 
@@ -278,6 +281,7 @@ New arm: tools/memory-tree/record_origin.py --selftest (the `record origin selft
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 9, retrofit.md `[origin]` :445-470,
   TOOL-dTotalRecall-2, -9 and -19, I20 and scout D's row for this unit.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-37, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 
 ## 10. Reuse audit
 

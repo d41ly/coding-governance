@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-3 — `reuse_lookup.py` and its agent retired, every reader rewritten by name and by value, with its upgrade step, and memory-recall narrowed to its why-search
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 24 · advances TOOL-dLinkedLibrary-26
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 24 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0240@5773ca81 whole
 **Carries:** node:record-kind.recall-index
@@ -13,6 +13,7 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
 
@@ -145,6 +146,9 @@ grammar and record, and `gen_build_index.py --reuse-scouts` (TOOL-dLinkedLibrary
 - **consumes-from** external — dTotalRecall, built before this build run: `record find`, `gov_map.py`, `record_kinds.py new` and the one index (TOOL-dTotalRecall-9 S3, -14 S2, -1 S9, -21 S2)
 - **consumes-from** external — dSafePassage: the `[[upgrade]]` and `[[retired]]` rows and `upgrade_steps.py` (TOOL-dSafePassage-1 S1 to S3)
 - **hands-off** external — dBoundRoles: recall's bench and union as an `experiment` workflow entry (TOOL-dBoundRoles-16 S4), the ask of §8 F3
+- **hands-off** `TOOL-dLinkedLibrary-42` — `MAP_CLI` and the step's `up`, which unit 42 points at the house index; this unit's ledger answers AC4 and AC7 AMENDED (id 8)
+- **hands-off** `TOOL-dLinkedLibrary-52` — `memory/project/encoding-posture-sites.txt` and the kit's `[[files]]` rows and selftest arms naming the three deleted files, which unit 52 drains (ids 44, 74)
+- **hands-off** `TOOL-dLinkedLibrary-53` — `tools/dead-path-waivers.txt` rows for the kept carriers, AC1's allowed hits and the protocol render's size, which unit 53 observes; this unit's ledger answers AC1 AMENDED (ids 12, 26, 43, 57)
 
 ## 4. Design
 
@@ -319,6 +323,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 AC5 · the stale-doss
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 3, layer-memory `[reuse]` :745-760,
   SA-6, TOOL-dSafePassage-1, TOOL-dBoundRoles-16 S4, I25 refined, and scout A's row and
   disagreements 2 to 4 and 7 for this unit.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-42, TOOL-dLinkedLibrary-52, TOOL-dLinkedLibrary-53, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 
 ## 10. Reuse audit
 

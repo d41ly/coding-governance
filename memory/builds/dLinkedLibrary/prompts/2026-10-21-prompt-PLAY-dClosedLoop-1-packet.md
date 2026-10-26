@@ -76,7 +76,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `b121325549783e09270194abf6cfa4f63b204aa7`
+- rendered at: `823440497d3815f59716b8c5ef42e8c4851b2935`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -222,12 +222,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dLinkedLibrary`:
 
-Coverage of dLinkedLibrary's 25 clauses and 25 owned nodes, over 25 specs:
+Coverage of dLinkedLibrary's 25 clauses and 25 owned nodes, over 42 specs:
 - carried whole: 25; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0238; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-37.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-38.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-39.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-40.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-41.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-42.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-43.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-44.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-45.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-46.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-47.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-48.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-49.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-50.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-51.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-52.md (PLAY-dClosedLoop-2), memory/builds/dLinkedLibrary/spec/2026-10-26-spec-TOOL-dLinkedLibrary-53.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0242, cl-dClosedLoop-0243, cl-dClosedLoop-0247, cl-dClosedLoop-0248, cl-dClosedLoop-0256, cl-dClosedLoop-0261
 
 ### Reading order

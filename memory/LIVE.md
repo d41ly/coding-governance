@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-26, the newest record date in this tree (dBoundRoles).
+Dormant: no record dated within 21 days of 2026-10-27, the newest record date in this tree (dLinkedLibrary).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -22,7 +22,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | OPEN | d | 2026-10-21 | tooling | 21 | 2026-10-21 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-10-26 | active | 0 |
 | [dKeptSession](builds/dKeptSession/README.md) | DEFERRED | d | 2026-10-21 | kickoff | 65 | 2026-10-26 | active | 0 |
-| [dLinkedLibrary](builds/dLinkedLibrary/README.md) | OPEN | d | 2026-10-21 | tooling | 36 | 2026-10-26 | active | 0 |
+| [dLinkedLibrary](builds/dLinkedLibrary/README.md) | OPEN | d | 2026-10-21 | tooling | 53 | 2026-10-27 | active | 0 |
 | [dMindYourWords](builds/dMindYourWords/README.md) | OPEN | d | 2026-10-21 | tooling | 18 | 2026-10-21 | active | 0 |
 | [dOrderedCharter](builds/dOrderedCharter/README.md) | DEFERRED | d | 2026-10-21 | playbook | 55 | 2026-10-25 | active | 0 |
 | [dPlacedRequest](builds/dPlacedRequest/README.md) | DEFERRED | d | 2026-10-21 | tooling | 67 | 2026-10-26 | active | 0 |
