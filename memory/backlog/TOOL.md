@@ -388,7 +388,16 @@ Cite ids, never line numbers.
 | [TOOL-cTracedPromise-4](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | check-memory-hygiene.test.sh printed an AUTHORED assertion count, stuck… |
 | [TOOL-cTracedPromise-5](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | an adopter who fills TRACE_CUTOFF before closing any spec after it reds… |
 | [TOOL-cTracedPromise-7](../builds/cTracedPromise/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-15 | the unset-TRACE_CUTOFF row prints DEAD PROBE though --check ignores it:… |
-| [TOOL-dBoundRoles-27](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dBoundRoles-27](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | MED | TOOL-dBoundRoles-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dBoundRoles-28](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-17 | 2026-10-26 | THE MARKER'S item= HAS NO WRITER IN THE SPEC WHO IS HANDED IT.… |
+| [TOOL-dBoundRoles-29](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-20 | 2026-10-26 | PLAY-dOrderedCharter-36's KIND SCHEMA HAS NO ROW-SCOPED fixed-by. A… |
+| [TOOL-dBoundRoles-30](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-15 | 2026-10-26 | PLAY-dOrderedCharter-11 S3 AND S4 READ A TABLE THIS BUILD DELETES. They… |
+| [TOOL-dBoundRoles-31](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-15 | 2026-10-26 | TOOL-dGroundRules-9 S1's CENSUS ROW POINTS AT A DELETED CONSTANT. Its… |
+| [TOOL-dBoundRoles-32](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-22 | 2026-10-26 | TOOL-dDeclaredLoop-6 S8's new workflow FACTORY WRITES THE OLD ROW… |
+| [TOOL-dBoundRoles-33](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | MED | TOOL-dBoundRoles-20 | 2026-10-26 | TOOL-dDeclaredLoop-24's COMPOSITION CHECK DOES NOT CALL THE ACTOR-PATCH… |
+| [TOOL-dBoundRoles-34](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-26 | 2026-10-26 | TOOL-dDeclaredLoop-14's REFUSAL ROW CARRIES NO REMEDY OR ACTOR.… |
+| [TOOL-dBoundRoles-35](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-12 | 2026-10-26 | TOOL-dPlacedRequest-4's place --return READS AN UNCHECKED RETURN.… |
+| [TOOL-dBoundRoles-36](../builds/dBoundRoles/BACKLOG.md) | DEFERRED | LOW | TOOL-dBoundRoles-2 | 2026-10-26 | TOOL-dWitnessedBar-23 WRITES THE TESTER IN THE RETIRING ROLE SHAPE. Its… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
