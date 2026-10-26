@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-9 — the memory extractors, `record find` and `record show` over the one index, and the per-item read budget
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 18 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 18 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0220@d0de1caf whole
 
@@ -30,6 +30,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
+| [2026-10-26-build-TOOL-dTotalRecall-9-deviation-91.md](../build/2026-10-26-build-TOOL-dTotalRecall-9-deviation-91.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -57,8 +60,9 @@ and `TAG_RE` (PLAY-dOrderedCharter-19 S1, S2, S4, S6); the `id#tag` address form
 unit (PLAY-dOrderedCharter-24 §4, -28 §3); `policy_value.py`'s contract (PLAY-dOrderedCharter-7 §4) through
 the memory-tree adapter (TOOL-dTotalRecall-8 S10); the caps census `tools/policy/caps.toml` and its `exempt`
 class (TOOL-dGroundRules-9 S1); the load-set check in `render_handoff` (PLAY-dOrderedCharter-11 S4); the
-card's `memory —` cell and `measure_index` (PLAY-dOrderedCharter-14 S2, S3); and the four catalogue rows
-landed with no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6).
+card's `memory —` cell and `measure_index` (PLAY-dOrderedCharter-14 S2, S3); the four catalogue rows
+landed with no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6); and each leg's one declaration, from
+which `tools/run-gates/leg_factory.py --write` renders `tools/gate-legs.json` (TOOL-dWitnessedBar-11 S1, S2).
 
 - **S1** — The extractors, in `tools/memory-tree/record_extract.py`, each one `[[namespace]]` row of
   `tools/playbook/namespaces.toml` with `extractor = "record_extract:<function>"` (I12):
@@ -91,9 +95,12 @@ landed with no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6).
   path:line`, no content, superseded rows hidden; past 40, the last line reads `<total> rows match;
   narrow with --kind, --build or --paths`. Observed by AC4 and AC5.
 - **S4** — The `check-recall` leg taken over: `tools/memory-recall/check-recall.py` grades `record find`'s
-  ranking through `record_find.run_fusion`, its floor unchanged, and the `recall floor` leg's guard in
-  `tools/gate-legs.json` gains `{prefix}/memory-tree/record_find.py`. The leg keeps its name. Observed by
-  AC6.
+  ranking through `record_find.run_fusion`, its floor unchanged, and the `recall floor` leg's guard gains
+  `{prefix}/memory-tree/record_find.py` in the leg's one declaration, its `[[exempt_leg]]` row at
+  `tools/govkit/registry.toml:380`, which holds the leg's whole row (TOOL-dWitnessedBar-11 S1); `python
+  tools/run-gates/leg_factory.py --write` then renders `tools/gate-legs.json` from it, since a guard
+  edited in the manifest alone reds `--check` (its S2). The leg keeps its name, and its `enforces` stays
+  TOOL-dWitnessedBar-11 S6's. Observed by AC6.
 - **S5** — `record show` in `record_find.py`, run as `python gov_record.py show <id>[#<tag>][@<blob>]`:
   the section's text sliced from its blob at the row's `line` to `end_line`, or the whole record with no
   `#<tag>`; `@<blob>` reads that blob's rows. An unknown key or tag exits 2 naming it. `gov_tag.py show`
@@ -241,7 +248,8 @@ arguments and output, so a caller of it sees no change.
 - `tools/policy/caps.toml`
 - `tools/policy/catalogue.toml`
 - `tools/policy/unsummarised-keys.txt`
-- `tools/gate-legs.json`
+- `tools/govkit/registry.toml` (the `recall floor` declaration's guard)
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`)
 - `tools/memory-tree/README.md`
 
 ### Alternatives rejected
@@ -293,8 +301,10 @@ arguments and output, so a caller of it sees no change.
   Red when: the archive is outside the record extractor's source, or a superseded row is returned.
 - **AC6** — When `python check-recall.py --data-dir <a scratch index>` runs from `tools/memory-recall/`, its
   graded rows equal those the pass's base computes, and `git grep -n "def run_fusion" -- tools` prints one
-  line, in `record_find.py`.
-  Red when: the leg grades a copy of the fusion that `record find` does not run.
+  line, in `record_find.py`; and `python leg_factory.py --check` run from `tools/run-gates/` exits 0 while
+  the `recall floor` row of `tools/gate-legs.json` lists `{prefix}/memory-tree/record_find.py` in its guard.
+  Red when: the leg grades a copy of the fusion that `record find` does not run, or the guard is edited
+  in the manifest alone, so `--check` exits 1 naming `recall floor`.
 - **AC7** — When `gov_record.py show <key>#section.nope` runs, it exits 2 naming `section.nope`; `show
   <key>@<an older blob of it>` returns that blob's text; `gov_tag.py show <key>#<tag>` prints the same
   section as `record show`.
@@ -368,6 +378,10 @@ New arm: tools/memory-recall/test_recall_floor.py · covers AC6 · the floor arm
   `extract.py` and `handoff.py` read at base `462d20f3`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · §2 preconditions, S4 · §4 Files touched · §6 AC6 · re-grounded on dWitnessedBar at
+  `443775a2f`, by the cross-check record `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck`, row
+  27: the `recall floor` guard is edited in its `[[exempt_leg]]` declaration and the manifest
+  regenerated by `leg_factory.py --write`, which AC6 observes through `--check`.
 
 ## 10. Reuse audit
 
