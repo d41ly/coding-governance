@@ -56,3 +56,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## From the first dispatch
+
+- The first builder handed this unit back because node a had only Python 3.14.6. The owner has since provisioned 3.15.2 (`memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-11-owner-python-floor.md`): `py -0p` lists `pythoncore-3.15-64` and `python3`, `python` and `py` all report 3.15.2. Re-probe before you build; other nodes (b, c, d) are §4 Rollout's landing cost, not this pass's.
