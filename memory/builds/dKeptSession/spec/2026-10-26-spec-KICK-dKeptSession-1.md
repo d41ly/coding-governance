@@ -1,6 +1,6 @@
 # KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 1 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 1 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0139@065e06ab whole
 **Carries:** node:policy-key.preset
@@ -10,9 +10,13 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-build-KICK-dKeptSession-1-crosscheck-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-crosscheck-returns.md) | research | — |
 | [2026-10-26-build-KICK-dKeptSession-1-departures-spec.md](../build/2026-10-26-build-KICK-dKeptSession-1-departures-spec.md) | journal | — |
 | [2026-10-26-build-KICK-dKeptSession-1-deviation-11.md](../build/2026-10-26-build-KICK-dKeptSession-1-deviation-11.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-1-deviation-12.md](../build/2026-10-26-build-KICK-dKeptSession-1-deviation-12.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-1-fix-return.md](../build/2026-10-26-build-KICK-dKeptSession-1-fix-return.md) | research | KICK-dKeptSession-2 KICK-dKeptSession-5 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-28 |
+| [2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md](../build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md) | research | — |
+| [2026-10-26-build-KICK-dKeptSession-1-reground-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-reground-returns.md) | research | — |
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-a.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-a.md) | research | KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-16 KICK-dKeptSession-19 KICK-dKeptSession-20 |
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-b.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-b.md) | research | KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-10 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-26 |
@@ -22,8 +26,12 @@
 | [2026-10-26-prompt-KICK-dKeptSession-1-3-reuse-scout.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-3-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-4-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-4-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-5-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-5-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-6-spec-reviewer.md) | journal | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-7-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-7-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md) | research | KICK-dKeptSession-2 KICK-dKeptSession-5 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-28 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md) | research | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-prompt-KICK-dKeptSession-30-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-1-spec-writer.md) | journal | KICK-dKeptSession-30 |
 | [2026-10-26-prompt-KICK-dKeptSession-56-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-56-1-spec-writer.md) | journal | KICK-dKeptSession-56 |
@@ -70,9 +78,14 @@ left pending for this build, so every reader in this build reads one store.
   `presets` table to this rule. Each problem carries the line `derive_key_line` finds. Observed by
   AC4 and AC5.
 - **S4** — The core-only load, `load_preset(name, table)` in `presets.py`, printed by `python
-  presets.py load <name>`: the named preset's assignment, each pair passed to dDeclaredLoop's
-  `check_expansion_value(key, value)`, a refusal only for a value a `[[selects]]` row of
-  `tools/loop/loop.toml` names (shared interface I3), never for a key alone. This unit adds the
+  presets.py load <name>`: the named preset's assignment, each pair judged by dDeclaredLoop's
+  `check_expansion_value(key, value)` (TOOL-dDeclaredLoop-2 S8), a refusal only for a value a
+  `[[selects]]` row of `tools/loop/loop.toml` names (shared interface I3), never for a key alone. A
+  kit imports no sibling kit (TOOL-dGroundRules-1 §4; TOOL-dDeclaredLoop-12 S4), so `presets.py` finds
+  `guard.py` through the policy kit's one inline block, `resolve_kit_dir("loop", "guard.py", here)`
+  (`tools/policy/policy.py:1132-1169`), and runs it as one subprocess per load, the verb §8 F4 asks
+  for; with the loop kit not found, the load exits 2 naming the kit, as PLAY-dOrderedCharter-7's
+  reader refuses with no policy kit found. This unit adds the
   `[[selects]]` row `build.closes` = `after-release-verifies` at the release slot's point, so on an
   install whose layer register attaches nothing there `strict` and `guarded` are refused for
   `build.closes` and `velocity` and `standard` load. Observed by AC6, AC7 and AC8.
@@ -117,8 +130,8 @@ left pending for this build, so every reader in this build reads one store.
 - **hands-off** `KICK-dKeptSession-20` — `presets.toml` and its `never` list, which a scenario's preset slot reads and may not set
 - **hands-off** `KICK-dKeptSession-9` — `presets.toml`, whose strict table holds `orient.budget` = `warn-at-evidence-ceiling`
 - **hands-off** `KICK-dKeptSession-7` — `presets.toml`, whose strict table holds the `deps.coordination` and `deps.early-build` cells
-- **consumes-from** external — dGroundRules' `check_value`, `read_catalogue_row`, `validate` with its `budgets` table rule, `check_policy.py`'s `ARMS` and fixture (TOOL-dGroundRules-1, -2, -9); dDeclaredLoop's `check_expansion_value` and `[[selects]]` rows (TOOL-dDeclaredLoop-2 S8) and its factory module (TOOL-dDeclaredLoop-6 S2); dOrderedCharter's `kinds.toml`, `core-pending.txt`, `core.py new` (PLAY-dOrderedCharter-7 S4-S6) and the layer register (PLAY-dOrderedCharter-16 S1)
-- **hands-off** external — the attached-point judgement in `check_expansion_value` (§8 F2) and a value per shipped preset in `new policy-key` (§8 F3), each an ask for dDeclaredLoop
+- **consumes-from** external — dGroundRules' `check_value`, `read_catalogue_row`, `validate` with its `budgets` table rule, `check_policy.py`'s `ARMS` and fixture (TOOL-dGroundRules-1, -2, -9); dDeclaredLoop's `check_expansion_value`, reached by subprocess, and `[[selects]]` rows (TOOL-dDeclaredLoop-2 S8) and its factory module (TOOL-dDeclaredLoop-6 S2); dOrderedCharter's `kinds.toml`, `core-pending.txt`, `core.py new` (PLAY-dOrderedCharter-7 S4-S6) and the layer register (PLAY-dOrderedCharter-16 S1)
+- **hands-off** external — the attached-point judgement in `check_expansion_value` (§8 F2), a value per shipped preset in `new policy-key` (§8 F3) and a `guard.py` verb printing `check_expansion_value`'s verdict (§8 F4), each an ask for dDeclaredLoop
 - **hands-off** `KICK-dKeptSession-33` — `presets.toml` and `check_presets`, whose rule for the eight derived-default rows that unit states (id 17)
 - **hands-off** `KICK-dKeptSession-44` — `arm_presets`' row-named half, `check_repo_presets`' shipped-name collision, the never-list comment and the one pair rule, the batch's S1, S32, S38 and S41 (ids 3, 62, 18, 43)
 
@@ -237,7 +250,8 @@ The store lands with its arm; the reader's step lands in unit 2, so no read chan
 - security — the store ships in the kit and is read, never written, by readers; the factory is the
   one writer and runs the gate; a repository preset passes `validate` at the policy guard's write
   boundary, deny by default for a name neither shipped nor declared.
-- perf / scale — one TOML read per check; the load is four presets times about 250 keys in process.
+- perf / scale — one TOML read per check; the load is four presets times about 250 keys, one
+  `guard.py` subprocess per preset, never one per key.
 - error / empty / loading states — an absent store is a refusal naming `presets.toml`; a malformed
   one is a finding naming its line.
 - observability — every finding names the preset and the key; the load names the key, the value and
@@ -281,8 +295,8 @@ remote-tracking ref.
   `velocity` and `standard` exit 0 and `strict` and `guarded` exit 2, each naming `build.closes`,
   `after-release-verifies` and the point, and no other key.
   Red when: a preset is refused for a key its value does not select, or `strict` loads.
-  fixture: needs the loop kit's `loop.toml` and the layer register landed by dDeclaredLoop and
-  dOrderedCharter; neither is in the tree today.
+  fixture: needs the loop kit's `loop.toml`, §8 F4's `guard.py` verb and the layer register landed
+  by dDeclaredLoop and dOrderedCharter; none is in the tree today.
 - **AC7** — When the `presets-core-only` case plants `absent-by-key`, a loader refusing any key a
   `[[selects]]` row names whatever its value, `arm_presets` reds naming `standard` and
   `build.closes`; when it plants `accept-all`, a loader admitting every value, it reds naming
@@ -343,6 +357,22 @@ New arm: tools/policy/check_policy.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC9 AC10
   rung 1, v2:1421. Ask for dDeclaredLoop, target TOOL-dDeclaredLoop-6 S4, accept: `new policy-key`
   takes one `--preset <name>=<toml>` per shipped preset or `--never`, and refuses a presettable key
   missing one, seen red on a key added with the `strict` value absent. widens: none · relaxes: none
+- **F4 — How does `presets.py` reach `check_expansion_value`, when `guard.py` has no verb printing its
+  verdict?** A kit imports no sibling kit (TOOL-dGroundRules-1 §4; TOOL-dDeclaredLoop-12 S4), and the
+  function lives in `tools/loop/guard.py`, whose only CLI flags are `--staged`, `--push-range` and
+  `--fixture` (TOOL-dDeclaredLoop-2 §4 Inventory). Options: (a) an ask to dDeclaredLoop: `guard.py
+  --expansion` reads `<key>=<value>` lines on stdin, judges each with `check_expansion_value`, prints
+  one line per refused pair naming the key, the value and the point, and exits 2 on any refusal, run
+  by S4 as one subprocess per load; (b) a declared `requires_if` row on `tools/policy/kit.toml` naming
+  `loop`, `presets.py` importing the function in process, which the rule admits only as a declaration
+  `govkit selfcheck` grades and that installs nothing, the shape of `tools/memory-tree/kit.toml:8`.
+  (a) keeps the call in the shape dDeclaredLoop uses for its own sibling reads (its spec 12 S4 and §8
+  F5) and dWitnessedBar's spec 3 §8 F6 asks the same way; its cost is a wait, since AC6, AC7 and the
+  arm's load half cannot pass until the ask lands. (b) needs no parent change, but makes the policy
+  kit an in-process consumer of a loop-kit function its owner reaches only by subprocess.
+  Recommendation (a). Open for the owner: the ask the build run files is "TOOL-dDeclaredLoop-2 S8:
+  `guard.py --expansion` judges `<key>=<value>` lines on stdin with `check_expansion_value`, one line
+  per refusal, exit 2 on any".
 
 ## 9. Revision log
 
@@ -350,13 +380,18 @@ New arm: tools/policy/check_policy.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC9 AC10
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-33`, `KICK-dKeptSession-44`
   mirrored, the other ends of the edges the round-1 spec audit's promoted units declare; no other
   section moved.
+- rev-3 · 2026-10-26 · S4 · §3 Edges · §5 · AC6 · §8 F4 · §10 · re-grounded on the cross-check record
+  `2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck`, row 3: `presets.py` reaches
+  `check_expansion_value` by subprocess through the policy kit's inline `resolve_kit_dir`, with F4
+  open for the `guard.py` verb.
 
 ## 10. Reuse audit
 
 The seams extended: dGroundRules' `check_value` (GR `policy.py:143`) and `read_catalogue_row`
 (`:219`) for every value and key, `validate`'s table-rule seam (`:581-601`, the `budgets` call), the
 `ARMS` table (`check_policy.py:737`); dDeclaredLoop's `check_expansion_value` over `[[selects]]`
-(TOOL-dDeclaredLoop-2 S8); the kinds contract (PLAY-dOrderedCharter-7 S4-S6). The prior art is
+(TOOL-dDeclaredLoop-2 S8), run by subprocess through the policy kit's inline `resolve_kit_dir`
+(`tools/policy/policy.py:1132`, which `check_policy.py:876` already shares); the kinds contract (PLAY-dOrderedCharter-7 S4-S6). The prior art is
 `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-preset-check.py`: its never set
 (`:30-35`), completeness and allowed-value checks (`:50-67`) and `PAIRS` (`:72`) are promoted; its
 `FREE` allowed-text regex (`:56`) is not, since `check_value` judges the parsed `allowed` table.

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 6 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 6 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0158@19d3fbd9 whole
 
@@ -12,6 +12,9 @@
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-a.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-a.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-16 KICK-dKeptSession-19 |
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-20-deviation-201.md](../build/2026-10-26-build-KICK-dKeptSession-20-deviation-201.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-20-deviation-202.md](../build/2026-10-26-build-KICK-dKeptSession-20-deviation-202.md) | deviation | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -36,11 +39,18 @@ touch, seen on two builds under scenarios with different presets.
   `extends` as the row's other fields are, a child's `overrides` laid over its parent's key by key.
   Observed by AC1 and AC4.
 - **S2** — The load check, `check_scenario_policy(row, table)` in `tools/loop/scenario.py`, run where
-  the scenario pack and overlay are loaded: the preset is a shipped name; each override key is a
-  catalogue key on no `never` row and its value passes `check_value`; and the pair rules hold over
-  the slot's assignment, the slot's preset with its overrides on top and the repository file's own
-  keys on top of both. Each refusal names the scenario, the key and the rule. Observed by AC4 and
-  AC5.
+  the scenario pack and overlay are loaded, for each row carrying a slot. A kit imports no sibling kit
+  (TOOL-dGroundRules-1 §4; TOOL-dDeclaredLoop-27 §4), so it finds `presets.py` through `loop_lib.py`'s
+  inline `resolve_kit_dir("policy", "presets.py", here)` (TOOL-dDeclaredLoop-12 S4) and runs two
+  policy-kit verbs as subprocesses. `presets.py slot --repo <root>`, which this unit adds to
+  KICK-dKeptSession-1's module, reads `{"scenario", "preset", "overrides"}` as JSON on stdin; it
+  refuses a preset that is not a shipped name, an override key that is no catalogue key or sits on a
+  `never` row, and a value `check_value` refuses, and otherwise prints the slot's assignment as JSON:
+  the slot's preset with its overrides on top and the repository file's own keys on top of both. Then
+  KICK-dKeptSession-44 S41's `presets.py pairs` judges the pair rules over that assignment. Each
+  refusal names the scenario, the key and the rule. A row carrying a slot where the policy kit does
+  not resolve is refused naming the kit; a pack whose rows carry no slot runs no verb. Observed by
+  AC4 and AC5.
 - **S3** — The build on a read. `read_revision(repo, rev, rows, build=None)` carries `read["build"]`,
   `resolve(key, repo, rev, build=None)` passes it, and `python policy.py get <key> --build <slug>`
   names it; each step of `RESOLUTION_ORDER` takes a keyword-only `build=None` that
@@ -49,11 +59,15 @@ touch, seen on two builds under scenarios with different presets.
 - **S4** — The step `read_scenario_value(path, row, table, rev_phrase, *, build=None)`, inserted
   after `read_file_value` and before KICK-dKeptSession-2's `read_preset_value`: it answers `None`
   with no build, for a build whose transition record names no scenario, and for a `never` key;
-  otherwise it reads the build's placed scenarios from TOOL-dDeclaredLoop-27 S8's
-  `derive_step_scenarios(build)`, composes their slots in declared order, and answers an override, or
-  else the slot preset's value through `derive_preset_assignment`, as `Resolution(<value>, "preset",
-  "scenario <tag> preset <name> at <rev>")`, `override` in place of `preset <name>` for an override.
-  Observed by AC1, AC2 and AC3.
+  otherwise it reads the build's placed scenarios and their slots, in declared order, from the loop
+  kit as a subprocess, §8 F3's `slots` verb, found through the policy kit's inline
+  `resolve_kit_dir("loop", "scenario.py", here)` (`tools/policy/policy.py:1132-1169`): TOOL-dDeclaredLoop-27
+  S8's `derive_step_scenarios(build)` is a loop-kit function, and a kit imports no sibling kit. It
+  composes the slots in declared order, and answers an override, or else the slot preset's value
+  through `derive_preset_assignment`, as `Resolution(<value>, "preset", "scenario <tag> preset <name>
+  at <rev>")`, `override` in place of `preset <name>` for an override. With the loop kit not found it
+  answers `None`, `--explain` naming the kit; a verb exiting non-zero is a `Refusal` carrying its first
+  stderr line. Observed by AC1, AC2 and AC3.
 - **S5** — Two placed scenarios whose slots disagree on a key, or name two presets, settle as
   `flow.scenario-conflict` says, through TOOL-dDeclaredLoop-27 S7's rule: under `refuse` the read is
   a `Refusal` naming both scenarios and the key, under `declared-order` the later scenario wins.
@@ -76,8 +90,9 @@ touch, seen on two builds under scenarios with different presets.
 
 - **consumes-from** `KICK-dKeptSession-1` — `presets.toml`, its `never` list, `derive_preset_assignment` and the pair rules, which the slot reads and may not cross
 - **consumes-from** `KICK-dKeptSession-2` — `RESOLUTION_ORDER` with `read_preset_value`, ahead of which the scenario's step is inserted
-- **consumes-from** external — TOOL-dDeclaredLoop-27's scenario row (S3), its schema file, its conflict rule (S7) and `derive_step_scenarios` over the transition record's `scenario=` field (S8); dGroundRules' `read_revision`, `read_ordered_value`, `resolve_read`, `resolve` and `get` (TOOL-dGroundRules-2, -3)
+- **consumes-from** external — TOOL-dDeclaredLoop-27's scenario row (S3), its schema file, its conflict rule (S7) and `derive_step_scenarios` over the transition record's `scenario=` field (S8), reached by subprocess (§8 F3); dGroundRules' `read_revision`, `read_ordered_value`, `resolve_read`, `resolve` and `get` (TOOL-dGroundRules-2, -3)
 - **hands-off** `KICK-dKeptSession-44` — `check_scenario_policy`'s pair rule, routed through `check_preset_pairs` by the batch's S41 (id 43)
+- **hands-off** external — under §8 F3 (a), a `scenario.py slots --build <slug>` verb, an ask for dDeclaredLoop
 
 ## 4. Design
 
@@ -88,7 +103,7 @@ RESOLUTION_ORDER = (read_file_value, read_scenario_value, read_preset_value, rea
 
 read_scenario_value(path, row, table, rev_phrase, *, build=None):
     if build is None or row["name"] in never:          return None
-    tags = derive_step_scenarios(build)                  # the transition record's scenario= field
+    tags = <loop kit>/scenario.py slots --build <build>  # subprocess, §8 F3; the record's scenario= field
     if not tags:                                         return None
     slot = compose the tags' slots in declared order     # S5 settles a disagreement
     if path in slot.overrides:                           return Resolution(v, "preset", "scenario <tag> override at <rev>")
@@ -116,6 +131,8 @@ overrides = { "review.max-rounds" = 5 }
 |---|---|---|
 | `preset`, `overrides` | scenario row fields | `tools/loop/scenario-schema.toml` |
 | `check_scenario_policy` | function | `tools/loop/scenario.py` |
+| `slot` | verb, run by subprocess from `check_scenario_policy` | `tools/policy/presets.py` |
+| `slots --build <slug>` | verb, run by subprocess from `read_scenario_value` | `tools/loop/scenario.py`, §8 F3 |
 | `read_scenario_value` | function | `tools/policy/policy.py` |
 | `--build` | flag of `get` | `tools/policy/policy.py` |
 | `scenario-preset` | fixture case | `tools/policy/check_policy.py` |
@@ -127,7 +144,8 @@ No scenario row carries a slot at landing, so every build reads as before until 
 ### Files touched (estimate)
 
 - `tools/loop/scenario-schema.toml`: the two fields
-- `tools/loop/scenario.py`: `check_scenario_policy` at load
+- `tools/loop/scenario.py`: `check_scenario_policy` at load, and the `slots` verb under §8 F3 (c)
+- `tools/policy/presets.py`: the `slot` verb
 - `tools/policy/policy.py`: the step, the `build` keyword, `get --build`
 - `tools/policy/check_policy.py`: the `scenario-preset` case
 - `tools/policy/README.md`: the order with its fourth source
@@ -150,7 +168,8 @@ No scenario row carries a slot at landing, so every build reads as before until 
   never set a `never` key, the guard and attendance among them, and never beats the file's explicit
   values. The residual risk, a slot loosening a loop bound the repository's preset sets, is the
   stall census's SC-comp-5 (`2026-10-19-build-PLAY-dClosedLoop-1-research-stall-scenarios.md:123`).
-- perf / scale — one transition-record read per build per `read_revision`, cached on the read.
+- perf / scale — one `slots` subprocess per build per `read_revision`, cached on the read; one
+  `slot` and one `pairs` subprocess per slotted scenario row at load.
 - error / empty / loading states — no build, no record or no slot: the step answers `None`.
 - observability — `get --build <slug> --explain` names the scenario and its preset.
 - risks — a caller that forgets `build=` reads the repository's values: the read is still valid, only
@@ -182,6 +201,8 @@ second.
   `overrides = { "runtime.agents-in-flight" = 9 }`, the load refuses naming the scenario and
   `runtime.agents-in-flight` as a key presets never touch, and the unplanted pack loads.
   Red when: a slot sets a `never` key.
+  fixture: AC4 and AC5's scratch install holds the policy kit beside the loop kit, where
+  `resolve_kit_dir` probes, since S2 reaches it by subprocess.
 - **AC5** — When `python scenario.py --fixture --plant slot-pair` loads a planted row setting
   `overrides = { "review.design.round-count" = 4 }` under `preset = "velocity"`, whose
   `review.max-rounds` is 2, the load refuses naming the pair.
@@ -218,12 +239,37 @@ New arm: tools/loop/scenario.py · covers AC4 AC5 · the `loop scenario fixtures
   a pack row's validity depend on each adopter's file. RESOLVED (agent, 2026-10-26, delegated): (a),
   rung 3, fewer open questions; an overlay scenario reaches a repository's posture through
   `overrides`. widens: none · relaxes: none
+- **F3 — How does `read_scenario_value`, in the policy kit, read a build's placed scenarios and their
+  slots, when `derive_step_scenarios` is a loop-kit function with no verb?** A kit imports no sibling
+  kit (TOOL-dGroundRules-1 §4; TOOL-dDeclaredLoop-27 §4; TOOL-dDeclaredLoop-26 S6 runs `policy.py get`
+  as a subprocess for that reason), and TOOL-dDeclaredLoop-27's `scenario.py` verbs are `members`,
+  `new` and `select` (its §4 Inventory and AC1). Options: (a) an ask to dDeclaredLoop:
+  `scenario.py slots --build <slug>` prints the scenarios the build's latest transition record places,
+  in declared order, each row resolved through `extends`, as JSON, and nothing for a record naming no
+  scenario; (b) a declared `requires_if` row on `tools/policy/kit.toml` naming `loop`,
+  `read_scenario_value` importing `derive_step_scenarios` in process, which the rule admits only as a
+  declaration `govkit selfcheck` grades and that installs nothing, the shape of
+  `tools/memory-tree/kit.toml:8`; (c) this unit adds the same verb to `tools/loop/scenario.py`, the
+  file S2 already edits, calling `derive_step_scenarios` inside the loop kit. (a) keeps the verb with
+  the module's owner, as dDeclaredLoop's spec 12 §8 F5 and dWitnessedBar's spec 3 §8 F6 ask, at the
+  cost of a wait on AC1 to AC3 and AC6; (b) needs no change elsewhere but makes the policy kit an
+  in-process consumer of a loop-kit function; (c) needs no parent change and no exception, but puts a
+  verb this build owns on a parent's module. Recommendation (c): the fields the verb exists to carry
+  are S1's slot, and S2 already places this unit's code in that file. Open for the owner: under (a),
+  the ask the build run files is "TOOL-dDeclaredLoop-27 S8: `scenario.py slots --build <slug>` prints
+  the build's placed scenarios in declared order, each row resolved through `extends`, as JSON".
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-44` mirrored, the other ends of
   the edges the round-1 spec audit's promoted units declare; no other section moved.
+- rev-3 · 2026-10-26 · S2 · S4 · AC4 · §3 Edges · §4 The order a build's read takes · §4 Inventory · §4 Files
+  touched · §5 · §8 F3 · §10 · re-grounded on the cross-check record
+  `2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck`, rows 73 and 74: `check_scenario_policy`
+  reaches the policy kit through its `slot` and `pairs` verbs, and `read_scenario_value` the loop kit
+  through a `slots` verb, each by subprocess through an inline `resolve_kit_dir`, with F3 open for
+  where that verb lives.
 
 ## 10. Reuse audit
 
@@ -231,7 +277,9 @@ The seams extended: TOOL-dDeclaredLoop-27's scenario row (S3) and its schema fil
 this slot to this build, its conflict rule (S7) and `derive_step_scenarios` (S8, §4 "At a transition
 into a step", line 201); dGroundRules' `RESOLUTION_ORDER` (GR `policy.py:710`) and `read_revision` (`:724-736`),
 whose read dict carries the build; KICK-dKeptSession-1's `never` list and pair rules, and
-KICK-dKeptSession-2's step. `python tools/codebase-map/reuse_lookup.py "scenario row field
+KICK-dKeptSession-2's step. Each crossing between the two kits is a subprocess through the inline
+`resolve_kit_dir` each kit carries (`tools/policy/policy.py:1132`; `loop_lib.py`'s, TOOL-dDeclaredLoop-12
+S4), the pair rule through KICK-dKeptSession-44 S41's `presets.py pairs`. `python tools/codebase-map/reuse_lookup.py "scenario row field
 inherited through extends and read per build"` ranked `rows`, `row`, `read`, `read_text`, `build` and
 `field`, name stems only: neither `tools/loop/` nor `tools/policy/` is at HEAD. `python
 tools/memory-recall/query.py "how does a scenario scope a preset and overrides to its builds"`

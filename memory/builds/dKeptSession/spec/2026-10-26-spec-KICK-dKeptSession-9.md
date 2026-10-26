@@ -1,6 +1,6 @@
 # KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0147@9a464fcd whole
 **Carries:** node:policy-key.orient.budget
@@ -15,7 +15,10 @@
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-9-deviation-91.md](../build/2026-10-26-build-KICK-dKeptSession-9-deviation-91.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-9-deviation-92.md](../build/2026-10-26-build-KICK-dKeptSession-9-deviation-92.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-9-deviation-93.md](../build/2026-10-26-build-KICK-dKeptSession-9-deviation-93.md) | deviation | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-5 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-28 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -44,9 +47,19 @@ warn (orientation OR-8; the whole-design audit's C2-F11; gap-orient-06).
   `measure_context_fill` by KICK-dKeptSession-14's I13).
   A row whose action is `none` is reported and never joins a ceiling's population. Observed by AC1.
 - **S3** — The stage: the step tag (`step.plan` to `step.deploy`, TOOL-dDeclaredLoop-1 S2) whose
-  `state` the build entered at the newest transition at or before the session's first timed record,
-  read through TOOL-dDeclaredLoop-3 S7's `read_transitions(build, repo)` and TOOL-dDeclaredLoop-1 S3's
-  `read_steps(kit_dir)`; `none` when no transition precedes it. Observed by AC2.
+  `state` the build entered at the newest transition at or before the session's first timed record;
+  `none` when no transition precedes it. A kit imports no sibling kit (TOOL-dDeclaredLoop-12 S4), and
+  TOOL-dDeclaredLoop-3 S7's `read_transitions` is a Python function with no verb, so the transitions
+  are read with `git` in `repo` on the source TOOL-dDeclaredLoop-3 §4 "The source, by selection"
+  names, as TOOL-dPlacedRequest-1 §8 F8 (a) reads it: `transitions.record` once by `policy.py get`, as
+  S4 reads its key; with `trailer` selected, one `git log` over `HEAD` printing each commit's
+  committer date and `Gov-Transition` trailer, kept where the trailer names `build=<slug>`; with `log`
+  and no `trailer`, the build's `-transition-<n>.md` records, each one's `**To:**` and the committer
+  date of the commit that added it; with `micro-format` alone nothing is stored, so every row reads
+  `none` with one NOTE naming the key. Each `to` state maps to its step through TOOL-dDeclaredLoop-1
+  S3's `read_steps`, reached by the verb §8 F5 asks for. Every sibling verb this unit runs is found
+  through one `resolve_kit_dir` block carried inline in `extract.py` under the `resolve_kit_dir` row of
+  `PARITY_ROWS` (`tools/lib/resolve-python.test.sh:172`). Observed by AC2.
 - **S4** — The hold, `orient.budget` read once per run through the Python reader of I8,
   `python <prefix>/policy/policy.py get orient.budget` run in `repo`, the catalogue default
   `record-only` with one NOTE when the reader refuses or is absent:
@@ -65,8 +78,11 @@ warn (orientation OR-8; the whole-design audit's C2-F11; gap-orient-06).
 - **S6** — The owner's number: a `[[cap]]` row `orient-calls` in TOOL-dGroundRules-9 S1's census
   `tools/policy/caps.toml` (class `switch`, unit `count`, enforcer `{prefix}/runlog/runlog.py`, home
   `constant:{prefix}/runlog/runlog.py:ORIENT_OWNER_CALLS`, `family` false), resolved through that
-  unit's `python <prefix>/policy/budgets.py resolve orient-calls=default:0` and judged by its
-  `check_cap`, so `budgets.enforce` decides whether a breach warns or refuses there as for every cap.
+  unit's `python <prefix>/policy/budgets.py resolve orient-calls=default:0` and judged per row by
+  `python <prefix>/policy/budgets.py check orient-calls=default:0 <calls>`, the CLI over its `check_cap`
+  (TOOL-dGroundRules-9 S2; `tools/policy/budgets.py:304`, :370), each run as a subprocess, its line's
+  `BUDGET WARN` or `BUDGET REFUSE` and its exit 1 read as the verdict, so `budgets.enforce` decides
+  whether a breach warns or refuses there as for every cap.
   `ORIENT_OWNER_CALLS` is 0, and a resolved 0 means no owner number: `owner-ceiling` then prints one
   NOTE naming `budgets.orient-calls` and reads as `record-only`. Observed by AC5.
 - **S7** — The verb, `python tools/runlog/runlog.py extract --orient <projects dir> --slug <slug>
@@ -95,8 +111,8 @@ warn (orientation OR-8; the whole-design audit's C2-F11; gap-orient-06).
 
 - **consumes-from** `KICK-dKeptSession-1` — `presets.toml`, whose strict cell `warn-at-evidence-ceiling` AC3 reads through the policy reader, the preset step in whose `RESOLUTION_ORDER` is KICK-dKeptSession-2's
 - **consumes-from** `KICK-dKeptSession-14` — `measure_context_fill` and its `derive_context_fill`, the one context reader S2's `context` column calls
-- **consumes-from** external — TOOL-dDeclaredLoop-3's `read_transitions` and TOOL-dDeclaredLoop-1's `read_steps`, which give S3 its stage
-- **consumes-from** external — TOOL-dGroundRules-9's cap census `tools/policy/caps.toml`, `budgets.py resolve` and `check_cap`, which hold S6's owner number
+- **consumes-from** external — TOOL-dDeclaredLoop-3's transition channel, read with `git` on its §4 source table, and TOOL-dDeclaredLoop-1's `read_steps` through the verb §8 F5 asks for, which give S3 its stage
+- **consumes-from** external — TOOL-dGroundRules-9's cap census `tools/policy/caps.toml`, `budgets.py resolve` and `budgets.py check`, run as subprocesses, which hold S6's owner number
 - **hands-off** external — dCalibratedLens's value ledger, which reads the rows S2 reports
 - **hands-off** `KICK-dKeptSession-44` — the orient report, its `orient-calls` cap row and its token sums, the batch's S11, S14, S15 and S40 (ids 15, 21, 46, 42)
 - **hands-off** `KICK-dKeptSession-46` — `measure_orient_tree`'s per-row `context` call, to which that unit passes this unit's own root (id 38)
@@ -165,8 +181,8 @@ its `new → READY` row (`research-orientation-cost.md` §3, measured 2026-10-14
 
 - security — reads transcripts already on the node and writes nothing; the report prints counts and
   classes only, the extract's structural rule (`extract.py` module header).
-- perf / scale — one scan per session file, as `--ready` makes; the stage read is one
-  `read_transitions` call per run.
+- perf / scale — one scan per session file, as `--ready` makes; the stage read is one `git log` and
+  one steps verb per run, and the owner cap one `budgets.py check` per row with an action.
 - error / empty / loading states — no session is a `DEAD PROBE`, exit 2; a stage under the floor names
   its count; an unreadable policy reads the default with one NOTE.
 - observability — every row, every stage's quartiles and ceiling, and each WARN print one line.
@@ -187,8 +203,9 @@ record moves `fx` into `designing`, with its policy file as each criterion plant
   planted transcript with no edit prints `action=none`.
   Red when: a call after the edit is counted, as a planted copy counting to the file's end shows.
 - **AC2** — When the fixture moves `fx` from `designing` to `building` between two sessions, the
-  earlier row reads `stage=step.design` and the later `stage=step.build`.
-  Red when: both rows read one stage.
+  earlier row reads `stage=step.design` and the later `stage=step.build`, under the default channel
+  set and again with `transitions.record = ["log"]` planted.
+  Red when: both rows read one stage, or the `["log"]` run reads every row `none`.
 - **AC3** — When the fixture's policy file is `preset = "strict"` with no `orient.budget` override,
   the report prints `orient.budget=warn-at-evidence-ceiling`, strict's cell read from `presets.toml`,
   and with 22 planted `step.design` rows one `orient WARN` for the row planted past their p90.
@@ -234,12 +251,28 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · a planted
   RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F4 — Do the transition rows carry their commit's time?** S3 needs the time of each transition.
   TOOL-dDeclaredLoop-3 S7 states `read_transitions` returns the recorded transitions newest first and
-  names no time field, while TOOL-dDeclaredLoop-23's `read_commits` returns each commit's `date`. Ask
-  for dDeclaredLoop: "accept `read_transitions(build, repo)` returns each transition's commit sha and
-  committer date beside its fields, seen on a two-move fixture". Until it lands, the build run reads
-  the date through `read_commits` for the commits `read_transitions` names. Rung 3, the most capable
-  option that edits no parent spec. RESOLVED (agent, 2026-10-26, delegated): the ask, filed by the
-  main loop. widens: none · relaxes: none
+  names no time field, while TOOL-dDeclaredLoop-23's `read_commits` returns each commit's `date`.
+  Options: (a) an ask for dDeclaredLoop that `read_transitions(build, repo)` return each transition's
+  commit sha and committer date, the date read meanwhile through `read_commits`; (b) S3 reads the
+  channel with `git`, each transition's committer date coming from the same read. RESOLVED (agent,
+  2026-10-26, delegated): (b), rung 1, re-resolved on TOOL-dDeclaredLoop-12 S4 at `783f1ad3a`, under
+  which runlog may call neither `read_transitions` nor `read_commits` in process, and on
+  TOOL-dPlacedRequest-1 §8 F8 (a), which reads the same channel with `git`; (a), first chosen on
+  rung 3, is no longer this unit's ask. widens: none · relaxes: none
+- **F5 — How does S3 map a transition's `to` state to its step tag, when no loop-kit verb prints the
+  steps?** TOOL-dDeclaredLoop-1 S3 makes `loop_lib.py` the definition's one reader, with
+  `read_steps(kit_dir)` and the verbs `--check` and `--fixture` only. Options: (a) an ask to
+  dDeclaredLoop for a verb printing `read_steps`, run as a subprocess; (b) a declared `requires_if`
+  row on `tools/runlog/kit.toml` naming `loop`, `extract.py` importing `read_steps` in process and
+  reading every stage `none` where the kit does not resolve, which the rule admits only as a
+  declaration `govkit selfcheck` grades and that installs nothing, the shape of
+  `tools/memory-tree/kit.toml:8`; (c) runlog parsing `tools/loop/loop.toml` itself, a second reader of
+  the definition. (a) keeps `loop_lib.py` the one reader and the call in the shape dDeclaredLoop uses
+  for its own sibling reads (TOOL-dDeclaredLoop-12 S4, §8 F5); its cost is a wait, since AC2 cannot
+  pass until the ask lands. (b) needs no parent change but makes runlog the one in-process consumer of
+  a module its owner's siblings reach by subprocess; (c) is a second fact. Recommendation (a). Open
+  for the owner: the ask the build run files is "TOOL-dDeclaredLoop-1: `loop_lib.py --steps` prints
+  one `<step tag>` TAB `<state>` line per `[[step]]` row, from `read_steps`".
 
 ## 9. Revision log
 
@@ -248,6 +281,11 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · a planted
   the edges the round-1 spec audit's promoted units declare; no other section moved.
 - rev-3 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-46` mirrored, the other ends of
   the edges the round-1 promotions' audit's disposal declared
+- rev-4 · 2026-10-26 · §2 S3, S6 · §3 Edges · §5 · §6 AC2 · §8 F4, F5 · re-grounded on dDeclaredLoop
+  at `783f1ad3a` and dPlacedRequest at `2740f0a3d` by the cross-check record
+  `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, row 36: the transition channel
+  is read with `git`, the steps through the verb F5 asks for, and the owner cap through
+  `budgets.py check`, each by subprocess, never an in-process import of a sibling kit.
 
 ## 10. Reuse audit
 

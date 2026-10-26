@@ -1,6 +1,6 @@
 # KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition
 
-**Status:** DEFERRED · rev-7 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 16 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-8 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 16 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0143@cafeb575 whole
 **Carries:** node:record-kind.mailbox-message
@@ -19,7 +19,10 @@
 | [2026-10-26-build-KICK-dKeptSession-5-deviation-54.md](../build/2026-10-26-build-KICK-dKeptSession-5-deviation-54.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-5-deviation-55.md](../build/2026-10-26-build-KICK-dKeptSession-5-deviation-55.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-5-deviation-56.md](../build/2026-10-26-build-KICK-dKeptSession-5-deviation-56.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-5-deviation-57.md](../build/2026-10-26-build-KICK-dKeptSession-5-deviation-57.md) | deviation | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-28 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -103,9 +106,11 @@ keeps what was disposed (coordination item 6; the whole-design audit's C2-F15).
 - **S10** — The disposal: past the guard, the writer lists every row addressed to the build whose
   state is `answered`, `acked` or, once KICK-dKeptSession-24 adds it, `expired`, and whose id no earlier transition of the build names in its
   `disposed` field, read through `read_transitions(build, repo)` (TOOL-dDeclaredLoop-3 S7), and writes
-  them as the extension field `disposed=<id>+<id>` (I21), registered in `TRANSITION_FIELDS`. Where
-  `log` is selected, it also writes one `mailbox-message` record per disposed id in the same commit.
-  Observed by AC6.
+  them as the extension field `disposed=<id>+<id>` (I21), registered in `TRANSITION_FIELDS`, before
+  TOOL-dDeclaredLoop-3 §4 writer step 5 writes the log record that carries it. Where `log` is
+  selected, it writes one `mailbox-message` record per disposed id after step 5 writes the transition
+  record and before step 6 commits, so step 4's refusal of a staged index never sees them and step 6
+  commits them beside the transition record. Observed by AC6.
 - **S11** — The switch and the stand-in. Every mail write runs only while `RUN_CLAIMS` is `on`
   (`:671-676`, TOOL-dPlacedRequest-12 S7's rule), and otherwise prints `mail — off` and writes nothing,
   exit 2 for a post and 0 for a read with no rows. The verbs write the ref directly through
@@ -113,9 +118,14 @@ keeps what was disposed (coordination item 6; the whole-design audit's C2-F15).
   `write_mail_ref` (§8 F4). Observed by AC7.
 - **S12** — The record kind `record-kind.mailbox-message`, a row of the record factory
   `tools/memory-tree/build_records.py` (PLAY-dOrderedCharter-7 S7):
-  `<date>-build-<anchor id>-mailbox-message-<n>.md`, `**Serves:** journal <anchor id>`, fields `Id`,
-  `From`, `To`, `Kind`, `Subject`, `Answers`, `State`, `Reply` (the replying message's id) and `Ref`,
-  and the body in one fenced block. The anchor is TOOL-dDeclaredLoop-3 §8 F2's rule. Observed by AC6.
+  `<date>-build-<anchor id>-mailbox-message-<n>.md`, `**Serves:** mailbox-message <anchor id>`, fields
+  `Id`, `From`, `To`, `Kind`, `Subject`, `Answers`, `State`, `Reply` (the replying message's id) and
+  `Ref`, and the body in one fenced block. The record serves as `mailbox-message`, never `journal`:
+  `KICK-dKeptSession-39` joins the kind to `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`
+  and to the closed `<kind>` list of `tools/memory-tree/HYGIENE.template.md`, and under
+  PLAY-dOrderedCharter-42 S3 a `-mailbox-message-<n>.md` file serving another kind is malformed, as
+  TOOL-dDeclaredLoop-3 S2 rules for its `transition` record. The anchor is TOOL-dDeclaredLoop-3 §8
+  F2's rule. Observed by AC6.
 - **S13** — The card: the `## pointers` section's `mail —` line (I11, KICK-dKeptSession-13), added to
   that unit's `render_pointers` with the word `mail` appended to its `POINTER_LINES`, and written by
   `manifest-check.sh --card --pointers --build <slug>` from `--mail read <slug> --open --ids`, run
@@ -221,8 +231,10 @@ Does the mail ref segment stay one component under derive_ref_segment?
 | 1a. the guard: `--mail read <slug> --open`; open rows refuse, exit 1 | this unit |
 | 2. `derive_move` | TOOL-dDeclaredLoop-3 |
 | 3. the witness | TOOL-dDeclaredLoop-3 |
-| 3a. the disposal: `disposed=<id>+<id>` and the `mailbox-message` records | this unit |
-| 4 to 7. staged check, records, commit, micro-format line | TOOL-dDeclaredLoop-3 |
+| 3a. the disposal: `disposed=<id>+<id>` | this unit |
+| 4 and 5. staged check, back-fill and this move's record | TOOL-dDeclaredLoop-3 |
+| 5a. the `mailbox-message` records, staged beside the transition record | this unit |
+| 6 and 7. commit, micro-format line | TOOL-dDeclaredLoop-3 |
 
 ### Inventory
 
@@ -314,7 +326,8 @@ clone's sessions a distinct `CLAUDE_CODE_SESSION_ID`, the loop kit and the trans
 - **AC6** — When `python loop_transition.py record --build fx …` runs with the planted `question`
   unanswered, it exits 1 printing `mail open <id>` and writes no commit; after the `ack`, the move
   writes a trailer carrying `disposed=<id>`, a log record carrying it, and one
-  `<date>-build-<anchor>-mailbox-message-1.md` with `**State:** acked`; the next move disposes nothing.
+  `<date>-build-<anchor>-mailbox-message-1.md` with `**Serves:** mailbox-message <anchor>` and
+  `**State:** acked`, all in the one transition commit; the next move disposes nothing.
   Red when: a transition records over an open message, as a planted guard reading no mail shows, or
   a disposed id is disposed twice.
 - **AC7** — When `RUN_CLAIMS` is off in the clone's conf, `--mail post …` prints `mail — off`, exits 2
@@ -388,6 +401,11 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC8 · the `mai
   the edges the round-4 minors batch's audit's disposal declared
 - rev-7 · 2026-10-26 · §3 · the Edges bullet to `KICK-dKeptSession-65` mirrored, the other ends of
   the edges the round-5 minors batch's audit's disposal declared
+- rev-8 · 2026-10-26 · §2 S10, S12 · §4 The transition, in order · §6 AC6 · re-grounded on
+  dDeclaredLoop at `783f1ad3a` by the cross-check record
+  `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, rows 13 and 16: the
+  `mailbox-message` records are written at step 5a, after TOOL-dDeclaredLoop-3's staged-index
+  refusal, and serve as `mailbox-message`, never `journal`, by reference to `KICK-dKeptSession-39`.
 
 ## 10. Reuse audit
 

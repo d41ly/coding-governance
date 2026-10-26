@@ -1,6 +1,6 @@
 # KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 8 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 8 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0150@1c3b5ca1 whole
 
@@ -13,8 +13,12 @@
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-26 KICK-dKeptSession-1 |
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-12-deviation-121.md](../build/2026-10-26-build-KICK-dKeptSession-12-deviation-121.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-12-deviation-122.md](../build/2026-10-26-build-KICK-dKeptSession-12-deviation-122.md) | deviation | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-5 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-14 KICK-dKeptSession-28 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
+| [2026-10-26-prompt-KICK-dKeptSession-12-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-12-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
 <!-- /gen:spec-records -->
@@ -53,9 +57,11 @@ v2:1177; flow-roles H14).
   unchanged, and an idle session under a red fixture is never recommended to resume. Observed by
   AC1, AC2.
 - **S4** — The worktree. Every `resume — fresh recommended` line ends `· in <tree>`, `<tree>` the
-  path of the build card's `tree —` cell (`render_tree_cell`, :742-746) as S6's lookup re-keys it,
-  when `git worktree list --porcelain` lists that path on this node, else `· in a new worktree of
-  <slug>`. Observed by AC5.
+  path of the `tree —` cell (`render_tree_cell`, :742-746) in the stored build card S6's lookup read
+  from the store that answered (the ref's message, the cache or the snapshot), taken before the
+  re-key re-renders the startup cells into `<sid>.md`, when `git worktree list --porcelain` lists
+  that path on this node, else `· in a new worktree of <slug>`. The re-keyed card is never read for
+  it: its cell names the replaying session's own tree. Observed by AC5.
 - **S5** — The replay order, I10. `print_replay` (:721) prints the stored card, then its `now —`
   line, then its computed lines in this order: `card —`, `route —`, `resume —`, `partial —`
   (TOOL-dPlacedRequest-2 §4), then `position — <answer> · next <item tag>` and, after a compaction,
@@ -104,6 +110,10 @@ v2:1177; flow-roles H14).
 - The fixture exits 0 on a pass, 1 naming the failed limb, 2 when `claude` is absent, and writes
   nothing outside its scratch directory (PLAY-dOrderedCharter-8 §4 "The fixture").
 - `derive_cli_line` takes the version from `AI_AGENT`'s `claude-code_<version>` with no spawn (:414).
+- `render_tree_cell` is a startup cell, called inside `render_card` (:517, :535), and
+  TOOL-dPlacedRequest-2 S6 re-keys the build card into the session's `<sid>.md` with "the startup
+  cells re-rendered there", so the re-keyed card's `tree —` cell names the replaying session's tree.
+  The stored build card keeps the cell its publisher or follower rendered (that unit's S1, S4).
 
 ### The verdict file
 
@@ -192,10 +202,10 @@ Live at landing. A node starts recommending resumption under `always-resume` onl
   `CARD_FIXTURE` stub exiting 0, 1 and 2, `card-fixture.verdict` reads `pass`, `red <limb>` and
   `absent` in turn, and nothing outside `<dir>` but that file is written.
   Red when: an exit maps to the wrong verdict, or a failed run records `pass`.
-- **AC5** — When the plant `worktree-named` replays with the build card's `tree —` cell naming a
-  worktree the clone lists, the fresh recommendation ends `· in <that path>`; with a tree the clone
-  does not list, it ends `· in a new worktree of tFix`.
-  Red when: a fresh recommendation names no tree.
+- **AC5** — When the plant `worktree-named` replays from a tree other than the one the stored build
+  card's `tree —` cell names, that cell naming a worktree the clone lists, the fresh recommendation
+  ends `· in <that path>`; with a tree the clone does not list, it ends `· in a new worktree of tFix`.
+  Red when: a fresh recommendation names no tree, or names the replaying tree, the re-keyed cell.
 - **AC6** — When the plant `replay-order` replays a routed card, `grep -n` over the output puts
   `now —`, `card —`, `route —`, `resume —` and `partial —` at increasing line numbers.
   Red when: any computed line prints before the stored card, or out of I10's order.
@@ -238,6 +248,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC1 AC3 AC4 · 
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-37`, `KICK-dKeptSession-38`,
   `KICK-dKeptSession-44` mirrored, the other ends of the edges the round-1 spec audit's promoted
   units declare; no other section moved.
+- rev-3 · 2026-10-26 · §2 S4 · §4 Evidence · §6 AC5 · re-grounded on dPlacedRequest at `2740f0a3d` by
+  the cross-check record `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, row 45:
+  the `tree —` cell is read from the stored build card before TOOL-dPlacedRequest-2 S6's re-key, which
+  re-renders it in the session's own tree; no fork, the stored text already holds the cell.
 
 ## 10. Reuse audit
 

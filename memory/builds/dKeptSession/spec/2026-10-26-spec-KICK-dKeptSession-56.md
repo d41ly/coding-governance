@@ -1,6 +1,6 @@
 # KICK-dKeptSession-56 — the round-1 promotions' audit's 45 minor findings, closed after every unit they land on is built
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 31 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 31 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,10 @@
 |---|---|---|
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-56-deviation-561.md](../build/2026-10-26-build-KICK-dKeptSession-56-deviation-561.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-56-deviation-562.md](../build/2026-10-26-build-KICK-dKeptSession-56-deviation-562.md) | deviation | — |
 | [2026-10-26-build-KICK-dKeptSession-56-promoted-fix-return.md](../build/2026-10-26-build-KICK-dKeptSession-56-promoted-fix-return.md) | research | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 |
 | [2026-10-26-prompt-KICK-dKeptSession-56-1-spec-writer.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-56-1-spec-writer.md) | journal | KICK-dKeptSession-1 |
 | [2026-10-26-prompt-KICK-dKeptSession-56-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-56-promoted-fix-brief.md) | research | — |
 | [2026-10-26-review-KICK-dKeptSession-45-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-45-spec-audit.md) | spec-audit | KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-54 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-55 |
@@ -49,9 +52,17 @@ the superseded text.
   `extract_files_touched` (`tools/check-spec-tokens.py:530`) under the kit's inline-parity marker.
   Observed by AC2.
 - **S3** — id 5, M3. One launcher, `run_driver(argv)` in `tools/loop/loop_lib.py`, runs
-  `[resolve_bash(), <driver>, *argv]`. `write_dependency_notices`' posts (`KICK-dKeptSession-7` S4,
-  `KICK-dKeptSession-35`), `KICK-dKeptSession-42` S2's `check_interface_notice`, its S3 acks and
-  `KICK-dKeptSession-44` S16 and S17's reads call it. Observed by AC3.
+  `[resolve_bash(), <driver>, *argv]`. It finds `<driver>` once per process through `loop_lib.py`'s
+  inline `resolve_kit_dir("unattended", "unattended.sh", here)`, joined with `unattended.sh`: a kit
+  imports no sibling kit, and the loop kit's one block is that one (TOOL-dDeclaredLoop-12 S4), the
+  locator TOOL-dDeclaredLoop-52 S3 reads the same driver through. The block's `LookupError`
+  (`tools/lib/resolve_kit_dir.py:23,49`) is the one unarmed signal: `run_driver` spawns nothing and
+  re-raises it unchanged, never as a `LoopError`, so each caller turns it into its own unarmed outcome,
+  `KICK-dKeptSession-36` S3's absent-driver pass among them, while `resolve_bash`'s `LoopError` keeps
+  meaning a present driver with no usable shell. `write_dependency_notices`' posts
+  (`KICK-dKeptSession-7` S4, `KICK-dKeptSession-35`), `KICK-dKeptSession-42` S2's
+  `check_interface_notice`, its S3 acks and `KICK-dKeptSession-44` S16 and S17's reads call it.
+  Observed by AC3.
 - **S4** — id 6, M4. `KICK-dKeptSession-36` §3's "This copy keeps govkit's contract so that extraction
   replaces it unchanged" is withdrawn by name. A loop selftest case asserts the copy refuses the
   `System32` and `WindowsApps` candidates, raises `LoopError` on a set but unusable `GOV_BASH`, and
@@ -273,7 +284,10 @@ Fixtures are each repaired unit's own, named by that unit's spec, under `%TEMP%`
   the path, and the inline copy's parity row passes. Red when: a shared write set reads `yes`.
 - **AC3** — When `grep -rnE "subprocess\.(run|Popen)\(\[\"bash\"" tools/loop` runs, it prints nothing,
   and a probe stubbing `subprocess.run` records `resolve_bash()`'s path as every driver call's
-  `argv[0]`. Red when: a loop-kit call launches bare `bash`.
+  `argv[0]` and, as its `argv[1]`, the directory `resolve_kit_dir("unattended", "unattended.sh", here)`
+  resolved joined with `unattended.sh`; with the unattended kit absent from every place the block
+  searches, `run_driver` raises `LookupError` and the stub records no call. Red when: a loop-kit call
+  launches bare `bash`, or a driver path the block did not resolve.
 - **AC4** — When the loop case runs `resolve_bash` against stub `System32` and `WindowsApps` candidates
   and an unusable `GOV_BASH`, each is refused, the last with `LoopError`, and `grep -c "replaces it
   unchanged"` over unit 36's ledger prints `0`. Red when: a refused launcher is accepted.
@@ -380,6 +394,10 @@ New arm: tools/policy/check_policy.py · covers AC6 AC23 AC26 · the two plants 
 - rev-1 · 2026-10-26 · initial draft, the round-1 promotions' audit's minors batch.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-57`, `KICK-dKeptSession-62`
   mirrored, the other ends of the edges the round-2 promotions' audit's disposal declared
+- rev-3 · 2026-10-26 · S3 · AC3 · re-grounded on the cross-check record
+  `2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck`, row 108: `run_driver` finds `<driver>`
+  through `loop_lib.py`'s inline `resolve_kit_dir` and passes its `LookupError` to each caller as the
+  unarmed signal; AC3's stub records `argv[1]` as the resolved path.
 
 ## 10. Reuse audit
 

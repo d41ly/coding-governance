@@ -1,6 +1,6 @@
 # KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 9 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 9 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0151@32b6ed5a whole
 **Carries:** node:policy-key.card.pointers
@@ -13,6 +13,9 @@
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-26 KICK-dKeptSession-1 |
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-13-deviation-131.md](../build/2026-10-26-build-KICK-dKeptSession-13-deviation-131.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-13-deviation-132.md](../build/2026-10-26-build-KICK-dKeptSession-13-deviation-132.md) | deviation | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -49,10 +52,13 @@ defines the item boundary, I12, the one point every later session unit reads at.
   stored card whose `## pointers` lacks a listed line fails `--card --check`, naming the line, and
   each later unit appends its own word. Observed by AC1, AC11.
 - **S3** — The records reader. `python tools/memory-tree/gen_build_index.py --latest-records <slug>`
-  prints one `<kind> <path>` line per kind of `RECORD_KIND_TOKENS`
-  (`tools/memory-tree/tree_lib.py:406`) that the build's records carry, the newest by filename,
-  read through `read_bindings` (:471), the binding reader the generator already holds. Observed by
-  AC10.
+  prints one `<kind> <path>` line per kind of `RECORD_KIND_TOKENS` that the build's records carry,
+  the newest by filename, read through `read_bindings` (:471), the binding reader the generator
+  already holds. PLAY-dOrderedCharter-42 S1 makes that tuple the four untyped kinds plus
+  `TYPED_RECORD_KINDS` (five members at `tools/memory-tree/tree_lib.py:406` at base), so each typed
+  kind a parent or this build joins, `transition` (TOOL-dDeclaredLoop-3 S2), `card`
+  (TOOL-dPlacedRequest-2) and `mailbox-message` (`KICK-dKeptSession-39`) among them, is read with no
+  change here. Observed by AC10.
 - **S4** — The write. `manifest-check.sh --card --pointers --build <slug> [--session <sid>]` renders
   S2, puts it into the build card's tail before the READY line, which stays last, and publishes the
   card through TOOL-dPlacedRequest-2's `publish_build_card` to every store `card.store` selects; with
@@ -212,7 +218,9 @@ Live at landing for a session whose card routes a build. A session with no route
   refused, the card left as it was.
 - observability — every crossing prints `boundary — <from> → <to>`.
 - risks — two sessions on one build race the ref; `publish_build_card`'s one re-render on a lost
-  compare-and-swap keeps both pointer sets in the ref's history.
+  compare-and-swap keeps both pointer sets in the ref's history. A build whose records serve many
+  typed kinds lengthens the `records —` line, one entry per kind (§8 F3); a card it pushes past
+  `CARD_CAP_BYTES` is refused whole by S4, named, never truncated.
 - testing — S9's plants and the hook arm, red and green.
 - migration — none.
 - user docs — `help/orientation-card.md`, S10.
@@ -295,8 +303,15 @@ New arm: tools/loop/position.py · covers AC4 · the `boundary` fixture case, th
 - **F3 — What are "the latest records by tag"?** Options: (a) the newest record of each `**Serves:**`
   kind; (b) the newest record of each filename tag such as `reuse-scout` or `deviation`; (c) every
   record. (b) and (c) grow with the build and would push the card past `CARD_CAP_BYTES`.
-  RESOLVED (agent, 2026-10-26, delegated): (a), rung 3: the kinds are a closed set of five
-  (`tree_lib.py:406`), so the line stays bounded and AC6 holds. widens: none · relaxes: none
+  RESOLVED (agent, 2026-10-26, delegated): (a), rung 3: the kinds are the closed tuple
+  `RECORD_KIND_TOKENS`, which PLAY-dOrderedCharter-42 S1 extends by `TYPED_RECORD_KINDS`, a member
+  added only by a spec through that unit's one-list rule, so the line holds at most one entry per
+  member and never grows with the build's record count. Re-derived for the grown set: the DEFERRED
+  specs at `c8d46e188` name twenty-one members, and every build's line measured there over its
+  non-spec records is at most 541 bytes over five kinds, an entry at most 122 bytes, so even a build
+  carrying all twenty-one bounds the line near 2.6 KB against `CARD_CAP_BYTES` 8192
+  (`skills/session-kickoff/manifest-check.sh:216`); a card it pushes past the cap is refused whole by
+  S4 and AC6. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -305,6 +320,11 @@ New arm: tools/loop/position.py · covers AC4 · the `boundary` fixture case, th
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-43`, `KICK-dKeptSession-44`
   mirrored, the other ends of the edges the round-1 spec audit's promoted units declare; no other
   section moved.
+- rev-3 · 2026-10-26 · §2 S3 · §5 · §8 F3 · re-grounded on dDeclaredLoop at `783f1ad3a` and
+  dPlacedRequest at `2740f0a3d` by the cross-check record
+  `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, row 49: the records reader
+  reads the token tuple PLAY-dOrderedCharter-42 S1 extends, and the `records —` line's bound is
+  re-derived against `CARD_CAP_BYTES` for the grown set.
 
 ## 10. Reuse audit
 
