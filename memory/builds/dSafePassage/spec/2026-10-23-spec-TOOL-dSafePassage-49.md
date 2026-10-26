@@ -15,6 +15,7 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-49-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-49-fork-resolution.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-fork-resolution.md) | research | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md) | research | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-50 |
 
 <!-- /gen:spec-records -->
