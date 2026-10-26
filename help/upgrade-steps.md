@@ -44,7 +44,13 @@ receipt at schema 4 keeps its schema and its `steps` across a re-apply, an `adop
 reaches 4 only by the step `govkit/receipt-schema-4`, the first row of `steps.toml`. Its up takes
 a schema-3 receipt to 4 with an empty `steps` (a receipt below 3 is refused: run `update` first,
 which lifts it to 3); its down takes the field out again and refuses while any other step reads
-`applied`. Until the deployer runs steps itself, run it by hand:
+`applied`.
+
+Before schema 4 no step row is written: a step's failure or interruption on such a receipt shows
+only in `update`'s output and findings. The `govkit/receipt-schema-4` row itself is written once
+that step's re-read of the receipt shows schema 4, like any other row. A row is recorded only on a
+receipt whose `schema` is a number of 4 or more and whose `steps` is a list; anything else is
+refused. Until the deployer runs steps itself, run the step by hand:
 
 ```sh
 python tools/govkit/steps/receipt_schema_4.py up <repo>       # schema 3 -> 4

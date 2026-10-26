@@ -5643,6 +5643,11 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "check_steps_recordable",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_sub_context",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
@@ -25051,6 +25056,11 @@
       "id": "test_stall_run",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "test_steps_recordable",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "test_substrate_dispatch_is_total",

@@ -540,16 +540,32 @@ def read_step_states(receipt: dict) -> list[dict]:
     return steps
 
 
+def test_steps_recordable(receipt: dict) -> bool:
+    """True exactly when `set_step_state` may record a row on `receipt`: its `schema` an int of 4
+    or more and its `steps` a list (TOOL-dSafePassage-16). It reads and writes nothing; every
+    caller asks it before a record, and the writer refuses by it, so the two never disagree."""
+    schema = receipt.get("schema")
+    return (isinstance(schema, int) and not isinstance(schema, bool) and schema >= 4
+            and isinstance(receipt.get("steps"), list))
+
+
 def set_step_state(receipt: dict, step_id, introduced, state, failure=None) -> dict:
     """Record `step_id` at `state` in the receipt's `steps`: the field's one writer (S3).
 
     The row moves to the end, so the last `applied` row is the last completed step; a known
-    `introduced` survives a call passing None. It refuses a receipt below schema 4 and any row
-    `read_step_states` would refuse, mutates `receipt` and persists nothing: the caller writes it."""
+    `introduced` survives a call passing None. It refuses a receipt `test_steps_recordable`
+    rejects and any row `read_step_states` would refuse, mutates `receipt` and persists nothing:
+    the caller writes it.
+
+    The bootstrap: before schema 4 no step row is persisted, so a step's failure or interruption
+    on such a receipt goes to `update`'s output and findings only; the `govkit/receipt-schema-4`
+    row is written after that step's post-spawn re-read shows schema 4, through this writer, like
+    any other row (TOOL-dSafePassage-16)."""
     schema = receipt.get("schema", 1)
-    if not (isinstance(schema, int) and not isinstance(schema, bool) and schema >= 4):
-        raise Refusal(f"a receipt at schema {schema!r} has no `steps` to record '{step_id}' in; "
-                      f"the step govkit/receipt-schema-4 takes it to schema 4 first")
+    if not test_steps_recordable(receipt):
+        raise Refusal(f"a receipt at schema {schema!r} has no `steps` to record '{step_id}' in: a "
+                      f"step row is recorded only where `schema` is a number of 4 or more and "
+                      f"`steps` is a list; the step govkit/receipt-schema-4 takes it to schema 4 first")
     row = {"id": step_id, "introduced": introduced, "state": state}
     if failure is not None:
         row["failure"] = failure

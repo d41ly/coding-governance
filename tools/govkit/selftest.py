@@ -3353,6 +3353,33 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
 
 
+def check_steps_recordable() -> None:
+    """TOOL-dSafePassage-16 AC1 AC2 — the step record's precondition and its one writer over the
+    spec's five receipt shapes: the predicate reads the table's answer and writes nothing, and the
+    writer refuses exactly where the predicate reads False and appends one row where it reads True."""
+    us = govkit_module().upgrade_steps
+    sid = "govkit/receipt-schema-4"
+    for label, rec, want in (
+            ("schema 3 with no `steps`", {"schema": 3}, False),
+            ("schema 4 with `steps` []", {"schema": 4, "steps": []}, True),
+            ("schema 4 with no `steps`", {"schema": 4}, False),
+            ("schema 3 with `steps` []", {"schema": 3, "steps": []}, False),
+            ("the string schema \"4\"", {"schema": "4", "steps": []}, False)):
+        before = json.dumps(rec, sort_keys=True)
+        got = us.test_steps_recordable(rec)
+        check(f"[dSP-16 AC1] test_steps_recordable reads {want} on {label}, writing nothing",
+              got is want and json.dumps(rec, sort_keys=True) == before, f"{got!r} {rec}")
+        try:
+            us.set_step_state(rec, sid, None, "applied")
+            refused = False
+        except us.Refusal:
+            refused = True
+        ok = (not refused and rec["steps"] == [{"id": sid, "introduced": None, "state": "applied"}]) if want \
+            else (refused and json.dumps(rec, sort_keys=True) == before)
+        check(f"[dSP-16 AC2] set_step_state {'appends one row' if want else 'refuses'} on {label}, "
+              "as the predicate reads", ok, str(rec))
+
+
 def check_receipt_schema(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-3 AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 — the receipt's schema 4: the
     back-fill pinned below 3, who writes 4, the step `govkit/receipt-schema-4`, and the `steps`
@@ -3715,6 +3742,7 @@ def main() -> int:
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
         check_receipt_schema(tmp / "drs")
+        check_steps_recordable()
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
