@@ -15,7 +15,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | active | 0 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 69 | 2026-10-26 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | OPEN | d | 2026-10-21 | tooling | 18 | 2026-10-21 | active | 0 |
-| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 33 | 2026-10-23 | active | 0 |
+| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 38 | 2026-10-26 | active | 0 |
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 24 | 2026-10-21 | active | 0 |
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 105 | 2026-10-26 | active | 0 |
 | [dFairHearing](builds/dFairHearing/README.md) | DEFERRED | d | 2026-10-21 | tooling | 40 | 2026-10-23 | active | 0 |
