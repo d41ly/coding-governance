@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: kickoff
 roster: KICK
-ids: KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-29 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56
+ids: KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-29 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62
 spec-audit: 2026-10-21
 parents: dDeclaredLoop dPlacedRequest
 may: PLAY-dClosedLoop-3
@@ -88,11 +88,12 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 55 unit(s) · node d · opened 2026-10-21 · streams kickoff
+**Build status:** OPEN · 61 unit(s) · node d · opened 2026-10-21 · streams kickoff
 ids KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14
 ids KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28
 ids KICK-dKeptSession-29 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42
 ids KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56
+ids KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -105,11 +106,14 @@ ids KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSes
 | [KICK-dKeptSession-34 — the reader's preset step answers None for a row the preset leaves unassigned, so a derived default reads with source default under every preset](spec/2026-10-26-spec-KICK-dKeptSession-34.md) | 4 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-40 — the preset store a recorded input of the JSON mirror, so a changed preset reads the mirror stale](spec/2026-10-26-spec-KICK-dKeptSession-40.md) | 4 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-4 — the preset asked once at govkit intake and written into the scaffolded policy file](spec/2026-10-26-spec-KICK-dKeptSession-4.md) | 5 | 2 | OPEN | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale](spec/2026-10-26-spec-KICK-dKeptSession-49.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-50 — the mirror's upgrade path observed on a pre-unit mirror: re-rendered by the kit's update, and refused by its check where the update skips it](spec/2026-10-26-spec-KICK-dKeptSession-50.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-54 — an unassigned derived row keeps dGroundRules' refusal in `get`, and its value is read through the caps module](spec/2026-10-26-spec-KICK-dKeptSession-54.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-49 — the JS mirror reader takes the inputs it compares from its own code, so a mirror missing the preset store reads stale](spec/2026-10-26-spec-KICK-dKeptSession-49.md) | 5 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-50 — the mirror's upgrade path observed on a pre-unit mirror: re-rendered by the kit's update, and refused by its check where the update skips it](spec/2026-10-26-spec-KICK-dKeptSession-50.md) | 5 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-54 — an unassigned derived row keeps dGroundRules' refusal in `get`, and its value is read through the caps module](spec/2026-10-26-spec-KICK-dKeptSession-54.md) | 5 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it](spec/2026-10-26-spec-KICK-dKeptSession-20.md) | 6 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-32 — the scaffold writes only the keys the named preset leaves unassigned, so a preset answered at intake is the posture the adopter reads](spec/2026-10-26-spec-KICK-dKeptSession-32.md) | 6 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-58 — the derived cap's row compared on its value and source, its mode read as strict sets it](spec/2026-10-26-spec-KICK-dKeptSession-58.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-59 — the JS reader's kit inputs held equal to the Python mirror's by a parity case](spec/2026-10-26-spec-KICK-dKeptSession-59.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-60 — the policy kit's rule for a new mirror input names both lists and the case that holds them equal](spec/2026-10-26-spec-KICK-dKeptSession-60.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [KICK-dKeptSession-16 — the policy namespaces' purposes, reviewed as `memory.map-purpose`'s default says](spec/2026-10-26-spec-KICK-dKeptSession-16.md) | 7 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes](spec/2026-10-26-spec-KICK-dKeptSession-12.md) | 8 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`](spec/2026-10-26-spec-KICK-dKeptSession-13.md) | 9 | 2 | OPEN | rev-2 | 2026-10-26 |
@@ -121,13 +125,13 @@ ids KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSes
 | [KICK-dKeptSession-30 — the context window derived per model from the node's observed usage, never pinned at 200000](spec/2026-10-26-spec-KICK-dKeptSession-30.md) | 13 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says](spec/2026-10-26-spec-KICK-dKeptSession-9.md) | 13 | 2 | OPEN | rev-3 | 2026-10-26 |
 | [KICK-dKeptSession-28 — a mailbox recipient names a build, a unit, a node by its fleet tag, or the whole project](spec/2026-10-26-spec-KICK-dKeptSession-28.md) | 14 | 2 | OPEN | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-45 — the window scan's default root resolved by `resolve_projects_root`, never a literal profile path](spec/2026-10-26-spec-KICK-dKeptSession-45.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-46 — every fill reader passes the projects root it already resolved, so the window is derived under the tree the reader reads](spec/2026-10-26-spec-KICK-dKeptSession-46.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-47 — a compaction counts towards a model's window only when the session's last main usage before it is on that model](spec/2026-10-26-spec-KICK-dKeptSession-47.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-48 — the mixed-window limit stated, and a 200k session on a 1M-observed model read against its own window by the harness's variable](spec/2026-10-26-spec-KICK-dKeptSession-48.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-45 — the window scan's default root resolved by `resolve_projects_root`, never a literal profile path](spec/2026-10-26-spec-KICK-dKeptSession-45.md) | 14 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-46 — every fill reader passes the projects root it already resolved, so the window is derived under the tree the reader reads](spec/2026-10-26-spec-KICK-dKeptSession-46.md) | 14 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-47 — a compaction counts towards a model's window only when the session's last main usage before it is on that model](spec/2026-10-26-spec-KICK-dKeptSession-47.md) | 14 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-48 — the mixed-window limit stated, and a 200k session on a 1M-observed model read against its own window by the harness's variable](spec/2026-10-26-spec-KICK-dKeptSession-48.md) | 14 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-22 — each message's id derived from what it says, never from its sender's session, and a retried post refused across the build's session refs](spec/2026-10-26-spec-KICK-dKeptSession-22.md) | 15 | 2 | OPEN | rev-3 | 2026-10-26 |
 | [KICK-dKeptSession-31 — the message id derived over its recipient and its content key, so two legitimate notices never share one id](spec/2026-10-26-spec-KICK-dKeptSession-31.md) | 16 | 2 | OPEN | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition](spec/2026-10-26-spec-KICK-dKeptSession-5.md) | 16 | 2 | OPEN | rev-3 | 2026-10-26 |
+| [KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition](spec/2026-10-26-spec-KICK-dKeptSession-5.md) | 16 | 2 | OPEN | rev-4 | 2026-10-26 |
 | [KICK-dKeptSession-23 — every mail write appended to the change feed once its ref update lands, inside the feed's census](spec/2026-10-26-spec-KICK-dKeptSession-23.md) | 17 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [KICK-dKeptSession-36 — the transition guard runs the driver through a bash that shares this filesystem, never the bare name, and an unresolved shell refuses](spec/2026-10-26-spec-KICK-dKeptSession-36.md) | 17 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-39 — `mailbox-message` a typed record kind, served as itself and joined to its file name both ways](spec/2026-10-26-spec-KICK-dKeptSession-39.md) | 17 | 2 | OPEN | rev-2 | 2026-10-26 |
@@ -144,31 +148,35 @@ ids KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSes
 | [KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight](spec/2026-10-26-spec-KICK-dKeptSession-8.md) | 25 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-11 — progress reported by `notify.owner`: one `progress —` line at the events the value selects](spec/2026-10-26-spec-KICK-dKeptSession-11.md) | 26 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-43 — the `actions.free` arm reads every form of the item pointer, a skipped pointer leaving it unarmed and saying so](spec/2026-10-26-spec-KICK-dKeptSession-43.md) | 26 | 2 | OPEN | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-52 — the per-exit pass observed on a repeated interface, so dropping `--pass` prints a duplicate](spec/2026-10-26-spec-KICK-dKeptSession-52.md) | 26 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-53 — a consumed interface notice supersedes the parent's earlier rows by content key and by the session chain, never by arrival](spec/2026-10-26-spec-KICK-dKeptSession-53.md) | 26 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [KICK-dKeptSession-55 — the transition writer acknowledges notices only when the guard would then pass, and prints each one it consumed](spec/2026-10-26-spec-KICK-dKeptSession-55.md) | 26 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-52 — the per-exit pass observed on a repeated interface, so dropping `--pass` prints a duplicate](spec/2026-10-26-spec-KICK-dKeptSession-52.md) | 26 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-53 — a consumed interface notice supersedes the parent's earlier rows by content key and by the session chain, never by arrival](spec/2026-10-26-spec-KICK-dKeptSession-53.md) | 26 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-55 — the transition writer acknowledges notices only when the guard would then pass, and prints each one it consumed](spec/2026-10-26-spec-KICK-dKeptSession-55.md) | 26 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor](spec/2026-10-26-spec-KICK-dKeptSession-17.md) | 27 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-61 — the session chain read over every row on the parent's refs, so a parent with two dependents is placed](spec/2026-10-26-spec-KICK-dKeptSession-61.md) | 27 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [KICK-dKeptSession-18 — the `repeat` disposition and its `none` row, joined both ways to what the claim admits](spec/2026-10-26-spec-KICK-dKeptSession-18.md) | 28 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-41 — the three catalogue rows that already stand given their summary and usage, one row per name, never a second minted beside them](spec/2026-10-26-spec-KICK-dKeptSession-41.md) | 29 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [KICK-dKeptSession-44 — the round-1 spec audit's 42 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-44.md) | 30 | 2 | OPEN | rev-2 | 2026-10-26 |
-| [KICK-dKeptSession-56 — the round-1 promotions' audit's 45 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-56.md) | 31 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-56 — the round-1 promotions' audit's 45 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-56.md) | 31 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [KICK-dKeptSession-57 — the batch's pass-bound items observed at a pass that runs after them, never at an earlier unit's commit](spec/2026-10-26-spec-KICK-dKeptSession-57.md) | 32 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-62 — the round-2 promotions' audit's 32 minor findings, closed after every unit they land on is built](spec/2026-10-26-spec-KICK-dKeptSession-62.md) | 33 | 2 | OPEN | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 49 bound to this build, across 4 record folder(s).
+Records: 59 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56.
+Ids no `spec-audit` record has ever named: KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62.
 
 Ids whose spec moved past its audited revision: KICK-dKeptSession-1@rev-1 KICK-dKeptSession-10@rev-1 KICK-dKeptSession-11@rev-1 KICK-dKeptSession-12@rev-1 KICK-dKeptSession-13@rev-1 KICK-dKeptSession-14@rev-1 KICK-dKeptSession-16@rev-1 KICK-dKeptSession-17@rev-1 KICK-dKeptSession-18@rev-1
 KICK-dKeptSession-2@rev-1 KICK-dKeptSession-20@rev-1 KICK-dKeptSession-21@rev-1 KICK-dKeptSession-22@rev-1 KICK-dKeptSession-25@rev-1 KICK-dKeptSession-27@rev-1 KICK-dKeptSession-28@rev-1 KICK-dKeptSession-3@rev-1 KICK-dKeptSession-30@rev-1 KICK-dKeptSession-31@rev-1 KICK-dKeptSession-32@rev-1
 KICK-dKeptSession-33@rev-1 KICK-dKeptSession-34@rev-1 KICK-dKeptSession-35@rev-1 KICK-dKeptSession-36@rev-1 KICK-dKeptSession-37@rev-1 KICK-dKeptSession-38@rev-1 KICK-dKeptSession-39@rev-1 KICK-dKeptSession-4@rev-1 KICK-dKeptSession-40@rev-1 KICK-dKeptSession-41@rev-1 KICK-dKeptSession-42@rev-1
-KICK-dKeptSession-43@rev-1 KICK-dKeptSession-44@rev-1 KICK-dKeptSession-5@rev-1 KICK-dKeptSession-7@rev-1 KICK-dKeptSession-8@rev-1 KICK-dKeptSession-9@rev-1.
+KICK-dKeptSession-43@rev-1 KICK-dKeptSession-44@rev-1 KICK-dKeptSession-45@rev-1 KICK-dKeptSession-46@rev-1 KICK-dKeptSession-47@rev-1 KICK-dKeptSession-48@rev-1 KICK-dKeptSession-49@rev-1 KICK-dKeptSession-5@rev-1 KICK-dKeptSession-50@rev-1 KICK-dKeptSession-52@rev-1 KICK-dKeptSession-53@rev-1
+KICK-dKeptSession-54@rev-1 KICK-dKeptSession-55@rev-1 KICK-dKeptSession-56@rev-1 KICK-dKeptSession-7@rev-1 KICK-dKeptSession-8@rev-1 KICK-dKeptSession-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 55 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 61 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 28
 - carried in parts: 0 (none)
@@ -183,7 +191,9 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 55 spec(s) at
   `spec/2026-10-26-spec-KICK-dKeptSession-41.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-44.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-KICK-dKeptSession-45.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-48.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-KICK-dKeptSession-49.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-52.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-KICK-dKeptSession-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-56.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-26-spec-KICK-dKeptSession-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-56.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-KICK-dKeptSession-57.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-60.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-26-spec-KICK-dKeptSession-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-KICK-dKeptSession-62.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0141, cl-dClosedLoop-0142, cl-dClosedLoop-0144, cl-dClosedLoop-0153, cl-dClosedLoop-0157, cl-dClosedLoop-0158, cl-dClosedLoop-0160, cl-dClosedLoop-0161, cl-dClosedLoop-0163, cl-dClosedLoop-0165
 <!-- /gen:build-coverage -->
 
@@ -196,7 +206,7 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 55 spec(s) at
 | 3 | `KICK-dKeptSession-2` | no |
 | 4 | `KICK-dKeptSession-3`, `KICK-dKeptSession-34`, `KICK-dKeptSession-40` | yes |
 | 5 | `KICK-dKeptSession-4`, `KICK-dKeptSession-49`, `KICK-dKeptSession-50`, `KICK-dKeptSession-54` | yes |
-| 6 | `KICK-dKeptSession-20`, `KICK-dKeptSession-32` | yes |
+| 6 | `KICK-dKeptSession-20`, `KICK-dKeptSession-32`, `KICK-dKeptSession-58`, `KICK-dKeptSession-59`, `KICK-dKeptSession-60` | yes |
 | 7 | `KICK-dKeptSession-16` | no |
 | 8 | `KICK-dKeptSession-12` | no |
 | 9 | `KICK-dKeptSession-13`, `KICK-dKeptSession-37`, `KICK-dKeptSession-38` | yes |
@@ -217,11 +227,13 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 55 spec(s) at
 | 24 | `KICK-dKeptSession-7` | no |
 | 25 | `KICK-dKeptSession-35`, `KICK-dKeptSession-42`, `KICK-dKeptSession-8` | yes |
 | 26 | `KICK-dKeptSession-11`, `KICK-dKeptSession-43`, `KICK-dKeptSession-52`, `KICK-dKeptSession-53`, `KICK-dKeptSession-55` | yes |
-| 27 | `KICK-dKeptSession-17` | no |
+| 27 | `KICK-dKeptSession-17`, `KICK-dKeptSession-61` | yes |
 | 28 | `KICK-dKeptSession-18` | no |
 | 29 | `KICK-dKeptSession-41` | no |
 | 30 | `KICK-dKeptSession-44` | no |
 | 31 | `KICK-dKeptSession-56` | no |
+| 32 | `KICK-dKeptSession-57` | no |
+| 33 | `KICK-dKeptSession-62` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
