@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-23 — the prompt writer's default frame, bounded lists, upstream rows, and the medium effort floor
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 18 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 18 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0188@23b122f8 whole
 
@@ -13,8 +13,11 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-23-deviation-231.md](../build/2026-10-26-build-TOOL-dBoundRoles-23-deviation-231.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-23-deviation-232.md](../build/2026-10-26-build-TOOL-dBoundRoles-23-deviation-232.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-23-deviation-233.md](../build/2026-10-26-build-TOOL-dBoundRoles-23-deviation-233.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -60,16 +63,23 @@ less.
 - **S5** — The floor. `EFFORT_FLOOR = "medium"` in `roles_lib.py` beside `EFFORT_LEVELS`
   (`roles_lib.py:45`), the one spelling of the floor, and `check_effort_floor(level, source)`: a level
   below the floor passes only when its source is the policy file `.governance/policy.toml`, read through
-  `read_policy_setting` (TOOL-dBoundRoles-21 S1) as a `roles.effort.*` key. It is applied at every
+  `read_policy_setting` (TOOL-dBoundRoles-21 S1) as a `roles.effort.*` key, under the guard value S6
+  names. It is applied at every
   place an effort is resolved or declared: steps 4 and 5 of TOOL-dBoundRoles-21's order in
   `resolve_stage_efforts` and `resolve_effort`; R12's `check_level` (`roles_lib.py:397-400`), so a house
   file `[effort]` value below medium is a defect while the house file stays a fallback; and R2's grade
   of a role's declared `effort`, so no role declares less than medium. Observed by AC4 and AC6.
-- **S6** — The owner's write is the only path below medium. A `roles.effort.*` key below medium reaches
-  `.governance/policy.toml` only through TOOL-dGroundRules-6's guard, which admits a guarded-path change
-  on the owner's terminal proof and refuses every agent change but its one budget shape
-  (TOOL-dGroundRules-6 S2 to S4), so an agent, a role's proposal, a scenario and a build's own change
-  cannot carry one; the floor's provenance is read from that file alone. Observed by AC5 and AC6.
+- **S6** — The owner's write is the only path below medium. A `roles.effort.*` key reaches
+  `.governance/policy.toml` only through TOOL-dDeclaredLoop-2's verdict, `tools/loop/guard.py --staged`
+  (its S1, S11), which admits a guarded-path change on the owner's terminal proof and otherwise decides
+  by `policy-file.guard`. Under `owner-only`, the default, it refuses every agent change but the one
+  budget shape (TOOL-dGroundRules-6 S2 to S4), so an agent, a role's proposal, a scenario and a build's
+  own change cannot carry a level below medium. Under `agents-with-reason` and `agents-within-mandate`
+  it admits an agent's change to that file with its change record and decision row (its §4 "The
+  verdict"), so the file no longer tells the owner's level from an agent's. There `check_effort_floor`
+  refuses a policy-file level below medium, naming `policy-file.guard`, read through
+  `read_policy_setting` from the same file, which only the owner's terminal commit changes (its S3).
+  The floor's provenance is read from that file alone (§8 F3). Observed by AC5 and AC6.
 - **S7** — Every refusal S5 adds names the level, its source, the floor, and the remedy's actor: the
   owner, who sets the key in the guarded policy file. The roles kit's own fixtures that plant `low`
   (`tools/roles/render_agents.py:448`) keep one floor plant and move the rest to `medium`.
@@ -84,7 +94,8 @@ less.
 - The prompt writer's fields and the framing blocks: TOOL-dBoundRoles-4's.
 - The effort keys, their order and their reader: TOOL-dBoundRoles-21's.
 - The upstream field, its block and its join: TOOL-dDeclaredLoop-29 S5 and S6.
-- The guard and the owner's terminal proof: TOOL-dGroundRules-6's, observed here and not changed.
+- The guard and the owner's terminal proof: TOOL-dGroundRules-6's and TOOL-dDeclaredLoop-2's verdict,
+  observed here and not changed.
 - An effort a caller types by hand into a harness's `efforts` argument. The harnesses grade its shape
   only (`tools/workflows/unattended-build.template.js:505-532`); a caller that reads
   `handoff.py stage-efforts` gets levels S5 has graded, and one that types a level is not seen.
@@ -97,7 +108,7 @@ less.
 - **consumes-from** `TOOL-dBoundRoles-5` — `validate_return`, which S3 extends with the bound a work order's return contract states
 - **consumes-from** `TOOL-dBoundRoles-21` — `roles.effort.default` and the re-pointed `resolve_stage_efforts`, whose steps S5 holds to the floor
 - **hands-off** `TOOL-dBoundRoles-24` — `render_handoff`, with the frame assembled, the one place a work order's task is composed and the point the anchor check runs
-- **consumes-from** external — TOOL-dDeclaredLoop-29 S5's `### upstream:rows` block and S6's `join_upstream`, and TOOL-dGroundRules-6's guard; the build run re-grounds on each and stops the unit if one is still absent
+- **consumes-from** external — TOOL-dDeclaredLoop-29 S5's `### upstream:rows` block and S6's `join_upstream`, TOOL-dGroundRules-6's guard and TOOL-dDeclaredLoop-2's verdict `tools/loop/guard.py --staged`; the build run re-grounds on each and stops the unit if one is still absent
 - **hands-off** `TOOL-dBoundRoles-43` — `check_effort_floor`, which unit 43 applies at unit 22's three steps (id 18 of the round-1 spec audit)
 - **consumes-from** `TOOL-dBoundRoles-48` — `check_block_fences` and its call in `render_handoff`, which runs after this unit's frame places its `### framing:` blocks, so a framing field that leaves a fence open is refused (id 34 of the round-1 audit of units 37 to 44)
 
@@ -136,14 +147,16 @@ else.
 ```
 check_effort_floor(level, source)
   EFFORT_LEVELS.index(level) >= EFFORT_LEVELS.index(EFFORT_FLOOR) -> pass
-  source == policy file (steps 1-3 of the order, read_policy_setting) -> pass   the owner's write
+  source == policy file (steps 1-3 of the order, read_policy_setting)
+    and policy-file.guard == owner-only -> pass   the owner's write
+  source == policy file, any other guard value -> RolesError naming policy-file.guard and its value
   otherwise -> RolesError: "<level> from <source> is below the floor medium; only the owner sets a
                lower level, as a roles.effort.* key in the guarded policy file"
 ```
 
 | Source of a level | Below medium |
 |---|---|
-| `roles.effort.<workflow>.<stage>`, `roles.effort.<role>`, `roles.effort.default` in `.governance/policy.toml` | admitted: the guard admits only the owner's write there |
+| `roles.effort.<workflow>.<stage>`, `roles.effort.<role>`, `roles.effort.default` in `.governance/policy.toml` | admitted under `policy-file.guard = owner-only`, where only the owner's terminal commit writes there; refused under the two other values, where TOOL-dDeclaredLoop-2's verdict also admits an agent's recorded change (S6) |
 | the house file's `[effort]` (step 4) | refused, by R12 at load and by S5 at resolve |
 | the role's declared `effort` (step 5) | refused, by R2 |
 | a stage row's own `effort`, a scenario's or an overlay's | refused at resolve, as a declared value |
@@ -182,8 +195,8 @@ own key.
 - **Blocks ordered by the order code appends them.** Every later block-adding unit would have to append
   in skeleton order by hand; one sort by declared slot cannot drift.
 - **A floor checked against the commit that last touched the key.** The clause reads provenance "from
-  that file alone"; the guard already makes every value in it the owner's, and a history read would be
-  a second guard.
+  that file alone"; the guard's value, which only the owner's terminal commit sets, decides whose write
+  may land there, and a history read would be a second guard.
 
 ## 5. Production-readiness checklist
 
@@ -222,15 +235,24 @@ own key.
   defect; and a stage whose only level comes from the house file at `low` is refused by
   `resolve_stage_efforts` naming the source.
   Red when: a below-medium level from the house file or a role's declaration resolves.
-- **AC5** — When `guard.py --staged` reads a fixture repository whose staged change to its policy file
-  sets `roles.effort.gov-builder = "low"`, then a stage key `roles.effort.build.builder = "low"`, then
-  `roles.effort.default = "low"`, with no owner proof, it refuses each, exit 1.
-  fixture: needs TOOL-dGroundRules-6 built; the build run re-grounds on it.
-  Red when: an agent's change below medium reaches the policy file.
+- **AC5** — When `python tools/loop/guard.py --staged` reads a fixture repository whose staged change
+  to its policy file sets `roles.effort.gov-builder = "low"`, then a stage key
+  `roles.effort.build.builder = "low"`, then `roles.effort.default = "low"`, with no owner proof and
+  `policy-file.guard` unset, it refuses each, exit 1. With `policy-file.guard = "agents-with-reason"`
+  landed, the `roles.effort.default` change staged with a change record naming
+  `policy.roles.effort.default` and a `memory/DECISIONS.md` row exits 0, and without the row exits 1;
+  with `"agents-within-mandate"` landed, the same staged change on a branch no run-state file names
+  exits 1.
+  fixture: needs TOOL-dDeclaredLoop-2 built; the build run re-grounds on it.
+  Red when: an agent's change below medium reaches the policy file under `owner-only`, or a value's
+  outcome differs from what S6 states.
 - **AC6** — When the fixture's committed policy file, `policy.toml`, sets `roles.effort.default = "low"`,
   `python tools/roles/handoff.py stage-efforts build` prints `"builder":"low"`, and
-  `check_effort_floor` passes the level because its source is the policy file.
-  Red when: the floor refuses the owner's own key, so no role can run at low.
+  `check_effort_floor` passes the level because its source is the policy file; with
+  `policy-file.guard = "agents-with-reason"` committed beside it, the same command exits 1 naming
+  `policy-file.guard`.
+  Red when: the floor refuses the owner's own key under `owner-only`, so no role can run at low, or
+  admits it under a value that lets an agent write the file.
 - **AC7** — When `grep -n "medium" help/roles.md` and `grep -n "FRAME_SLOTS" tools/roles/README.md`
   run, the page states the floor and its one exception and the README names the frame's order.
   Red when: the page still says the effort is whatever the policy file sets, with no floor.
@@ -255,11 +277,16 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 AC6 · its self-
   veto 2 refusing (b). widens: none · relaxes: none
 - **F3 — How does the floor read "the owner's explicit authorization" without a second guard?**
   Options: (a) a level's source is the provenance: steps 1 to 3 of the order read the guarded policy
-  file, which only the owner can change below medium (TOOL-dGroundRules-6), and every other source is
-  held to the floor; (b) the floor reads each key's last commit and its proof. (b) re-implements the
-  guard over history and reads more than "that file alone". RESOLVED (agent, 2026-10-25, delegated):
-  (a), rung 1, the clause's own words, "the check reading an effort's provenance from that file
-  alone". widens: none · relaxes: none
+  file, and every other source is held to the floor; (b) the floor reads each key's last commit and its
+  proof, or the change record TOOL-dDeclaredLoop-2 requires; (c) as (a), a policy-file level below
+  medium passing only while `policy-file.guard`, read from the same file, is `owner-only`. (b)
+  re-implements the guard over history and reads more than "that file alone". The rev-1 pick, (a),
+  rested on only the owner changing the file (TOOL-dGroundRules-6), which TOOL-dDeclaredLoop-2 §4 "The
+  verdict" rules out under `agents-with-reason` and `agents-within-mandate`, so (a) would admit an
+  agent's level there. RESOLVED (agent, 2026-10-26, delegated): (c), rung 1, naming
+  TOOL-dDeclaredLoop-2: the clause's own words, "below medium only by the owner's explicit write" and
+  "provenance from that file alone", hold under every value only when the floor reads the guard value
+  beside the level; that unit's S3 keeps the value the owner's. widens: none · relaxes: none
 - **F4 — Does the frame carry a slot for every block, or only the prompt writer's?** Options: (a) every
   block `render_handoff` adds carries a slot and one sort assembles the task; (b) the prompt writer's
   parts are placed and every other block keeps its arrival order. (b) leaves the work order's own blocks,
@@ -274,6 +301,11 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 AC6 · its self-
   `tools/roles/` at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the **consumes-from** bullet mirroring TOOL-dBoundRoles-48's hands-off, a promotion of the round-1 audit of units 37 to 44; nothing else moved.
+- rev-4 · 2026-10-26 · S5 · S6 · §3 · §4 The floor, Alternatives rejected · AC5 · AC6 · §8 F3 ·
+  re-grounded on TOOL-dDeclaredLoop-2 by `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md`
+  row 43: the verdict is `tools/loop/guard.py --staged`, which admits an agent's recorded policy change
+  under the two non-default `policy-file.guard` values, so the floor admits a policy-file level below
+  medium only under `owner-only`; AC5 plants each value; F3 re-resolved to (c).
 
 ## 10. Reuse audit
 

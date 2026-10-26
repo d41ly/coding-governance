@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0166@83615023 whole
 
@@ -13,8 +13,12 @@
 | [2026-10-25-build-TOOL-dBoundRoles-1-reuse-scout-c.md](../build/2026-10-25-build-TOOL-dBoundRoles-1-reuse-scout-c.md) | research | TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-16 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-25 |
 | [2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md) | research | TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
+| [2026-10-26-build-TOOL-dBoundRoles-1-crosscheck-returns.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-crosscheck-returns.md) | research | — |
 | [2026-10-26-build-TOOL-dBoundRoles-1-departures-spec.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-departures-spec.md) | journal | — |
 | [2026-10-26-build-TOOL-dBoundRoles-1-deviation-11.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-deviation-11.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-1-deviation-12.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-deviation-12.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | — |
+| [2026-10-26-build-TOOL-dBoundRoles-1-reground-returns.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-reground-returns.md) | research | — |
 | [2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-2-reuse-scout.md) | journal | — |
@@ -22,6 +26,8 @@
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-1-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-10-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-10-spec-reviewer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-11-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-11-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-2-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-3-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-3-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-4-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-4-spec-writer.md) | journal | — |
@@ -31,6 +37,8 @@
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-8-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-8-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-9-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-9-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dBoundRoles-1-owner-review-stop.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-owner-review-stop.md) | research | TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -80,9 +88,10 @@ had no spawn in 60 days and two double up (gap-roles-07), and no check keeps cor
 - **S6** — The role index carries each role's `layer` and `acts-as`, rendered by `render_roles_index`
   (`tools/roles/render_agents.py:207`). Observed by AC5.
 - **S7** — The P28 matrix arm, `check_item_roles` in `tools/loop/loop_items.py`, called by
-  TOOL-dDeclaredLoop-24 S4's `check_item_composition`: a core item whose actor `role:<slot>` names a
-  role an expansion registers or whose index `layer` is an expansion row, and any item whose actor names
-  a `cycle` role, is a refusal naming the item and the role. Observed by AC6.
+  TOOL-dDeclaredLoop-24 S4's `check_item_composition` over the composition its S3 builds, gov's rows as
+  patched and the repository's rows alike: an item whose actor `role:<slot>` names a role an expansion
+  registers or whose index `layer` is an expansion row, and any item whose actor names a `cycle` role,
+  is a refusal naming the item and the role. Observed by AC6.
 - **S8** — The renders: `.claude/agents/` and `.claude/roles.json` by `render_agents.py --write`, the
   catalogue region of `tools/roles/README.md` by `check_roles.py --write`, and the roster region of
   `AGENTS.md` by the playbook render, which prints `handoff.py roster`. Observed by AC5.
@@ -98,7 +107,7 @@ had no spawn in 60 days and two double up (gap-roles-07), and no check keeps cor
 - `gov-session`'s retirement: Runtime's, the night pass two's point 4 and NT-21 (D3). It gains the two
   fields and stays.
 - The matrix arms that every core role acts in a core item and that a repository role acts in some
-  item: TOOL-dBoundRoles-20's, over the composition. This unit's arm reads gov's items only.
+  item: TOOL-dBoundRoles-20's. This unit's arm reads the same composition, repository rows included.
 - The prompt writer's job and its authorship key: TOOL-dBoundRoles-4's. Its file here carries a body
   stating the job the roster names and nothing a later unit decides.
 
@@ -182,14 +191,16 @@ adds four reds to the layer contract's conformance gate (PLAY-dOrderedCharter-16
 row or file: a `roles` or `lenses` list on a `core` row; an entry outside the `seg` shape; a role file
 under the roles kit whose slot an expansion row registers and whose `layer` is not one of the
 registering rows; and a role file whose slot no expansion registers and whose `layer` names a non-core
-row. The role files are read through `roles_lib.load_roles`, imported through
-`resolve_kit_dir("roles", "roles_lib.py", here)`, so the playbook kit types no role grammar.
+row. Each role's slot and `layer` are read as JSON data from `.claude/roles.json`, the index S6
+renders, so the playbook kit neither imports the roles kit ("A kit may not import a sibling kit",
+PLAY-dOrderedCharter-7 §4 "The policy reads") nor types a role grammar (§8 F6). An index older than
+its role files is the `roles render wiring` leg's red; with no index the role half prints `unarmed`.
 
 ### The item arm
 
 ```
 check_item_roles(items, index, layers) -> list of refusals
-  for each item of gov's loop definition whose actor is role:<slot>:
+  for each item of the composition (TOOL-dDeclaredLoop-24 S3) whose actor is role:<slot>:
       "item <tag> names role.<slot>, which <layer> registers as an expansion role"  when an expansion row's roles holds <slot>
       "item <tag> names role.<slot>, whose layer <layer> is not core"                 when index.roles[<slot>].layer is not a core row
       "item <tag> names role.<slot>, a cycle role, which acts in no item"            when index.roles[<slot>].acts-as is cycle
@@ -197,9 +208,13 @@ check_item_roles(items, index, layers) -> list of refusals
 
 `index` is `.claude/roles.json`, the generated contract the loop kit already reads beside the roles
 kit, never a role file; `layers` is `layers.toml`. An actor naming no role of the index is the actor
-arm's refusal (layer-roles `[matrix]` arm 1), unchanged here. Gov's items are core because gov's loop
-definition is a core kit's: an expansion's items arrive from its own kit, which no gov item check
-grades.
+arm's refusal (layer-roles `[matrix]` arm 1), unchanged here. `items` is the composition
+`check_item_composition` grades, gov's `[[item]]` rows as their pinned patches leave them and the
+overlay's repository rows (`item.<step>.adopter.<name>`), and every check of TOOL-dDeclaredLoop-24 S4
+runs over it (its S3). Every row is an item of the core loop, so the arm grades each one and skips
+none: a repository item naming an expansion role binds the core loop to an expansion as a gov item
+would, and an `amends` of a gov item's actor is graded as composed. layer-roles `[matrix]` (FA-4):
+"every arm reads the composition, never gov's rows alone".
 
 ### Inventory
 
@@ -286,9 +301,12 @@ Live at landing on the `roles catalogue` leg; the new agent types reach a sessio
   unlinks.
 - **AC6** — When `python loop_items.py check` runs in the loop kit's directory over a fixture loop definition
   holding one item with `actor = "role:gov-deployer"` and one with `actor = "role:gov-prompt-writer"`,
-  it exits 1 with two refusals, the first naming `layer.distribution`, the second naming a cycle role;
-  with both actors set to `role:gov-builder` it exits 0.
-  Red when: the arm reads the actor's slot without the index, so the expansion role passes.
+  and an overlay adding the repository item `item.build.adopter.ship` with `actor = "role:gov-deployer"`,
+  it exits 1 with three refusals: the first and the third naming `layer.distribution`, the third naming
+  `item.build.adopter.ship`, the second naming a cycle role; with all three actors set to
+  `role:gov-builder` it exits 0.
+  Red when: the arm reads the actor's slot without the index, or reads gov's rows alone, so an expansion
+  role passes.
   fixture: the loop kit is TOOL-dDeclaredLoop-24's and is absent at `4ed9e567`; the build run
   re-grounds on its fixture mode.
 
@@ -334,12 +352,26 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC4 · the playbook-render s
   section this unit calls and stops the unit if one is still absent then; `gov-tester` gains the two
   fields only where its file has landed, rung 1, the brief's rule for unbuilt parents.
   widens: none · relaxes: none
+- **F6 — How does `check_layers.py`, a playbook-kit module, read each role's slot and `layer`?** A kit
+  may not import a sibling kit (PLAY-dOrderedCharter-7 §4 "The policy reads"; TOOL-dDeclaredLoop-12 S4).
+  Options: (a) read `.claude/roles.json`, the generated index S6 renders with `layer` per role, as
+  JSON data; (b) a roles-kit print verb run as a subprocess through the inline `resolve_kit_dir`;
+  (c) a declared `requires_if` row on the playbook kit's descriptor naming `roles`, keeping the
+  import, the shape of `tools/memory-tree/kit.toml:8`. (b) adds a verb that prints what the index
+  already holds, and (c) keeps the one in-process sibling read the rule refuses. Rev-2 imported
+  `roles_lib.load_roles`, which the rule rules out. RESOLVED (agent, 2026-10-26, delegated): (a),
+  rung 1, PLAY-dOrderedCharter-7 §4 and F4's choice that the loop kit reads the same index.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 1, the brief's I3, D3 and D6, scout A's
   row for cl-0166, layer-roles `[roster]` and `[matrix]`, and the roles kit at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-37, TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-10-26 · S7 · §3 · §4 The registration · §4 The item arm · AC6 · §8 F6 · re-grounded on
+  the cross-check record `2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck`, rows 3 and 8: the
+  item arm grades every composed item, repository rows included (TOOL-dDeclaredLoop-24 S3), with a
+  planted repository item; `check_layer_roles` reads `.claude/roles.json` and imports no roles module.
 
 ## 10. Reuse audit
 
