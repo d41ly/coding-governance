@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-36 — every code writer of a record writes its `Caused-by` line, so the causes check stays green on the records written after its seed
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 17 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
+| [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 |
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-1-spec-writer.md) | journal | TOOL-dTotalRecall-1 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
+| [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-39 TOOL-dTotalRecall-43 |
 
 <!-- /gen:spec-records -->
 
@@ -89,6 +90,12 @@ repairs `TOOL-dTotalRecall-19`.
 - **consumes-from** `TOOL-dTotalRecall-19` — `check_causes`, the legacy population `legacy-records`
   and the door's `--caused-by`, whose cause grammar every writer here emits and whose module the
   writer census joins
+- **hands-off** `TOOL-dTotalRecall-47` — S6's backfill rule, which that unit applies as a verb at its later tip (the round-1 audit of units 36 to 43, id 3)
+- **hands-off** `TOOL-dTotalRecall-48` — `render_markdown`'s cause line and `check_cause_line`, which that unit admits into the run record's fixed head and narrows to shape (the round-1 audit of units 36 to 43, id 30)
+- **hands-off** `TOOL-dTotalRecall-49` — `VIEW_HEAD`'s cause line, which that unit takes back out, and `CAUSE_WRITER_KEPT`, whose reasons it widens (the round-1 audit of units 36 to 43, id 31)
+- **hands-off** `TOOL-dTotalRecall-50` — `check_cause_writers`, whose population that unit widens to the build folders' scripts (the round-1 audit of units 36 to 43, id 32)
+- **hands-off** `TOOL-dTotalRecall-51` — S5's Record bindings sentence and S6's backfill, whose non-markdown records that unit gives their comment-prefixed form (the round-1 audit of units 36 to 43, id 40)
+- **hands-off** `TOOL-dTotalRecall-53` — the writer census, `CAUSE_WRITER_KEPT`, AC4 and the writers `migrate_backlog.py` and the guide's record heads, which that unit extends (the round-1 audit of units 36 to 43, ids 4, 5, 14, 15, 16, 28, 29, 33, 34 and 41)
 
 ## 4. Design
 
@@ -225,6 +232,7 @@ New arm: tools/runlog/selftest.py · covers AC4 · a run record head with its ca
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's id 1 (HIGH, item H1).
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-47, TOOL-dTotalRecall-48, TOOL-dTotalRecall-49, TOOL-dTotalRecall-50, TOOL-dTotalRecall-51, TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted.
 
 ## 10. Reuse audit
 

@@ -48,3 +48,25 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-25T23:39:26Z rescope · item add TOOL-dTotalRecall-43 · reason spec-audit round 1 (reviews/2026-10-26-review-dTotalRecall-spec-audit-round1.md) the 59 confirmed minors batched into one unit: 46 MEDIUM, ids 2 3 4 5 6 7 8 9 10 11 12 13 18 19 24 25 26 27 28 29 30 31 32 33 37 38 39 40 41 42 43 44 45 46 48 50 52 53 56 57 58 60 62 63 64 65 (items M1 to M44), and 13 LOW, ids 15 20 21 22 34 35 47 54 55 59 66 67 68 (items L1 to L13); lands on several units, so repairs no unit in particular
 
 2026-10-26T00:02:54Z review · item dTotalRecall-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 59 · disposition promote
+
+2026-10-26T00:57:52Z rescope · item add TOOL-dTotalRecall-44 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 1 HIGH, item H1 shared with id 35: unit 38's split census keys on the value's name, so it cannot list check-recall.py:511 or gen_build_index.py:4073 and its AC2 is red by construction; repairs TOOL-dTotalRecall-38
+
+2026-10-26T00:57:52Z rescope · item add TOOL-dTotalRecall-45 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 35 HIGH, item H1 shared with id 1: unit 38's census and AC3 grep miss single-quoted and tree-wide id splits, so branch_reconcile.py:520, row_grammar.py:1116 and gen_build_index.py:8576 still split under the hyphenated slug; repairs TOOL-dTotalRecall-38
+
+2026-10-26T00:57:53Z rescope · item add TOOL-dTotalRecall-46 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 22 HIGH, item H3: unit 38's parse_id_parts reads named groups ID_RE does not have and int() a seq the grammar admits with a suffix; repairs TOOL-dTotalRecall-38
+
+2026-10-26T00:57:54Z rescope · item add TOOL-dTotalRecall-47 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 3 HIGH, item H2: unit 36 is ordered after unit 19's causes leg and backfills only at its own pass base, so the records of 19, 21 and 39 written after the seed stay causeless; repairs TOOL-dTotalRecall-36
+
+2026-10-26T00:57:54Z rescope · item add TOOL-dTotalRecall-48 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 30 HIGH, item H4: unit 36 puts the run record's cause line where runlog's fixed six-line head requires a blank line; repairs TOOL-dTotalRecall-36
+
+2026-10-26T00:57:55Z rescope · item add TOOL-dTotalRecall-49 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 31 HIGH, item H5: unit 36's VIEW_HEAD cause line breaks byte parity with the pinned asbuilt.py instrument and rewrites a legacy view; repairs TOOL-dTotalRecall-36
+
+2026-10-26T00:57:56Z rescope · item add TOOL-dTotalRecall-50 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 32 HIGH, item H6: unit 36 misses the pinned deviations.py departures writer the close runs, so the close's departures record reds the causes leg; repairs TOOL-dTotalRecall-36
+
+2026-10-26T00:57:57Z rescope · item add TOOL-dTotalRecall-51 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 40 HIGH, item H7: unit 36 gives a non-markdown record no cause form and its backfill writes a bare markdown line into a script record; repairs TOOL-dTotalRecall-36
+
+2026-10-26T00:57:57Z rescope · item add TOOL-dTotalRecall-52 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) id 37 HIGH, item H8: unit 43 S19 merges two legacy ledgers on a key that collides, through a shrink-only rule that refuses it, and leaves the retired name's carriers; repairs TOOL-dTotalRecall-43
+
+2026-10-26T00:58:02Z rescope · item add TOOL-dTotalRecall-53 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) the 41 confirmed minors batched into one unit: 24 MEDIUM, ids 2 5 6 7 8 9 13 14 15 17 18 19 23 25 27 28 36 38 41 42 45 49 50 51 (items M1 to M17), and 17 LOW, ids 4 10 11 12 16 20 21 24 26 29 33 34 39 43 46 47 52 (items L1 to L16); lands on several units, so repairs no unit in particular
+
+2026-10-26T01:17:29Z review · item dTotalRecall-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 41 · disposition promote
