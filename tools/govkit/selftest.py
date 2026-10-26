@@ -3561,7 +3561,8 @@ def check_step_rollback() -> None:
     stop at a failed down and its resume, the stop over a witness that still holds, an unrecorded
     row downed, the one caller, and `update --rollback` with its preview, record, stamp and four
     refusals. Each plant's failing case is staged by the plant; the fixture prints `<family>: FAILED`
-    on any unmet expectation. TOOL-dSafePassage-43's AC3 is the `down-fails` and `witness-stays` rows."""
+    on any unmet expectation. TOOL-dSafePassage-43's AC3 is the `down-fails` and `witness-stays` rows;
+    TOOL-dSafePassage-18's AC1 to AC3 are the `schema-step` rows, the schema step's down writing no row."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -3581,6 +3582,15 @@ def check_step_rollback() -> None:
             ("rollback", "unrecorded", 0, (rolled, same)),
             ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
                                         "in planted_caller\n")),
+            ("rollback", "schema-step", 0, ("step fx/s1 · rolled-back\nstep govkit/receipt-schema-4 · rolled-back",
+                                            "rollback: the receipt reads schema 3 without steps · last verdict "
+                                            "('govkit/receipt-schema-4', 'rolled-back')")),
+            ("rollback", "schema-step-kill", 0, ("rollback: after the kill · the receipt reads schema ",
+                                                 "rollback: the receipt reads schema 3 without steps · last verdict "
+                                                 "('govkit/receipt-schema-4', 'rolled-back')",
+                                                 "rollback: the re-run's receipt equals an uninterrupted rollback's")),
+            ("rollback", "schema-step-early", 1, ("step fx/s3 · rolled-back\nstep fx/s2 · STOPPED · receipt below "
+                                                  "schema 4 before the last down\nrollback: 3 reached · stopped at fx/s2",)),
             ("rollback-update", None, 0, ("rollback-update: the stopped run exits 1 · file rows and gov_commit held at B",
                                           "rollback-update: s1's down found tools/demo/one.txt at B, before the write loop moved it",
                                           "rollback-update: record · down fx/s1: rolled-back",
@@ -3598,7 +3608,8 @@ def check_step_rollback() -> None:
         p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
-        check(f"[dSP-4] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
+        tag = "dSP-18" if (plant or "").startswith("schema-step") else "dSP-4"
+        check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
               p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
 
     # The refusals no fixture plant reaches, in process: a receipt row HEAD no longer declares, and

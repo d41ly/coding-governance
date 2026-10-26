@@ -139,6 +139,9 @@ ATTENDED_STOP = "attended: the step needs the target's code"
 # The suffix of a forward-walk step line whose verdict the receipt cannot hold, being below schema 4
 # (TOOL-dSafePassage-15 S2): the verdict is output, and a stop is still a finding of `update`.
 NOT_RECORDED_SUFFIX = "(not recorded: receipt below schema 4)"
+# The reverse walk's stop at a down that lowers the receipt before its last row, whose later downs
+# could not be recorded (TOOL-dSafePassage-18 S3).
+LOWERED_STOP = "receipt below schema 4 before the last down"
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 OID_RE = re.compile(r"[0-9a-f]{40}(?:[0-9a-f]{24})?")  # a blob oid, sha-1 or sha-256
 # The host a write lock and a reclaim guard name (TOOL-dSafePassage-2 S6): a holder is judged dead
@@ -1116,8 +1119,15 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
     (read before the down took the image away) and the image, and recording `rolled-back`. A
     `failed` row is downed like an `applied` one: the down is what tolerates a partial up.
 
+    After the down's re-read, `test_steps_recordable` decides whether that row's records are written
+    (TOOL-dSafePassage-18): a down that leaves the receipt below schema 4, the schema step's, writes
+    none, the field's absence being its record, and its verdict still reads `rolled-back`. Such a
+    down before the last row stops the walk with `LOWERED_STOP`, since no later down could be
+    recorded.
+
     Its one caller is `update --rollback`: a stopped walk, the verify rollback and `apply` run no
-    down. Returns `{"downs": [(id, verdict)], "stopped", "failure", "order"}`."""
+    down. Returns `{"downs": [(id, verdict)], "stopped", "failure", "order"}`, `downs` the verdict
+    list in the order the rows were reached, which `write_rollback_record` prints."""
     target, receipt_path = pathlib.Path(target).resolve(), pathlib.Path(receipt_path)
     out = {"downs": [], "stopped": None, "failure": None, "order": None}
 
@@ -1127,7 +1137,7 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
         out.update(stopped=row.id, failure=failure)
         return out
 
-    for row in rows:
+    for n, row in enumerate(rows, 1):
         seen = row._replace(needs_target=False)  # a witness runs under the contract, as the walk's
         state = next((r["state"] for r in read_step_states(receipt) if r["id"] == row.id), None)
         if state in (None, "rolled-back"):
@@ -1143,16 +1153,22 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
         write_step_record(receipt_path, receipt, row, state, f"{DOWN_STOP_PREFIXES[0]} started "
                           f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded")
         got = run_step_reread(row, "down", target, gov_root, receipt_path, receipt)
+        recordable = test_steps_recordable(receipt)  # TOOL-dSafePassage-18 S1: below 4, no row
         if got["verdict"] != "ok":
             failure = f"{DOWN_STOP_PREFIXES[1]}{got['rc']}: {(got['tail'].splitlines() or [''])[-1]}"
-            write_step_record(receipt_path, receipt, row, state, failure)
+            if recordable:
+                write_step_record(receipt_path, receipt, row, state, failure)
             return stop(row, failure)
+        if not recordable and n < len(rows):
+            return stop(row, LOWERED_STOP)
         if run_step_reread(seen, "witness", target, gov_root, receipt_path, receipt)["verdict"] == "ok":
-            write_step_record(receipt_path, receipt, row, state, DOWN_STOP_PREFIXES[2])
+            if recordable:
+                write_step_record(receipt_path, receipt, row, state, DOWN_STOP_PREFIXES[2])
             return stop(row, DOWN_STOP_PREFIXES[2])
         write_step_staged(target, row.id, paths, "the step stays recorded down interrupted and the "
                           "next rollback runs its down again")
-        write_step_record(receipt_path, receipt, row, "rolled-back")
+        if recordable:
+            write_step_record(receipt_path, receipt, row, "rolled-back")
         print(f"step {row.id} · rolled-back")
         out["downs"].append((row.id, "rolled-back"))
     return out
@@ -1589,7 +1605,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
 # then the pid and `<slug>.blocking`, and waits to be killed; `<slug>.block-after` does the same
 # after its first file (TOOL-dSafePassage-4). Its down writes `<slug>.down-saw`, each target file's
 # path and sha256 as the down found them, then restores from the image, `<slug>.down-fails` exiting
-# 1 first and `<slug>.down-keeps` exiting 0 with nothing restored.
+# 1 first and `<slug>.down-keeps` exiting 0 with nothing restored; `<slug>.down-lowers` then sets the
+# receipt to schema 3 and takes `steps` out, as the schema step's down does (TOOL-dSafePassage-18).
 FIXTURE_WALK_STEP = r'''import importlib.util, os, pathlib, sys, time
 verb, target, slug = sys.argv[1], pathlib.Path(sys.argv[2]), sys.argv[3]
 reports = target.with_name(target.name + ".fx")
@@ -1617,6 +1634,13 @@ if verb == "down":
         sys.exit(1)
     if not (reports / f"{slug}.down-keeps").exists():
         steps.write_from_before_image(target, f"fx/{slug}")
+    if (reports / f"{slug}.down-lowers").exists():
+        import json
+        rp = target / ".governance" / "install.json"
+        rec = json.loads(rp.read_text(encoding="utf-8"))
+        rec.pop("steps", None)
+        rec["schema"] = 3
+        rp.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
     sys.exit(0)
 if (reports / f"{slug}.fail").exists():
     sys.stderr.write(f"fx: {slug} {verb} fails by its plant\n")
@@ -1655,6 +1679,7 @@ rp = target / ".governance" / "install.json"
 receipt = json.loads(rp.read_text(encoding="utf-8"))
 out = us.run_reverse_walk(gov, target, rp, receipt, us.derive_reverse_steps(gov, receipt, to))
 print(f"rollback: {len(out['downs'])} reached · stopped at {out['stopped'] or 'none'}")
+print(f"rollback: verdicts {out['downs']}")
 sys.exit(1 if out["stopped"] else 0)
 '''
 # One take of a target's write lock through govkit's `take_write_lock`, held until `<release>`
@@ -1684,8 +1709,9 @@ WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "no
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-unreadable",
                "lock-race", "guard-dead")
 UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update")
+ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
-                   "callers")
+                   "callers") + ROLLBACK_SCHEMA_PLANTS
 ROLLBACK_UPDATE_PLANTS = ("refused", "read-only", "descendant", "scoped", "no-base")
 
 
@@ -1755,7 +1781,7 @@ def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, 
     """The `walk` family's scratch gov: A, a side branch from A introducing `s3`, B introducing `s1`
     and `s2`, the side branch merged at M, C introducing `s4`, and for `not-pending` D introducing
     `s5`. The side commit is dated before B, so only the first-parent order puts `s3` at M. For a
-    `schema-3` plant, B introduces the copied `govkit/receipt-schema-4` row first (TOOL-dSafePassage-15)."""
+    schema plant, B introduces the copied `govkit/receipt-schema-4` row first (TOOL-dSafePassage-15, -18)."""
     gov = tmp / "gov"
     gkd = gov / "tools" / HERE.name
     (gkd / "steps").mkdir(parents=True)
@@ -1766,7 +1792,7 @@ def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, 
     steps = gkd / STEPS_FILE
     row = {s: render_fixture_row(s, resume=(plant == "resume" and s == "s3"),
                                  needs=(plant == "attended" and s == "s2")) for s in ("s1", "s2", "s3", "s4", "s5")}
-    first = ("schema",) if plant in WALK_SCHEMA_PLANTS else ()
+    first = ("schema",) if plant in WALK_SCHEMA_PLANTS + ROLLBACK_SCHEMA_PLANTS else ()
     if first:
         row["schema"] = write_fixture_schema_step(gkd)
     sha: dict[str, str] = {}
@@ -2405,8 +2431,10 @@ def run_rollback_fixture(plant: str | None) -> int:
     """`fixture rollback [--plant <case>]` (TOOL-dSafePassage-4 AC1 to AC4, AC7): the `walk` family's
     scratch gov, A to C and `s1` to `s4`, and a target walked from A to C, then reverse-walked to A
     (to B under `partial-to`) through `FIXTURE_REVERSE_CHILD`. Its bytes are compared but for the
-    receipt and the staging journal. An unmet expectation prints `rollback: FAILED`; otherwise the
-    exit is the reverse walk's first, `down-fails`' and `witness-stays`' 1 by design."""
+    receipt and the staging journal. The `schema-step` plants (TOOL-dSafePassage-18) put the copied
+    schema step first, over a schema-3 target. An unmet expectation prints `rollback: FAILED`;
+    otherwise the exit is the reverse walk's first, `down-fails`', `witness-stays`' and
+    `schema-step-early`'s 1 by design."""
     if plant == "callers":
         texts = {p.name: p.read_text(encoding="utf-8") for p in (pathlib.Path(__file__).resolve(), HERE / "govkit.py")}
         rc = run_callers_probe(texts)
@@ -2419,9 +2447,9 @@ def run_rollback_fixture(plant: str | None) -> int:
         return rc
     with tempfile.TemporaryDirectory(prefix="gk-rb-", ignore_cleanup_errors=True) as td:
         tmp = pathlib.Path(td)
-        gov, sha = build_walk_gov(tmp, None)
+        gov, sha = build_walk_gov(tmp, plant)
         env = build_fixture_env()
-        t = build_walk_target(tmp, sha["A"], "t")
+        t = build_walk_target(tmp, sha["A"], "t", schema3=plant in ROLLBACK_SCHEMA_PLANTS)
         fx = t.with_name("t.fx")
         fx.mkdir()
         rp = t / ".governance" / "install.json"
@@ -2475,6 +2503,26 @@ def run_rollback_fixture(plant: str | None) -> int:
             (fx / "s3.down-fails").touch()
         elif plant == "witness-stays":
             (fx / "s2.down-keeps").touch()
+        elif plant == "schema-step-early":
+            (fx / "s2.down-lowers").touch()
+        elif plant == "schema-step-kill":
+            # TOOL-dSafePassage-18 AC2: killed during the schema step's down, after its temporary
+            # file and before its rename; the reverse() below is the re-run.
+            (fx / "schema.block").touch()
+            why = run_killed([sys.executable, "-c", FIXTURE_REVERSE_CHILD, str(HERE / "upgrade_steps.py"),
+                              str(gov), str(t), sha["A"]], fx, "schema", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            (fx / "schema.block").unlink()
+            try:
+                rec = json.loads(rp.read_text(encoding="utf-8"))
+            except ValueError:
+                rec = {}
+            srow = next((r for r in rec.get("steps") or [] if r.get("id") == "govkit/receipt-schema-4"), {})
+            whole = ((rec.get("schema") == 3 and "steps" not in rec)
+                     or (rec.get("schema") == 4 and str(srow.get("failure", "")).startswith(DOWN_STOP_PREFIXES[0])))
+            print(f"rollback: after the kill · the receipt reads schema {rec.get('schema')}"
+                  + (" whole" if whole else ", NOT WHOLE"))
+            expect(whole, "the kill left neither schema 4 with the schema step's `down interrupted:` nor schema 3 without `steps`")
         rc, got, out = reverse()
         state = rows()
         if plant in (None, "unrecorded", "after-kill", "after-fail"):
@@ -2515,6 +2563,36 @@ def run_rollback_fixture(plant: str | None) -> int:
                 expect(got2 == rolled("s3", "s2", "s1") and len(s4_downs) == 1 and rc2 == 0,
                        "the re-run did not resume at s3")
                 expect(tracked() == before, "the re-run did not return the target's bytes")
+        elif plant in ("schema-step", "schema-step-kill"):
+            # TOOL-dSafePassage-18 AC1, AC2: the schema step's down writes no row, its verdict
+            # `rolled-back` last; the killed run's re-run converges on an uninterrupted run's receipt.
+            rec = json.loads(rp.read_text(encoding="utf-8"))
+            verdicts = next((ln for ln in out.splitlines() if ln.startswith("rollback: verdicts ")), "")
+            last = "('govkit/receipt-schema-4', 'rolled-back')"
+            lowered = rec.get("schema") == 3 and "steps" not in rec
+            print(f"rollback: the receipt reads schema {rec.get('schema')}"
+                  + (" without steps" if lowered else " WITH steps" if "steps" in rec else "")
+                  + f" · last verdict {last if verdicts.endswith(last + ']') else 'NOT the schema step rolled-back'}")
+            expect(lowered and verdicts.endswith(last + "]"), "the receipt is not schema 3 without `steps`, or the "
+                   "verdict list does not name the schema step rolled-back last")
+            expect(got == (rolled("s4", "s3", "s2", "s1") if plant == "schema-step" else []),
+                   "the reverse walk's fx lines are not the ones this plant downs")
+            expect(tracked() == before and rc == 0 and "Traceback" not in out,
+                   f"the bytes differ from before the walk, or the reverse walk exited {rc}")
+            if plant == "schema-step-kill":
+                t2 = build_walk_target(tmp, sha["A"], "t2", schema3=True)
+                rc_w2, _o = run_fixture_child(FIXTURE_WALK_CHILD, gov, t2, sha["C"], env)
+                rc2, _o = run_fixture_child(FIXTURE_REVERSE_CHILD, gov, t2, sha["A"], env)
+                same = (t2 / ".governance" / "install.json").read_bytes() == rp.read_bytes()
+                print(f"rollback: the re-run's receipt {'equals' if same else 'DIFFERS from'} an uninterrupted rollback's")
+                expect(same and rc_w2 == 0 and rc2 == 0, "the re-run's receipt is not an uninterrupted rollback's")
+        elif plant == "schema-step-early":
+            # TOOL-dSafePassage-18 AC3: s2's down lowers the receipt before the last row, so the
+            # walk stops there and downs nothing it could not record.
+            expect(got == rolled("s4", "s3") + [f"step fx/s2 · STOPPED · {LOWERED_STOP}"],
+                   f"the reverse walk did not stop at fx/s2 naming `{LOWERED_STOP}`")
+            expect("s1.down" not in downs() and rc == 1 and "Traceback" not in out,
+                   f"the walk downed s1 after the lowered receipt, or exited {rc}, or printed a traceback")
         for f in fails:
             print(f"rollback: FAILED · {f}")
         return 1 if fails else rc

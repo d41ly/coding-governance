@@ -79,3 +79,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-26T15:25:38Z brief · item TOOL-dSafePassage-15 · reason 96f496fcf412 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-15-build-brief.md
 
 2026-10-26T15:36:53Z decision · item TOOL-dSafePassage-11 needs Python 3.15 on the build node: provision node a (and every node) at 3.15 final, or rule how the floor lands · reason options: (a) the owner provisions 3.15 per AP-31 and the run resumes 11 and its 38 dependants; (b) the owner rules a different landing for the floor. Refused to choose: node a resolves only 3.14.6 (py -0p; uv lists 3.15.0b2 only); provisioning is a §3 non-goal and an owner act; a resolver refusing below 3.15 would refuse every later hook and the close's bar; a floor switch is the fail-open override §3 rules out. Units outside 11's consumes-from closure build meanwhile
+
+2026-10-26T15:43:18Z dispatch · item ee025c5f TOOL-dSafePassage-18 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-18.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-18-ledger.md
+
+2026-10-26T15:43:24Z brief · item TOOL-dSafePassage-18 · reason 8e9915b50083 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-18-build-brief.md
