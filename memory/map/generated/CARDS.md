@@ -89,7 +89,7 @@ govkit — a declared kit population, and the selfcheck that keeps it honest
 
 - status `building` · streams `deployer`, `tooling` · dossier `memory/map/features/govkit.md`
 - decisions 0
-- gate-legs 7: `govkit selfcheck`, `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`, `govkit runbook parity`, `kit epoch (shipped bytes move, the version moves)`, `step-rows-frozen`
+- gate-legs 8: `govkit selfcheck`, `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`, `govkit runbook parity`, `kit epoch (shipped bytes move, the version moves)`, `step-rows-frozen`, `step-gate`
 - kits 1: `govkit`
 - skill-engines 1: `deploy-governance`
 - gotcha-classes 4: `fixture-lacks-a-gate-the-consumer-has.md`, `a-new-local-collides-in-a-long-function.md`, `guard-above-a-fold-makes-its-fallback-dead.md`, `verdict-printed-before-the-step-that-reverts-it.md`

@@ -1,0 +1,66 @@
+# surface-classes.toml — the classes of adopter-visible member the step gate grades (TOOL-dSafePassage-10).
+#
+# One `[[class]]` row per class, read by `<prefix>/govkit/step_gate.py` beside this file and by
+# nothing else: `id`, the `<class>` half of every member id `<class>:<name>`; `reader`, the function
+# returning the member names over one tree; `plant`, the function staging one vanished member in a
+# scratch clone; a `summary`; and an optional `witness`, a reader of the class's own change record
+# whose names count as witnessed. Each function is `<path under the tool root>:<function>`, spelled
+# through `{prefix}`, and loaded from the TIP's tree for both sides of the range.
+#
+# A CLASS JOINS BY ADDING ITS ROW, and the row arms its own red: a row naming no plant is refused,
+# and `step_gate.py --fixture --plant <id>` must exit 1 without a witness row and 0 with one. A class
+# empty at the tip refuses the gate, so a row whose reader finds nothing grades nothing and says so.
+
+[[class]]
+id = "file"
+reader = "{prefix}/govkit/step_gate.py:read_file_members"
+plant = "{prefix}/govkit/step_gate.py:write_file_plant"
+summary = "each files row's path in gov's source-mode receipt, .governance/install.json"
+
+[[class]]
+id = "installable"
+reader = "{prefix}/govkit/step_gate.py:read_installable_members"
+plant = "{prefix}/govkit/step_gate.py:write_installable_plant"
+summary = "each destination a shipped descriptor survivor resolves to, as shipped --epoch reads them"
+
+[[class]]
+id = "hook"
+reader = "{prefix}/govkit/step_gate.py:read_hook_members"
+plant = "{prefix}/govkit/step_gate.py:write_hook_plant"
+summary = "each tracked hook fragment's name, the population the deployer wires"
+
+[[class]]
+id = "command"
+reader = "{prefix}/govkit/step_gate.py:read_command_members"
+plant = "{prefix}/govkit/step_gate.py:write_command_plant"
+summary = "each Skill a shipped survivor lands at .claude/skills/<name>/SKILL.md, by its name"
+
+[[class]]
+id = "agent"
+reader = "{prefix}/govkit/step_gate.py:read_agent_members"
+plant = "{prefix}/govkit/step_gate.py:write_agent_plant"
+summary = "each role agent an adopter's roles kit renders, by its stem"
+
+[[class]]
+id = "conf"
+reader = "{prefix}/govkit/step_gate.py:read_conf_members"
+plant = "{prefix}/govkit/step_gate.py:write_conf_plant"
+summary = "each conf key a descriptor's [config] declares required or defaulted, as <conf file>#<KEY>"
+
+[[class]]
+id = "policy"
+reader = "{prefix}/govkit/step_gate.py:read_policy_members"
+plant = "{prefix}/govkit/step_gate.py:write_policy_plant"
+summary = "each [[key]] name in the policy schema catalogue"
+
+[[class]]
+id = "verb"
+reader = "{prefix}/govkit/step_gate.py:read_verb_members"
+plant = "{prefix}/govkit/step_gate.py:write_verb_plant"
+summary = "each verb a declared usage source states, as <cli>:<verb>"
+
+[[class]]
+id = "entry"
+reader = "{prefix}/govkit/step_gate.py:read_entry_members"
+plant = "{prefix}/govkit/step_gate.py:write_entry_plant"
+summary = "each registry [[entry]] row's id"

@@ -706,3 +706,7 @@ why = "it runs `check_policy.py --fixture`, which plants each red case of the po
 [[exempt_leg]]
 name = "step-rows-frozen"
 why = "it runs `<prefix>/govkit/upgrade_steps.py frozen`, the deployer's own step reader grading gov's landed `[[upgrade]]` and `[[retired]]` rows against the push base. The deployer is a registry exemption that never travels into a target, and a step row is authored in gov's descriptors, so the rows are frozen where they land; an adopter has no deployer and no row to freeze. TOOL-dSafePassage-1."
+
+[[exempt_leg]]
+name = "step-gate"
+why = "it runs `<prefix>/govkit/step_gate.py`, which diffs gov's adopter-visible surface population between a landing's base and its tip through the deployer's own readers, and reds a member that vanishes with no `[[upgrade]]` or `[[retired]]` row naming it. The deployer is a registry exemption that never travels into a target, and the rows it asks for are authored in gov, so the gate grades gov's landings; an adopter has no deployer and no population to step. TOOL-dSafePassage-10."

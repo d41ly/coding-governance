@@ -130,6 +130,7 @@
       "spawn budget (forks per hot entrypoint)",
       "spec tokens (a spec's own names resolve)",
       "spec-tokens self-test",
+      "step-gate",
       "step-rows-frozen",
       "straggler-guard arms",
       "template size <=48KiB",

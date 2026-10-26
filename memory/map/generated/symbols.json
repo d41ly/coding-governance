@@ -5703,6 +5703,16 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "check_step_gate",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "check_step_gate_fixture",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_step_isolation",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -7878,6 +7888,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "derive_member_path",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "derive_memory_disciplines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -8036,11 +8051,6 @@
       "id": "derive_prompt_name",
       "kind": "function",
       "file": "tools/roles/handoff.py"
-    },
-    {
-      "id": "derive_push_base",
-      "kind": "function",
-      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_push_failure",
@@ -8721,6 +8731,11 @@
       "id": "derive_unsummarised",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_vanished_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "derive_verdict",
@@ -10323,6 +10338,11 @@
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
+      "id": "load_class_callable",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "load_conf",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -10806,6 +10826,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "main",
@@ -13438,6 +13463,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_agent_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_agree_field",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -13596,6 +13626,11 @@
       "id": "read_base_pairs",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_base_population",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "read_base_version",
@@ -13868,6 +13903,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "read_command_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_commit_paths",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
@@ -13921,6 +13961,11 @@
       "id": "read_conf_key_gaps",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "read_conf_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "read_conf_mode",
@@ -14128,6 +14173,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_entry_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_envelope",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -14208,6 +14258,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "read_file_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_file_value",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -14258,6 +14313,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_fixture_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_fixture_row",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -14266,6 +14326,11 @@
       "id": "read_fixture_skip",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "read_fixture_successors",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "read_flag_value",
@@ -14493,6 +14558,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "read_hook_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_hook_oids",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
@@ -14601,6 +14671,11 @@
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_installable_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "read_inventory",
@@ -15243,6 +15318,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_policy_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_policy_text",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -15678,6 +15758,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "read_shipped_survivors",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_side",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
@@ -15953,9 +16038,19 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_surface_classes",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_surface_disagreements",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_surface_population",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "read_sweep_expectations",
@@ -16208,6 +16303,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_verb_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "read_verdict",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -16281,6 +16381,11 @@
       "id": "read_withheld_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_witnessed_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "read_worksheet_design",
@@ -18953,6 +19058,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "resolve_landing_base",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "resolve_landing_node",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -19953,6 +20063,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "rmtree_writable",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "roles_from_kits_json",
       "kind": "function",
       "file": "tools/govkit/census.py"
@@ -20688,6 +20803,11 @@
       "file": "tools/check-template-size.test.sh"
     },
     {
+      "id": "run_gate_subprocess",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "run_gh33",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -20761,6 +20881,16 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "run_git_staged",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "run_git_text",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "run_gov_first",
@@ -21586,6 +21716,11 @@
       "id": "run_sr_defer",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_step_gate_fixture",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "run_step_isolated",
@@ -25923,6 +26058,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "write_agent_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_alias_fixture",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -26078,9 +26218,19 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_class_row_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_close_commit",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_command_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "write_conf",
@@ -26098,6 +26248,11 @@
       "file": "tools/memory-tree/transition-audit.test.sh"
     },
     {
+      "id": "write_conf_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_conflict_body",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -26106,6 +26261,11 @@
       "id": "write_conflict_candidate",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_content_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "write_cov29_spec",
@@ -26163,6 +26323,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "write_entry_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_envelope",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -26188,6 +26353,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "write_file_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_files_touched",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
@@ -26201,6 +26371,11 @@
       "id": "write_fixture",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "write_fixture_commit",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "write_fixture_records",
@@ -26278,6 +26453,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "write_hook_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_hooks",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
@@ -26291,6 +26471,11 @@
       "id": "write_inherited_asks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_installable_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "write_ir_stamp",
@@ -26478,6 +26663,11 @@
       "file": "tools/check-remote-literals.test.sh"
     },
     {
+      "id": "write_plant_edit",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_planted",
       "kind": "function",
       "file": "tools/unattended/check-arms-groups.test.sh"
@@ -26491,6 +26681,11 @@
       "id": "write_policy",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "write_policy_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "write_post_merge_record",
@@ -26768,6 +26963,11 @@
       "file": "tools/lexicon/adopt-lexicon.sh"
     },
     {
+      "id": "write_sparse_checkout",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_spawn_floor",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -26888,6 +27088,11 @@
       "file": "tools/push-main.test.sh"
     },
     {
+      "id": "write_verb_plant",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
       "id": "write_version_carriers",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -26901,6 +27106,11 @@
       "id": "write_waiver",
       "kind": "function",
       "file": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
+      "id": "write_witness_row",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
     },
     {
       "id": "write_work_owner",

@@ -13792,7 +13792,7 @@ def derive_epoch_state(root: pathlib.Path, eid: str, desc: dict, base: str, head
     return "moved", f"FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}", w, n
 
 
-def derive_push_base(root: pathlib.Path, base: str | None) -> tuple[str, bool, str]:
+def resolve_landing_base(root: pathlib.Path, base: str | None) -> tuple[str, bool, str]:
     """`(sha, boundary, why)`: the commit a push-boundary leg grades from, and whether it is one.
 
     `--base` when given, else `GATE_PUSH_BASE`, else the merge-base with the remote ladder's default
@@ -13800,7 +13800,8 @@ def derive_push_base(root: pathlib.Path, base: str | None) -> tuple[str, bool, s
     base `sha` is "" and `why` completes the line `no base to compare against`, because no base is a
     FAILED exit 1 for every caller and never a zero-status skip: run-gates judges a leg by its exit
     code, and a silent 0 reads as a pass forever. Extracted from `cmd_epoch` at its second caller,
-    `upgrade_steps.py frozen` (TOOL-dSafePassage-1).
+    `upgrade_steps.py frozen` (TOOL-dSafePassage-1), which calls it as `derive_push_base`; the step
+    gate is its third (TOOL-dSafePassage-10 S6), so the legs grading a landing read one base.
     """
     boundary = base is not None
     # An ALL-ZERO value reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's old
@@ -13827,6 +13828,10 @@ def derive_push_base(root: pathlib.Path, base: str | None) -> tuple[str, bool, s
         return "", boundary, (f" ({base or 'no merge-base with the default branch'})"
                               " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
     return rb.stdout.strip(), boundary, ""
+
+
+# ponytail: one function, two names — `upgrade_steps.py frozen` spells TOOL-dSafePassage-1's.
+derive_push_base = resolve_landing_base
 
 
 def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
@@ -13865,7 +13870,7 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
         for p in r.problems:
             sys.stderr.write(f"govkit: {p}\n")
         return 2
-    base, boundary, why = derive_push_base(root, base)
+    base, boundary, why = resolve_landing_base(root, base)
     if not base:
         print(f"epoch: FAILED · no base to compare against{why}")
         return 1

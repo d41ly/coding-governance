@@ -3490,6 +3490,33 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
           == {"verdict": "attended", "rc": None, "tail": ""})
 
 
+def check_step_gate_fixture() -> None:
+    """TOOL-dSafePassage-10 AC2 to AC9 — `step_gate.py --fixture` over every class row's own plant,
+    each red with no row and green with one, `content-edit` green with 0 vanished, `empty-class` and
+    `no-plant` refused naming their row, and the own-record witness counted beside the step rows.
+    The classes are read from the registry, so a joining class's row arms its own case here."""
+    import tomllib  # noqa: PLC0415
+    sg_py = HERE / "step_gate.py"
+    with open(HERE / "surface-classes.toml", "rb") as fh:
+        ids = [c["id"] for c in tomllib.load(fh)["class"]]
+    cases = [(cid, 1, 0, rf"^step-gate: RED {_re.escape(cid)}:\S") for cid in ids] + [
+        ("content-edit", 0, 0, r"^step-gate: \d+ classes · \d+ members at the tip · 0 vanished · 0 witnessed$"),
+        ("empty-class", 2, 2, r"^step-gate: REFUSED · class sg-fixture is empty at the tip"),
+        ("no-plant", 2, 2, r"^step-gate: REFUSED · .*\(id sg-fixture\) key plant: required"),
+        ("own-record", 0, 0, r"^step-gate: \d+ classes · \d+ members at the tip · 1 vanished · 1 witnessed$"),
+        ("own-record-unnamed", 1, 0, r"^step-gate: RED sg-fixture:gone vanished ")]
+    for case, bare, rowed, needle in cases:
+        for with_row, want in ((False, bare), (True, rowed)):
+            p = subprocess.run([sys.executable, str(sg_py), "--fixture", "--plant", case,
+                                *(("--with-row",) if with_row else ())], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace", timeout=900)
+            out = p.stdout + p.stderr
+            named = bool(_re.search(needle, out, _re.M)) if not with_row or want == 2 else True
+            check(f"[dSP-10] step-gate fixture {case}{' --with-row' if with_row else ''} exits {want}"
+                  f"{'' if with_row and want != 2 else ' and names ' + needle}",
+                  p.returncode == want and named, out[-3000:])
+
+
 def check_step_walk() -> None:
     """TOOL-dSafePassage-2 AC1 to AC9 — `upgrade_steps.py fixture walk|lock|update` with every plant:
     the walk's order, skip, stop, kill and resume, its attended stop, the lock's reclaim of a dead or
@@ -4209,6 +4236,7 @@ def main() -> int:
         check_step_walk()
         check_step_rollback()
         check_source_mode(tmp / "dgf")
+        check_step_gate_fixture()
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
