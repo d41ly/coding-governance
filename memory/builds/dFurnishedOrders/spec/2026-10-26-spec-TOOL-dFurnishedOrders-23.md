@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-23 — the answered-call hook's verifier exemption keyed on `subject-reads`, and certified on every verifier the shipped role index holds, never on a planted block name
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +66,8 @@ non-subject slot of the same role. It repairs `TOOL-dFurnishedOrders-6` and buil
 
 - **consumes-from** `TOOL-dFurnishedOrders-6` — `checkAnsweredCall`'s exemption step and the suite whose `### input:claim` plant S3 and S4 replace (id 48)
 - **consumes-from** `TOOL-dFurnishedOrders-22` — `subject-reads`, the index key the exemption compares a block heading with (ids 1 and 48)
+- **hands-off** `TOOL-dFurnishedOrders-32` — `checkAnsweredCall`'s subject comparison and the index-drawn arm, which unit 32 extends to a group entry, and AC1 and AC2's reviewer rows, which unit 32 re-reads from the roster (id 2 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-37` — S2's reading of a malformed `subject-reads`, which unit 37 S35 moves into `loadRoleIndex` as a broken index (id 24 of the second audit)
 
 ## 4. Design
 
@@ -182,6 +186,7 @@ New arm: tools/roles/answered-calls.test.sh · covers AC1 AC2 AC3 AC4 · the ver
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 20 unit specs, id 48
   (BLOCKER, item B1, shared with id 1).
+- rev-2 · 2026-10-26 · §3 · hands-off edges to units 32 and 37 (ids 2 and 24 of the second audit).
 
 ## 10. Reuse audit
 

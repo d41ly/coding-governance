@@ -50,3 +50,19 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-26T19:49:09Z rescope · item add TOOL-dFurnishedOrders-29 · reason spec-audit round1 (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) minors batched, roles hooks and runlog half: MEDIUM ids 2 5 7 23 24 51 25 29 30 31 32 33 34 35 36 39 43 44 45 56 57 58 59 (items M1 M2 M4 M7-M18 M20-M22 M25-M28) and LOW ids 10 12 14 38 15 16 26 27 37 47 60 61 (items L1 L3 L5-L9 L11 L13-L15)
 
 2026-10-26T19:49:10Z rescope · item add TOOL-dFurnishedOrders-30 · reason spec-audit round1 (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) minors batched, workflows unattended kickoff and memory-tree half, a write set disjoint from TOOL-dFurnishedOrders-29 by M6: MEDIUM ids 6 20 49 8 22 42 53 21 40 41 54 55 (items M3 M5 M6 M19 M23 M24) and LOW ids 11 13 28 46 (items L2 L4 L10 L12)
+
+2026-10-26T21:27:48Z rescope · item add TOOL-dFurnishedOrders-31 · reason spec-audit round1 of the round-1 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) finding id 1 at HIGH, report item H1: unit 24 builds an anyOf branch for the establishes table before the outcome filter lands
+
+2026-10-26T21:27:57Z rescope · item add TOOL-dFurnishedOrders-32 · reason spec-audit round1 of the round-1 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) finding id 2 at HIGH, report item H2: units 22 and 23 hard-code the two reviewer roles the parent build merges, and the merged role re-opens F2
+
+2026-10-26T21:27:58Z rescope · item add TOOL-dFurnishedOrders-33 · reason spec-audit round1 of the round-1 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) finding id 3 at HIGH, report item H3, shared with id 30: a posture that cannot be read still answers attended inside a run's window
+
+2026-10-26T21:27:59Z rescope · item add TOOL-dFurnishedOrders-34 · reason spec-audit round1 of the round-1 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) finding id 30 at HIGH, report item H3, shared with id 3: the posture read has no failure causes and no bound inside a run's window
+
+2026-10-26T21:28:00Z rescope · item add TOOL-dFurnishedOrders-35 · reason spec-audit round1 of the round-1 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) finding id 10 at HIGH, report item H4, shared with id 25: on gov's own tree the call-site scan has no installed-kit subtraction, so it hits files under tools/
+
+2026-10-26T21:28:01Z rescope · item add TOOL-dFurnishedOrders-36 · reason spec-audit round1 of the round-1 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) finding id 25 at HIGH, report item H4, shared with id 10: a kit's own suites spell the retired keys on purpose and stay in the call-site population
+
+2026-10-26T21:28:02Z rescope · item add TOOL-dFurnishedOrders-37 · reason spec-audit round1 of the round-1 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 4 5 14 6 11 34 12 36 18 13 23 20 21 41 22 40 26 27 31 32 28 33 35 38 39 37 43 (items M1-M22) and LOW ids 7 8 9 17 15 16 19 24 29 42 (items L1-L9)
+
+2026-10-26T21:59:12Z review · item dFurnishedOrders-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 37 · disposition promote

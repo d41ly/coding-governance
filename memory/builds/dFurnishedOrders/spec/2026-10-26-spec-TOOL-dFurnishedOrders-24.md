@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-24 — each work order's return schema rendered as one branch per outcome, the template's and each arm's, so a valid refused or probe return passes and a malformed one fails on its own fields
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +70,8 @@ repairs `TOOL-dFurnishedOrders-19` and builds one step after it (order 9).
 - **consumes-from** `TOOL-dFurnishedOrders-15` — `derive_return_arms`, whose `(arm, outcome, fields)` triples S1 renders as one branch each (id 4)
 - **consumes-from** `TOOL-dFurnishedOrders-19` — `render_return_schema`, `check_return_schema` and `SCHEMA_KEYWORDS`, which S1 to S3 extend with the outcome branches (id 4)
 - **hands-off** `TOOL-dFurnishedOrders-29` — the outcome branches, which unit 29 S12 keeps out of `validate_return`'s own evaluation, rendering them for the order's block and the harness route only (id 32)
+- **hands-off** `TOOL-dFurnishedOrders-31` — `[return.establishes]` and any field table, which unit 31 keeps out of the branches S1 builds one per arm, at the step after this one (id 1 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-37` — the `anyOf` evaluator, the shared `allOf` member's readers and S4's checkers, which unit 37 S11, S18 and S33 narrow, re-point and re-ground (ids 23, 27, 16 of the second audit)
 
 ## 4. Design
 
@@ -194,6 +198,8 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 · a planted 
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 20 unit specs, id 4
   (HIGH, item H2).
+- rev-2 · 2026-10-26 · §3 · hands-off edges to units 31 and 37, the second spec audit's promotions
+  for ids 1, 23, 27 and 16.
 
 ## 10. Reuse audit
 

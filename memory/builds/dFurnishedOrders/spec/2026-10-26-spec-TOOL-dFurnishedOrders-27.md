@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-27 — every owner question the driver raises carries the run's window: `--dispatch` and `--phase` ask the door through one helper that hands it the run's session and lease start
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +62,7 @@ builds one step after it (order 21), after unit 26 by the dispatch's id sort.
 
 - **consumes-from** `TOOL-dFurnishedOrders-16` — the two driver paths that ask the `owner-question` door, `--dispatch`'s FORKED case and `--phase`'s gated exit, which S1 and S2 route through one helper (id 19)
 - **consumes-from** `TOOL-dFurnishedOrders-26` — `--since`, the door flag the helper fills with the run's lease start (ids 3 and 19)
+- **hands-off** `TOOL-dFurnishedOrders-37` — `read_owner_door`'s failure outcome and AC2's no-bypass scan, which unit 37 S20 and S22 settle (ids 32, 33 of the second audit)
 
 ## 4. Design
 
@@ -170,6 +173,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · a stub doo
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 20 unit specs, id 19
   (HIGH, item H1, shared with ids 3 and 52).
+- rev-2 · 2026-10-26 · §3 · a hands-off edge to unit 37 (ids 32 and 33 of the second audit).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-22 — a verifier's subject declared as the input slots it reads, `subject-reads`, checked against `reads` and `verifies` and written into the role index
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dFurnishedOrders-22-round1-fix-return.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-22-round1-fix-return.md) | research | TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-22-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-22-round1-fix-brief.md) | research | TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
+| [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,8 @@ verification, checked both ways against the role's `reads` and `verifies`, and w
 - **consumes-from** `TOOL-dFurnishedOrders-5` — `verifies` and the index entry `render_roles_index` writes it into, beside which S3 writes `subject-reads` and against which S2 checks it (id 1)
 - **consumes-from** `TOOL-dFurnishedOrders-15` — the re-founded `gov-tester` role file, its `reads` and its `verifies`, which S1 gives a `subject-reads` value (id 1)
 - **hands-off** `TOOL-dFurnishedOrders-23` — `subject-reads`, the index key the answered-call hook keys a verifier's exemption on (ids 1 and 48)
+- **hands-off** `TOOL-dFurnishedOrders-32` — `subject-reads`, its R3 check and its index entry, which unit 32 extends with the group form, and AC1's reviewer rows, which unit 32 re-reads from the roster present at the pass (id 2 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-37` — R3's entry check, which unit 37 S27 makes refuse a `?` (id 43 of the second audit)
 
 ## 4. Design
 
@@ -210,6 +213,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · the shipped index'
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 20 unit specs, id 1
   (BLOCKER, item B1, shared with id 48).
+- rev-2 · 2026-10-26 · §3 · hands-off edges to units 32 and 37 (ids 2 and 43 of the second audit).
 
 ## 10. Reuse audit
 

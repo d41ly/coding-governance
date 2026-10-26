@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-30 — the round-1 audit's 16 workflows, unattended, kickoff and memory-tree minors: retired keys refused and observed, every cold carrier named, the card's map cell given a failure state, and the harness's rows checked in-script
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dFurnishedOrders-22-round1-fix-return.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-22-round1-fix-return.md) | research | TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-29 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-22-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-22-round1-fix-brief.md) | research | TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-29 |
+| [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 |
 
 <!-- /gen:spec-records -->
 
@@ -102,6 +103,7 @@ LOW. Each report id is named once below and closed by its scope item.
 - **consumes-from** `TOOL-dFurnishedOrders-13` — `check_card_map` and the card's map cell, which S6 to S8 settle (ids 54, 55, 13)
 - **consumes-from** `TOOL-dFurnishedOrders-16` — the unattended Skill's asked-live line, which S5 fits under the Skill's row (id 41)
 - **consumes-from** `TOOL-dFurnishedOrders-19` — `returnRows` and `addUpstreamSchema`, whose rows S9 checks in-script (id 28)
+- **hands-off** `TOOL-dFurnishedOrders-37` — AC3's floor, S6's bound and second run, the respelled cell's readers, the cold log line and the kickoff manifest re-stamp after this unit's `manifest-check.sh` edit, which unit 37 S4, S13 to S17, S21, S30, S31, S36 and S37 settle (ids 6, 21, 41, 22, 40, 26, 28, 9, 17, 29, 42 of the second audit)
 
 ## 4. Design
 
@@ -246,6 +248,8 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 AC6 · a fa
 
 - rev-1 · 2026-10-26 · initial draft, the round-1 spec audit's workflows, unattended, kickoff and
   memory-tree minors batched.
+- rev-2 · 2026-10-26 · §3 · a hands-off edge to unit 37 (ids 6, 21, 41, 22, 40, 26, 28, 9, 17, 29
+  and 42 of the second audit).
 
 ## 10. Reuse audit
 

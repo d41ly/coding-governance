@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-28 — an unreadable presence inside a run's window reads away, so no owner question of an unattended run is held for an owner nobody can show is there
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
 
 <!-- /gen:spec-records -->
 
@@ -58,6 +60,9 @@ step after it (order 21), after units 26 and 27 by the dispatch's id sort.
 
 - **consumes-from** `TOOL-dFurnishedOrders-16` — `derive_attended`'s `unread` row and the `turns` read it runs, which S1 to S3 decide inside a window (id 52)
 - **consumes-from** `TOOL-dFurnishedOrders-26` — `since`, the window inside which an unread presence reads away (ids 3 and 52)
+- **hands-off** `TOOL-dFurnishedOrders-33` — the window's unread rows and their source form, which unit 33 extends to a posture the run cannot read (id 3 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-34` — S3's 10-second bound and S2's cause list, which unit 34 extends to the posture read (id 30 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-37` — S2's missing-transcript cause, S3's runner, the `turns` grammar and AC3's docs grep, which unit 37 S1, S12, S19 and S28 settle (ids 4, 20, 31, 7 of the second audit)
 
 ## 4. Design
 
@@ -165,6 +170,8 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a missing transcri
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 20 unit specs, id 52
   (HIGH, item H1, shared with ids 3 and 19).
+- rev-2 · 2026-10-26 · §3 · hands-off edges to units 33, 34 and 37 (ids 3, 30, 4, 20, 31 and 7 of
+  the second audit).
 
 ## 10. Reuse audit
 

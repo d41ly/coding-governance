@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-26 — presence read inside a run's window: `derive_attended` counts only owner turns after the run started, so the prompt that launched an unattended run never reads as the owner attending
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +66,7 @@ and unit 28 decides what an unreadable turn means inside a window.
 - **consumes-from** `TOOL-dFurnishedOrders-16` — `derive_attended`, the `turns` verb it reads and the `owner-question` door, which S1 to S3 give a window (id 3)
 - **hands-off** `TOOL-dFurnishedOrders-27` — `--since`, the door flag the driver passes the run's lease start to on each path it asks the door (ids 3 and 19)
 - **hands-off** `TOOL-dFurnishedOrders-28` — `since`, the window whose unreadable-turn row unit 28 decides (ids 3 and 52)
+- **hands-off** `TOOL-dFurnishedOrders-37` — S2's time compare and unparsed count, which unit 37 S10 grounds on the `turns` verb's `untimed` line (id 13 of the second audit)
 
 ## 4. Design
 
@@ -181,6 +184,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 · a launch-o
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 20 unit specs, id 3
   (HIGH, item H1, shared with ids 19 and 52).
+- rev-2 · 2026-10-26 · §3 · a hands-off edge to unit 37 (id 13 of the second audit).
 
 ## 10. Reuse audit
 

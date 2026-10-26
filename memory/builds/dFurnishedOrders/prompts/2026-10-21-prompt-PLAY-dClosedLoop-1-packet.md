@@ -72,7 +72,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `5ff4357238dc74a501f567aa0ccca8231caabbc8`
+- rendered at: `8c395e3c333ecb46cde3a6653db56413755daa0a`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -197,12 +197,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dFurnishedOrders`:
 
-Coverage of dFurnishedOrders's 20 clauses and 14 owned nodes, over 29 specs:
+Coverage of dFurnishedOrders's 20 clauses and 14 owned nodes, over 36 specs:
 - carried whole: 20; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: none; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-22.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-23.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-24.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-25.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-26.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-27.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-28.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-29.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-30.md (PLAY-dClosedLoop-2)
+- specs derived from no clause: memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-22.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-23.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-24.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-25.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-26.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-27.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-28.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-29.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-30.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-31.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-32.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-33.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-34.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-35.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-36.md (PLAY-dClosedLoop-2), memory/builds/dFurnishedOrders/spec/2026-10-26-spec-TOOL-dFurnishedOrders-37.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0192, cl-dClosedLoop-0195, cl-dClosedLoop-0200, cl-dClosedLoop-0204, cl-dClosedLoop-0205, cl-dClosedLoop-0211
 
 ### Reading order

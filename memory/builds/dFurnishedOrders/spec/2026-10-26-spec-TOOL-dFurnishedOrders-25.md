@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-25 — the retired-argument upgrade steps scan an adopter's executable call sites only, never its records or its markdown, so `up` and `witness` pass on a tree whose history quotes the retired command
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 5 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 5 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +66,9 @@ and states the population it reads. It repairs `TOOL-dFurnishedOrders-4` and bui
 ### Edges
 
 - **consumes-from** `TOOL-dFurnishedOrders-4` — `retired_dispatch_args.py` and the two `[[upgrade]]` rows whose `witness` and `up` scan S1 to S5 bound (id 50)
+- **hands-off** `TOOL-dFurnishedOrders-35` — `derive_call_sites`'s kit-file subtraction on a target with no receipt and on gov's own kit source, and AC5, which unit 35 replaces with a criterion run on this repository (id 10 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-36` — the kits' own suites, which unit 36 drops from the population on every target (id 25 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-37` — S2's key regex, S4's `MEMORY_ROOT` read and S1's file read, which unit 37 S5 to S9, S23, S29 and S34 settle (ids 11, 34, 12, 36, 18, 35, 8, 19 of the second audit)
 
 ## 4. Design
 
@@ -186,6 +191,8 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 · a target with quo
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 20 unit specs, id 50
   (HIGH, item H3).
+- rev-2 · 2026-10-26 · §3 · hands-off edges to units 35, 36 and 37 (ids 10, 25, 11, 34, 12, 36, 18,
+  35, 8 and 19 of the second audit).
 
 ## 10. Reuse audit
 
