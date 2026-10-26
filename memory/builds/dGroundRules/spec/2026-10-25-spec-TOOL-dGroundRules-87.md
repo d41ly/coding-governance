@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-87 — the spec tokens leg's ceiling covers the packet join over a live chain run, sized through `derive-ceilings.py --observed` from a reading of the leg alone
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node a · Tier-1 · base 87917c2f · streams tooling · order 34
+**Status:** CLOSED · rev-1 · 2026-10-26 · node a · Tier-1 · base 87917c2f · streams tooling · order 34
 
 **Derived:** PLAY-dClosedLoop-2
 

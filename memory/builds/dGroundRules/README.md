@@ -128,7 +128,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 86 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** CLOSED · 86 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14
 ids TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28
 ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42
@@ -225,7 +225,7 @@ ids TOOL-dGroundRules-109 TOOL-dGroundRules-110 TOOL-dGroundRules-111 TOOL-dGrou
 | [TOOL-dGroundRules-84 — the shell sources and kit-path spellings this build left red on the bar, each site converted or declared, and the install-prefix counter reads a `limits:` home as the Skill path it is](spec/2026-10-25-spec-TOOL-dGroundRules-84.md) | 31 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-85 — both size-cap enforcers split the budgets answer once with builtins, so the memory-hygiene and manifest-check probes fork within their ceilings again](spec/2026-10-25-spec-TOOL-dGroundRules-85.md) | 32 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-86 — the records and the runbook this build's code left stale: the kickoff manifest re-audited and re-stamped, dSafePassage-26's Readers clause, the TOOL-dGroundRules-34 ledger's AC32 token, two method-carrier rows and the policy kit's runbook section](spec/2026-10-25-spec-TOOL-dGroundRules-86.md) | 33 | 1 | CLOSED | rev-2 | 2026-10-25 |
-| [TOOL-dGroundRules-87 — the spec tokens leg's ceiling covers the packet join over a live chain run, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-25-spec-TOOL-dGroundRules-87.md) | 34 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-87 — the spec tokens leg's ceiling covers the packet join over a live chain run, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-25-spec-TOOL-dGroundRules-87.md) | 34 | 1 | CLOSED | rev-1 | 2026-10-26 |
 | [TOOL-dGroundRules-88 — packet.py's `--repin` guard admits an owner at a console inside a live chain run, refuses every agent and unattended caller, and records the admitted repin in each packet's Pins](spec/2026-10-25-spec-TOOL-dGroundRules-88.md) | 34 | 2 | CLOSED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 

@@ -584,3 +584,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T22:15:06Z hold · item host-owner-action · reason until owner · reaped 1273355c · resume none(owner)
 
 2026-10-25T23:56:16Z resume · item dGroundRules · reason held · keepalive d49f2fa7 · manual
+
+2026-10-26T00:05:45Z dispatch · item 0d9b531f TOOL-dGroundRules-87 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-87.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-26T00:05:48Z brief · item TOOL-dGroundRules-87 · reason ac7d79aa7519 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-87-spec-brief.md
