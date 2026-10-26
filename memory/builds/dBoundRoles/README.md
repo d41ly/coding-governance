@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29 TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64
+ids: TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29 TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66
 spec-audit: 2026-10-21
 parents: dDeclaredLoop dWitnessedBar dPlacedRequest
 may: PLAY-dClosedLoop-3
@@ -87,12 +87,12 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 54 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 56 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
 ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
 ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43
 ids TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57
-ids TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64
+ids TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -136,39 +136,41 @@ ids TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles
 | [TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes](spec/2026-10-25-spec-TOOL-dBoundRoles-20.md) | 23 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [TOOL-dBoundRoles-59 — unit 53's read check folds each `reads` entry through `roles_lib.parse_read_key`, so the tag spelling unit 14 writes passes and the read-key grammar keeps one owner](spec/2026-10-26-spec-TOOL-dBoundRoles-59.md) | 23 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [TOOL-dBoundRoles-19 — the roles kit's house text files moved into the overlay as level-5 units selecting their role, by their own upgrade step](spec/2026-10-25-spec-TOOL-dBoundRoles-19.md) | 24 | 2 | OPEN | rev-5 | 2026-10-26 |
-| [TOOL-dBoundRoles-61 — unit 59's read check fails on its slice's exit status, so a slice that crashes can no longer pass for a read it never checked](spec/2026-10-26-spec-TOOL-dBoundRoles-61.md) | 24 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [TOOL-dBoundRoles-61 — unit 59's read check fails on its slice's exit status, so a slice that crashes can no longer pass for a read it never checked](spec/2026-10-26-spec-TOOL-dBoundRoles-61.md) | 24 | 2 | OPEN | rev-3 | 2026-10-26 |
 | [TOOL-dBoundRoles-18 — the reviewers' merge as an upgrade step: an adopter's reviewer agents renamed to `gov-reviewer`, the role index re-rendered, every key the merge touches re-keyed](spec/2026-10-25-spec-TOOL-dBoundRoles-18.md) | 25 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step](spec/2026-10-25-spec-TOOL-dBoundRoles-25.md) | 26 | 2 | OPEN | rev-4 | 2026-10-26 |
 | [TOOL-dBoundRoles-42 — the retired hook's readers under `memory/` classed, append-only records left as written, and the live-carrier check scoped to what a reader can still be misled by](spec/2026-10-26-spec-TOOL-dBoundRoles-42.md) | 27 | 2 | OPEN | rev-3 | 2026-10-26 |
 | [TOOL-dBoundRoles-43 — the round-1 audit's 46 roles-code minors: one grammar each for returns, shapes and slots, one reader and writer each, bounded readers, resumable steps, and the registries they feed](spec/2026-10-26-spec-TOOL-dBoundRoles-43.md) | 28 | 2 | OPEN | rev-4 | 2026-10-26 |
 | [TOOL-dBoundRoles-44 — the round-1 audit's 11 docs-and-records minors: memory readers re-derived, frozen receipt waived, gotcha pages re-pointed, two Skills fitted, legacy registry named, workflow suites re-keyed and the close's harness swap checked](spec/2026-10-26-spec-TOOL-dBoundRoles-44.md) | 29 | 2 | OPEN | rev-3 | 2026-10-26 |
-| [TOOL-dBoundRoles-50 — the round-1 audit of units 37 to 44, its 24 roles-code minors: one fence walker per language, fence-aware marker readers, live leg names, waiver and registry rows kept true, and criteria that can fail](spec/2026-10-26-spec-TOOL-dBoundRoles-50.md) | 30 | 2 | OPEN | rev-3 | 2026-10-26 |
+| [TOOL-dBoundRoles-50 — the round-1 audit of units 37 to 44, its 24 roles-code minors: one fence walker per language, fence-aware marker readers, live leg names, waiver and registry rows kept true, and criteria that can fail](spec/2026-10-26-spec-TOOL-dBoundRoles-50.md) | 30 | 2 | OPEN | rev-4 | 2026-10-26 |
 | [TOOL-dBoundRoles-51 — the round-1 audit of units 37 to 44, its 8 records-and-Skills minors: build order verified, the policy mirror's net diff, append-only records observed by class, one owner per ledger verdict, and the recall Skill off a refused tool](spec/2026-10-26-spec-TOOL-dBoundRoles-51.md) | 30 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [TOOL-dBoundRoles-56 — the three readers of a spec's H1 share one fence rule: `parse_spec_h1` and KICK R4 move with `checkBuildable` onto the length rule, and one fixture set sees one id from all three](spec/2026-10-26-spec-TOOL-dBoundRoles-56.md) | 31 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [TOOL-dBoundRoles-57 — the memory-recall kit's description invariant follows the Skill off the refused tools: augments shell `grep` and `git grep`, and names neither search tool](spec/2026-10-26-spec-TOOL-dBoundRoles-57.md) | 31 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [TOOL-dBoundRoles-58 — the round-1 audit of units 45 to 51, its 35 minors: criteria that can pass on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers that name a revision](spec/2026-10-26-spec-TOOL-dBoundRoles-58.md) | 32 | 2 | OPEN | rev-3 | 2026-10-26 |
-| [TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes](spec/2026-10-26-spec-TOOL-dBoundRoles-60.md) | 33 | 2 | OPEN | rev-3 | 2026-10-26 |
-| [TOOL-dBoundRoles-62 — the spawn guard's suite carries the floor unit 60's AC15 checks, and AC15 refuses a suite with no floor and names its units suite by suite](spec/2026-10-26-spec-TOOL-dBoundRoles-62.md) | 34 | 2 | OPEN | rev-2 | 2026-10-26 |
-| [TOOL-dBoundRoles-63 — the round-1 audit of units 59 and 60, its 19 minors: a floor sum that counts its base, criteria that can fail on the text they retire, observations on a tree that imports, and write sets that name every file](spec/2026-10-26-spec-TOOL-dBoundRoles-63.md) | 35 | 2 | OPEN | rev-2 | 2026-10-26 |
-| [TOOL-dBoundRoles-64 — the round-1 audit of units 61 to 63, its 32 minors: floors at the executed count naming every unit, a negative case inverting its verdict, criteria failing on the text they retire, no stray worktree, and an edge per bumped spec](spec/2026-10-26-spec-TOOL-dBoundRoles-64.md) | 36 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes](spec/2026-10-26-spec-TOOL-dBoundRoles-60.md) | 33 | 2 | OPEN | rev-4 | 2026-10-26 |
+| [TOOL-dBoundRoles-62 — the spawn guard's suite carries the floor unit 60's AC15 checks, and AC15 refuses a suite with no floor and names its units suite by suite](spec/2026-10-26-spec-TOOL-dBoundRoles-62.md) | 34 | 2 | OPEN | rev-3 | 2026-10-26 |
+| [TOOL-dBoundRoles-63 — the round-1 audit of units 59 and 60, its 19 minors: a floor sum that counts its base, criteria that can fail on the text they retire, observations on a tree that imports, and write sets that name every file](spec/2026-10-26-spec-TOOL-dBoundRoles-63.md) | 35 | 2 | OPEN | rev-3 | 2026-10-26 |
+| [TOOL-dBoundRoles-64 — the round-1 audit of units 61 to 63, its 32 minors: floors at the executed count naming every unit, a negative case inverting its verdict, criteria failing on the text they retire, no stray worktree, and an edge per bumped spec](spec/2026-10-26-spec-TOOL-dBoundRoles-64.md) | 36 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [TOOL-dBoundRoles-65 — the observation worktree's cleanup check compares normalised paths under a named root, and a positive control proves it sees a leftover](spec/2026-10-26-spec-TOOL-dBoundRoles-65.md) | 37 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dBoundRoles-66 — the round-1 audit of unit 64, its 23 minors: skip lines by a pinned predicate, loops swept by class, unit terms tied to their arms, absence checks on joined prose, and the observation's failure path staged](spec/2026-10-26-spec-TOOL-dBoundRoles-66.md) | 37 | 2 | OPEN | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 44 bound to this build, across 4 record folder(s).
+Records: 48 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dBoundRoles-64.
+Ids no `spec-audit` record has ever named: TOOL-dBoundRoles-65 TOOL-dBoundRoles-66.
 
 Ids whose spec moved past its audited revision: TOOL-dBoundRoles-1@rev-1 TOOL-dBoundRoles-10@rev-1 TOOL-dBoundRoles-11@rev-1 TOOL-dBoundRoles-12@rev-1 TOOL-dBoundRoles-13@rev-1 TOOL-dBoundRoles-14@rev-1 TOOL-dBoundRoles-15@rev-1 TOOL-dBoundRoles-16@rev-1 TOOL-dBoundRoles-17@rev-1
 TOOL-dBoundRoles-18@rev-1 TOOL-dBoundRoles-19@rev-1 TOOL-dBoundRoles-2@rev-1 TOOL-dBoundRoles-20@rev-1 TOOL-dBoundRoles-21@rev-1 TOOL-dBoundRoles-22@rev-1 TOOL-dBoundRoles-23@rev-1 TOOL-dBoundRoles-24@rev-1 TOOL-dBoundRoles-25@rev-1 TOOL-dBoundRoles-26@rev-1 TOOL-dBoundRoles-3@rev-1
 TOOL-dBoundRoles-4@rev-1 TOOL-dBoundRoles-5@rev-1 TOOL-dBoundRoles-6@rev-1 TOOL-dBoundRoles-7@rev-1 TOOL-dBoundRoles-9@rev-1 TOOL-dBoundRoles-37@rev-1 TOOL-dBoundRoles-38@rev-1 TOOL-dBoundRoles-39@rev-1 TOOL-dBoundRoles-40@rev-1 TOOL-dBoundRoles-41@rev-1 TOOL-dBoundRoles-42@rev-1
 TOOL-dBoundRoles-43@rev-1 TOOL-dBoundRoles-44@rev-1 TOOL-dBoundRoles-45@rev-1 TOOL-dBoundRoles-46@rev-1 TOOL-dBoundRoles-47@rev-1 TOOL-dBoundRoles-48@rev-1 TOOL-dBoundRoles-49@rev-1 TOOL-dBoundRoles-50@rev-1 TOOL-dBoundRoles-51@rev-1 TOOL-dBoundRoles-52@rev-1 TOOL-dBoundRoles-53@rev-1
-TOOL-dBoundRoles-54@rev-1 TOOL-dBoundRoles-55@rev-1 TOOL-dBoundRoles-56@rev-1 TOOL-dBoundRoles-57@rev-1 TOOL-dBoundRoles-58@rev-1 TOOL-dBoundRoles-59@rev-1 TOOL-dBoundRoles-60@rev-1 TOOL-dBoundRoles-61@rev-1 TOOL-dBoundRoles-62@rev-1 TOOL-dBoundRoles-63@rev-1.
+TOOL-dBoundRoles-54@rev-1 TOOL-dBoundRoles-55@rev-1 TOOL-dBoundRoles-56@rev-1 TOOL-dBoundRoles-57@rev-1 TOOL-dBoundRoles-58@rev-1 TOOL-dBoundRoles-59@rev-1 TOOL-dBoundRoles-60@rev-1 TOOL-dBoundRoles-61@rev-1 TOOL-dBoundRoles-62@rev-1 TOOL-dBoundRoles-63@rev-1 TOOL-dBoundRoles-64@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 54 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 56 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 26
 - carried in parts: 0 (none)
@@ -184,7 +186,7 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 54 spec(s) at 
   `spec/2026-10-26-spec-TOOL-dBoundRoles-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-55.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-TOOL-dBoundRoles-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-57.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-59.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-TOOL-dBoundRoles-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-63.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-26-spec-TOOL-dBoundRoles-64.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-26-spec-TOOL-dBoundRoles-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-65.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dBoundRoles-66.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0173, cl-dClosedLoop-0178, cl-dClosedLoop-0187, cl-dClosedLoop-0189
 <!-- /gen:build-coverage -->
 
@@ -228,6 +230,7 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 54 spec(s) at 
 | 34 | `TOOL-dBoundRoles-62` | no |
 | 35 | `TOOL-dBoundRoles-63` | no |
 | 36 | `TOOL-dBoundRoles-64` | no |
+| 37 | `TOOL-dBoundRoles-65`, `TOOL-dBoundRoles-66` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

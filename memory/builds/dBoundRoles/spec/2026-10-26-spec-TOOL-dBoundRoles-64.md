@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-64 — the round-1 audit of units 61 to 63, its 32 minors: floors at the executed count naming every unit, a negative case inverting its verdict, criteria failing on the text they retire, no stray worktree, and an edge per bumped spec
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 |
+| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 |
 | [2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-64-round6-fix-return.md) | research | TOOL-dBoundRoles-42 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-64-round6-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-64-round6-fix-brief.md) | research | TOOL-dBoundRoles-42 |
+| [2026-10-26-review-TOOL-dBoundRoles-64-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-64-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -193,6 +194,8 @@ the other floored suite, found while grounding them (§8 F4).
 - **consumes-from** `TOOL-dBoundRoles-53` — its citations of the read-set parse, which S28 re-reads, and §3, which S30 extends (ids 26 and 29)
 - **consumes-from** `TOOL-dBoundRoles-54` — §3, which S30 extends by the hands-off bullet for unit 63 (id 26)
 - **consumes-from** `TOOL-dBoundRoles-55` — §3, which S30 extends by the hands-off bullet for unit 63 (id 26)
+- **hands-off** `TOOL-dBoundRoles-65` — S18 and AC13, which unit 65 restates: the worktree check compared through normalised keys under spec 63's named root, with a positive control that must report a planted leftover (id 11 of the round-1 audit of unit 64)
+- **hands-off** `TOOL-dBoundRoles-66` — S1, S12, S16, S18, S23, S28, S33, §1, §3, §4, §5, §6, §7, §8 F2, §10 and the floors, comments and ledger answers this unit's pass leaves, which unit 66 restates: one skip predicate and its join, loops swept by class, the unit-50 term tied to its arm, joined absence checks, the staged failed import and the owned cleanup (ids 1 to 10 and 12 to 24 of the round-1 audit of unit 64)
 
 ## 4. Design
 
@@ -503,6 +506,7 @@ New arm: tools/roles/spawn-guard.test.sh · covers AC2 AC7 AC8 · the floor comp
   to 63, each id its own item, in one unit, with S33 for the same class on the adopter suite. Before its
   commit, the round-6 fix brief shortened the H1 by 29 characters so its index row fits the 350 cap, and
   named the adopter suite in prose in AC6 and AC14.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-65 and TOOL-dBoundRoles-66, the HIGH promotion and the minors batch of the round-1 audit of unit 64; nothing else moved.
 
 ## 10. Reuse audit
 
