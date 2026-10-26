@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
+**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 |
+| [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 |
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 |
 | [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 |
@@ -19,30 +19,28 @@
 
 The round-1 spec audit (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md`)
 exited CONVERGED with 66 confirmed findings over units 1 to 26; its seven highs, ids 1, 16, 17, 23, 36,
-49 and 51, are units 36 to 42. This unit is BUILD-METHOD M4's batch of the rest, every MEDIUM and LOW,
-each keeping its report id and scope item, plus gap-mem-16 (id 2), the owned gap no spec carried.
-Landing on 24 units, it builds after every unit (order 27, above `TOOL-dTotalRecall-12`'s 26).
+49 and 51, are units 36 to 42. This unit is BUILD-METHOD M4's batch of every MEDIUM and LOW, each
+keeping its report id, plus gap-mem-16 (id 2), the owned gap no spec carried. Landing on 24 units, it
+builds after every unit (order 27, above `TOOL-dTotalRecall-12`'s 26).
 
-Items follow the report's order, M1 to M44 then L1 to L13, except M10's ids 11, 32 and 33 (S10 to S12)
-and L12, id 67 (S17, beside its twin id 19 at S16); the review holds each item's text. Ids 9 and
-36 are one defect at two grades: unit 40 closes unit 4's half (id 36), S8 unit 2's (id 9). Ids 19 and
-67 are one match, and ids 12 and 51 one home rule; each keeps its item and is fixed once. Refuted ids 14
-and 61 are outside the disposal.
+Items follow the report's order, M1 to M44 then L1 to L13, but for M10's ids 11, 32 and 33 (S10 to
+S12) and L12's id 67 (S17, beside its twin id 19); the review holds each item's text. Ids 9 and 36 are
+one defect at two grades (unit 40 closes unit 4's half, S8 unit 2's); ids 19 and 67 are one match, ids
+12 and 51 one home rule, each fixed once. Refuted ids 14 and 61 are outside the disposal.
 
 ## 2. Scope (IN)
 
-Each item states the change to the unit it lands on, as built; a landed unit's criterion the finding
-showed unpassable is re-observed here, corrected, its spec frozen.
+Each item states its change to the unit it lands on, as built; a landed criterion the finding showed
+unpassable is re-observed here, corrected.
 
-- **S1** — id 2, gap-mem-16. `check_record_kinds` in `tools/memory-tree/record_kinds.py` gains the
-  arm `homeless records`: every tracked file under the memory root and outside `builds/` that carries a
+- **S1** — id 2, gap-mem-16. `check_record_kinds` in `record_kinds.py` gains the arm
+  `homeless records`: every tracked file under the memory root and outside `builds/` that carries a
   `**Serves:**` binding in its first `BIND_HEAD_LINES` lines is matched by some row's `home` or is red,
-  named by path. Each period-, SHA- or adopter-keyed record kind the candidate run finds in
-  the real tree gains a registry row with a glob `home`, in `TOOL-dTotalRecall-18`'s column grammar.
+  named by path. Each period-, SHA- or adopter-keyed record kind the candidate run finds in the real
+  tree gains a registry row with a glob `home`, in `TOOL-dTotalRecall-18`'s column grammar.
   Observed by AC1.
-- **S2** — id 3. `TOOL-dTotalRecall-21` AC1's grep forbade the call its S4 and S8 require. Corrected here,
-  the FTS builder's old name is spelled nowhere in recall, and the one index writer stays.
-  Observed by AC2.
+- **S2** — id 3. `TOOL-dTotalRecall-21` AC1's grep forbade the call its S4 and S8 require; corrected,
+  recall spells the FTS builder's old name nowhere and keeps the one index writer. Observed by AC2.
 - **S3** — id 4. The registry rows of units 11, 7, 3 and 4 take units 16 and 18's grammar:
   `layer = "layer.memory"`; `lifecycle` from the closed set (`append-only` for `shape-run` and `claim`,
   `current-state` for `ask` and `build-readme`); `readers` as read keys, or `[]` with
@@ -54,20 +52,20 @@ showed unpassable is re-observed here, corrected, its spec frozen.
   **Readers:** by name: READER NOT IN TREE — `record-kinds.toml`, minted by `TOOL-dTotalRecall-1`, is
   absent at base · by value: `check_record_kinds` and the door's kind lookup read the row's `writer`
   and `source` cells, the factory row after this item.
-- **S5** — id 6. Unit 1's field check locates records by each row's `home`, which
-  `TOOL-dTotalRecall-18` fills on every row. Its AC1 report, per-kind graded and legacy counts, the
-  `deviation` legacy count non-zero, is observed here at the tip. Observed by AC5.
-- **S6** — id 7. The retag step of `TOOL-dTotalRecall-20`, `tools/govkit/steps/memory_retag.py`, writes
-  `## [section.<anchor>] <heading>`, the one authored-tag spelling `TOOL-dTotalRecall-9` S1 reads, and
-  its conservation rule (`TOOL-dTotalRecall-20` S6) cuts `[section.<anchor>] `. Observed by AC6.
-- **S7** — id 8. `TOOL-dTotalRecall-19` AC1 and AC2 named a `--serves` flag the door does not have. Their
-  corrected form, with `--unit` and no alias added, is observed here. Observed by AC7.
+- **S5** — id 6. Unit 1's field check finds records by each row's `home`, which
+  `TOOL-dTotalRecall-18` fills on every row. Its AC1 report, per-kind graded and legacy counts with
+  `deviation`'s legacy count non-zero, holds at the tip. Observed by AC5.
+- **S6** — id 7. The retag step of `TOOL-dTotalRecall-20` writes `## [section.<anchor>] <heading>`,
+  the one authored-tag spelling `TOOL-dTotalRecall-9` S1 reads, and its conservation rule
+  (`TOOL-dTotalRecall-20` S6) cuts `[section.<anchor>] `. Observed by AC6.
+- **S7** — id 8. `TOOL-dTotalRecall-19` AC1 and AC2 named a `--serves` flag the door lacks; corrected,
+  they use `--unit`, adding no alias. Observed by AC7.
 - **S8** — id 9. Unit 2's half of the `journal` defect: the door's registry rewrite of `hand` rows
   (`TOOL-dTotalRecall-2` S9) names the row `log`, reading each row's kind through `canonical_kind`, so
   the `log` row's `writer` reads `gov_record.py new log`. Unit 40's alias census reds any raw comparison
   left in `gov_record.py`. Observed by AC8.
 - **S9** — id 10. `stream-plan` joins the record-kind vocabulary: `RECORD_KIND_TOKENS` in
-  `tools/memory-tree/tree_lib.py` carries it, so a record opening `**Serves:** stream-plan <ids>`
+  `tree_lib.py` carries it, so a record opening `**Serves:** stream-plan <ids>`
   classifies under `read_bindings`, that line being the kind's binding, stated in the row's
   `purpose`. Observed by AC9.
 - **S10** — id 11. The memory-tree kit declares its reach into the playbook kit's index once: a
@@ -78,8 +76,8 @@ showed unpassable is re-observed here, corrected, its spec frozen.
   adapter `tools/memory-tree/policy_value.py` (`TOOL-dTotalRecall-8` S10), not the playbook kit's.
   Observed by AC11.
 - **S12** — id 33. `gov_map.py` (`TOOL-dTotalRecall-14` S6) reads `memory.map-budget` and
-  `memory.map-overflow` through `tools/memory-tree/policy_value.py`. Observed by AC12.
-- **S13** — id 12. The `record` extractor of `tools/memory-tree/record_extract.py` takes a record's kind
+  `memory.map-overflow` through S11's adapter. Observed by AC12.
+- **S13** — id 12. The `record` extractor of `record_extract.py` takes a record's kind
   from `derive_record_kind` (unit 42 S5): the Serves kind decides and the home admits, so log, research,
   deviation, shape-run and stream-plan records under one `build/` folder each tag as their own kind.
   Observed by AC13.
@@ -110,10 +108,9 @@ showed unpassable is re-observed here, corrected, its spec frozen.
   **Readers:** by name: READER NOT IN TREE — both registrations, minted by `TOOL-dTotalRecall-1` and
   `TOOL-dTotalRecall-19`, are absent at base · by value: `check_causes` and `check_record_kinds` read
   the rows, each its own slice after this item.
-- **S20** — id 26. `tools/govkit/steps/memory_front_matter.py` (`TOOL-dTotalRecall-20` S4) calls the one
-  grader `check_front_matter`, which `tools/memory-tree/gen_build_index.py` exposes and its own
-  `parse_front_matter` refusal (`TOOL-dTotalRecall-4` S4) calls, so the legacy exception holds in both.
-  Observed by AC20.
+- **S20** — id 26. The front-matter step (`TOOL-dTotalRecall-20` S4) calls the one grader
+  `check_front_matter`, which `gen_build_index.py` exposes and its own `parse_front_matter` refusal
+  (`TOOL-dTotalRecall-4` S4) calls, so the legacy exception holds in both. Observed by AC20.
 - **S21** — id 27. The memory legs' readers `unfenced-head` and `id-harvest` (`TOOL-dTotalRecall-23` S2)
   register through PLAY-dOrderedCharter-44's extractor mechanism and write `blob_row` rows, the payload
   in `text`, so `blob_parsed` is the one freshness ledger. The 44 version rule gains an optional params
@@ -145,8 +142,7 @@ showed unpassable is re-observed here, corrected, its spec frozen.
   exits non-zero naming it. Observed by AC26.
 - **S27** — id 38. `tools/memory-recall/verbatim.json` is re-stamped for `bench.py` and `union.py`, a
   reason each; `union.py`'s fork, `B.build_fts_rows` for `B.build_index`, is recorded in the selftest's
-  verbatim docstring and the kit README's verbatim table, for the next re-pull to reconcile by hand.
-  Observed by AC27.
+  verbatim docstring and the kit README's verbatim table. Observed by AC27.
 - **S28** — id 39. Every fixture README under `tools/` that types `node`, `roster` or `streams` keeps only
   the keys `TOOL-dTotalRecall-4`'s schema admits as typed, except the plants staging that refusal; the
   files are those `git grep -lE '^(node|roster|streams): ' -- tools` lists at the pass.
@@ -156,18 +152,17 @@ showed unpassable is re-observed here, corrected, its spec frozen.
   `govkit.py selfcheck --write`, its `tools/run-gates/ceiling-evidence.txt` line, and a
   `gate-legs` claim in a dossier with room under `DOSSIER_CAP_BYTES`. Observed by AC29.
 - **S30** — id 41. `memory/map/generated/` is regenerated by `python tools/codebase-map/gen_map.py
-  --write` at this pass, after every unit that minted or renamed a symbol, so its freshness leg reads
-  the final symbol set. Observed by AC30.
+  --write` at this pass, after every unit that minted or renamed a symbol. Observed by AC30.
 - **S31** — id 42. Every name the units' Inventory lines mint is asked of the lexicon at this pass;
-  each flagged name, `canonical_kind` and `ensure_index` among them, takes its suggestion, or has its
-  stem declared through the lexicon's declare path where the name is a contract across units.
+  each flagged name, `canonical_kind` and `ensure_index` among them, takes its suggestion, or, where
+  the name is a contract across units, has its stem declared.
   Observed by AC31.
 - **S32** — id 43. The legs running the readers unit 5 re-points, and the README slot contract for every
   unit editing `gen_build_index.py`, are named on this unit's §7 leg line. NOT OBSERVED: the leg line is
   the change, and the close runs it.
 - **S33** — id 44. The resolver parity leg for unit 26's `help_pages` row, `drift-audit records` and the
   lexicon leg for unit 13's edits, and `runlog record schema` for unit 12's verb are named on this
-  unit's §7 leg line. NOT OBSERVED: the leg line is the change, and the close runs it.
+  unit's §7 leg line. NOT OBSERVED: as S32.
 - **S34** — id 45. `tools/codebase-map/scen-adversarial.json` ADV-05 and ADV-06 name
   `{prefix}/memory-tree/record_find.py` as `expected_file`, their `established_by` citing its lines, and
   the comment at `tools/memory-recall/selftest.py:1906` names `record_find.py`'s `rrf`. Observed by AC34.
@@ -202,7 +197,7 @@ showed unpassable is re-observed here, corrected, its spec frozen.
   existing file byte-identical. Observed by AC43.
 - **S44** — id 62. Every caller of `derive_anchor` (`TOOL-dTotalRecall-10` S1) seeds `seen` with the
   record's authored tags before deriving any anchor, so an untagged heading never derives an address an
-  authored tag holds; the contract in `tools/playbook/tag_index.py` says so. Observed by AC44.
+  authored tag holds; the contract in `tag_index.py` says so. Observed by AC44.
 - **S45** — id 63. `edge_grammar.py --cardinality` with the memory-tree kit unresolved exits 2 naming
   that kit, and never prints a zero count. Observed by AC45.
 - **S46** — id 64. `gen_atlas.py` emits each Mermaid node as `id["<label>"]`, `"` encoded `#quot;`,
@@ -210,12 +205,12 @@ showed unpassable is re-observed here, corrected, its spec frozen.
 - **S47** — id 65. `record_kinds.py --purpose-review --write` refuses a write into a path a
   `[[generated]]` row or a kit `rendered` row owns, drafting an ask for that member; its `--writes` list
   names each member file it would write. Observed by AC47.
-- **S48** — id 15. `TOOL-dTotalRecall-14` AC7 read a byte count the header does not carry; its
-  corrected form, the byte length of `gov_map.py`'s stdout, is observed here. Observed by AC48.
+- **S48** — id 15. `TOOL-dTotalRecall-14` AC7 read a byte count the header does not carry; corrected,
+  it reads the byte length of `gov_map.py`'s stdout. Observed by AC48.
 - **S49** — id 20. The playbook kit's reach into `design_lib.py` is `TOOL-dTotalRecall-22`'s own, PLAY-
   dOrderedCharter-24 S7 being DEFERRED at base: `tools/playbook/kit.toml` declares it as a `requires_if`
   row for `memory-tree` naming `edge_grammar.py --cardinality`, beside S45's refusal. Observed by AC49.
-- **S50** — id 21. The module docstring of `tools/memory-tree/policy_value.py` gives the adapter's true
+- **S50** — id 21. The module docstring of `policy_value.py` states the adapter's
   reason: memory-tree's `requires` is empty, so a sibling import must be optional and declared in
   `requires_if`, and the adapter keeps the policy read degradable where no policy kit resolves.
   Observed by AC50.
@@ -227,7 +222,7 @@ showed unpassable is re-observed here, corrected, its spec frozen.
 - **S53** — id 35. One result-byte counter, `read_result_bytes(records)` in `tools/runlog/extract.py`,
   called by `measure_agent_memory` (`TOOL-dTotalRecall-12` S4) and `measure_bytes_before_act`
   (`TOOL-dTotalRecall-17`). Observed by AC53.
-- **S54** — id 47. `memory/guides/SESSION-KICKOFF.md`'s `last-audit` is re-stamped once at this pass,
+- **S54** — id 47. The kickoff guide's `last-audit` (S35) is re-stamped once at this pass,
   after the last unit editing a watched path, its delta line naming the watched paths this build edited.
   Observed by AC54.
 - **S55** — id 54. A degraded code record is never written to the per-tree cache; a later run on the
@@ -256,8 +251,7 @@ showed unpassable is re-observed here, corrected, its spec frozen.
 
 ### Edges
 
-- **consumes-from** `TOOL-dTotalRecall-1` — `record_kinds.py`, `check_record_kinds`, `new`, the legacy
-  registration
+- **consumes-from** `TOOL-dTotalRecall-1` — `record_kinds.py`, `check_record_kinds`, `new`, the legacy row
 - **consumes-from** `TOOL-dTotalRecall-2` — `gov_record.py`, its writer refusal, hand-row rewrite and mint
 - **consumes-from** `TOOL-dTotalRecall-3` — the counter's replay detection and the claim row
 - **consumes-from** `TOOL-dTotalRecall-4` — `parse_front_matter`, the build-readme row, the fixtures it refuses
@@ -286,25 +280,23 @@ showed unpassable is re-observed here, corrected, its spec frozen.
 - **consumes-from** `TOOL-dTotalRecall-40` — the alias census
 - **consumes-from** `TOOL-dTotalRecall-41` — `check_row_value`
 - **consumes-from** `TOOL-dTotalRecall-42` — `derive_record_kind`
-- **hands-off** `TOOL-dTotalRecall-52` — S19's merged `record-kinds-legacy` registration, which that unit keys by path, section and check (the round-1 audit of units 36 to 43, id 37)
-- **hands-off** `TOOL-dTotalRecall-53` — the kept marker, the homeless arm, the path match, `GIT_OWN` and the merged ledger, which that unit extends (the round-1 audit of units 36 to 43, ids 9, 12, 26, 29, 49, 50, 51 and 52)
+- **hands-off** `TOOL-dTotalRecall-52` — S19's merged `record-kinds-legacy` registration, which that unit keys by path, section and check (units 36 to 43's round-1 audit, id 37)
+- **hands-off** `TOOL-dTotalRecall-53` — the kept marker, the homeless arm, the path match, `GIT_OWN` and the merged ledger, which that unit extends (units 36 to 43's round-1 audit, ids 9, 12, 26, 29, 49, 50, 51 and 52)
+- **hands-off** `TOOL-dTotalRecall-60` — the `# slug-grammar: kept` lines S14 writes, which that unit re-marks in unit 53 S34's grammar (units 44 to 53's round-1 audit, id 27)
 
 ## 4. Design
 
 ### How the batch builds
 
-One pass, after every unit is terminal. The items' write sets intersect on shared files
-(`record-kinds.toml`, `tools/gate-legs.json`, `memory/map/generated/`, the kickoff manifest), so
-BUILD-METHOD M6 keeps them one unit. Order: registry rows (S1, S3, S4, S9), code items in unit order,
-then S29, S30, S31 and S54, each reading every earlier change.
+One pass, after every unit is terminal. The items' write sets intersect on shared files (Files
+touched), so BUILD-METHOD M6 keeps them one unit. Order: registry rows (S1, S3, S4, S9), code items
+in unit order, then S29, S30, S31 and S54, each reading every earlier change.
 
 ### Inventory
 
-Minted: the `homeless records` arm; `scan_cycles` and `check_line_break` in
-`tools/memory-tree/backlog.py`; the ledger field `check`; `check_front_matter` in
-`tools/memory-tree/gen_build_index.py`; the 44 params digest; `read_result_bytes` in
-`tools/runlog/extract.py`; the marker `# slug-grammar: kept`; S15's and S25's parity arms. Naming
-cells: S31 asks the lexicon.
+Minted: the `homeless records` arm; `scan_cycles` (S18) and `check_line_break` (S37); the ledger
+field `check`; `check_front_matter` (S20); the 44 params digest; `read_result_bytes` (S53); the marker
+`# slug-grammar: kept`; S15's and S25's parity arms. Naming cells: S31 asks the lexicon.
 
 ### Files touched (estimate)
 
@@ -567,29 +559,28 @@ New arm: tools/memory-recall/selftest.py · covers AC38 AC39 · the held write t
 
 ## 8. Open questions
 
-- **F1 — Which binding line does a promoted unit carry?** The carries join reds a chain spec carrying
-  and derived from nothing. Options: (a) `**Derived:**` naming `PLAY-dClosedLoop-2`, the ruling that a
-  chain spec run carries the units it adds; (b) a `part k/n` carry, splitting a clause its unit carries
-  whole and redding the parts join, which veto 1 discards. RESOLVED (agent, 2026-10-26, delegated):
+- **F1 — Which binding line does a promoted unit carry?** Options: (a) `**Derived:**` naming
+  `PLAY-dClosedLoop-2`, the ruling that a chain spec run carries the units it adds; (b) a `part k/n`
+  carry, redding the parts join, which veto 1 discards. RESOLVED (agent, 2026-10-26, delegated):
   (a), rung 3, `TOOL-dDeclaredLoop-36` §8 F1's precedent. widens: none · relaxes: none
 - **F2 — How is the memory-tree kit's reach into the playbook kit's index declared (S10)?** Options:
   (a) a `requires_if` row naming the modules, each refusing by name where the kit does not resolve;
-  (b) `requires = ["playbook"]`, breaking a memory-tree-only adopter; (c) an adapter wrapping the one
-  index writer in a second module. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the kit's
-  `requires_if` rows (`tools/memory-tree/kit.toml:8`) and S50's corrected reason. widens: none · relaxes: none
+  (b) `requires = ["playbook"]`, breaking a memory-tree-only adopter; (c) a second module wrapping the
+  index writer. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the kit's `requires_if` rows
+  (§10) and S50's corrected reason. widens: none · relaxes: none
 - **F3 — May this unit edit `WIRE-INTO-PROJECT.md` and `memory/guides/SESSION-KICKOFF.md` (S26, S35,
   S54)?** Options: (a) yes, under the build's grant, each edit stating a change cl-dClosedLoop-0232 or
-  cl-dClosedLoop-0229 makes; (b) no, shipping a runbook that cannot install the recall kit and a
-  kickoff instructing the retired kind. RESOLVED (agent, 2026-10-26, delegated): (a), rung 5, the
-  README's `may:` grant. grants: PLAY-dClosedLoop-3 WIRE-INTO-PROJECT.md §0 and §3c name the
-  playbook kit beside memory-recall, and SESSION-KICKOFF.md names the `log` record · widens: none ·
-  relaxes: none
+  cl-dClosedLoop-0229 makes; (b) no, shipping a runbook and a kickoff the build left stale.
+  RESOLVED (agent, 2026-10-26, delegated): (a), rung 5, the README's `may:` grant.
+  grants: PLAY-dClosedLoop-3 WIRE-INTO-PROJECT.md §0 and §3c name the playbook kit beside
+  memory-recall, and SESSION-KICKOFF.md names the `log` record · widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's 59 minors: 46 MEDIUM
   (items M1 to M44) and 13 LOW (items L1 to L13).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-52, TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted; non-criterion prose cut to the size cap.
+- rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-60, each the other end of an edge a unit the round-1 spec audit of units 44 to 53 promoted wrote; non-criterion prose cut to the size cap.
 
 ## 10. Reuse audit
 

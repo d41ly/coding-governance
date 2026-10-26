@@ -70,3 +70,19 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T00:58:02Z rescope · item add TOOL-dTotalRecall-53 · reason spec-audit round 1 of units 36 to 43 (reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) the 41 confirmed minors batched into one unit: 24 MEDIUM, ids 2 5 6 7 8 9 13 14 15 17 18 19 23 25 27 28 36 38 41 42 45 49 50 51 (items M1 to M17), and 17 LOW, ids 4 10 11 12 16 20 21 24 26 29 33 34 39 43 46 47 52 (items L1 to L16); lands on several units, so repairs no unit in particular
 
 2026-10-26T01:17:29Z review · item dTotalRecall-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 41 · disposition promote
+
+2026-10-26T02:12:38Z rescope · item add TOOL-dTotalRecall-54 · reason spec-audit round 1 of units 44 to 53 (reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) id 1 HIGH, item H2: unit 46 repairs unit 38's parse_id_parts after unit 38's own order-8 pass needs it, so every call there raises IndexError; repairs TOOL-dTotalRecall-5, landing the working parser in step 8 ahead of unit 38's re-points
+
+2026-10-26T02:12:49Z rescope · item add TOOL-dTotalRecall-55 · reason spec-audit round 1 of units 44 to 53 (reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) id 37 HIGH, item H1 shared with ids 4, 15 and 24: unit 53 S34 retires CAUSE_WRITER_KEPT with no keep path for unit 50's eight build-folder scripts, which no pass of this build may edit; repairs TOOL-dTotalRecall-53
+
+2026-10-26T02:12:50Z rescope · item add TOOL-dTotalRecall-56 · reason spec-audit round 1 of units 44 to 53 (reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) id 15 HIGH, item H1 shared with ids 4, 24 and 37: unit 53 S22 keeps the pinned deviations.py compare by an in-file marker, which would move a pinned blob outside the build's write set; repairs TOOL-dTotalRecall-53
+
+2026-10-26T02:12:50Z rescope · item add TOOL-dTotalRecall-57 · reason spec-audit round 1 of units 44 to 53 (reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) id 4 HIGH, item H1 shared with ids 15, 24 and 37: unit 53 AC34 reds every file-keyed exemption and S34 exempts no pinned file, so a file that cannot carry the marker has no lawful keep; repairs TOOL-dTotalRecall-53
+
+2026-10-26T02:12:51Z rescope · item add TOOL-dTotalRecall-58 · reason spec-audit round 1 of units 44 to 53 (reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) id 24 HIGH, item H1 shared with ids 4, 15 and 37: built as written, unit 53's pass writes markers into pinned instruments and stops at packet.py --check, or cannot keep them; repairs TOOL-dTotalRecall-53
+
+2026-10-26T02:12:51Z rescope · item add TOOL-dTotalRecall-59 · reason spec-audit round 1 of units 44 to 53 (reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) id 13 HIGH, item H3: unit 52's gained refusal and absorbs read cannot arise at this run's compare base, where neither legacy home exists; repairs TOOL-dTotalRecall-52
+
+2026-10-26T02:12:52Z rescope · item add TOOL-dTotalRecall-60 · reason spec-audit round 1 of units 44 to 53 (reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) the 35 confirmed minors batched into one unit: 26 MEDIUM, ids 2 3 5 6 7 8 12 14 16 17 18 19 20 21 25 26 27 29 30 32 33 38 39 40 42 44 (items M1 to M21), and 9 LOW, ids 9 10 11 22 23 31 34 35 36 (items L1 to L8); lands on several units, so repairs no unit in particular
+
+2026-10-26T02:27:23Z review · item dTotalRecall-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 35 · disposition promote
