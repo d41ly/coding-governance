@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-47 — one criterion across the fence, the strip and the graded text: with units 38, 45, 24 and 41 landed, an anchor planted in a typed `--input` value is refused
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

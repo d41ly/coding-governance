@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-64 — the round-1 audit of units 61 to 63, its 32 minors: floors at the executed count naming every unit, a negative case inverting its verdict, criteria failing on the text they retire, no stray worktree, and an edge per bumped spec
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 36 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

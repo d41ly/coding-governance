@@ -1,6 +1,6 @@
-# TOOL-dBoundRoles-58 — the round-1 audit of units 45 to 51, its 35 minors: criteria that can pass on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers that name a revision
+# TOOL-dBoundRoles-58 — the 35 minors of auditing units 45 to 51: criteria passable on a correct build, one typed set and one block reader at spawn, one extents record at render, the H1 parity's consumers, and AMENDED answers naming a revision
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 32 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -416,6 +416,7 @@ New arm: tools/govkit/selftest.py · covers AC31 · the shared seed predicate, s
   to 51, each id its own item, in one unit.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-59 and TOOL-dBoundRoles-60, the HIGH promotion and the minors batch of the round-1 audit of units 52 to 58; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
+  The H1 is shortened to fit the build index's row cap after the DEFERRED flip; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 8 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0182@0cc5ed88 whole
 

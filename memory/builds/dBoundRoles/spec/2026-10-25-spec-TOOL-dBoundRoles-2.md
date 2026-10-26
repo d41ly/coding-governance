@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-2 — each role's static instructions as structured fields: the never list with its enforcers, the ceiling and the typed return
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 2 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 2 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0167@0ec2ea97 whole
 

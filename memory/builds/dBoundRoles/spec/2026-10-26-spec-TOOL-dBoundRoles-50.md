@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-50 — the round-1 audit of units 37 to 44, its 24 roles-code minors: one fence walker per language, fence-aware marker readers, live leg names, waiver and registry rows kept true, and criteria that can fail
 
-**Status:** OPEN · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-57 — the memory-recall kit's description invariant follows the Skill off the refused tools: augments shell `grep` and `git grep`, and names neither search tool
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 31 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 31 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-67 — unit 65's leftover sweep also selects the observation's worktrees by what they checked out, so a leftover at an unnamed `%TEMP%` path is found
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

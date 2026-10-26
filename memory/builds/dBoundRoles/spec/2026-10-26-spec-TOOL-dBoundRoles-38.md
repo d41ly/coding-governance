@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-38 — handed content fenced inside the work order, and every reader of a fact line or a marker line skips what a fence holds
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

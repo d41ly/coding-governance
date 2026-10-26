@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-63 — the round-1 audit of units 59 and 60, its 19 minors: a floor sum that counts its base, criteria that can fail on the text they retire, observations on a tree that imports, and write sets that name every file
 
-**Status:** OPEN · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

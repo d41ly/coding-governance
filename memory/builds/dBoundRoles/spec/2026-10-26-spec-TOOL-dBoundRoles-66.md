@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-66 — the round-1 audit of unit 64, its 23 minors: skip lines by a pinned predicate, loops swept by class, unit terms tied to their arms, absence checks on joined prose, and the observation's failure path staged
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 37 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

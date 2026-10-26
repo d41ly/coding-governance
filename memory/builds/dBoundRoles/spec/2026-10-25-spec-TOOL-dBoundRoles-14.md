@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0179@f74e2fff whole
 **Carries:** node:tag-namespace.role

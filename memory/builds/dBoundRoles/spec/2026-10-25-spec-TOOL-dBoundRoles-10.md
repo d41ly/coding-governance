@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-10 — `driver.reads`, `prompts.author` and `roles.no-spawn`, each read and enforced at its seam
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0175@0d300fb9 whole
 **Carries:** node:policy-key.driver.reads

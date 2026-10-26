@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0181@6ebedcff whole
 **Carries:** node:system.role-shapes

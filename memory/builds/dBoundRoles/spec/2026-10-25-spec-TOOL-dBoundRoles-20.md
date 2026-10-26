@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0185@ce70dc70 whole
 **Carries:** node:tag-namespace.workflow

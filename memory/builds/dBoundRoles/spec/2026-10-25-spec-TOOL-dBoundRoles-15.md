@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-15 — the role static block carried once per spawn, and its budget over the whole rendered block
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 7 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 7 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0180@145f826e whole
 **Carries:** node:policy-key.instructions.task-charter

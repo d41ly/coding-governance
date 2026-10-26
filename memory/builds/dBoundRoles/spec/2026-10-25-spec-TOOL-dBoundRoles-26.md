@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-26 — the typed refusal return: its rule, its remedy and the remedy's actor, routed at once and never re-offered
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0191@66acd199 whole
 

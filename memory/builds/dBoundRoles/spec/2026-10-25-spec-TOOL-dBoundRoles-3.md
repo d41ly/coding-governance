@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0168@abfd5f4f whole
 **Carries:** node:record-kind.work-order

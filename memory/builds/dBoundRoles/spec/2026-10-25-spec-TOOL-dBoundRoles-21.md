@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-21 — the effort and model keys, `default` reserved, and the gate grant a role field, every reader re-pointed
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0186@e356242a whole
 **Carries:** node:policy-key.roles.effort.<role>

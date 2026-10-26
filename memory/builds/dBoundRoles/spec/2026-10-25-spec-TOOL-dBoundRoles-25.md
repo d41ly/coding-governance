@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step
 
-**Status:** OPEN · rev-4 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0190@03bbbf1e whole
 

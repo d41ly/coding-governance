@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0173@a66af889 whole
 

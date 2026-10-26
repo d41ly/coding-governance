@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-24 — the framing checked at render: every anchor a work order points at resolves to a fact it hands
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 19 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 19 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0189@8d7be499 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-40 — a recorded harness-stage stop replayed against every `SubagentStop` hook a default install registers, red on any output, any block or any record
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 3 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0166@83615023 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-52 — unit 47's cross-unit render pair runs on a role that reads both of its inputs: `gov-orienter`, the span typed in `input:question` and handed in `input:prompt`
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 22 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

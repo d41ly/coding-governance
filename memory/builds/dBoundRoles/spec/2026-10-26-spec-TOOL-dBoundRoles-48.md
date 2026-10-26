@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-48 — the composed task section checked block by block: every block opens outside a fence, and each handed block's content lies inside its own, at render and at spawn
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

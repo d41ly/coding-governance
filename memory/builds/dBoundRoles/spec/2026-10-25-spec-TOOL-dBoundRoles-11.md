@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-11 — every fork resolved by the role that meets it with its full record, or held as `run.on-owner-question` says
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0176@6a45e0b7 whole
 **Carries:** node:policy-key.run.on-owner-question

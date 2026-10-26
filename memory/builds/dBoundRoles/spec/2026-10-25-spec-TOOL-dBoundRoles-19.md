@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-19 — the roles kit's house text files moved into the overlay as level-5 units selecting their role, by their own upgrade step
 
-**Status:** OPEN · rev-5 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 24 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 24 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0184@923d7266 whole
 

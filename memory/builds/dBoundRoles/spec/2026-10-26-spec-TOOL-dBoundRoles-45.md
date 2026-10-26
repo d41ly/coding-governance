@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-45 — a typed `--input` value is authored text: written unfenced, refused when a line would stand as an executor line, so the anchor check grades it
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

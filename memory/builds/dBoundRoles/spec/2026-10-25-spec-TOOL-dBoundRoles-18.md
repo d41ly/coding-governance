@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-18 — the reviewers' merge as an upgrade step: an adopter's reviewer agents renamed to `gov-reviewer`, the role index re-rendered, every key the merge touches re-keyed
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 25 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 25 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0183@46564bcb whole
 

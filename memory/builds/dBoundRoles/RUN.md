@@ -112,3 +112,121 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T07:51:24Z rescope · item add TOOL-dBoundRoles-69 · reason spec-audit round1 of units 65 and 66 minors batched in one unit (BUILD-METHOD M4, no disjoint split by M6): MEDIUM ids 2 13 3 7 21 8 22 12 16 15 6 23 19 (items M1-M8) and LOW ids 5 9 11 17 18 (items L1-L5)
 
 2026-10-26T08:08:29Z review · item dBoundRoles-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 18 · disposition promote
+
+2026-10-26T08:18:12Z rescope · item defer TOOL-dBoundRoles-14 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:13Z rescope · item defer TOOL-dBoundRoles-2 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:14Z rescope · item defer TOOL-dBoundRoles-1 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:15Z rescope · item defer TOOL-dBoundRoles-21 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:16Z rescope · item defer TOOL-dBoundRoles-37 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:17Z rescope · item defer TOOL-dBoundRoles-22 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:18Z rescope · item defer TOOL-dBoundRoles-49 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:19Z rescope · item defer TOOL-dBoundRoles-16 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:20Z rescope · item defer TOOL-dBoundRoles-54 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:20Z rescope · item defer TOOL-dBoundRoles-55 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:21Z rescope · item defer TOOL-dBoundRoles-15 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:22Z rescope · item defer TOOL-dBoundRoles-17 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:23Z rescope · item defer TOOL-dBoundRoles-6 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:24Z rescope · item defer TOOL-dBoundRoles-13 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:25Z rescope · item defer TOOL-dBoundRoles-3 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:25Z rescope · item defer TOOL-dBoundRoles-38 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:26Z rescope · item defer TOOL-dBoundRoles-8 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:27Z rescope · item defer TOOL-dBoundRoles-45 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:28Z rescope · item defer TOOL-dBoundRoles-46 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:29Z rescope · item defer TOOL-dBoundRoles-48 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:30Z rescope · item defer TOOL-dBoundRoles-9 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:30Z rescope · item defer TOOL-dBoundRoles-7 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:31Z rescope · item defer TOOL-dBoundRoles-5 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:32Z rescope · item defer TOOL-dBoundRoles-10 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:33Z rescope · item defer TOOL-dBoundRoles-39 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:34Z rescope · item defer TOOL-dBoundRoles-40 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:34Z rescope · item defer TOOL-dBoundRoles-4 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:35Z rescope · item defer TOOL-dBoundRoles-23 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:36Z rescope · item defer TOOL-dBoundRoles-24 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:37Z rescope · item defer TOOL-dBoundRoles-12 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:38Z rescope · item defer TOOL-dBoundRoles-41 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:39Z rescope · item defer TOOL-dBoundRoles-11 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:40Z rescope · item defer TOOL-dBoundRoles-47 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:40Z rescope · item defer TOOL-dBoundRoles-26 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:42Z rescope · item defer TOOL-dBoundRoles-52 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:42Z rescope · item defer TOOL-dBoundRoles-53 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:43Z rescope · item defer TOOL-dBoundRoles-20 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:44Z rescope · item defer TOOL-dBoundRoles-59 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:45Z rescope · item defer TOOL-dBoundRoles-19 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:46Z rescope · item defer TOOL-dBoundRoles-61 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:47Z rescope · item defer TOOL-dBoundRoles-18 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:47Z rescope · item defer TOOL-dBoundRoles-25 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:48Z rescope · item defer TOOL-dBoundRoles-42 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:49Z rescope · item defer TOOL-dBoundRoles-43 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:50Z rescope · item defer TOOL-dBoundRoles-44 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:51Z rescope · item defer TOOL-dBoundRoles-50 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:52Z rescope · item defer TOOL-dBoundRoles-51 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:53Z rescope · item defer TOOL-dBoundRoles-56 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:53Z rescope · item defer TOOL-dBoundRoles-57 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:54Z rescope · item defer TOOL-dBoundRoles-58 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:55Z rescope · item defer TOOL-dBoundRoles-60 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:56Z rescope · item defer TOOL-dBoundRoles-62 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:57Z rescope · item defer TOOL-dBoundRoles-63 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:57Z rescope · item defer TOOL-dBoundRoles-64 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:58Z rescope · item defer TOOL-dBoundRoles-65 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:18:59Z rescope · item defer TOOL-dBoundRoles-66 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:19:00Z rescope · item defer TOOL-dBoundRoles-67 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:19:00Z rescope · item defer TOOL-dBoundRoles-68 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T08:19:01Z rescope · item defer TOOL-dBoundRoles-69 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dBoundRoles-27

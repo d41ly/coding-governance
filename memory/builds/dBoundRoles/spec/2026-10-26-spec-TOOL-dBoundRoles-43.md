@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-43 — the round-1 audit's 46 roles-code minors: one grammar each for returns, shapes and slots, one reader and writer each, bounded readers, resumable steps, and the registries they feed
 
-**Status:** OPEN · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 28 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

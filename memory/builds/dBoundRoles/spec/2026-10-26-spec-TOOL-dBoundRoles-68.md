@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-68 — unit 65's AC4 says it is green by construction over `dbr63obs` alone, and a positive control proves the signature selection sees a leftover outside that root
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 38 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

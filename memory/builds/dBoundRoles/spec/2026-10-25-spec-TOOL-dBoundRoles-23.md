@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-23 — the prompt writer's default frame, bounded lists, upstream rows, and the medium effort floor
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 18 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 18 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0188@23b122f8 whole
 

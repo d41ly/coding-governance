@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-5 — returns through a schema-forced channel on both routes, residual failures retried by `roles.retries`
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 15 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 15 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0170@d33b224b whole
 **Carries:** node:policy-key.roles.retries

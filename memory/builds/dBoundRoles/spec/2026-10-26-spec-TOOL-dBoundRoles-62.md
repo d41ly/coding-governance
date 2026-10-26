@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-62 — the spawn guard's suite carries the floor unit 60's AC15 checks, and AC15 refuses a suite with no floor and names its units suite by suite
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 34 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

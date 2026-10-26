@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-39 — the return check grades a direct spawn only: a stop whose transcript is a harness stage's, or whose first record carries no handoff marker, passes untouched
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 

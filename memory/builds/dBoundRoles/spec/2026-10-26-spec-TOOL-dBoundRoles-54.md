@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-54 — unit 49's overlay check reads its expected side from the roster, one `house/<slot>.md` per role slot, never from the seed rule it is compared with
 
-**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
