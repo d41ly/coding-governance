@@ -164,6 +164,10 @@ CLIENT_HOOKS = ("applypatch-msg", "pre-applypatch", "post-applypatch", "pre-comm
                 "p4-post-changelist", "p4-pre-submit", "post-index-change", "reference-transaction")
 FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "credential-stub",
                   "needs-target", "breach", "token", "callers")
+# How much later than a lock's `started` a census row of its pid may estimate its creation and still
+# be the holder (TOOL-dSafePassage-22 S3). It covers the census's rounding of `age_s` to whole
+# seconds and no latency: the clock is read before the census, so a slow census errs toward live.
+REUSE_MARGIN_S = 2.0
 
 
 class Refusal(RuntimeError):
@@ -1216,25 +1220,27 @@ def read_lock_holder(lock) -> tuple[bytes | None, dict | None]:
 def check_holder_dead(record: dict | None) -> tuple[str, str]:
     """(`dead`, `live` or `unknown`, why) for a lock or guard holder (S7). `dead`: its `host` is this
     host or absent, and the process-monitor census holds no row with its pid, or one created more
-    than two seconds after its `started`, a reused pid; `live`: a row with that pid created no later
-    than that; `unknown`: an unreadable record, another host, or a census that cannot run. The
-    clock is read BEFORE the census, so a slow census makes a holder look older, toward `live`."""
+    than `REUSE_MARGIN_S` after its `started`, a reused pid; `live`: a row with that pid created no
+    later than that; `unknown`: an unreadable record, another host, or a census that cannot run. The
+    clock is read once BEFORE the census is spawned and no later reading enters the estimate, so a
+    slow census makes a holder look older, toward `live` (TOOL-dSafePassage-22 S1)."""
     if record is None:
         return "unknown", "its record names no readable pid and start time"
     host = record.get("host")
     if host is not None and host != THIS_HOST:
         return "unknown", f"it was taken on host {host!r}, and this host's process table cannot speak for that one"
-    pid, now = record["pid"], time.time()
+    pid = record["pid"]
     try:
         pm_dir = load_govkit().resolve_kit_dir("process-monitor", "census.py", HERE)
         spec = importlib.util.spec_from_file_location("gk_lock_census", pm_dir / "census.py")
         census = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(census)
+        now = time.time()
         rows, _counts = census.scan_processes()
     except Exception as e:  # ponytail: any census failure proves nothing, and `unknown` refuses
         return "unknown", f"the process census could not run ({type(e).__name__}: {e})"
     born = [now - float(r["age_s"]) for r in rows if r.get("winpid") == pid]
-    if any(b <= record["started"] + 2 for b in born):
+    if any(b <= record["started"] + REUSE_MARGIN_S for b in born):
         return "live", f"pid {pid} is still running and was started before it took the lock"
     if born:
         return "dead", f"pid {pid} now names a process started after the lock was taken, a reused pid"
@@ -1683,9 +1689,23 @@ print(f"rollback: verdicts {out['downs']}")
 sys.exit(1 if out["stopped"] else 0)
 '''
 # One take of a target's write lock through govkit's `take_write_lock`, held until `<release>`
-# exists; `<gate>` makes two racers start together. `-` waits for neither.
-FIXTURE_LOCK_CHILD = r'''import importlib.util, os, pathlib, sys, time
+# exists; `<gate>` makes two racers start together. `-` waits for neither. A sixth argument, seconds,
+# delays every return of the census `check_holder_dead` loads, in this process only, so the census
+# answers that much after it sampled (TOOL-dSafePassage-22 S4).
+FIXTURE_LOCK_CHILD = r'''import importlib.machinery, importlib.util, os, pathlib, sys, time
 sys.stdout.reconfigure(encoding="utf-8")
+if len(sys.argv) > 5:
+    _exec = importlib.machinery.SourceFileLoader.exec_module
+    def _slow_exec(self, module):
+        _exec(self, module)
+        if module.__name__ == "gk_lock_census":
+            scan = module.scan_processes
+            def slow_scan(*a, **k):
+                out = scan(*a, **k)
+                time.sleep(float(sys.argv[5]))
+                return out
+            module.scan_processes = slow_scan
+    importlib.machinery.SourceFileLoader.exec_module = _slow_exec
 spec = importlib.util.spec_from_file_location("upgrade_steps", sys.argv[1])
 us = importlib.util.module_from_spec(spec)
 sys.modules["upgrade_steps"] = us
@@ -1707,7 +1727,7 @@ while sys.argv[4] != "-" and not pathlib.Path(sys.argv[4]).exists() and time.tim
 WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSafePassage-15
 WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending") + WALK_SCHEMA_PLANTS
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-unreadable",
-               "lock-race", "guard-dead")
+               "lock-race", "guard-dead", "lock-live-slow-census")
 UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update")
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
@@ -2099,6 +2119,7 @@ def run_lock_fixture(plant: str) -> int:
 
         def take(gate: str = "-", release: str = "-", out_file: pathlib.Path | None = None):
             argv = [sys.executable, "-c", FIXTURE_LOCK_CHILD, str(HERE / "upgrade_steps.py"), str(t), gate, release]
+            argv += ["3"] if plant == "lock-live-slow-census" else []
             if out_file is None:
                 p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace",
                                    env=env, timeout=600)
@@ -2116,7 +2137,8 @@ def run_lock_fixture(plant: str) -> int:
 
         try:
             rc = 0
-            if plant in ("lock-dead", "lock-reused", "lock-live", "lock-foreign-host", "lock-unreadable"):
+            if plant in ("lock-dead", "lock-reused", "lock-live", "lock-foreign-host", "lock-unreadable",
+                         "lock-live-slow-census"):
                 if plant == "lock-dead":
                     holder = dead_pid()
                     before = plant_lock(holder, time.time() - 30)
@@ -2125,6 +2147,12 @@ def run_lock_fixture(plant: str) -> int:
                     holder = sleeper.pid
                     time.sleep(0.5)
                     before = plant_lock(holder, time.time() - (600 if plant == "lock-reused" else 0))
+                elif plant == "lock-live-slow-census":
+                    # TOOL-dSafePassage-22: the lock taken at once, so a clock read after the
+                    # census's three seconds puts the live holder past REUSE_MARGIN_S.
+                    sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)"])
+                    holder = sleeper.pid
+                    before = plant_lock(holder, time.time())
                 elif plant == "lock-foreign-host":
                     holder = dead_pid()
                     before = plant_lock(holder, time.time() - 30, "gk-elsewhere.invalid")
@@ -2145,7 +2173,8 @@ def run_lock_fixture(plant: str) -> int:
                     expect(rc == 1 and "another govkit write holds" in out and "reclaim" in out,
                            "the take did not refuse with the holder described and the remedy naming the reclaim")
                     expect(lock.read_bytes() == before, "a refusing take changed the lock")
-                    expect({"lock-live": f"pid {holder} ", "lock-foreign-host": "gk-elsewhere.invalid",
+                    expect({"lock-live": f"pid {holder} ", "lock-live-slow-census": f"pid {holder} ",
+                            "lock-foreign-host": "gk-elsewhere.invalid",
                             "lock-unreadable": "no readable pid"}[plant] in out, "the refusal does not describe the holder")
             elif plant == "lock-race":
                 plant_lock(dead_pid(), time.time() - 30)

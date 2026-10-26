@@ -3469,7 +3469,8 @@ def check_step_walk() -> None:
     reused holder and its refusal of a live, foreign or unreadable one, the guard's race and its dead
     holder, and the walk inside `update` with its staging journal across a kill. The `schema-3` plants
     are TOOL-dSafePassage-15's AC1 to AC4: a schema-3 receipt walks through the schema step, recording
-    nothing until its up lands schema 4. Each plant's failing case is staged by the plant; the fixture
+    nothing until its up lands schema 4. `lock-live-slow-census` is TOOL-dSafePassage-22's AC1: a live
+    holder behind a census three seconds slow still reads live. Each plant's failing case is staged by the plant; the fixture
     prints `<family>: FAILED` on any unmet expectation."""
     us_py = HERE / "upgrade_steps.py"
     for family, plant, want, needles in (
@@ -3498,6 +3499,8 @@ def check_step_walk() -> None:
             ("lock", "lock-dead", 0, ("govkit update — reclaimed ", "lock: taken")),
             ("lock", "lock-reused", 0, ("a reused pid", "lock: taken")),
             ("lock", "lock-live", 1, ("refusing rather than joining in: live, ", "reclaimed by the next run")),
+            ("lock", "lock-live-slow-census", 1, ("refusing rather than joining in: live, ",
+                                                  "reclaimed by the next run", "lock: the planted lock unchanged")),
             ("lock", "lock-foreign-host", 1, ("unknown, it was taken on host 'gk-elsewhere.invalid'",
                                               "is reclaimed by the next run")),
             ("lock", "lock-unreadable", 1, ("unknown, its record names no readable pid",
@@ -3522,7 +3525,8 @@ def check_step_walk() -> None:
         p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
-        tag = "dSP-15" if (plant or "").startswith("schema-3") else "dSP-2"
+        tag = ("dSP-15" if (plant or "").startswith("schema-3")
+               else "dSP-22" if plant == "lock-live-slow-census" else "dSP-2")
         check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
               p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
 
