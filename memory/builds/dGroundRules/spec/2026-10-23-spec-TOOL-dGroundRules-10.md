@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0016@df63b6eb whole
 
@@ -10,9 +10,21 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dGroundRules-10-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-10-ledger.md) | journal | — |
+| [2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md](../build/2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md) | deviation | — |
+| [2026-10-25-build-TOOL-dGroundRules-1-runlog-28554d7f.md](../build/2026-10-25-build-TOOL-dGroundRules-1-runlog-28554d7f.md) | journal | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-52 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70 TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-84 TOOL-dGroundRules-85 TOOL-dGroundRules-86 |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 |
+| [2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-divergence-2-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-divergence-2-brief.md) | research | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-divergence-brief.md) | research | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-span-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dGroundRules-25-arm-breaks-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-25-arm-breaks-brief.md) | research | TOOL-dGroundRules-25 TOOL-dGroundRules-21 |
+| [2026-10-25-prompt-TOOL-dGroundRules-9-close-arms-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-9-close-arms-brief.md) | research | TOOL-dGroundRules-9 TOOL-dGroundRules-11 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
+| [2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md](../reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-52 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70 TOOL-dGroundRules-71 |
 
 <!-- /gen:spec-records -->
 
@@ -54,8 +66,10 @@ do not exceed it.
 - **S3** — The landing regeneration. A `[[generated]]` row in `tools/policy/kit.toml`, `stage = 1`,
   whose `write` and `check` argv are the two S2 modes, so `tools/run-gates/regen.py --write` renders
   it at the merge commit of every landing (`tools/push-main.sh:749-772`) and `--check` grades it
-  before a bar's first leg. Gov's own `.claude/settings.json` is rendered in this unit. Observed by
-  AC5.
+  before a bar's first leg. The builder does not render gov's own `.claude/settings.json`: rewriting
+  it changes the configuration of the session running in this worktree. The main loop renders it at
+  the close, before the bar, through this row's regeneration,
+  `python tools/run-gates/regen.py --write`, and observes AC5 then. Observed by AC5.
 - **S4** — agent-cap's retirements, in `tools/hooks/agent-cap.js`:
   - rule 4, the direct-spawn slot ledger: `guardAgentSpawn`, `sweepTurns`, `gitCommonDir`,
     `SLOT_TTL_MS` and every helper only they call;
@@ -66,15 +80,24 @@ do not exceed it.
     unused `CAP`, so no value outside 1 to 5 is refused and the hook reads no conf;
   - the refusal of a set `AGENT_CAP` (`:2241-2257`) and the `--print-cap` print mode (`:2191-2211`).
   Rules 0, 2, 5 and 6 and the `--only=` selector stay. Rule 2's bound is `MAX_VERIFIERS`, the
-  review protocol's verify total (§8 F2). `KIT_AGENT_CAP_VERSION` moves to `'2.0'` and the header
-  states only the kept rules. Observed by AC6, AC7, AC8, AC9.
+  review protocol's verify total (§8 F2). The header states only the kept rules. No version marker
+  moves on the branch: `KIT_AGENT_CAP_VERSION` and the `gov:kit agent-cap@` markers in
+  `tools/hooks/format-guard.js` and `tools/hooks/scratch-guard.js` keep their value. The landing
+  mints the next minor, 1.41: `cmd_mint` adds one to the last component and does not choose a bump
+  size (`tools/govkit/govkit.py:13491-13495`); a major bump for the retirements is the owner's call,
+  named in the wrap-up. The retirements take the file from 2427 lines to 1960, past line citations
+  in two other builds' specs; editing those is an outside write this build's README refuses, and
+  padding the file is dead bytes, so the unit waives the graded ones and asks for re-citation, as
+  §4 "The stranded citations" states (§8 F7). They also reach five readers §4
+  "The other readers" names. Observed by AC6, AC7, AC8, AC9.
   **Readers:**
   by name: `tools/workflows/check-verifier-fanout.sh`, `tools/workflows/check-protocol-parity.test.sh`,
   `tools/workflows/check-verifier-fanout.test.sh`, `tools/hooks/agent-cap.test.sh`,
   `tools/govkit/selftest.py`, `tools/workflows/unattended-build.test.sh`, `tools/workflows/kit.toml`,
   `tools/workflows/REVIEW-PROTOCOL.template.md`, `memory/guides/REVIEW-PROTOCOL.md`, `README.md`,
   `WIRE-INTO-PROJECT.md`, `tools/hooks/README.md`, `tools/check-wiring.sh` (a comment naming the
-  `AGENT_CAP` class, kept as history).
+  `AGENT_CAP` class, kept as history), `tools/workflows/check-review-join.test.sh`,
+  `tools/roles/adopt-roles.test.sh`, `.lexicon.conf`, `help/policy.md`, `tools/policy/README.md`.
   by value: `tools/workflows/check-protocol-parity.test.sh` renders `{{FANOUT_CAP}}` from the
   print mode's answer, and `tools/workflows/check-verifier-fanout.sh` prints it on its clean line.
 - **S5** — Rule 7, the settings in force, in `tools/hooks/agent-cap.js`, run for every `Agent` and
@@ -82,8 +105,9 @@ do not exceed it.
   beside the hooks kit, as `resolveHarnessName` probes the workflows kit (`agent-cap.js:109-117`); with
   none there it adds no rule. It reads the landed limit with `readPolicy("runtime.agents-in-flight",
   { repo })` (TOOL-dGroundRules-5), then `.claude/settings.json` and `.claude/settings.local.json` at
-  the payload `cwd`'s checkout root, and takes for each of the two harness variables the value the
-  harness applies, the local file's when set and else the project file's. It refuses, exit 2, when
+  the payload `cwd`'s checkout root; when that `cwd` lies in no checkout it adds no rule, a case
+  TOOL-dGroundRules-21 S38 later makes refuse. It takes for each of the two harness variables the
+  value the harness applies, the local file's when set and else the project file's. It refuses, exit 2, when
   either is absent, not a positive integer, or above the limit, naming the file, the variable, both
   numbers and `python tools/policy/policy.py settings --write`. A `PolicyRefusal` refuses with its
   line. After rule 7 an `Agent` call exits 0. Observed by AC10, AC11.
@@ -137,6 +161,7 @@ do not exceed it.
 - **consumes-from** `TOOL-dGroundRules-3` — the resolution order whose result S1 lowers
 - **consumes-from** `TOOL-dGroundRules-5` — `readPolicy` in `tools/policy/policy-mirror.js` and its `PolicyRefusal`, which rule 7 calls, and `arm_mirror_landed`, whose fixture hook S8 replaces with `tools/hooks/agent-cap.js`
 - **hands-off** external — dWellOiledMachine: the in-flight ledger, the admission queue, the session total and the ultracode exemption (`gap-rt-35`)
+- **hands-off** external — aOrientedCast's TOOL-aOrientedCast-28 and dFairHearing's TOOL-dFairHearing-22: citing `agent-cap.js` by symbol where they cite lines this unit moves, which retires the waiver rows §4 "The stranded citations" adds
 - **hands-off** external — dSafePassage: the step that moves `FANOUT_CAP` into the key and retires `.agent-cap.conf`
 - **hands-off** `TOOL-dGroundRules-15` — the conf lowering moved from the `resolve` wrapper into `resolve_read` (finding 2)
 - **hands-off** `TOOL-dGroundRules-18` — the writer marker `gov:fixed-writers`, whose split rule 2 judges against the limit while verifiers stay at `MAX_VERIFIERS` (finding 13)
@@ -180,10 +205,86 @@ past the landed limit.
 `main()` keeps, in order: the `--only=` selector, the payload parse and tool filter, rule 6, rule 7,
 an `Agent` exit 0, rule 0, the script read, rule 2 with its deny message naming `MAX_VERIFIERS` where
 it named `EFFECTIVE_CAP` and `renderCapSource()`, and rule 5. `boundedK` compares against
-`MAX_VERIFIERS`. Rule 2's remedy keeps `boundedParallel(..., MAX_VERIFIERS)` as an example only. The
-suite drops the arms of the retired rules (`tools/hooks/agent-cap.test.sh:1214-1227`, `:1237-1322`,
-`:1917-2001` and the rule 1 and rule 3 corpora) and gains the arms §7 declares. A slot-ledger
-directory an earlier version left under the git common dir is read by nothing and left in place.
+`MAX_VERIFIERS`. Rule 2's remedy keeps `boundedParallel(..., MAX_VERIFIERS)` as an example only. A
+slot-ledger directory an earlier version left under the git common dir is read by nothing and left in
+place.
+
+### The suite after this unit
+
+The suite drops the arms of the retired rules (`tools/hooks/agent-cap.test.sh:1214-1227`, `:1237-1322`,
+`:1917-2001` and the rule 1 and rule 3 corpora) and gains the arms §7 declares. Its update also covers
+the two places where the retirements and rule 7 reach arms that stay:
+
+- **The rule-6 section** (`tools/hooks/agent-cap.test.sh:2355`) builds a checkout, `$HOREPO`, with a
+  bare `.git` and no settings files, so under rule 7 its admit arms would exit 2: AC1's rendered
+  handoff and CRLF variant, AC3's sixth call, AC4's two harness calls, AC5's no-index spawn and
+  inline script, OC27's unit-less handoff and OC14 AC4's index-less checkout. The section's arms run
+  on a copy of the hook in a scratch directory with no `policy` kit beside it, where rule 7 adds no
+  rule (S5). Its refusal arms do not move, since rule 6 decides before rule 7. The slot-ledger
+  checks in that section, `tools/hooks/agent-cap.test.sh:2456-2460`, `:2482-2486` and `:2502-2506`,
+  read the ledger rule 4 kept and are deleted with it, their spawn arms kept. The `--only=scripts`
+  arm at `tools/hooks/agent-cap.test.sh:2517`, which asserts rule 1's `raw parallel()/pipeline()`
+  text, takes a script that spawns one agent per item and asserts rule 2's
+  `spawns one agent per item`, so it still shows that selector runs the script rules.
+- **The no-denial-lost property** (`tools/hooks/agent-cap.test.sh:2046-2281`, against the BASE hook
+  `GOV_BASE_SHA`, `d65da7ab`). A BASE denial that came from a rule this unit retires is an expected
+  loss, excluded by name and never counted as a lost denial. The runner records the BASE run's
+  stderr, which its sink now discards (`:2147`), and names the rule by the denial's opening text:
+  rule 1's `raw parallel()/pipeline()`, rule 3's
+  `a bound is written here that this file cannot resolve`. BASE runs rule 2 before both, so their
+  text means rule 2 admitted the payload there; the exclusion also requires BASE under
+  `--only=join`, passed in the `argv` the runner hands the hook, to admit it, so a rule-5 denial is
+  never hidden behind a retired one. Each exclusion prints `RETIRED rule <n>: <path>`, the summary
+  line counts them, and every other admitted BASE denial still counts as lost or ratified, as now. The
+  property's own fixtures that hit those rules, run against `d65da7ab` on 2026-10-24, are
+  `backtick-in-regex.js` and `exposed-backtick.js` (rule 3, a width of 50) and
+  `template-borne-comment.js` (rule 1). `seq-marked-bounded.js`, `seq-unmarked-braceless.js` and
+  the six nesting-matrix files BASE denies are rule 2's and stay counted; BASE admits the other four,
+  so they never enter the comparison. The property's payloads carry a `cwd` in no checkout, so
+  rule 7 adds no rule to them.
+
+The rule-6 section's hook copy carries `scratch-guard.js` beside it, which the hook requires from its
+own directory (`agent-cap.js:1887`, `:2160`).
+
+### The other readers
+
+- `tools/workflows/check-review-join.test.sh:207` provokes the predicate's own refusal with
+  `env AGENT_CAP=7`, which S4 retires. The arm keeps its expected text and takes the refusal from a
+  stub `agent-cap.js` in a fixture checkout that, under `--only=join`, exits 2 printing no line
+  opening two spaces and `L`, placed as the `badstatus` fixture places its stub (`:213-225`).
+- `tools/roles/adopt-roles.test.sh` arms 6 (`:158`) and 11 (`:413`) run gov's hook in a fixture with
+  no settings, where rule 7 would refuse their admits. Each runs a copy of the hooks kit's
+  `agent-cap.js` and `scratch-guard.js` in a scratch directory with no `policy` kit beside it, as the
+  rule-6 section does (S5).
+- `.lexicon.conf:317`: `VERB_OFFENDER_PIN` 1213 to 1204, nine offenders leaving with the retired
+  code, under a `RE-MEASURED` comment naming them, as the comments above it do.
+- `help/policy.md:8-9`: "No gate or hook reads a value through it yet" goes stale; the page names
+  rule 7's read and the settings render, and points at `help/agent-limit.md`.
+- `tools/policy/README.md`: the CLI list gains the `settings` verb and `check_policy.py --live`, the
+  files table's `policy.py` row (`:22`) gains `read_legacy_fanout`, `render_settings` and `settings`,
+  and the lead's "no consumer calls the reader yet" and "no hook reads it yet" (`:8-13`) drop.
+
+### The stranded citations
+
+The cites join (`tools/check-spec-tokens.py:1588-1596`) reds a backticked `<path>:<line>` past a
+tracked file's end, in OPEN, SPECCED, INPROGRESS or BLOCKED specs only (`LIVE`, `:299`). At 1960
+lines TOOL-aOrientedCast-28 (OPEN) cites `:2092` and `:1972-1994` past it. TOOL-dFairHearing-22's
+`:2269-2272` gets no row: that spec is DEFERRED, ungraded, so a row would red as stale; it reds only
+when the spec leaves DEFERRED in its own build. By §8 F7, in the commit that shrinks the file:
+
+- `memory/project/spec-token-waivers.txt` gains one row per token, keyed
+  tools/hooks/agent-cap.js:2092 and tools/hooks/agent-cap.js:1972,
+  each reason naming `[cite]`, the other build's live spec, that this unit's retirements moved the
+  lines, the ask below and the count, 26 rows to 28 (34 lines to 36), under ER:388 (dGroundRules);
+- `memory/builds/dGroundRules/BACKLOG.md` gains one ask row, the build's next unminted id, asking
+  both units to cite `agent-cap.js` by symbol, accepted when both do and the two rows leave in
+  TOOL-aOrientedCast-28's re-citing commit, with a `SEV` row (LOW) and a `KEEP` row (the cure is outside this build's writes);
+- `memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md` (the next
+  free number if 72 is taken), per `memory/HYGIENE.md` "Deviation records": Departs from
+  `TOOL-dRetiredFork-20@rev-2`; Risk loosening; Follow-through `ask` that row;
+  `**Bound:** spec-token-waivers shrink-only count`; `**Tier:** middle` (the registry header's rule,
+  no clause's); `**Reason:**` naming F7's refused options;
+  `**Surface:** memory/project/spec-token-waivers.txt` (F8).
 
 ### Migration
 
@@ -198,7 +299,8 @@ directory an earlier version left under the git common dir is read by nothing an
 
 ### Rollout
 
-Live at landing: the landing's regeneration renders gov's settings, every session started after it
+The builder leaves gov's `.claude/settings.json` alone; the main loop's render at the close, before
+the bar, writes it (S3). Live at landing: the landing's regeneration renders gov's settings, every session started after it
 runs under them, and rule 7 refuses spawns in a worktree whose settings are missing or above the
 landed limit until `policy.py settings --write` is run there.
 
@@ -214,7 +316,11 @@ landed limit until `policy.py settings --write` is run there.
 `tools/workflows/drift-audit-state.js` · `tools/workflows/unattended-build.js` ·
 `tools/workflows/kit.toml` · `tools/workflows/README.md` · `tools/workflows/REVIEW-PROTOCOL.template.md` ·
 `memory/guides/REVIEW-PROTOCOL.md` · `tools/govkit/selftest.py` · `README.md` ·
-`WIRE-INTO-PROJECT.md` · `help/agent-limit.md` · `help/README.md`
+`WIRE-INTO-PROJECT.md` · `help/agent-limit.md` · `help/README.md` ·
+`tools/workflows/check-review-join.test.sh` · `tools/roles/adopt-roles.test.sh` · `.lexicon.conf` ·
+`help/policy.md` · `tools/policy/README.md` · `memory/project/spec-token-waivers.txt` ·
+`memory/builds/dGroundRules/BACKLOG.md` ·
+`memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md`
 
 ### Alternatives rejected
 
@@ -271,9 +377,11 @@ landed limit until `policy.py settings --write` is run there.
   policy write of `6`, `policy.py settings --check` exits 1 naming both keys, and after `--write`
   both hold `"6"` and `--check` exits 0.
   Red when: either key is absent or keeps the earlier value after the second render.
-- **AC5** — When `python policy.py settings --check` runs over this repository at the
-  unit's commit, it exits 0, and `python tools/run-gates/regen.py --list` lists the S3 row.
+- **AC5** — When the main loop, at the close and before the bar, has rendered this repository's
+  settings through `python tools/run-gates/regen.py --write`, `python policy.py settings --check`
+  exits 0, and `python tools/run-gates/regen.py --list` lists the S3 row.
   Red when: a hand edit sets either `env` value in `.claude/settings.json` to `50`.
+  permission: rewrites the settings of the session in this worktree; the main loop's, at the close, never the builder's.
 - **AC6** — When the run reaches `limit-hook-admits-eight`, a fixture whose `.claude/roles.json`
   declares one `agent`-true role and one harness, under a landed limit of eight with settings
   rendered at eight and `FANOUT_CAP=8` planted in `.agent-cap.conf`, a handoff-valid `Agent` payload
@@ -304,18 +412,18 @@ landed limit until `policy.py settings --write` is run there.
   exits 2 naming the local file; and when `arm_mirror_landed` runs its case with the working-tree
   `policy.json` hand-edited to `8`, the real hook refuses settings at `3`.
   Red when: rule 7 reads only the project file, or reads the working-tree mirror.
-- **AC12** — When the four renders are regenerated in this repository, `grep -c "const MAX_VERIFIERS
-  = 5" tools/workflows/tier2-review.js` prints at least 1 and `grep -n "boundedParallel(thunks, cap
-  = " tools/workflows/tier2-review.js` shows the value `policy.py get runtime.agents-in-flight`
-  prints.
+- **AC12** — When the four renders are regenerated in this repository,
+  `grep -c "const MAX_VERIFIERS = 5" tools/workflows/tier2-review.js` prints at least 1 and
+  `grep -n "boundedParallel(thunks, cap = " tools/workflows/tier2-review.js` shows the value
+  `policy.py get runtime.agents-in-flight` prints.
   Red when: the token still renders the print mode's `5`, or `MAX_VERIFIERS` renders the limit.
   figure: the width is DERIVED from the reader at observation time.
 - **AC13** — When each of the four renders is piped as a `Workflow` script through
   `node tools/hooks/agent-cap.js --only=scripts`, each exits 0.
   Red when: a template still writes `const MAX_VERIFIERS = {{FANOUT_CAP}}` and rule 2 refuses a
   render above `MAX_VERIFIERS`.
-- **AC14** — When `git grep -n "AGENT_CAP\|print-cap\|FANOUT_CAP" -- README.md WIRE-INTO-PROJECT.md
-  tools/workflows/REVIEW-PROTOCOL.template.md memory/guides/REVIEW-PROTOCOL.md tools/hooks/README.md`
+- **AC14** — When
+  `git grep -n "AGENT_CAP\|print-cap\|FANOUT_CAP" -- README.md WIRE-INTO-PROJECT.md tools/workflows/REVIEW-PROTOCOL.template.md memory/guides/REVIEW-PROTOCOL.md tools/hooks/README.md`
   runs, no line it prints says a set `AGENT_CAP` is refused, names the print mode, or calls
   `FANOUT_CAP` a ceiling of five; and `agent-limit.md` names `runtime.agents-in-flight` and
   `policy.py settings --write`.
@@ -339,15 +447,19 @@ landed limit until `policy.py settings --write` is run there.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `hook destinations self-test` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `agent-cap restatement` · `kit version markers` · `memory hygiene`
+`agent-cap self-test` · `scratch-guard self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `hook destinations self-test` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `agent-cap restatement` · `kit version markers` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)` · `roles adopter self-test` · `straggler-guard arms` · `kit epoch (shipped bytes move, the version moves)`
 
 New arm: tools/policy/check_policy.py --fixture · covers AC1 AC2 AC3 AC4 AC6 AC7 AC8 AC9 AC10 AC11 · the `limit-` cases in `CASES`, each planting its input in the temporary repository and asserting its outcome, in the `policy fixtures` leg TOOL-dGroundRules-1 declares · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC6 AC7 AC8 AC9 AC10 · a conf at `FANOUT_CAP=8`, six spawns in one prompt, a raw `parallel` script, a width of 50 and a set `AGENT_CAP`, each admitted, and settings above a fixture limit refused, staged by running each arm against the base revision's hook, `git show 3708a705:tools/hooks/agent-cap.js` in the suite's scratch copy · none
 New arm: tools/govkit/selftest.py · covers AC12 · its fixture renderer arm, re-pointed from the print mode to the policy reader, staged by an absent `policy` kit · none
 New arm: tools/workflows/unattended-build.test.sh · covers AC12 · its renderer arm at line 1997, re-pointed to the policy reader, staged by a reader answering a non-integer · none
 
-AC5, AC13 and AC14 are probes the close reads directly; AC13 is also the `verifier fan-out` leg's
+AC5, AC13 and AC14 are probes the close reads directly, AC5 after the main loop's settings render
+(S3); AC13 is also the `verifier fan-out` leg's
 verdict. AC15 to AC17 are the main loop's live observation at the close, and no suite runs them.
+`kit version markers` and `kit epoch (shipped bytes move, the version moves)` are graded at the close,
+after the landing mints the next minor (S4). The added legs are those §4's new files trip by
+`tools/gate-legs.json`'s guards (`python tools/check-spec-tokens.py --list`), and `roles adopter self-test`.
 
 ## 8. Open questions
 
@@ -397,11 +509,33 @@ verdict. AC15 to AC17 are the main loop's live observation at the close, and no 
   and leaves the mirror helper with no consumer. Rule 7 is a bound this spec adds beyond the clause,
   the weakest tier, and it satisfies every criterion the clause states. Recommendation (b); rung 3.
   RESOLVED (agent, 2026-10-23, delegated): (b). widens: none · relaxes: none
+- **F7 — How does the unit meet the citations its retirements strand in other builds' live specs?**
+  (a) Waive each token and ask both builds to cite by symbol, relaxing the shrink-only registry's
+  count (§4 "The stranded citations"). (b) Revise both specs: an outside write this build's README
+  refuses (`memory/builds/dGroundRules/README.md:48-49`), veto 2 outside the grant. (c) Pad
+  `agent-cap.js` to its old length: dead bytes. Rung 5: RESOLVED (agent, 2026-10-24, delegated): (a),
+  citing ER:388 (`PLAY-dClosedLoop-6`), the main loop's ruling, recorded as deviation-72. The commit's
+  `Decided:` trailer carries the keys F8 rules.
+  widens: memory/project/spec-token-waivers.txt · relaxes: spec-token-waivers shrink-only count
+- **F8 — Which `widens:` does F7's trailer carry?** The close's `deviations.py --check`
+  (`memory/builds/dGroundRules/README.md:39-42`) reds a trailer citing ER:388 with `widens: none`
+  (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py:860-861`).
+  (a) ER:388 with `widens: memory/project/spec-token-waivers.txt` beside F7's `relaxes:`, the record
+  gaining that `**Surface:**`, as dTrueNorth's waiver trailers do (`0c0d1bb0e`, `55c7df4a9`). (b)
+  ER:328 with `widens: none`, which the arm admits, respelling the ruling. (c) As F7 states: the
+  close reds. Recommendation (a): it keeps the ruling and its `relaxes:`. RESOLVED (agent,
+  2026-10-24, delegated): (a), citing ER:388 and the dTrueNorth precedent (`0c0d1bb0e`,
+  `55c7df4a9`): the trailer carries the keys below, and deviation-72 gains that `**Surface:**`.
+  widens: memory/project/spec-token-waivers.txt · relaxes: spec-token-waivers shrink-only count
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
-- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-15, TOOL-dGroundRules-18, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-2 · 2026-10-23 · §3 · hands-off edges to TOOL-dGroundRules-15, -18, -20 and -21, reciprocals of the round-1 spec audit's promoted units; no scope, design or acceptance moved.
+- rev-3 · 2026-10-24 · §6 · AC12, AC14: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
+- rev-4 · 2026-10-24 · §2 S3, S5 · §4 · §6 AC5 · §7 · the builder's first DIVERGENCE (check 49): §7 adds `policy fixtures`; the main loop, not the builder, renders gov's settings at the close (S3, AC5); rule 7 adds no rule outside a checkout (S5); §4's suite section: hook copy for the rule-6 arms, slot-ledger checks deleted, `--only=scripts` asserts rule 2, retired-rule BASE denials excluded by name.
+- rev-5 · 2026-10-24 · §2 S4 · §3 · §4 · §7 · §8 F7, F8 · §10 · the builder's second DIVERGENCE (check 49): stranded `agent-cap.js` citations waived per token under ER:388 with an ask row and deviation-72 (F7); five more readers named, hook copies carrying `scratch-guard.js`; no version marker moves on the branch; §7 adds `spec tokens`, `roles adopter self-test`, `straggler-guard arms`, `kit epoch`; the ask takes `KEEP`; F8 ruled (a), `widens:` the registry. Revision log condensed for the size ceiling.
+- rev-6 · 2026-10-24 · §2 S4 · §4 · §7 · §9 · the third builder's measurements: (1) `tools/check-spec-tokens.py` grades only `LIVE` specs (`:299`, `:153`), and TOOL-dFairHearing-22 is DEFERRED, so `:2269` yields no hit and a row for it reds as stale: two rows, 26 to 28 (34 lines to 36), the ask still naming both specs; (2) `cmd_mint` adds one to the last component (`tools/govkit/govkit.py:13491-13495`), so the landing mints agent-cap 1.41, and a major bump is the owner's call, named in the wrap-up.
 
 ## 10. Reuse audit
 
@@ -418,7 +552,9 @@ moved into the reader, so the conf keeps one parser. The kit locators are the in
 the hook. The mirror read is `readPolicy`, TOOL-dGroundRules-5's. Recall hit [6]
 (`2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-b.md:119`) says the clause retires only the
 ledger, the conf, the refusal and the print mode; the clause at `df63b6eb` also retires the raw
-primitive ban and the bound rule's concurrency half, and the clause governs.
+primitive ban and the bound rule's concurrency half, and the clause governs. The stranded citations
+reuse dTrueNorth's waiver rows (`memory/project/spec-token-waivers.txt:32-34`), each under ER:388
+with its ask in that build's own `BACKLOG.md`.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the agent fan-out cap declared,
 lowered and read by the hook and the harness renderer" --terms "agent-cap FANOUT_CAP print-cap slot

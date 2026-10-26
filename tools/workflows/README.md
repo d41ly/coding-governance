@@ -24,11 +24,13 @@ argument is the leg that grades them:
 | `drift-audit-code.js`, beside its template | `drift-audit-code.template.js` | `FANOUT_CAP` |
 | `drift-audit-state.js`, beside its template | `drift-audit-state.template.js` | `FANOUT_CAP` |
 
-**`FANOUT_CAP` is the agent-cap hook's own declaration** (TOOL-aRepatriatedFork-7): `FANOUT_CAP=<n>` in
-`.agent-cap.conf` at the checkout root, ANSWERED by the hook (`agent-cap.js --print-cap`) rather than
-parsed here, so the value rendered is the value enforced and a repo that
-lowers its cap receives harnesses its hook admits. No conf renders the ceiling, byte-identical to the
-harnesses as they shipped before. A value the hook would refuse makes the render refuse too. The
+**`FANOUT_CAP` is the agent limit** (TOOL-dGroundRules-10, which re-pointed TOOL-aRepatriatedFork-7's
+token from the agent-cap hook): `runtime.agents-in-flight` as the policy kit's reader answers it at
+HEAD, `policy.py get runtime.agents-in-flight --rev HEAD`, a `FANOUT_CAP` lowering in `.agent-cap.conf`
+included, so a policy write and the widths rendered from it land together. It carries the concurrency
+widths and the build harness's `SPEC_WRITERS`, never the verify total: the review and drift-audit
+templates write the agent-cap hook's `MAX_VERIFIERS` as a literal. No policy kit, a refused read, or an
+answer that is not a positive integer makes the render refuse, naming why. The
 three harnesses beside the build harness moved from `engine` to `rendered` at review-harness 1.9, and
 an install from before that migrates them the way the build harness migrated at 1.8, below. A
 `*.template.js` is a render source, not a harness: the verifier fan-out and syntax gates judge its
@@ -82,7 +84,7 @@ again with it unset.
 its tool root, so the tool root plus `memory-tree/` is not an answer. The render takes the first
 TRACKED of `{{TOOL_ROOT}}memory-tree/gotchas.py` and `{{TOOL_ROOT}}gotchas.py`. When neither is
 tracked it SKIPS the harness pair out loud and still renders and grades the protocol, because this
-kit requires only agent-cap and an install without the memory-tree kit is legal. If yours is
+kit requires only agent-cap and policy, and an install without the memory-tree kit is legal. If yours is
 somewhere else, run the render with `MEMORY_TREE_DIR=<dir>` exported; an override naming nothing
 tracked is refused. That override comes only from the environment, so a tree that needs it on its
 bar exports it there too. A template in this directory with no pair in the script is a red, so a

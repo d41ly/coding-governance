@@ -1,75 +1,63 @@
 #!/usr/bin/env node
 /**
- * agent-cap — project-agnostic PreToolUse guard against unbounded agent fan-out.
+ * agent-cap — project-agnostic PreToolUse guard on the `Workflow` and `Agent` tool calls.
  *
- * WHY: `Workflow` `parallel()` / `pipeline()` fan out to the harness cap
- * (min(16, cores-2) ≈ 14). Large concurrent agent bursts saturate server
- * throughput and trip the SERVER rate limiter — killing whole review phases
- * and burning millions of subagent tokens for zero output. That cap is NOT
- * lowerable from userland, and a script's own `agent()` is a runtime call and
- * not a TOOL call, so no matcher ever sees it — so the only preventive lever
- * is to scan the Workflow *tool call* (a main-loop call that DOES fire
- * PreToolUse) and reject scripts that use the raw fan-out primitives instead
- * of the capped helpers.
+ * THE AGENT LIMIT IS NOT THIS FILE'S (TOOL-dGroundRules-10). How many agents run at once is the policy
+ * key `runtime.agents-in-flight`, which the policy kit renders into the harness's own two concurrency
+ * settings in `.claude/settings.json` (`policy.py settings --write`). The harness counts agents in
+ * flight and knows when each one ends, which a PreToolUse hook cannot. What a call-time check CAN see
+ * is the settings files the harness started from, and RULE 7 holds them to the landed limit.
  *
- * CONTRACT: route ALL fan-out through boundedParallel(thunks, CAP) /
- * boundedPipeline(items, CAP, ...stages). The sanctioned helper bodies are the
- * ONLY place a raw `parallel(`/`pipeline(` may appear, and each such line
- * carries a `gov:bounded-fanout` marker. Any other raw primitive call = deny.
+ * THE RULES IT KEEPS, in the order `main()` runs them: rule 6, rule 7, then an `Agent` call is admitted;
+ * a `Workflow` call goes on to rule 0, the script read, rule 2 and rule 5.
  *
- * TWO MODALITIES, not one. A `Workflow` call is read STATICALLY (its script).
- * A direct `Agent` call carries no script, so it is counted at RUNTIME: each
- * spawn claims a numbered slot with O_EXCL under a session+prompt-keyed dir in
- * the git common dir, and the spawn that finds every slot taken is denied. The
- * budget resets on the next user prompt. Agents spawned INSIDE a workflow
- * sidechain remain uncounted and always will be — the script's `agent()` is
- * not a tool call, so no matcher covers it. NOT because a sidechain runs no
- * hooks: it does, and RULE 4 carries the measurement.
+ * RULE 6 (TOOL-aOrientedCast-7) — every agent prompt is a rendered handoff. Armed by
+ * `.claude/roles.json` at the checkout root of the payload `cwd`, else of `CLAUDE_PROJECT_DIR`
+ * (TOOL-aOrientedCast-14; neither resolving adds no rule, with one stderr line when
+ * `CLAUDE_PROJECT_DIR` is set), read through the sibling hook's `resolveRoleRoot` and `loadRoleIndex`:
+ * absent adds no rule; broken refuses both tools; no `agent`-true role refuses every `Agent` call, and
+ * an empty `harnesses` list every `Workflow` call, as UNARMED. An `Agent` call is admitted only when
+ * its `subagent_type` is an `agent`-true role and its `prompt` is, line endings folded and its ends
+ * trimmed, exactly one `gov:handoff` marker line naming that role, blank lines, and the `## Task`
+ * section of the file the marker's `path` names under `builds/<build>/prompts/`, that file holding the
+ * same single marker and a section whose SHA-256 prefix is the marker's `task-sha`, and its
+ * `description`, ends trimmed, the name the renderer prints on stderr: `<build> · <unit> · <workflow>`
+ * from the marker and the index's `workflow` for that role, the unit part left out for a `-` unit
+ * (TOOL-aOrientedCast-27). That step stops a stale or freeform name, never a forged one. A `Workflow`
+ * call is admitted only by a `scriptPath` listed in `harnesses`, with `args.roles` a non-empty object
+ * whose every value is an `agent`-true role. Skipped under `--only=`. A throw inside it refuses.
+ * CEILING, said rather than implied: it stops forgetting, not evasion. A hook-less or `--bare` run,
+ * the agents a running harness spawns through its own `agent()`, a session-to-session message, a
+ * self-consistent hand-written prompt file and a hand-edited index all pass it, and it never compares
+ * `role-sha` with the role an agent type was rendered from.
  *
- * ONE RULE HERE IS NOT A FAN-OUT BOUND. RULE 0 (TOOL-aBlindedTrial-6) denies a `Workflow` call whose
- * structured `args` carry `kind: "spec-audit"` unless the build README under `args.repo` declares
- * `spec-audit: <YYYY-MM-DD>` in its front matter, or (TOOL-aBlindedTrial-7) that README carries no
- * key and `<args.repo>/.unattended.conf` declares `SPEC_AUDIT_DEFAULT="<YYYY-MM-DD>"`. What it does
- * NOT see, said here rather than
- * implied: the `workflow()` a running harness calls from INSIDE its script is a runtime call and not
- * a tool call, so the programmatic route is the driver's to refuse (TOOL-aBlindedTrial-3); an `args`
- * string that does not parse shows it no `kind`; and it reads the WORKTREE README and conf while the
- * unattended driver reads both at BASE, so the two can disagree for exactly one uncommitted edit.
+ * RULE 7 (TOOL-dGroundRules-10) — the settings in force. With the policy kit's `policy-mirror.js` in
+ * the `policy` kit beside this hooks kit, every `Agent` and `Workflow` call reads the landed limit
+ * through `readPolicy`, then every settings layer `readSettingsLayers` reads at the payload `cwd`'s
+ * checkout root, and refuses when no layer sets a harness variable, or any layer that sets one holds
+ * a value that is not a positive integer, or is above the limit (TOOL-dGroundRules-61). No policy kit beside this one adds
+ * no rule; a `cwd` in no checkout refuses, naming it (TOOL-dGroundRules-21 S38). Skipped under `--only=`. A throw inside it refuses.
  *
- * RULE 6 IS NOT A FAN-OUT BOUND EITHER (TOOL-aOrientedCast-7): every agent prompt is a rendered
- * handoff. Armed by `.claude/roles.json` at the checkout root of the payload `cwd`, else of
- * `CLAUDE_PROJECT_DIR` (TOOL-aOrientedCast-14; neither resolving adds no rule, with one stderr line
- * when `CLAUDE_PROJECT_DIR` is set), read through the
- * sibling hook's `resolveRoleRoot` and `loadRoleIndex`: absent adds no rule; broken refuses both tools; no `agent`-true role
- * refuses every `Agent` call, and an empty `harnesses` list every `Workflow` call, as UNARMED. An
- * `Agent` call is admitted only when its `subagent_type` is an `agent`-true role and its `prompt` is,
- * line endings folded and its ends trimmed, exactly one `gov:handoff` marker line naming that role,
- * blank lines, and the `## Task` section of the file the marker's `path` names under
- * `builds/<build>/prompts/`, that file holding the same single marker and a section whose SHA-256
- * prefix is the marker's `task-sha`, and its `description`, ends trimmed, the name the renderer
- * prints on stderr: `<build> · <unit> · <workflow>` from the marker and the index's `workflow` for
- * that role, the unit part left out for a `-` unit (TOOL-aOrientedCast-27). That step stops a stale
- * or freeform name, never a forged one. A `Workflow` call is admitted only by a `scriptPath` listed in
- * `harnesses`, with `args.roles` a non-empty object whose every value is an `agent`-true role. ORDER:
- * after the AGENT_CAP refusal and the declared-cap read, before rule 4 (so a refused spawn claims no
- * slot) and before rule 0; skipped under `--only=`. A throw inside it refuses. CEILING, said rather
- * than implied: it stops forgetting, not evasion. A hook-less or `--bare` run, the agents a running
- * harness spawns through its own `agent()`, a session-to-session message, a self-consistent
- * hand-written prompt file and a hand-edited index all pass it, and it never compares `role-sha` with
- * the role an agent type was rendered from.
+ * RULE 0 (TOOL-aBlindedTrial-6) denies a `Workflow` call whose structured `args` carry
+ * `kind: "spec-audit"` unless the build README under `args.repo` declares `spec-audit: <YYYY-MM-DD>`
+ * in its front matter, or (TOOL-aBlindedTrial-7) that README carries no key and
+ * `<args.repo>/.unattended.conf` declares `SPEC_AUDIT_DEFAULT="<YYYY-MM-DD>"`. What it does NOT see,
+ * said here rather than implied: the `workflow()` a running harness calls from INSIDE its script is a
+ * runtime call and not a tool call, so the programmatic route is the driver's to refuse
+ * (TOOL-aBlindedTrial-3); an `args` string that does not parse shows it no `kind`; and it reads the
+ * WORKTREE README and conf while the unattended driver reads both at BASE, so the two can disagree for
+ * exactly one uncommitted edit.
  *
- * CAP: 5, a FILE CONSTANT and the CEILING, never raisable. This guard RESOLVES the number
- * wherever a bound is written — the helper CALL SITE, the helper's own DEFAULT
- * PARAMETER, and the width a `gov:bounded-fanout` line claims — and denies one
- * it cannot resolve at or under the cap. Setting AGENT_CAP is REFUSED with a
- * message rather than ignored: a knob that used to appear to work is how the
- * override claim this version deletes survived two releases.
+ * RULE 2 — the verify-stage TOTAL. A review's verify stage spawns at most `MAX_VERIFIERS` agents, the
+ * review protocol's verify total, whatever the finding count: an `agent(` reached through an iteration
+ * construct must fan over a receiver this file can PROVE bounded. It reads the `Workflow` call's inline
+ * `script`, or the file its `scriptPath` names; a `name:` run supplies no source. The verify total is
+ * not the agent limit: the limit bounds how many run AT ONCE, and N findings still spawn N agents.
  *
- * A REPO MAY LOWER IT, and only lower it (TOOL-aRepatriatedFork-7): `FANOUT_CAP=<n>` in a tracked
- * `.agent-cap.conf` at the checkout root makes the enforced cap min(n, 5) at every site above and
- * for the direct-spawn slots. A value that is not an integer from 1 to 5 denies every call and
- * names the file. Absent file or key means 5. A value that can only LOWER the cap raises nothing,
- * which is why a file is admissible where the AGENT_CAP environment knob is not.
+ * RULE 5 (TOOL-dTieredTribunal-14) — the ref-keyed verdict join, refused in a script.
+ *
+ * `--only=join` runs rule 5 alone and `--only=scripts` rules 2 and 5, the rules that read a script; a
+ * WIRED command never carries either, which `check-wiring.sh` asserts.
  *
  * Wiring (per project): run `python <prefix>/settings-merge.py` (idempotent) — it merges the block
  * below into .claude/settings.json; or merge it by hand:
@@ -77,18 +65,11 @@
  *     "hooks": [ { "type": "command",
  *       "command": "node \"${CLAUDE_PROJECT_DIR}/<path>/agent-cap.js\"" } ] } ] }
  * The matcher is a LIST OF EXACT STRINGS separated by `|`, in ONE group — not a regular expression.
- * `Workflow` is where this file reads a script; `Agent` is the modality it was blind to, where a
- * direct spawn met no rule at all. Widening it is inert on its own: main() exits 0 on any tool_name
- * that is not Workflow.
+ * `Workflow` is where this file reads a script; `Agent` is where rules 6 and 7 judge a direct spawn.
+ * main() exits 0 on any other tool_name.
  * Blocks via exit 2 + stderr (version-robust; no JSON-schema dependency).
  *
- * ponytail: a static scan can't prove a dynamically-built array is ≤CAP — this
- * enforces "use the helper", killing the exact `parallel(items.map(...))`
- * pattern that causes the bursts. Ceiling: line comments AND quoted-string
- * literals are stripped before the scan; block comments naming the primitive
- * are NOT — still trips the guard (benign, fail-closed).
- *
- * WHAT A QUOTE IS, since three rules turn on it. A quote opens a string literal
+ * WHAT A QUOTE IS, since rules 2 and 5 turn on it. A quote opens a string literal
  * only where one may legally BEGIN (`checkLiteralOpen`): glued to the character
  * that ends an expression it is TEXT — the apostrophe in `don't` — and so it is
  * after a bare word that is not a JS keyword. A quote that opens nothing is left
@@ -101,10 +82,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.40' // gov:kit agent-cap@1.40 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
-// A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
-// guard exists to remove, and it leaves no diff behind when someone raises it.
-const CAP = 5
+const KIT_AGENT_CAP_VERSION = '1.41' // gov:kit agent-cap@1.41 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 
 // The review harness a deny message points at, DERIVED (TOOL-aRepatriatedFork-2 S6): probed in the
 // workflows kit beside this hook's own directory, and the bare name when that probe misses, because
@@ -414,8 +392,8 @@ function renderBlankedLiterals(script) {
 // Run one rule over BOTH views and merge. The mode is restored before returning, so a rule that
 // throws cannot leave the next one reading the wrong view. Findings merge on `n`, the 1-based line
 // number every rule's finding shape carries — and on the `why` beside it where one exists, because
-// `capFindings` can push more than one finding for a single line and keying on `n` alone would drop
-// the second.
+// a rule can push more than one finding for a single line and keying on `n` alone would drop the
+// second.
 function runBothViews(rule, script) {
   // BOTH passes are isolated, and neither may turn a crash into an admission. `main()` has no
   // top-level catch and a PreToolUse hook that exits 1 is NON-BLOCKING, so an unguarded lexed pass
@@ -449,27 +427,12 @@ function runBothViews(rule, script) {
   return lexed.concat(shipped.filter((f) => !seen.has(key(f))))
 }
 
-function offendingLines(script) {
-  // Case-sensitive: primitives are lowercase `parallel`/`pipeline`; the helpers
-  // are `boundedParallel`/`boundedPipeline` (capital P) so they never match.
-  // Lookbehind rejects `.parallel(` / `xparallel(` member/identifier hits.
-  const raw = /(?<![.\w$])(parallel|pipeline)\s*\(/
-  return script
-    .split(/\r?\n/)
-    .map((line, i) => ({ line, n: i + 1 }))
-    .filter(({ line }) => {
-      if (line.includes('gov:bounded-fanout')) return false // sanctioned helper line
-      const code = renderStrippedView(line).split('//')[0] // strings blanked, then line-comments
-      return raw.test(code)
-    })
-}
-
 // ---------------------------------------------------------------------------
 // RULE 2 — the VERIFIER ARITY rule (memory/guides/REVIEW-PROTOCOL.md).
 //
-// A review's verify stage spawns at most 5 agents WHATEVER the finding count. Rule 1 above does not
-// give that: it bounds CONCURRENCY, so N findings still spawn N agents, five at a time. Concurrency
-// is not a budget. The failure this rule exists for was written as an INLINE `script` on a Workflow
+// A review's verify stage spawns at most MAX_VERIFIERS agents WHATEVER the finding count. The agent
+// limit the harness enforces does not give that: it bounds CONCURRENCY, so N findings still spawn N
+// agents, a limit's worth at a time. Concurrency is not a budget. The failure this rule exists for was written as an INLINE `script` on a Workflow
 // tool call — never a file — which is why the check lives here, at the tool call, and not only in a
 // gate over `tools/**/*.js` that structurally cannot see one.
 //
@@ -481,8 +444,9 @@ function offendingLines(script) {
 // ALLOWED receivers:
 //   (a) an identifier assigned on a line marked `gov:fixed-verifiers`, where that line spells
 //       chunk(x, Math.ceil(x.length / K)) or splitInto(x, K) and K is an integer literal <= 5 or an
-//       identifier bound in this file to one. The marker is the AUTHOR'S CLAIM; the shape check is
-//       what stops the claim being made falsely — `chunk(all, 1) // gov:fixed-verifiers` reds.
+//       identifier bound in this file to one — or marked `gov:fixed-writers`, the same shape with K at most
+//       the landed agent limit (MAX_VERIFIERS with no policy kit). The marker is the AUTHOR'S CLAIM; the
+//       shape check is what stops the claim being made falsely — `chunk(all, 1) // gov:fixed-verifiers` reds.
 //   (b) an identifier assigned from an ARRAY LITERAL with <= MAX_LENSES elements — the finder-lens
 //       case, where the agent count is a constant visible in the source. The count drops a trailing
 //       comma; counting it as an element is what made this allowance read as 6.
@@ -495,16 +459,17 @@ const MAX_VERIFIERS = 5
 // and no shipped harness has ever had six lenses — tier2-review has four, both drift-audit waves
 // have five. With the count fixed, 5 is what the charter says and what every harness already obeys.
 const MAX_LENSES = 5
-// TOOL-aRepatriatedFork-7 S4 — the cap EVERY enforcement site reads: the call-site bound, the
-// helper's default parameter, the `gov:bounded-fanout` width, the verify-stage total and the
-// direct-spawn slots. It is `min(FANOUT_CAP, MAX_VERIFIERS)`, set ONCE by main() from the repo's
-// tracked `.agent-cap.conf` before any rule runs (a hook process judges one call), and it is 5 when
-// no conf declares one. MAX_VERIFIERS stays the CEILING: a declared value can only LOWER it, so an
-// untracked local edit is at worst stricter than the tracked one. MAX_LENSES does not move with it.
-let EFFECTIVE_CAP = MAX_VERIFIERS
-// The file that lowered EFFECTIVE_CAP, named in every message that prints the cap; '' at the ceiling.
-let CAP_SOURCE = ''
-const CAP_CONF = '.agent-cap.conf'
+// TOOL-dGroundRules-10 F2 — a VERIFIER split's comparand is MAX_VERIFIERS, the verify total. TOOL-dGroundRules-18 — a WRITER
+// split's is the agent limit (receiver (a)), read through rule 7's `readPolicy` once, only for a script carrying the marker.
+const WRITER_MARK = 'gov:fixed-writers'
+const POLICY_HELPER = require('path').join(require('path').dirname(__dirname), 'policy', 'policy-mirror.js')
+function readWriterBound(repo) {
+  if (!require('fs').existsSync(POLICY_HELPER)) return { n: MAX_VERIFIERS, key: 'MAX_VERIFIERS, as no policy kit sits beside this hooks kit' }
+  let v
+  try { v = require(POLICY_HELPER).readPolicy('runtime.agents-in-flight', { repo }).value } catch (e) { return { why: `the agent limit could not be read: ${(e && e.message) || e}` } }
+  return Number.isInteger(v) && v > 0 ? { n: v, key: 'runtime.agents-in-flight' } : { why: `runtime.agents-in-flight reads ${JSON.stringify(v)}, not a positive integer` }
+}
+
 // THE THIRD MARKER, and the only one that admits a LOOP. Spelling ratified by the owner
 // 2026-09-01: `gov:sequential-agents`, carrying its bound — `gov:sequential-agents(5)`.
 //
@@ -546,12 +511,12 @@ const LOOP_HEADER = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{
 const LOOP_HEADER_G = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{', 'g')
 const LOOP_KEYWORD_TAIL = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*$')
 
-// `K` resolved against this file: an integer literal, or an identifier bound to one. Judged against
-// EFFECTIVE_CAP, the declared lower cap where a repo has one, never above MAX_VERIFIERS.
-function boundedK(tok, consts) {
+// `K` resolved against this file: an integer literal, or an identifier bound to one, judged against
+// `bound` — MAX_VERIFIERS, or readWriterBound's for a writer split.
+function boundedK(tok, consts, bound) {
   const t = String(tok).trim()
-  if (/^\d+$/.test(t)) return Number(t) <= EFFECTIVE_CAP
-  if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t)) return consts.get(t) <= EFFECTIVE_CAP
+  if (/^\d+$/.test(t)) return Number(t) <= bound
+  if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t)) return consts.get(t) <= bound
   return false
 }
 
@@ -563,15 +528,12 @@ function boundedK(tok, consts) {
 // constant's clothes — which is exactly how two shipped harnesses raised their own verifier count
 // past the cap while this hook read the 5 and every gate stayed green. The form is left legal
 // JavaScript and stays usable for constants nothing here resolves; only its use as a RESOLVED BOUND
-// is refused, and it is recorded separately so the deny can name the form rather than shrug.
+// is refused.
 function intConsts(code) {
   const consts = new Map()
-  const orBound = new Map()
   code.forEach((l) => {
     const m = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(\d+)\s*$/.exec(l.trim())
-    if (m) { consts.set(m[1], Number(m[2])); return }
-    const o = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*[^=]*\|\|\s*(\d+)\s*$/.exec(l.trim())
-    if (o && !orBound.has(o[1])) orBound.set(o[1], Number(o[2]))
+    if (m) consts.set(m[1], Number(m[2]))
   })
   // A BARE REASSIGNMENT invalidates the binding, for the same reason it invalidates a bounded
   // receiver below: `let K = 5` followed by `K = 500` published a 5 this file could read and ran a
@@ -579,13 +541,10 @@ function intConsts(code) {
   code.forEach((l) => {
     const m = /(?:^|[;{}]\s*)([A-Za-z_$][\w$]*)\s*=[^=]/.exec(l)
     if (m && !/\b(const|let|var)\s+$/.test(l.slice(0, m.index + m[0].indexOf(m[1])))) {
-      if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) {
-        consts.delete(m[1])
-        orBound.delete(m[1])
-      }
+      if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) consts.delete(m[1])
     }
   })
-  return { consts, orBound }
+  return { consts }
 }
 
 // TOOL-dTieredTribunal-13 S2 - split an expression into its top-level VALUE branches. Depth-aware
@@ -625,13 +584,13 @@ function parseBranches(expr) {
 // array LITERAL whose top-level element count is at or under MAX_LENSES, counted with the shared
 // splitter so a trailing comma is not an element; or a bare identifier already proven bounded,
 // alone or followed by a chain of operations that cannot grow it.
-function boundedBranch(br, name, consts, ok) {
+function boundedBranch(br, name, consts, ok, bound) {
   if (br === null) return false
   const t = String(br).trim()
   if (!t) return false
   const c = /\bchunk\s*\(\s*[^,]+,\s*Math\.ceil\s*\(\s*[A-Za-z_$][\w$.]*\.length\s*\/\s*([^)]+)\)/.exec(t)
   const sp = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(t)
-  if ((c && boundedK(c[1], consts)) || (sp && boundedK(sp[1], consts))) return true
+  if ((c && boundedK(c[1], consts, bound)) || (sp && boundedK(sp[1], consts, bound))) return true
   if (t.startsWith('[') && t.endsWith(']')) return topLevelArgs(t.slice(1, -1)).length <= MAX_LENSES
   const m = /^([A-Za-z_$][\w$]*)([\s\S]*)$/.exec(t)
   if (!m || m[1] === name || !ok.has(m[1])) return false
@@ -786,7 +745,7 @@ function renderLexedView(script) {
   return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
 }
 
-function fanoutFindings(script) {
+function fanoutFindings(script, writer) {
   const lines = script.split(/\r?\n/)
   // TOOL-aLexedStripper-5: an unterminated scan falls back to the per-line view, which returns
   // the verdict this hook reached before rule 2 moved. Not a fail-closed branch: that denied a
@@ -829,7 +788,7 @@ function fanoutFindings(script) {
     // stated refusal — the two rules are separate and the marker must satisfy both.
     if (!mm) return ` — ${SEQ_MARK} carries no bound token, and a bare marker claims concurrency one with an unbounded total`
     // C4: the number is CHECKED, never trusted, and by the one resolver every other consumer uses.
-    if (!boundedK(mm[1], consts)) return ` — ${SEQ_MARK}(${mm[1]}) names a bound this file does not resolve to an integer no greater than ${EFFECTIVE_CAP}`
+    if (!boundedK(mm[1], consts, MAX_VERIFIERS)) return ` — ${SEQ_MARK}(${mm[1]}) names a bound this file does not resolve to an integer no greater than MAX_VERIFIERS (${MAX_VERIFIERS})`
     const ch = code[h] || ''
     // C5: the SHAPE is read from the literal-blanked view, so a marker sitting inside a quoted
     // string on a line that is not really a loop header blesses nothing.
@@ -876,7 +835,9 @@ function fanoutFindings(script) {
     const asg = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/.exec(l)
     if (!asg) return
     const name = asg[1]
-    if (raw.includes(FIXED_MARK)) {
+    const mark = raw.includes(FIXED_MARK) ? FIXED_MARK : raw.includes(WRITER_MARK) ? WRITER_MARK : null
+    if (mark) {
+      const bound = mark === WRITER_MARK ? writer : raw.includes(WRITER_MARK) ? { why: `the line carries ${WRITER_MARK} too, so its bound is ambiguous` } : { n: MAX_VERIFIERS, key: 'MAX_VERIFIERS' }
       // TOOL-dTieredTribunal-13 S1 - EVERY top-level value branch is judged, not the first that
       // happens to match. This block used to be two sequential accepts, and either could return on a
       // SINGLE arm: a marked ternary whose other branch was caller-supplied passed, and an
@@ -889,8 +850,8 @@ function fanoutFindings(script) {
       // blessed `ALL_LENSES.concat(allFindings)` on the strength of the word appearing.
       const grows = /\b(concat|push|flat|flatMap|fill|repeat)\s*\(|\.\.\./.test(rhs)
       const branches = parseBranches(rhs)
-      const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok))
-      if (!grows && branches.length && bad0 === undefined) {
+      const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok, bound.n))
+      if (!grows && !bound.why && branches.length && bad0 === undefined) {
         // TOOL-aWeldedTribunal-2, closing-review fold. RECORD WHAT THIS BLESSING LEANED ON. A
         // derivation like `const groups = batches.filter(Boolean)` is bounded only because
         // `batches` was; when a later take-back removes `batches`, `groups` kept a bound nothing
@@ -916,20 +877,20 @@ function fanoutFindings(script) {
       // assignment two lines above. This is the convention `why()` already applies to every
       // unresolvable K: one explanation per refusal, naming the FORM, because an operator who
       // cannot tell which spelling was refused fixes it by guessing.
+      const kTok = (/([\w$]+)\s*\)+\s*$/.exec(String(bad0)) || [])[1], k = consts.has(kTok) ? consts.get(kTok) : Number(kTok)
       markedWhy.set(
         name,
-        grows
-          ? `\`${name}\` carries ${FIXED_MARK} but its right-hand side can GROW the receiver`
+        bound.why ? `\`${name}\` carries ${mark} but ${bound.why}` : grows
+          ? `\`${name}\` carries ${mark} but its right-hand side can GROW the receiver`
           : !branches.length || bad0 === null
-            ? `\`${name}\` carries ${FIXED_MARK} but this file cannot delimit its value branches`
+            ? `\`${name}\` carries ${mark} but this file cannot delimit its value branches`
             : /\b(chunk|splitInto)\s*\(/.test(String(bad0))
-              // A branch that IS a bounded split and still fails, failed on its K. Saying only that
-              // the branch is not a bounded form would send the author to rewrite a spelling that is
-              // already correct, so the cap is named instead — and the phrase the generic refusal
-              // uses is kept, because two self-test arms assert a marked K's refusal by that text and
-              // a message edit that strands an arm is a recorded class in this repo.
-              ? `\`${name}\` carries ${FIXED_MARK} but its bounded split names a cap which this file does not show to be bounded`
-              : `\`${name}\` carries ${FIXED_MARK} but the branch \`${String(bad0).trim()}\` is not one of the bounded forms`,
+              // A bounded split that still fails failed on its K, so the cap is named, with its value and
+              // bound where it resolves above one (TOOL-dGroundRules-18); the generic phrase is kept, as
+              // two self-test arms assert a marked K's refusal by it, and a stranded arm is a known class.
+              ? `\`${name}\` carries ${mark} but its bounded split names a cap which this file does not show to be bounded` +
+                (k > bound.n ? ` — its K ${kTok} resolves to ${k}, above the bound ${bound.n}: ${bound.key}` : '')
+              : `\`${name}\` carries ${mark} but the branch \`${String(bad0).trim()}\` is not one of the bounded forms`,
       )
       return
     }
@@ -1046,9 +1007,9 @@ function fanoutFindings(script) {
   // top-level `lenses`. The obvious repair — a consuming class `[^.\w$)\]]` — leaked TWICE from one
   // regex: it excluded `)` and `]`, so `if (x) LENSES.push(y)` never matched at all; and because it
   // CONSUMES the character it inspects, under `/g` a receiver sitting right after a previous match's
-  // `(` was unreachable, so `sink.push(LENSES.push(9))` escaped. Both close with the LOOKBEHIND form
-  // this file already uses in `offendingLines`: it asserts without consuming, and it excludes only
-  // what actually makes a name a member — a dot or a name character.
+  // `(` was unreachable, so `sink.push(LENSES.push(9))` escaped. Both close with a LOOKBEHIND form: it
+  // asserts without consuming, and it excludes only what actually makes a name a member — a dot or a
+  // name character.
   const GROWS_RECEIVER = /(?<![.\w$])([A-Za-z_$][\w$]*)\s*\.\s*(?:push|unshift|splice)\s*\(/g
   takeBackView.forEach((l, li) => {
     let g
@@ -1263,43 +1224,15 @@ function fanoutFindings(script) {
   return bad
 }
 
-// ---------------------------------------------------------------------------
-// RULE 3 — the hook READS THE BOUND IT ENFORCES.
-//
-// Rules 1 and 2 above police the SHAPE of a fan-out: route it through the helper, and give the
-// verify stage a bounded group count. Neither ever read the number. `CAP` reached the remediation
-// text and decided nothing, so a shipped harness raised its own verifier count from the caller —
-// `const CAP = (args && args.cap) || 5` — and every gate stayed green over a rule the charter calls
-// BINDING. A cap enforced by convention is not enforced.
-//
-// THREE places a bound is written, and all three are resolved here:
-//   S1  the CALL SITE          boundedParallel(thunks, K) / boundedPipeline(items, K, ...stages)
-//   S2  the DEFAULT PARAMETER  async function boundedParallel(thunks, cap = K)
-//   S4  the MARKER's width     out.push(...await parallel(thunks.slice(i, i + cap))) // gov:bounded-fanout
-//
-// S4 is the asymmetry the audit named as the clearest lesson in this file: `gov:fixed-verifiers` is
-// a claim whose SHAPE is checked, while `gov:bounded-fanout` returned early and exempted a line
-// slicing fifty wide. All three markers are claims now.
-//
-// FAIL CLOSED, like every other branch here: a K this file cannot resolve to an integer at or under
-// MAX_VERIFIERS is a denial. The burden is on the fan-out.
-const HELPERS = /(?<![.\w$])(boundedParallel|boundedPipeline)\s*\(/g
-
-// TOOL-dMispairedQuote-1 — the re-baselining this header's author declined is DONE, and measured.
-// The quote branch below now asks `resolveLiteralEnd` whether a literal opens at all, which removes
-// both of this branch's defects: it ran to end of line synthesizing a closer the source never had,
-// and it paired a prose apostrophe with the next quote. Rule 3 reads the BOUND through a cross-line
-// paren join, so either one hid a declared width behind an ordinary-looking comment; a cap of 50 was
-// reproduced as ADMITTED. The three dozen measured arms this header worried about all still pass,
-// and eleven more were added. The claim below that string AND template contents are gone therefore
-// holds for every span this file can RESOLVE as a literal, and a quote it cannot resolve is left as
-// text on a line that is still blanked.
+// TOOL-dMispairedQuote-1 — the quote branch below asks `resolveLiteralEnd` whether a literal opens at
+// all, which removes both of this view's old defects: it ran to end of line synthesizing a closer the
+// source never had, and it paired a prose apostrophe with the next quote. The claim below that string
+// AND template contents are gone therefore holds for every span this file can RESOLVE as a literal,
+// and a quote it cannot resolve is left as text on a line that is still blanked.
 //
 // A literal-blanked view: string AND TEMPLATE contents gone, comments gone, delimiters and structure
-// kept. The per-line strip the two rules above run on cannot see a template literal spanning lines,
-// and a `(` inside a prompt string unbalances a forward paren join — which is the one mechanism this
-// rule is built on. Deliberately a SECOND view rather than a replacement: the existing strip carries
-// three dozen measured arms and is not worth re-baselining for a rule that can afford its own pass.
+// kept. Rule 5 reads it, through `renderBlankedLiterals`, so a banned join named inside a prompt
+// string is prose and not code.
 function renderBlankedView(script) {
   const out = []
   let mode = 'code' // code | tmpl | block
@@ -1379,207 +1312,6 @@ function topLevelArgs(text) {
   return out
 }
 
-function capFindings(script) {
-  const lines = script.split(/\r?\n/)
-  // TOOL-aWeldedTribunal-3 — an UNTERMINATED scan falls back to the per-line blanked view. The
-  // primary view carries its mode across lines, so one unterminated backtick blanked every line
-  // below it and this rule saw nothing under it (TOOL-aLexedStripper-4). Not a fail-closed branch:
-  // `TOOL-aLexedStripper-5` measured that and it denied a legal script carrying a regex literal with
-  // a backtick in it.
-  const view = renderBlankedLiterals(script)
-  const code = view.unterminated ? renderPerLineBlanked(script) : view.code
-  const { consts, orBound } = intConsts(code)
-  const bad = []
-
-  // ONE explanation per unresolvable K, naming the FORM rather than shrugging — an operator who
-  // cannot tell which of three spellings the hook refused fixes it by guessing.
-  const why = (tok, where) => {
-    const t = String(tok).trim()
-    if (orBound.has(t))
-      return `${where} resolves \`${t}\`, bound by an \`<expr> || ${orBound.get(t)}\` FALLBACK form — a caller-settable knob is not a bound, so it no longer resolves`
-    if (/^\d+$/.test(t))
-      return `${where} is ${t}, above the ${EFFECTIVE_CAP}-agent cap`
-    if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t))
-      return `${where} resolves \`${t}\` to ${consts.get(t)}, above the ${EFFECTIVE_CAP}-agent cap`
-    return `${where} is \`${t || '(nothing)'}\`, which this file cannot resolve to an integer at or under ${EFFECTIVE_CAP}`
-  }
-
-  // --- S2: the helper DEFINITIONS, and the default each one carries ---------------------------
-  // Keyed by helper name, because a bare `boundedParallel(thunks)` is governed by the default of
-  // the helper it names.
-  const defaults = new Map()
-  const paramsOf = new Map()
-  code.forEach((l, i) => {
-    const d = /\bfunction\s+(boundedParallel|boundedPipeline)\s*\(/.exec(l)
-    if (!d) return
-    const j = joinCall(code, i, d.index + d[0].length - 1)
-    if (!j) return
-    const args = topLevelArgs(j.text)
-    paramsOf.set(d[1], args.map((p) => (p.split('=')[0] || '').trim()).filter(Boolean))
-    const second = args[1]
-    if (second === undefined) { defaults.set(d[1], { tok: null, n: i + 1 }); return }
-    const eq = second.indexOf('=')
-    if (eq < 0) { defaults.set(d[1], { tok: null, n: i + 1 }); return }
-    const tok = second.slice(eq + 1)
-    defaults.set(d[1], { tok, n: i + 1 })
-    if (!boundedK(tok, consts))
-      bad.push({ n: i + 1, line: lines[i], why: why(tok, `the DEFAULT PARAMETER of ${d[1]}()`) })
-  })
-
-  // --- S1: every CALL SITE ---------------------------------------------------------------------
-  code.forEach((l, i) => {
-    HELPERS.lastIndex = 0
-    let m
-    while ((m = HELPERS.exec(l))) {
-      if (/\bfunction\s+$/.test(l.slice(0, m.index))) continue // a definition — S2 judged it
-      const name = m[1]
-      const j = joinCall(code, i, m.index + m[0].length - 1)
-      if (!j) {
-        bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE never closes its parens within 200 lines, so the cap argument cannot be read — a call this hook cannot parse is not a call it may approve` })
-        continue
-      }
-      const args = topLevelArgs(j.text)
-      if (args.length >= 2) {
-        if (!boundedK(args[1], consts))
-          bad.push({ n: i + 1, line: lines[i], why: why(args[1], `the cap argument at the ${name}() CALL SITE`) })
-        continue
-      }
-      // No cap argument: the helper's own DEFAULT governs. An undefined helper, or one whose second
-      // parameter carries no default, leaves nothing to resolve — and nothing to resolve is a deny.
-      const def = defaults.get(name)
-      if (!def)
-        bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE passes no cap and this file defines no ${name}(), so there is no DEFAULT PARAMETER to resolve the bound from` })
-      else if (def.tok === null)
-        bad.push({ n: i + 1, line: lines[i], why: `the ${name}() CALL SITE passes no cap and ${name}() (L${def.n}) declares no default for its second parameter, so nothing bounds this fan-out` })
-      // A resolvable-but-wide default already denied at its definition; not reported twice.
-    }
-  })
-
-  // --- S4: the `gov:bounded-fanout` marker is a CLAIM about a width ----------------------------
-  lines.forEach((raw, i) => {
-    if (!raw.includes('gov:bounded-fanout')) return
-    const l = code[i]
-    const s = /(?:^|[^.\w$)\]])([A-Za-z_$][\w$]*)\s*\.\s*slice\s*\(\s*[^,]*,\s*([^)]*)\)/.exec(l)
-    if (!s) {
-      bad.push({ n: i + 1, line: raw, why: 'the gov:bounded-fanout MARKED LINE does not slice a bare identifier by a visible width — the marker claims a bound and there is no bound here to check' })
-      return
-    }
-    const width = s[2].replace(/^[^+]*\+\s*/, '').trim()
-    // The enclosing helper's own `cap` PARAMETER is admitted explicitly: S2 has bounded its default
-    // and S1 has bounded every call site, so the parameter is bounded wherever it comes from. This
-    // is the token the three shipped harnesses use, and without this case S4 denies all of them.
-    const holder = (() => {
-      for (let k = i; k >= 0 && k > i - 40; k--) {
-        const d = /\bfunction\s+([A-Za-z_$][\w$]*)\s*\(/.exec(code[k])
-        if (d) return d[1]
-      }
-      return null
-    })()
-    if (holder && paramsOf.has(holder) && paramsOf.get(holder).includes(width)) return
-    if (!boundedK(width, consts))
-      bad.push({ n: i + 1, line: raw, why: why(width, 'the gov:bounded-fanout MARKED LINE slice width') })
-  })
-
-  return bad
-}
-
-// ---------------------------------------------------------------------------
-// RULE 4 — the ARITY of DIRECT `Agent` spawns, as an ATOMIC COUNT.
-//
-// Rules 1-3 read a workflow SCRIPT, so they reach exactly one of the two ways agents get spawned. A
-// session that fans out with direct `Agent` tool calls met no rule at all — the charter calls the
-// number BINDING and the commonest modality was unguarded.
-//
-// THE CASE THIS FILE'S OWN REJECTED ALTERNATIVE WAS ABOUT IS STILL REJECTED — but NOT for the reason
-// this comment gave for two releases. Counting agents spawned INSIDE a workflow script is impossible
-// because the script's `agent()` is a runtime call and not a TOOL call: the matcher covers
-// `Workflow|Agent` and there is no tool call to match. A sidechain agent could not re-fan-out either,
-// holding neither of those tools — MEASURED 2026-08-15, `ToolSearch` for them returns nothing.
-//
-// IT IS NOT BECAUSE A SIDECHAIN RUNS NO HOOKS. It runs them. MEASURED 2026-09-12 on node d: the
-// project-level `PreToolUse` guard on matcher `Bash|PowerShell` — `scratch-guard`, the sibling hook
-// beside this one, wired the same way — DENIED a Bash command issued by an agent inside a `Workflow`
-// sidechain. That is exactly the matcher-on-a-tool-the-sidechain-does-hold experiment the 2026-08-15
-// record asked for, and it settles the reach question against the old claim. The conclusion survives
-// its refuted premise, which is why the static scan stays; the premise does not.
-//
-// A main-loop `Agent` call differs in kind — it IS a tool call, so this hook receives it. MEASURED on
-// node a before any of this was written: `tool_name` arrives as exactly `Agent`, and the payload
-// carries `session_id`, `prompt_id` and `tool_use_id`.
-//
-// WHY SLOTS AND NOT A COUNT. Read-then-decide loses updates: measured on node a, a four-call burst
-// overlapped its hook processes and two of four read the same count. Create-a-token-then-count does
-// not fix it either — six concurrent processes each see between their own ordinal and six, so
-// several deny and the arm requiring EXACTLY ONE deny fails nondeterministically. Claiming a
-// NUMBERED slot with O_EXCL is decided entirely by the atomic create: exactly MAX_VERIFIERS slots
-// can ever exist, so exactly one process out of the sixth-and-beyond is refused, every time.
-//
-// The budget is keyed per PROMPT, so a new user turn resets it with no cleanup step; a TTL sweep
-// drops the directories a long-lived tree accumulates. The count does NOT distinguish a verifier
-// from any other agent, because keying on "is this a verify agent" needs a session-to-build binding
-// no payload field provides — and the concurrency rule binds every fan-out to the same number
-// anyway, so a uniform cap needs no such binding.
-//
-// THE SLOT LEDGER AND THE SCRIPT RULES ARE MUTUALLY EXCLUSIVE BY DESIGN, and this paragraph is here
-// for whoever next reaches for "why not count `Workflow` calls too". Rules 1-3 read a script and
-// bound the fan-out INSIDE it; the slot ledger counts `Agent` payloads and bounds the fan-out made
-// without a script. Neither wants the other's population. A build harness that dispatches one
-// `Workflow` call per roster unit from a single prompt issues many calls that are each a bounded,
-// single-agent act, and extending the ledger over them would spend a per-prompt budget written for a
-// BURST of verifiers on a SEQUENCE of unit passes — denying such a build partway through its own
-// roster, a refusal with no fan-out behind it.
-//
-// AND THE REASON IS THE LEDGER'S OWN NATURE, stated fifteen lines above and easy to get backwards:
-// this budget is LIFETIME-PER-PROMPT, so it is the TOTAL and never the concurrency bound. A total is
-// exactly the wrong instrument for a dispatch sequence, because the dispatch count is a function of
-// the ROSTER SIZE — the shape that has no budget in it at all — while a verify fan-out's total is
-// what the charter fixes. Two rules, not one; the script rules bound concurrency inside a script and
-// this bounds the total outside one, and only the `Agent` matcher can tell the two populations apart
-// from the payload alone.
-//
-// NO ROSTER SIZE IS STATED HERE, deliberately. A distribution restated in a hook comment rots on the
-// next build, and this file may not name the harness whose shape would settle it.
-const AGENT_TTL_MS = 12 * 60 * 60 * 1000
-// A SLOT expires too, and that is a different clock from the turn-directory sweep above.
-//
-// WHY IT HAS TO. A slot is claimed with O_EXCL and there is no release path, because PreToolUse is
-// the only event this hook is wired for and it fires BEFORE the work, never after. So the count is
-// LIFETIME-PER-PROMPT, not concurrency: five agents that ran one after another, each finishing
-// before the next began, exhaust the budget for the rest of the turn. Measured on node `a` — six
-// sequential spawns in one prompt, distinct tool_use_ids, the sixth denied with every slot long
-// since idle. The protocol's own words are "at most 5 run concurrently"; without an expiry this
-// mechanism could not measure that, and a permanent budget is not the rule it is named after.
-//
-// WHY 45 MINUTES, and why erring long. The failure this whole rule exists to prevent is a BURST —
-// ~40 agents at once, a tripped server rate limiter, ~3.65 M subagent tokens for nothing. A burst
-// claims its slots within a second of each other, so no expiry short of absurd lets one through:
-// the TTL is irrelevant to the case that matters. What the TTL trades is the opposite direction —
-// if five agents genuinely run CONCURRENTLY for longer than the TTL, a sixth is admitted. So the
-// value must exceed the longest realistic subagent, and it is set from measurement rather than
-// taste: subagent durations observed on this fleet run 2 s to 34 min (a 999 s review lens, a
-// 1 026 s engine split, a 2 029 s closing review). 45 min clears the longest by ~30%.
-//
-// ponytail: an expiry is a HEURISTIC standing in for a completion signal, and the ceiling is stated
-// rather than buried — five long-running concurrent agents plus a sixth after 45 min is admitted.
-// The precise fix is a release keyed on tool_use_id, which the harness guarantees to be the SAME id
-// in PreToolUse and PostToolUse for one tool execution. It is NOT built here because it turns on one
-// unmeasured fact: whether the `Agent` tool fires PostToolUse at all. The public hooks reference says
-// Agent skips both tool events in favour of SubagentStart/Stop, and SubagentStop carries no
-// tool_use_id to correlate on — while this repo's own protocol records, from measurement, that
-// PreToolUse DOES fire for Agent — re-confirmed here by watching a real spawn claim a slot. Both
-// cannot be right, and wiring a release for an event that never arrives would ship exactly the
-// mechanism-that-cannot-fire this repo gates against. Settle it with a PostToolUse[Agent] probe plus
-// a PostToolUse[Bash] CONTROL, wired IN PLACE. This comment used to send that probe to a FRESH
-// session because settings are not hot-reloaded; that reason is wrong. The public hooks reference
-// says direct edits to hooks in settings files are normally picked up by the file watcher, and
-// OBSERVED on node d in session a6d954d0 the wired agent-cap command CHANGED mid-session after
-// commit 206af3de retargeted `.claude/settings.json` — two denials in one transcript naming two
-// different commands. A fresh session is still the tidier control, because it removes the question of
-// WHEN the watcher caught the edit; it is no longer a precondition. Then the TTL demotes to the
-// crash/interrupt backstop the hooks reference recommends and stops being the primary mechanism.
-const SLOT_TTL_MS = 45 * 60 * 1000
-const slug = (s) => String(s).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120)
-
 // The CHECKOUT root: the nearest directory holding `.git`, a directory in a primary tree and a FILE
 // in a linked worktree. Resolved without shelling out to git — this runs on every call.
 function resolveCheckoutRoot(start) {
@@ -1598,159 +1330,6 @@ function resolveCheckoutRoot(start) {
   return null
 }
 
-// The git COMMON dir, resolved without shelling out to git — this runs on every spawn.
-function gitCommonDir(start) {
-  const fs = require('fs')
-  const path = require('path')
-  const dir = resolveCheckoutRoot(start)
-  if (!dir) return null
-  const g = path.join(dir, '.git')
-  let st = null
-  try { st = fs.statSync(g) } catch { return null }
-  if (st.isDirectory()) return g
-  // A WORKTREE: `.git` is a FILE holding `gitdir: <path>`, and that gitdir names the shared
-  // common dir in its own `commondir`. One budget per repo, not per worktree — a session is a
-  // session whichever checkout it stands in.
-  try {
-    const m = /gitdir:\s*(.+)/.exec(fs.readFileSync(g, 'utf8'))
-    if (!m) return null
-    const gd = path.resolve(dir, m[1].trim())
-    try {
-      return path.resolve(gd, fs.readFileSync(path.join(gd, 'commondir'), 'utf8').trim())
-    } catch {
-      return gd
-    }
-  } catch {
-    return null
-  }
-}
-
-// TOOL-aRepatriatedFork-7 S4/S5 — the DECLARED cap, read from `.agent-cap.conf` at the checkout root
-// (a linked worktree reads its own checkout's file, not the primary's). Returns
-// `{ cap, file }` — `file` is '' when nothing lowered the ceiling — or `{ error }`, a deny message.
-// Grammar: `FANOUT_CAP=4` or `FANOUT_CAP="4"` on a line of its own; the LAST such line wins, as a
-// shell `.` would read it; blank lines, `#` comments and other keys are ignored.
-function loadDeclaredCap(start) {
-  const fs = require('fs')
-  const path = require('path')
-  const root = resolveCheckoutRoot(start)
-  if (!root) return { cap: MAX_VERIFIERS, file: '' }
-  const file = path.join(root, CAP_CONF)
-  let text
-  try {
-    text = fs.readFileSync(file, 'utf8')
-  } catch (e) {
-    if (e && e.code === 'ENOENT') return { cap: MAX_VERIFIERS, file: '' }
-    return { error: `${file} could not be read (${(e && e.code) || (e && e.message) || e}), and a declared cap this hook cannot read is not one it may assume` }
-  }
-  let raw = null
-  for (const line of text.split(/\r?\n/)) {
-    const m = /^\s*FANOUT_CAP\s*=(.*)$/.exec(line)
-    if (m) raw = m[1].trim()
-  }
-  if (raw === null) return { cap: MAX_VERIFIERS, file: '' }
-  const v = /^"(.*)"$/.test(raw) ? raw.slice(1, -1) : raw
-  if (!/^[0-9]+$/.test(v) || Number(v) < 1 || Number(v) > MAX_VERIFIERS)
-    return { error: `${file} declares FANOUT_CAP=${raw}, and the declared cap must be an integer from 1 to ${MAX_VERIFIERS} — it can LOWER the ceiling, never raise or disable it` }
-  const n = Number(v)
-  return { cap: n, file: n < MAX_VERIFIERS ? file : '' }
-}
-
-// The clause every cap-printing message carries when a conf LOWERED the cap, and nothing otherwise.
-function renderCapSource() {
-  return CAP_SOURCE ? ` (lowered from ${MAX_VERIFIERS} by FANOUT_CAP in ${CAP_SOURCE})` : ''
-}
-
-function sweepTurns(root, keep) {
-  const fs = require('fs')
-  const path = require('path')
-  let names
-  try { names = fs.readdirSync(root) } catch { return }
-  const now = Date.now()
-  for (const n of names) {
-    const p = path.join(root, n)
-    if (p === keep) continue
-    // Never fatal: a concurrent hook process may be sweeping the same entry, and losing that race is
-    // not a reason to refuse a spawn.
-    try {
-      if (now - fs.statSync(p).mtimeMs < AGENT_TTL_MS) continue
-      fs.rmSync(p, { recursive: true, force: true })
-    } catch { /* ignore */ }
-  }
-}
-
-// null = allow · string = the deny message.
-function guardAgentSpawn(data) {
-  const fs = require('fs')
-  const path = require('path')
-  const { session_id: sid, prompt_id: pid, tool_use_id: uid } = data
-  // FAIL OPEN, SILENTLY, when the budget cannot be KEYED or its directory cannot be resolved. The
-  // split is stated rather than blurred: a hook that denies every spawn on a filesystem hiccup is
-  // worse than the burst it prevents. A token that cannot be CREATED is a different fact and denies.
-  if (!sid || !pid || !uid) return null
-  const common = gitCommonDir(data.cwd || process.cwd())
-  if (!common) return null
-  const root = path.join(common, 'agent-cap')
-  const turn = path.join(root, `${slug(sid)}__${slug(pid)}`)
-  try { fs.mkdirSync(turn, { recursive: true }) } catch { return null }
-  sweepTurns(root, turn)
-
-  // IDEMPOTENT PER tool_use_id. A hook re-invoked for the same call must not spend a second slot.
-  for (let n = 1; n <= MAX_VERIFIERS; n++) {
-    let held
-    try { held = fs.readFileSync(path.join(turn, `slot-${n}`), 'utf8') } catch { continue }
-    if (held.trim() === uid) return null
-  }
-
-  for (let n = 1; n <= EFFECTIVE_CAP; n++) {
-    const slot = path.join(turn, `slot-${n}`)
-    let fd
-    try {
-      fd = fs.openSync(slot, 'wx') // O_CREAT|O_EXCL — the atomic decision
-    } catch (e) {
-      // An EXPIRED slot is a free slot: unlink it and re-claim through the SAME O_EXCL create, so
-      // two hooks racing on one stale slot still resolve in the create — the only place that
-      // decides. A failed unlink (the other racer got there first) is not an error, and a failed
-      // re-create means that racer won the slot, so this one moves to the next ordinal rather than
-      // retrying. Nothing here ever overwrites a live claim: the age test gates the unlink, and the
-      // create is still exclusive.
-      if (e.code === 'EEXIST') {
-        let age = 0
-        try { age = Date.now() - fs.statSync(slot).mtimeMs } catch { age = 0 }
-        if (age > SLOT_TTL_MS) {
-          try { fs.unlinkSync(slot) } catch { /* another racer won it; the retry sees the truth */ }
-          try {
-            fd = fs.openSync(slot, 'wx')
-          } catch { continue }
-          try { fs.writeSync(fd, uid) } finally { try { fs.closeSync(fd) } catch { /* ignore */ } }
-          return null
-        }
-        continue
-      }
-      return (
-        `BLOCKED by agent-cap: this spawn's token could not be created in ${turn} ` +
-        `(${e.code || e.message}), so the ${EFFECTIVE_CAP}-agent budget could not be enforced for ` +
-        `it. A spawn this hook cannot count is not a spawn it may approve.`
-      )
-    }
-    try { fs.writeSync(fd, uid) } finally { try { fs.closeSync(fd) } catch { /* ignore */ } }
-    return null
-  }
-
-  return (
-    `BLOCKED by agent-cap: the direct-Agent spawn budget for this prompt is exhausted — ` +
-    `${EFFECTIVE_CAP} of ${EFFECTIVE_CAP} claimed in this turn within the last ` +
-    `${Math.round(SLOT_TTL_MS / 60000)} minutes. A review's verify stage spawns at most ` +
-    `${EFFECTIVE_CAP} agents TOTAL${renderCapSource()} and the charter binds every other fan-out to the same number ` +
-    `(memory/guides/REVIEW-PROTOCOL.md).\n\n` +
-    `Consolidate instead of spawning again: batch the work so the BATCH SIZE grows with the item ` +
-    `count and the agent count does not. For a review, ${resolveHarnessName()} already does ` +
-    `it. A new user prompt resets the budget, and a slot idle longer than ` +
-    `${Math.round(SLOT_TTL_MS / 60000)} minutes is reclaimed on the next spawn; nothing needs ` +
-    `cleaning up either way.\n`
-  )
-}
-
 // TOOL-dTieredTribunal-14 S1 - RULE 5, the ref-keyed verdict join. Ported from the awk in
 // <prefix>/workflows/check-review-join.sh, which is a FILE gate and therefore blind to the modality
 // where this defect actually happens: an ad-hoc review harness is an inline `script` string on a
@@ -1766,10 +1345,9 @@ function guardAgentSpawn(data) {
 // excludes this file from its own population - the ban table below would otherwise match itself.
 function scanJoinFindings(script) {
   const raws = script.split(/\r?\n/)
-  // TOOL-aWeldedTribunal-3 — the SAME fallback rule 3 takes, for the same reason and over the same
-  // view. Giving rule 3 the fallback and not this one would be the gate-the-class-not-the-instance
-  // failure one level up: both read `renderBlankedLiterals` through the same dispatcher and both
-  // went blind below an unterminated literal. The per-line view preserves S2's narrowing WITHIN each
+  // TOOL-aWeldedTribunal-3 — an UNTERMINATED scan falls back to the per-line blanked view: the
+  // primary view carries its mode across lines, so one unterminated backtick blanked every line below
+  // it and this rule saw nothing under it. The per-line view preserves S2's narrowing WITHIN each
   // line, which `renderStrippedView` would not — it leaves backticks alone.
   const view = renderBlankedLiterals(script)
   const code = view.unterminated ? renderPerLineBlanked(script) : view.code
@@ -1821,7 +1399,7 @@ function scanJoinFindings(script) {
 // that does not parse shows this hook no `kind` and is not this rule's business (the harness itself
 // throws on it, so no audit runs). Placement is `<args.repo>/<parent of args.reviewDir>/README.md` —
 // the harness REQUIRES `repo` and takes `reviewDir` repo-relative, and that parent must be a
-// `builds/<slug>` folder. Never `gitCommonDir(cwd)`: in a linked worktree that is the PRIMARY tree's
+// `builds/<slug>` folder. Never the git common dir of `cwd`: in a linked worktree that is the PRIMARY tree's
 // `.git`, and the README read would be the wrong checkout's.
 //
 // FAIL CLOSED, for this kind only (F1, resolved): a spec-audit call this rule cannot PLACE — `repo`
@@ -2187,37 +1765,79 @@ function checkHarnessCall(data, index, root) {
   return null
 }
 
-function main() {
-  // TOOL-aRepatriatedFork-7, closing review round 1 residual (b) — `--print-cap` ANSWERS the effective
-  // cap for the checkout the caller stands in, and judges nothing. The shell readers that need the
-  // number (the verifier fan-out gate's clean line, the review-harness renderer's FANOUT_CAP token)
-  // ask here instead of re-parsing `.agent-cap.conf`: two parsers of one file are two answers to one
-  // question, and a BOM-led conf was the measured case where they disagreed. Exit 0 prints the
-  // integer; a malformed declaration exits 2 with the deny message, as every call would be denied.
-  // FAIL CLOSED IF WIRED: a payload on stdin is a tool call being judged, and a query mode that exited
-  // 0 on it would admit every call with no diff. A caller redirects stdin from /dev/null.
-  if (process.argv.slice(2).includes('--print-cap')) {
-    if (!process.stdin.isTTY && readStdin().trim() !== '') {
-      process.stderr.write('BLOCKED by agent-cap: --print-cap is a query mode and must not be wired — it judges no call. Remove it from the hook command.\n')
-      process.exit(2)
-    }
-    const asked = loadDeclaredCap(process.cwd())
-    if (asked.error) {
-      process.stderr.write(`agent-cap: ${asked.error}.\n`)
-      process.exit(2)
-    }
-    process.stdout.write(`${Math.min(asked.cap, MAX_VERIFIERS)}\n`)
-    process.exit(0)
-  }
+// RULE 7 (TOOL-dGroundRules-10) — the settings in force. The agent limit is the harness's to enforce,
+// through the two variables the policy kit renders into `.claude/settings.json`; the harness reads
+// them from the working tree, so a hand-raised `env`, or a render left behind a lowering, would run
+// past the landed limit. This rule refuses that at the next call. It reads the landed limit through
+// the policy kit's `readPolicy`, located beside this hooks kit as `resolveHarnessName` probes the
+// workflows kit, and never the working-tree mirror; a hooks kit with no `policy` kit beside it adds no
+// rule. WHAT IT DOES NOT SEE: an environment override of the two variables, which the harness applies
+// and no hook can read. UNVERIFIED: that a session started before a lowering keeps its settings until
+// it restarts. Read: every layer readSettingsLayers returns (TOOL-dGroundRules-61 S1); a cwd in no checkout, or a throw at any step, refuses, naming it (TOOL-dGroundRules-21 S38). A refused policy read is no settings fault, so it denies under its own text, printing the reader's line and never the settings remedy (TOOL-dGroundRules-73). null = allow · string = deny.
+const SETTINGS_VARS = ['CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS', 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS']
 
+function checkSettingsInForce(data) {
+  const fs = require('fs')
+  const path = require('path')
+  const helper = POLICY_HELPER
+  if (!fs.existsSync(helper)) return null
+  const root = resolveCheckoutRoot(data.cwd || process.cwd())
+  if (!root) return `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the payload cwd ${String(data.cwd || process.cwd()).split(path.sep).join('/')} is in no git checkout, so the settings in force and the landed agent limit cannot be read, and a rule that cannot read does not admit.\n`
+  const rel = path.relative(root, path.dirname(helper)).split(path.sep).join('/')  // the render's kit path: a hook names no prefix
+  const remedy = `python ${rel ? rel + '/' : ''}policy.py settings --write`
+  const renderSettingsDeny = (why) =>
+    `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the ` +
+    `settings this checkout's harness starts from do not hold the landed agent limit.\n${why}\n` +
+    `Render them from the policy: ${remedy}, run at ${root.split(path.sep).join('/')}. A session started ` +
+    `before the render keeps the settings it started with until it restarts (UNVERIFIED).\n`
+  const renderReadDeny = (why) =>
+    `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the ` +
+    `landed agent limit cannot be read, so the settings in force were not compared, and a rule that ` +
+    `cannot read does not admit. Clear the policy reader's refusal, which names its cause:\n${why}\n`
+  checkSettingsInForce.step = `reading the landed limit through ${helper.split(path.sep).join('/')}` // main names the step a throw left
+  const { readPolicy, PolicyRefusal } = require(helper)
+  let limit
+  try {
+    limit = readPolicy('runtime.agents-in-flight', { repo: root }).value
+  } catch (e) {
+    if (PolicyRefusal && e instanceof PolicyRefusal) return renderReadDeny(`  ${e.message}`)
+    throw e
+  }
+  if (!Number.isInteger(limit) || limit < 1) return renderSettingsDeny(`  runtime.agents-in-flight reads ${JSON.stringify(limit)}, not a positive integer.`)
+  // TOOL-dGroundRules-61 S2: the value the harness applies is one of the values its layers set, and the
+  // declared file's place in its precedence is declared nowhere, so EVERY read layer that sets a
+  // variable is bounded (§8 F1 (b)): a declared file never hides the project's, nor the project the
+  // declared one. Unread, so unbounded here: the --settings flag layer, the managed-policy layer and an
+  // exported variable (F2). A shadowed lower layer above the limit refuses too, naming its remedy.
+  const layers = readSettingsLayers(root)
+  const bad = []
+  for (const v of SETTINGS_VARS) {
+    const set = layers.filter((l) => Object.prototype.hasOwnProperty.call(l.env, v))
+    if (!set.length) {
+      bad.push(`  .claude/settings.json: env.${v} is absent, and runtime.agents-in-flight is ${limit} (layers read: ${layers.map((l) => l.name).join(', ')}).`)
+      continue
+    }
+    for (const { name, env } of set) { // highest precedence first: the first violating layer is named
+      const got = env[v]
+      const s = typeof got === 'number' ? String(got) : got
+      const why = typeof s !== 'string' || !/^[1-9][0-9]*$/.test(s)
+        ? `is ${JSON.stringify(got)}, not a positive integer; runtime.agents-in-flight is ${limit}.`
+        : Number(s) > limit ? `is ${s}, above runtime.agents-in-flight ${limit}.` : ''
+      if (why) { bad.push(`  ${name}: env.${v} ${why}`); break }
+    }
+  }
+  return bad.length ? renderSettingsDeny(bad.join('\n')) : null
+}
+
+function main() {
   // TOOL-dTieredTribunal-14 S4 - a rule selector over a CLOSED set, so a second entry point can ask
   // for ONE rule. Absent runs every rule, which is the wiring's invocation and is unchanged.
   // Anything outside the set REFUSES rather than silently matching nothing, which would be this
   // repo's vacuous-selector-empty-population class arriving in the file whose job is to refuse what
   // it cannot resolve. A WIRED command must never carry it: <prefix>/check-wiring.sh asserts that,
-  // because `--only=join` in settings.json would turn the three cap rules off with no diff.
-  // TOOL-aOrientedCast-7 S11 - `scripts` is rules 1, 2, 3 and 5, the rules that read a SCRIPT, and
-  // never rules 0 and 6, which judge the CALL. A file gate feeding committed scripts as inline
+  // because `--only=join` in settings.json would turn the other rules off with no diff.
+  // TOOL-aOrientedCast-7 S11 - `scripts` is rules 2 and 5, the rules that read a SCRIPT, and never
+  // rules 0, 6 and 7, which judge the CALL. A file gate feeding committed scripts as inline
   // `script` payloads asks with it; rule 6 would refuse every such payload wherever an index exists.
   const ONLY_RULES = ["join", "scripts"]
   const onlyArg = process.argv.slice(2).find((a) => a.startsWith("--only="))
@@ -2238,38 +1858,10 @@ function main() {
   }
   if (!data || (data.tool_name !== 'Workflow' && data.tool_name !== 'Agent')) process.exit(0)
 
-  // AGENT_CAP used to raise the ceiling and no longer can. REFUSED rather than ignored: this hook's
-  // own header advertised the override for two releases after it stopped deciding anything, and a
-  // silently-ignored knob that appears to work is exactly how that claim survived. An operator who
-  // sets it gets told, in the one place they will look.
-  if (process.env.AGENT_CAP !== undefined && process.env.AGENT_CAP !== '') {
-    process.stderr.write(
-      `BLOCKED by agent-cap: AGENT_CAP is set (${process.env.AGENT_CAP}) and this guard NO LONGER ` +
-        `reads it. The ceiling is the file constant ${MAX_VERIFIERS}, resolved at the call site, the ` +
-        `default parameter and the gov:bounded-fanout width; a repo may only LOWER it, with ` +
-        `FANOUT_CAP in a tracked ${CAP_CONF}. An environment override would be a ` +
-        `ceiling raise that leaves no diff behind. Unset AGENT_CAP and re-run; to change the number, ` +
-        `change it in the kit's own agent-cap.js, the source of truth, never in a mirror of it that a bar ` +
-        `reverts (this process ran ${require('path').basename(__dirname)}/${require('path').basename(__filename)}).\n`,
-    )
-    process.exit(2)
-  }
-
-  // TOOL-aRepatriatedFork-7 S4/S5 — the declared cap, read on EVERY call before any rule, so each
-  // rule and each message below sees the one effective number. A malformed declaration DENIES,
-  // fail closed, whichever tool this is: a value this hook cannot trust is not one it may ignore.
-  const declared = loadDeclaredCap(data.cwd || process.cwd())
-  if (declared.error) {
-    process.stderr.write(`BLOCKED by agent-cap: ${declared.error}. Fix or remove FANOUT_CAP and re-run.\n`)
-    process.exit(2)
-  }
-  EFFECTIVE_CAP = Math.min(declared.cap, MAX_VERIFIERS)
-  CAP_SOURCE = declared.file
-
-  // RULE 6 (TOOL-aOrientedCast-7) — before rule 4, so a refused spawn claims no slot, and before rule
-  // 0, so a call outside a declared harness is refused whatever its args. Skipped under any `--only=`
-  // selector, as rule 0 is. An absent `.claude/roles.json` at the role root adds no rule; a broken one, or a throw
-  // anywhere in the rule, refuses: a rule that cannot finish does not admit.
+  // RULE 6 (TOOL-aOrientedCast-7) — first, so a call outside a declared harness is refused whatever its
+  // args. Skipped under any `--only=` selector, as rules 7 and 0 are. An absent `.claude/roles.json` at
+  // the role root adds no rule; a broken one, or a throw anywhere in the rule, refuses: a rule that
+  // cannot finish does not admit.
   if (ONLY === null) {
     let deny = null
     let index = null
@@ -2294,19 +1886,28 @@ function main() {
     }
   }
 
-  // RULE 4 for an `Agent` payload, and after rule 6 the ONLY thing that path runs: the rules below
-  // all read a script, and an Agent spawn carries none.
-  if (data.tool_name === 'Agent') {
-    const deny = guardAgentSpawn(data)
-    if (!deny) process.exit(0)
-    process.stderr.write(deny)
-    process.exit(2)
+  // RULE 7 (TOOL-dGroundRules-10) — the settings in force, for both tools. A throw refuses: a rule that
+  // cannot finish does not admit, and a hook that exits 1 is non-blocking.
+  if (ONLY === null) {
+    let deny = null
+    try {
+      deny = checkSettingsInForce(data)
+    } catch (e) {
+      deny = `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) threw (while ${checkSettingsInForce.step || 'resolving the payload cwd'}: ${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
+    }
+    if (deny) {
+      process.stderr.write(deny)
+      process.exit(2)
+    }
   }
 
+  // An `Agent` payload carries no script, and every rule below reads one.
+  if (data.tool_name === 'Agent') process.exit(0)
+
   // RULE 0 sits ABOVE the script read on purpose: a `name:`-only run exits below with no source, and
-  // a rule placed among rules 1-5 would never see the spec-audit route invoked by name. It keys on
-  // the structured args, so it needs no script at all. Gated on ONLY like rules 1-3, so
-  // `--only=join` stays exactly the join rule.
+  // a rule placed among the script rules would never see the spec-audit route invoked by name. It keys
+  // on the structured args, so it needs no script at all. Skipped under `--only=`, so `--only=join`
+  // stays exactly the join rule.
   if (ONLY === null) {
     const deny = checkSpecAuditDeclared(data)
     if (deny) {
@@ -2335,75 +1936,22 @@ function main() {
   }
   if (!script) process.exit(0) // a `name:` run: no source reaches this hook (see the protocol)
 
-  const fan = ONLY !== 'join' ? runBothViews(fanoutFindings, script) : []
+  const writer = ONLY !== 'join' && script.includes(WRITER_MARK) ? readWriterBound(ONLY === 'scripts' ? process.cwd() : data.cwd || process.cwd()) : null
+  const fan = ONLY !== 'join' ? runBothViews((s) => fanoutFindings(s, writer), script) : []
   if (fan.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol ` +
-        `caps verify-stage agents at ${EFFECTIVE_CAP} TOTAL${renderCapSource()} — the batch size grows with the finding ` +
+        `caps verify-stage agents at ${MAX_VERIFIERS} TOTAL, this hook's MAX_VERIFIERS — the batch size grows with the finding ` +
         `count, the agent count never does (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
         fan.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${line.trim()}\n        ${why}`).join('\n') +
         `\n\nSplit into a BOUNDED number of groups and mark the assignment:\n` +
-        `  const MAX_VERIFIERS = ${EFFECTIVE_CAP}\n` +
+        `  const MAX_VERIFIERS = ${MAX_VERIFIERS}\n` +
         `  const batches = chunk(items, Math.ceil(items.length / MAX_VERIFIERS)) // ${FIXED_MARK}\n` +
-        `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), ${EFFECTIVE_CAP})\n\n` +
+        `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), MAX_VERIFIERS)\n\n` +
         `A fixed lens array (<= ${MAX_LENSES} elements) is allowed as-is — its agent count is a ` +
         `constant. Ready-made: ${resolveHarnessName()}.\n`,
     )
     process.exit(2)
-  }
-
-  // RULE 3 runs AFTER the arity rule on purpose. A one-argument `boundedParallel(all.map(…))` breaks
-  // both, and the arity message is the one that names the defect an operator has to fix; reversing
-  // the order would retitle the rule-2 corpus without changing a verdict.
-  const caps = ONLY !== 'join' ? runBothViews(capFindings, script) : []
-  if (caps.length) {
-    process.stderr.write(
-      `BLOCKED by agent-cap: a bound is written here that this file cannot resolve at or under ` +
-        `${EFFECTIVE_CAP}${renderCapSource()}. The cap is enforced by reading the number, not by trusting the helper's ` +
-        `name (memory/guides/REVIEW-PROTOCOL.md).\n\n` +
-        caps.slice(0, 6).map(({ n, line, why }) => `  L${n}: ${String(line).trim()}\n        ${why}`).join('\n') +
-        `\n\nWrite the bound as an integer literal at or under ${EFFECTIVE_CAP}, or as an identifier ` +
-        `bound DIRECTLY to one and never reassigned:\n` +
-        `  const MAX_VERIFIERS = ${EFFECTIVE_CAP}\n` +
-        `  await boundedParallel(batches.map((g) => () => agent(promptFor(g))), MAX_VERIFIERS)\n`,
-    )
-    process.exit(2)
-  }
-
-  // TOOL-dTieredTribunal-14 S3 - INVERTED. This block alone was written as an early exit-0, so any
-  // rule appended after it never ran for a script carrying no raw parallel()/pipeline() - which is
-  // every script the join ban exists to judge. The two rules above already use this additive shape.
-  // Order is unchanged and still decides which message an operator sees: the three rules above all
-  // prevent a BURST, the expensive failure this hook exists for, while a ref-keyed join is a wrong
-  // verdict, which is cheap to re-run.
-  const bad = ONLY !== 'join' ? runBothViews(offendingLines, script) : []
-  if (bad.length) {
-  const shown = bad
-    .slice(0, 6)
-    .map(({ n, line }) => `  L${n}: ${line.trim()}`)
-    .join('\n')
-  process.stderr.write(
-    `BLOCKED by agent-cap: raw parallel()/pipeline() fans out to the harness ` +
-      `cap (~14 agents) and trips the server rate limiter.\n\n` +
-      `Route ALL fan-out through the cap-${EFFECTIVE_CAP} helpers${renderCapSource()} and call them instead:\n` +
-      `  async function boundedParallel(thunks, cap = ${EFFECTIVE_CAP}) {\n` +
-      `    const out = []\n` +
-      `    for (let i = 0; i < thunks.length; i += cap)\n` +
-      `      out.push(...await parallel(thunks.slice(i, i + cap))) // gov:bounded-fanout\n` +
-      `    return out\n` +
-      `  }\n` +
-      `  async function boundedPipeline(items, cap, ...stages) {\n` +
-      `    const out = []\n` +
-      `    for (let i = 0; i < items.length; i += cap)\n` +
-      `      out.push(...await pipeline(items.slice(i, i + cap), ...stages)) // gov:bounded-fanout\n` +
-      `    return out\n` +
-      `  }\n\n` +
-      `Consolidate before fanning: batch skeptics/items so total agents stay low.\n` +
-      `Offending line(s):\n` +
-      shown +
-      `\n`,
-  )
-  process.exit(2)
   }
 
   // RULE 5 - the ref-keyed verdict join. LAST because it is the cheapest failure to recover from.
@@ -2425,3 +1973,36 @@ function main() {
 }
 
 main()
+
+// TOOL-dGroundRules-61 S1 — the settings layers rule 7 reads, highest precedence first: the local file
+// and the project file under the checkout root, then the file GOV_SETTINGS_JSON declares, a relative
+// path read against that root. Below main() so no line above it moves; a declaration hoists. A declared
+// path that is not a file throws, as check-wiring.sh's settings_json and `policy.py settings` refuse it,
+// and one that resolves to the project or the local file is read once. An absent file is a layer that
+// sets nothing; one that does not parse throws naming it (TOOL-dGroundRules-21 S38).
+function readSettingsLayers(root) {
+  const fs = require('fs')
+  const path = require('path')
+  const names = ['.claude/settings.local.json', '.claude/settings.json']
+  const declared = process.env.GOV_SETTINGS_JSON
+  if (declared) {
+    checkSettingsInForce.step = `resolving GOV_SETTINGS_JSON ${declared}`
+    const p = path.resolve(root, declared)
+    let st = null
+    try { st = fs.statSync(p) } catch { st = null }
+    if (!st || !st.isFile()) throw new Error(`GOV_SETTINGS_JSON names ${declared}, which is not a file`)
+    const real = fs.realpathSync(p)
+    if (!names.some((n) => { try { return fs.realpathSync(path.resolve(root, n)) === real } catch { return false } })) names.push(declared)
+  }
+  return names.map((name) => {
+    checkSettingsInForce.step = `reading ${name}`
+    let text
+    try { text = fs.readFileSync(path.resolve(root, name), 'utf8') } catch (e) {
+      if (e && e.code === 'ENOENT') return { name, env: {} }
+      throw e
+    }
+    let obj
+    try { obj = JSON.parse(text) } catch (e) { throw new Error(`${name} does not parse as JSON: ${e.message}`) }
+    return { name, env: obj && typeof obj === 'object' && obj.env && typeof obj.env === 'object' ? obj.env : {} }
+  })
+}

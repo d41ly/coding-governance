@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+# adopt-policy.sh — scaffold a repository's policy file, and check it against the policy catalogue.
+#
+#   bash <this kit>/adopt-policy.sh --scaffold [--target <repo>]   # write .governance/policy.toml if absent
+#   bash <this kit>/adopt-policy.sh --check [--target <repo>]      # every policy arm over <repo>
+#
+# <repo> defaults to the git top level of the working directory.
+#
+# `--scaffold` writes the starter file `policy.py scaffold` prints, and ONLY when no file is there:
+# a policy file is the repository's own from its first write, so an existing one is kept byte for
+# byte and the script says "kept". Then, kept or written, it renders the harness's two concurrency
+# settings from the agent limit at HEAD, `policy.py settings --write`, whenever HEAD resolves, so an
+# adopter spawns on install day without running the render by hand, and then the JSON mirror,
+# `policy.py mirror --write` (TOOL-dGroundRules-25 S7); with no commit yet it prints one line naming
+# the re-run, and while an input of the mirror is uncommitted, as on install day, one line deferring
+# the mirror to the re-run after the commit, unless `check_policy.py`'s `arm_schema` finds the policy
+# file invalid, which exits 2 printing its findings (TOOL-dGroundRules-34 S20). `[[regenerate]]` in
+# kit.toml runs this same verb on every update unless GOVKIT_RERENDER=0 is exported
+# (TOOL-dGroundRules-21 S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
+#
+# The kit dir is this script's own directory, never spelled, so the adopter runs from wherever the
+# kit is installed. Its refusals are armed by `adopt-policy.test.sh` beside it.
+#
+#   Exit 0 = written, kept or green · 1 = red, or a write failed · 2 = wrong invocation, no
+#   repository, no python, or an invalid policy file on install day.
+set -u
+
+HERE=.; [[ $0 == */* ]] && HERE=${0%/*}; HERE="$(cd "$HERE" && pwd)" || exit 2
+USAGE="usage: bash <this kit>/adopt-policy.sh --scaffold | --check [--target <repo>]"
+
+MODE=""
+TARGET=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --scaffold|--check) [ -z "$MODE" ] || { echo "$USAGE"; exit 2; }
+                        MODE="$1" ;;
+    --target) [ $# -ge 2 ] || { echo "$USAGE"; exit 2; }
+              TARGET="$2"; shift ;;
+    *) echo "$USAGE"; exit 2 ;;
+  esac
+  shift
+done
+[ -n "$MODE" ] || { echo "$USAGE"; exit 2; }
+if [ -z "$TARGET" ]; then
+  TARGET="$(git rev-parse --show-toplevel 2>/dev/null)" || {
+    echo "policy: the working directory is in no git repository; name one with --target <repo>"; exit 2; }
+fi
+[ -d "$TARGET" ] || { echo "policy: --target $TARGET is not a directory"; exit 2; }
+
+# The resolver, INLINE. This kit is copy-installed as a standalone directory, so the shared lib
+# does not exist in an adopting repo. The block below is byte-identical to the canonical copy its
+# own marker line names, and that copy's self-test reds if any inline copy drifts.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+PY=$(resolve_python) || exit 2
+
+if [ "$MODE" = "--check" ]; then
+  "$PY" -B "$HERE/check_policy.py" --repo "$TARGET"
+  exit $?
+fi
+
+FILE="$TARGET/.governance/policy.toml"
+if [ -e "$FILE" ]; then
+  echo "kept     $FILE — a policy file is the repository's own, and the scaffold never overwrites it"
+else
+  if ! mkdir -p "$TARGET/.governance" 2>/dev/null; then
+    echo "policy: the directory .governance could not be made in $TARGET"
+    exit 1
+  fi
+  _tmp=$(mktemp -u "$FILE.XXXXXXXX")
+  if ! { "$PY" -B "$HERE/policy.py" scaffold > "$_tmp" && mv "$_tmp" "$FILE"; } 2>/dev/null; then
+    rm -f "$_tmp" 2>/dev/null
+    echo "policy: the scaffold could not be written to $FILE"
+    exit 1
+  fi
+  echo "wrote    $FILE"
+fi
+
+# The harness's settings, rendered from the agent limit at HEAD wherever HEAD resolves.
+if ! git -C "$TARGET" rev-parse --verify -q HEAD >/dev/null 2>&1; then
+  echo "policy: $TARGET has no commit yet, so the harness settings are not rendered; re-run --scaffold after the first commit"
+  exit 0
+fi
+if ! (cd "$TARGET" && "$PY" -B "$HERE/policy.py" settings --write); then
+  echo "policy: the harness settings could not be rendered in $TARGET; the line above says why"
+  exit 1
+fi
+# Then the JSON mirror the hooks read, rendered at HEAD the same way (TOOL-dGroundRules-25 S7), so an
+# adopter's bar finds it fresh at its preflight. On install day every input it records differs from
+# HEAD, so its `uncommitted changes` refusal, and only that one, is deferred to the re-run after the
+# first commit, naming the input the refusal names (TOOL-dGroundRules-31); the scaffold compares no
+# input itself. Every other refusal stands.
+OUT=$(cd "$TARGET" && "$PY" -B "$HERE/policy.py" mirror --write 2>&1)
+RC=$?
+if [ "$RC" = 2 ] && [[ "$OUT" == *"uncommitted changes"* ]]; then
+  # An invalid policy file is never deferred (TOOL-dGroundRules-34 S20): `check_policy.py`'s
+  # `arm_schema` grades the working-tree file first, and a finding stops the scaffold, exit 2.
+  SCHEMA=$("$PY" -B "$HERE/check_policy.py" --repo "$TARGET" 2>&1 |
+    awk '/^policy-check: arm_schema · /{f=1; print; next} f && /^  /{print; next} {f=0}')
+  case "$SCHEMA" in
+    "policy-check: arm_schema · "[1-9]*)
+      echo "policy: $TARGET/.governance/policy.toml is invalid, so the mirror is not deferred; fix it, then re-run --scaffold"
+      printf '%s\n' "$SCHEMA"
+      exit 2 ;;
+  esac
+  INPUT=${OUT#*refused · }
+  echo "adopt-policy: mirror deferred · ${INPUT%%:[0-9]* · uncommitted changes*} has uncommitted changes · commit, then re-run --scaffold"
+elif [ "$RC" != 0 ]; then
+  echo "policy: the policy mirror could not be rendered in $TARGET; the line below says why"
+  printf '%s\n' "$OUT"
+  exit 1
+else
+  printf '%s\n' "$OUT"
+fi
+exit 0

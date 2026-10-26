@@ -41,7 +41,14 @@
 # A declaration that EXISTS and selects nothing is still exit 2 — that is an authoring error, not an
 # unadopted gate, and it is the anti-vacuity arm.
 #
-# Exit 0 = every subject within its limit, or not adopted · 1 = an offender or a stale row · 2 = could not run.
+# THE SWITCH (TOOL-dGroundRules-9). An over-length line WARNS or REFUSES as the policy kit's
+# `budgets.enforce` and `budgets.pinned` say for the cap `line-length`, a FAMILY: its values stay the
+# rows above, and the policy reader is asked only the mode, ONCE, at the first breach. Under `warn` a
+# breach prints a `BUDGET WARN` line and passes; under `refuse`, or with the cap pinned, it is check 3,
+# naming the rule. With no policy kit beside this gate, or a reader that refuses, every breach refuses
+# as it did before, and the gate says so once. Checks 1, 2, 4, 5 and 6 are correctness: never switched.
+#
+# Exit 0 = every subject within its limit, a warned breach, or not adopted · 1 = an offender or a stale row · 2 = could not run.
 set -u
 _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "check-line-length: not a git tree"; exit 2; }
@@ -84,6 +91,81 @@ resolve_python() {
   return 1
 }
 PY_BIN=$(resolve_python "${LINELEN_PY:-}") || exit 2
+
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. `resolve_kit_dir <python> <home> <anchor> <here>` prints the kit directory ABSOLUTE, or the
+# resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+  "$1" -c "${_rkd%$'\n'}"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+print(d.as_posix())' "$2" "$3" "$4"
+}
+
+# The switch for `line-length`, read ONCE and only at the first breach: the mode and the rule that set
+# it, from `budgets.py resolve --explain`. Unanswered, by an absent kit or a refusal, it is `refuse`,
+# as before this unit, and the reason prints once.
+LL_MODE="" LL_RULE=""
+read_line_mode() {
+  [ -n "$LL_MODE" ] && return 0
+  local _pk="" _out=""
+  if _pk=$(resolve_kit_dir "$PY_BIN" policy budgets.py "$_self_dir" 2>&1) \
+      && _out=$("$PY_BIN" "$_pk/budgets.py" resolve --explain line-length 2>&1); then
+    LL_MODE=$(printf '%s\n' "$_out" | awk -F'\t' '$1 == "line-length" { print $3 }')
+    LL_RULE=$(printf '%s\n' "$_out" | awk -F' · ' '$1 == "budgets: line-length" { print $2 }')
+  fi
+  if [ -z "$LL_MODE" ]; then
+    LL_MODE=refuse
+    LL_RULE="no policy kit answered, so a breach refuses as before"
+    _out=${_out:-$_pk}
+    printf 'check-line-length: %s — %s\n' "$LL_RULE" "${_out%%$'\n'*}"
+  fi
+}
 
 # The offender scanner. One python invocation, because the fence machine has to be a real parser and
 # `awk` in the C locale counts BYTES rather than characters.
@@ -179,7 +261,13 @@ for f in $subjects; do
   fi
   n=$(printf '%s\n' "$over" | grep -c . || true)
   if [ "$n" -gt 0 ]; then
-    fail 3 "a subject carries line(s) over its limit of $limit characters, resolved from $src: $f"
+    read_line_mode
+    if [ "$LL_MODE" = warn ]; then
+      longest=$(printf '%s\n' "$over" | awk -F: '$2 + 0 > m { m = $2 + 0 } END { print m + 0 }')
+      printf 'BUDGET WARN — line-length · %s · %s chars over %s · %s line(s) · %s\n' "$f" "$longest" "$limit" "$n" "$LL_RULE"
+    else
+      fail 3 "a subject carries line(s) over its limit of $limit characters, resolved from $src: $f ($LL_RULE)"
+    fi
     printf '%s\n' "$over" | while IFS=: read -r ln len; do
       [ -n "$ln" ] && printf '  %s:%s is %s characters\n' "$f" "$ln" "$len"
     done

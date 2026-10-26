@@ -142,7 +142,13 @@ CODEBASE_MAP="${CODEBASE_MAP_DIR##*/}"
 # Fixture identity and line endings for every git below, through the environment and not per repo
 # (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
 export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t.test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t.test
-export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
+# The initial branch is PINNED too (TOOL-dGroundRules-9). Checks 6 and 7 obey the policy kit's size
+# switch, read at the landed revision, which in a repository with no remote is local main: a plain
+# `git init` here lands on master, so no fixture has a landed revision, every check-6/7 breach refuses
+# as before whatever the node's own init.defaultBranch says, and the switch's own warn and refuse
+# cases are the policy kit's `budgets-cap-` fixtures. A fixture that names main itself is unaffected.
+export GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
+export GIT_CONFIG_KEY_1=init.defaultBranch GIT_CONFIG_VALUE_1=master
 cd "$TMP" || exit 2
 git init -q --template= .
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
@@ -1054,6 +1060,16 @@ lineno()  { grep -nF "$1" <<<"$out" | head -1 | cut -d: -f1; }
 before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
             { [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ]; } \
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
+# NO PYTHON LAUNCHER (TOOL-dGroundRules-25 S35): the checker stops at its resolver with exit 2 and its
+# own line, never a pass over nothing. Every launcher name on PATH answers as the Microsoft Store stub
+# does, exit 9009, and no override is set. The line is asserted by its TEXT: an exit 2 is no `fail`
+# call, so `check-arms.py --report` lists no branch for it and this arm is its one witness.
+mkdir -p "$TMP/nopy"
+for _np in python3 python py; do printf '#!/usr/bin/env bash\nexit 9009\n' > "$TMP/nopy/$_np"; chmod +x "$TMP/nopy/$_np"; done
+_npout=$(env -u GOV_PYTHON PATH="$TMP/nopy:$PATH" bash "$SCRIPT" 2>&1); _nprc=$?
+n=$((n+1)); [ "$_nprc" = 2 ] || { echo "FAIL no python launcher: the checker exited $_nprc, not 2"; st=1; }
+n=$((n+1)); grep -qF "HYGIENE — no usable python" <<<"$_npout" \
+  || { echo "FAIL no python launcher: the checker never printed 'HYGIENE — no usable python': $_npout"; st=1; }
 # ONE SCOPED RUN, its liveness asserted (TOOL-aSparedSpawn-7 S8). Leaves the output in `sout` and the
 # exit in `src`, never in `out`, which the main block's arms read. Counts one assertion per requested
 # id named among what RAN, plus one for the unreached-guard refusal being absent: a scoped arm reading
@@ -1490,12 +1506,14 @@ n=$((n+1))
 hit  'HYGIENE check 7 FAILED'
 # The finding now NAMES THE CAP it was measured against. With a per-class width (300 for an index,
 # 350 for a build README) "419 chars" alone does not tell an operator whether that is a violation.
-n7=$(grep -cE '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\)$' <<<"$out")
+# ...and after ` · `, the rule that refused it (TOOL-dGroundRules-9). No fixture here has a landed
+# revision, so the policy reader refuses and the rule is budgets.py's READER_REFUSED.
+n7=$(grep -cE '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\) · [^[:cntrl:]]+$' <<<"$out")
 [ "$n7" = 2 ] || { echo "FAIL check 7 emitted $n7 findings, expected exactly 2 (fence, comment and separator are exempt; the 300-byte row is under the cap)"; st=1; }
 n=$((n+1))
-hitl 'memory/backlog/ARCH.md:7 (301 chars > 300)'
+hitl 'memory/backlog/ARCH.md:7 (301 chars > 300) · the policy reader refused, so a breach refuses as before'
 miss 'memory/backlog/ARCH.md:6 ('
-c7line=$(grep -E '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\)$' <<<"$out" | head -1)
+c7line=$(grep -E '^memory/backlog/ARCH\.md:[0-9]+ \([0-9]+ chars > [0-9]+\) · [^[:cntrl:]]+$' <<<"$out" | head -1)
 case "$c7line" in 'memory/backlog/ARCH.md:5 ('*) ;;
   *) echo "FAIL check 7 reported '$c7line'; expected the offending row at UNFENCED line 5 (raw line 8)"; st=1;; esac
 
@@ -4367,7 +4385,9 @@ fi
 # spec-token checker sits in the kit directory's parent. Counted by reading; OWED: observed at the close.
 # RAISED 666 -> 668 by TOOL-dTrueNorth-27: its two full-run check-29-and-30 assertions, each top-level and
 # skipped aloud with that block's others. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=668
+# RAISED 668 -> 670 by TOOL-dGroundRules-25 S35: its two no-launcher assertions, exit 2 and the line,
+# each top-level and never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=670
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

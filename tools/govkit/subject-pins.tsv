@@ -85,6 +85,8 @@ playbook placeholder catalogue	repo	product
 playbook render selftest	kit	selftests
 playbook render wiring	repo	wiring
 playbook validity gate	repo	declarations
+policy check	repo	declarations
+policy fixtures	kit	selftests
 pre-push bar self-test	kit	selftests
 pre-push run-log line	repo	selftests
 pre-push self-test	kit	selftests

@@ -6,7 +6,8 @@ scope = "repo"
 # The TEMPLATE, since TOOL-aRepatriatedFork-7: `tier2-review.js` is a render now, and a version constant
 # the [[files]] rules do not land is one an adopter cannot pin against. Both carry the same line.
 version_from = { file = "tier2-review.template.js", pattern = "version: " }
-requires = ["agent-cap"]
+# `policy` since TOOL-dGroundRules-10: the renderer reads the `{{FANOUT_CAP}}` width from its reader.
+requires = ["agent-cap", "policy"]
 why_two_ids = "this directory versions its files under TWO kit ids — the review harness and the drift-audit workflows — so a single version_from cannot describe it. The drift-audit workflow scripts travel with the drift-audit entry."
 
 [[files]]
@@ -57,7 +58,7 @@ placeholders = ["TOOL_ROOT"]
 # NOT come from `TOOL_ROOT`: an adopter may install the memory-tree kit flat in its tool root, and
 # both measured adopters do, so `TOOL_ROOT` plus `memory-tree/` names a file neither has. The renderer
 # PROBES the tracked tree for `gotchas.py`, and when it finds none it SKIPS this pair out loud and
-# still renders the protocol, because this kit requires agent-cap and nothing else.
+# still renders the protocol, because this kit requires agent-cap and policy and nothing else.
 [[files]]
 include = ["unattended-build.template.js"]
 role = "rendered"
@@ -65,10 +66,10 @@ to = "{kit}/unattended-build.js"
 placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "FANOUT_CAP"]
 
 # THE REVIEW AND DRIFT-AUDIT HARNESSES ARE RENDERED TOO, since TOOL-aRepatriatedFork-7, and for ONE
-# token: `FANOUT_CAP`. A repo may LOWER the fan-out cap in a tracked `.agent-cap.conf`, and the hook
-# then denies any harness still carrying the ceiling as a literal — so an adopter at a lower cap kept
-# a hand fork of all four. The renderer asks the hook for the value (`--print-cap`), and at no conf
-# every render is byte-identical to the file it replaces. The same engine-to-rendered move the build
+# token: `FANOUT_CAP`, the concurrency width. An adopter whose fan-out bound differed kept a hand fork
+# of all four. Since TOOL-dGroundRules-10 the token is the agent limit, `runtime.agents-in-flight`,
+# which the renderer reads from the policy kit's reader at HEAD; the verify total is the agent-cap
+# hook's MAX_VERIFIERS, which the templates write as a literal. The same engine-to-rendered move the build
 # harness made above, and the same adopter migration: the runbook section the kit README points at.
 # drift-audit-state takes `TOOL_ROOT` as well, for the example leg-manifest path its input block shows
 # (TOOL-aRepatriatedFork-26): the renderer substitutes every token into every template it pairs.

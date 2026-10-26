@@ -15,13 +15,14 @@ export const meta = {
 // gov:kit drift-audit@1.30
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
-// budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
-// BOTH ARE BARE LITERALS AND NEITHER IS CALLER-SETTABLE. The retired form bound each of them from
-// an `<expr> || 5` fallback, which read as a constant to the guard and as a knob to the runtime — so
-// a caller raised this harness's own agent count past the cap with every gate green. agent-cap.js
-// now RESOLVES the bound and refuses that binder form outright. (The spelling itself is paraphrased
+// budget: N findings fanned one-skeptic-each still spawn N agents, a limit's worth at a time.
+// BOTH ARE BARE LITERALS IN THE RENDER AND NEITHER IS CALLER-SETTABLE. The retired form bound each of
+// them from an `<expr> || 5` fallback, which read as a constant to the guard and as a knob to the
+// runtime — so a caller raised this harness's own agent count past the cap with every gate green.
+// agent-cap.js RESOLVES the verify total and refuses that binder form outright; `CAP` is the agent
+// limit, `runtime.agents-in-flight`, which the harness's own settings enforce (TOOL-dGroundRules-10). (The spelling itself is paraphrased
 // here on purpose: the acceptance grep for it is repo-wide and would match the comment explaining it.)
-const CAP = 5
+const CAP = 6
 // TOOL-dRetiredFork-6, taken from adopter ic's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
 // hand-written ternary with THREE outcomes that conflated TWO of them: `!synth` gave UNVERIFIED,
 // anything non-zero gave PARTIAL, and everything else gave the bare string `complete` — so "nothing
@@ -93,6 +94,8 @@ if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !/^[A-Za-
   throw new Error('drift-audit-code: `workerType` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' + JSON.stringify(a.workerType) + '.')
 const skepticOpts = a.workerType ? { agentType: a.workerType } : {}
 const OUT = a.outDir || `${REPO}/memory`
+// The verify total is the agent-cap hook's own MAX_VERIFIERS, the review protocol's, and never the
+// agent limit `CAP` renders, which bounds how many run at once (TOOL-dGroundRules-10 F3).
 const MAX_VERIFIERS = 5
 
 const COMMON = `

@@ -161,7 +161,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-36 — the config check walks the target worktree's own git directory for submodules, so a linked worktree's submodules are graded](spec/2026-10-23-spec-TOOL-dSafePassage-36.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dSafePassage-37 — the refused-key predicate keeps every key named as a hook, and the step environment closes the `ext::` transport by one command-scope pair](spec/2026-10-23-spec-TOOL-dSafePassage-37.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-24 |
-| [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | DEFERRED | rev-5 | 2026-10-25 |
+| [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | DEFERRED | rev-6 | 2026-10-25 |
 | [TOOL-dSafePassage-39 — the step row's `via` mark survives every rewrite that keeps the row `applied`, so the reverse walk's own records cannot erase it](spec/2026-10-23-spec-TOOL-dSafePassage-39.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-40 — the forward walk marks a row `via: witness` only when nothing records that its up ever ran](spec/2026-10-23-spec-TOOL-dSafePassage-40.md) | 6 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 | [TOOL-dSafePassage-31 — the write lock records its holder's pid namespace, and a holder from another namespace reads unknown](spec/2026-10-23-spec-TOOL-dSafePassage-31.md) | 7 | 2 | DEFERRED | rev-2 | 2026-10-23 |
@@ -231,21 +231,21 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 58 spec(s) at 
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dSafePassage-1`, `TOOL-dSafePassage-3` | yes |
-| 2 | `TOOL-dSafePassage-16`, `TOOL-dSafePassage-2`, `TOOL-dSafePassage-20`, `TOOL-dSafePassage-4`, `TOOL-dSafePassage-43`, `TOOL-dSafePassage-7` | yes |
-| 3 | `TOOL-dSafePassage-11`, `TOOL-dSafePassage-12`, `TOOL-dSafePassage-15`, `TOOL-dSafePassage-18`, `TOOL-dSafePassage-19`, `TOOL-dSafePassage-22`, `TOOL-dSafePassage-24`, `TOOL-dSafePassage-8` | yes |
-| 4 | `TOOL-dSafePassage-10`, `TOOL-dSafePassage-17`, `TOOL-dSafePassage-23`, `TOOL-dSafePassage-25`, `TOOL-dSafePassage-29`, `TOOL-dSafePassage-30`, `TOOL-dSafePassage-32`, `TOOL-dSafePassage-6`, `TOOL-dSafePassage-9` | yes |
-| 5 | `TOOL-dSafePassage-13`, `TOOL-dSafePassage-21`, `TOOL-dSafePassage-27`, `TOOL-dSafePassage-28`, `TOOL-dSafePassage-33`, `TOOL-dSafePassage-36`, `TOOL-dSafePassage-37`, `TOOL-dSafePassage-5` | yes |
-| 6 | `TOOL-dSafePassage-26`, `TOOL-dSafePassage-39`, `TOOL-dSafePassage-40` | yes |
+| 1 | `TOOL-dSafePassage-1`, `TOOL-dSafePassage-3` | no |
+| 2 | `TOOL-dSafePassage-16`, `TOOL-dSafePassage-2`, `TOOL-dSafePassage-20`, `TOOL-dSafePassage-4`, `TOOL-dSafePassage-43`, `TOOL-dSafePassage-7` | no |
+| 3 | `TOOL-dSafePassage-11`, `TOOL-dSafePassage-12`, `TOOL-dSafePassage-15`, `TOOL-dSafePassage-18`, `TOOL-dSafePassage-19`, `TOOL-dSafePassage-22`, `TOOL-dSafePassage-24`, `TOOL-dSafePassage-8` | no |
+| 4 | `TOOL-dSafePassage-10`, `TOOL-dSafePassage-17`, `TOOL-dSafePassage-23`, `TOOL-dSafePassage-25`, `TOOL-dSafePassage-29`, `TOOL-dSafePassage-30`, `TOOL-dSafePassage-32`, `TOOL-dSafePassage-6`, `TOOL-dSafePassage-9` | no |
+| 5 | `TOOL-dSafePassage-13`, `TOOL-dSafePassage-21`, `TOOL-dSafePassage-27`, `TOOL-dSafePassage-28`, `TOOL-dSafePassage-33`, `TOOL-dSafePassage-36`, `TOOL-dSafePassage-37`, `TOOL-dSafePassage-5` | no |
+| 6 | `TOOL-dSafePassage-26`, `TOOL-dSafePassage-39`, `TOOL-dSafePassage-40` | no |
 | 7 | `TOOL-dSafePassage-31`, `TOOL-dSafePassage-34` | yes |
 | 8 | `TOOL-dSafePassage-35`, `TOOL-dSafePassage-41` | yes |
 | 9 | `TOOL-dSafePassage-38` | no |
-| 10 | `TOOL-dSafePassage-42`, `TOOL-dSafePassage-44` | yes |
+| 10 | `TOOL-dSafePassage-42`, `TOOL-dSafePassage-44` | no |
 | 11 | `TOOL-dSafePassage-45`, `TOOL-dSafePassage-46` | yes |
-| 12 | `TOOL-dSafePassage-47`, `TOOL-dSafePassage-48`, `TOOL-dSafePassage-50` | yes |
+| 12 | `TOOL-dSafePassage-47`, `TOOL-dSafePassage-48`, `TOOL-dSafePassage-50` | no |
 | 13 | `TOOL-dSafePassage-49`, `TOOL-dSafePassage-52` | yes |
-| 14 | `TOOL-dSafePassage-51`, `TOOL-dSafePassage-57`, `TOOL-dSafePassage-58` | yes |
-| 15 | `TOOL-dSafePassage-53`, `TOOL-dSafePassage-54`, `TOOL-dSafePassage-55`, `TOOL-dSafePassage-56`, `TOOL-dSafePassage-59` | yes |
+| 14 | `TOOL-dSafePassage-51`, `TOOL-dSafePassage-57`, `TOOL-dSafePassage-58` | no |
+| 15 | `TOOL-dSafePassage-53`, `TOOL-dSafePassage-54`, `TOOL-dSafePassage-55`, `TOOL-dSafePassage-56`, `TOOL-dSafePassage-59` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
