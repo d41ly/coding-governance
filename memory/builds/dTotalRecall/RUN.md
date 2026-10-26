@@ -160,3 +160,21 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T07:48:33Z rescope · item add TOOL-dTotalRecall-92 · reason spec-audit round 1 of units 77 to 88 (reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md) the 24 confirmed minors batched into one unit: 17 MEDIUM, ids 2 3 5 6 10 11 12 13 16 17 18 19 20 24 25 26 27 (items M1 to M15), and 7 LOW, ids 7 8 9 14 15 21 28 (items L1 to L7); lands on several units, so repairs no unit in particular, landing at order 39
 
 2026-10-26T08:04:15Z review · item dTotalRecall-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 24 · disposition promote
+
+2026-10-26T08:54:34Z rescope · item add TOOL-dTotalRecall-93 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) id 1 HIGH, item H1 shared with id 28: unit 90's has_deviation assigns a record to a unit by its Departs from address, which never names the record's own unit, so every write-once guard of units 89 to 92 counts 0 over records that exist; repairs TOOL-dTotalRecall-90, landing at order 37
+
+2026-10-26T08:54:45Z rescope · item add TOOL-dTotalRecall-94 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) id 28 HIGH, item H1 shared with id 1: unit 90's AC3 fixture holds a record whose address is its own unit, a shape no real record has, so the probe passes its fixture and is never run over the real records it misses; repairs TOOL-dTotalRecall-90, landing at order 37
+
+2026-10-26T08:54:46Z rescope · item add TOOL-dTotalRecall-95 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) id 2 HIGH, item H2 alone, one defect with ids 13 and 19 at item M5: unit 90's record recipe puts no pass(59) in Evidence, so unit 89 counts the record of unit 59 that unit 90 wrote as 0 and writes a second one; repairs TOOL-dTotalRecall-90, landing at order 37
+
+2026-10-26T08:54:47Z rescope · item add TOOL-dTotalRecall-96 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) id 12 HIGH, item H3 shared with id 30: unit 91's c5_of prints passed for a read with rc=1 and no failure line, which only a checker that never ran gives, so unit 69's AC1 is answered green from a read in which C5 never ran; repairs TOOL-dTotalRecall-91, landing at order 38
+
+2026-10-26T08:54:48Z rescope · item add TOOL-dTotalRecall-97 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) id 30 HIGH, item H3 shared with id 12: unit 91's c5_of drops every labelled line it cannot place and states no extraction from unit 80's ledger, so an indented check-5 line or an rc=0 beside a check-5 line reads passed; repairs TOOL-dTotalRecall-91, landing at order 38
+
+2026-10-26T08:54:49Z rescope · item add TOOL-dTotalRecall-98 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) id 15 HIGH, item H4 alone: unit 92's restore listing runs with git's rename detection, so a record deleted in a commit that adds a near-copy is listed as a rename and never restored, while AC11 passes; repairs TOOL-dTotalRecall-92, landing at order 40
+
+2026-10-26T08:54:50Z rescope · item add TOOL-dTotalRecall-99 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) id 29 HIGH, item H5 alone: every criterion over unit 92's tip scan is the absence of a line, so a scan that crashes with empty output passes AC8, AC11, AC15, AC16, AC18 and AC22; repairs TOOL-dTotalRecall-92, landing at order 40
+
+2026-10-26T08:54:50Z rescope · item add TOOL-dTotalRecall-100 · reason spec-audit round 1 of units 89 to 92 (reviews/2026-10-26-review-TOOL-dTotalRecall-89-spec-audit-round1.md) the 20 confirmed minors batched into one unit: 14 MEDIUM, ids 3 4 6 7 13 14 19 21 23 24 25 26 31 32 (items M1 to M9), and 6 LOW, ids 9 10 11 16 17 22 (items L1 to L5); lands on several units, so repairs no unit in particular, landing at order 41
+
+2026-10-26T09:18:12Z review · item dTotalRecall-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 20 · disposition promote
