@@ -62,3 +62,29 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T01:38:46Z rescope · item add KICK-dKeptSession-43 · reason spec-audit round1 of the dKeptSession spec set, finding id 57 at HIGH, report item H10
 
 2026-10-26T01:38:49Z rescope · item add KICK-dKeptSession-44 · reason spec-audit round1 of the dKeptSession spec set, minors batch, MEDIUM ids 3 5 6 7 34 8 37 9 10 11 15 19 20 21 46 23 24 27 33 35 36 40 48 49 50 51 52 56 59 60 61 62 63 and LOW ids 12 13 14 44 18 41 42 43 53
+
+2026-10-26T03:37:07Z rescope · item add KICK-dKeptSession-45 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 28 at HIGH, report item H1, which it shares with id 38, promoted as KICK-dKeptSession-46; id 18 is the same defect at MEDIUM, item M12, batched into KICK-dKeptSession-56
+
+2026-10-26T03:37:12Z rescope · item add KICK-dKeptSession-46 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 38 at HIGH, report item H1, which it shares with id 28, promoted as KICK-dKeptSession-45
+
+2026-10-26T03:37:15Z rescope · item add KICK-dKeptSession-47 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 16 at HIGH, report item H2; id 44 is the same defect at MEDIUM, item M25, batched into KICK-dKeptSession-56
+
+2026-10-26T03:37:17Z rescope · item add KICK-dKeptSession-48 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 43 at HIGH, report item H8
+
+2026-10-26T03:37:28Z rescope · item add KICK-dKeptSession-49 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 22 at HIGH, report item H3, which it shares with id 48, promoted as KICK-dKeptSession-50; id 9 is the same defect at MEDIUM, item M8, batched into KICK-dKeptSession-56
+
+2026-10-26T03:37:30Z rescope · item add KICK-dKeptSession-50 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 48 at HIGH, report item H3, which it shares with id 22, promoted as KICK-dKeptSession-49
+
+2026-10-26T03:37:32Z rescope · item add KICK-dKeptSession-51 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 39 at HIGH, report item H4; id 8 is the same defect at MEDIUM, item M7, batched into KICK-dKeptSession-56
+
+2026-10-26T03:37:34Z rescope · item add KICK-dKeptSession-52 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 3 at HIGH, report item H5
+
+2026-10-26T03:37:36Z rescope · item add KICK-dKeptSession-53 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 4 at HIGH, report item H6
+
+2026-10-26T03:37:38Z rescope · item add KICK-dKeptSession-54 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 21 at HIGH, report item H7
+
+2026-10-26T03:37:40Z rescope · item add KICK-dKeptSession-55 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, finding id 49 at HIGH, report item H9
+
+2026-10-26T03:37:42Z rescope · item add KICK-dKeptSession-56 · reason spec-audit round1 of the round-1 promotions KICK-dKeptSession-30 to -44, minors batch, MEDIUM ids 1 2 5 6 7 8 9 10 11 17 18 19 20 23 24 25 27 29 30 31 32 34 35 36 37 40 44 45 46 47 50 51 52 54 and LOW ids 12 13 14 15 26 33 41 42 53 55 56
+
+2026-10-26T04:00:18Z review · item dKeptSession-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 11 · minors 45 · disposition promote

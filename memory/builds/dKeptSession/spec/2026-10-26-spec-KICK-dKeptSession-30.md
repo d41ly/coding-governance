@@ -1,6 +1,6 @@
 # KICK-dKeptSession-30 — the context window derived per model from the node's observed usage, never pinned at 200000
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
+**Status:** OPEN · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 13 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 |
+| [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 |
 | [2026-10-26-build-KICK-dKeptSession-30-deviation-301.md](../build/2026-10-26-build-KICK-dKeptSession-30-deviation-301.md) | deviation | — |
+| [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
 <!-- /gen:spec-records -->
 
@@ -79,6 +80,11 @@ own transcripts show the window holds, and lets the harness's own window variabl
 ### Edges
 
 - **consumes-from** `KICK-dKeptSession-14` — `measure_context_fill`, `derive_context_fill`, `derive_context_tokens` and `CONTEXT_WINDOW_TOKENS`, the fill this unit re-points from the pinned window to the derived one (id 16)
+- **hands-off** `KICK-dKeptSession-45` — `derive_context_window`'s `root` argument, whose default that unit resolves through `resolve_projects_root` (id 28)
+- **hands-off** `KICK-dKeptSession-46` — `derive_context_fill` and `derive_context_window`, whose root that unit makes the caller's (id 38)
+- **hands-off** `KICK-dKeptSession-47` — the observation's compact events, which that unit attributes to a model (id 16)
+- **hands-off** `KICK-dKeptSession-48` — rung 1 and the mixed-window root, whose limit that unit states and observes (id 43)
+- **hands-off** `KICK-dKeptSession-56` — the window's scan, its rung 1, §3's cache non-goal and §5's price, and §7's legs, the batch's S11, S12, S14, S21 and S26 (ids 20, 45, 17, 29, 35)
 
 ## 4. Design
 
@@ -197,6 +203,9 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case o
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's B1 (id 16).
+- rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-45`, `KICK-dKeptSession-46`,
+  `KICK-dKeptSession-47`, `KICK-dKeptSession-48`, `KICK-dKeptSession-56` mirrored, the other ends of
+  the edges the round-1 promotions' audit's disposal declared
 
 ## 10. Reuse audit
 
