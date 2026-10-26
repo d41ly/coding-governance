@@ -21,13 +21,13 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 1. `cl-dClosedLoop-0166@83615023` · now `83615023`, as at the baseline · tokens: none, so the token arm cannot see this clause — the roster sorted by layer: twelve core roles (orientation scout, prompt writer, planner, researcher, reuse scout, architect, spec writer, builder, tester, one reviewer with a lens per step, skeptic, synthesizer), and the deployer and maintainer as expansion roles registered through the distribution, integrations and observability layer contracts, the deployer under both distribution's and integrations', their definitions built by dShippedRelease and dTendedCadence, with the reviewer's maintenance-run and loop lenses
 2. `cl-dClosedLoop-0167@0ec2ea97` · now `0ec2ea97`, as at the baseline · tokens: none, so the token arm cannot see this clause — each role's static instructions as structured fields, every limit paired with its enforcer, a ceiling of tools, write classes and gate legs, and a typed return template
 3. `cl-dClosedLoop-0168@abfd5f4f` · now `abfd5f4f`, as at the baseline · tokens: none, so the token arm cannot see this clause — the work order rendered per item (the item, its inputs handed as content, its allowance, its return template, its witness), hashed into the spawn marker and bound to its act by task-sha and the session's binding record
-4. `cl-dClosedLoop-0169@cdc1b7f9` · now `cdc1b7f9`, as at the baseline · tokens: none, so the token arm cannot see this clause — the prompt writer composing every role's task from the driver's details
+4. `cl-dClosedLoop-0169@cdc1b7f9` · now `60524f05` by deviation `2026-10-25-build-TOOL-dBoundRoles-4-deviation-41` · tokens: none, so the token arm cannot see this clause — the prompt writer composes the task of every role spawned directly through `Agent`, its own spawn excepted, and rule 6 refuses an unframed direct spawn while `prompts.author` is `prompt-writer`; a harness stage's prompt is still composed by its harness script.
 5. `cl-dClosedLoop-0170@d33b224b` · now `d33b224b`, as at the baseline · tokens: `roles.retries` — returns through a schema-forced channel, residual failures retried by `roles.retries`
 6. `cl-dClosedLoop-0171@efd80f4f` · now `efd80f4f`, as at the baseline · tokens: `role-sha` — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn
-7. `cl-dClosedLoop-0172@b73b4974` · now `b73b4974`, as at the baseline · tokens: none, so the token arm cannot see this clause — shell writes held to the allowance
+7. `cl-dClosedLoop-0172@b73b4974` · now `d88edbe8` by deviation `2026-10-25-build-TOOL-dBoundRoles-7-deviation-71` · tokens: none, so the token arm cannot see this clause — a role agent's shell write is held to the verdict an `Edit` of the same target meets, its write class through `checkRouted`, and additionally to its work order's `allowance` where the agent's spawned prompt carries one; an agent whose prompt carries no allowance block, every harness stage among them, is held to its class alone, with one witness line.
 8. `cl-dClosedLoop-0173@a66af889` · now `a66af889`, as at the baseline · tokens: none, so the token arm cannot see this clause — the role-gate arm's field escape explained and closed
 9. `cl-dClosedLoop-0174@b2c09e04` · now `b2c09e04`, as at the baseline · tokens: `none`, `review` — the `none` and `review` write classes enforced
-10. `cl-dClosedLoop-0175@79a1c7d0` · now `79a1c7d0`, as at the baseline · tokens: `driver.reads`, `prompts.author`, `roles.no-spawn` — `driver.reads`, `prompts.author` and `roles.no-spawn`
+10. `cl-dClosedLoop-0175@79a1c7d0` · now `0d300fb9` by deviation `2026-10-25-build-TOOL-dBoundRoles-10-deviation-102` · tokens: `driver.reads`, `prompts.author`, `roles.no-spawn` — `driver.reads`, under whose `state-reads-only` the main loop's `Grep` and `Glob` are refused and its `Read` admitted, and under whose `none-scout-only` all three are refused, the main loop's Bash reads unseen by the arm; `prompts.author`; and `roles.no-spawn`, under whose `executor-role-session` this build refuses `handoff.py render --stand-in`, naming the route that is always open, a role spawned through `Agent` or a listed harness, and naming dWellOiledMachine as the build whose executor starts the role session.
 11. `cl-dClosedLoop-0176@6a45e0b7` · now `6a45e0b7`, as at the baseline · tokens: `run.on-owner-question` — every fork resolved by the role that meets it and recorded, or held as `run.on-owner-question` says, its options only those the core admits, ranked the most feature-rich first and then the most expandable, its full record naming the admitted options in that ranking and the pick, seen red on a planted fork whose pick lies outside the admitted set and on one whose pick is not the first of its recorded ranking (LR-3)
 12. `cl-dClosedLoop-0177@4a09db23` · now `4a09db23`, as at the baseline · tokens: `placement.check` — the orientation scout's return carrying the placement disposition and its reason, the driver recording it and running `placement.check`
 13. `cl-dClosedLoop-0178@f3b0d6ea` · now `f3b0d6ea`, as at the baseline · tokens: none, so the token arm cannot see this clause — the trust mechanism (P29): inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch
@@ -63,13 +63,13 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - The 483 clauses of the other 21 chain builds' rows: carrying one needs a `**Moved:** <clause id> to dBoundRoles by <decision>` line.
 - Any path outside `memory/builds/dBoundRoles/`, but the product paths a build run's units record with `--dispatch --writes`, an ask row in another build's `BACKLOG.md`, and the shared renders a landing re-renders (README rule 7).
 - Another build's packet, the instruments under `memory/builds/dClosedLoop/build/*.py`, and this packet's pin lines: only `packet.py --repin <instrument>`, the owner's, moves a pin.
-- The surfaces of dConvergedCharter, which this build's clauses use as stand-ins only (Later builds named).
+- The surfaces of dWellOiledMachine, dConvergedCharter, which this build's clauses use as stand-ins only (Later builds named).
 
 ### Pins
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `78439dede4df9ccc5b8ae85a5f5e1e99407b277e`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `0598f12814ac37b33b734bf956001adf76822e94`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -78,7 +78,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `399ec42de36b47647ccd0a03a6fdcc1e361a40c7`
+- rendered at: `26a573a4fe8ae5feb526e546dc1847f30fa1821f`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -147,6 +147,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - `cl-dClosedLoop-0166` names dShippedRelease: "…the deployer under both distribution's and integrations', their definitions built by dShippedRelease and dTendedCadence, with the reviewer's maintenance-run…"
 - `cl-dClosedLoop-0166` names dTendedCadence: "…both distribution's and integrations', their definitions built by dShippedRelease and dTendedCadence, with the reviewer's maintenance-run and loop lenses"
+- `cl-dClosedLoop-0175` names dWellOiledMachine, a stand-in: "…that is always open, a role spawned through `Agent` or a listed harness, and naming dWellOiledMachine as the build whose executor starts the role session."
 - `cl-dClosedLoop-0181` names dConvergedCharter, a stand-in: "…`tools/roles/house/policy.toml` by workflow and stage only where no key is set, until dConvergedCharter retires the seed (M7, FA-6, the flow adoption's review),…"
 - `cl-dClosedLoop-0186` names dConvergedCharter, a stand-in: "…file's `[effort]` and `[gates]` read only where no key or grant field is set, until dConvergedCharter retires the seed, each seen red on a planted house-file…"
 
@@ -172,32 +173,32 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dBoundRol
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dBoundRoles-1` · README:62 | 1 | `TOOL-dBoundRoles-1` | `cl-dClosedLoop-0166@83615023` | the roster sorted by layer: twelve core roles (orientation scout |
-- unit id `TOOL-dBoundRoles-2` · README:63 | 2 | `TOOL-dBoundRoles-2` | `cl-dClosedLoop-0167@0ec2ea97` | each role's static instructions as structured fields |
-- unit id `TOOL-dBoundRoles-3` · README:64 | 3 | `TOOL-dBoundRoles-3` | `cl-dClosedLoop-0168@abfd5f4f` | the work order rendered per item (the item |
-- unit id `TOOL-dBoundRoles-4` · README:65 | 4 | `TOOL-dBoundRoles-4` | `cl-dClosedLoop-0169@cdc1b7f9` | the prompt writer composing every role's task from the driver's details |
-- unit id `TOOL-dBoundRoles-5` · README:66 | 5 | `TOOL-dBoundRoles-5` | `cl-dClosedLoop-0170@d33b224b` | returns through a schema-forced channel |
-- unit id `TOOL-dBoundRoles-6` · README:67 | 6 | `TOOL-dBoundRoles-6` | `cl-dClosedLoop-0171@efd80f4f` | the role index and agent files beyond every worker's reach |
-- unit id `TOOL-dBoundRoles-7` · README:68 | 7 | `TOOL-dBoundRoles-7` | `cl-dClosedLoop-0172@b73b4974` | shell writes held to the allowance |
-- unit id `TOOL-dBoundRoles-8` · README:69 | 8 | `TOOL-dBoundRoles-8` | `cl-dClosedLoop-0173@a66af889` | the role-gate arm's field escape explained and closed |
-- unit id `TOOL-dBoundRoles-9` · README:70 | 9 | `TOOL-dBoundRoles-9` | `cl-dClosedLoop-0174@b2c09e04` | the `none` and `review` write classes enforced |
-- unit id `TOOL-dBoundRoles-10` · README:71 | 10 | `TOOL-dBoundRoles-10` | `cl-dClosedLoop-0175@79a1c7d0` | `driver.reads` |
-- unit id `TOOL-dBoundRoles-11` · README:72 | 11 | `TOOL-dBoundRoles-11` | `cl-dClosedLoop-0176@6a45e0b7` | every fork resolved by the role that meets it and recorded |
-- unit id `TOOL-dBoundRoles-12` · README:73 | 12 | `TOOL-dBoundRoles-12` | `cl-dClosedLoop-0177@4a09db23` | the orientation scout's return carrying the placement disposition and its reason |
-- unit id `TOOL-dBoundRoles-13` · README:74 | 13 | `TOOL-dBoundRoles-13` | `cl-dClosedLoop-0178@f3b0d6ea` | the trust mechanism (P29): inputs handed as content |
-- unit id `TOOL-dBoundRoles-14` · README:75 | 14 | `TOOL-dBoundRoles-14` | `cl-dClosedLoop-0179@f74e2fff` | the `role` and `field` tag namespaces |
-- unit id `TOOL-dBoundRoles-15` · README:76 | 15 | `TOOL-dBoundRoles-15` | `cl-dClosedLoop-0180@145f826e` | the role static block carried once per spawn |
-- unit id `TOOL-dBoundRoles-16` · README:77 | 16 | `TOOL-dBoundRoles-16` | `cl-dClosedLoop-0181@6ebedcff` | the shapes |
-- unit id `TOOL-dBoundRoles-17` · README:78 | 17 | `TOOL-dBoundRoles-17` | `cl-dClosedLoop-0182@0cc5ed88` | every work order carrying its marker with `item=` |
-- unit id `TOOL-dBoundRoles-18` · README:79 | 18 | `TOOL-dBoundRoles-18` | `cl-dClosedLoop-0183@46564bcb` | its own upgrade steps: an adopter's rendered agents renamed as the two reviewer roles merge |
-- unit id `TOOL-dBoundRoles-19` · README:80 | 19 | `TOOL-dBoundRoles-19` | `cl-dClosedLoop-0184@923d7266` | the roles kit's house text files |
-- unit id `TOOL-dBoundRoles-20` · README:81 | 20 | `TOOL-dBoundRoles-20` | `cl-dClosedLoop-0185@ce70dc70` | a repository's roles and workflow entries |
-- unit id `TOOL-dBoundRoles-21` · README:82 | 21 | `TOOL-dBoundRoles-21` | `cl-dClosedLoop-0186@e356242a` | `roles.effort.<role>` |
-- unit id `TOOL-dBoundRoles-22` · README:83 | 22 | `TOOL-dBoundRoles-22` | `cl-dClosedLoop-0187@5afc67cc` | workflow entries as data: each entry's ordered stages |
-- unit id `TOOL-dBoundRoles-23` · README:84 | 23 | `TOOL-dBoundRoles-23` | `cl-dClosedLoop-0188@23b122f8` | the prompt writer's default frame for a role item |
-- unit id `TOOL-dBoundRoles-24` · README:85 | 24 | `TOOL-dBoundRoles-24` | `cl-dClosedLoop-0189@8d7be499` | the prompt writer's framing checked at render |
-- unit id `TOOL-dBoundRoles-25` · README:86 | 25 | `TOOL-dBoundRoles-25` | `cl-dClosedLoop-0190@03bbbf1e` | agent-cap's spawn guard and harness admission moved into the roles pack |
-- unit id `TOOL-dBoundRoles-26` · README:87 | 26 | `TOOL-dBoundRoles-26` | `cl-dClosedLoop-0191@66acd199` | the typed refusal return in every role's template |
+- unit id `TOOL-dBoundRoles-1` · README:61 | 1 | `TOOL-dBoundRoles-1` | `cl-dClosedLoop-0166@83615023` | the roster sorted by layer: twelve core roles (orientation scout |
+- unit id `TOOL-dBoundRoles-2` · README:62 | 2 | `TOOL-dBoundRoles-2` | `cl-dClosedLoop-0167@0ec2ea97` | each role's static instructions as structured fields |
+- unit id `TOOL-dBoundRoles-3` · README:63 | 3 | `TOOL-dBoundRoles-3` | `cl-dClosedLoop-0168@abfd5f4f` | the work order rendered per item (the item |
+- unit id `TOOL-dBoundRoles-4` · README:64 | 4 | `TOOL-dBoundRoles-4` | `cl-dClosedLoop-0169@cdc1b7f9` | the prompt writer composing every role's task from the driver's details |
+- unit id `TOOL-dBoundRoles-5` · README:65 | 5 | `TOOL-dBoundRoles-5` | `cl-dClosedLoop-0170@d33b224b` | returns through a schema-forced channel |
+- unit id `TOOL-dBoundRoles-6` · README:66 | 6 | `TOOL-dBoundRoles-6` | `cl-dClosedLoop-0171@efd80f4f` | the role index and agent files beyond every worker's reach |
+- unit id `TOOL-dBoundRoles-7` · README:67 | 7 | `TOOL-dBoundRoles-7` | `cl-dClosedLoop-0172@b73b4974` | shell writes held to the allowance |
+- unit id `TOOL-dBoundRoles-8` · README:68 | 8 | `TOOL-dBoundRoles-8` | `cl-dClosedLoop-0173@a66af889` | the role-gate arm's field escape explained and closed |
+- unit id `TOOL-dBoundRoles-9` · README:69 | 9 | `TOOL-dBoundRoles-9` | `cl-dClosedLoop-0174@b2c09e04` | the `none` and `review` write classes enforced |
+- unit id `TOOL-dBoundRoles-10` · README:70 | 10 | `TOOL-dBoundRoles-10` | `cl-dClosedLoop-0175@79a1c7d0` | `driver.reads` |
+- unit id `TOOL-dBoundRoles-11` · README:71 | 11 | `TOOL-dBoundRoles-11` | `cl-dClosedLoop-0176@6a45e0b7` | every fork resolved by the role that meets it and recorded |
+- unit id `TOOL-dBoundRoles-12` · README:72 | 12 | `TOOL-dBoundRoles-12` | `cl-dClosedLoop-0177@4a09db23` | the orientation scout's return carrying the placement disposition and its reason |
+- unit id `TOOL-dBoundRoles-13` · README:73 | 13 | `TOOL-dBoundRoles-13` | `cl-dClosedLoop-0178@f3b0d6ea` | the trust mechanism (P29): inputs handed as content |
+- unit id `TOOL-dBoundRoles-14` · README:74 | 14 | `TOOL-dBoundRoles-14` | `cl-dClosedLoop-0179@f74e2fff` | the `role` and `field` tag namespaces |
+- unit id `TOOL-dBoundRoles-15` · README:75 | 15 | `TOOL-dBoundRoles-15` | `cl-dClosedLoop-0180@145f826e` | the role static block carried once per spawn |
+- unit id `TOOL-dBoundRoles-16` · README:76 | 16 | `TOOL-dBoundRoles-16` | `cl-dClosedLoop-0181@6ebedcff` | the shapes |
+- unit id `TOOL-dBoundRoles-17` · README:77 | 17 | `TOOL-dBoundRoles-17` | `cl-dClosedLoop-0182@0cc5ed88` | every work order carrying its marker with `item=` |
+- unit id `TOOL-dBoundRoles-18` · README:78 | 18 | `TOOL-dBoundRoles-18` | `cl-dClosedLoop-0183@46564bcb` | its own upgrade steps: an adopter's rendered agents renamed as the two reviewer roles merge |
+- unit id `TOOL-dBoundRoles-19` · README:79 | 19 | `TOOL-dBoundRoles-19` | `cl-dClosedLoop-0184@923d7266` | the roles kit's house text files |
+- unit id `TOOL-dBoundRoles-20` · README:80 | 20 | `TOOL-dBoundRoles-20` | `cl-dClosedLoop-0185@ce70dc70` | a repository's roles and workflow entries |
+- unit id `TOOL-dBoundRoles-21` · README:81 | 21 | `TOOL-dBoundRoles-21` | `cl-dClosedLoop-0186@e356242a` | `roles.effort.<role>` |
+- unit id `TOOL-dBoundRoles-22` · README:82 | 22 | `TOOL-dBoundRoles-22` | `cl-dClosedLoop-0187@5afc67cc` | workflow entries as data: each entry's ordered stages |
+- unit id `TOOL-dBoundRoles-23` · README:83 | 23 | `TOOL-dBoundRoles-23` | `cl-dClosedLoop-0188@23b122f8` | the prompt writer's default frame for a role item |
+- unit id `TOOL-dBoundRoles-24` · README:84 | 24 | `TOOL-dBoundRoles-24` | `cl-dClosedLoop-0189@8d7be499` | the prompt writer's framing checked at render |
+- unit id `TOOL-dBoundRoles-25` · README:85 | 25 | `TOOL-dBoundRoles-25` | `cl-dClosedLoop-0190@03bbbf1e` | agent-cap's spawn guard and harness admission moved into the roles pack |
+- unit id `TOOL-dBoundRoles-26` · README:86 | 26 | `TOOL-dBoundRoles-26` | `cl-dClosedLoop-0191@66acd199` | the typed refusal return in every role's template |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -221,12 +222,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dBoundRoles`:
 
-Coverage of dBoundRoles's 26 clauses and 15 owned nodes, over 0 specs:
-- carried whole: 0; carried in parts: 0 (none)
+Coverage of dBoundRoles's 26 clauses and 15 owned nodes, over 59 specs:
+- carried whole: 26; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0169, cl-dClosedLoop-0170, cl-dClosedLoop-0171, cl-dClosedLoop-0172, cl-dClosedLoop-0173, cl-dClosedLoop-0174, cl-dClosedLoop-0175, cl-dClosedLoop-0176, cl-dClosedLoop-0177, cl-dClosedLoop-0178, cl-dClosedLoop-0179, cl-dClosedLoop-0180, cl-dClosedLoop-0181, cl-dClosedLoop-0182, cl-dClosedLoop-0183, cl-dClosedLoop-0184, cl-dClosedLoop-0185, cl-dClosedLoop-0186, cl-dClosedLoop-0187, cl-dClosedLoop-0188, cl-dClosedLoop-0189, cl-dClosedLoop-0190, cl-dClosedLoop-0191; stale: none; ambiguous: none
-- owned nodes no spec names: policy-key.driver.reads, policy-key.instructions.task-charter, policy-key.prompts.author, policy-key.roles.effort.<role>, policy-key.roles.effort.<workflow>.<stage>, policy-key.roles.effort.default, policy-key.roles.model.<role>.<harness>, policy-key.roles.no-spawn, policy-key.roles.retries, policy-key.run.on-owner-question, record-kind.work-order, system.role-shapes, tag-namespace.field, tag-namespace.role, tag-namespace.workflow
-- specs derived from no clause: none
+- uncarried: none; stale: cl-dClosedLoop-0169, cl-dClosedLoop-0172, cl-dClosedLoop-0175; ambiguous: none
+- owned nodes no spec names: none
+- specs derived from no clause: memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-37.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-38.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-39.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-40.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-41.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-42.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-43.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-44.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-45.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-46.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-47.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-48.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-49.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-50.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-51.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-52.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-53.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-54.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-55.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-56.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-57.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-58.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-59.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-60.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-61.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-62.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-63.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-64.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-65.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-66.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-67.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-68.md (PLAY-dClosedLoop-2), memory/builds/dBoundRoles/spec/2026-10-26-spec-TOOL-dBoundRoles-69.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0169, cl-dClosedLoop-0172, cl-dClosedLoop-0173, cl-dClosedLoop-0178, cl-dClosedLoop-0187, cl-dClosedLoop-0189
 
 ### Reading order
