@@ -136,6 +136,9 @@ DOWN_STOP_PREFIXES = ("down interrupted:", "down exit ", "witness still holds af
 # Why an attended row stops either walk: the forward walk records it as the row's failure, the
 # reverse walk prints it beside the order that names the down (TOOL-dSafePassage-2 S5, -4 S4).
 ATTENDED_STOP = "attended: the step needs the target's code"
+# The suffix of a forward-walk step line whose verdict the receipt cannot hold, being below schema 4
+# (TOOL-dSafePassage-15 S2): the verdict is output, and a stop is still a finding of `update`.
+NOT_RECORDED_SUFFIX = "(not recorded: receipt below schema 4)"
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 OID_RE = re.compile(r"[0-9a-f]{40}(?:[0-9a-f]{24})?")  # a blob oid, sha-1 or sha-256
 # The host a write lock and a reclaim guard name (TOOL-dSafePassage-2 S6): a holder is judged dead
@@ -1025,7 +1028,10 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
     does not hold after up` and stops. No down runs, and the steps before a stop stay applied.
 
     Each record goes through `set_step_state` into `receipt`, the caller's, and onto `receipt_path`
-    in one atomic write (S3); after each spawn `schema` and `steps` are re-read from disk, since a
+    in one atomic write (S3), and only where `test_steps_recordable` holds on `receipt`: below schema
+    4 none is made, nothing is written, and the step line ends `NOT_RECORDED_SUFFIX`, so a schema-3
+    receipt walks to `govkit/receipt-schema-4`, whose `applied` row lands after its up
+    (TOOL-dSafePassage-15). After each spawn `schema` and `steps` are re-read from disk, since a
     step may rewrite them. Returns `{"pending", "applied", "skipped", "stopped", "failure",
     "order"}`, `applied` counting the ups run and `skipped` the steps passed by their witness."""
     target, receipt_path = pathlib.Path(target).resolve(), pathlib.Path(receipt_path)
@@ -1033,15 +1039,21 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
     out = {"pending": len(rows), "applied": 0, "skipped": 0, "stopped": None, "failure": None,
            "order": None}
 
-    def persist(row: StepRow, state: str, failure: str | None = None) -> None:
+    def persist(row: StepRow, state: str, failure: str | None = None) -> str:
+        # TOOL-dSafePassage-15 S1: below schema 4 the receipt holds no row, so nothing is written and
+        # the step line carries the suffix this returns; the schema step's own `applied` row lands
+        # after its up, once the re-read brought schema 4 into `receipt`.
+        if not test_steps_recordable(receipt):
+            return f" {NOT_RECORDED_SUFFIX}"
         write_step_record(receipt_path, receipt, row, state, failure)
+        return ""
 
     def spawn(row: StepRow, phase: str) -> dict:
         return run_step_reread(row, phase, target, gov_root, receipt_path, receipt)
 
     def stop(row: StepRow, failure: str) -> dict:
-        persist(row, "failed", failure)
-        print(f"step {row.id} · failed · {failure}")
+        unrecorded = persist(row, "failed", failure)
+        print(f"step {row.id} · failed · {failure}{unrecorded}")
         out.update(stopped=row.id, failure=failure)
         return out
 
@@ -1051,8 +1063,8 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
         # Its up is what the attended mode keeps from spawning, and move 2 below keeps it so.
         seen = row._replace(needs_target=False)
         if spawn(seen, "witness")["verdict"] == "ok":
-            persist(row, "applied")
-            print(f"step {row.id} · skipped (witness holds)")
+            unrecorded = persist(row, "applied")
+            print(f"step {row.id} · skipped (witness holds){unrecorded}")
             out["skipped"] += 1
             continue
         if derive_step_mode(row) == "attended":
@@ -1070,8 +1082,8 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
         # path the before-image lists, and the image, journaled first (S8).
         write_step_staged(target, row.id, read_image_paths(target, row.id),
                           "the step stays recorded interrupted and the next walk runs it again")
-        persist(row, "applied")
-        print(f"step {row.id} · applied" + (" · by its resume" if phase == "resume" else ""))
+        unrecorded = persist(row, "applied")
+        print(f"step {row.id} · applied" + (" · by its resume" if phase == "resume" else "") + unrecorded)
         out["applied"] += 1
     return out
 
@@ -1667,10 +1679,11 @@ print("lock: taken", flush=True)
 while sys.argv[4] != "-" and not pathlib.Path(sys.argv[4]).exists() and time.time() < deadline:
     time.sleep(0.05)
 '''
-WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending")
+WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSafePassage-15
+WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending") + WALK_SCHEMA_PLANTS
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-unreadable",
                "lock-race", "guard-dead")
-UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit")
+UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update")
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
                    "callers")
 ROLLBACK_UPDATE_PLANTS = ("refused", "read-only", "descendant", "scoped", "no-base")
@@ -1700,10 +1713,49 @@ def render_fixture_row(slug: str, resume: bool = False, needs: bool = False) -> 
             + f'surfaces = []\nneeds-target = {"true" if needs else "false"}\n\n')
 
 
+# The schema step's plants (TOOL-dSafePassage-15), each an (anchor, replacement) over a copy of
+# `steps/receipt_schema_4.py`, read in `<target>.fx` as `fx.py` reads its own: `schema.fail` exits
+# the up 1 before any write, `schema.block` blocks after the temporary file is written and before
+# its rename, writing the pid and `schema.blocking`, until the fixture kills it.
+FIXTURE_SCHEMA_STEP_PLANTS = (
+    ("    code, msg, out = verbs[argv[0]](receipt)\n",
+     "    fx = path.parents[1].with_name(path.parents[1].name + \".fx\")\n"
+     "    if argv[0] == \"up\" and (fx / \"schema.fail\").exists():\n"
+     "        sys.stderr.write(\"fx: schema up fails by its plant\\n\")\n"
+     "        return 1\n"
+     "    code, msg, out = verbs[argv[0]](receipt)\n"),
+    ("        os.replace(tmp, path)\n",
+     "        if (fx / \"schema.block\").exists():\n"
+     "            (fx / \"schema.pid\").write_text(str(os.getpid()), encoding=\"utf-8\")\n"
+     "            (fx / \"schema.blocking\").touch()\n"
+     "            __import__(\"time\").sleep(300)\n"
+     "        os.replace(tmp, path)\n"),
+)
+
+
+def write_fixture_schema_step(gkd: pathlib.Path) -> str:
+    """Copy `steps/receipt_schema_4.py` into the scratch gov's kit directory `gkd` with
+    FIXTURE_SCHEMA_STEP_PLANTS applied, and return its `steps.toml` row as this checkout spells it
+    (TOOL-dSafePassage-15 S5). An anchor or row this checkout no longer holds is a refusal."""
+    text = (HERE / "steps" / "receipt_schema_4.py").read_text(encoding="utf-8")
+    for anchor, planted in FIXTURE_SCHEMA_STEP_PLANTS:
+        if anchor not in text:
+            raise Refusal(f"steps/receipt_schema_4.py no longer holds the fixture's anchor {anchor.strip()!r}")
+        text = text.replace(anchor, planted)
+    (gkd / "steps").mkdir(parents=True, exist_ok=True)
+    (gkd / "steps" / "receipt_schema_4.py").write_text(text, encoding="utf-8", newline="\n")
+    m = re.search(r'\[\[upgrade\]\]\nid = "govkit/receipt-schema-4"\n(?:[a-z-]+ = .*\n)*',
+                  (HERE / STEPS_FILE).read_text(encoding="utf-8"))
+    if not m:
+        raise Refusal(f"{STEPS_FILE} holds no govkit/receipt-schema-4 row for the fixture to copy")
+    return m[0] + "\n"
+
+
 def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, dict[str, str]]:
     """The `walk` family's scratch gov: A, a side branch from A introducing `s3`, B introducing `s1`
     and `s2`, the side branch merged at M, C introducing `s4`, and for `not-pending` D introducing
-    `s5`. The side commit is dated before B, so only the first-parent order puts `s3` at M."""
+    `s5`. The side commit is dated before B, so only the first-parent order puts `s3` at M. For a
+    `schema-3` plant, B introduces the copied `govkit/receipt-schema-4` row first (TOOL-dSafePassage-15)."""
     gov = tmp / "gov"
     gkd = gov / "tools" / HERE.name
     (gkd / "steps").mkdir(parents=True)
@@ -1714,6 +1766,9 @@ def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, 
     steps = gkd / STEPS_FILE
     row = {s: render_fixture_row(s, resume=(plant == "resume" and s == "s3"),
                                  needs=(plant == "attended" and s == "s2")) for s in ("s1", "s2", "s3", "s4", "s5")}
+    first = ("schema",) if plant in WALK_SCHEMA_PLANTS else ()
+    if first:
+        row["schema"] = write_fixture_schema_step(gkd)
     sha: dict[str, str] = {}
 
     def commit(name: str, date: int, *rows: str) -> None:
@@ -1727,27 +1782,31 @@ def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, 
     run_fixture_git(gov, "checkout", "-q", "-b", "side")
     commit("S", 1_700_000_010, "s3")
     run_fixture_git(gov, "checkout", "-q", "main")
-    commit("B", 1_700_000_020, "s1", "s2")
+    commit("B", 1_700_000_020, *first, "s1", "s2")
     run_fixture_git(gov, "merge", "-q", "--no-ff", "--no-commit", "side")
-    commit("M", 1_700_000_030, "s1", "s2", "s3")
-    commit("C", 1_700_000_040, "s1", "s2", "s3", "s4")
+    commit("M", 1_700_000_030, *first, "s1", "s2", "s3")
+    commit("C", 1_700_000_040, *first, "s1", "s2", "s3", "s4")
     if plant == "not-pending":
         commit("D", 1_700_000_050, "s1", "s2", "s3", "s4", "s5")
     return gov, sha
 
 
 def build_walk_target(tmp: pathlib.Path, sha_a: str, name: str, steps: list | None = None,
-                      files: dict | None = None) -> pathlib.Path:
+                      files: dict | None = None, schema3: bool = False) -> pathlib.Path:
     """A scratch target repository `tmp/<name>` holding `files` and a schema-4 receipt at `sha_a`
-    with `steps`, committed: what the `walk` and `rollback` families walk over."""
+    with `steps`, committed: what the `walk` and `rollback` families walk over. `schema3` forces the
+    receipt to schema 3 with `steps` taken out (TOOL-dSafePassage-15)."""
     t = tmp / name
     (t / ".governance").mkdir(parents=True)
     run_fixture_git(tmp, "init", "-q", "-b", "main", name)
     for rel, body in (files or {}).items():
         (t / rel).write_text(body, encoding="utf-8", newline="\n")
-    (t / ".governance" / "install.json").write_text(json.dumps(
-        {"schema": 4, "gov_commit": sha_a, "kits": [], "files": [], "steps": steps or []},
-        indent=2) + "\n", encoding="utf-8", newline="\n")
+    receipt = {"schema": 4, "gov_commit": sha_a, "kits": [], "files": [], "steps": steps or []}
+    if schema3:
+        receipt["schema"] = 3
+        del receipt["steps"]
+    (t / ".governance" / "install.json").write_text(json.dumps(receipt, indent=2) + "\n",
+                                                    encoding="utf-8", newline="\n")
     run_fixture_git(t, "add", "-A")
     run_fixture_git(t, "commit", "-qm", "base")
     return t
@@ -1810,13 +1869,13 @@ def run_walk_fixture(plant: str | None) -> int:
                 fails.append(what)
 
         def build_target(name: str, steps: list | None = None, files: dict | None = None) -> pathlib.Path:
-            return build_walk_target(tmp, sha["A"], name, steps, files)
+            return build_walk_target(tmp, sha["A"], name, steps, files, schema3=plant in WALK_SCHEMA_PLANTS)
 
         def walk(t: pathlib.Path) -> tuple[int, str]:
             return run_fixture_child(FIXTURE_WALK_CHILD, gov, t, sha["C"], env)
 
         def lines_of(out: str) -> list[str]:
-            return [ln for ln in out.splitlines() if ln.startswith("step fx/")]
+            return [ln for ln in out.splitlines() if ln.startswith(("step fx/", "step govkit/receipt-schema-4 "))]
 
         def canaries(t: pathlib.Path) -> list[str]:
             r = t.with_name(t.name + ".fx")
@@ -1915,6 +1974,60 @@ def run_walk_fixture(plant: str | None) -> int:
             expect(lines_of(out2) == ["step fx/s2 · skipped (witness holds)", "step fx/s3 · applied",
                                       "step fx/s4 · applied"] and rc2 == 0,
                    "the re-run does not pass s2 by its witness and apply s3 and s4")
+        elif plant in ("schema-3", "schema-3-kill"):
+            # TOOL-dSafePassage-15 AC1, AC3: a schema-3 receipt walks to the schema step, whose
+            # `applied` row lands after its up; a kill between its temporary file and its rename.
+            t = build_target("t")
+            if plant == "schema-3-kill":
+                fx = t.with_name("t.fx")
+                fx.mkdir()
+                (fx / "schema.block").touch()
+                argv = [sys.executable, "-c", FIXTURE_WALK_CHILD, str(HERE / "upgrade_steps.py"), str(gov), str(t), sha["C"]]
+                why = run_killed(argv, fx, "schema", env)
+                expect(why is None, f"the kill was not staged: {why}")
+                (fx / "schema.block").unlink()
+                try:
+                    rec = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+                except ValueError:
+                    rec = {}
+                whole = ((rec.get("schema") == 3 and "steps" not in rec)
+                         or (rec.get("schema") == 4 and isinstance(rec.get("steps"), list)))
+                tmp_file = (t / ".governance" / "install.json.govkit-new").is_file()
+                print(f"walk: after the kill · the receipt reads schema {rec.get('schema')}"
+                      + (" whole" if whole else ", NOT WHOLE") + f" · the up's temporary file "
+                      + ("present" if tmp_file else "absent"))
+                expect(whole, "the kill left a receipt that is neither schema 3 nor schema 4 whole")
+                expect(tmp_file, "the kill did not land after the up's temporary file was written")
+            rc, out = walk(t)
+            want = ["govkit/receipt-schema-4", "fx/s1", "fx/s2", "fx/s3", "fx/s4"]
+            rec = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+            print(f"walk: the receipt reads schema {rec.get('schema')} · first row "
+                  f"{(rec.get('steps') or [{}])[0].get('id')} {(rec.get('steps') or [{}])[0].get('state')}")
+            expect(lines_of(out) == [f"step {s} · applied" for s in want],
+                   f"the step lines are not {want} in that order, each applied")
+            expect(rec.get("schema") == 4 and [(r["id"], r["state"]) for r in read_receipt_steps(t)]
+                   == [(s, "applied") for s in want], "the receipt is not schema 4 with the walk's rows, "
+                   "the schema step's first")
+            expect(rc == 0, f"the walk exited {rc}")
+            if plant == "schema-3-kill":
+                t2 = build_target("t2")
+                rc2, _out2 = walk(t2)
+                same = read_target_bytes(t) == read_target_bytes(t2)
+                print(f"walk: the re-run's target and receipt {'equal' if same else 'DIFFER from'} an uninterrupted walk's")
+                expect(same and rc2 == 0, "the re-run did not converge to an uninterrupted walk's bytes")
+        elif plant == "schema-3-fail":
+            # TOOL-dSafePassage-15 AC2: the schema step's up fails on a schema-3 receipt, which holds
+            # no row, so the walk stops writing nothing and says why.
+            t = build_target("t")
+            t.with_name("t.fx").mkdir()
+            (t.with_name("t.fx") / "schema.fail").touch()
+            before = (t / ".governance" / "install.json").read_bytes()
+            rc, out = walk(t)
+            same = (t / ".governance" / "install.json").read_bytes() == before
+            print(f"walk: the receipt's bytes {'equal' if same else 'DIFFER from'} their bytes before the run")
+            expect(lines_of(out) == ["step govkit/receipt-schema-4 · failed · exit 1: fx: schema up fails by its "
+                                     f"plant {NOT_RECORDED_SUFFIX}"], "the step line is not the unrecorded failure")
+            expect(same and rc == 1, f"the receipt changed, or the walk exited {rc}, not 1")
         for f in fails:
             print(f"walk: FAILED · {f}")
         return 1 if fails else rc
@@ -2055,11 +2168,14 @@ def run_fixture_govkit(gov: pathlib.Path, env: dict, *args: str) -> tuple[int, s
     return p.returncode, p.stdout + p.stderr
 
 
-def build_update_gov(tmp: pathlib.Path, names, slugs, fails: list[str]) -> tuple[pathlib.Path, dict, str, str, dict]:
+def build_update_gov(tmp: pathlib.Path, names, slugs, fails: list[str],
+                     schema3: bool = False) -> tuple[pathlib.Path, dict, str, str, dict]:
     """The `update` and `rollback-update` families' scratch gov: at A copies of this checkout's
     `govkit.py`, `upgrade_steps.py` and the process-monitor census and a `demo` kit whose
     `one.txt` reads `v1`; a target per `names` installed at A by `apply` and committed; at B the
-    steps `fx/<slug>` for each of `slugs` and `one.txt` reading `v2`. A failed install is appended
+    steps `fx/<slug>` for each of `slugs` and `one.txt` reading `v2`. `schema3` forces each receipt
+    `apply` wrote to schema 3 with `steps` taken out before that commit, and puts the copied
+    `govkit/receipt-schema-4` row first at B (TOOL-dSafePassage-15). A failed install is appended
     to `fails`. Returns (gov, {name: target}, A, B, the env every govkit call runs under)."""
     gov = tmp / "gov"
     gkd, demo = gov / "tools" / HERE.name, gov / "tools" / "demo"
@@ -2096,11 +2212,18 @@ def build_update_gov(tmp: pathlib.Path, names, slugs, fails: list[str]) -> tuple
         rc, out = run_fixture_govkit(gov, env, "apply", "--target", str(t))
         if rc != 0:
             fails.append(f"the scratch install of {name} failed ({rc}): {out[-600:]}")
+        if schema3:
+            rp = t / ".governance" / "install.json"
+            rec = json.loads(rp.read_text(encoding="utf-8"))
+            rec["schema"] = 3
+            rec.pop("steps", None)
+            rp.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
         run_fixture_git(t, "add", "-A")
         run_fixture_git(t, "commit", "-qm", "install")
     (gkd / "steps").mkdir()
     (gkd / "steps" / "fx.py").write_text(FIXTURE_WALK_STEP, encoding="utf-8", newline="\n")
-    (gkd / STEPS_FILE).write_text("".join(render_fixture_row(s) for s in slugs), encoding="utf-8", newline="\n")
+    (gkd / STEPS_FILE).write_text((write_fixture_schema_step(gkd) if schema3 else "")
+                                  + "".join(render_fixture_row(s) for s in slugs), encoding="utf-8", newline="\n")
     (demo / "one.txt").write_text("v2\n", encoding="utf-8", newline="\n")
     run_fixture_git(gov, "add", "-A")
     run_fixture_git(gov, "commit", "-qm", "B")
@@ -2116,7 +2239,8 @@ def run_update_fixture(plant: str | None) -> int:
         tmp = pathlib.Path(td)
         fails: list[str] = []
         gov, targets, sha_a, sha_b, env = build_update_gov(
-            tmp, ("t", "t2") if plant in ("kill-walk", "kill-walk-edit") else ("t",), ("s1", "s2"), fails)
+            tmp, ("t", "t2") if plant in ("kill-walk", "kill-walk-edit", "schema-3-update") else ("t",), ("s1", "s2"),
+            fails, schema3=plant == "schema-3-update")
         gkd = gov / "tools" / HERE.name
 
         def expect(ok: bool, what: str) -> None:
@@ -2183,6 +2307,38 @@ def run_update_fixture(plant: str | None) -> int:
             expect(got == {"fx/s1": "applied", "fx/s2": "failed"}, "s1 is not applied and s2 failed")
             expect((t / "tools" / "demo" / "one.txt").read_bytes() == b"v2\n", "the file rows did not land")
             expect(not [c for c in canaries() if c.endswith(".down")], "a down ran")
+        elif plant == "schema-3-update":
+            # TOOL-dSafePassage-15 AC4: `update` from a schema-3 receipt `apply` wrote, then again on
+            # a second target with the schema step killed during its up, and that target re-run.
+            rc, out = govkit("update", "--target", str(t), "--to", sha_b, "--write")
+            print(out, end="")
+            rec = receipt_of(t)
+            got = [(r.get("id"), r.get("state")) for r in rec.get("steps") or []]
+            print(f"update: the receipt reads schema {rec.get('schema')} · steps {got}")
+            expect(rc == 0 and rec.get("schema") == 4 and got == [("govkit/receipt-schema-4", "applied"),
+                   ("fx/s1", "applied"), ("fx/s2", "applied")],
+                   "update did not take the schema-3 receipt to schema 4 with the schema step applied first")
+            t2 = targets["t2"]
+            r2 = t2.with_name("t2.fx")
+            r2.mkdir()
+            (r2 / "schema.block").touch()
+            why = run_killed([sys.executable, str(gkd / "govkit.py"), "update", "--target", str(t2), "--to", sha_b,
+                              "--write"], r2, "schema", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            (r2 / "schema.block").unlink()
+            rc2, out2 = govkit("update", "--target", str(t2), "--to", sha_b, "--write")
+            print(out2, end="")
+            # `carry` is output, recomputed each run (DEPL-dCarriedReceipt-9 S2), and the killed run
+            # persisted no receipt below schema 4, so it is the one key the two may differ in (rev-2).
+            a, b = receipt_of(t), receipt_of(t2)
+            for rec in (a, b):
+                for f in rec.get("files") or []:
+                    f.pop("carry", None)
+            same = a == b
+            print(f"update: the killed target's re-run exits {rc2} · its receipt, carry aside, "
+                  f"{'equals' if same else 'DIFFERS from'} the uninterrupted run's"
+                  + ("" if same else f": {sorted(k for k in set(a) | set(b) if a.get(k) != b.get(k))}"))
+            expect(rc2 == 0 and same, "the re-run after the kill did not exit 0 with the uninterrupted run's receipt")
         else:
             reports.mkdir()
             (reports / "s1.block").touch()

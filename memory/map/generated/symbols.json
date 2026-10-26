@@ -26128,6 +26128,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "write_fixture_schema_step",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "write_fleet_claim",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"

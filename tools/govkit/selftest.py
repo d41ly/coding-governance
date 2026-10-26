@@ -3467,8 +3467,10 @@ def check_step_walk() -> None:
     """TOOL-dSafePassage-2 AC1 to AC9 — `upgrade_steps.py fixture walk|lock|update` with every plant:
     the walk's order, skip, stop, kill and resume, its attended stop, the lock's reclaim of a dead or
     reused holder and its refusal of a live, foreign or unreadable one, the guard's race and its dead
-    holder, and the walk inside `update` with its staging journal across a kill. Each plant's failing
-    case is staged by the plant; the fixture prints `<family>: FAILED` on any unmet expectation."""
+    holder, and the walk inside `update` with its staging journal across a kill. The `schema-3` plants
+    are TOOL-dSafePassage-15's AC1 to AC4: a schema-3 receipt walks through the schema step, recording
+    nothing until its up lands schema 4. Each plant's failing case is staged by the plant; the fixture
+    prints `<family>: FAILED` on any unmet expectation."""
     us_py = HERE / "upgrade_steps.py"
     for family, plant, want, needles in (
             ("walk", None, 0, ("step fx/s1 · applied\nstep fx/s2 · applied\nstep fx/s3 · applied\n"
@@ -3485,6 +3487,14 @@ def check_step_walk() -> None:
                                    "walk: fx/s3 up spawned 1 time(s) · resume spawned")),
             ("walk", "attended", 1, ("step fx/s2 · failed · attended: the step needs the target's code",
                                      "up canary absent", "step fx/s2 · skipped (witness holds)")),
+            ("walk", "schema-3", 0, ("step govkit/receipt-schema-4 · applied\nstep fx/s1 · applied\n"
+                                     "step fx/s2 · applied\nstep fx/s3 · applied\nstep fx/s4 · applied",
+                                     "walk: the receipt reads schema 4 · first row govkit/receipt-schema-4 applied")),
+            ("walk", "schema-3-fail", 1, ("step govkit/receipt-schema-4 · failed · exit 1: fx: schema up fails by "
+                                          "its plant (not recorded: receipt below schema 4)",
+                                          "walk: the receipt's bytes equal their bytes before the run")),
+            ("walk", "schema-3-kill", 0, (" whole · the up's temporary file present",
+                                          "walk: the re-run's target and receipt equal an uninterrupted walk's")),
             ("lock", "lock-dead", 0, ("govkit update — reclaimed ", "lock: taken")),
             ("lock", "lock-reused", 0, ("a reused pid", "lock: taken")),
             ("lock", "lock-live", 1, ("refusing rather than joining in: live, ", "reclaimed by the next run")),
@@ -3504,11 +3514,16 @@ def check_step_walk() -> None:
                                           "update: gov_commit A · steps {'fx/s1': 'applied', 'fx/s2': 'failed'}")),
             ("update", "kill-walk", 0, ("govkit update — reclaimed ", "update: the re-run's bytes equal an "
                                         "uninterrupted run's")),
-            ("update", "kill-walk-edit", 2, ("DIRTY: tools/demo/one.txt",))):
+            ("update", "kill-walk-edit", 2, ("DIRTY: tools/demo/one.txt",)),
+            ("update", "schema-3-update", 0, ("update: the receipt reads schema 4 · steps [('govkit/receipt-schema-4', "
+                                              "'applied'), ('fx/s1', 'applied'), ('fx/s2', 'applied')]",
+                                              "update: the killed target's re-run exits 0 · its receipt, carry aside, "
+                                              "equals the uninterrupted run's"))):
         p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
-        check(f"[dSP-2] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
+        tag = "dSP-15" if (plant or "").startswith("schema-3") else "dSP-2"
+        check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
               p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
 
     # The walk's two refusals, in process: a step that leaves the receipt unreadable, and a step's
