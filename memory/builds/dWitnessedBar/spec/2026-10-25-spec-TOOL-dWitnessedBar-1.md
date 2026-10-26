@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-1 — gate health measured and the reliability bar
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 23 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 23 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0339@8e7bc7ae whole
 
@@ -16,11 +16,17 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-c.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-c.md) | research | TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md) | research | TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
+| [2026-10-26-build-TOOL-dWitnessedBar-1-crosscheck-returns.md](../build/2026-10-26-build-TOOL-dWitnessedBar-1-crosscheck-returns.md) | research | — |
+| [2026-10-26-build-TOOL-dWitnessedBar-1-deviation-12.md](../build/2026-10-26-build-TOOL-dWitnessedBar-1-deviation-12.md) | deviation | — |
+| [2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md](../build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | — |
+| [2026-10-26-build-TOOL-dWitnessedBar-1-reground-returns.md](../build/2026-10-26-build-TOOL-dWitnessedBar-1-reground-returns.md) | research | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-3-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-4-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-4-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-5-spec-reviewer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-5-spec-reviewer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-owner-review-stop.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-owner-review-stop.md) | research | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-1-spec-writer.md) | journal | TOOL-dWitnessedBar-40 |
@@ -39,6 +45,8 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-89-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-89-1-spec-writer.md) | journal | TOOL-dWitnessedBar-89 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-91-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-91-1-spec-writer.md) | journal | TOOL-dWitnessedBar-91 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-97-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-97-1-spec-writer.md) | journal | TOOL-dWitnessedBar-97 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-1-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -67,10 +75,20 @@ holds one. Today nothing measures a flake rate and no catch history is committed
   ascending, `p90 = c[ceil(0.9 × len(c)) − 1]` (nearest rank), and the threshold is `p90 + 1` in 10,
   written `<count>/10`. Observed by AC1 and AC2.
 - **S4** — The gate-health record: a record kind `gate-health` of S7's factory, named
-  `<date>-build-<unit id>-gate-health-<n>.md`, with required fields `Measured` (`<count>/10`, shared
-  interface I12), `Verdicts` (the run ids of every flake record the measurement read) and `Legs`
-  (`<armed>/<bar legs>`), written by `python tools/drift-audit/drift_report.py --gate-health --write
-  --build <slug> --unit <id>` at each armed measurement and never while unarmed. Observed by AC4.
+  `<date>-build-<unit id>-gate-health-<n>.md`, served as `**Serves:** gate-health <unit id>`, with
+  required fields `Measured` (`<count>/10`, shared interface I12), `Verdicts` (the run ids of every
+  flake record the measurement read) and `Legs` (`<armed>/<bar legs>`). The kind joins the reader in
+  the same pass: `gate-health` is added to `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`,
+  which the factory's kind table must equal at import (PLAY-dOrderedCharter-42 S1, S2), and to the
+  closed `<kind>` list of `tools/memory-tree/HYGIENE.template.md` (its S5); under its S3 a
+  `-gate-health-<n>.md` file served as any other kind is malformed. `python
+  tools/drift-audit/drift_report.py --gate-health --write --build <slug> --unit <id>` writes it at
+  each armed measurement and never while unarmed. It runs the factory as a subprocess, since a kit
+  imports no sibling kit (TOOL-dGroundRules-1 §4), and passes it `--build <slug> --unit <id>
+  --measured <count>/10 --verdicts <run ids> --legs <armed>/<bar legs>`. Whether the factory's `new`
+  verb is generic per kind is unknown until PLAY-dOrderedCharter-7 builds, so this unit claims no
+  `new gate-health` door, and the build run re-grounds AC4's call on the landed factory. Observed by
+  AC4 and AC6.
 - **S5** — The measurement's moment: `verdict_flow.py flakes` (`TOOL-dWitnessedBar-8` S4) runs it with
   `--write` for its own build and unit right after writing its flake record, so each new verdict
   re-derives the threshold; a plain drift report reads it and writes nothing. Observed by AC4.
@@ -93,8 +111,8 @@ holds one. Today nothing measures a flake rate and no catch history is committed
 ### Edges
 
 - **consumes-from** `TOOL-dWitnessedBar-8` — `record-kind.flake`, the records whose rows this measurement counts, and the `flakes` verb and `flakes --check` it hooks into
-- **consumes-from** external — PLAY-dOrderedCharter-7 S7's record factory, where the `gate-health` kind is registered
-- **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 2 and 31: the gate-health record's `journal` binding, and the bar's legs taken through the runner's hold predicate, each a scope item of that unit
+- **consumes-from** external — PLAY-dOrderedCharter-7 S7's record factory, where the `gate-health` kind is registered, and PLAY-dOrderedCharter-42's `TYPED_RECORD_KINDS`, file-name join and closed kind list, which the kind joins
+- **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 2 and 31: the check that the gate-health record serves as its own kind, and the bar's legs taken through the runner's hold predicate, each a scope item of that unit
 - **hands-off** `TOOL-dWitnessedBar-62` — the `--gate-health` callers of S4 and AC1 to AC4, which the minors batch of the round-1 audit of units 52 to 57 has pass `--selection` once unit 57 makes it required (id 29)
 
 ## 4. Design
@@ -153,7 +171,7 @@ which is what `flakes --check` reads for a hold's filing date.
 | `measure_gate_health` | function | `py.function`, asked at the pass |
 | `gate_health` | drift signal | none |
 | `--gate-health`, `--write`, `--build`, `--unit` | drift CLI flags | none |
-| `gate-health` | record kind of S7's factory | none |
+| `gate-health` | record kind of `build_records.py`, a member of `TYPED_RECORD_KINDS` | none |
 | `measured-check` | fixture case of `flakes --check` | none |
 
 ### Migration
@@ -171,6 +189,8 @@ Live at landing; it arms itself on the thirtieth Test-step verdict of the slowes
 - `tools/drift-audit/README.md`
 - `tools/drift-audit/selftest.py`
 - `tools/memory-tree/build_records.py`
+- `tools/memory-tree/tree_lib.py`: `gate-health` in `TYPED_RECORD_KINDS`
+- `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: `gate-health` in the closed kind list
 - `tools/run-gates/verdict_flow.py`
 
 ### Alternatives rejected
@@ -227,10 +247,15 @@ Live at landing; it arms itself on the thirtieth Test-step verdict of the slowes
   exits 0.
   Red when: a `test.flakes` that holds at 2 in 10 once the record holds a measured threshold passes
   the check (the clause's planted red).
+- **AC6** — When `python gen_build_index.py --print-bindings` runs in `tools/memory-tree/` over AC4's
+  fixture repository with the record committed, it prints an `S` row for
+  `<date>-build-<id>-gate-health-1.md` with kind `gate-health`, and no `A` row for it.
+  Red when: the record serves as `journal`, or the kind is added to the factory alone, so the factory
+  refuses at import or the record reads malformed.
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `run-gates canary` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `run-gates canary` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 · `test_gate_health` over the three planted record sets, the short set staged by deleting one row of one leg · `CHECK_FLOOR` raised by the arm's counted checks
 
@@ -260,12 +285,18 @@ New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 · `test_gate_healt
   edges of TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-62's
   consumes-from edge, promoted by the round-1 spec audit of units 52 to 57; nothing else moved.
+- rev-4 · 2026-10-26 · §2 S4 · §3 Edges · §4 Inventory, Files touched · §6 AC6 · §7 · §10 · re-grounded
+  on dOrderedCharter at `462d20f35` and dDeclaredLoop at `783f1ad3a` by the cross-check record
+  `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`, row 2: the record serves as
+  `gate-health`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list; the binding is observed;
+  the factory is run as a subprocess and no `new gate-health` door is claimed.
 
 ## 10. Reuse audit
 
 The seam extended is drift's per-signal measurement, `measure_legs_retried_after_timeout`
 (`tools/drift-audit/drift_report.py:3126`) and the `SIGNALS` list (`:3521`), whose dict shape the new
-signal returns; the records are read and written through PLAY-dOrderedCharter-7 S7's factory. `python
+signal returns; the records are read and written through PLAY-dOrderedCharter-7 S7's factory, extended
+by one kind and its `TYPED_RECORD_KINDS` member (PLAY-dOrderedCharter-42). `python
 tools/codebase-map/reuse_lookup.py "measure each leg's flake rate across verdict records and derive a
 threshold"` ranked `measure_typed_counts` (`tools/codebase-map/map_lib.py`, a map count), the
 deviation and runlog record readers, and generic `leg` stems; none derives a rate from per-leg rows,

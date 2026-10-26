@@ -7588,8 +7588,10 @@ git reset -q --hard; rm -f "$GH39M"
 # (e): ONE derivation, in the shared library, called by every reader and defined by none of them
 same "read_pass_declarations is defined exactly once, in the shared library" \
   "$(grep -c '^read_pass_declarations()' "$HERE/lib-unattended.sh")" "1"
-same "the driver's five readers call it rather than parsing the rows their own way" \
-  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'read_pass_declarations ')" "5"
+same "the driver's five readers call it or read_open_passes rather than parsing the rows their own way" \
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | awk '/^read_open_passes\(\)/{s=1} !s; s&&/^}/{s=0}' | grep -cE 'read_(pass_declarations|open_passes) ')" "5"
+same "and read_open_passes itself calls it, so the two readers it serves reach the same derivation" \
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | awk '/^read_open_passes\(\)/{s=1} s; s&&/^}/{s=0}' | grep -c 'read_pass_declarations ')" "1"
 same "and so does check 23" \
   "$(grep -v '^[[:space:]]*#' "$HERE/check-unattended.sh" | grep -c 'read_pass_declarations ')" "1"
 same "and neither defines its own" \
@@ -7931,6 +7933,28 @@ run --dispatch tRun --pass ARCH-tRun-1 --writes work/sub/ --writes ./work/other 
 n=$((n+1))
 grep -q ' dispatch · item .* ARCH-tRun-1 · reason work/sub work/other$' memory/builds/tRun/RUN.md \
   || { echo "FAIL the parked declaration kept a spelling the refusals never judged: $(grep ' ARCH-tRun-1 · reason ' memory/builds/tRun/RUN.md | tail -1)"; st=1; }
+
+# ---- TOOL-dGroundRules-66: A TERMINAL UNIT RESERVES NOTHING. The first unit declares the index of a
+# ---- pair and its spec closes in a commit naming no unit, so `pass_commit` never closes its key. The
+# ---- base driver then refused the second unit's generator forever; this one leaves the key out and
+# ---- names it. Reopened, the key reserves again; and the closed unit's own dispatch says it reserves
+# ---- nothing. Nine assertions, the three `mutate`s included.
+build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+printf '\nGENERATED_INDEXES="work/idx.md:work/gen"\n' >> .unattended.conf
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/idx.md >/dev/null 2>&1
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/'
+git add -A && git commit -q -m "chore: close the first spec" --no-verify
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/gen)
+hit "$out" "dispatch declared"
+hit "$out" "ARCH-tRun-1 left out as terminal (CLOSED), so its declared paths reserve nothing: work/idx.md"
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* CLOSED/**Status:** INPROGRESS/'
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes work/gen)
+hit  "$out" "--dispatch declares a generated index together with its generator"
+miss "$out" "left out as terminal"
+mutate memory/builds/tRun/spec/u1.md 's/^\*\*Status:\*\* INPROGRESS/**Status:** CLOSED/'
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes work/other)
+hit "$out" "ARCH-tRun-1 is CLOSED, so this declaration reserves nothing against a sibling"
+hit "$out" "dispatch declared"
 
 # ---- M1: the generated-index/generator pairing, armed. The `covers` to `overlaps` change at this
 # ---- site reverted with the whole suite still green, which is a repair nothing was holding.
@@ -17937,7 +17961,12 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region five's run_bounded span on node a, 2026-10-11; no suite ran.
 # MERGED at TOOL-aSparedSpawn-34's reconcile with local main: the shared 2808, less this build's 66
 # and plus local main's 34 = 2776, each side's move counting only its own arms.
-FLOOR_ASSERTIONS=2776
+# RAISED 2776 -> 2785 by TOOL-dGroundRules-66: the terminal-unit sibling arm in region four beside
+# condition 3's arms, three `mutate`s and six `hit`/`miss` lines, every one unconditional, counted off
+# the block's own lines; no suite ran, and its RED-first observation is the close's.
+# RAISED 2785 -> 2786 by TOOL-dGroundRules-70: the reader arm's added hop through read_open_passes in
+# region four, one `same`, counted off the block's own lines; no suite ran.
+FLOOR_ASSERTIONS=2786
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18134,7 +18163,9 @@ FLOOR_SHARD_2=218
 # RAISED 270 -> 304 by TOOL-aBriskPreflight-4: the same 34 region-five overlapped-probe and handle assertions, see FLOOR_ASSERTIONS.
 # Region five MERGED at TOOL-aSparedSpawn-34's reconcile: the shared 270, less 7, plus 34 = 297.
 FLOOR_SHARD_3=405
-FLOOR_SHARD_4=373
+# RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
+# RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=383
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311

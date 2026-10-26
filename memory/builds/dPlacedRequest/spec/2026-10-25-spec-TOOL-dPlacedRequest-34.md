@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks
 
-**Status:** DEFERRED · rev-9 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-10 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,9 +13,13 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-34-deviation-342.md](../build/2026-10-25-build-TOOL-dPlacedRequest-34-deviation-342.md) | deviation | — |
 | [2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md) | research | TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
 | [2026-10-25-build-TOOL-dPlacedRequest-50-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-50-promoted-fix-return.md) | research | TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-34-deviation-343.md](../build/2026-10-26-build-TOOL-dPlacedRequest-34-deviation-343.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-50-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-50-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 |
 | [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 |
 
 <!-- /gen:spec-records -->
@@ -136,9 +140,10 @@ the skeptic's binding re-grade. Criterion ACn observes item Sn.
   and its one caller are unit 1 S11's, this build's own.
   by value: NO VALUE READERS, since the host only selected a row. Observed by AC30.
 - **S31** — finding 28 (M23), the skeptic's fix. The two new legs, `loop placement fixtures` (unit 4) and
-  `loop claim fixtures` (unit 21), each state a subject, a chunk and a ceiling in `tools/gate-legs.json`,
-  and a `selftest-budgets.txt` row when held; no `ceiling-evidence.txt` row, as that file is generated
-  and an unbacked leg is no failure. Observed by AC31.
+  `loop claim fixtures` (unit 21), each state a subject, a chunk, a ceiling and the `enforces` its unit
+  gives it (unit 4 S10, unit 21 S8) in `tools/gate-legs.json`, and a `selftest-budgets.txt` row when
+  held; no `ceiling-evidence.txt` row, as that file is generated and an unbacked leg is no failure.
+  Observed by AC31.
 - **S32** — finding 47 (M23). Per leg, `tools/govkit/subject-pins.tsv` gains its row by
   `python tools/govkit/govkit.py selfcheck --write`, `memory/map/features/loop.md` claims the leg's key, and
   S38's regeneration carries both. Observed by AC32.
@@ -481,16 +486,17 @@ Fixtures are the named unit's own unless an item names one.
   `--lease acquire build tFix` writes `fleet-tag` from that row. Red when: the result rests on the machine.
 - **AC30** — When `USERNAME` matches a row in another case and `GOV_NODE` is unset, the tag resolves; with
   `GOV_NODE` naming an unregistered tag, the verb exits 2. Red when: case or host refuses a node.
-- **AC31** — When `python -c` reads `tools/gate-legs.json`, both legs carry a subject, a chunk and a
-  ceiling. Red when: a leg lacks one.
+- **AC31** — When `python -c` reads `tools/gate-legs.json`, both legs carry a subject, a chunk, a
+  ceiling and a non-empty `enforces`. Red when: a leg lacks one.
 - **AC32** — When `python tools/govkit/govkit.py selfcheck` and `python tools/codebase-map/gen_map.py --check`
   run, both exit 0 with the two legs present. Red when: a pin
   row or dossier claim is missing.
 - **AC33** — When two background appenders break one planted stale `gov-feed.lock`,
   `cut -f1 gov-feed.log | sort | uniq -d` prints nothing. Red when: two events share a `seq`.
-- **AC34** — When `git grep -n resolve_kit_dir -- tools/loop/` runs, it prints only `loop_lib.py`'s loader;
-  with a skewed memory-tree kit planted, `request.py key` prints the named refusal. Red when: a raw
-  ImportError escapes.
+- **AC34** — When `git grep -n -F 'resolve_kit_dir("memory-tree"' -- tools/loop/` runs, it prints one
+  line, `loop_lib.py`'s loader, so no other module resolves a memory-tree module; with a skewed
+  memory-tree kit planted, `request.py key` prints the named refusal. Red when: a raw ImportError
+  escapes, or a second module resolves the memory-tree kit.
 - **AC35** — When `git grep -n 'refs/gov/runs/<slug>\|refs/gov/runs/tRun'` runs over the files S35 lists, it
   prints only legacy-read mentions. Red when: a reader still names the old home.
 - **AC36** — When `wc -c skills/session-kickoff/SKILL.md` runs, it prints at most 18432, and
@@ -592,6 +598,10 @@ New arm: skills/session-kickoff/card-store.fixture.sh · covers AC7 AC9 AC11 AC1
   and prose tightened; no item, criterion, edge or fork dropped.
 - rev-8 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-54`, mirroring its consumes-from.
 - rev-9 · 2026-10-25 · §3 · round-5 edge mirrors to units 57, 59.
+- rev-10 · 2026-10-26 · §2 S31 · §6 AC31, AC34 · re-grounded on dDeclaredLoop at `783f1ad3a` and
+  dOrderedCharter at `462d20f35` by `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`,
+  rows 78 and 80: both legs carry `enforces`; AC34's grep narrows to the memory-tree call, as
+  TOOL-dDeclaredLoop-12 S4 puts playbook calls in `loop_lib.py`.
 
 ## 10. Reuse audit
 

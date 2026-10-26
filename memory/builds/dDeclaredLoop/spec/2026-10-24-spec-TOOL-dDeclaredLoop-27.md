@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 24 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 24 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0112@de8c6c54 whole
 **Carries:** node:tag-namespace.scenario
@@ -11,10 +11,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-build-TOOL-dDeclaredLoop-27-deviation-271.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-27-deviation-271.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -31,12 +34,19 @@ research-scenarios-design's question 8, six seams, no selector).
 ## 2. Scope (IN)
 
 - **S1** — The kind. A `[[kind]]` row `kind.scenario` in `tools/playbook/kinds.toml` (dOrderedCharter-7
-  S4, I15), its population gov's pack `tools/loop/scenarios.toml` and the overlay's `[[scenario]]`
-  rows, its factory arm `python tools/playbook/core.py new scenario <name>` (dOrderedCharter-7 S6), and
-  its `schema` naming `tools/loop/scenario-schema.toml` (dOrderedCharter-36 S1). Observed by AC7.
+  S4, I15), §4's row: its `binds` `principle.p8`, its population gov's pack `tools/loop/scenarios.toml`
+  and the overlay's `[[scenario]]` rows read by a reader command, its `factory` run by
+  `python tools/playbook/core.py new scenario <name>` (dOrderedCharter-7 S6), its `gate` the leg
+  `loop scenario fixtures`, and its `schema` naming `tools/loop/scenario-schema.toml`
+  (dOrderedCharter-36 S1). The factory writes gov's pack only. Given an `adopter.` name it writes
+  nothing and prints the proposed `[[scenario]]` row and the `instructions_edit.py` command that would
+  apply it, since unit 15's `instructions.edit` is the one door that writes an overlay row
+  (dOrderedCharter-35 §3) and refuses every write until the guard point is declared
+  (dOrderedCharter-15 S4). Observed by AC7.
 - **S2** — The namespace. A `[[namespace]]` row `scenario` in `tools/playbook/namespaces.toml`
-  (dOrderedCharter-19 S4) whose extractor reads every `tag` of the population: gov's rows tagged
-  `scenario.<name>`, a repository's `scenario.adopter.<name>` in the owner seat (I2). Observed by AC7.
+  (dOrderedCharter-19 S2), every required field filled (§4), whose extractor reads every `tag` of the
+  population: gov's rows tagged `scenario.<name>`, a repository's `scenario.adopter.<name>` in the
+  owner seat (I2). Observed by AC7.
 - **S3** — The row. Each scenario row names `extends` (a scenario tag or `none`), `admits` (its
   admission predicate, a table from a fact name to the list of values that admit), `entry` (the step tag
   a build enters at), `activates` (a table from a kind tag to that kind's rows, in the overlay row
@@ -60,8 +70,9 @@ research-scenarios-design's question 8, six seams, no selector).
   registered scenario is refused naming the key. Observed by AC1 and AC6.
 - **S6** — The composition. A build's composition is gov's packs, the repository's overlay, the rows its
   scenarios activate in their declared order, then its own recorded changes (TOOL-dDeclaredLoop-28),
-  composed by dOrderedCharter-35's `compose_rows`, so every check reads the composed result. A scenario
-  whose activated rows take out, reorder or swap a gov stage is refused by those checks. Observed by AC3.
+  composed by dOrderedCharter-35's `compose_rows` through TOOL-dDeclaredLoop-26's `compose_at` at the
+  build's pin (that unit's §8 F4 and F5), so every check reads the composed result. A scenario whose
+  activated rows take out, reorder or swap a gov stage is refused by those checks. Observed by AC3.
 - **S7** — Conflicts, as `flow.scenario-conflict` says (default `refuse`): two placed scenarios setting
   one field of one row to different values refuse the composition under `refuse`, naming both
   scenarios, the row and the field; under `declared-order` the later scenario in the declared order
@@ -81,8 +92,9 @@ research-scenarios-design's question 8, six seams, no selector).
 - **S10** — The fixture: `python tools/loop/scenario.py --fixture --plant <case>` builds a scratch
   repository with gov's pack, an overlay scenario and builds' transition records, each plant run
   against its expected observation by `--fixture` alone; the leg `loop scenario fixtures` in
-  `tools/gate-legs.json`, argv `python {prefix}/loop/scenario.py --fixture`, declared in
-  `tools/loop/kit.toml`. Observed by AC1 to AC9.
+  `tools/gate-legs.json`, argv `python {prefix}/loop/scenario.py --fixture`, carrying
+  `enforces = ["principle.p8"]` so it holds the kind's `binds` (dOrderedCharter-7 S2, S5), declared in
+  `tools/loop/kit.toml`. Observed by AC1 to AC9 and AC11.
 - **S11** — The page `help/loop.md` (TOOL-dDeclaredLoop-1 S7) gains a section on scenarios: gov's
   five, how one is admitted, the default, a conflict under each value and the switch at a step
   boundary. Observed by AC10.
@@ -96,12 +108,16 @@ research-scenarios-design's question 8, six seams, no selector).
 - No promotion of a change into a scenario: the Loop Review proposing one (NT-5) is a later program.
 - No scenario per feature or per unit: they wait on the feature and unit tables (NT-7, `gap-flow-15`).
 - No workflow shapes as data (NT-8).
-- No reference page of the kind's rows: dOrderedCharter-37 renders those from each registry.
+- No reference page of the scenario rows (§8 F5). dOrderedCharter-37 renders a page only for a
+  registry with its own `[[reference]]` row, its class first registered in
+  `tools/govkit/surface-classes.toml` and given a `usage.toml` row (its S1, S5), and this unit lands
+  none. `help/reference/kinds.md`, the kinds register's page, re-renders with `kind.scenario` in this
+  unit's commit.
 
 ### Edges
 
 - **consumes-from** `TOOL-dDeclaredLoop-3` — `Gov-Transition`, whose `TRANSITION_FIELDS` the `scenario` and `scenario-settled` fields join and whose `write_transition` records them
-- **consumes-from** `TOOL-dDeclaredLoop-26` — composition revision, the pin beside which the `scenario` field is recorded and at which a build's composition is read
+- **consumes-from** `TOOL-dDeclaredLoop-26` — composition revision, the pin beside which the `scenario` field is recorded and at which `compose_at` reads a build's composition, as that unit's §8 F4 settles
 - **consumes-from** `TOOL-dDeclaredLoop-12` — `needs`, the needs-graph helper whose acyclicity check runs over the `then` and `extends` chains
 - **hands-off** `TOOL-dDeclaredLoop-28` — `scenario`, the placed scenarios whose composition a build's recorded changes apply over
 - **hands-off** `TOOL-dDeclaredLoop-33` — `scenario`, the successor chains and composed scenarios the termination check reads
@@ -109,6 +125,38 @@ research-scenarios-design's question 8, six seams, no selector).
 - **hands-off** `TOOL-dDeclaredLoop-56` — the minors of the round-1 spec audit that land on this unit, ids 9, 12, 39, each a scope item of that unit
 
 ## 4. Design
+
+### The kind and namespace rows
+
+```toml
+# tools/playbook/kinds.toml
+[[kind]]
+tag = "kind.scenario"
+owner = "dDeclaredLoop"
+binds = ["principle.p8"]
+population = "python {prefix}/loop/scenario.py members"
+factory = "python {prefix}/loop/scenario.py new"
+gate = "loop scenario fixtures"
+schema = "tools/loop/scenario-schema.toml"
+
+# tools/playbook/namespaces.toml
+[[namespace]]
+ns = "scenario"
+owner = "dDeclaredLoop"
+layer = "layer.flow"
+source = "tools/loop/scenarios.toml and .governance/instructions.toml, the tag of each [[scenario]] row"
+extractor = "tag_index:extract_scenario"
+role = "describes"
+purpose-source = "memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md#design-tags"
+join-armed-by = "dDeclaredLoop"
+```
+
+P8's text names a build's composition adding "the scenarios it was placed under" (v2:885-886); no
+principle's enforcement row cites `cl-dClosedLoop-0112`. The kind row also carries the `summary` and
+`usage` the kinds page renders, in the keys unit 37's kinds reader reads, which its build run names
+(dOrderedCharter-37 S2). The extractor sits in the playbook kit's `tag_index.py` beside
+TOOL-dDeclaredLoop-18's four, since the index runs it and a kit imports no sibling kit. The role is
+`describes`: no instruction unit's `scope` names a scenario.
 
 ### Data model
 
@@ -160,7 +208,8 @@ step, so two builds pinned to different scenarios each derive their own composit
 | Minted | Kind |
 |---|---|
 | `kind.scenario` | `[[kind]]` row |
-| `scenario` | `[[namespace]]` row, its extractor in `tools/loop/scenario.py` |
+| `scenario` | `[[namespace]]` row, its extractor `extract_scenario` in `tools/playbook/tag_index.py` |
+| `members`, `new` | `tools/loop/scenario.py` verbs, the kind's population reader and factory |
 | `scenario.feature`, `scenario.amendment`, `scenario.patch`, `scenario.playbook-run`, `scenario.design-only` | gov's scenario rows |
 | `extends`, `admits`, `entry`, `activates`, `then`, `activatable` | scenario row and schema keys |
 | `select_scenarios`, `compose_scenarios`, `derive_step_scenarios` | functions, `tools/loop/scenario.py` |
@@ -186,7 +235,8 @@ scenario activates nothing, so no gov build's flow moves.
 - `tools/loop/scenario-schema.toml` (new)
 - `tools/playbook/kinds.toml`
 - `tools/playbook/namespaces.toml`
-- `tools/playbook/core.py`: the `new scenario` arm
+- `tools/playbook/tag_index.py`: `extract_scenario`
+- `help/reference/kinds.md`, re-rendered by `python tools/playbook/render_playbook.py --reference`
 - `tools/loop/loop_transition.py`: the two fields in `TRANSITION_FIELDS`, and `derive_step_scenarios`
   called before `write_transition` writes
 - `tools/loop/kit.toml`: the module and the leg declared
@@ -204,7 +254,8 @@ what this unit builds; F survives as `then` and as cross-build `depends-on`.
 ## 5. Production-readiness checklist
 
 - security — a repository's scenario reaches the composition only through the overlay, whose write is
-  guarded (dOrderedCharter-15); no new write path but the record field.
+  guarded (dOrderedCharter-15); the factory writes gov's pack and only prints an `adopter.` row, so no
+  new write path but that pack row and the record field.
 - perf / scale — one predicate pass per placement and one compose per transition.
 - error / empty / loading states — no admitting scenario runs the default; an unregistered default, a
   conflict under `refuse` and a cycle each refuse by name.
@@ -213,8 +264,8 @@ what this unit builds; F survives as `then` and as cross-build `depends-on`.
   selection prints the facts it read.
 - testing — the fixture plants of S10, run by the pass; the suite arm in §7 at the close.
 - migration — none.
-- user docs — `help/loop.md` gains the scenarios section; the reference page renders from the
-  registry rows (dOrderedCharter-37).
+- user docs — `help/loop.md` gains the scenarios section, and `help/reference/kinds.md` re-renders
+  with `kind.scenario` (dOrderedCharter-37 S2); no page of the scenario rows (§8 F5).
 
 ## 6. Acceptance criteria
 
@@ -242,10 +293,13 @@ what this unit builds; F survives as `then` and as cross-build `depends-on`.
 - **AC6** — When `python scenario.py --fixture --plant bad-default` sets `flow.scenario-default` to
   `scenario.nowhere`, selection with no admitting scenario refuses naming the key and the value.
   Red when: an unregistered default falls back to `scenario.feature` without a word.
-- **AC7** — When `python core.py new scenario adopter.trial` runs in the fixture
-  repository, the row it writes carries every key S3 names and the kind's gate reads it clean, and the
-  tag index lists `scenario.adopter.trial` under the `scenario` namespace.
-  Red when: the namespace row is missing, so the tag's first segment is no registered namespace.
+- **AC7** — When `python core.py new scenario trial` runs in the fixture repository, the gov-pack row
+  it writes carries every key S3 names, the tag index lists `scenario.trial` under the `scenario`
+  namespace, and `python core.py kinds` passes `kind.scenario`; `python core.py new scenario
+  adopter.trial` writes no file and prints the proposed overlay row and its `instructions_edit.py`
+  command.
+  Red when: the namespace row is missing, so the tag's first segment is no registered namespace, or
+  the factory writes an `adopter.` row past the overlay's one door.
 - **AC8** — When `python scenario.py --fixture --plant mid-step-switch` changes a build's placed
   scenario between two boundaries, the position inside the step still reads the old scenario, and
   `python scenario.py --fixture --plant then` hands over to the scenario `then` names on the record
@@ -257,13 +311,18 @@ what this unit builds; F survives as `then` and as cross-build `depends-on`.
 - **AC10** — When `grep -n "flow.scenario-conflict" loop.md` runs over the help page at this unit's
   commit, it finds the section naming gov's five scenarios, `refuse` and `declared-order`.
   Red when: the kind ships and the page says nothing of how a build's variant is chosen.
+- **AC11** — When `python -m json.tool gate-legs.json` runs in the tools folder, the row named
+  `loop scenario fixtures` carries `enforces` holding `principle.p8`, the tag of `kind.scenario`'s
+  `binds`.
+  Red when: the leg carries no `enforces`, which dOrderedCharter-7 S3's meta-check and S5's kinds
+  contract each red.
 
 ## 7. Gates
 
 `govkit acceptance matrix` · `playbook render selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/loop/scenario.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 · the `loop scenario fixtures` leg's plants, its failing case staged by `conflict` with the later scenario winning under `refuse` · none
-New arm: the kinds register's conformance gate dOrderedCharter-7 S5 runs · covers AC7 · the register before the `kind.scenario` row · none
+New arm: tools/playbook/core.py · covers AC7 · `core.py kinds` over a register whose `kind.scenario` gate leg carries no `enforces` · none
 
 ## 8. Open questions
 
@@ -285,6 +344,13 @@ New arm: the kinds register's conformance gate dOrderedCharter-7 S5 runs · cove
   `design-only`, plus any fact a repository predicate names, supplied by placement; (b) build README
   front matter; (c) free text. (b) has no entry field and (c) cannot be evaluated. RESOLVED (agent,
   2026-10-24, delegated): (a), by rung 3, the CLI's `--fact` standing in for placement.
+- **F5 — Does this unit render a reference page of the scenario rows?** dOrderedCharter-37 renders a
+  page only for a registry that lands its own `[[reference]]` row (its S1, §3), with a class registered
+  in `tools/govkit/surface-classes.toml` first and a `usage.toml` row (its S5). Options: (a) land the
+  three rows, a reader and a plant, and a `summary` and `usage` on every scenario row; (b) defer the
+  page by name, `help/reference/scenarios.md`, with `help/loop.md` naming gov's five (S11). No other
+  kind's population gets a page, items and splices included, and the kinds page lists `kind.scenario`
+  either way. RESOLVED (agent, 2026-10-25, delegated): (b), rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -292,6 +358,13 @@ New arm: the kinds register's conformance gate dOrderedCharter-7 S5 runs · cove
   research-scenarios-design's option D and v2:1264-1265, read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-10-25 · S1 S2 S6 S10 · §3 · §4 · §5 · AC7 AC11 · §7 · §8 F5 · §10 · re-grounded on
+  dOrderedCharter's specs at `462d20f35` per
+  `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md` rows 91, 93, 99, 101 and
+  103: the factory writes gov's pack and prints an adopter row; the namespace row is unit 19 S2's,
+  filled; the pin and the call into the playbook kit follow TOOL-dDeclaredLoop-26 §8 F4 and F5; the
+  scenario rows' page is deferred and the kinds page re-renders; `kind.scenario` names `binds` and
+  `gate`, and its leg carries `enforces`.
 
 ## 10. Reuse audit
 
@@ -299,7 +372,7 @@ No existing seam selects a scenario: `python tools/codebase-map/reuse_lookup.py 
 ranked name stems (`resolve`, `field`, `resolve_kit_dir`) with no predicate or variant selector, and
 research-scenarios-design records that no record defines a scenario. The unit extends its parents'
 registers: the `[[kind]]` row and factory (dOrderedCharter-7 S4, S6), the `[[namespace]]` row
-(dOrderedCharter-19 S4), the row grammar and `compose_rows` (dOrderedCharter-35) and the row checks
+(dOrderedCharter-19 S2), the row grammar and `compose_rows` (dOrderedCharter-35) and the row checks
 (dOrderedCharter-36), with TOOL-dDeclaredLoop-12's acyclicity helper for the chains.
 `python tools/memory-recall/query.py` returned scout B's row, the night pass instruments' catalogue
 rows for the two keys and the brief's row; scout B's v2:1264-1265 citation agrees with the packet's

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-25 — the verdict names its bar run and its cause, and a failing leg's output tail is kept by hash
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 18 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 18 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0363@4ad46937 whole
 **Carries:** node:policy-key.trace.leg-output
@@ -13,8 +13,11 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-a.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-a.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
+| [2026-10-26-build-TOOL-dWitnessedBar-25-deviation-251.md](../build/2026-10-26-build-TOOL-dWitnessedBar-25-deviation-251.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-26 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -51,13 +54,21 @@ owner's AP-22), commits it as a record a later reader finds by that hash.
   reads `trace.leg-output` through `policy.py get` (TOOL-dGroundRules-2), the catalogue default where
   the reader cannot run (TOOL-dGroundRules-3). Under `tail-by-hash` it writes, for each `tail.<n>` of the
   run, one record through the record factory's `leg-tail` kind (PLAY-dOrderedCharter-7 S7), skipping a
-  hash a tracked `leg-tail` record already holds; under `node-local` it writes nothing and says so. The
+  hash a tracked `leg-tail` record already holds. It runs the factory as a subprocess, since a kit
+  imports no sibling kit (TOOL-dGroundRules-1 §4), passing it `--build <slug> --unit <id>`, the five
+  fields of S6 and the tail; under `node-local` it writes nothing and says so. The
   unattended driver calls it on a red bar of a dispatched pass, before its records commit. Each tail is
   masked by runlog's `scan_secrets` before it is written (§8 F3). Observed by AC6, AC7 and AC9.
 - **S6** — The `leg-tail` kind. A kind row of `tools/memory-tree/build_records.py`: name
-  `<date>-build-<unit id>-leg-tail-<n>.md` in the build's `build/` folder, binding
-  `**Serves:** journal <unit id>` (`memory/HYGIENE.md`, "Record bindings"), required fields `Leg`,
-  `Hash`, `Run`, `Sha`, `Cause`, the tail in one fenced block after them. Observed by AC6.
+  `<date>-build-<unit id>-leg-tail-<n>.md` in the build's `build/` folder, served as
+  `**Serves:** leg-tail <unit id>`, required fields `Leg`, `Hash`, `Run`, `Sha`, `Cause`, the tail in
+  one fenced block after them. The kind joins the reader in the same pass: `leg-tail` is added to
+  `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`, which the factory's kind table must equal at
+  import (PLAY-dOrderedCharter-42 S1, S2), and to the closed `<kind>` list of
+  `tools/memory-tree/HYGIENE.template.md` (its S5); under its S3 a `-leg-tail-<n>.md` file served as
+  any other kind is malformed. Whether the factory's `new` verb is generic per kind is unknown until
+  PLAY-dOrderedCharter-7 builds, so this unit claims no `new leg-tail` door, and the build run
+  re-grounds AC6's call on the landed factory. Observed by AC6 and AC10.
 - **S7** — The key's catalogue row. `trace.leg-output`'s row of `tools/policy/catalogue.toml`
   (TOOL-dGroundRules-1 S3) gets its `summary` and `usage`, drained from
   `tools/policy/unsummarised-keys.txt` by `policy.py lists --write`; no row is added. Observed by AC8.
@@ -79,7 +90,7 @@ owner's AP-22), commits it as a record a later reader finds by that hash.
 
 - **consumes-from** `TOOL-dWitnessedBar-4` — `gate-verdict`, the per-tree verdict and the run record's verdict block this unit adds `cause` and `tail.<n>` to; without it the tail has no per-tree record to ride
 - **hands-off** `TOOL-dWitnessedBar-29` — `run_id`, the verdict-record key the warning keys `warn.<k>` sit after, so a breach is joined to the run that showed it
-- **consumes-from** external — PLAY-dOrderedCharter-7 S7's record factory `build_records.py`, which the `leg-tail` kind joins; dGroundRules' catalogue row and reader for `trace.leg-output`
+- **consumes-from** external — PLAY-dOrderedCharter-7 S7's record factory `build_records.py`, which the `leg-tail` kind joins, and PLAY-dOrderedCharter-42's `TYPED_RECORD_KINDS`, file-name join and closed kind list; dGroundRules' catalogue row and reader for `trace.leg-output`
 - **hands-off** `TOOL-dWitnessedBar-42` — the tail sweep, which unit 42 widens to every worktree's retained runs, with a grace for fresh tails and a renamed write (id 60)
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 11 and 61: its `New arm:` line's flag read by suite path, and the tail's byte cut, decode and fence, each a scope item of that unit
 
@@ -122,7 +133,7 @@ half is the keep verb's, which is the key's one reader.
 
 Minted: the verdict keys `run_id` (in the run record), `cause` and `tail.<n>`; the variable
 `GATE_CAUSE`; the directory `<common-dir>/gate-tails/`; `tools/run-gates/keep_tails.py`; the record kind
-`leg-tail` with its five fields. Naming cells: each is asked of `python tools/lexicon/lexicon.py
+`leg-tail` with its five fields, a member of `TYPED_RECORD_KINDS`. Naming cells: each is asked of `python tools/lexicon/lexicon.py
 --suggest <name>` at the pass.
 
 ### Migration
@@ -144,6 +155,8 @@ Live at landing. The first red bar after it writes the first tail.
 - `.githooks/pre-push`
 - `tools/unattended/unattended.sh`
 - `tools/memory-tree/build_records.py`
+- `tools/memory-tree/tree_lib.py`: `leg-tail` in `TYPED_RECORD_KINDS`
+- `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: `leg-tail` in the closed kind list
 - `tools/policy/catalogue.toml`
 - `tools/policy/unsummarised-keys.txt`
 
@@ -151,7 +164,8 @@ Live at landing. The first red bar after it writes the first tail.
 
 - **A new top-level directory under `memory/` for tails.** It needs hygiene check 3's fixed directory
   set and `memory/HYGIENE.md`'s layout widened, a governance-carrier change this clause does not name;
-  a build-folder record under an existing kind grammar needs neither (§8 F1).
+  a build-folder record under an existing kind grammar needs neither, only its kind's member of the
+  closed kind list (§8 F1).
 - **The full log committed.** A red suite's log runs to megabytes, and the tail is what a reader acts on.
 
 ## 5. Production-readiness checklist
@@ -205,10 +219,15 @@ Live at landing. The first red bar after it writes the first tail.
 - **AC9** — When the keep verb runs over a tail holding a value one of runlog's default secret rules
   matches, the written `leg-tail` record holds the masked span and not the value.
   Red when: the committed tail carries a secret the redacted run copy kept.
+- **AC10** — When `python gen_build_index.py --print-bindings` runs in `tools/memory-tree/` over AC6's
+  scratch tree with the record committed, it prints an `S` row for `<date>-build-TOOL-x-1-leg-tail-1.md`
+  with kind `leg-tail`, and no `A` row for it.
+  Red when: the record serves as `journal`, or the kind is added to the factory alone, so the factory
+  refuses at import or the record reads malformed.
 
 ## 7. Gates
 
-`measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `run-gates evidence` · `run-gates run-log line` · `pre-push self-test` · `memory hygiene`
+`measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `run-gates evidence` · `run-gates run-log line` · `pre-push self-test` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms`
 
 The guards join's broad `.githooks/`, `tools/` and `tools/run-gates/` guards are excluded by the
 checker's floor; dOrderedCharter's record-factory leg and dGroundRules' `policy check` leg are not in
@@ -220,13 +239,16 @@ New arm: tools/run-gates/keep_tails.py --selftest · covers AC6 AC7 AC9 · a tai
 ## 8. Open questions
 
 - **F1 — Where is the committed tail kept, so that HYGIENE admits it?** Options: (a) a `leg-tail` kind of
-  the record factory, one build-folder record per hash, named by check 5's existing build-record grammar
-  and bound `journal`; (b) a new `memory/traces/` directory admitted by check 3 and the layout in
-  `memory/HYGIENE.md`; (c) a tracked file under `tools/run-gates/`. (b) changes a governance carrier the
-  clause does not name, which the `may:` grant PLAY-dClosedLoop-3 does not lift, and (c) puts run output
-  in kit source that ships. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the record's home
-  registered through the grammar and binding HYGIENE already states, tie-broken by reuse of S7's
-  factory. widens: none · relaxes: none
+  the record factory, one build-folder record per hash, named by check 5's existing build-record grammar;
+  (b) a new `memory/traces/` directory admitted by check 3 and the layout in `memory/HYGIENE.md`; (c) a
+  tracked file under `tools/run-gates/`. (b) changes a governance carrier's layout the clause does not
+  name, which the `may:` grant PLAY-dClosedLoop-3 does not lift, and (c) puts run output in kit source
+  that ships. Rev-2 bound (a) as `journal`, which PLAY-dOrderedCharter-42 S3 makes malformed for a
+  `-leg-tail-<n>.md` file. Its S5 makes the closed kind list of `tools/memory-tree/HYGIENE.template.md`
+  the place every typed kind is declared, so (a) adds one member there, the edit dDeclaredLoop's units
+  3, 16, 17 and 22 make for their kinds, and no directory or layout. RESOLVED (agent, 2026-10-26,
+  delegated): (a), served as `leg-tail`, rung 1, PLAY-dOrderedCharter-42 S2, S3 and S5, tie-broken by
+  reuse of S7's factory. widens: none · relaxes: none
 - **F2 — What is a verdict's `cause` before dOrderedCharter's `caused-by` edge and dTotalRecall's
   `parent` field land?** Options: (a) the act that started the bar, exported by its caller as
   `GATE_CAUSE`, `attended` when none; (b) the run's parent record id, which no kind declares yet. (b)
@@ -244,13 +266,19 @@ New arm: tools/run-gates/keep_tails.py --selftest · covers AC6 AC7 AC9 · a tai
   I8, scout A's row for cl-0363, research-observability-trace.md OB-4 and the away pass's AP-22.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-42, TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · §2 S5, S6 · §3 Edges · §4 Inventory, Files touched, Alternatives rejected ·
+  §6 AC10 · §7 · §8 F1 · §10 · re-grounded on dOrderedCharter at `462d20f35` and dDeclaredLoop at
+  `783f1ad3a` by the cross-check record `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`,
+  row 77: the record serves as `leg-tail`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list;
+  the binding is observed; the factory is run as a subprocess; F1 re-resolved; no `new leg-tail` door
+  is claimed.
 
 ## 10. Reuse audit
 
 The seams extended are the runner's verdict block and header (`tools/run-gates/run-gates.sh:3481`,
 `:5552-5570`), its redacted output copy (`:3938-3942`) and run sweep (`:5688-5696`), the
 `GATE_RUN_ID` read-and-unset idiom (`:2617-2623`), unit 4's per-tree verdict, and PLAY-dOrderedCharter-7
-S7's record factory. `python tools/codebase-map/reuse_lookup.py "keep a failing leg's output tail by its
+S7's record factory, extended by one kind and its `TYPED_RECORD_KINDS` member (PLAY-dOrderedCharter-42). `python tools/codebase-map/reuse_lookup.py "keep a failing leg's output tail by its
 hash beyond the worktree"` ranked generic stems (`legs`, `fail`, `read_git_output`) and named no tail
 store, which is the expected answer: scout A found output living only in the run directory, and
 `derive_fail_tail` (`:4012`) names a failure's reason, not its output. The recall probe returned the

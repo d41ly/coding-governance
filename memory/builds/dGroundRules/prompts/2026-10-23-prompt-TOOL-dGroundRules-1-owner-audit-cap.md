@@ -13,6 +13,8 @@
 
 - No round 7 runs. Units TOOL-dGroundRules-44 to TOOL-dGroundRules-52, which round 6's disposal promoted, stay
   specced as written and unaudited, and the close records the `specs-audited` override citing this record.
-- Every unit of the roster, the eleven the README opened with and the forty-one the audit promoted, is deferred
-  against TOOL-dGroundRules-12 and carried forward to the build run, which builds them (README rule 1).
+- Every unit of the roster, TOOL-dGroundRules-1 to TOOL-dGroundRules-11 as the README opened with them,
+  TOOL-dGroundRules-65 and TOOL-dGroundRules-14 to TOOL-dGroundRules-52 as the audit promoted them, and each
+  unit the closing review promotes, is deferred against TOOL-dGroundRules-12 and carried forward to the build
+  run, which builds them (README rule 1).
 - The run then closes and lands as the spec run of the execution plan's `[phase-2]` states.

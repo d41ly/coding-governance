@@ -181,6 +181,9 @@ health_log_sh|$ROOT/$KIT_REL/health-log.sh|$KIT_REL/health-log
 health_log_py|$ROOT/$KIT_REL/health_log.py|$KIT_REL/health_log
 remote_ladder_py|$ROOT/$KIT_REL/resolve_remote.py|$KIT_REL/resolve_remote
 remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
+compare_base_py|$ROOT/$KIT_REL/compare_base.py|$KIT_REL/compare_base
+git_env_leaks_py|$ROOT/$KIT_REL/git_env_leaks.py|$KIT_REL/git_env_leaks
+resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -206,6 +209,11 @@ remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 # remote_ladder_py and remote_ladder_sh (TOOL-dLadderedRemote-1) are the remote and default-branch
 # ladder, one canonical per language beside this file; every probe that asks which ref "landed"
 # means carries one inline, and §2d below holds the two canonicals to one truth table.
+# compare_base_py (TOOL-dGroundRules-21 S7) is the shrink-only compare base the codebase map and the
+# policy kit both read, and git_env_leaks_py (S9) the git variables the policy reader drops, the
+# memory-tree kit's GIT_ENV_LEAKS member for member; each had a copy with no canonical to drift from.
+# resolve_bash_py (TOOL-dGroundRules-25 S28) is the run-gates kit's bash rule the policy kit's checker
+# carries; the other copies return another shape and are TOOL-dSettledRoster-6's ask.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
@@ -462,6 +470,42 @@ for ck_k in 1 2 3; do
       || bad "check_kit_cites input $ck_k did not return 2 with one line naming $ck_cite: '${ck_got//$'\r'/<CR>}'"
   fi; ok
 done
+
+# ---- 2j. THE TWO BASH RESOLVERS' CANDIDATE ORDER, BEHAVIOUR (TOOL-dGroundRules-82) -----------------
+# Parity holds check_policy.py's copy of resolve_bash to its canonical; this holds the policy kit's JS
+# resolveBash to the canonical's candidate ORDER, which no byte compare can, as TOOL-dGroundRules-81 §4
+# "The order" states it. Each runs with its spawn stubbed, so every candidate fails and each prints all
+# it tried, over a PATH of two fixture directories, each holding the bash name `shutil.which` finds on
+# this host. GOV_BASH first and RB_TAIL last are one order on both sides; in the PATH slot the JS tries
+# every PATH bash and Python the one `which` names. D1 stands for a first PATH bash that cannot see the
+# shim, so D2 in the JS list is the case TOOL-dGroundRules-81 restored. A host with no node prints no
+# list and reds, never skips. WHAT THIS DOES NOT CHECK: which candidate a real host keeps, a repeat
+# tried once, a `bash.exe` before a `bash` in one directory (git-bash opens `bash.exe` when asked to
+# write `bash` beside it), or any resolve_bash copy but the canonical.
+POLICY_DIR=$(resolve_kit_dir "$REALPY" policy policy-mirror.js "$HERE") || exit 2
+NODE=$(command -v node)
+case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) RB_B=bash.exe ;; *) RB_B=bash ;; esac
+RB="$TMP/rb"; mkdir -p "$RB/D1" "$RB/D2"
+: > "$RB/D1/$RB_B"; : > "$RB/D2/$RB_B"; chmod +x "$RB/D1/$RB_B" "$RB/D2/$RB_B"
+RB_TAIL="C:/Program Files/Git/bin/bash.exe;C:/Program Files/Git/usr/bin/bash.exe;bash"
+rb_js=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$NODE" -e '
+const cp = require("child_process"), path = require("path");
+const root = path.dirname(process.env.PATH.split(path.delimiter)[0]), tried = [];
+cp.spawnSync = (c) => c === "git" ? { status: 0, stdout: process.cwd() + "\n" } : (tried.push(c), { status: 1 });
+try { require(process.argv[1]).readPolicy("runtime.agents-in-flight"); } catch (_e) { /* the refusal is expected */ }
+console.log(tried.map((c) => c.split(root).join("F").split(path.sep).join("/")).join(";"));' "$ROOT/$POLICY_DIR/policy-mirror.js" 2>&1)
+rb_py=$(cd "$RB" && PATH="$RB/D1:$RB/D2" GOV_BASH=GB "$REALPY_ABS" -B -c '
+import os, subprocess, sys
+sys.path.insert(0, sys.argv[1])
+import resolve_bash
+root, tried = os.path.dirname(os.environ["PATH"].split(os.pathsep)[0]), []
+subprocess.run = lambda argv, **kw: tried.append(argv[0]) or subprocess.CompletedProcess(argv, 1)
+resolve_bash.resolve_bash("x")
+print(";".join(c.replace(root, "F").replace(os.sep, "/").replace(".EXE", ".exe") for c in tried))' "$HERE" 2>&1 | tr -d '\r')
+[ "$rb_js" = "GB;F/D1/$RB_B;F/D2/$RB_B;$RB_TAIL" ] \
+  || bad "the JS resolveBash order left the one TOOL-dGroundRules-81 states: $rb_js"; ok
+[ "$rb_py" = "GB;F/D1/$RB_B;$RB_TAIL" ] \
+  || bad "the canonical resolve_bash order left the one TOOL-dGroundRules-81 states: $rb_py"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

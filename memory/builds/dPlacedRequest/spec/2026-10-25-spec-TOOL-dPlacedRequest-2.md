@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0121@2f58beed whole
 **Carries:** node:record-kind.card
@@ -18,8 +18,12 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-2-deviation-21.md](../build/2026-10-25-build-TOOL-dPlacedRequest-2-deviation-21.md) | deviation | — |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-2-deviation-22.md](../build/2026-10-26-build-TOOL-dPlacedRequest-2-deviation-22.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -100,10 +104,17 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   and AC8.
 - **S8** — The `card` record kind, `record-kind.card`, a row of the record factory
   `tools/memory-tree/build_records.py` (PLAY-dOrderedCharter-7 S7):
-  `<date>-build-<anchor id>-card-<n>.md`, `**Serves:** journal <anchor id>`, fields `Build`, `Step`,
-  `Ref` (the ref's commit id or `none`) and the card's text in one fenced block. The anchor is the
-  lowest unit id a spec H1 under the build defines, TOOL-dDeclaredLoop-3 §8 F2's rule. Observed by
-  AC5.
+  `<date>-build-<anchor id>-card-<n>.md`, served as `**Serves:** card <anchor id>`, fields `Build`,
+  `Step`, `Ref` (the ref's commit id or `none`) and the card's text in one fenced block. The anchor is
+  the lowest unit id a spec H1 under the build defines, TOOL-dDeclaredLoop-3 §8 F2's rule. The kind
+  joins the reader in the same pass: `card` is added to `TYPED_RECORD_KINDS` in
+  `tools/memory-tree/tree_lib.py`, which the factory's kind table must equal at import
+  (PLAY-dOrderedCharter-42 S1, S2), and to the closed `<kind>` list of
+  `tools/memory-tree/HYGIENE.template.md` (its S5); under its S3 a `-card-<n>.md` file whose Serves
+  kind is not `card` is malformed. The snapshot passes the factory `--build <slug> --unit <anchor id>`
+  and one field each for `Build`, `Step` and `Ref`. No `new card` door is claimed: the build run calls
+  whatever writer the landed factory offers, as TOOL-dDeclaredLoop-3 §4 "The log record" does.
+  Observed by AC5 and AC12.
 - **S9** — The terminal route. A route rule R7 in `check_card_route`: a route whose build's local
   ref `refs/gov/builds/<slug>/card` reads a `step` the follow marked terminal is refused at append,
   naming the build and its state, and reported by S7's re-check. Observed by AC9.
@@ -119,7 +130,7 @@ fresh session recommended by `resume.context` and partial work handled by `resum
   card only, as today. Observed by AC11.
 - **S12** — The fixture, `bash skills/session-kickoff/card-store.fixture.sh --plant <case>`: a
   scratch repository and a bare remote in the system temp directory, a stub policy kit answering the
-  planted values, and the case's observation printed, exit 0 when it holds. Observed by AC1 to AC11.
+  planted values, and the case's observation printed, exit 0 when it holds. Observed by AC1 to AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -142,7 +153,7 @@ fresh session recommended by `resume.context` and partial work handled by `resum
 - **consumes-from** `TOOL-dPlacedRequest-9` — `## pockets`, the card section the build card carries in its startup cells
 - **hands-off** `TOOL-dPlacedRequest-3` — `refs/gov/builds/<slug>/card`, published at READY and resolved through `manifest-check.sh --card --path`, the path reader `entry.orient` names as its body
 - **consumes-from** external — dDeclaredLoop, built before this build run: `write_transition` (TOOL-dDeclaredLoop-3 S5), the `terminal` set (TOOL-dDeclaredLoop-15 S1), `claims.py`'s verdict (TOOL-dDeclaredLoop-8 S3), the policy-key factory (TOOL-dDeclaredLoop-6 S4)
-- **consumes-from** external — dOrderedCharter's `write_card_file` (PLAY-dOrderedCharter-8 S2) and record factory (PLAY-dOrderedCharter-7 S7); dGroundRules' `policy.py get`
+- **consumes-from** external — dOrderedCharter's `write_card_file` (PLAY-dOrderedCharter-8 S2), record factory (PLAY-dOrderedCharter-7 S7) and `TYPED_RECORD_KINDS` (PLAY-dOrderedCharter-42 S1); dGroundRules' `policy.py get`
 - **hands-off** `TOOL-dPlacedRequest-33` — the `remote-ref` store's publish and follow, which that unit routes through the driver's `--card-ref write`, dark behind `RUN_CLAIMS`
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
 - **hands-off** `TOOL-dPlacedRequest-49` — `skills/session-kickoff/card-store.fixture.sh`, which that unit's item for finding 3 gives the `publish-late` plant
@@ -202,7 +213,7 @@ the platform's documentation in this tree; it is one constant beside `CARD_CAP_B
 | `--card --publish`, `--card --follow`, `--card --lookup`, `--build`, `--to`, `--terminal` | flags of `manifest-check.sh` | none |
 | `CARD_FETCH_BOUND`, `RESUME_IDLE_S` | constants | none declared |
 | `refs/gov/builds/<slug>/card` | ref | none |
-| `card` | record kind of `build_records.py` | none |
+| `card` | record kind of `build_records.py`, a member of `TYPED_RECORD_KINDS` | `lexicon naming predicates` grades the tuple |
 | R7 | route rule | none |
 | `card-store.fixture.sh` | fixture | none |
 
@@ -226,6 +237,8 @@ transition the loop kit records.
 - `tools/hooks/scratch-guard.js`: `readCard`
 - `tools/loop/loop_transition.py`: the follow call after the commit
 - `tools/memory-tree/build_records.py`: the `card` kind row
+- `tools/memory-tree/tree_lib.py`: `card` in `TYPED_RECORD_KINDS`
+- `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: `card` in the closed kind list
 - `tools/policy/catalogue.toml`: five rows, through the factory
 - `.governance/policy.json`: the mirror, regenerated by `policy.py mirror --write` in its own commit
 - `help/orientation-card.md`: the build card's stores, the follow and the resume lines
@@ -305,10 +318,15 @@ transition the loop kit records.
   finds the read.
   Red when: a key has no row, or is read in a shape the reader-coverage arm does not count.
   fixture: the catalogue is dGroundRules', untracked until it builds.
+- **AC12** — When `python tools/memory-tree/gen_build_index.py --print-bindings` runs over the
+  `snapshot-terminal` plant's repository with its record committed, it prints an `S` row for the
+  `-card-1.md` record with kind `card` and the anchor id, and no `A` row for it.
+  Red when: the kind is missing from `TYPED_RECORD_KINDS`, so the factory refuses at import or the
+  record reads malformed.
 
 ## 7. Gates
 
-`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `spec tokens (a spec's own names resolve)`
+`manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `spec tokens (a spec's own names resolve)` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms`
 
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 AC4 AC6 AC9 · the publish, follow, lookup and R7 arms over a scratch bare remote, the failing case a lookup trusting a stale cache · none
 
@@ -345,6 +363,11 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against 
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-33,
   hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
 - rev-4 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
+- rev-5 · 2026-10-26 · §2 S8, S12 · §3 · §4 Inventory, Files touched · §6 AC12 · §7 · re-grounded on
+  dDeclaredLoop at `783f1ad3a` and dOrderedCharter at `462d20f35` by the cross-check record
+  `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 5: the record serves as
+  `card`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list, its binding observed; no
+  `new card` door is claimed.
 
 ## 10. Reuse audit
 

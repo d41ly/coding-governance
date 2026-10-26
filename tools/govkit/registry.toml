@@ -123,6 +123,10 @@ id = "lexicon"
 descriptor = "{prefix}/lexicon/kit.toml"
 
 [[entry]]
+id = "policy"
+descriptor = "{prefix}/policy/kit.toml"
+
+[[entry]]
 id = "check-placeholders"
 descriptor = "{prefix}/govkit/entries/check-placeholders.kit.toml"
 why_split = "a FLAT entry for two depth-1 FILES under <prefix>/, not a kit directory; `<prefix>/*` is a depth-1 surface glob that includes files, so each one is its own unclaimed path"
@@ -319,6 +323,14 @@ why = "gov's own rebase-time carrier for the straggler rule, deliberately not sh
 [[exempt]]
 path = ".githooks/straggler-guard.test.sh"
 why = "gov's own red/green arms for the two files above, which are themselves registry exemptions. Its fixtures build a memory tree, install this repo's kits into it and drive the real hooks; an adopter receives neither the library nor `pre-rebase`, so the suite would red there on absence rather than on behaviour. Exemptions are exact-path, so the subjects' rows do not cover their sibling — the precedent is `.githooks/pre-commit.test.sh` above. TOOL-dDerivedDocket-13."
+
+[[exempt]]
+path = "AGENTS.md"
+why = "gov's own rendered charter, deliberately not shipped: the playbook kit renders each adopter its own. It lies outside the declared surface, so this row narrows nothing there. It is the class selfcheck's guard taxonomy (check 7c) gives the `policy fixtures` guard line naming it, a gov-only leg (its `[[exempt_leg]]` row) whose cases read the file. TOOL-dGroundRules-79."
+
+[[exempt]]
+path = "help/policy.md"
+why = "gov's own help page for the policy kit, deliberately not shipped: an adopter writes its own pages under its own help directory. It lies outside the declared surface, so this row narrows nothing there. It is the class selfcheck's guard taxonomy (check 7c) gives the `policy fixtures` guard line naming it, a gov-only leg (its `[[exempt_leg]]` row) whose cases read the file. TOOL-dGroundRules-79."
 
 [[exempt_leg]]
 name = "hook destinations (every declared hook path ships)"
@@ -678,3 +690,7 @@ why = "it runs `adopt-roles.test.sh`, which `<prefix>/roles/kit.toml` withholds 
 [[exempt_leg]]
 name = "encoding posture (text IO names its encoding)"
 why = "it grades GOV's own tools and skills Python against `memory/project/encoding-posture-sites.txt`, a registry of THIS repo's gov-internal sites. The scanner ships with the gate-lint kit's `**` include, but the leg does not: a declared adopter leg would red at every adopter's next pull until they seeded a registry, and whether gov's scanner replaces an adopter's own is theirs to decide. Owner ruling, TOOL-aRepatriatedFork-3 section 8 F2."
+
+[[exempt_leg]]
+name = "policy fixtures"
+why = "it runs `check_policy.py --fixture`, which plants each red case of the policy kit's arms into a scratch repository and asserts it red as planted and green without, so its subject is the arms and the catalogue in `<prefix>/policy/` and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. The file ships, because the same script is the `policy check` leg every adopter runs; the LEG is gov's, held on GOV's bar like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dGroundRules-1."

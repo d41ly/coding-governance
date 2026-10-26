@@ -204,25 +204,25 @@ Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 59 spec(s) at 
 | 3 | `TOOL-dBoundRoles-1` | no |
 | 4 | `TOOL-dBoundRoles-21`, `TOOL-dBoundRoles-37` | yes |
 | 5 | `TOOL-dBoundRoles-22`, `TOOL-dBoundRoles-49` | yes |
-| 6 | `TOOL-dBoundRoles-16`, `TOOL-dBoundRoles-54`, `TOOL-dBoundRoles-55` | yes |
+| 6 | `TOOL-dBoundRoles-16`, `TOOL-dBoundRoles-54`, `TOOL-dBoundRoles-55` | no |
 | 7 | `TOOL-dBoundRoles-15` | no |
 | 8 | `TOOL-dBoundRoles-17` | no |
 | 9 | `TOOL-dBoundRoles-6` | no |
 | 10 | `TOOL-dBoundRoles-13` | no |
-| 11 | `TOOL-dBoundRoles-3`, `TOOL-dBoundRoles-38` | yes |
-| 12 | `TOOL-dBoundRoles-45`, `TOOL-dBoundRoles-46`, `TOOL-dBoundRoles-48`, `TOOL-dBoundRoles-8` | yes |
+| 11 | `TOOL-dBoundRoles-3`, `TOOL-dBoundRoles-38` | no |
+| 12 | `TOOL-dBoundRoles-45`, `TOOL-dBoundRoles-46`, `TOOL-dBoundRoles-48`, `TOOL-dBoundRoles-8` | no |
 | 13 | `TOOL-dBoundRoles-9` | no |
 | 14 | `TOOL-dBoundRoles-7` | no |
 | 15 | `TOOL-dBoundRoles-5` | no |
-| 16 | `TOOL-dBoundRoles-10`, `TOOL-dBoundRoles-39`, `TOOL-dBoundRoles-40` | yes |
+| 16 | `TOOL-dBoundRoles-10`, `TOOL-dBoundRoles-39`, `TOOL-dBoundRoles-40` | no |
 | 17 | `TOOL-dBoundRoles-4` | no |
 | 18 | `TOOL-dBoundRoles-23` | no |
 | 19 | `TOOL-dBoundRoles-24` | no |
 | 20 | `TOOL-dBoundRoles-12`, `TOOL-dBoundRoles-41` | yes |
-| 21 | `TOOL-dBoundRoles-11`, `TOOL-dBoundRoles-47` | yes |
-| 22 | `TOOL-dBoundRoles-26`, `TOOL-dBoundRoles-52`, `TOOL-dBoundRoles-53` | yes |
-| 23 | `TOOL-dBoundRoles-20`, `TOOL-dBoundRoles-59` | yes |
-| 24 | `TOOL-dBoundRoles-19`, `TOOL-dBoundRoles-61` | yes |
+| 21 | `TOOL-dBoundRoles-11`, `TOOL-dBoundRoles-47` | no |
+| 22 | `TOOL-dBoundRoles-26`, `TOOL-dBoundRoles-52`, `TOOL-dBoundRoles-53` | no |
+| 23 | `TOOL-dBoundRoles-20`, `TOOL-dBoundRoles-59` | no |
+| 24 | `TOOL-dBoundRoles-19`, `TOOL-dBoundRoles-61` | no |
 | 25 | `TOOL-dBoundRoles-18` | no |
 | 26 | `TOOL-dBoundRoles-25` | no |
 | 27 | `TOOL-dBoundRoles-42` | no |

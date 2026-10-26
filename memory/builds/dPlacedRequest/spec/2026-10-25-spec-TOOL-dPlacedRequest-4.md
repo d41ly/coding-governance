@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-4 — the placement predicate and its check: a disposition for every request, recorded with its reason
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 16 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 16 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0123@626c316e whole
 **Carries:** node:policy-key.placement
@@ -13,8 +13,12 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-fix-return.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-4-deviation-41.md](../build/2026-10-26-build-TOOL-dPlacedRequest-4-deviation-41.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -105,6 +109,18 @@ audited (`gap-orient-01`, `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY
   disposition opens no build (anything but `new`, `patch` and `repeat`), and a block `placement.py check`
   refuses. So a prompt that asks to continue or amend a live build is routed there, never opened as a new build. Observed by
   AC10.
+- **S10** — The leg `loop placement fixtures`, running `placement.py --fixture`, with the rows a new leg
+  owes, `enforces = ["principle.p22"]` among them: PLAY-dOrderedCharter-7 S3's meta-check reds a leg
+  with no `enforces`, and its pending list only shrinks after that unit's pass. P22 is the principle
+  whose v2 `[enforcement]` row names this unit's clause `cl-dClosedLoop-0123`
+  (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:1844`).
+  Where the pending list holds a `principle` row for `principle.p22`, this pass deletes it, as the
+  meta-check reds it stale. Units 5 and 10 ride the same leg. Observed by AC11.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of
+  the playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells
+  the `principle.p22` row at this spec's base; once that unit lands, the meta-check is the one reader ·
+  by value: NO VALUE READERS — a pending row's value is its arming build, which the meta-check prints
+  only in its pending count.
 
 ## 3. Non-goals (OUT)
 
@@ -194,7 +210,8 @@ at the first preflight after landing; a run already past its first preflight is 
 
 - `tools/loop/placement.py` (new)
 - `tools/loop/kit.toml`: the module and its fixture leg declared
-- `tools/gate-legs.json`: the leg `loop placement fixtures`, argv `python {prefix}/loop/placement.py --fixture`
+- `tools/gate-legs.json`: the leg `loop placement fixtures`, argv `python {prefix}/loop/placement.py --fixture`, with `enforces`
+- `tools/playbook/core-pending.txt`: the stale `principle` row of S10's tag, where it holds one
 - `tools/roles/agents/gov-orienter.agent.md`: the `returns:` line and the body paragraph
 - `.claude/agents/gov-orienter.md`: its render, by `tools/roles/render_agents.py`
 - `tools/roles/README.md`: the catalogue region re-rendered by `tools/roles/check_roles.py`
@@ -271,10 +288,14 @@ at the first preflight after landing; a run already past its first preflight is 
   Red when: a prompt-mode run opens a new build for a request that continues a live one.
   fixture: built by `python placement.py --fixture --plant prompt-continue`, a scratch repository with the
   driver copied in; the tree holds none today.
+- **AC11** — When `python -m json.tool gate-legs.json` runs in the tools folder, the row named
+  `loop placement fixtures` carries `enforces` holding `principle.p22`, and its argv names
+  `placement.py --fixture`.
+  Red when: the leg carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render selftest` · `check-wiring self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render selftest` · `check-wiring self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `playbook render selftest` · `govkit acceptance matrix`
 
 New arm: tools/loop/placement.py · covers AC1 AC2 AC3 AC5 AC6 AC7 AC8 AC9 · the `loop placement fixtures` leg's plants, its failing case staged by `continue-closed` with the check reading the return's text · none
 New arm: tools/unattended/unattended.test.sh · covers AC10 · the prompt-mode preflight case whose `## Placement` block reads `continue`, its failing case staged by removing `check_prompt_placement`'s call · none
@@ -317,6 +338,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC10 · the prompt-mode p
   `run-gates gov canary` and `measure-legs selftest`, the legs `tools/gate-legs.json` in Files touched trips.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-10-26 · §2 S10 · §4 Files touched · §6 AC11 · §7 · re-grounded on dOrderedCharter at
+  `462d20f35` by the cross-check record
+  `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 31: the leg
+  `loop placement fixtures` carries `enforces`, P22's, whose v2 `[enforcement]` row names
+  `cl-dClosedLoop-0123`.
 
 ## 10. Reuse audit
 

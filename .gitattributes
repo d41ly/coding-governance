@@ -20,6 +20,12 @@ tools/template-size-highwater.txt text eol=lf
 # The DECLARED ceilings, same reason: the gate parses this file, and an unpinned path smudges to
 # CRLF on this fleet. A person edits it, so it never gets a rewrite to normalise it back.
 tools/template-size-limits.txt text eol=lf
+# The policy kit's parsed files (TOOL-dGroundRules-21 S2): the policy file, and the kit's catalogue,
+# cap census and lists, each read by tomllib or a line parser and byte-compared with a fresh render, so
+# a CRLF checkout under core.autocrlf=true would read a fresh file as changed.
+.governance/policy.toml text eol=lf
+tools/policy/*.toml text eol=lf
+tools/policy/*.txt text eol=lf
 # The runner's DECLARED hardware profile table: parsed at runtime with a TAB field separator, so a
 # stray CR lands inside the last field and turns `timeout=0` into a value the runner refuses.
 tools/run-gates/gate-profiles.txt text eol=lf
@@ -98,6 +104,9 @@ memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md 
 coding-governance-agents.template.md text eol=lf
 AGENTS.md text eol=lf
 .governance/deploy.toml text eol=lf
+# The policy file's JSON mirror (TOOL-dGroundRules-5): `policy.py mirror --check` and the parity arm
+# compare its bytes with a fresh LF render, so a CRLF checkout would read a fresh mirror as stale.
+.governance/policy.json text eol=lf
 tools/line-length-limits.txt text eol=lf
 # TOOL-dHonouredPark-3: the dead-path registry became TAB-separated, so its bytes are load-bearing
 # in a way they were not while a row was `<path>:<line>` plus free whitespace.

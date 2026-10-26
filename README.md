@@ -68,17 +68,15 @@ machines/sessions on the same repo.
   identifier collisions, and BOM-less scripts containing non-ASCII that PowerShell 5.1 decodes as
   CP1252. Two lines to adopt, on no gate leg of the kit's own, `--selftest` included. See
   `tools/gate-lint/README.md`.
-- **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard on `Workflow|Agent` that caps fan-out in both
-  modalities. A direct `Agent` spawn carries no script, so it is COUNTED at runtime — each claims a
-  numbered slot with `O_EXCL` under a session+prompt-keyed dir in the git common dir, and the spawn
-  that finds every slot taken is denied; the budget resets on the next user prompt. A `Workflow` call
-  is read statically: it DENIES any
-  script calling raw `parallel(`/`pipeline(` instead of the bounded `boundedParallel`/`boundedPipeline`
-  helpers, so a wide agent burst can't trip the server rate limiter. It enforces the second half of
-  the rule too: a review's verify stage spawns at most the total the guard resolves. That number is a
-  FILE CONSTANT inside `tools/hooks/agent-cap.js`, which ships deployed verbatim; the guard resolves it at the call
-  site, at the helper's default parameter and at the `gov:bounded-fanout` width, and refuses a set
-  `AGENT_CAP` rather than ignoring it — an environment override leaves no diff behind.
+- **`tools/hooks/agent-cap.js`** — a `PreToolUse` guard on `Workflow|Agent`. How many agents run at
+  once is the policy key `runtime.agents-in-flight`, which `tools/policy/policy.py settings --write`
+  renders into the harness's own two concurrency settings in `.claude/settings.json`; the harness
+  enforces them, and the guard refuses any call whose checkout's settings are absent or above the
+  landed limit. It enforces the second rule itself: a review's verify stage spawns at most
+  `MAX_VERIFIERS` agents TOTAL, a FILE CONSTANT inside `tools/hooks/agent-cap.js`, which ships
+  deployed verbatim, read from a `Workflow` call's script, so a wide verify fan can't trip the
+  server rate limiter. Since TOOL-dGroundRules-10 it counts no direct spawns and bans no raw `parallel(`, and an
+  environment variable sets neither number (`help/agent-limit.md`).
   Wire per WIRE-INTO-PROJECT §5; sanity-check with `tools/hooks/agent-cap.test.sh`.
   Operationalizes the charter's `[bound]` practice; the binding text is
   `memory/guides/REVIEW-PROTOCOL.md`.

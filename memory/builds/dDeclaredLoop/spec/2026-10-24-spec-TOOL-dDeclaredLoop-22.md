@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-22 — the stage-exit recommendation: a command scores it, the producing role reasons it, one record carries both
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 32 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 32 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0107@a606d808 whole
 
@@ -30,10 +30,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-c.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-build-TOOL-dDeclaredLoop-22-deviation-221.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-22-deviation-221.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -54,8 +57,14 @@ reasons it (`gap-flow-12`, AF-1, DA-H2).
   (dOrderedCharter-7 S7): fields `Stage` (`plan`, `design`, `build`, `test`, `deploy`), `Score` (`review`,
   `no-review`, `unarmed`, `none`), `Signals`, `Source` (the `review.recommendation.source` value), `Binds`
   (`yes` or `no`), `Reason`, `Role`, and `Answers` on a reason record, naming the score record it answers.
-  Written by `python tools/memory-tree/build_records.py new recommendation --build <slug> --unit <id> …`,
-  `<id>` being the build's first unit, the house form for a build-level record. Observed by AC1.
+  Served as `**Serves:** recommendation <id>`, `<id>` being the build's first unit, the house form for a
+  build-level record. The kind joins the reader in the same pass: `recommendation` is added to
+  `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`, which the factory's kind table must equal at
+  import (PLAY-dOrderedCharter-42 S1, S2), and to the closed `<kind>` list of
+  `tools/memory-tree/HYGIENE.template.md` (its S5). The verb passes the factory `--build <slug> --unit
+  <id>` and one flag per field; whether the factory's `new` verb is generic per kind is unknown until
+  dOrderedCharter-7 builds, since its S8 states only `new exception`, so AC1's call is re-grounded on
+  the landed factory. Observed by AC1 and AC10.
 - **S2** — The signals, once. `derive_review_signals <slug> <stage>` in `tools/unattended/unattended.sh`
   computes a stage's signals from the tree: for `design`, the two `print_spec_audit_line` computes today, two
   or more units in the generated region and a spec grading FORKED; for `build`, two or more units or a
@@ -100,8 +109,9 @@ reasons it (`gap-flow-12`, AF-1, DA-H2).
   `unarmed`, never `no-review`.
 - The owner-only opt-in to the spec audit. `print_spec_audit_line` still tells the owner, never the run,
   to declare it (TOOL-aWardedAudit-1), and a recommendation writes no opt-in.
-- A record-kind registry row. The registry is a later build's (dTotalRecall); the factory's kind table is
-  where record kinds live today.
+- A record-kind registry row. The registry is a later build's (dTotalRecall); until it lands a record
+  kind lives in the factory's kind table and in `TYPED_RECORD_KINDS`, which the factory refuses at
+  import to differ from (PLAY-dOrderedCharter-42 S2).
 - No help page: `help/` does not document the driver or the build harness.
 
 ### Edges
@@ -150,7 +160,7 @@ unchanged. The `build` stage adds a Tier-2 spec as a signal, read from the statu
   otherwise                     -> Score no-review
   binds: binding -> yes; binding-above-tier -> yes when a spec is Tier-2; advice -> no
   Binds yes and Score review    -> print the --trigger … --cause recommendation line
-  write the record: python build_records.py new recommendation …
+  write the record through build_records.py, with S1's flags
 ```
 
 The verb finds `build_records.py` with `resolve_kit_dir` (`tools/unattended/lib-unattended.sh:191`), as the
@@ -178,7 +188,7 @@ on: the harness neither opts the audit in nor out on it, because the opt-in is t
 |---|---|---|
 | `--recommend`, `--stage`, `--review` | driver verb and flags | flag, none |
 | `run_recommend`, `derive_review_signals` | bash functions | `sh.function`, verb-first |
-| `recommendation` | record kind in `tools/memory-tree/build_records.py` | none |
+| `recommendation` | record kind in `tools/memory-tree/build_records.py`, a member of `TYPED_RECORD_KINDS` | `lexicon naming predicates` grades the tuple |
 | `Stage`, `Score`, `Signals`, `Source`, `Binds`, `Reason`, `Role`, `Answers` | record fields | none |
 | `reason` | harness stage, `workflows.toml` slot and return field | none |
 
@@ -195,6 +205,8 @@ no record and behaves as today.
 ### Files touched (estimate)
 
 - `tools/memory-tree/build_records.py`
+- `tools/memory-tree/tree_lib.py`: `recommendation` in `TYPED_RECORD_KINDS`
+- `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: `recommendation` in the closed kind list
 - `tools/unattended/unattended.sh`
 - `tools/unattended/unattended.test.sh`
 - `tools/unattended/VERBS.template.md`
@@ -279,6 +291,11 @@ the template is the edit.
   for `--recommend`, and over `tools/workflows/README.md` for `recommendation` and `reason`, each prints at
   least 1.
   Red when: the template is edited and the guide is not re-rendered.
+- **AC10** — When `python tools/memory-tree/gen_build_index.py --print-bindings` runs over AC1's scratch
+  repository with the record committed, it prints an `S` row for the `-recommendation-1.md` record with
+  kind `recommendation`, and no `A` row for it.
+  Red when: the kind is added to the factory alone, so the factory refuses at import or the record
+  reads malformed.
 
 ## 7. Gates
 
@@ -314,11 +331,18 @@ declared here and read by the owner's run PLAY-dClosedLoop-13 names.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-51, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
 
+- rev-3 · 2026-10-25 · §2 S1 · §3 · §4 The score, Inventory, Files touched · §6 AC10 · §10 · re-grounded on
+  dOrderedCharter at `462d20f35` by the cross-check record
+  `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md`, rows 59 and 60: the
+  kind joins `TYPED_RECORD_KINDS` and the HYGIENE kind list, the binding is observed, and no
+  `new recommendation` door is claimed.
+
 ## 10. Reuse audit
 
 The score's seam is `print_spec_audit_line` (`tools/unattended/unattended.sh:7887-7905`), today's only signal-scored
 recommendation: its two signals move into one function both callers read. The record goes through
-dOrderedCharter-7's factory, `tools/memory-tree/build_records.py`, as a new kind, never a second writer. The
+dOrderedCharter-7's factory, `tools/memory-tree/build_records.py`, as a new kind joined to
+`TYPED_RECORD_KINDS` (PLAY-dOrderedCharter-42), never a second writer. The
 reason stage reuses the harness's stage spawner and the roles kit's slot table
 (`tools/roles/workflows.toml`'s `stages`), as the DISPOSAL stage does. For a role returning a reason joined to
 a score, no existing seam fits: `git grep -i recommendation -- tools` finds only that line, the lexicon and

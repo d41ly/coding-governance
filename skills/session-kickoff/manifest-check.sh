@@ -43,7 +43,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.31"   # gov:kit kickoff-manifest@1.31 — the registry id
+KIT_MANIFEST_VERSION="1.32"   # gov:kit kickoff-manifest@1.32 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -1307,16 +1307,69 @@ c1=$(grep -nE '\{\{[A-Z]' "$MF" || true)
 [ -n "$c1" ] && fail 1 "unfilled {{PLACEHOLDER}} survives in $MF (fill or delete each):
 $(printf '%s\n' "$c1" | sed 's/^/  /')"
 
+# THE SWITCH OVER CHECKS 7, 8 AND 11 (TOOL-dGroundRules-9). Each cap is a row of the policy kit's cap
+# census: `manifest-bytes`, `manifest-line` and `manifest-trap`. ONE python start asks all three,
+# handing in this file's constants as `default:`, and the answers replace them, so a `budgets.<cap>`
+# in .governance/policy.toml takes a constant's place. A breach under `warn` prints a `BUDGET WARN` line
+# and passes; under `refuse`, or with the cap pinned, it is the check as before, naming the rule. The
+# policy kit is found as every sibling this kit reads is, by `resolve_kit_file`. No kit, or a refusal,
+# keeps every constant and refuses as before, and says so once, at the first breach. The orientation
+# card's cap, CARD_CAP_BYTES, is a consumer's limit outside the switch and reads none of this.
+MAX_MANIFEST_BYTES=${MAX_MANIFEST_BYTES:-25600}
+MANIFEST_LINE_MAX=400   # check 8's per-line cap
+MANIFEST_TRAP_MAX=400   # check 11's per-bullet cap, which reuses check 8's figure
+MB_ANSWERS="" MB_NOTE=""
+_mb_py=$(resolve_python 2>/dev/null) || _mb_py=""
+_mb_pk=$(resolve_kit_file policy budgets.py)
+# The last rung searches by NAME, so a repository's own `budgets.py` would answer it: the policy kit
+# is the one whose directory also holds its census and its catalogue, and anything else is no kit.
+case "$_mb_pk" in */budgets.py) [ -f "${_mb_pk%/*}/caps.toml" ] && [ -f "${_mb_pk%/*}/catalogue.toml" ] || _mb_pk="" ;; esac
+if [ -z "$_mb_py" ] && [ -n "$_mb_pk" ]; then  # the no-kit branch, said as what it is (TOOL-dGroundRules-21 S31)
+  MB_NOTE="MANIFEST — no python launcher resolved to run the policy kit, so a size breach refuses as before"
+elif [ -z "$_mb_py" ] || [ -z "$_mb_pk" ]; then
+  MB_NOTE="MANIFEST — no policy kit is installed beside this checker, so a size breach refuses as before"
+elif _mb_out=$("$_mb_py" "$_mb_pk" resolve --explain "manifest-bytes=default:$MAX_MANIFEST_BYTES" \
+    "manifest-line=default:$MANIFEST_LINE_MAX" "manifest-trap=default:$MANIFEST_TRAP_MAX" 2>&1); then
+  MB_ANSWERS=$_mb_out
+else
+  MB_NOTE="MANIFEST — the policy reader refused, so a size breach refuses as before: $(printf '%s\n' "$_mb_out" | grep -v '^budgets: ' | head -n 1)"
+fi
+read_budget_field() { printf '%s\n' "$MB_ANSWERS" | awk -F'\t' -v c="$1" -v k="$2" '$1 == c { print $k }'; }
+read_budget_rule() { printf '%s\n' "$MB_ANSWERS" | awk -F' · ' -v c="budgets: $1" '$1 == c { print $2 }'; }
+# The three values from ONE builtin split of the answer, never a substitution per cap (TOOL-dGroundRules-85).
+_mb_ifs=$IFS; IFS=$'\n'; set -f
+for _l in $MB_ANSWERS; do
+  case "$_l" in *$'\t'*) ;; *) continue ;; esac
+  _v=${_l#*$'\t'}; _v=${_v%%$'\t'*}
+  case "$_v" in ''|*[!0-9]*) continue ;; esac
+  case "${_l%%$'\t'*}" in
+    manifest-bytes) MAX_MANIFEST_BYTES=$_v ;;
+    manifest-line) MANIFEST_LINE_MAX=$_v ;;
+    manifest-trap) MANIFEST_TRAP_MAX=$_v ;;
+  esac
+done
+set +f; IFS=$_mb_ifs
+# check_budget_breach <cap> <measured> <unit> <value> <subject> — 0 when the breach WARNS, having printed its
+# line; 1 when it refuses, the caller's check then failing as before.
+check_budget_breach() {
+  if [ "$(read_budget_field "$1" 3)" = warn ]; then
+    printf 'BUDGET WARN — %s · %s · %s %s over %s · %s\n' "$1" "$5" "$2" "$3" "$4" "$(read_budget_rule "$1")"
+    return 0
+  fi
+  [ -z "$MB_NOTE" ] || { echo "$MB_NOTE"; MB_NOTE=""; }
+  return 1
+}
+
 # C7 — SIZE. LF-NORMALISED bytes, because the manifest is not eol-pinned in every adopting tree and
 # an unnormalised count answers differently per platform — the split that already cost this repo a
 # blocked push on the memory-tree byte caps. `check-template-size.sh` is the in-repo precedent and
 # measures the same way. The env override exists so the self-test can drive the limit without writing
 # a 25 KiB fixture on every run; it is NOT an adopter escape hatch, and the message says so.
-MAX_MANIFEST_BYTES=${MAX_MANIFEST_BYTES:-25600}
 c7bytes=$(tr -d '\r' < "$MF" | wc -c | tr -d '[:space:]')
-if [ "$c7bytes" -gt "$MAX_MANIFEST_BYTES" ]; then
+if [ "$MAX_MANIFEST_BYTES" -gt 0 ] && [ "$c7bytes" -gt "$MAX_MANIFEST_BYTES" ] && ! check_budget_breach manifest-bytes "$c7bytes" bytes "$MAX_MANIFEST_BYTES" "$MF"; then
   c7over=$((c7bytes - MAX_MANIFEST_BYTES))
-  fail 7 "the manifest is over its size limit and must be trimmed, not have the limit raised: $c7bytes bytes, $c7over over the $MAX_MANIFEST_BYTES-byte limit in $MF"
+  _r=$(read_budget_rule manifest-bytes)
+  fail 7 "the manifest is over its size limit and must be trimmed, not have the limit raised: $c7bytes bytes, $c7over over the $MAX_MANIFEST_BYTES-byte limit in $MF${_r:+ ($_r)}"
 fi
 
 # C8 — LINE LENGTH, in BYTES. awk's length() counts bytes on this platform, and portable character
@@ -1327,17 +1380,23 @@ fi
 # list is one line that grows as pathspecs are added. Fenced blocks hold commands that cannot be
 # wrapped without breaking them. NOTHING else is exempt — a table row or a body bullet over the limit
 # is prose someone wrote, which is exactly what this check is for.
-c8=$(awk '
+c8=$(awk -v cap="$MANIFEST_LINE_MAX" '
   { ln=$0; sub(/\r$/,"",ln) }
   index(ln,"<!-- manifest-audit")==1 { inblk=1; next }
   inblk && ln ~ /-->/ { inblk=0; next }
   inblk { next }
   ln ~ /^[[:space:]]*(```|~~~)/ { fence=!fence; next }
   fence { next }
-  length(ln) > 400 { printf "  line %d: %d bytes\n", NR, length(ln) }
+  cap+0 > 0 && length(ln) > cap+0 { printf "  line %d: %d bytes\n", NR, length(ln); if (length(ln) > m) m = length(ln) }
+  END { if (m) printf "%d\n", m }
 ' "$MF")
-[ -n "$c8" ] && fail 8 "a manifest line is over the 400-byte limit; wrap the prose or move the detail out:
+# The awk's last line is the longest offender's length, the switch's measure, and never a finding.
+c8max=${c8##*$'\n'}; c8=${c8%"$c8max"}; c8=${c8%$'\n'}
+if [ -n "$c8" ] && ! check_budget_breach manifest-line "$c8max" bytes "$MANIFEST_LINE_MAX" "$MF"; then
+  _r=$(read_budget_rule manifest-line)
+  fail 8 "a manifest line is over the $MANIFEST_LINE_MAX-byte limit; wrap the prose or move the detail out${_r:+ ($_r)}:
 $c8"
+fi
 
 # C2 — exactly one manifest-audit block, four keys with non-empty, well-formed values.
 # The stamp rule's single MACHINE home. TOOL-aHonedRuleset-5 hoisted it above RETROFIT so that
@@ -1412,7 +1471,12 @@ if [ "$BLOCK_OK" = 1 ]; then
          done
          set +f; IFS=$_c6ifs ;;
     esac
-    { [ "$n" -gt 0 ] && [ -z "$_c6q" ]; } || n=$(git ls-files -- "$w" 2>/dev/null | wc -l | tr -d '[:space:]')
+    # A literal the listing counted zero, or any name git quoted, is asked of git alone, its lines
+    # counted by expansion, not by `wc -l` and `tr` (TOOL-dGroundRules-85).
+    if [ "$n" -eq 0 ] || [ -n "$_c6q" ]; then
+      _c6one=$(git ls-files -- "$w" 2>/dev/null); _c6nl=${_c6one//[!$'\n']/}
+      n=0; [ -z "$_c6one" ] || n=$(( ${#_c6nl} + 1 ))
+    fi
     if [ "$n" -eq 0 ]; then
       fail 6 "watch pathspec '$w' matches no tracked file — update the watch list to the restructured paths."
     elif [ "$n" -gt 100 ]; then
@@ -1531,21 +1595,27 @@ $files
     #
     # C7 is not a substitute. It bounds the FILE, so traps can re-accrete to the size limit by crowding
     # out every other section; C11 bounds the ENTRY, which is where accretion actually happens.
-    c11=$(awk '
+    # The awk's last line is the longest offender's length, the switch's measure (TOOL-dGroundRules-9).
+    c11=$(awk -v cap="$MANIFEST_TRAP_MAX" '
+      function over() { if (n > 0 && cap+0 > 0 && len > cap+0) { printf "  the bullet starting %s is %d bytes\n", head, len; if (len > m) m = len } }
       { ln=$0; sub(/\r$/,"",ln) }
       /^###[[:space:]]+Environment traps/ { intraps=1; next }
       intraps && /^##[^#]/ { intraps=0 }
       intraps && /^###[[:space:]]/ { intraps=0 }
       !intraps { next }
       /^-[[:space:]]/ {
-        if (n > 0 && len > 400) printf "  the bullet starting %s is %d bytes\n", head, len
+        over()
         n++; len = length(ln) + 1; head = "\"" substr(ln, 3, 40) "…\""; next
       }
       { len += length(ln) + 1 }
-      END { if (n > 0 && len > 400) printf "  the bullet starting %s is %d bytes\n", head, len }
+      END { over(); if (m) printf "%d\n", m }
     ' "$MF")
-    [ -n "$c11" ] && fail 11 "an environment-traps bullet is over the 400-byte cap; the template asks for one line each with the detail linked out, and a record under the memory tree is where the detail belongs:
+    c11max=${c11##*$'\n'}; c11=${c11%"$c11max"}; c11=${c11%$'\n'}
+    if [ -n "$c11" ] && ! check_budget_breach manifest-trap "$c11max" bytes "$MANIFEST_TRAP_MAX" "$MF"; then
+      _r=$(read_budget_rule manifest-trap)
+      fail 11 "an environment-traps bullet is over the $MANIFEST_TRAP_MAX-byte cap; the template asks for one line each with the detail linked out, and a record under the memory tree is where the detail belongs${_r:+ ($_r)}:
     $c11"
+    fi
 
     # C9 — MAINTENANCE STALL. Never in the staged leg: the pre-commit hook runs that leg
     # unconditionally on every commit in an adopting repo, and this question is not one a single

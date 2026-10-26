@@ -81,8 +81,8 @@ is the only one admitting a loop; its bound resolves through the same `boundedK`
 its weight is carried by the bounded RECEIVER clause and the one-call sweep rather than by the number
 an author typed. Asymmetry between markers doing the same job is how one of them becomes a password.
 
-**The cap is a FILE CONSTANT and a set `AGENT_CAP` is refused, not ignored.** An environment-settable
-ceiling is the defeatable class this guard exists to remove, and it leaves no diff behind.
+**Rule 7 holds the settings to `runtime.agents-in-flight`.** A writer split's bound is that limit, a
+verifier split's `MAX_VERIFIERS`; no environment variable moves either.
 
 **The runtime half claims a NUMBERED SLOT with `O_EXCL`; it does not count.** Read-then-decide loses
 updates, as `TOOL-aNumeralWarden-1` measured. Create-a-token-then-count does not fix it: six concurrent processes each observe a count

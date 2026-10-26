@@ -168,6 +168,25 @@ print(" ".join(a for a in alts if not any(re.search("(?i)" + a, l) for l in line
   else bad "NONKIT alternative(s) no homonym fixture line or census site exercises, so they guard a spelling nobody writes: $_nkdead"; fi
 fi
 
+# ==================== TOOL-dGroundRules-84 — rule 3's operand splits on `:` too ==============
+# A declaration's `<kind>:` prefix ahead of a Skill dir is no path segment, so a `limits:` home counts
+# nothing; a `git show` operand naming a kit after `HEAD:`, bare or under a literal directory, still
+# counts.
+K="$TMP/colon"; build_source_fixture "$K" 'A qdemo kit.'
+{
+  printf '%s\n' 'home = "limits:.claude/skills/qdemo/SKILL.md"'
+  printf '%s\n' 'git show "HEAD:qdemo/x.sh"'
+  printf '%s\n' 'git show "HEAD:sub/qdemo/x.sh"'
+} > "$K/${PFX}qdemo/colon.sh"
+git -C "$K" add -A >/dev/null 2>&1
+read_gate "$K"; _kc=$?
+if [ "$_kc" = 1 ] && [[ $LAST_OUT != *"  ${PFX}qdemo/colon.sh:1  "* ]]; then good "DGR84 a limits:-prefixed Skill path counts nothing"
+else bad "DGR84 a limits:-prefixed Skill path counted, or the gate exited $_kc, wanted 1"; fi
+for _n in 2 3; do
+  case "$LAST_OUT" in *"  ${PFX}qdemo/colon.sh:$_n  qdemo"*) good "DGR84 ...and the HEAD: operand on line $_n still counts" ;;
+    *) bad "DGR84 ...the HEAD: operand on line $_n passed unnamed" ;; esac
+done
+
 # ==================== the POPULATION is every tracked file, shipped or not =====================
 P1="$TMP/population"; build_source_fixture "$P1" 'A qdemo kit.'
 mkdir -p "$P1/${PFX}notes"

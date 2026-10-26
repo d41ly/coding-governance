@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-6 — the verdict backends registered under `verdict`: the local hook, the peer-node verifier and the `remote-ci` slot with its witness rule and pin
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 28 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 28 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0344@5cea08b4 whole
 **Carries:** node:policy-key.verdict
@@ -17,8 +17,11 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-6-deviation-61.md](../build/2026-10-25-build-TOOL-dWitnessedBar-6-deviation-61.md) | deviation | — |
+| [2026-10-26-build-TOOL-dWitnessedBar-6-deviation-62.md](../build/2026-10-26-build-TOOL-dWitnessedBar-6-deviation-62.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -92,9 +95,12 @@ as its reader.
   outside a run the lander's refusal line names it. Observed by AC6.
 - **S9** — The pin: `verdict.remote.pin` is a table of `<path> = "<blob id>"`, written only by the
   owner's guarded command, `python tools/loop/policy_edit.py set verdict.remote.pin <value>`
-  (TOOL-dDeclaredLoop-2 S4, its terminal proof). `tools/loop/guard.py --staged` refuses a staged
-  change to that key without the command's `Gov-Policy:` trailer whatever `policy-file.guard` allows,
-  through one constant `OWNER_ONLY_KEYS`. `python remote_verdict.py pin` prints, and never writes,
+  (TOOL-dDeclaredLoop-2 S4, its terminal proof). `tools/loop/guard.py --staged` runs at pre-commit
+  only for an agent's commit, where no commit message exists yet (TOOL-dDeclaredLoop-2 §4 "The
+  verdict"), so it reads no trailer: it refuses every agent-staged change to a key of one constant
+  `OWNER_ONLY_KEYS` under every value of `policy-file.guard`, naming the key, before the value's rule,
+  as its guard-self step refuses the `floor` keys. The `Gov-Policy:` trailer the owner's commit
+  carries is checked by the push arm, `--push-range` (its S6). `python remote_verdict.py pin` prints, and never writes,
   the value the owner would set: the blob of each file `verdict.remote.pin-scope` names at HEAD,
   `workflow` naming `.github/workflows/remote-ci.yml` and `dispatch-closure` adding
   `tools/run-gates/run-gates.sh`, `tools/gate-legs.json` and `.githooks/gate-env.sh`. With no pin
@@ -278,8 +284,10 @@ until the owner pins. The run-gates and unattended kits' versions move.
   Red when: the moved reader's rows differ from the bash function's, or the function stays.
 - **AC8** — When `python remote_verdict.py pin` runs at HEAD with `verdict.remote.pin-scope` at
   `dispatch-closure`, it prints four `<path> = "<blob>"` lines whose blobs equal
-  `git rev-parse HEAD:<path>`, and `python guard.py --staged`, run in the loop kit's directory over a fixture
-  staging a change to `verdict.remote.pin` with no `Gov-Policy:` trailer, exits 1 naming the key.
+  `git rev-parse HEAD:<path>`, and `python guard.py --staged`, run in the loop kit's directory over a
+  fixture whose policy sets `policy-file.guard = "agents-with-reason"` and which stages a change to
+  `verdict.remote.pin` with its change record and `memory/DECISIONS.md` row, so that only
+  `OWNER_ONLY_KEYS` can refuse, exits 1 naming the key.
   Red when: the pin helper writes the policy file, or the guard admits an agent's pin.
 - **AC9** — When the fixture lander `push-main.sh` runs in the fixture repository of
   `verdict_backends.py --fixture --plant lander-peer` under `verdict = "peer-node"` with no peer
@@ -339,6 +347,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 · the h9 arm re-poin
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-56, promoted by the round-1 spec audit of units 40 to 51; nothing else
   moved.
+- rev-4 · 2026-10-26 · S9 · AC8 · re-grounded on the cross-check record
+  `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck`, row 13: `--staged` reads no trailer at
+  pre-commit, so it refuses every agent-staged `OWNER_ONLY_KEYS` change under every value, naming the
+  key, and the trailer stays with `--push-range`; AC8's fixture sets `agents-with-reason`.
 
 ## 10. Reuse audit
 
