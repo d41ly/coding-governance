@@ -77,7 +77,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `f070230a554c0a19a7f77d6378508167ab7733f8`
+- rendered at: `eae2894ed8721d6d244b1beeb7d2ee45de7656d4`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -248,12 +248,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dTotalRecall`:
 
-Coverage of dTotalRecall's 26 clauses and 36 owned nodes, over 34 specs:
+Coverage of dTotalRecall's 26 clauses and 36 owned nodes, over 44 specs:
 - carried whole: 26; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0213, cl-dClosedLoop-0219, cl-dClosedLoop-0234; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-36.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-37.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-39.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-40.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-41.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-42.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md (PLAY-dClosedLoop-2)
+- specs derived from no clause: memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-36.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-37.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-38.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-39.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-40.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-41.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-42.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-43.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-44.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-45.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-46.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-47.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-48.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-49.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-50.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-51.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-52.md (PLAY-dClosedLoop-2), memory/builds/dTotalRecall/spec/2026-10-26-spec-TOOL-dTotalRecall-53.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0221, cl-dClosedLoop-0222, cl-dClosedLoop-0232, cl-dClosedLoop-0233, cl-dClosedLoop-0234, cl-dClosedLoop-0236
 
 ### Reading order
