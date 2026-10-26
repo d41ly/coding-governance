@@ -52,3 +52,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-26T12:06:51Z brief · item TOOL-dSafePassage-16 · reason 009ed7d60646 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-16-build-brief.md
 
 2026-10-26T12:11:29Z dispatch · item 885d0ff9 TOOL-dSafePassage-16 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-16-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-10-26T12:24:11Z brief · item TOOL-dSafePassage-20 · reason 8afb1c293e7a memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-20-build-brief.md
+
+2026-10-26T12:32:29Z dispatch · item c4fc7de1 TOOL-dSafePassage-20 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/refusal_join.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-20.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-20-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json

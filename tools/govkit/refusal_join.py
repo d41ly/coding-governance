@@ -38,7 +38,11 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 307    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 308    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 307 -> 308 at TOOL-dSafePassage-20, BY THE MEASURED DELTA: the matcher read 377 at that unit's base
+# `c4fc7de1` and 378 on the tree it left. The one is `resolve_recorded_introduced`'s refusal of an
+# `introduced` that is neither a 40-hex commit, the reader's `unlanded` nor null, in
+# `upgrade_steps.py`; `check_upgrade_steps` reaches it in process (its dSP-20 AC1 arm).
 # 297 -> 307 at TOOL-dSafePassage-3, BY THE MEASURED DELTA: the matcher read 367 over the seven
 # modules at that unit's base `14054d44` and 377 on the tree it left. Nine are the `steps` field's
 # reader and writer in `upgrade_steps.py` (`read_step_states` eight, `set_step_state`'s schema

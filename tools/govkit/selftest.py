@@ -3086,6 +3086,28 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     check("[dSP-1 AC16] a home only an unlanded step names prints open, a landed step's home closed",
           "window: .second.txt · open" in p.stdout
           and "window: .demo.conf · closed by demo/first" in p.stdout, p.stdout + p.stderr)
+
+    # ---- TOOL-dSafePassage-20 AC1 AC2 AC3: every output kind of the reader crosses the one writer.
+    for kind20, v20, want20 in (("a 40-hex commit", x, x), ("UNLANDED", steps.UNLANDED, None),
+                                ("None", None, None)):
+        check(f"[dSP-20 AC1] resolve_recorded_introduced maps {kind20} to {'itself' if want20 else 'None'}",
+              steps.resolve_recorded_introduced(v20) == want20)
+    check("[dSP-20 AC1] ...and refuses any other value, naming it",
+          "'main'" in read_refusal(lambda: steps.resolve_recorded_introduced("main")))
+    rec20 = {"schema": 4, "steps": []}
+    why20 = read_refusal(lambda: steps.set_step_state(rec20, "s1", steps.UNLANDED, "applied"))
+    first20 = [dict(r) for r in rec20["steps"]]
+    why20 += read_refusal(lambda: steps.set_step_state(rec20, "s1", x, "applied"))
+    check("[dSP-20 AC2] the writer records the reader's unlanded as null, then a landed commit over it",
+          not why20 and first20 == [{"id": "s1", "introduced": None, "state": "applied"}]
+          and rec20["steps"] == [{"id": "s1", "introduced": x, "state": "applied"}], why20 + str(rec20))
+    rows20 = steps.read_steps(g, None, "main")
+    rec20 = {"schema": 4, "steps": []}
+    why20 = read_refusal(lambda: [steps.set_step_state(rec20, r.id, r.introduced, "applied") for r in rows20])
+    check("[dSP-20 AC3] the reader's rows pass through the writer: the landed row its commit, the unlanded one null",
+          not why20 and {r.id: r.introduced for r in rows20} == {"demo/first": x, "lib/second": steps.UNLANDED}
+          and {s["id"]: s["introduced"] for s in rec20["steps"]} == {"demo/first": x, "lib/second": None},
+          why20 + str(rec20))
     git(g, "checkout", "-q", "main")
     git(g, "merge", "-q", "--no-ff", "-m", "land feat", "feat")
     m = run_gov_git(g, "rev-parse", "HEAD")

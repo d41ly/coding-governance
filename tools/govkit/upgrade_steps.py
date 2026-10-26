@@ -549,6 +549,17 @@ def test_steps_recordable(receipt: dict) -> bool:
             and isinstance(receipt.get("steps"), list))
 
 
+def resolve_recorded_introduced(value):
+    """The `introduced` the step record stores for the reader's `value` (TOOL-dSafePassage-20): a
+    40-hex commit unchanged, None for `UNLANDED` or None, and a refusal naming anything else, so the
+    reader's every output kind crosses the one writer and the stored domain stays 40-hex or null."""
+    if value is None or value == UNLANDED:
+        return None
+    if isinstance(value, str) and SHA_RE.fullmatch(value):
+        return value
+    raise Refusal(f"`introduced` {value!r} is neither a 40-hex commit, the reader's {UNLANDED!r} nor null")
+
+
 def set_step_state(receipt: dict, step_id, introduced, state, failure=None) -> dict:
     """Record `step_id` at `state` in the receipt's `steps`: the field's one writer (S3).
 
@@ -560,7 +571,11 @@ def set_step_state(receipt: dict, step_id, introduced, state, failure=None) -> d
     The bootstrap: before schema 4 no step row is persisted, so a step's failure or interruption
     on such a receipt goes to `update`'s output and findings only; the `govkit/receipt-schema-4`
     row is written after that step's post-spawn re-read shows schema 4, through this writer, like
-    any other row (TOOL-dSafePassage-16)."""
+    any other row (TOOL-dSafePassage-16).
+
+    `introduced` is the reader's value as `read_steps` returns it: `resolve_recorded_introduced`
+    maps it first, so the reader's `unlanded` records null (TOOL-dSafePassage-20)."""
+    introduced = resolve_recorded_introduced(introduced)
     schema = receipt.get("schema", 1)
     if not test_steps_recordable(receipt):
         raise Refusal(f"a receipt at schema {schema!r} has no `steps` to record '{step_id}' in: a "

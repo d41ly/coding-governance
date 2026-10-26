@@ -19388,6 +19388,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "resolve_recorded_introduced",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "resolve_registry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
