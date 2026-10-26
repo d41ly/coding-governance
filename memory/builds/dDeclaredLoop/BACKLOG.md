@@ -8,6 +8,7 @@
 - TOOL-dDeclaredLoop-103 · filed 2026-10-26 · THE MAILBOX INTERRUPT NAMES THE WRONG ARMING BUILD. TOOL-dDeclaredLoop-7 S4 prints the mailbox interrupt `unarmed` until dWellOiledMachine lands the mailbox, and v2's `[chain]` row gives the mailbox to dKeptSession, whose KICK-dKeptSession-10 arms it (KICK-dKeptSession-10 §8 F3) · accept TOOL-dDeclaredLoop-7 S4 names dKeptSession's KICK-dKeptSession-10 as the unit that arms the mailbox interrupt, at the item boundary KICK-dKeptSession-13's verb provides, its text amended in place by a rev bump with its §9 line
 - TOOL-dDeclaredLoop-104 · filed 2026-10-26 · THE REMAINING REWORK BUDGET HAS NO ONE-LINE READER. KICK-dKeptSession-26 renders `budget_state` on the card's pointers, and the loop kit's `budget.py` exposes it to no shell caller (KICK-dKeptSession-26 §8 F2) · accept the loop kit's `budget.py` carries a `state --build <slug>` subcommand printing `budget_state`'s one line, exit 0, with a fixture case per answer
 - TOOL-dDeclaredLoop-105 · filed 2026-10-26 · THE TRANSITION READER RETURNS NO COMMIT OR DATE. KICK-dKeptSession-9 keys orientation cost per stage by each transition's time, and `read_transitions(build, repo)` returns the fields alone (KICK-dKeptSession-9 §8 F4) · accept `read_transitions(build, repo)` returns each transition's commit sha and committer date beside its fields, seen on a two-move fixture
+- TOOL-dDeclaredLoop-106 · filed 2026-10-26 · `item.entry.intake`'S FIXED ROW IS NEVER ARMED. TOOL-dDeclaredLoop-24 §4 writes that item's `[[fixed-row]]` when dPlacedRequest declares it as an item, and dWellOiledMachine is the build that declares it (TOOL-dPlacedRequest-3 §3 and §8 F8), so the row would carry no fixed witness and an overlay patch could reshape it (TOOL-dRankedPlan-10 §8 F6) · accept TOOL-dDeclaredLoop-24's trigger reads "when dWellOiledMachine declares it", and the pass that declares `item.entry.intake` writes its `[[fixed-row]]` in `tools/loop/item-schema.toml`, seen as a patch of that item's `witness` refused once `read_items` lists it
 
 ## Dispositions
 
@@ -18,3 +19,4 @@
 - SEV · TOOL-dDeclaredLoop-103 · LOW · a reader of the position engine's spec looks for the mailbox in the wrong build
 - SEV · TOOL-dDeclaredLoop-104 · LOW · the card's `budget —` line prints its `skipped` stand-in
 - SEV · TOOL-dDeclaredLoop-105 · LOW · KICK-dKeptSession-9 reads each date through `read_commits`, a second walk of the same history
+- SEV · TOOL-dDeclaredLoop-106 · LOW · an overlay patch can reshape the intake item's witness TOOL-dRankedPlan-10's fallback reads

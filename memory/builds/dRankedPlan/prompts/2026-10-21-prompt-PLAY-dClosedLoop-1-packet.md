@@ -22,11 +22,11 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 2. `cl-dClosedLoop-0370@23b0ac8f` · now `23b0ac8f`, as at the baseline · tokens: `owner-orders`, `plan.authority`, `planner-drafts-owner-ratifies`, `planner-within-themes` — the planner and triager role and Plan workflow, the plan's order set as `plan.authority` says: drafted by the planner and binding once the owner ratifies it, the planner adding but never reordering between ratifications, under `planner-drafts-owner-ratifies`, ordered by the planner within the themes and priorities the owner sets under `planner-within-themes`, and written by the owner, agents only proposing, under `owner-orders`, each value seen on its planted case (R2.4)
 3. `cl-dClosedLoop-0371@3ec4f25f` · now `3ec4f25f`, as at the baseline · tokens: `archive-legacy`, `owner-batches`, `plan.triage`, `plan.triage-rule`, `rules` — triage as `plan.triage` says: by `plan.triage-rule`'s declared rules, the planner judging what no rule decides, under `rules`, drafted and held for the owner to ratify in batches at an owner breakpoint under `owner-batches`, and the legacy backlog archived with only new asks triaged under `archive-legacy`, each value seen on its planted case
 4. `cl-dClosedLoop-0372@5c733981` · now `5c733981`, as at the baseline · tokens: none, so the token arm cannot see this clause — dormancy disposal
-5. `cl-dClosedLoop-0373@70fb5631` · now `70fb5631`, as at the baseline · tokens: none, so the token arm cannot see this clause — the live-build mapping carried out
+5. `cl-dClosedLoop-0373@70fb5631` · now `f1eb8c00` by deviation `2026-10-26-build-TOOL-dRankedPlan-5-deviation-51` · tokens: none, so the token arm cannot see this clause — the mapping's population is every build the plan view lists at the build run's base, less the 22 chain builds of v2's `[chain]` table, derived by TOOL-dRankedPlan-5 §8 F1's probe; at `0689e7fa1` that is v1's 24 rows plus `aScoutedSeam` and `dClosedLoop`, each of the two recorded `kept` since v1 names no chain build for it.
 6. `cl-dClosedLoop-0374@c6143eda` · now `c6143eda`, as at the baseline · tokens: `review.pin` — Plan Review, run until dCalibratedLens's Plan lenses land with the lenses of the preset `review.pin` passes from dFairHearing's catalogue, seen on a tree that holds no Plan lens
 7. `cl-dClosedLoop-0375@33084fbd` · now `33084fbd`, as at the baseline · tokens: `advisory`, `binding`, `offer-next`, `plan.kickoff` — kickoff using the plan as `plan.kickoff` says: offering the plan's next item under `offer-next`, holding the session to the plan's next item under `binding`, and showing the plan as advice beside the session's own choice under `advisory`, each value seen on its planted case, and attended briefs gated
 8. `cl-dClosedLoop-0376@f1c33063` · now `f1c33063`, as at the baseline · tokens: `kickoff.runs` — the full kickoff only where `kickoff.runs` says
-9. `cl-dClosedLoop-0377@fd363a7f` · now `fd363a7f`, as at the baseline · tokens: `entry.intake`, `plan.ratification` — the session's intake log, which `entry.intake`'s prompt-submit hook writes (dWellOiledMachine's, PM-9), its owner-origin intake alone read as the request's ratification by `plan.ratification`
+9. `cl-dClosedLoop-0377@fd363a7f` · now `a78b3ac9` by deviation `2026-10-26-build-TOOL-dRankedPlan-9-deviation-91` · tokens: `entry.intake`, `plan.ratification` — the session's intake log, which `entry.intake`'s prompt-submit hook writes once dWellOiledMachine lands it and which until then is dPlacedRequest's request record and its `.typed` line, its owner-origin intake alone read as the request's ratification by `plan.ratification`, every witness read from the stand-in marked `log stand-in` in place of a `[[stand-in]]` row
 10. `cl-dClosedLoop-0378@ed811c10` · now `ed811c10`, as at the baseline · tokens: `plan.exit`, `plan.ratification: request` — until the intake kind lands and the harness's adapter declares the prompt-submit event in its capability table, `plan.exit` under `plan.ratification: request` falls back to dDeclaredLoop's owner gate, held for the owner's disposition, its witness recorded as "intake not installed", the fallback kept for every harness whose adapter does not declare the event whichever of this build and dWellOiledMachine lands first, seen on a planted Codex-shaped adapter that reaches Plan's exit through it (RC-9, AF-1, DA-H1)
 11. `cl-dClosedLoop-0379@f1807fe1` · now `f1807fe1`, as at the baseline · tokens: `id#tag` — each role item's memory read set sized at Plan, as `id#tag` keys
 12. `cl-dClosedLoop-0380@1e2f59a7` · now `1e2f59a7`, as at the baseline · tokens: `plan.record` — `plan.record` declaring the probes owed before Design (night pass, point 2)
@@ -53,7 +53,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - The 493 clauses of the other 21 chain builds' rows: carrying one needs a `**Moved:** <clause id> to dRankedPlan by <decision>` line.
 - Any path outside `memory/builds/dRankedPlan/`, but the product paths a build run's units record with `--dispatch --writes`, an ask row in another build's `BACKLOG.md`, and the shared renders a landing re-renders (README rule 7).
 - Another build's packet, the instruments under `memory/builds/dClosedLoop/build/*.py`, and this packet's pin lines: only `packet.py --repin <instrument>`, the owner's, moves a pin.
-- The surfaces of dCalibratedLens, which this build's clauses use as stand-ins only (Later builds named).
+- The surfaces of dWellOiledMachine, dCalibratedLens, which this build's clauses use as stand-ins only (Later builds named).
 
 ### Pins
 
@@ -68,7 +68,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `0689e7fa12b553c712dd853eeba9e0085abdf6ff`
+- rendered at: `911a70393ac1f94625f03e69ee55b42edb1416bb`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -123,7 +123,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 ### Later builds named
 
 - `cl-dClosedLoop-0374` names dCalibratedLens, a stand-in: "Plan Review, run until dCalibratedLens's Plan lenses land with the lenses of the preset…"
-- `cl-dClosedLoop-0377` names dWellOiledMachine: "the session's intake log, which `entry.intake`'s prompt-submit hook writes (dWellOiledMachine's, PM-9), its owner-origin intake alone read as the…"
+- `cl-dClosedLoop-0377` names dWellOiledMachine, a stand-in: "the session's intake log, which `entry.intake`'s prompt-submit hook writes once dWellOiledMachine lands it and which until then is dPlacedRequest's request…"
 - `cl-dClosedLoop-0378` names dWellOiledMachine: "…for every harness whose adapter does not declare the event whichever of this build and dWellOiledMachine lands first, seen on a planted Codex-shaped adapter that…"
 
 ### Obligations
@@ -140,22 +140,22 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dRankedPl
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dRankedPlan-1` · README:61 | 1 | `TOOL-dRankedPlan-1` | `cl-dClosedLoop-0369@9f2afd12` | priority beside `parents:` and the generated plan view |
-- unit id `TOOL-dRankedPlan-2` · README:62 | 2 | `TOOL-dRankedPlan-2` | `cl-dClosedLoop-0370@23b0ac8f` | the planner and triager role and Plan workflow |
-- unit id `TOOL-dRankedPlan-3` · README:63 | 3 | `TOOL-dRankedPlan-3` | `cl-dClosedLoop-0371@3ec4f25f` | triage as `plan.triage` says: by `plan.triage-rule`'s declared rules |
-- unit id `TOOL-dRankedPlan-4` · README:64 | 4 | `TOOL-dRankedPlan-4` | `cl-dClosedLoop-0372@5c733981` | dormancy disposal |
-- unit id `TOOL-dRankedPlan-5` · README:65 | 5 | `TOOL-dRankedPlan-5` | `cl-dClosedLoop-0373@70fb5631` | the live-build mapping carried out |
-- unit id `TOOL-dRankedPlan-6` · README:66 | 6 | `TOOL-dRankedPlan-6` | `cl-dClosedLoop-0374@c6143eda` | Plan Review |
-- unit id `TOOL-dRankedPlan-7` · README:67 | 7 | `TOOL-dRankedPlan-7` | `cl-dClosedLoop-0375@33084fbd` | kickoff using the plan as `plan.kickoff` says: offering the plan's next item under `offer-next` |
-- unit id `TOOL-dRankedPlan-8` · README:68 | 8 | `TOOL-dRankedPlan-8` | `cl-dClosedLoop-0376@f1c33063` | the full kickoff only where `kickoff.runs` says |
-- unit id `TOOL-dRankedPlan-9` · README:69 | 9 | `TOOL-dRankedPlan-9` | `cl-dClosedLoop-0377@fd363a7f` | the session's intake log |
-- unit id `TOOL-dRankedPlan-10` · README:70 | 10 | `TOOL-dRankedPlan-10` | `cl-dClosedLoop-0378@ed811c10` | until the intake kind lands and the harness's adapter declares the prompt-submit event in its capability table |
-- unit id `TOOL-dRankedPlan-11` · README:71 | 11 | `TOOL-dRankedPlan-11` | `cl-dClosedLoop-0379@f1807fe1` | each role item's memory read set sized at Plan |
-- unit id `TOOL-dRankedPlan-12` · README:72 | 12 | `TOOL-dRankedPlan-12` | `cl-dClosedLoop-0380@1e2f59a7` | `plan.record` declaring the probes owed before Design (night pass |
-- unit id `TOOL-dRankedPlan-13` · README:73 | 13 | `TOOL-dRankedPlan-13` | `cl-dClosedLoop-0381@634c7b47` | the plan record's intent fields: the affected systems derived from the `code` record and checked |
-- unit id `TOOL-dRankedPlan-14` · README:74 | 14 | `TOOL-dRankedPlan-14` | `cl-dClosedLoop-0382@182ba9ba` | the plan record's scenario field |
-- unit id `TOOL-dRankedPlan-15` · README:75 | 15 | `TOOL-dRankedPlan-15` | `cl-dClosedLoop-0497@2b8de50e` | the plan revision record: a fork the goal cannot survive moving the build from designing back to planning |
-- unit id `TOOL-dRankedPlan-16` · README:76 | 16 | `TOOL-dRankedPlan-16` | `cl-dClosedLoop-0498@e9d43f26` | the artifact levels declared as the owner confirmed them in the flow round: the card at the session's level above the plan |
+- unit id `TOOL-dRankedPlan-1` · README:60 | 1 | `TOOL-dRankedPlan-1` | `cl-dClosedLoop-0369@9f2afd12` | priority beside `parents:` and the generated plan view |
+- unit id `TOOL-dRankedPlan-2` · README:61 | 2 | `TOOL-dRankedPlan-2` | `cl-dClosedLoop-0370@23b0ac8f` | the planner and triager role and Plan workflow |
+- unit id `TOOL-dRankedPlan-3` · README:62 | 3 | `TOOL-dRankedPlan-3` | `cl-dClosedLoop-0371@3ec4f25f` | triage as `plan.triage` says: by `plan.triage-rule`'s declared rules |
+- unit id `TOOL-dRankedPlan-4` · README:63 | 4 | `TOOL-dRankedPlan-4` | `cl-dClosedLoop-0372@5c733981` | dormancy disposal |
+- unit id `TOOL-dRankedPlan-5` · README:64 | 5 | `TOOL-dRankedPlan-5` | `cl-dClosedLoop-0373@70fb5631` | the live-build mapping carried out |
+- unit id `TOOL-dRankedPlan-6` · README:65 | 6 | `TOOL-dRankedPlan-6` | `cl-dClosedLoop-0374@c6143eda` | Plan Review |
+- unit id `TOOL-dRankedPlan-7` · README:66 | 7 | `TOOL-dRankedPlan-7` | `cl-dClosedLoop-0375@33084fbd` | kickoff using the plan as `plan.kickoff` says: offering the plan's next item under `offer-next` |
+- unit id `TOOL-dRankedPlan-8` · README:67 | 8 | `TOOL-dRankedPlan-8` | `cl-dClosedLoop-0376@f1c33063` | the full kickoff only where `kickoff.runs` says |
+- unit id `TOOL-dRankedPlan-9` · README:68 | 9 | `TOOL-dRankedPlan-9` | `cl-dClosedLoop-0377@fd363a7f` | the session's intake log |
+- unit id `TOOL-dRankedPlan-10` · README:69 | 10 | `TOOL-dRankedPlan-10` | `cl-dClosedLoop-0378@ed811c10` | until the intake kind lands and the harness's adapter declares the prompt-submit event in its capability table |
+- unit id `TOOL-dRankedPlan-11` · README:70 | 11 | `TOOL-dRankedPlan-11` | `cl-dClosedLoop-0379@f1807fe1` | each role item's memory read set sized at Plan |
+- unit id `TOOL-dRankedPlan-12` · README:71 | 12 | `TOOL-dRankedPlan-12` | `cl-dClosedLoop-0380@1e2f59a7` | `plan.record` declaring the probes owed before Design (night pass |
+- unit id `TOOL-dRankedPlan-13` · README:72 | 13 | `TOOL-dRankedPlan-13` | `cl-dClosedLoop-0381@634c7b47` | the plan record's intent fields: the affected systems derived from the `code` record and checked |
+- unit id `TOOL-dRankedPlan-14` · README:73 | 14 | `TOOL-dRankedPlan-14` | `cl-dClosedLoop-0382@182ba9ba` | the plan record's scenario field |
+- unit id `TOOL-dRankedPlan-15` · README:74 | 15 | `TOOL-dRankedPlan-15` | `cl-dClosedLoop-0497@2b8de50e` | the plan revision record: a fork the goal cannot survive moving the build from designing back to planning |
+- unit id `TOOL-dRankedPlan-16` · README:75 | 16 | `TOOL-dRankedPlan-16` | `cl-dClosedLoop-0498@e9d43f26` | the artifact levels declared as the owner confirmed them in the flow round: the card at the session's level above the plan |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -184,11 +184,11 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dRankedPlan`:
 
-Coverage of dRankedPlan's 16 clauses and 18 owned nodes, over 0 specs:
-- carried whole: 0; carried in parts: 0 (none)
+Coverage of dRankedPlan's 16 clauses and 18 owned nodes, over 16 specs:
+- carried whole: 16; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: cl-dClosedLoop-0369, cl-dClosedLoop-0370, cl-dClosedLoop-0371, cl-dClosedLoop-0372, cl-dClosedLoop-0373, cl-dClosedLoop-0374, cl-dClosedLoop-0375, cl-dClosedLoop-0376, cl-dClosedLoop-0377, cl-dClosedLoop-0378, cl-dClosedLoop-0379, cl-dClosedLoop-0380, cl-dClosedLoop-0381, cl-dClosedLoop-0382, cl-dClosedLoop-0497, cl-dClosedLoop-0498; stale: none; ambiguous: none
-- owned nodes no spec names: item.plan.dedupe, item.plan.exit, item.plan.input, item.plan.lease, item.plan.place, item.plan.record, item.plan.research, item.plan.triage-judge, item.plan.triage-rule, policy-key.kickoff.runs, policy-key.plan.authority, policy-key.plan.kickoff, policy-key.plan.ratification, policy-key.plan.triage, policy-key.plan.unplaced, record-kind.dupes, record-kind.plan, record-kind.triage
+- uncarried: none; stale: cl-dClosedLoop-0373, cl-dClosedLoop-0377; ambiguous: none
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0372, cl-dClosedLoop-0373, cl-dClosedLoop-0382, cl-dClosedLoop-0497, cl-dClosedLoop-0498
 
