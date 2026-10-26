@@ -197,8 +197,8 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 AC3 AC4 · the window case o
   (b) is a public surface no clause names, an owner turn under BUILD-METHOD M3's veto 2. (c) cannot
   tell two windows apart, since the transcript records one model id for both. (d) fails the audit's
   criterion, a 900k turn reading under 100%. (a) meets AC1 to AC4 and adds no surface.
-  RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the most capable survivor. widens: none ·
-  relaxes: none
+  RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the most capable survivor.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
