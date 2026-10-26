@@ -3,10 +3,11 @@
 # Each row is an `[[upgrade]]` table in the one grammar a descriptor's `[[upgrade]]` rows use, read
 # by `upgrade_steps.py` beside this file and by nothing else: `id = "<entry>/<slug>"`, where
 # `<entry>` names NO registry entry (`govkit`, `lib`); `up`, `down` and `witness` argvs; an optional
-# `resume`; `surfaces`; and `needs-target`. The introducing commit is derived from the default
-# branch's first-parent history and is never typed here. Within one commit this file's rows run
-# before every descriptor's. A landed row is frozen: correct it with a new step, retire it with a
-# `[[retired]]` row in the registry. `python <prefix>/govkit/upgrade_steps.py list` prints the order.
+# `resume`; an optional `reverted`, "down-exit" or an argv, judging the down; `surfaces`; and
+# `needs-target`. The introducing commit is derived from the default branch's first-parent history
+# and is never typed here. Within one commit this file's rows run before every descriptor's. A
+# landed row is frozen: correct it with a new step, retire it with a `[[retired]]` row in the
+# registry. `python <prefix>/govkit/upgrade_steps.py list` prints the order.
 
 # TOOL-dSafePassage-3: the receipt's schema 4, whose one new field is `steps`. FIRST, because every
 # later step records its state in that field; a receipt below 3 is refused, the preamble lifts it.
@@ -22,13 +23,16 @@ needs-target = false
 # TOOL-dSafePassage-11: the interpreter floor raised to Python 3.15, declared in python-floor.txt in
 # gov's lib dir. Its up and witness are the preflight, which refuses below the floor exactly as the
 # resolver does; its down grades the target's tracked .py and .toml files under the floor it restores,
-# 3.11, and restores the declaration only where the target carries it. A later raise appends its own
-# row after the newest one, its down naming the floor it replaces, and never edits this one.
+# 3.11, and restores the declaration only where the target carries it. Its witness reads the node,
+# which no down changes, so `reverted = "down-exit"` lets the down's own exit 0 judge it
+# (TOOL-dSafePassage-17). A later raise appends its own row after the newest one, its down naming
+# the floor it replaces, and never edits this one.
 [[upgrade]]
 id = "lib/python-floor-3.15"
 up = ["bash", "{gov}/lib/python-floor.sh", "preflight"]
 down = ["bash", "{gov}/lib/python-floor.sh", "down", "3.11", "{target}"]
 witness = ["bash", "{gov}/lib/python-floor.sh", "preflight"]
+reverted = "down-exit"
 surfaces = []
 needs-target = false
 resume = "atomic"

@@ -3023,6 +3023,14 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
         check(f"[dSP-1 AC2] {label} exits 2 naming its file, row and key",
               p.returncode == 2 and want in p.stderr, f"rc={p.returncode} " + p.stdout + p.stderr)
         git(g, "checkout", "-q", "--", ".")
+    # ---- TOOL-dSafePassage-17 AC1: `reverted` is "down-exit" or an argv; any other value is refused.
+    for value, want_rc in (('"maybe"', 2), ('"down-exit"', 0), ('["python", "' + prog + '", "reverted", "{target}"]', 0)):
+        write_file(g, "demo/kit.toml", demo_head + render_row("demo/first", f"reverted = {value}\n"))
+        p = run_steps(g, "list")
+        check(f"[dSP-17 AC1] reverted = {value} exits {want_rc}" + (" naming its file, row and key" if want_rc else ""),
+              p.returncode == want_rc and (not want_rc or f"{kit} 1 key reverted" in p.stderr),
+              f"rc={p.returncode} " + p.stdout + p.stderr)
+        git(g, "checkout", "-q", "--", ".")
     p = subprocess.run([sys.executable, str(g / PFX / gkn / "upgrade_steps.py"), "list"], capture_output=True,
                        text=True, encoding="utf-8", env={**STEPS_ENV, "GOV_REMOTE": "nosuch"})
     check("[dSP-1 S3] a remote ladder that refuses refuses `list`, naming GOV_REMOTE, at exit 2",
@@ -3137,6 +3145,9 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     p = run_frozen_on("demo/kit.toml", landed.replace('"down", "{target}"]', '"down", "{target}", "--x"]'))
     check("[dSP-1 AC4] an edited landed `down` argv exits 1 naming the id and the field",
           p.returncode == 1 and "demo/first: its landed `down` was edited" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on("demo/kit.toml", landed + 'reverted = "down-exit"\n')
+    check("[dSP-17 AC7] an edited landed `reverted` exits 1 naming the id and the field",
+          p.returncode == 1 and "demo/first: its landed `reverted` was edited" in p.stdout, p.stdout + p.stderr)
     p = run_frozen_on("demo/kit.toml", demo_head)
     check("[dSP-1 AC4] a removed landed row exits 1 naming the id",
           p.returncode == 1 and "demo/first: the landed [[upgrade]] row is gone" in p.stdout, p.stdout + p.stderr)
@@ -3294,6 +3305,11 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
     check("[dSP-1 AC11] a down after the up leaves a BOM-led CRLF conf and the policy file byte-identical",
           down.returncode == 0 and read_tree(t) == pre
           and not (t / ".governance" / "steps" / "agent-cap").exists(), down.stdout + down.stderr)
+    t = make_target(tmp / "fs-ac17", None)
+    down = run_step("down", t)
+    status = run_gov_git(t, "status", "--porcelain")
+    check("[dSP-17 AC5] a down on a target that never held the conf, with no image, exits 0 and writes nothing",
+          down.returncode == 0 and status == "", down.stdout + down.stderr + status)
 
     t = build_capped("fs-ac11k", b"FANOUT_CAP=2\n")
     pre = read_tree(t)
@@ -3622,7 +3638,10 @@ def check_step_rollback() -> None:
     on any unmet expectation. TOOL-dSafePassage-43's AC3 is the `down-fails` and `witness-stays` rows;
     TOOL-dSafePassage-18's AC1 to AC3 are the `rollback` family's `schema-step` rows, the schema step's
     down writing no row; TOOL-dSafePassage-19's AC1 and AC2 are the `rollback-update` family's, a
-    rollback past the schema step stamping schema 3 with no `steps` and converging after a kill."""
+    rollback past the schema step stamping schema 3 with no `steps` and converging after a kill.
+    TOOL-dSafePassage-17's AC2 to AC4 are the `witness-only`, `node-witness`, `node-witness-refuses`
+    and `witness-stays` rows: a down with no before-image, or under `reverted = "down-exit"`, is
+    judged by its exit, and one whose image was present still by its witness."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -3640,6 +3659,11 @@ def check_step_rollback() -> None:
             ("rollback", "witness-stays", 1, ("step fx/s2 · STOPPED · witness still holds after down",
                                               "stop text opens with an entry of DOWN_STOP_PREFIXES: yes")),
             ("rollback", "unrecorded", 0, (rolled, same)),
+            ("rollback", "witness-only", 0, ("rollback: fx/s2 applied by witness alone, no before-image", rolled, same)),
+            ("rollback", "node-witness", 0, ("rollback: fx/s2 applied by witness alone, no before-image", rolled, same)),
+            ("rollback", "node-witness-refuses", 1, ("step fx/s3 · rolled-back\nstep fx/s2 · STOPPED · down exit 1: "
+                                                     "fx: s2 down fails by its plant\nrollback: 3 reached",
+                                                     "stop text opens with an entry of DOWN_STOP_PREFIXES: yes")),
             ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
                                         "in planted_caller\n")),
             ("rollback", "schema-step", 0, ("step fx/s1 · rolled-back\nstep govkit/receipt-schema-4 · rolled-back",
@@ -3678,7 +3702,8 @@ def check_step_rollback() -> None:
         p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
-        tag = ("dSP-4" if not (plant or "").startswith("schema-step")
+        tag = ("dSP-17" if plant in ("witness-only", "node-witness", "node-witness-refuses")
+               else "dSP-4" if not (plant or "").startswith("schema-step")
                else "dSP-19" if family == "rollback-update" else "dSP-18")
         check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
               p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])

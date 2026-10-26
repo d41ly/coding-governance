@@ -146,7 +146,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-24 — a step is refused when the target's own git config declares an executor or a credential](spec/2026-10-23-spec-TOOL-dSafePassage-24.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt](spec/2026-10-23-spec-TOOL-dSafePassage-8.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip](spec/2026-10-23-spec-TOOL-dSafePassage-10.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-26 |
-| [TOOL-dSafePassage-17 — a down is judged by its row's declared `reverted` rule, and a down with no before-image by its exit](spec/2026-10-23-spec-TOOL-dSafePassage-17.md) | 4 | 2 | DEFERRED | rev-5 | 2026-10-26 |
+| [TOOL-dSafePassage-17 — a down is judged by its row's declared `reverted` rule, and a down with no before-image by its exit](spec/2026-10-23-spec-TOOL-dSafePassage-17.md) | 4 | 2 | CLOSED | rev-5 | 2026-10-27 |
 | [TOOL-dSafePassage-23 — the resolver keeps an override's own name, and prefers the direct executable only for the launcher names](spec/2026-10-23-spec-TOOL-dSafePassage-23.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-25 — a refused gov-first landing removes the untracked files its walk made](spec/2026-10-23-spec-TOOL-dSafePassage-25.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-29 — the step contract's refused keys are the class git's own config list derives, held to it by an arm](spec/2026-10-23-spec-TOOL-dSafePassage-29.md) | 4 | 2 | DEFERRED | rev-4 | 2026-10-26 |
@@ -190,7 +190,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 255 bound to this build, across 4 record folder(s).
+Records: 256 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

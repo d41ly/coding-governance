@@ -26,9 +26,9 @@ the row, and a row the default branch has not landed reads `unlanded`. A kit tha
   <step id>`.
 - **Correct a landed step:** add a new step under a new id. A landed row is frozen: the
   `step-rows-frozen` leg, `python tools/govkit/upgrade_steps.py frozen`, fails when a branch edits a
-  landed row's `up`, `down`, `witness`, `resume` or `surfaces`, edits a byte of a program a landed
-  row runs, or removes a landed row with no `[[retired]]` row naming it. It does not check what a
-  step program imports.
+  landed row's `up`, `down`, `witness`, `resume`, `reverted` or `surfaces`, edits a byte of a
+  program a landed row runs, or removes a landed row with no `[[retired]]` row naming it. It does
+  not check what a step program imports.
 
 ## What a step can reach
 
@@ -172,15 +172,24 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
   `govkit/receipt-schema-4` comes last. A step recorded nowhere, or `rolled-back`, runs its witness
   first and is skipped where the witness does not hold: `step <id> · skipped (nothing applied)`. A
   step that runs its down is marked `down interrupted: started <utc>, no exit recorded` before it
-  starts, and reads `rolled-back` once the down exits 0 and its witness no longer holds; what the
-  down restored is staged. All of this happens before any file moves; then the files return to
+  starts, and reads `rolled-back` once the down exits 0 and is judged to have taken effect; what
+  the down restored is staged. All of this happens before any file moves; then the files return to
   `<rev>`'s bytes as any `update --to <rev>` moves them, and the receipt's `gov_commit` is set to
   `<rev>`, its `schema` left as the downs left it. Without `--write` it prints `would roll back
   <id>` for each step and runs none.
-- **A stopped rollback.** A down that exits non-zero (`down exit <rc>: <its last stderr line>`), or a
-  witness that still holds after it (`witness still holds after down`), stops the rollback with that
-  step's state kept: no file moves, `gov_commit` does not move, and the run exits 1. Fix the cause
-  and run the same command again; it resumes at that step.
+- **How a down is judged.** By default, by the step's witness: it must no longer hold after the
+  down. A step with no before-image (`.governance/steps/<entry>/<slug>.before.json`) when its down
+  starts, such as one recorded `applied` because its witness already held, wrote nothing to undo,
+  so its down's exit 0 is the verdict instead. A row whose witness reads something no down
+  changes, such as the node's own interpreter, declares `reverted = "down-exit"`, so its down's exit
+  0 decides even where an image exists; `lib/python-floor-3.15` does. A row may instead declare
+  `reverted` as a command, under the same rules as `up`, `down` and `witness`, whose exit 0 means
+  the down took effect. A landed row's `reverted` is frozen, like its `down`.
+- **A stopped rollback.** A down that exits non-zero (`down exit <rc>: <its last stderr line>`), a
+  witness that still holds after it (`witness still holds after down`), or a `reverted` command that
+  exits non-zero (`reverted check exits <rc>`), stops the rollback with that step's state kept: no
+  file moves, `gov_commit` does not move, and the run exits 1. Fix the cause and run the same
+  command again; it resumes at that step.
 - **A failed `update` never rolls back by itself.** A stopped walk leaves the steps before it
   applied and runs no down; only `update --rollback` runs downs.
 - **The record.** A `--write` rollback writes `.governance/outbox/update-reverted-<from8>-<to8>.md`
@@ -196,6 +205,8 @@ To see it on this machine:
 ```sh
 python tools/govkit/upgrade_steps.py fixture rollback                         # s4 to s1 rolled back
 python tools/govkit/upgrade_steps.py fixture rollback --plant down-fails      # stops at s3, resumes
+python tools/govkit/upgrade_steps.py fixture rollback --plant witness-only    # no image: judged by the down
+python tools/govkit/upgrade_steps.py fixture rollback --plant node-witness    # reverted = "down-exit"
 python tools/govkit/upgrade_steps.py fixture rollback-update                  # update --rollback --to A
 ```
 

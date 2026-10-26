@@ -19,7 +19,8 @@ unknown key; an authored `introduced` or `retired`; a placeholder other than `{g
 `{prefix}`; an interpreter other than python and bash; a `{gov}/` program git does not track at the
 revision read; a duplicate id; a descriptor row whose `<entry>` is not that descriptor's own id, or
 a steps-file row whose `<entry>` IS a registry entry; a `surfaces` item that is not
-`<class>:<name>`; and a succession row whose id is still live or whose successor is not.
+`<class>:<name>`; a `reverted` that is neither `"down-exit"` nor an argv; and a succession row
+whose id is still live or whose successor is not.
 
 THE DERIVED COMMIT. A row's introducing commit, and a succession row's retiring commit, is never
 typed, because a row cannot name the commit that lands it and any other typed commit copies a fact
@@ -34,7 +35,7 @@ one file, row order.
 
 FROZEN ROWS. `check_frozen` compares every row present at a base on the default branch with the same
 id at the head. A removed `[[upgrade]]` row reds unless a `[[retired]]` row at the head names it; an
-edited `up`, `down`, `witness`, `resume` or `surfaces` reds; an edited byte of a program a landed
+edited `up`, `down`, `witness`, `resume`, `reverted` or `surfaces` reds; an edited byte of a program a landed
 argv names reds; a removed or edited `[[retired]]` row reds. A correction shipped as a new step is
 green, and `needs-target` stays mutable. WHAT IT DOES NOT CHECK: what a step program imports, so a
 landed step can still change through an import; whether a correction step reverses its defect; and
@@ -79,8 +80,10 @@ an operator's. `fixture walk|lock|update` observe it in scratch repositories.
 THE REVERSE WALK (TOOL-dSafePassage-4). `update --rollback --to <rev> --write`, and nothing else,
 calls `run_reverse_walk` over `derive_reverse_steps`, the rows introduced after `<rev>` that the
 receipt records applied or failed, or records nowhere, newest first: per step its down, a
-`down interrupted:` failure persisted before the spawn, then its witness, which must no longer hold
-before the row reads `rolled-back`; the first stop ends the walk, and a re-run resumes there.
+`down interrupted:` failure persisted before the spawn, then `derive_down_verdict`'s judge
+(TOOL-dSafePassage-17): the row's `reverted` argv, which must exit 0, or its down's own exit under
+`reverted = "down-exit"` or with no before-image at the spawn, else its witness, which must no longer
+hold, before the row reads `rolled-back`; the first stop ends the walk, and a re-run resumes there.
 `write_rollback_record` begins `.governance/outbox/update-reverted-<from8>-<to8>.md` before the
 first down and finishes it before `update` returns. `fixture rollback|rollback-update` observe it.
 
@@ -125,9 +128,11 @@ if __name__ == "__main__":
 
 INTERPRETERS = ("python", "bash")
 PLACEHOLDER_RE = re.compile(r"\{(?:gov|target|prefix)\}")
-STEP_KEYS = ("id", "up", "down", "witness", "resume", "surfaces", "needs-target")
+STEP_KEYS = ("id", "up", "down", "witness", "resume", "reverted", "surfaces", "needs-target")
 RETIRED_KEYS = ("id", "successor", "surfaces")
-FROZEN_FIELDS = ("up", "down", "witness", "resume", "surfaces")
+FROZEN_FIELDS = ("up", "down", "witness", "resume", "reverted", "surfaces")
+# The `reverted` value under which a down's own exit 0 decides it took effect (TOOL-dSafePassage-17).
+DOWN_EXIT = "down-exit"
 ID_RE = re.compile(r"([^/\s]+)/([a-z0-9][a-z0-9.-]*)")
 SURFACE_RE = re.compile(r"[a-z][a-z0-9-]*:\S.*")
 UNLANDED = "unlanded"
@@ -158,7 +163,7 @@ THIS_HOST = socket.gethostname()
 # variable included, falls out because nothing copies it in; a name joins by a reviewed edit.
 STEP_ENV_KEEP = ("PATH", "PATHEXT", "SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "COMSPEC", "OS",
                  "PROCESSOR_ARCHITECTURE", "NUMBER_OF_PROCESSORS", "LANG", "LC_ALL", "TZ")
-STEP_PHASES = ("up", "down", "witness", "resume")
+STEP_PHASES = ("up", "down", "witness", "resume", "reverted")
 # Where `check_needs_target` gathers canaries: inside the scratch tree it is handed, so a target
 # module planted beside the plants can name its own canary by its own path.
 CANARY_DIR = ".gk-canaries"
@@ -193,7 +198,8 @@ class Refusal(RuntimeError):
 
 class StepRow(NamedTuple):
     """One `[[upgrade]]` row, validated. `introduced` is a commit, `unlanded`, or None where the
-    caller asked for no derivation; `file` is repo-relative and `row` 1-based within that file."""
+    caller asked for no derivation; `file` is repo-relative and `row` 1-based within that file.
+    `reverted` is None, `DOWN_EXIT` or an argv (TOOL-dSafePassage-17)."""
     id: str
     up: list
     down: list
@@ -204,6 +210,7 @@ class StepRow(NamedTuple):
     file: str
     row: int
     introduced: str | None
+    reverted: object = None
 
 
 class RetiredRow(NamedTuple):
@@ -355,13 +362,18 @@ def read_steps(root, rev: str | None, landed_ref: str | None) -> list[StepRow]:
             resume = d.get("resume")
             if resume is not None and resume != "atomic":
                 check_argv(resume, f"{at} key resume", tr, where, read_tracked)
+            reverted = d.get("reverted")
+            if reverted is not None and reverted != DOWN_EXIT:
+                if not isinstance(reverted, list):
+                    raise Refusal(f"{at} key reverted: '{reverted}' is neither \"{DOWN_EXIT}\" nor an argv")
+                check_argv(reverted, f"{at} key reverted", tr, where, read_tracked)
             if "surfaces" not in d:
                 raise Refusal(f"{at} key surfaces: required, possibly empty, so an absence is declared")
             check_surfaces(d["surfaces"], f"{at} key surfaces")
             if not isinstance(d.get("needs-target"), bool):
                 raise Refusal(f"{at} key needs-target: required, true or false")
             rows.append(StepRow(sid, d["up"], d["down"], d["witness"], resume, d["surfaces"],
-                                d["needs-target"], rel, n, None))
+                                d["needs-target"], rel, n, None, reverted))
     if landed_ref is None:
         return rows
     hit = derive_introduced(root, landed_ref, [rel for rel, _e in files], "upgrade", [r.id for r in rows])
@@ -495,7 +507,7 @@ def check_frozen(root, base: str, head: str) -> tuple[int, list[str]]:
             if getattr(row, field) != getattr(cur, field):
                 problems.append(f"{row.id}: its landed `{field}` was edited in {cur.file} — a landed "
                                 f"row is frozen; ship the correction as a new step")
-        for argv in (row.up, row.down, row.witness, row.resume if isinstance(row.resume, list) else []):
+        for argv in (row.up, row.down, row.witness, *(a for a in (row.resume, row.reverted) if isinstance(a, list))):
             for tok in argv:
                 if not tok.startswith("{gov}/"):
                     continue
@@ -1190,15 +1202,30 @@ def derive_reverse_steps(gov_root, receipt: dict, to_commit: str) -> list[StepRo
         or run_git(gov_root, "merge-base", "--is-ancestor", r.introduced, to_commit) is None)]
 
 
+def derive_down_verdict(row: StepRow, image_present: bool, down_rc) -> tuple[bool | None, str]:
+    """Move 5 of `run_reverse_walk` (TOOL-dSafePassage-17 S2): `(reverted, phase)`. Where the down's
+    own exit decides, `reverted` is `down_rc == 0` and `phase` is `down`: the row declares
+    `reverted = "down-exit"`, or declares no `reverted` and had no before-image at the down's spawn
+    (`image_present` read before it, the no-image rule). Otherwise `reverted` is None and `phase`
+    names the check to spawn: `reverted`, the row's argv, its exit 0 the down took effect; or
+    `witness`, with no `reverted` and an image present, the down reverted when it does NOT hold."""
+    if row.reverted == DOWN_EXIT or (row.reverted is None and not image_present):
+        return down_rc == 0, "down"
+    return None, "witness" if row.reverted is None else "reverted"
+
+
 def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[StepRow]) -> dict:
     """Down `rows`, `derive_reverse_steps`' order, over `target` (TOOL-dSafePassage-4 S4), every
     spawn through `run_step_reread`. Per step: (1) one recorded `rolled-back` or nowhere runs its
     witness first and is skipped where it does not hold, nothing of it applied; (2) a row needing
     target code stops the walk with `write_attended_order`'s order naming its down; (3) its state
     kept, `failure` `down interrupted: ...` is persisted BEFORE the spawn; (4) its down, a non-zero
-    exit stopping with `down exit <rc>: <last stderr line>`; (5) its witness, exit 0 stopping with
-    `witness still holds after down`, anything else staging the paths its before-image listed
-    (read before the down took the image away) and the image, and recording `rolled-back`. A
+    exit stopping with `down exit <rc>: <last stderr line>`; (5) `derive_down_verdict`'s judge
+    (TOOL-dSafePassage-17): the down's own exit under `reverted = "down-exit"` or with no
+    before-image at the spawn, the row's `reverted` argv, a non-zero exit stopping with `reverted
+    check exits <rc>`, else its witness, exit 0 stopping with `witness still holds after down`; a
+    down that took effect stages the paths its before-image listed (read before the down took the
+    image away) and the image, and records `rolled-back`. A
     `failed` row is downed like an `applied` one: the down is what tolerates a partial up.
 
     After the down's re-read, `test_steps_recordable` decides whether that row's records are written
@@ -1243,10 +1270,17 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
             return stop(row, failure)
         if not recordable and n < len(rows):
             return stop(row, LOWERED_STOP)
-        if run_step_reread(seen, "witness", target, gov_root, receipt_path, receipt)["verdict"] == "ok":
+        reverted, phase = derive_down_verdict(row, bool(paths), got["rc"])
+        rc = got["rc"]
+        if reverted is None:
+            check = run_step_reread(seen, phase, target, gov_root, receipt_path, receipt)
+            reverted, rc = (check["verdict"] == "ok") == (phase == "reverted"), check["rc"]
+        if not reverted:
+            failure = {"witness": DOWN_STOP_PREFIXES[2], "reverted": f"{DOWN_STOP_PREFIXES[3]}{rc}"}.get(
+                phase, f"{DOWN_STOP_PREFIXES[1]}{rc}")
             if recordable:
-                write_step_record(receipt_path, receipt, row, state, DOWN_STOP_PREFIXES[2])
-            return stop(row, DOWN_STOP_PREFIXES[2])
+                write_step_record(receipt_path, receipt, row, state, failure)
+            return stop(row, failure)
         write_step_staged(target, row.id, paths, "the step stays recorded down interrupted and the "
                           "next rollback runs its down again")
         if recordable:
@@ -1739,6 +1773,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
 # path and sha256 as the down found them, then restores from the image, `<slug>.down-fails` exiting
 # 1 first and `<slug>.down-keeps` exiting 0 with nothing restored; `<slug>.down-lowers` then sets the
 # receipt to schema 3 and takes `steps` out, as the schema step's down does (TOOL-dSafePassage-18).
+# `<slug>.witness-absent` makes its witness "the file is absent", and `<slug>.witness-always` one
+# that exits 0 whatever the target holds, as a witness reading node state does (TOOL-dSafePassage-17).
 FIXTURE_WALK_STEP = r'''import importlib.util, os, pathlib, sys, time
 verb, target, slug = sys.argv[1], pathlib.Path(sys.argv[2]), sys.argv[3]
 reports = target.with_name(target.name + ".fx")
@@ -1746,7 +1782,8 @@ reports.mkdir(exist_ok=True)
 with open(reports / f"{slug}.{verb}", "a", encoding="utf-8") as f:
     f.write(f"{os.getpid()}\n")
 if verb == "witness":
-    sys.exit(0 if (target / f"{slug}.txt").is_file() else 1)
+    held = (target / f"{slug}.txt").is_file() != (reports / f"{slug}.witness-absent").exists()
+    sys.exit(0 if held or (reports / f"{slug}.witness-always").exists() else 1)
 spec = importlib.util.spec_from_file_location("upgrade_steps", pathlib.Path(__file__).resolve().parents[1] / "upgrade_steps.py")
 steps = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(steps)
@@ -1856,8 +1893,9 @@ LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lo
                "lock-race", "guard-dead", "lock-live-slow-census")
 UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update")
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
+NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePassage-17: s2 is the floor row's shape
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
-                   "callers") + ROLLBACK_SCHEMA_PLANTS
+                   "callers", "witness-only") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS
 ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp")  # TOOL-dSafePassage-19
 ROLLBACK_UPDATE_PLANTS = ("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
 
@@ -1877,12 +1915,14 @@ def run_fixture_git(cwd, *args: str, date: int | None = None) -> str:
                           encoding="utf-8", errors="replace", env=env).stdout.strip()
 
 
-def render_fixture_row(slug: str, resume: bool = False, needs: bool = False) -> str:
-    """One `[[upgrade]]` row of the fixture step `fx/<slug>`, its argvs calling `fx.py`."""
+def render_fixture_row(slug: str, resume: bool = False, needs: bool = False, reverted: str | None = None) -> str:
+    """One `[[upgrade]]` row of the fixture step `fx/<slug>`, its argvs calling `fx.py`, declaring
+    `reverted` where given (TOOL-dSafePassage-17)."""
     def argv(verb: str) -> str:
         return json.dumps(["python", "{gov}/govkit/steps/fx.py", verb, "{target}", slug])
     return (f'[[upgrade]]\nid = "fx/{slug}"\nup = {argv("up")}\ndown = {argv("down")}\n'
             f'witness = {argv("witness")}\n' + (f'resume = {argv("resume")}\n' if resume else "")
+            + (f'reverted = {json.dumps(reverted)}\n' if reverted else "")
             + f'surfaces = []\nneeds-target = {"true" if needs else "false"}\n\n')
 
 
@@ -1943,7 +1983,9 @@ def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, 
     (gkd / "steps" / "fx.py").write_text(FIXTURE_WALK_STEP, encoding="utf-8", newline="\n")
     steps = gkd / STEPS_FILE
     row = {s: render_fixture_row(s, resume=(plant == "resume" and s == "s3"),
-                                 needs=(plant == "attended" and s == "s2")) for s in ("s1", "s2", "s3", "s4", "s5")}
+                                 needs=(plant == "attended" and s == "s2"),
+                                 reverted=DOWN_EXIT if plant in NODE_WITNESS_PLANTS and s == "s2" else None)
+           for s in ("s1", "s2", "s3", "s4", "s5")}
     first = ("schema",) if plant in WALK_SCHEMA_PLANTS + ROLLBACK_SCHEMA_PLANTS else ()
     if first:
         row["schema"] = write_fixture_schema_step(gkd)
@@ -2594,8 +2636,10 @@ def run_rollback_fixture(plant: str | None) -> int:
     (to B under `partial-to`) through `FIXTURE_REVERSE_CHILD`. Its bytes are compared but for the
     receipt and the staging journal. The `schema-step` plants (TOOL-dSafePassage-18) put the copied
     schema step first, over a schema-3 target. An unmet expectation prints `rollback: FAILED`;
-    otherwise the exit is the reverse walk's first, `down-fails`', `witness-stays`' and
-    `schema-step-early`'s 1 by design."""
+    otherwise the exit is the reverse walk's first, `down-fails`', `witness-stays`',
+    `node-witness-refuses`' and `schema-step-early`'s 1 by design. `witness-only` and the
+    `node-witness` plants (TOOL-dSafePassage-17) make s2's witness hold before any up, so the walk
+    records it `applied` by witness alone and writes it no before-image."""
     if plant == "callers":
         texts = {p.name: p.read_text(encoding="utf-8") for p in (pathlib.Path(__file__).resolve(), HERE / "govkit.py")}
         rc = run_callers_probe(texts)
@@ -2651,8 +2695,18 @@ def run_rollback_fixture(plant: str | None) -> int:
         else:
             if plant == "after-fail":
                 (fx / "s3.fail").touch()
+            elif plant == "witness-only":
+                (fx / "s2.witness-absent").touch()
+            elif plant in NODE_WITNESS_PLANTS:
+                (fx / "s2.witness-always").touch()
             rc_w, _out = run_fixture_child(FIXTURE_WALK_CHILD, gov, t, sha["C"], env)
             expect(rc_w == (1 if plant == "after-fail" else 0), f"the walk exited {rc_w}")
+            if plant in ("witness-only",) + NODE_WITNESS_PLANTS:
+                bare = (rows().get("fx/s2", ("",))[0] == "applied" and not (fx / "s2.up").exists()
+                        and not derive_image_path(t, "fx/s2").exists())
+                print("rollback: fx/s2 " + ("applied by witness alone, no before-image" if bare
+                                            else "NOT applied by witness alone"))
+                expect(bare, "s2 is not recorded applied by witness alone with no before-image")
         print(f"rollback: down canaries before the reverse walk: {downs() or 'none'}")
         expect(not downs(), "a down ran before the reverse walk was called")
         if plant == "unrecorded":
@@ -2664,6 +2718,8 @@ def run_rollback_fixture(plant: str | None) -> int:
             (fx / "s3.down-fails").touch()
         elif plant == "witness-stays":
             (fx / "s2.down-keeps").touch()
+        elif plant == "node-witness-refuses":
+            (fx / "s2.down-fails").touch()
         elif plant == "schema-step-early":
             (fx / "s2.down-lowers").touch()
         elif plant == "schema-step-kill":
@@ -2686,8 +2742,8 @@ def run_rollback_fixture(plant: str | None) -> int:
             expect(whole, "the kill left neither schema 4 with the schema step's `down interrupted:` nor schema 3 without `steps`")
         rc, got, out = reverse()
         state = rows()
-        if plant in (None, "unrecorded", "after-kill", "after-fail"):
-            want = (rolled("s4", "s3", "s2", "s1") if plant in (None, "unrecorded")
+        if plant in (None, "unrecorded", "after-kill", "after-fail", "witness-only", "node-witness"):
+            want = (rolled("s4", "s3", "s2", "s1") if plant in (None, "unrecorded", "witness-only", "node-witness")
                     else ["step fx/s4 · skipped (nothing applied)"] + rolled("s3", "s2", "s1"))
             same = tracked() == before
             print(f"rollback: the target's bytes {'equal' if same else 'DIFFER from'} their bytes before the walk")
@@ -2702,9 +2758,10 @@ def run_rollback_fixture(plant: str | None) -> int:
             expect(got == rolled("s4", "s3") and downs() == ["s3.down", "s4.down"], "the reverse walk to B does not down only s4 and s3")
             expect(state.get("fx/s1", ("",))[0] == "applied" and (t / "s1.txt").is_file() and (t / "s2.txt").is_file()
                    and rc == 0, "a step introduced at or before B was downed")
-        elif plant in ("down-fails", "witness-stays"):
-            sid, text = (("fx/s3", "down exit 1: fx: s3 down fails by its plant") if plant == "down-fails"
-                         else ("fx/s2", DOWN_STOP_PREFIXES[2]))
+        elif plant in ("down-fails", "witness-stays", "node-witness-refuses"):
+            sid, text = {"down-fails": ("fx/s3", "down exit 1: fx: s3 down fails by its plant"),
+                         "node-witness-refuses": ("fx/s2", "down exit 1: fx: s2 down fails by its plant")}.get(
+                plant, ("fx/s2", DOWN_STOP_PREFIXES[2]))
             stops = [state[sid][1]] if state.get(sid, ("", None))[1] else []
             opens = all(s.startswith(DOWN_STOP_PREFIXES) for s in stops)
             print(f"rollback: {sid} {state.get(sid)} · stop text opens with an entry of DOWN_STOP_PREFIXES: "
@@ -2712,7 +2769,7 @@ def run_rollback_fixture(plant: str | None) -> int:
             expect(got == (rolled("s4") if plant == "down-fails" else rolled("s4", "s3")) + [f"step {sid} · STOPPED · {text}"],
                    "the reverse walk did not stop at its failed down with the stop line")
             expect(state.get(sid) == ("applied", text) and stops and opens, f"{sid} does not keep applied with `{text}`")
-            expect("s1.down" not in downs() and (plant == "witness-stays" or "s2.down" not in downs()),
+            expect("s1.down" not in downs() and (plant != "down-fails" or "s2.down" not in downs()),
                    "the reverse walk went on past the stop")
             expect(rc == 1 and "Traceback" not in out, f"the reverse walk exited {rc}, or printed a traceback")
             if plant == "down-fails":
