@@ -542,6 +542,7 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-33](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-21 | 2026-10-26 | TWO FUNCTIONS ARE NAMED build_index. PLAY-dOrderedCharter-18 moves… |
 | [TOOL-dTotalRecall-34](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-20 | 2026-10-26 | THE SHIM KINDS HAVE NO VERB. TOOL-dTotalRecall-20 forwards --new-build… |
 | [TOOL-dTotalRecall-35](../builds/dTotalRecall/BACKLOG.md) | DEFERRED | LOW | TOOL-dTotalRecall-12 | 2026-10-26 | THE SLICE CHANNEL HAS NO PRODUCER. TOOL-dTotalRecall-12 counts the work… |
+| [TOOL-dTotalRecall-101](../builds/dTotalRecall/BACKLOG.md) | OPEN | HIGH | — | 2026-10-26 | held red: suite policy fixtures red at 60d90cb7 on the daily held job,… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTrueNorth-21](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-dPinnedHandoff-2 | 2026-10-21 | TWO LIVE SPECS OF dPinnedHandoff OMIT TWO LEGS THEIR FILES TRIP. Since… |

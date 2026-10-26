@@ -11,6 +11,7 @@
 - TOOL-dTotalRecall-33 · filed 2026-10-26 · TWO FUNCTIONS ARE NAMED `build_index`. PLAY-dOrderedCharter-18 moves memory-recall's FTS5 builder into `id_grammar.py` as `build_index`, and PLAY-dOrderedCharter-19's `tag_index.build_index` is the one index writer; TOOL-dTotalRecall-21's deviation 211 re-spells the FTS builder `build_fts_rows` · accept PLAY-dOrderedCharter-18 spells the moved builder `build_fts_rows`, or TOOL-dTotalRecall-21 is revised to agree with it
 - TOOL-dTotalRecall-34 · filed 2026-10-26 · THE SHIM KINDS HAVE NO VERB. TOOL-dTotalRecall-20 forwards `--new-build` and `--new-spec` to `gov_record.py` through TOOL-dSafePassage-6's shims, whose kind set admits no `verb` kind (TOOL-dTotalRecall-20 §8 F1, under the grant PLAY-dClosedLoop-3) · accept TOOL-dSafePassage-6's shim kinds admit `verb`, or TOOL-dTotalRecall-20 is revised to forward the scaffold verbs another way
 - TOOL-dTotalRecall-35 · filed 2026-10-26 · THE SLICE CHANNEL HAS NO PRODUCER. TOOL-dTotalRecall-12 counts the work order's inlined slices from a slice manifest that only dWellOiledMachine's executor writes (systems.md:522-523), so its verdict reads `unarmed` until that build arms `read_slice_bytes` · accept dWellOiledMachine's executor writes the slice manifest and arms TOOL-dTotalRecall-12's `read_slice_bytes`, its verdict no longer `unarmed`
+- TOOL-dTotalRecall-101 · filed 2026-10-26 · held red: suite policy fixtures red at 60d90cb7 on the daily held job, run 40306224805 · seen `{prefix}/policy/check_policy.py`@60d90cb7 run `python {prefix}/policy/check_policy.py --fixture --strict-from memory/builds/dClosedLoop/build/` · accept the suite is green on the daily held job at the default branch's tip
 
 ## Dispositions
 
@@ -32,3 +33,5 @@
 - DEFERRED · TOOL-dTotalRecall-34 · until TOOL-dTotalRecall-20 · TOOL-dTotalRecall-20's build run adds the `verb` kind under the grant per its §8 F1, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dTotalRecall-35 · LOW · the re-measure cannot pass while one of its three channels is unarmed
 - DEFERRED · TOOL-dTotalRecall-35 · until TOOL-dTotalRecall-12 · TOOL-dTotalRecall-12's build run lands the measure with the stand-in reader; dWellOiledMachine arms it when its executor lands (the spec run carries it forward with the unit it waits on)
+- SEV · TOOL-dTotalRecall-101 · HIGH · a held self-test is red on the default branch's daily job
+- KEEP · TOOL-dTotalRecall-101 · filed by an unattended run for the owning build; outside this build's goal

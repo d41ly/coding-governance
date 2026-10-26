@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-17930120802646078553-94108 3d5d3750
+asks-at-landing: TOOL-dTotalRecall-27=DEFERRED TOOL-dTotalRecall-28=DEFERRED TOOL-dTotalRecall-29=DEFERRED TOOL-dTotalRecall-30=DEFERRED TOOL-dTotalRecall-31=DEFERRED TOOL-dTotalRecall-32=DEFERRED TOOL-dTotalRecall-33=DEFERRED TOOL-dTotalRecall-34=DEFERRED TOOL-dTotalRecall-35=DEFERRED
+units-at-landing: TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-37 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-38 TOOL-dTotalRecall-4 TOOL-dTotalRecall-54 TOOL-dTotalRecall-40 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-6 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-41 TOOL-dTotalRecall-10 TOOL-dTotalRecall-42 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-61 TOOL-dTotalRecall-24 TOOL-dTotalRecall-67 TOOL-dTotalRecall-20 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-17 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 TOOL-dTotalRecall-43 TOOL-dTotalRecall-52 TOOL-dTotalRecall-62 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-60 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-73 TOOL-dTotalRecall-75 TOOL-dTotalRecall-74 TOOL-dTotalRecall-87 TOOL-dTotalRecall-76 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-90 TOOL-dTotalRecall-88 TOOL-dTotalRecall-91 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-89 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-92 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100
+gates-run: unattended-17930157317679038617-24498 899a7c9a
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 0b4656227c54098572872bef9408c717311b4862
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -363,3 +365,7 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T09:43:53Z rescope · item defer TOOL-dTotalRecall-99 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
 
 2026-10-26T09:43:53Z rescope · item defer TOOL-dTotalRecall-100 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dTotalRecall-27
+
+2026-10-26T12:08:08Z override · item specs-audited · reason the owner stopped the spec-audit chain at round 9 ('No more review rounds after round 9', memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-owner-review-stop.md), so round 9's promotions TOOL-dTotalRecall-93 to -100 close with no audit naming them, as M4 provides when a chain ends
+
+2026-10-26T12:08:08Z override · item closing-review-recorded · reason the spec run's closing diff review is not run: this run's whole diff is specs and records, already read by nine spec-audit rounds, and the owner stopped spec review ('No more review rounds after round 9', memory/builds/dTotalRecall/prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-owner-review-stop.md); the build run's closing diff review over its code meets it
