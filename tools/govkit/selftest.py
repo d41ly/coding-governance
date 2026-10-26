@@ -3419,16 +3419,19 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
                      "GIT_CONFIG_COUNT 2 · core.hooksPath holds []", "sys.flags.isolated 1",
                      "fixture/clean · isolated")),
             (("hook",), 0, ("hook canary: absent",)),
-            (("hook-stub",), 1, ("hook canary: present", "hook-post-index-change")),
+            (("hook-stub",), 1, ("hook canary: present · hook-post-index-change",)),
             (("module",), 0, ("module canary: absent",)),
-            (("module-stub",), 1, ("module canary: present", "module-sitecustomize.py")),
+            (("module-stub",), 1, ("module canary: present · module-json.py, module-sitecustomize.py",)),
             (("credential",), 0, ("credential canary: absent", "token: absent", "credential.helper reads ['']")),
             (("credential-stub",), 1, ("credential canary: present · credential-helper",
-                                       "token: present · GH_TOKEN")),
-            (("needs-target",), 1, ("fixture/reaches · needs-target", "declare needs-target = true",
-                                    "fixture/reaches-attended · attended", "reaches-attended · own canary absent")),
-            (("breach",), 1, ("fixture/opens · breach", "adopter_only")),
-            (("token",), 1, ("fixture/token · refused", "{unknown}", "nothing was spawned")),
+                                       "token: present · GH_TOKEN reached the step")),
+            (("needs-target",), 1, ("fixture/reaches · needs-target · its up exits 1 under the contract and no "
+                                    "canary ran, so it needs target code: declare needs-target = true",
+                                    "fixture/reaches-attended · attended · it declares needs-target = true",
+                                    "fixture/reaches-attended · own canary absent")),
+            (("breach",), 1, ("fixture/opens · breach · target code ran under the contract: adopter_only",)),
+            (("token",), 1, ("fixture/token · refused · fixture/token: '{unknown}' holds {unknown}, which this "
+                             "run does not answer, so nothing was spawned",)),
             (("callers",), 0, ("one spawn site of a step argv, inside run_step_isolated",))):
         rc, out = fixture(us_py, *plant)
         check(f"[dSP-7] fixture isolation {' '.join(plant) or '(base)'} exits {want} and names "

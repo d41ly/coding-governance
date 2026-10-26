@@ -3028,6 +3028,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "build_tree_git_env",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "build_tree_rows",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"

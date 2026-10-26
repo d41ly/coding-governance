@@ -762,6 +762,14 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root) -> dict:
             "tail": "\n".join(p.stderr.splitlines()[-20:])}
 
 
+def build_tree_git_env() -> dict[str, str]:
+    """The parent's environment for a git call that must read ONE tree's own config: no `GIT_*`
+    name, so a `GIT_DIR` or `GIT_INDEX_FILE` a calling hook exported cannot point the call at
+    another repository, and no system or global config, which are the node's and never the tree's."""
+    return {**{k: v for k, v in os.environ.items() if not k.upper().startswith("GIT_")},
+            "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+
+
 def write_target_plants(tree, canary_dir) -> list[str]:
     """Plant in `tree`, a SCRATCH COPY of a target, code that names itself in `canary_dir` when it
     runs (S4), and return the planted paths: a hook under every `CLIENT_HOOKS` name in the tree's
@@ -770,8 +778,7 @@ def write_target_plants(tree, canary_dir) -> list[str]:
     path holds the tree runs at start-up, and `json.py`, which shadows the standard module."""
     tree, canary_dir = pathlib.Path(tree).resolve(), pathlib.Path(canary_dir).resolve()
     canary_dir.mkdir(parents=True, exist_ok=True)
-    # The tree's own config only: a global `core.hooksPath` is the node's, never the target's.
-    env = {**os.environ, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+    env = build_tree_git_env()
     hooks = None
     for args in (("config", "--local", "--get", "core.hooksPath"), ("rev-parse", "--git-path", "hooks")):
         p = subprocess.run(["git", "-C", str(tree), *args], capture_output=True, text=True,
@@ -975,6 +982,8 @@ def run_isolation_fixture(plant: str | None) -> int:
         return 1
     g, saved_env = globals(), dict(os.environ)
     saved = {k: g[k] for k in ("build_step_env", "resolve_step_argv")}
+    for k in [k for k in os.environ if k.upper().startswith("GIT_")]:
+        del os.environ[k]  # a calling hook's GIT_DIR would point every fixture git call elsewhere
     try:
         with tempfile.TemporaryDirectory(prefix="gk-iso-", ignore_cleanup_errors=True) as td:
             return run_isolation_case(pathlib.Path(td), plant)
@@ -995,7 +1004,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
     for name, text in FIXTURE_STEPS.items():
         (gov / "tools" / "steps" / name).write_text(text, encoding="utf-8", newline="\n")
     reports.mkdir()
-    quiet = {**os.environ, "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
+    quiet = build_tree_git_env()
     subprocess.run(["git", "init", "-q", str(target)], env=quiet, capture_output=True, check=True)
     (target / ".governance").mkdir()
     (target / ".governance" / "deploy.toml").write_text('prefix = "tools"\n', encoding="utf-8")
