@@ -71,7 +71,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `78439dede4df9ccc5b8ae85a5f5e1e99407b277e`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `f93dc0c02fc781dbd3c14b6716d362c4179561dd`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -80,7 +80,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `399ec42de36b47647ccd0a03a6fdcc1e361a40c7`
+- rendered at: `d2e071573d19edde2cbef8a04e7baf182e748020`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -159,34 +159,34 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dKeptSess
 
 The opened README's roster, every unit with its row:
 
-- unit id `KICK-dKeptSession-1` · README:61 | 1 | `KICK-dKeptSession-1` | `cl-dClosedLoop-0139@065e06ab` | the named presets and their completeness check |
-- unit id `KICK-dKeptSession-2` · README:62 | 2 | `KICK-dKeptSession-2` | `cl-dClosedLoop-0140@6531184d` | the preset step added to dGroundRules's reader |
-- unit id `KICK-dKeptSession-3` · README:63 | 3 | `KICK-dKeptSession-3` | `cl-dClosedLoop-0141@4d07a3de` | the charter's preset section |
-- unit id `KICK-dKeptSession-4` · README:64 | 4 | `KICK-dKeptSession-4` | `cl-dClosedLoop-0142@816ff525` | policy at govkit intake |
-- unit id `KICK-dKeptSession-5` · README:65 | 5 | `KICK-dKeptSession-5` | `cl-dClosedLoop-0143@cafeb575` | the mailbox per build |
-- unit id `KICK-dKeptSession-6` · README:66 | 6 | `KICK-dKeptSession-6` | `cl-dClosedLoop-0144@c41201f3` | live delivery where the harness has it |
-- unit id `KICK-dKeptSession-7` · README:67 | 7 | `KICK-dKeptSession-7` | `cl-dClosedLoop-0145@b38efe3e` | dependency coordination by the parent's lease as `deps.coordination` says |
-- unit id `KICK-dKeptSession-8` · README:68 | 8 | `KICK-dKeptSession-8` | `cl-dClosedLoop-0146@a9c32df5` | `actions.free` at the tool call |
-- unit id `KICK-dKeptSession-9` · README:69 | 9 | `KICK-dKeptSession-9` | `cl-dClosedLoop-0147@9a464fcd` | orientation cost recorded per stage and held as `orient.budget` says |
-- unit id `KICK-dKeptSession-10` · README:70 | 10 | `KICK-dKeptSession-10` | `cl-dClosedLoop-0148@ab3d7b8c` | the mailbox read at every item boundary by `mailbox.reads` |
-- unit id `KICK-dKeptSession-11` · README:71 | 11 | `KICK-dKeptSession-11` | `cl-dClosedLoop-0149@d9aa0a3a` | progress reported by `notify.owner` |
-- unit id `KICK-dKeptSession-12` · README:72 | 12 | `KICK-dKeptSession-12` | `cl-dClosedLoop-0150@1c3b5ca1` | a fresh session in the build's worktree recommended until the card-import fixture passes |
-- unit id `KICK-dKeptSession-13` · README:73 | 13 | `KICK-dKeptSession-13` | `cl-dClosedLoop-0151@32b6ed5a` | the card's pointers updated as the build progresses |
-- unit id `KICK-dKeptSession-14` · README:74 | 14 | `KICK-dKeptSession-14` | `cl-dClosedLoop-0152@da455c7f` | what a session does as its window fills |
-- unit id `KICK-dKeptSession-15` · README:75 | 15 | `KICK-dKeptSession-15` | `cl-dClosedLoop-0153@9a9b7d43` | a compaction's summary read as a lead |
-- unit id `KICK-dKeptSession-16` · README:76 | 16 | `KICK-dKeptSession-16` | `cl-dClosedLoop-0154@62e72743` | the policy namespaces' purposes |
-- unit id `KICK-dKeptSession-17` · README:77 | 17 | `KICK-dKeptSession-17` | `cl-dClosedLoop-0155@6d913746` | the attendance rule: `attendance` places owner breakpoints and has owner questions asked live |
-- unit id `KICK-dKeptSession-18` · README:78 | 18 | `KICK-dKeptSession-18` | `cl-dClosedLoop-0156@c935df77` | the `repeat` disposition in the placement set and its `none` row in the transition table |
-- unit id `KICK-dKeptSession-19` · README:79 | 19 | `KICK-dKeptSession-19` | `cl-dClosedLoop-0157@7d569b91` | the catalogue's reader join: every key named by a unit on its owner build's row |
-- unit id `KICK-dKeptSession-20` · README:80 | 20 | `KICK-dKeptSession-20` | `cl-dClosedLoop-0158@19d3fbd9` | a scenario's preset slot: a named preset and overrides scoped to the builds placed under the scenario |
-- unit id `KICK-dKeptSession-21` · README:81 | 21 | `KICK-dKeptSession-21` | `cl-dClosedLoop-0159@ad40c608` | news shown as `mailbox.notice` says |
-- unit id `KICK-dKeptSession-22` · README:82 | 22 | `KICK-dKeptSession-22` | `cl-dClosedLoop-0160@3e3e0128` | each message's id derived from its build |
-- unit id `KICK-dKeptSession-23` · README:83 | 23 | `KICK-dKeptSession-23` | `cl-dClosedLoop-0161@10c6cad1` | every mail write appended to the change feed once its ref update lands |
-- unit id `KICK-dKeptSession-24` · README:84 | 24 | `KICK-dKeptSession-24` | `cl-dClosedLoop-0162@6ce67958` | a message awaiting an answer declaring `flow.wait-ceiling` as its deadline |
-- unit id `KICK-dKeptSession-25` · README:85 | 25 | `KICK-dKeptSession-25` | `cl-dClosedLoop-0504@b051ecfa` | `mailbox.answer`: a `question` addressed to a build answered by the role that owns the asked interface or item |
-- unit id `KICK-dKeptSession-26` · README:86 | 26 | `KICK-dKeptSession-26` | `cl-dClosedLoop-0163@709e57f9` | the card showing the build's remaining rework budget beside its pointers |
-- unit id `KICK-dKeptSession-27` · README:87 | 27 | `KICK-dKeptSession-27` | `cl-dClosedLoop-0164@148f5fda` | each message carrying its session's sequence number |
-- unit id `KICK-dKeptSession-28` · README:88 | 28 | `KICK-dKeptSession-28` | `cl-dClosedLoop-0165@8c92ee12` | a mailbox recipient naming a node by its fleet tag |
+- unit id `KICK-dKeptSession-1` · README:60 | 1 | `KICK-dKeptSession-1` | `cl-dClosedLoop-0139@065e06ab` | the named presets and their completeness check |
+- unit id `KICK-dKeptSession-2` · README:61 | 2 | `KICK-dKeptSession-2` | `cl-dClosedLoop-0140@6531184d` | the preset step added to dGroundRules's reader |
+- unit id `KICK-dKeptSession-3` · README:62 | 3 | `KICK-dKeptSession-3` | `cl-dClosedLoop-0141@4d07a3de` | the charter's preset section |
+- unit id `KICK-dKeptSession-4` · README:63 | 4 | `KICK-dKeptSession-4` | `cl-dClosedLoop-0142@816ff525` | policy at govkit intake |
+- unit id `KICK-dKeptSession-5` · README:64 | 5 | `KICK-dKeptSession-5` | `cl-dClosedLoop-0143@cafeb575` | the mailbox per build |
+- unit id `KICK-dKeptSession-6` · README:65 | 6 | `KICK-dKeptSession-6` | `cl-dClosedLoop-0144@c41201f3` | live delivery where the harness has it |
+- unit id `KICK-dKeptSession-7` · README:66 | 7 | `KICK-dKeptSession-7` | `cl-dClosedLoop-0145@b38efe3e` | dependency coordination by the parent's lease as `deps.coordination` says |
+- unit id `KICK-dKeptSession-8` · README:67 | 8 | `KICK-dKeptSession-8` | `cl-dClosedLoop-0146@a9c32df5` | `actions.free` at the tool call |
+- unit id `KICK-dKeptSession-9` · README:68 | 9 | `KICK-dKeptSession-9` | `cl-dClosedLoop-0147@9a464fcd` | orientation cost recorded per stage and held as `orient.budget` says |
+- unit id `KICK-dKeptSession-10` · README:69 | 10 | `KICK-dKeptSession-10` | `cl-dClosedLoop-0148@ab3d7b8c` | the mailbox read at every item boundary by `mailbox.reads` |
+- unit id `KICK-dKeptSession-11` · README:70 | 11 | `KICK-dKeptSession-11` | `cl-dClosedLoop-0149@d9aa0a3a` | progress reported by `notify.owner` |
+- unit id `KICK-dKeptSession-12` · README:71 | 12 | `KICK-dKeptSession-12` | `cl-dClosedLoop-0150@1c3b5ca1` | a fresh session in the build's worktree recommended until the card-import fixture passes |
+- unit id `KICK-dKeptSession-13` · README:72 | 13 | `KICK-dKeptSession-13` | `cl-dClosedLoop-0151@32b6ed5a` | the card's pointers updated as the build progresses |
+- unit id `KICK-dKeptSession-14` · README:73 | 14 | `KICK-dKeptSession-14` | `cl-dClosedLoop-0152@da455c7f` | what a session does as its window fills |
+- unit id `KICK-dKeptSession-15` · README:74 | 15 | `KICK-dKeptSession-15` | `cl-dClosedLoop-0153@9a9b7d43` | a compaction's summary read as a lead |
+- unit id `KICK-dKeptSession-16` · README:75 | 16 | `KICK-dKeptSession-16` | `cl-dClosedLoop-0154@62e72743` | the policy namespaces' purposes |
+- unit id `KICK-dKeptSession-17` · README:76 | 17 | `KICK-dKeptSession-17` | `cl-dClosedLoop-0155@6d913746` | the attendance rule: `attendance` places owner breakpoints and has owner questions asked live |
+- unit id `KICK-dKeptSession-18` · README:77 | 18 | `KICK-dKeptSession-18` | `cl-dClosedLoop-0156@c935df77` | the `repeat` disposition in the placement set and its `none` row in the transition table |
+- unit id `KICK-dKeptSession-19` · README:78 | 19 | `KICK-dKeptSession-19` | `cl-dClosedLoop-0157@7d569b91` | the catalogue's reader join: every key named by a unit on its owner build's row |
+- unit id `KICK-dKeptSession-20` · README:79 | 20 | `KICK-dKeptSession-20` | `cl-dClosedLoop-0158@19d3fbd9` | a scenario's preset slot: a named preset and overrides scoped to the builds placed under the scenario |
+- unit id `KICK-dKeptSession-21` · README:80 | 21 | `KICK-dKeptSession-21` | `cl-dClosedLoop-0159@ad40c608` | news shown as `mailbox.notice` says |
+- unit id `KICK-dKeptSession-22` · README:81 | 22 | `KICK-dKeptSession-22` | `cl-dClosedLoop-0160@3e3e0128` | each message's id derived from its build |
+- unit id `KICK-dKeptSession-23` · README:82 | 23 | `KICK-dKeptSession-23` | `cl-dClosedLoop-0161@10c6cad1` | every mail write appended to the change feed once its ref update lands |
+- unit id `KICK-dKeptSession-24` · README:83 | 24 | `KICK-dKeptSession-24` | `cl-dClosedLoop-0162@6ce67958` | a message awaiting an answer declaring `flow.wait-ceiling` as its deadline |
+- unit id `KICK-dKeptSession-25` · README:84 | 25 | `KICK-dKeptSession-25` | `cl-dClosedLoop-0504@b051ecfa` | `mailbox.answer`: a `question` addressed to a build answered by the role that owns the asked interface or item |
+- unit id `KICK-dKeptSession-26` · README:85 | 26 | `KICK-dKeptSession-26` | `cl-dClosedLoop-0163@709e57f9` | the card showing the build's remaining rework budget beside its pointers |
+- unit id `KICK-dKeptSession-27` · README:86 | 27 | `KICK-dKeptSession-27` | `cl-dClosedLoop-0164@148f5fda` | each message carrying its session's sequence number |
+- unit id `KICK-dKeptSession-28` · README:87 | 28 | `KICK-dKeptSession-28` | `cl-dClosedLoop-0165@8c92ee12` | a mailbox recipient naming a node by its fleet tag |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -210,12 +210,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dKeptSession`:
 
-Coverage of dKeptSession's 28 clauses and 16 owned nodes, over 0 specs:
-- carried whole: 0; carried in parts: 0 (none)
+Coverage of dKeptSession's 28 clauses and 16 owned nodes, over 64 specs:
+- carried whole: 28; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: cl-dClosedLoop-0139, cl-dClosedLoop-0140, cl-dClosedLoop-0141, cl-dClosedLoop-0142, cl-dClosedLoop-0143, cl-dClosedLoop-0144, cl-dClosedLoop-0145, cl-dClosedLoop-0146, cl-dClosedLoop-0147, cl-dClosedLoop-0148, cl-dClosedLoop-0149, cl-dClosedLoop-0150, cl-dClosedLoop-0151, cl-dClosedLoop-0152, cl-dClosedLoop-0153, cl-dClosedLoop-0154, cl-dClosedLoop-0155, cl-dClosedLoop-0156, cl-dClosedLoop-0157, cl-dClosedLoop-0158, cl-dClosedLoop-0159, cl-dClosedLoop-0160, cl-dClosedLoop-0161, cl-dClosedLoop-0162, cl-dClosedLoop-0504, cl-dClosedLoop-0163, cl-dClosedLoop-0164, cl-dClosedLoop-0165; stale: none; ambiguous: none
-- owned nodes no spec names: item.mailbox.answer, policy-key.actions.free, policy-key.attendance, policy-key.card.pointers, policy-key.context.on-full, policy-key.context.threshold, policy-key.deps.coordination, policy-key.deps.early-build, policy-key.deps.messaging, policy-key.mailbox.fetch-seconds, policy-key.mailbox.notice, policy-key.mailbox.reads, policy-key.notify.owner, policy-key.orient.budget, policy-key.preset, record-kind.mailbox-message
-- specs derived from no clause: none
+- uncarried: none; stale: none; ambiguous: none
+- owned nodes no spec names: none
+- specs derived from no clause: memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-30.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-31.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-32.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-33.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-34.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-35.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-36.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-37.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-38.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-39.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-40.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-41.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-42.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-43.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-44.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-45.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-46.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-47.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-48.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-49.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-50.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-51.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-52.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-53.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-54.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-55.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-56.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-57.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-58.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-59.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-60.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-61.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-62.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-63.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-64.md (PLAY-dClosedLoop-2), memory/builds/dKeptSession/spec/2026-10-26-spec-KICK-dKeptSession-65.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0141, cl-dClosedLoop-0142, cl-dClosedLoop-0144, cl-dClosedLoop-0153, cl-dClosedLoop-0157, cl-dClosedLoop-0158, cl-dClosedLoop-0160, cl-dClosedLoop-0161, cl-dClosedLoop-0163, cl-dClosedLoop-0165
 
 ### Reading order
