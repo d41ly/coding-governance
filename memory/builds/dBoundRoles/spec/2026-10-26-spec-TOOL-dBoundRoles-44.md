@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-44 — the round-1 audit's 11 docs-and-records minors: memory readers re-derived, frozen receipt waived, gotcha pages re-pointed, two Skills fitted, legacy registry named, workflow suites re-keyed and the close's harness swap checked
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
+**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 29 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
+| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 |
 | [2026-10-26-build-TOOL-dBoundRoles-37-round1-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-37-round1-fix-return.md) | research | TOOL-dBoundRoles-37 TOOL-dBoundRoles-40 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 |
 | [2026-10-26-build-TOOL-dBoundRoles-43-round1-size-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-43-round1-size-return.md) | research | TOOL-dBoundRoles-3 TOOL-dBoundRoles-24 TOOL-dBoundRoles-43 |
 | [2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 |
@@ -113,6 +113,7 @@ of the defect `TOOL-dBoundRoles-42` closes at HIGH.
 - **consumes-from** `TOOL-dBoundRoles-25` — the retirement, S8's readers and the close, whose memory half, frozen receipt, gotcha pages and harness swap S1, S3, S5 and S9 complete (ids 3, 26, 43 and 62)
 - **consumes-from** `TOOL-dBoundRoles-42` — the class table, whose memory half S1 re-derives and whose fixture and gotcha rows S3 and S5 dispose (ids 3, 26 and 43)
 - **hands-off** `TOOL-dBoundRoles-51` — AC1, AC8, AC9 and S4, which unit 51 completes; this unit's ledger answers AC8 and AC9 AMENDED, naming unit 51, and cites unit 42's AC14 answer rather than restating it (ids 3, 8, 20 and 31 of the round-1 audit of units 37 to 44)
+- **hands-off** `TOOL-dBoundRoles-58` — AC8 and AC9, which unit 58 bumps with the text unit 51 answers them by (id 48 of the round-1 audit of units 45 to 51)
 
 ## 4. Design
 
@@ -246,6 +247,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC6 · the rol
   R3: the 11 minors whose write set is disjoint from unit 43's, each item and criterion carried as it was
   there, S3 stating the base its re-derivation reads.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dBoundRoles-51, the minors batch of the round-1 audit of units 37 to 44; it names AC8's and AC9's AMENDED answers. Nothing else moved.
+- rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-58, the minors batch of the round-1 audit of units 45 to 51; nothing else moved.
 
 ## 10. Reuse audit
 

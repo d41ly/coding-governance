@@ -64,3 +64,19 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T01:43:38Z rescope · item add TOOL-dBoundRoles-51 · reason spec-audit round1 of units 37-44 minors batched, records-and-Skills half split by write set (BUILD-METHOD M4, M6): MEDIUM ids 2 3 13 31 (items M1 M2 M7 M14) and LOW ids 7 8 14 20 (items L2 L3 L5)
 
 2026-10-26T02:09:24Z review · item dBoundRoles-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 32 · disposition promote
+
+2026-10-26T03:13:29Z rescope · item add TOOL-dBoundRoles-52 · reason spec-audit round1 of units 45-51 finding id 13 at HIGH, report item H1, shared with id 30 (ids 2 and 39 share the defect at MEDIUM, item M1)
+
+2026-10-26T03:13:38Z rescope · item add TOOL-dBoundRoles-53 · reason spec-audit round1 of units 45-51 finding id 30 at HIGH, report item H1, shared with id 13 (ids 2 and 39 share the defect at MEDIUM, item M1)
+
+2026-10-26T03:13:38Z rescope · item add TOOL-dBoundRoles-54 · reason spec-audit round1 of units 45-51 finding id 14 at HIGH, report item H2, shared with id 40
+
+2026-10-26T03:13:39Z rescope · item add TOOL-dBoundRoles-55 · reason spec-audit round1 of units 45-51 finding id 40 at HIGH, report item H2, shared with id 14
+
+2026-10-26T03:13:40Z rescope · item add TOOL-dBoundRoles-56 · reason spec-audit round1 of units 45-51 finding id 20 at HIGH, report item H3 (id 34 shares the defect at MEDIUM, item M9)
+
+2026-10-26T03:13:41Z rescope · item add TOOL-dBoundRoles-57 · reason spec-audit round1 of units 45-51 finding id 29 at HIGH, report item H4
+
+2026-10-26T03:13:42Z rescope · item add TOOL-dBoundRoles-58 · reason spec-audit round1 of units 45-51 minors batched in one unit (BUILD-METHOD M4, no disjoint split by M6): MEDIUM ids 2 39 3 4 37 46 5 8 15 32 21 33 11 17 34 22 23 24 25 31 42 45 47 48 (items M1-M18) and LOW ids 9 10 12 38 19 26 27 28 35 49 50 (items L1-L10)
+
+2026-10-26T03:33:27Z review · item dBoundRoles-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 35 · disposition promote
