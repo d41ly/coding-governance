@@ -150,3 +150,13 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T06:27:15Z rescope · item add TOOL-dTotalRecall-87 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 39 HIGH, item H4 alone: resolve_kept_registration joins an unnormalised memory root, so a trailing slash gives a home git show cannot read and the ratchet reads a first seed forever; repairs TOOL-dTotalRecall-73, landing at step 34
 
 2026-10-26T06:27:15Z rescope · item add TOOL-dTotalRecall-88 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) the 29 confirmed minors batched into one unit: 17 MEDIUM, ids 2 3 4 5 12 18 19 24 25 26 27 30 31 41 42 43 44 (items M1 to M15), and 12 LOW, ids 6 7 14 15 17 20 21 22 33 35 40 45 (items L1 to L9); lands on several units, so repairs no unit in particular
+
+2026-10-26T07:48:23Z rescope · item add TOOL-dTotalRecall-89 · reason spec-audit round 1 of units 77 to 88 (reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md) id 1 HIGH, item H1 alone: unit 88's S19 and AC13 demand one record of unit 59 with no condition, where unit 83's decision table rules none is owed when its verified S1 reads 1 or more; repairs TOOL-dTotalRecall-88, landing at order 38
+
+2026-10-26T07:48:31Z rescope · item add TOOL-dTotalRecall-90 · reason spec-audit round 1 of units 77 to 88 (reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md) id 22 HIGH, item H2 alone, one defect with id 10 at item M5: units 82, 83 and 84 capture pass_of's red line into P and print nothing, so unit 83 reads the next liveness line as S1 = 0; repairs TOOL-dTotalRecall-83, landing at order 36
+
+2026-10-26T07:48:32Z rescope · item add TOOL-dTotalRecall-91 · reason spec-audit round 1 of units 77 to 88 (reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md) id 23 HIGH, item H3 alone: unit 80 answers unit 69's AC1 green whenever p69 prints no check-5 line, whatever its exit status, so a read where C5 never ran reads as cleared; repairs TOOL-dTotalRecall-80, landing at order 37
+
+2026-10-26T07:48:33Z rescope · item add TOOL-dTotalRecall-92 · reason spec-audit round 1 of units 77 to 88 (reviews/2026-10-26-review-TOOL-dTotalRecall-77-spec-audit-round1.md) the 24 confirmed minors batched into one unit: 17 MEDIUM, ids 2 3 5 6 10 11 12 13 16 17 18 19 20 24 25 26 27 (items M1 to M15), and 7 LOW, ids 7 8 9 14 15 21 28 (items L1 to L7); lands on several units, so repairs no unit in particular, landing at order 39
+
+2026-10-26T08:04:15Z review · item dTotalRecall-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 24 · disposition promote
