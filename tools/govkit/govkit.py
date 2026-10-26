@@ -106,7 +106,8 @@ try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - the message is the product on an old interpreter
     sys.stderr.write(
-        "govkit: this tool needs tomllib (CPython 3.11+). The descriptors are TOML and there is no\n"
+        "govkit: this tool needs tomllib, which ships with every interpreter at the floor\n"
+        "govkit: python-floor.txt in gov's lib dir declares. The descriptors are TOML and there is no\n"
         "govkit: vendored parser: a second TOML dialect is a second source of truth about the same\n"
         "govkit: files, which is the defect class this unit exists to close.\n"
     )

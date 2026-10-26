@@ -151,7 +151,6 @@ plan.kickoff
 plan.ratification
 plan.triage
 plan.unplaced
-platforms.provision
 platforms.supported
 platforms.verify
 policy-file.guard

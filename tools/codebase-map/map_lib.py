@@ -14,7 +14,7 @@ Two claim planes (the load-bearing design decision, learned the hard way):
 This module is identical across repos. Project specifics live in TWO sibling files the adopting
 repo owns: `.codebase-map.conf` at the repo root (paths) and `<kit-dir>/map_extractors.py`
 (the EXTRACTORS dict — what is enumerable in THIS project). Everything here is stdlib-only,
-Python >= 3.11 (tomllib).
+at the interpreter floor python-floor.txt in gov's lib dir declares (tomllib).
 
 The kit DIRECTORY is named `codebase-map` by convention (the gate resolves it by that name), but
 its PREFIX under the repo root is free: `<repo-root>/codebase-map/` and

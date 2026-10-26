@@ -4233,6 +4233,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "check_down_floor",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
+    },
+    {
       "id": "check_emitted",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -4356,6 +4361,11 @@
       "id": "check_fixtures",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "check_floor_copies",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "check_folder_slots",
@@ -4551,11 +4561,6 @@
       "id": "check_honest_rotation",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "check_hook_blobs",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
     },
     {
       "id": "check_hook_call",
@@ -7798,6 +7803,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "derive_lib_rel",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
+    },
+    {
       "id": "derive_limits_rel",
       "kind": "function",
       "file": "tools/policy/budgets.py"
@@ -10821,6 +10831,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/lexicon/scaffold_lexicon.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "main",
@@ -14248,6 +14263,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_floor",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
+    },
+    {
       "id": "read_fm_key_of",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -15046,6 +15066,11 @@
       "id": "read_parity",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "read_parity_population",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "read_parser_slice",
@@ -18353,6 +18378,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "resolve_floor_interpreter",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
+    },
+    {
       "id": "resolve_fragment_hook",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -18601,11 +18631,6 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/check-testsuite-counts.test.sh"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
     },
     {
       "id": "resolve_kit_dir",
@@ -18886,16 +18911,6 @@
       "id": "resolve_kit_file",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
-    },
-    {
-      "id": "resolve_kit_file",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
-    },
-    {
-      "id": "resolve_kit_files",
-      "kind": "function",
-      "file": "tools/check-wiring.sh"
     },
     {
       "id": "resolve_kit_homes",
@@ -20533,6 +20548,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_down_git",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "run_driver",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
@@ -20676,6 +20696,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "run_git",
@@ -21201,6 +21226,16 @@
       "id": "run_profile",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "run_provision_git",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
+      "id": "run_provision_refusal",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "run_push",
@@ -22111,6 +22146,11 @@
       "id": "scan_filed_days",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "scan_floor_statements",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "scan_forbidden",
@@ -26113,6 +26153,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "write_fake_launcher",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "write_file",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -26146,6 +26191,11 @@
       "id": "write_fleet_claim",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "write_floor",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
     },
     {
       "id": "write_fork_spec",
@@ -26446,6 +26496,11 @@
       "id": "write_prose_scenario",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_provision",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
     },
     {
       "id": "write_published_conf",

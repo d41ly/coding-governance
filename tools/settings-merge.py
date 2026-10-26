@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
-Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
+Stdlib only (json, argparse, pathlib), at the interpreter floor python-floor.txt in gov's lib dir declares.
 
 # gov:kit settings-merge@1.18
 

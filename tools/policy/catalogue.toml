@@ -1628,6 +1628,8 @@ owner = "dShippedRelease"
 name = "platforms.provision"
 allowed = ["name", "uv", "off"]
 default = "name"
+summary = "What the Python resolver's refusal below the interpreter floor does about installing it: name the install command, offer to run it with uv on a terminal, or name nothing."
+usage = 'platforms.provision = "uv"'
 owner = "dSafePassage"
 
 [[key]]

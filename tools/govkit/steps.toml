@@ -18,3 +18,17 @@ witness = ["python", "{gov}/govkit/steps/receipt_schema_4.py", "witness", "{targ
 resume = "atomic"
 surfaces = []
 needs-target = false
+
+# TOOL-dSafePassage-11: the interpreter floor raised to Python 3.15, declared in python-floor.txt in
+# gov's lib dir. Its up and witness are the preflight, which refuses below the floor exactly as the
+# resolver does; its down grades the target's tracked .py and .toml files under the floor it restores,
+# 3.11, and restores the declaration only where the target carries it. A later raise appends its own
+# row after the newest one, its down naming the floor it replaces, and never edits this one.
+[[upgrade]]
+id = "lib/python-floor-3.15"
+up = ["bash", "{gov}/lib/python-floor.sh", "preflight"]
+down = ["bash", "{gov}/lib/python-floor.sh", "down", "3.11", "{target}"]
+witness = ["bash", "{gov}/lib/python-floor.sh", "preflight"]
+surfaces = []
+needs-target = false
+resume = "atomic"

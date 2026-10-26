@@ -1,0 +1,66 @@
+# The Python floor
+
+**What it is.** Every gate, hook and kit here runs Python through one resolver, and that resolver
+refuses any interpreter below a floor. The floor is declared once, in `tools/lib/python-floor.txt`:
+one `<major>.<minor>` line, `3.15` today. The resolver block every script carries holds a copy of
+that line, `_rp_floor="3.15"`, because a kit copied into another repository has no `tools/lib/` to
+read; `python tools/lib/python_floor.py check` fails when a copy differs from the declaration, and
+when any tracked file outside `memory/` states a floor of its own instead of pointing here.
+
+## What the refusal says
+
+The resolver tries, in order, the caller's own override, `GOV_PYTHON`, then `python3`, `python` and
+`py`. It runs each one once and asks for its version and its own executable. The first at or above
+the floor wins, and the resolver hands back that executable's path, so nothing spawns the Windows
+App Execution Alias again. When none qualifies, it exits non-zero and names every candidate:
+
+```text
+resolve_python: no usable python launcher at the floor 3.15 (python-floor.txt in gov's lib dir).
+resolve_python: tried: python3 python py
+resolve_python:   python3: ran 3.14, below the floor 3.15
+resolve_python:   python: ran 3.14, below the floor 3.15
+resolve_python:   py: did not run
+resolve_python: install the floor with: uv python install 3.15
+resolve_python: or, on Windows: py install 3.15
+```
+
+`bash tools/lib/python-floor.sh preflight` refuses the same way, byte for byte. At the floor it
+prints the interpreter and its version and exits 0.
+
+## How to install the floor
+
+- **With uv:** `uv python install 3.15`.
+- **On Windows:** `py install 3.15`, the Python install manager; `py -0p` then lists it.
+- **Any other way**, then point the resolver at it if it is not first on `PATH`:
+  `export GOV_PYTHON=/path/to/python3.15`. `GOV_PYTHON` names the interpreter; nothing lowers the
+  floor.
+
+## `platforms.provision` — what the refusal does about installing
+
+Set it in `.governance/policy.toml` (see [the policy file](policy.md)). The resolver reads it with
+`policy.py get platforms.provision` at the landed revision, so a branch or an uncommitted edit does
+not change it.
+
+| Value | The refusal |
+|---|---|
+| `name` (the default) | names the install command: `uv python install 3.15`, then `py install 3.15` on Windows |
+| `uv` | on a terminal, where `uv` runs, offers to run `uv python install 3.15` and runs it only on `y`; otherwise names the command as `name` does and says why nothing was offered |
+| `off` | names no command |
+
+```toml
+[platforms]
+provision = "uv"
+```
+
+When no reader can run (no candidate at 3.11 or newer, no policy kit beside the script, or the reader
+fails), the refusal reads the default, `name`, and says which.
+
+## The upgrade step
+
+The raise is the upgrade step `lib/python-floor-3.15` in `tools/govkit/steps.toml`, after
+`govkit/receipt-schema-4` (see [upgrade steps](upgrade-steps.md)). Its up and its witness are the
+preflight. Its down, `python-floor.sh down 3.11 <target>`, grades every tracked `.py` and `.toml`
+file of the target under 3.11: with a real 3.11 interpreter where one resolves (`python3.11`,
+`py -3.11` or `uv python find 3.11`), otherwise statically, and it says which mode it ran in on its
+first line. Any finding stops the down, naming `path:line`, with nothing written. With none, it
+writes `3.11` back into the declaration and every copy, in gov's own source tree only.
