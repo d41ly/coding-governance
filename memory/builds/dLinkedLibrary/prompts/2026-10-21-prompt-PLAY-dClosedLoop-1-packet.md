@@ -18,7 +18,7 @@ Every unit of dLinkedLibrary specced and built, so that each of the 25 clauses o
 
 Each clause of the row, in its order: its id at its baseline hash, its hash now in the as-built view with the record behind any change, its tokens as `carries.py`'s token arm reads them, and its text.
 
-1. `cl-dClosedLoop-0238@36136b48` · now `36136b48`, as at the baseline · tokens: `[records]`, `flow.on-exhausted`, `memory/map/conventions/` — decisions split by kind: reuse entries as level-3 instruction units beside their dossiers and under `memory/map/conventions/`, proposed with their build through the instruction command and rendered once the owner accepts them, the major-decision log with its holds-now view, today's 200 rows routed by two raters at kappa 0.8 or better, below it the rubric revised and the routing re-run, no row moving until it passes, each re-run drawing on the build's rework budget and ending as `flow.on-exhausted` says, and the `[records]` rule reworded
+1. `cl-dClosedLoop-0238@36136b48` · now `b2c1827b` by deviation `2026-10-26-build-TOOL-dLinkedLibrary-1-deviation-11` · tokens: `[records]`, `flow.on-exhausted`, `memory/map/conventions/` — decisions split by kind: reuse entries as level-3 instruction units beside their dossiers and under `memory/map/conventions/`, proposed with their build through the instruction command and rendered once the owner accepts them, the major-decision log with its holds-now view, every live row of `memory/DECISIONS.md` at the routing's base, 213 rows at `82a392696` and derived again by `decision_rubric.py rows` at the pass, routed by two raters at kappa 0.8 or better, below it the rubric revised and the routing re-run, no row moving until it passes, each re-run drawing on the build's rework budget and ending as `flow.on-exhausted` says, and the `[records]` rule reworded
 2. `cl-dClosedLoop-0239@36d4c1c8` · now `36d4c1c8`, as at the baseline · tokens: `**Reuse:**`, `[reuse]`, `reuse.delivery` — the reuse scout's house index in M1c's shape (a digest of symbols, callers, dossiers and reuse entries, with the sketch and census steps), delivered through the task card's `**Reuse:**` field (`reuse.delivery`) and accepted by re-running aScoutedSeam's benchmark and its twelve held-out cases, which dFairHearing lands and whose cases name commits in two adopter repositories, the re-run refusing, naming the clone it lacks, without them, and the acceptance passing only at M1c's 16 of 24 on the benchmark and its 8 of 12 on the held-out cases or better (layer-memory `[reuse]`, the scouted-seam research's held-out run)
 3. `cl-dClosedLoop-0240@5773ca81` · now `5773ca81`, as at the baseline · tokens: `MAP_CLI`, `[[retired]]`, `experiment`, `record find`, `reuse-probed`, `reuse_lookup`, `reuse_lookup.py` — `reuse_lookup.py` and its agent retired with their readers rewritten, by name and by value, and their own upgrade step, the readers by value named: hygiene check 12's §10 arm, which accepts the token `reuse_lookup` as reuse evidence and past a new cutoff accepts the reuse scout's record instead, seen red on a planted spec citing `reuse_lookup` after it, unattended's `MAP_CLI`, re-pointed at the map's CLI, and the `reuse-probed` DoD item and M5, which read the reuse scout's record in place of the lookup's and recall's query logs, a `[[retired]]` row for the files codebase-map installs (P38), and memory-recall narrowed to what `record find` does not answer, its why-search, its bench and union becoming dBoundRoles' `experiment` instance, the finder itself dTotalRecall's (SA-6)
 4. `cl-dClosedLoop-0241@0e5185f1` · now `0e5185f1`, as at the baseline · tokens: `annotations.grammar`, `annotations.resolve-scope`, `gov:feature`, `gov:note` — the `gov:note` grammar and `gov:feature` anchors checked both ways with reuse entries, the generated annotation index and its resolve check (`annotations.grammar`), over notes alone or every comment reference as `annotations.resolve-scope` says, the shipped-evidence signal re-checked first
@@ -76,7 +76,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `5fede642ad2ff1418f12b5d7117129edc8287d7e`
+- rendered at: `82a3926962d55b6d9bd6b59a9e941dd526fa18cc`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -169,31 +169,31 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dLinkedLi
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dLinkedLibrary-1` · README:64 | 1 | `TOOL-dLinkedLibrary-1` | `cl-dClosedLoop-0238@36136b48` | decisions split by kind: reuse entries as level-3 instruction units beside their dossiers and under `memory/map/conventions/` |
-- unit id `TOOL-dLinkedLibrary-2` · README:65 | 2 | `TOOL-dLinkedLibrary-2` | `cl-dClosedLoop-0239@36d4c1c8` | the reuse scout's house index in M1c's shape (a digest of symbols |
-- unit id `TOOL-dLinkedLibrary-3` · README:66 | 3 | `TOOL-dLinkedLibrary-3` | `cl-dClosedLoop-0240@5773ca81` | `reuse_lookup.py` and its agent retired with their readers rewritten |
-- unit id `TOOL-dLinkedLibrary-4` · README:67 | 4 | `TOOL-dLinkedLibrary-4` | `cl-dClosedLoop-0241@0e5185f1` | the `gov:note` grammar and `gov:feature` anchors checked both ways with reuse entries |
-- unit id `TOOL-dLinkedLibrary-5` · README:68 | 5 | `TOOL-dLinkedLibrary-5` | `cl-dClosedLoop-0242@866cebbc` | the generated views: the decisions' holds-now view and the reuse view |
-- unit id `TOOL-dLinkedLibrary-6` · README:69 | 6 | `TOOL-dLinkedLibrary-6` | `cl-dClosedLoop-0243@9acc070e` | the research view |
-- unit id `TOOL-dLinkedLibrary-7` · README:70 | 7 | `TOOL-dLinkedLibrary-7` | `cl-dClosedLoop-0244@e14fc5fd` | the `annotations` leg |
-- unit id `TOOL-dLinkedLibrary-8` · README:71 | 8 | `TOOL-dLinkedLibrary-8` | `cl-dClosedLoop-0245@2d7af537` | retrofit's `baseline` and `census` record kinds |
-- unit id `TOOL-dLinkedLibrary-9` · README:72 | 9 | `TOOL-dLinkedLibrary-9` | `cl-dClosedLoop-0246@96afa172` | the origin check |
-- unit id `TOOL-dLinkedLibrary-10` · README:73 | 10 | `TOOL-dLinkedLibrary-10` | `cl-dClosedLoop-0247@87bb7e47` | the progress cell |
-- unit id `TOOL-dLinkedLibrary-11` · README:74 | 11 | `TOOL-dLinkedLibrary-11` | `cl-dClosedLoop-0248@8c261008` | the annotation resolve check's legacy and the untouched long blocks registered as ledger populations |
-- unit id `TOOL-dLinkedLibrary-12` · README:75 | 12 | `TOOL-dLinkedLibrary-12` | `cl-dClosedLoop-0249@49ce83a8` | the `marker` namespace over the existing `gov:` words |
-- unit id `TOOL-dLinkedLibrary-13` · README:76 | 13 | `TOOL-dLinkedLibrary-13` | `cl-dClosedLoop-0250@9ea3dfcf` | and the dated backfill of `kind: research-return` over the existing returns |
-- unit id `TOOL-dLinkedLibrary-14` · README:77 | 14 | `TOOL-dLinkedLibrary-14` | `cl-dClosedLoop-0251@23b8b8e1` | `gov map code` and `gov code show` |
-- unit id `TOOL-dLinkedLibrary-15` · README:78 | 15 | `TOOL-dLinkedLibrary-15` | `cl-dClosedLoop-0252@5aa0f94b` | the enrichment workflow: purposes derived first from docstrings and headers |
-- unit id `TOOL-dLinkedLibrary-16` · README:79 | 16 | `TOOL-dLinkedLibrary-16` | `cl-dClosedLoop-0253@22d88118` | the replay's losing test extended to code: a unit's files read and its lookups counted |
-- unit id `TOOL-dLinkedLibrary-17` · README:80 | 17 | `TOOL-dLinkedLibrary-17` | `cl-dClosedLoop-0254@e703feac` | extractors emitting typed edges from annotations |
-- unit id `TOOL-dLinkedLibrary-18` · README:81 | 18 | `TOOL-dLinkedLibrary-18` | `cl-dClosedLoop-0255@c0b78911` | the region-parser factory in `tools/lib` |
-- unit id `TOOL-dLinkedLibrary-19` · README:82 | 19 | `TOOL-dLinkedLibrary-19` | `cl-dClosedLoop-0256@aea4db49` | the dossier's header becoming the feature node and its prose moving into units and records |
-- unit id `TOOL-dLinkedLibrary-20` · README:83 | 20 | `TOOL-dLinkedLibrary-20` | `cl-dClosedLoop-0257@ac01a5f8` | the `feature` namespace armed as an instruction selector when it registers |
-- unit id `TOOL-dLinkedLibrary-21` · README:84 | 21 | `TOOL-dLinkedLibrary-21` | `cl-dClosedLoop-0258@bbce050b` | the ctags extractor pack |
-- unit id `TOOL-dLinkedLibrary-22` · README:85 | 22 | `TOOL-dLinkedLibrary-22` | `cl-dClosedLoop-0259@2b91da03` | `decides` on every decision row |
-- unit id `TOOL-dLinkedLibrary-23` · README:86 | 23 | `TOOL-dLinkedLibrary-23` | `cl-dClosedLoop-0260@c677f704` | `adopt.instructions`: at install an adopter's own instruction files rendered verbatim as a legacy block after the project block |
-- unit id `TOOL-dLinkedLibrary-24` · README:87 | 24 | `TOOL-dLinkedLibrary-24` | `cl-dClosedLoop-0261@6566da73` | each bug class's gate status derived |
-- unit id `TOOL-dLinkedLibrary-25` · README:88 | 25 | `TOOL-dLinkedLibrary-25` | `cl-dClosedLoop-0500@84eb6d7a` | the records that contradict the code corrected at their sources: the map README's path |
+- unit id `TOOL-dLinkedLibrary-1` · README:63 | 1 | `TOOL-dLinkedLibrary-1` | `cl-dClosedLoop-0238@36136b48` | decisions split by kind: reuse entries as level-3 instruction units beside their dossiers and under `memory/map/conventions/` |
+- unit id `TOOL-dLinkedLibrary-2` · README:64 | 2 | `TOOL-dLinkedLibrary-2` | `cl-dClosedLoop-0239@36d4c1c8` | the reuse scout's house index in M1c's shape (a digest of symbols |
+- unit id `TOOL-dLinkedLibrary-3` · README:65 | 3 | `TOOL-dLinkedLibrary-3` | `cl-dClosedLoop-0240@5773ca81` | `reuse_lookup.py` and its agent retired with their readers rewritten |
+- unit id `TOOL-dLinkedLibrary-4` · README:66 | 4 | `TOOL-dLinkedLibrary-4` | `cl-dClosedLoop-0241@0e5185f1` | the `gov:note` grammar and `gov:feature` anchors checked both ways with reuse entries |
+- unit id `TOOL-dLinkedLibrary-5` · README:67 | 5 | `TOOL-dLinkedLibrary-5` | `cl-dClosedLoop-0242@866cebbc` | the generated views: the decisions' holds-now view and the reuse view |
+- unit id `TOOL-dLinkedLibrary-6` · README:68 | 6 | `TOOL-dLinkedLibrary-6` | `cl-dClosedLoop-0243@9acc070e` | the research view |
+- unit id `TOOL-dLinkedLibrary-7` · README:69 | 7 | `TOOL-dLinkedLibrary-7` | `cl-dClosedLoop-0244@e14fc5fd` | the `annotations` leg |
+- unit id `TOOL-dLinkedLibrary-8` · README:70 | 8 | `TOOL-dLinkedLibrary-8` | `cl-dClosedLoop-0245@2d7af537` | retrofit's `baseline` and `census` record kinds |
+- unit id `TOOL-dLinkedLibrary-9` · README:71 | 9 | `TOOL-dLinkedLibrary-9` | `cl-dClosedLoop-0246@96afa172` | the origin check |
+- unit id `TOOL-dLinkedLibrary-10` · README:72 | 10 | `TOOL-dLinkedLibrary-10` | `cl-dClosedLoop-0247@87bb7e47` | the progress cell |
+- unit id `TOOL-dLinkedLibrary-11` · README:73 | 11 | `TOOL-dLinkedLibrary-11` | `cl-dClosedLoop-0248@8c261008` | the annotation resolve check's legacy and the untouched long blocks registered as ledger populations |
+- unit id `TOOL-dLinkedLibrary-12` · README:74 | 12 | `TOOL-dLinkedLibrary-12` | `cl-dClosedLoop-0249@49ce83a8` | the `marker` namespace over the existing `gov:` words |
+- unit id `TOOL-dLinkedLibrary-13` · README:75 | 13 | `TOOL-dLinkedLibrary-13` | `cl-dClosedLoop-0250@9ea3dfcf` | and the dated backfill of `kind: research-return` over the existing returns |
+- unit id `TOOL-dLinkedLibrary-14` · README:76 | 14 | `TOOL-dLinkedLibrary-14` | `cl-dClosedLoop-0251@23b8b8e1` | `gov map code` and `gov code show` |
+- unit id `TOOL-dLinkedLibrary-15` · README:77 | 15 | `TOOL-dLinkedLibrary-15` | `cl-dClosedLoop-0252@5aa0f94b` | the enrichment workflow: purposes derived first from docstrings and headers |
+- unit id `TOOL-dLinkedLibrary-16` · README:78 | 16 | `TOOL-dLinkedLibrary-16` | `cl-dClosedLoop-0253@22d88118` | the replay's losing test extended to code: a unit's files read and its lookups counted |
+- unit id `TOOL-dLinkedLibrary-17` · README:79 | 17 | `TOOL-dLinkedLibrary-17` | `cl-dClosedLoop-0254@e703feac` | extractors emitting typed edges from annotations |
+- unit id `TOOL-dLinkedLibrary-18` · README:80 | 18 | `TOOL-dLinkedLibrary-18` | `cl-dClosedLoop-0255@c0b78911` | the region-parser factory in `tools/lib` |
+- unit id `TOOL-dLinkedLibrary-19` · README:81 | 19 | `TOOL-dLinkedLibrary-19` | `cl-dClosedLoop-0256@aea4db49` | the dossier's header becoming the feature node and its prose moving into units and records |
+- unit id `TOOL-dLinkedLibrary-20` · README:82 | 20 | `TOOL-dLinkedLibrary-20` | `cl-dClosedLoop-0257@ac01a5f8` | the `feature` namespace armed as an instruction selector when it registers |
+- unit id `TOOL-dLinkedLibrary-21` · README:83 | 21 | `TOOL-dLinkedLibrary-21` | `cl-dClosedLoop-0258@bbce050b` | the ctags extractor pack |
+- unit id `TOOL-dLinkedLibrary-22` · README:84 | 22 | `TOOL-dLinkedLibrary-22` | `cl-dClosedLoop-0259@2b91da03` | `decides` on every decision row |
+- unit id `TOOL-dLinkedLibrary-23` · README:85 | 23 | `TOOL-dLinkedLibrary-23` | `cl-dClosedLoop-0260@c677f704` | `adopt.instructions`: at install an adopter's own instruction files rendered verbatim as a legacy block after the project block |
+- unit id `TOOL-dLinkedLibrary-24` · README:86 | 24 | `TOOL-dLinkedLibrary-24` | `cl-dClosedLoop-0261@6566da73` | each bug class's gate status derived |
+- unit id `TOOL-dLinkedLibrary-25` · README:87 | 25 | `TOOL-dLinkedLibrary-25` | `cl-dClosedLoop-0500@84eb6d7a` | the records that contradict the code corrected at their sources: the map README's path |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -222,11 +222,11 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dLinkedLibrary`:
 
-Coverage of dLinkedLibrary's 25 clauses and 25 owned nodes, over 0 specs:
-- carried whole: 0; carried in parts: 0 (none)
+Coverage of dLinkedLibrary's 25 clauses and 25 owned nodes, over 25 specs:
+- carried whole: 25; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: cl-dClosedLoop-0238, cl-dClosedLoop-0239, cl-dClosedLoop-0240, cl-dClosedLoop-0241, cl-dClosedLoop-0242, cl-dClosedLoop-0243, cl-dClosedLoop-0244, cl-dClosedLoop-0245, cl-dClosedLoop-0246, cl-dClosedLoop-0247, cl-dClosedLoop-0248, cl-dClosedLoop-0249, cl-dClosedLoop-0250, cl-dClosedLoop-0251, cl-dClosedLoop-0252, cl-dClosedLoop-0253, cl-dClosedLoop-0254, cl-dClosedLoop-0255, cl-dClosedLoop-0256, cl-dClosedLoop-0257, cl-dClosedLoop-0258, cl-dClosedLoop-0259, cl-dClosedLoop-0260, cl-dClosedLoop-0261, cl-dClosedLoop-0500; stale: none; ambiguous: none
-- owned nodes no spec names: item.adopt.census, item.adopt.decisions, item.adopt.decisions-ratify, item.adopt.instructions, item.adopt.practices, item.adopt.reconstruct, policy-key.annotations.grammar, policy-key.annotations.lookup, policy-key.annotations.resolve-scope, policy-key.decisions.major, policy-key.memory.code-enrich, policy-key.retrofit.decisions, policy-key.retrofit.practice-pending, policy-key.retrofit.reconstruct, policy-key.reuse.delivery, policy-key.reuse.propose, record-kind.annotation-index, record-kind.baseline, record-kind.census, record-kind.decision, record-kind.gotcha, record-kind.recall-index, record-kind.research-return, record-kind.ruling, system.annotations
+- uncarried: none; stale: cl-dClosedLoop-0238; ambiguous: none
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0242, cl-dClosedLoop-0243, cl-dClosedLoop-0247, cl-dClosedLoop-0248, cl-dClosedLoop-0256, cl-dClosedLoop-0261
 

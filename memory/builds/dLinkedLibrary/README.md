@@ -4,8 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-26
-status: OPEN
+ids: TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-26 TOOL-dLinkedLibrary-27 TOOL-dLinkedLibrary-28 TOOL-dLinkedLibrary-29 TOOL-dLinkedLibrary-30 TOOL-dLinkedLibrary-31 TOOL-dLinkedLibrary-32 TOOL-dLinkedLibrary-33 TOOL-dLinkedLibrary-34 TOOL-dLinkedLibrary-35 TOOL-dLinkedLibrary-36
 spec-audit: 2026-10-21
 parents: dTotalRecall
 may: PLAY-dClosedLoop-3
@@ -89,45 +88,96 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 25 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13
 ids TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25
-ids TOOL-dLinkedLibrary-26
+ids TOOL-dLinkedLibrary-26 TOOL-dLinkedLibrary-27 TOOL-dLinkedLibrary-28 TOOL-dLinkedLibrary-29 TOOL-dLinkedLibrary-30 TOOL-dLinkedLibrary-31 TOOL-dLinkedLibrary-32 TOOL-dLinkedLibrary-33 TOOL-dLinkedLibrary-34 TOOL-dLinkedLibrary-35 TOOL-dLinkedLibrary-36
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dLinkedLibrary-25 — eight records that contradict the code, each corrected at its source](spec/2026-10-26-spec-TOOL-dLinkedLibrary-25.md) | 1 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-18 — the region-parser factory in `tools/lib`, and every region parser re-pointed to it](spec/2026-10-26-spec-TOOL-dLinkedLibrary-18.md) | 2 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-12 — the `marker` namespace's members, one per existing `gov:` word, and the check that refuses an unregistered one](spec/2026-10-26-spec-TOOL-dLinkedLibrary-12.md) | 3 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-22 — `decides` on every decision row, `Decided:` trailers read as decision rows, and every bug class naming its cause, language and platform](spec/2026-10-26-spec-TOOL-dLinkedLibrary-22.md) | 4 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-24 — each bug class's gate status derived, never declared, and a gated class left off every checklist](spec/2026-10-26-spec-TOOL-dLinkedLibrary-24.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-13 — the research-return kind: its declared line, its check, and the dated backfill over the existing returns](spec/2026-10-26-spec-TOOL-dLinkedLibrary-13.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-6 — the research view over the research-return kind, and the library-view seam it lands](spec/2026-10-26-spec-TOOL-dLinkedLibrary-6.md) | 7 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-1 — decisions split by kind: reuse entries as level-3 units, the major-decision log, its rows routed by two raters, and the `[records]` rule reworded](spec/2026-10-26-spec-TOOL-dLinkedLibrary-1.md) | 8 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-5 — the generated views: the decision log's holds-now view and the reuse view](spec/2026-10-26-spec-TOOL-dLinkedLibrary-5.md) | 9 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-19 — the dossier's header becomes the feature node, and its prose moves into units and records](spec/2026-10-26-spec-TOOL-dLinkedLibrary-19.md) | 10 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-20 — the `feature` namespace armed as an instruction selector](spec/2026-10-26-spec-TOOL-dLinkedLibrary-20.md) | 11 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-4 — the `gov:note` grammar, the generated annotation index, its resolve check and `gov:feature` anchors joined both ways with reuse entries](spec/2026-10-26-spec-TOOL-dLinkedLibrary-4.md) | 12 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-17 — typed edges from annotations, front matter, dossiers and decision rows, and the span rule with `gov:end <tag>`](spec/2026-10-26-spec-TOOL-dLinkedLibrary-17.md) | 13 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-11 — the annotation resolve check's legacy and the untouched long comment blocks registered as ledger populations](spec/2026-10-26-spec-TOOL-dLinkedLibrary-11.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-7 — the `annotations` leg, the lookup under `annotations.lookup`, the read hook on shell reads, and the follow-through test](spec/2026-10-26-spec-TOOL-dLinkedLibrary-7.md) | 15 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-21 — the ctags extractor pack: definitions and ranges for every language the built-in extractors do not read](spec/2026-10-26-spec-TOOL-dLinkedLibrary-21.md) | 16 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-14 — the code reader: `gov map code`, and `gov code show`, `callers`, `tests` and `where`, `git grep` its floor](spec/2026-10-26-spec-TOOL-dLinkedLibrary-14.md) | 17 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-15 — code purposes: derived first from docstrings and headers, an agent's pass for the rest as `memory.code-enrich` says, keyed to body hashes and joined both ways with a pending population](spec/2026-10-26-spec-TOOL-dLinkedLibrary-15.md) | 18 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-16 — the code replay: a unit's files read and its lookups counted with the `code` slot and without, scored by the scorer factory against the seed alone](spec/2026-10-26-spec-TOOL-dLinkedLibrary-16.md) | 19 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-8 — retrofit's record kinds, the `origin` field, and the `adopt` program the core's own command runs](spec/2026-10-26-spec-TOOL-dLinkedLibrary-8.md) | 20 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-9 — the origin check: each record's `origin` re-derived from history, shown in every slice and ranked in the reuse digest](spec/2026-10-26-spec-TOOL-dLinkedLibrary-9.md) | 21 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-10 — the progress cell: the retrofit's populations, seeded, now and drained, on the orientation card](spec/2026-10-26-spec-TOOL-dLinkedLibrary-10.md) | 22 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-2 — the reuse scout's house index, delivered through the task card's `**Reuse:**` field and accepted on aScoutedSeam's benchmark](spec/2026-10-26-spec-TOOL-dLinkedLibrary-2.md) | 23 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-3 — `reuse_lookup.py` and its agent retired, every reader rewritten by name and by value, with its upgrade step, and memory-recall narrowed to its why-search](spec/2026-10-26-spec-TOOL-dLinkedLibrary-3.md) | 24 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dLinkedLibrary-23 — `adopt.instructions`: an adopter's own instruction files kept verbatim as a legacy block, every harness file wired at once, each paragraph ruled once](spec/2026-10-26-spec-TOOL-dLinkedLibrary-23.md) | 25 | 2 | OPEN | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 2 record folder(s).
+Records: 16 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19
+TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8
+TOOL-dLinkedLibrary-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 25 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 25 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 25
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 25 (cl-dClosedLoop-0238, cl-dClosedLoop-0239, cl-dClosedLoop-0240, cl-dClosedLoop-0241, cl-dClosedLoop-0242, cl-dClosedLoop-0243, cl-dClosedLoop-0244, cl-dClosedLoop-0245, cl-dClosedLoop-0246, cl-dClosedLoop-0247, cl-dClosedLoop-0248, cl-dClosedLoop-0249, cl-dClosedLoop-0250,
-  cl-dClosedLoop-0251, cl-dClosedLoop-0252, cl-dClosedLoop-0253, cl-dClosedLoop-0254, cl-dClosedLoop-0255, cl-dClosedLoop-0256, cl-dClosedLoop-0257, cl-dClosedLoop-0258, cl-dClosedLoop-0259, cl-dClosedLoop-0260, cl-dClosedLoop-0261, cl-dClosedLoop-0500)
+- uncarried: 0 (none)
 - stale: 0 (none)
 - ambiguous: 0 (none)
-- owned nodes no spec names: item.adopt.census, item.adopt.decisions, item.adopt.decisions-ratify, item.adopt.instructions, item.adopt.practices, item.adopt.reconstruct, policy-key.annotations.grammar, policy-key.annotations.lookup, policy-key.annotations.resolve-scope, policy-key.decisions.major,
-  policy-key.memory.code-enrich, policy-key.retrofit.decisions, policy-key.retrofit.practice-pending, policy-key.retrofit.reconstruct, policy-key.reuse.delivery, policy-key.reuse.propose, record-kind.annotation-index, record-kind.baseline, record-kind.census, record-kind.decision,
-  record-kind.gotcha, record-kind.recall-index, record-kind.research-return, record-kind.ruling, system.annotations
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0242, cl-dClosedLoop-0243, cl-dClosedLoop-0247, cl-dClosedLoop-0248, cl-dClosedLoop-0256, cl-dClosedLoop-0261
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dLinkedLibrary-25` | no |
+| 2 | `TOOL-dLinkedLibrary-18` | no |
+| 3 | `TOOL-dLinkedLibrary-12` | no |
+| 4 | `TOOL-dLinkedLibrary-22` | no |
+| 5 | `TOOL-dLinkedLibrary-24` | no |
+| 6 | `TOOL-dLinkedLibrary-13` | no |
+| 7 | `TOOL-dLinkedLibrary-6` | no |
+| 8 | `TOOL-dLinkedLibrary-1` | no |
+| 9 | `TOOL-dLinkedLibrary-5` | no |
+| 10 | `TOOL-dLinkedLibrary-19` | no |
+| 11 | `TOOL-dLinkedLibrary-20` | no |
+| 12 | `TOOL-dLinkedLibrary-4` | no |
+| 13 | `TOOL-dLinkedLibrary-17` | no |
+| 14 | `TOOL-dLinkedLibrary-11` | no |
+| 15 | `TOOL-dLinkedLibrary-7` | no |
+| 16 | `TOOL-dLinkedLibrary-21` | no |
+| 17 | `TOOL-dLinkedLibrary-14` | no |
+| 18 | `TOOL-dLinkedLibrary-15` | no |
+| 19 | `TOOL-dLinkedLibrary-16` | no |
+| 20 | `TOOL-dLinkedLibrary-8` | no |
+| 21 | `TOOL-dLinkedLibrary-9` | no |
+| 22 | `TOOL-dLinkedLibrary-10` | no |
+| 23 | `TOOL-dLinkedLibrary-2` | no |
+| 24 | `TOOL-dLinkedLibrary-3` | no |
+| 25 | `TOOL-dLinkedLibrary-23` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
