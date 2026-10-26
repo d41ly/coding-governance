@@ -6,14 +6,21 @@
 # every leg guard ignored, whose conclusion is this sha's verdict. Daily and on a manual dispatch:
 # `held-plan`, which derives one matrix entry per declared self-test from the runner's own resolved
 # population, and `held`, which runs each suite the way the sweep runs one and publishes its output.
+# Each job, once its tree is on disk and before anything runs Python, reads the interpreter floor
+# from its one declaration, tools/lib/python-floor.txt, refusing any value but <major>.<minor>, and
+# sets Python up at it with actions/setup-python (TOOL-dSafePassage-12). In `bar` the floor's
+# preflight, `bash tools/lib/python-floor.sh preflight`, is the step before the merge bar.
 #
 # WHAT THIS DOES NOT DO, said here because a green run reads as more than it is:
 #   - it blocks nothing. Landing stays a direct push, so a push that skipped every local hook lands
 #     first and CI reds after it. Making a job a required check is a repository setting, the owner's.
 #   - the held run issues no cost verdict. The budgets were measured on this repo's own nodes, and a
 #     hosted runner's clock would red them with nothing wrong in the tree; it keeps the hang bound.
-#   - no permanent gate grades this file's text. Its contract was observed before landing by staged
-#     breaks on a scratch copy, recorded in the unit's acceptance ledger.
+#   - one permanent gate grades this file's text, and only its `python-version` lines: the floor
+#     query, `python tools/lib/python_floor.py check`, reds a version typed here instead of read from
+#     the declaration. Nothing else grades it: that every job keeps its setup step and that the
+#     preflight stays first, like the rest of its contract, was observed before landing by staged
+#     breaks on a scratch copy, recorded in the units' acceptance ledgers.
 #   - it runs on no event a fork can trigger, reads no secret and writes nothing to the repository.
 #
 # WHY WINDOWS UNDER GIT-BASH: every recorded green was earned there, so a Linux runner's first reds
@@ -66,6 +73,20 @@ jobs:
       - name: origin/HEAD resolves before any bar command runs
         working-directory: tree
         run: git symbolic-ref refs/remotes/origin/HEAD
+      - name: the floor, read from its one declaration
+        id: floor
+        working-directory: tree
+        run: |
+          floor=$(tr -d '\r\n' < tools/lib/python-floor.txt) || floor=""
+          if ! [[ "$floor" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "floor: tools/lib/python-floor.txt holds '$floor', not <major>.<minor>" >&2
+            exit 1
+          fi
+          echo "floor=$floor" >> "$GITHUB_OUTPUT"
+      - name: Python at the floor
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ steps.floor.outputs.floor }}
       - name: the history audit, check 9 and check 26, over the full history
         working-directory: tree
         run: |
@@ -101,6 +122,23 @@ jobs:
       - name: origin/HEAD resolves before any bar command runs
         working-directory: ${{ env.PRIMARY_TREE }}
         run: git symbolic-ref refs/remotes/origin/HEAD
+      - name: the floor, read from its one declaration
+        id: floor
+        working-directory: ${{ env.PRIMARY_TREE }}
+        run: |
+          floor=$(tr -d '\r\n' < tools/lib/python-floor.txt) || floor=""
+          if ! [[ "$floor" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "floor: tools/lib/python-floor.txt holds '$floor', not <major>.<minor>" >&2
+            exit 1
+          fi
+          echo "floor=$floor" >> "$GITHUB_OUTPUT"
+      - name: Python at the floor
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ steps.floor.outputs.floor }}
+      - name: the floor's preflight, the bar's first step
+        working-directory: ${{ env.PRIMARY_TREE }}
+        run: bash tools/lib/python-floor.sh preflight
       - name: the merge bar, every leg guard ignored, walled inside the job limit
         working-directory: ${{ env.PRIMARY_TREE }}
         run: GATE_FULL=1 GATE_WALL=20400 bash tools/run-gates/run-gates.sh
@@ -145,6 +183,20 @@ jobs:
       - name: origin/HEAD resolves before any bar command runs
         working-directory: tree
         run: git symbolic-ref refs/remotes/origin/HEAD
+      - name: the floor, read from its one declaration
+        id: floor
+        working-directory: tree
+        run: |
+          floor=$(tr -d '\r\n' < tools/lib/python-floor.txt) || floor=""
+          if ! [[ "$floor" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "floor: tools/lib/python-floor.txt holds '$floor', not <major>.<minor>" >&2
+            exit 1
+          fi
+          echo "floor=$floor" >> "$GITHUB_OUTPUT"
+      - name: Python at the floor
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ steps.floor.outputs.floor }}
       - name: one matrix entry per declared self-test, derived from the runner's own --list
         id: plan
         working-directory: tree
@@ -293,6 +345,20 @@ jobs:
       - name: origin/HEAD resolves before any bar command runs
         working-directory: ${{ env.PRIMARY_TREE }}
         run: git symbolic-ref refs/remotes/origin/HEAD
+      - name: the floor, read from its one declaration
+        id: floor
+        working-directory: ${{ env.PRIMARY_TREE }}
+        run: |
+          floor=$(tr -d '\r\n' < tools/lib/python-floor.txt) || floor=""
+          if ! [[ "$floor" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "floor: tools/lib/python-floor.txt holds '$floor', not <major>.<minor>" >&2
+            exit 1
+          fi
+          echo "floor=$floor" >> "$GITHUB_OUTPUT"
+      - name: Python at the floor
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ steps.floor.outputs.floor }}
       - name: run the suite as the sweep runs one, its output written as it runs
         working-directory: ${{ env.PRIMARY_TREE }}
         # `timeout` bounds the suite and not the pipe: `tee` reads until its LAST writer closes, so a
