@@ -7,3 +7,14 @@
 # branch's first-parent history and is never typed here. Within one commit this file's rows run
 # before every descriptor's. A landed row is frozen: correct it with a new step, retire it with a
 # `[[retired]]` row in the registry. `python <prefix>/govkit/upgrade_steps.py list` prints the order.
+
+# TOOL-dSafePassage-3: the receipt's schema 4, whose one new field is `steps`. FIRST, because every
+# later step records its state in that field; a receipt below 3 is refused, the preamble lifts it.
+[[upgrade]]
+id = "govkit/receipt-schema-4"
+up = ["python", "{gov}/govkit/steps/receipt_schema_4.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/receipt_schema_4.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/receipt_schema_4.py", "witness", "{target}"]
+resume = "atomic"
+surfaces = []
+needs-target = false

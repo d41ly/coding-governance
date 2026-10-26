@@ -5163,6 +5163,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "check_receipt_schema",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_receipt_vintage",
       "kind": "function",
       "file": "tools/memory-tree/check-verdict-epoch.sh"
@@ -6238,6 +6243,11 @@
       "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
+      "id": "cmd_down",
+      "kind": "function",
+      "file": "tools/govkit/steps/receipt_schema_4.py"
+    },
+    {
       "id": "cmd_emit_floors",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -6503,6 +6513,11 @@
       "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
+      "id": "cmd_up",
+      "kind": "function",
+      "file": "tools/govkit/steps/receipt_schema_4.py"
+    },
+    {
       "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -6516,6 +6531,11 @@
       "id": "cmd_witness",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/receipt_schema_4.py"
     },
     {
       "id": "cmd_write",
@@ -7956,6 +7976,11 @@
       "id": "derive_receipt_miss",
       "kind": "function",
       "file": "tools/check-wiring.sh"
+    },
+    {
+      "id": "derive_receipt_schema",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_record_commits",
@@ -10671,6 +10696,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/receipt_schema_4.py"
     },
     {
       "id": "main",
@@ -15696,6 +15726,11 @@
       "id": "read_stem",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_step_states",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_steps",
@@ -22776,6 +22811,11 @@
       "id": "set_sr_landed",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "set_step_state",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "set_tool_root",

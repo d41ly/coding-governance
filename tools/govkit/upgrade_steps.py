@@ -45,6 +45,11 @@ its before bytes, else refuses naming the path and restores nothing, so a later 
 discarded silently; then it removes the image. A step program imports this file by its own path,
 because the runner's `-I` drops the script directory from `sys.path`.
 
+THE RECEIPT'S `steps` (TOOL-dSafePassage-3). A schema-4 receipt records each step's progress as
+`{"id", "introduced", "state"}` rows, `state` applied, failed (adding `failure`) or rolled-back.
+`set_step_state` is the only code that mutates the field and `read_step_states` the only code that
+parses it; the writer persists nothing.
+
 Exit 0 clean, 1 a frozen-row finding or no base to compare against, 2 a refused row, an unreadable
 revision or a usage error.
 """
@@ -80,6 +85,8 @@ UNLANDED = "unlanded"
 STEPS_FILE = "steps.toml"
 REGISTRY_FILE = "registry.toml"
 IMAGE_DIR = ".governance/steps"
+STEP_STATES = ("applied", "failed", "rolled-back")
+SHA_RE = re.compile(r"[0-9a-f]{40}")
 
 
 class Refusal(RuntimeError):
@@ -493,6 +500,66 @@ def write_from_before_image(target, step_id: str) -> list[str]:
         except OSError:
             break  # ponytail: not empty, another step's image is there
     return [p for p, _c, _w in plan]
+
+
+def read_step_states(receipt: dict) -> list[dict]:
+    """The receipt's `steps` rows, validated: the field's one parser (TOOL-dSafePassage-3, S3).
+
+    A receipt below schema 4 has no rows and may carry no field; one at schema 4 or above must carry
+    a list of `{"id", "introduced", "state"}` objects, `state` one of STEP_STATES, a `failed` row
+    adding a non-empty `failure` and no other row carrying one, `introduced` a 40-hex commit or
+    null. Anything else is a refusal naming the row, and nothing is repaired."""
+    schema = receipt.get("schema", 1)
+    at4 = isinstance(schema, int) and not isinstance(schema, bool) and schema >= 4
+    if not at4:
+        if "steps" in receipt:
+            raise Refusal(f"`steps` on a receipt at schema {schema!r}: the field is schema 4's")
+        return []
+    steps = receipt.get("steps")
+    if not isinstance(steps, list):
+        raise Refusal(f"a schema-{schema} receipt's `steps` is "
+                      + ("absent" if "steps" not in receipt else type(steps).__name__)
+                      + ", and schema 4 requires a list")
+    for n, row in enumerate(steps, 1):
+        at = f"`steps` row {n}" + (f" ({row.get('id')!r})" if isinstance(row, dict) else "")
+        if not isinstance(row, dict):
+            raise Refusal(f"{at} is {type(row).__name__}, not an object")
+        state = row.get("state")
+        want = {"id", "introduced", "state"} | ({"failure"} if state == "failed" else set())
+        if set(row) != want:
+            raise Refusal(f"{at} carries the keys {sorted(row)}, where a {state!r} row carries {sorted(want)}")
+        if not isinstance(row["id"], str) or not row["id"]:
+            raise Refusal(f"{at}: `id` is not a non-empty string")
+        if state not in STEP_STATES:
+            raise Refusal(f"{at}: `state` {state!r} is not one of {', '.join(STEP_STATES)}")
+        if state == "failed" and not (isinstance(row["failure"], str) and row["failure"]):
+            raise Refusal(f"{at}: a failed row's `failure` is a non-empty string")
+        intro = row["introduced"]
+        if intro is not None and not (isinstance(intro, str) and SHA_RE.fullmatch(intro)):
+            raise Refusal(f"{at}: `introduced` {intro!r} is neither a 40-hex commit nor null")
+    return steps
+
+
+def set_step_state(receipt: dict, step_id, introduced, state, failure=None) -> dict:
+    """Record `step_id` at `state` in the receipt's `steps`: the field's one writer (S3).
+
+    The row moves to the end, so the last `applied` row is the last completed step; a known
+    `introduced` survives a call passing None. It refuses a receipt below schema 4 and any row
+    `read_step_states` would refuse, mutates `receipt` and persists nothing: the caller writes it."""
+    schema = receipt.get("schema", 1)
+    if not (isinstance(schema, int) and not isinstance(schema, bool) and schema >= 4):
+        raise Refusal(f"a receipt at schema {schema!r} has no `steps` to record '{step_id}' in; "
+                      f"the step govkit/receipt-schema-4 takes it to schema 4 first")
+    row = {"id": step_id, "introduced": introduced, "state": state}
+    if failure is not None:
+        row["failure"] = failure
+    rows = read_step_states(receipt)
+    old = next((r for r in rows if r["id"] == step_id), None)
+    if introduced is None and old is not None:
+        row["introduced"] = old["introduced"]
+    read_step_states({"schema": schema, "steps": [row]})  # the writer refuses what the reader would
+    receipt["steps"] = [r for r in rows if r["id"] != step_id] + [row]
+    return row
 
 
 def render_toml_scalar(value) -> str:

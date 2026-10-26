@@ -30,6 +30,28 @@ the row, and a row the default branch has not landed reads `unlanded`. A kit tha
   row runs, or removes a landed row with no `[[retired]]` row naming it. It does not check what a
   step program imports.
 
+## What the receipt records about steps
+
+The receipt, `.governance/install.json`, declares its `schema`. Schema 4 adds `steps`, one row per
+step that has run on this repository: its `id`, the commit that `introduced` it (`null` for a step
+that ran before its row landed), and its `state`, one of `applied`, `failed` (with the `failure`
+text) or `rolled-back`. The last `applied` row is the last step completed. `govkit.py check`
+reports a malformed `steps` field as a problem naming the row.
+
+A first install, by `apply` or `adopt`, is born at schema 4 with an empty `steps`. An existing
+receipt at schema 4 keeps its schema and its `steps` across a re-apply, an `adopt --re-adopt` or an
+`update`; one below 4 is never raised past 3 by them, and an existing receipt
+reaches 4 only by the step `govkit/receipt-schema-4`, the first row of `steps.toml`. Its up takes
+a schema-3 receipt to 4 with an empty `steps` (a receipt below 3 is refused: run `update` first,
+which lifts it to 3); its down takes the field out again and refuses while any other step reads
+`applied`. Until the deployer runs steps itself, run it by hand:
+
+```sh
+python tools/govkit/steps/receipt_schema_4.py up <repo>       # schema 3 -> 4
+python tools/govkit/steps/receipt_schema_4.py witness <repo>  # exit 0 at schema 4
+python tools/govkit/steps/receipt_schema_4.py down <repo>     # schema 4 -> 3
+```
+
 ## What `update` does with a retired kit
 
 `govkit.py update --target <repo>` reads the target's receipt. A claimed kit that is still a registry

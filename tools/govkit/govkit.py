@@ -47,7 +47,7 @@ import time
 
 KIT_GOVKIT_VERSION = "1.14"  # gov:kit govkit@1.14 — kit identity; set HERE, never from a conf
 
-RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
+RECEIPT_SCHEMA = 4  # readers accept 1 to 4; 4 is reached by the step govkit/receipt-schema-4, or by a first install's apply or adopt
 
 # The REPO-LOCAL GATE POLICY keys, one tuple that check 7h3's predicate compiles its alternation from
 # (TOOL-dDerivedDocket-24 S14). `GATE_SELFTESTS` is TOOL-dUnstalledConvoy-28's; `INHERITED_RED` and
@@ -4260,6 +4260,24 @@ def write_atomic(dest: pathlib.Path, text: str) -> None:
             pass
 
 
+def derive_receipt_schema(prior) -> dict:
+    """The `schema` and `steps` keys of the receipt `apply` or `adopt` writes over `prior`, the
+    parsed receipt the run rewrites, or None for a first install (TOOL-dSafePassage-3 S5).
+
+    A first install is born at RECEIPT_SCHEMA with an empty `steps`. A prior at schema 4 or more
+    keeps its schema and, where it holds the key, its `steps` verbatim: the field records EVENTS,
+    so D2's rule holds for it and a re-run never re-measures it. Any other prior — below 4, no
+    `schema`, a non-int, or `{}` for a receipt `--re-adopt` could not parse — is written at 3 with
+    no `steps`, so only the step govkit/receipt-schema-4 lifts an existing receipt to 4. A carried
+    `steps` is not checked here: `check` reports a malformed one through `read_step_states`."""
+    if prior is None:
+        return {"schema": RECEIPT_SCHEMA, "steps": []}
+    s = prior.get("schema") if isinstance(prior, dict) else None
+    if isinstance(s, int) and not isinstance(s, bool) and s >= 4:
+        return {"schema": s, **({"steps": prior["steps"]} if "steps" in prior else {})}
+    return {"schema": 3}
+
+
 def check_leg_claimable(argv: list[str], runner_leg: object) -> bool:
     """DEPL-aRepatriatedFork-17 S8. Is the runner's same-named leg gov's own, by its resolved argv?
 
@@ -5449,6 +5467,12 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
     deploy = load_deploy(target)
     selection = receipt.get("kits") or []
+    # TOOL-dSafePassage-3 S3: the per-step record, through its one parser; a malformed one is
+    # reported here, where nothing is written, rather than by the walk mid-update.
+    try:
+        upgrade_steps.read_step_states(receipt)
+    except Refusal as e:
+        r.fail(f"{receipt_path.as_posix()}: the receipt's step record is malformed: {e}")
 
     # ---- DEPL-aRepatriatedFork-1 S5. `[charter]` is the render-only value class: `target_context`
     # ---- never reads it, so a key a selected kit needs as an argv or destination token, answered
@@ -7709,7 +7733,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         step(STEP_BASELINE, "no runner declared" if gr.get("kind") == "none"
              else "this target's descriptor declares no [gate_runner] at all")
 
-    rows: list[dict] = []       # every file gov is responsible for — the receipt, schema 3
+    rows: list[dict] = []       # every file gov is responsible for — the receipt, at derive_receipt_schema's schema
     staged: list[str] = []      # only what this run actually wrote
 
     # ---- ATTRIBUTES. The pin block is written EARLY — before any content — because it is what the
@@ -8011,8 +8035,10 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                                 and o.get("id") in {h.get("id") for k in _carried_kits
                                                     if k in descs
                                                     for h in descs[k][0].get("hole", [])}))]
+    # TOOL-dSafePassage-3 S5: `schema` and `steps` from the receipt this run rewrites, `steps` last.
+    _rs = derive_receipt_schema(receipt)
     _rcpt_doc = {
-        "schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
+        "schema": _rs["schema"], "gov_source": str(root), "gov_commit": commit,
         "prefix": (deploy.get("prefix") or "tools"), "kits": selection + _carried_kits,
         "files": rows + _carried_rows,
         "orders": (receipt or {}).get("orders") or [], "baseline": baseline,
@@ -8020,7 +8046,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         "hook_block": {"state": hook_state},
         "gate_runner": (receipt or {}).get("gate_runner") or {
             "kind": gr.get("kind", "absent"), "file": gr.get("file"),
-            "emitted": [], "legs_withheld": False}}
+            "emitted": [], "legs_withheld": False},
+        **({"steps": _rs["steps"]} if "steps" in _rs else {})}
     (target / ".governance").mkdir(exist_ok=True)
     write_atomic(receipt_path, json.dumps(_rcpt_doc, indent=2) + "\n")
     print(f"govkit apply — receipt written ahead of CONFIGURE: {len(_rcpt_doc['files'])} row(s), "
@@ -8438,7 +8465,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
               f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
     step(STEP_RECEIPT, f"{len(_rcpt_doc['files'])} row(s), "
-                       f"{len(_rcpt_doc['kits'])} kit(s), schema {RECEIPT_SCHEMA}")
+                       f"{len(_rcpt_doc['kits'])} kit(s), schema {_rcpt_doc['schema']}")
     return r.emit()
 
 
@@ -9377,14 +9404,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # A receipt written before schema 3 carries no `gov_oid` at all, so every engine row in one would
     # read as S9's half-populated pair. Fill it ONCE, from EVIDENCE — gov's own blob at the row's
     # recorded `commit` — and never from `sha256`, which hashes the bytes that landed and is not an
-    # object name. SCOPED TO `schema < RECEIPT_SCHEMA`: a schema-3 receipt is NEVER back-filled,
-    # because a schema-3 row carrying `commit` and no `gov_oid` is exactly the corruption S9 exists
-    # to catch, and filling it in is how a text-merged receipt gets laundered into a plausible one.
+    # object name. SCOPED TO `schema < 3`, never `schema < RECEIPT_SCHEMA` (TOOL-dSafePassage-3 S4):
+    # schema 3 is the one that introduced `gov_oid`, so a receipt at 3 or above is NEVER back-filled,
+    # because such a row carrying `commit` and no `gov_oid` is exactly the corruption S9 exists to
+    # catch, and filling it in is how a text-merged receipt gets laundered into a plausible one. Tied
+    # to the constant, the pin moved with every schema bump and laundered every schema-3 receipt.
     # Scoped to LANDABLE_ROLES for S1's reason: those are the only rows whose destination holds a
     # whole-file gov blob. A `merged` row's gov bytes are a BLOCK inside a file the target owns and
     # an `attributes` row's are a block `lf_pins` composes — neither has a blob to name, and neither
     # gets one invented for it here.
-    if schema < RECEIPT_SCHEMA:
+    if schema < 3:
         for row in rows_all:
             if row.get("role", "engine") not in LANDABLE_ROLES or row.get("gov_oid"):
                 continue
@@ -9438,11 +9467,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             + ("`commit` and no `gov_oid`" if has_commit else "`gov_oid` and no `commit`")
             + ". The two are written together and are meaningless apart, so this pairing is the "
               "corruption shape a text merge of `install.json` produces — REFUSING the whole run "
-              "rather than acting on half of it. A receipt below schema "
-            + f"{RECEIPT_SCHEMA} has `gov_oid` filled from gov's blob at the row's own `commit` "
-              "before this check, so a row that still lacks it either could not be upgraded — gov "
-              "has no blob for that source at that commit — or was written at schema "
-            + f"{RECEIPT_SCHEMA} and has since been split"
+              "rather than acting on half of it. "
+              "A receipt below schema 3 has `gov_oid` filled from gov's blob at the row's own "
+              "`commit` before this check, so a row that still lacks it either could not be "
+              "upgraded — gov has no blob for that source at that commit — or was written at "
+              "schema 3 or above and has since been split"
         )
 
     # ---- S4. A claimed path PRESENT IN THE WORKTREE and ABSENT FROM THE INDEX, over the same
@@ -12472,7 +12501,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"stamp would tell the next run that guards which fired here have already been passed")
         return r.emit()
 
-    receipt["schema"] = RECEIPT_SCHEMA
+    # TOOL-dSafePassage-3 S5: the re-stamp lifts a schema-1 or schema-2 receipt to 3 and never past
+    # it, because schema 4 carries `steps` and only the step govkit/receipt-schema-4 writes that.
+    receipt["schema"] = max(schema, 3)
     # DEPL-dGaugedVintage-8 S1. THE STAMP MUST NOT OUTRUN THE ROWS THIS RUN NEVER GRADED. An
     # `evidence: "unattributed"` row is skipped above (`how == "table"` branch) before
     # `classify_row`, by DEPL-dCarriedReceipt-13's ratified design, and it is graded against the
@@ -13095,8 +13126,11 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # ---- D2 below. This sentence used to say they are "NOT written", four lines above the block
     # ---- that writes them.
     (target / ".governance").mkdir(exist_ok=True)
-    envelope = {"schema": RECEIPT_SCHEMA, "gov_source": str(root), "gov_commit": commit,
+    # `schema` is set by `derive_receipt_schema` below, once the prior receipt is read; the key is
+    # opened here so it stays the envelope's first (TOOL-dSafePassage-3 S5).
+    envelope = {"schema": None, "gov_source": str(root), "gov_commit": commit,
                 "prefix": (deploy.get("prefix") or "tools"), "kits": selection, "files": rows}
+    _prior = None
     # ---- D2, from this build's closing review. S10's "this verb installs nothing" is true and was
     # ---- the wrong reason to DROP these five keys: `--re-adopt` runs over a receipt somebody else
     # ---- wrote, and `apply` writes exactly these to record what an INSTALL DID. Re-measuring
@@ -13135,11 +13169,14 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
             print(f"govkit adopt — carried {len(_carried)} install-record key(s) forward from the "
                   f"receipt being replaced: {', '.join(_carried)}. Re-measuring provenance does not "
                   f"un-perform an install, and dropping these bricks the next `apply`")
+    # TOOL-dSafePassage-3 S5: `schema` in place and, where it is given, `steps` as the last key —
+    # carried verbatim from the receipt `--re-adopt` replaces, for D2's reason, or a first install's.
+    envelope.update(derive_receipt_schema(_prior))
     write_atomic(target / ".governance" / "install.sums",
                  "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w))
     write_atomic(receipt_path, json.dumps(envelope, indent=2) + "\n")
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
-          f"schema {RECEIPT_SCHEMA}, gov_commit {commit[:8]}")
+          f"schema {envelope['schema']}, gov_commit {commit[:8]}")
     if staged:
         # S5. STAGED WITH THE BYTES IT MEASURED, so the fork edit and its receipt are one commit.
         _ga = subprocess.run(["git", "-C", str(target), "add", "--", *ADOPT_STAGED_RECEIPT],

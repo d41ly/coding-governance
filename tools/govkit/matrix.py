@@ -483,6 +483,8 @@ def build_role_pair(tmp: pathlib.Path, tag: str, *, schema: int, edits: dict[str
     data = json.loads(rec.read_text(encoding="utf-8"))
     if schema != data.get("schema"):
         data["schema"] = schema
+        if schema < 4:
+            data.pop("steps", None)  # a receipt below schema 4 carries no `steps` (TOOL-dSafePassage-3)
         rec.write_text(json.dumps(data, indent=2) + NL, encoding="utf-8", newline=NL)
     # THE AGEING. The descriptor moves AFTER the receipt was written, which is the one ordering
     # that produces a disagreement at all.

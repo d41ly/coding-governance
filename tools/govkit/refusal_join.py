@@ -38,7 +38,12 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 297    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 307    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 297 -> 307 at TOOL-dSafePassage-3, BY THE MEASURED DELTA: the matcher read 367 over the seven
+# modules at that unit's base `14054d44` and 377 on the tree it left. Nine are the `steps` field's
+# reader and writer in `upgrade_steps.py` (`read_step_states` eight, `set_step_state`'s schema
+# guard one) and one is `check`'s `r.fail` on a malformed field in the engine; the step program
+# `steps/receipt_schema_4.py` exits by code and adds none. 10/10 reached by `check_receipt_schema`.
 # 255 -> 297 at TOOL-dSafePassage-1, BY THE MEASURED DELTA and not to the live count, which keeps the
 # re-baselining below that row's own job: the matcher read 325 over four modules at the build's base
 # `60d90cb7` and 367 over six on the tree this unit left, so the floor moves by 42. The two new

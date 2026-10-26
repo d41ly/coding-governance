@@ -42,3 +42,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-26T10:43:20Z dispatch · item 2d20e0b5 TOOL-dSafePassage-1 · reason .gitattributes
 
 2026-10-26T10:56:17Z dispatch · item 29ccb065 TOOL-dSafePassage-1 · reason tools/govkit/selftest.py memory/map/generated/symbols.json
+
+2026-10-26T11:29:59Z dispatch · item 14054d44 TOOL-dSafePassage-3 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/steps/receipt_schema_4.py tools/govkit/selftest.py tools/govkit/matrix.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-3.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-3-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-10-26T11:30:19Z brief · item TOOL-dSafePassage-3 · reason 3df06df6ea40 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-3-build-brief.md
+
+2026-10-26T11:45:05Z dispatch · item 14054d44 TOOL-dSafePassage-3 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/steps/receipt_schema_4.py tools/govkit/selftest.py tools/govkit/matrix.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-3.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-3-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-3-deviation-165.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

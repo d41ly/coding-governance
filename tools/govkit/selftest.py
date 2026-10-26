@@ -3353,6 +3353,213 @@ def check_fanout_step(tmp: pathlib.Path) -> None:
           and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
 
 
+def check_receipt_schema(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-3 AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 — the receipt's schema 4: the
+    back-fill pinned below 3, who writes 4, the step `govkit/receipt-schema-4`, and the `steps`
+    field's one writer and one reader. Each case is its own scratch target installed by `apply`
+    with ONE forced schema, taken-out field or planted state."""
+    gk = govkit_module()
+    us = gk.upgrade_steps
+    step_py = HERE / "steps" / "receipt_schema_4.py"
+    kit = "check-wiring"
+
+    def receipt(t: pathlib.Path) -> pathlib.Path:
+        return t / ".governance" / "install.json"
+
+    def read(t: pathlib.Path) -> dict:
+        return json.loads(receipt(t).read_text(encoding="utf-8"))
+
+    def installed(tag: str) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
+        t = make_target(tmp / tag, DEPLOY_FULL)
+        p = run("apply", "--target", str(t), "--kits", kit)
+        settle(t, "the install")
+        return t, p
+
+    def plant(t: pathlib.Path, fn) -> bytes:
+        rec = read(t)
+        fn(rec)
+        receipt(t).write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        settle(t, "the planted receipt")
+        return receipt(t).read_bytes()
+
+    def at(schema: int):
+        def fn(rec: dict) -> None:
+            rec["schema"] = schema
+            rec.pop("steps", None)
+        return fn
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
+                              text=True, encoding="utf-8")
+
+    def refused(fn) -> str:
+        try:
+            fn()
+        except us.Refusal as e:
+            return str(e)
+        return ""
+
+    # ---- AC4: a first install is born at schema 4 with an empty `steps` as its last key, by either verb.
+    t, p = installed("rs-ac4a")
+    rec = read(t)
+    check("[dSP-3 AC4] a first `apply` writes schema 4 with `\"steps\": []` as the receipt's last key",
+          p.returncode == 0 and rec.get("schema") == 4 and rec.get("steps") == [] and list(rec)[-1] == "steps"
+          and "schema 4" in p.stdout, f"{p.returncode} {list(rec)} {p.stdout[-300:]}")
+    t, _p = installed("rs-ac4b")
+    receipt(t).unlink()
+    settle(t, "the receipt gone, the files kept: a first adopt")
+    p = run("adopt", "--target", str(t), "--write")
+    rec = read(t) if receipt(t).is_file() else {}
+    check("[dSP-3 AC4] a first `adopt --write` writes the same: schema 4, `\"steps\": []` last",
+          p.returncode == 0 and rec.get("schema") == 4 and rec.get("steps") == [] and list(rec)[-1] == "steps",
+          f"{p.returncode} {list(rec)} {(p.stdout + p.stderr)[-400:]}")
+
+    # ---- AC1 / AC2: the `gov_oid` back-fill runs below schema 3 only.
+    def split_row(schema: int):
+        def fn(rec: dict) -> None:
+            at(schema)(rec)
+            row = next(f for f in rec["files"] if f.get("role", "engine") == "engine" and f.get("commit"))
+            fn.path, fn.oid = row["path"], row.pop("gov_oid", None)
+        return fn
+
+    t, _p = installed("rs-ac1")
+    cut = split_row(3)
+    b1 = plant(t, cut)
+    p = run("update", "--target", str(t))
+    check("[dSP-3 AC1] a schema-3 receipt whose engine row keeps `commit` with no `gov_oid` refuses by name, "
+          "never back-filled, with RECEIPT_SCHEMA at 4",
+          gk.RECEIPT_SCHEMA == 4 and bool(cut.oid) and p.returncode == 2
+          and any("`commit` and no `gov_oid`" in ln and cut.path in ln for ln in p.stderr.splitlines())
+          and receipt(t).read_bytes() == b1, p.stdout[-300:] + p.stderr)
+    t, _p = installed("rs-ac2")
+    cut = split_row(2)
+    plant(t, cut)
+    p = run("update", "--target", str(t), "--write")
+    row = next((f for f in read(t)["files"] if f.get("path") == cut.path), {})
+    check("[dSP-3 AC2] the same row at schema 2 is back-filled from gov's blob at its `commit` and classified",
+          bool(cut.oid) and p.returncode == 0 and "REFUSING" not in p.stderr and row.get("gov_oid") == cut.oid,
+          f"{row.get('gov_oid')} != {cut.oid} · " + (p.stdout + p.stderr)[-400:])
+    check("[dSP-3 AC2] ...and the clean run lifts it to schema 3, no further and with no `steps`",
+          read(t).get("schema") == 3 and "steps" not in read(t), str(read(t).get("schema")))
+
+    # ---- AC9: a clean `update --write` never moves a receipt past 3 by itself, and keeps a 4.
+    for tag, fn, want in (("rs-ac9a", at(3), 3), ("rs-ac9b", lambda rec: None, 4)):
+        t, _p = installed(tag)
+        plant(t, fn)
+        p = run("update", "--target", str(t), "--write")
+        rec = read(t)
+        check(f"[dSP-3 AC9] a clean `update --write` over a schema-{want} receipt leaves it at {want}",
+              p.returncode == 0 and rec.get("schema") == want and ("steps" in rec) == (want == 4),
+              f"{p.returncode} {rec.get('schema')} " + (p.stdout + p.stderr)[-300:])
+
+    # ---- AC5: the step's witness, up and down over a receipt `apply` wrote, forced back to 3.
+    t, _p = installed("rs-ac5")
+    b3 = plant(t, at(3))
+    w0, up = run_step("witness", t), run_step("up", t)
+    rec = read(t)
+    w1 = run_step("witness", t)
+    check("[dSP-3 AC5] the witness exits 1 at schema 3; the up takes it to schema 4 with an empty `steps`; "
+          "the witness then exits 0",
+          w0.returncode == 1 and up.returncode == 0 and rec.get("schema") == 4 and rec.get("steps") == []
+          and list(rec)[-1] == "steps" and w1.returncode == 0, w0.stdout + up.stdout + up.stderr + w1.stdout)
+    down = run_step("down", t)
+    check("[dSP-3 AC5] ...and the down restores the schema-3 bytes exactly",
+          down.returncode == 0 and receipt(t).read_bytes() == b3, down.stdout + down.stderr)
+
+    # ---- AC6: the up's and down's refusals write nothing, and a foreign shape is normalised.
+    t, _p = installed("rs-ac6a")
+    b2 = plant(t, at(2))
+    up = run_step("up", t)
+    check("[dSP-3 AC6] the up over a schema-2 receipt exits 1 naming the schema and writes nothing",
+          up.returncode == 1 and "schema 2" in up.stderr and receipt(t).read_bytes() == b2, up.stdout + up.stderr)
+    t, _p = installed("rs-ac6b")
+    b4 = plant(t, lambda rec: rec.__setitem__(
+        "steps", [{"id": "lib/python-floor-3.15", "introduced": None, "state": "applied"}]))
+    down = run_step("down", t)
+    check("[dSP-3 AC6] the down while another step reads applied exits 1 naming it and writes nothing",
+          down.returncode == 1 and "lib/python-floor-3.15" in down.stderr and receipt(t).read_bytes() == b4,
+          down.stdout + down.stderr)
+    t, _p = installed("rs-ac6c")
+    plant(t, lambda rec: rec.pop("steps"))
+    down = run_step("down", t)
+    rec = read(t)
+    check("[dSP-3 AC6] the down over a schema-4 receipt with no `steps` leaves schema 3 without the field",
+          down.returncode == 0 and rec.get("schema") == 3 and "steps" not in rec, down.stdout + down.stderr)
+    for verb in ("up", "down"):
+        t, _p = installed(f"rs-ac6{verb}")
+        bx = plant(t, lambda rec: rec.__setitem__("schema", "4"))
+        got = run_step(verb, t)
+        check(f"[dSP-3 S6] the {verb} over a receipt whose schema is not a number exits 1 and writes nothing",
+              got.returncode == 1 and "not a number" in got.stderr and receipt(t).read_bytes() == bx,
+              got.stdout + got.stderr)
+
+    # ---- AC7: the one writer, in process.
+    r3 = {"schema": 3}
+    check("[dSP-3 AC7] set_step_state refuses a schema-3 receipt and gives it no `steps`",
+          "at schema 3" in refused(lambda: us.set_step_state(r3, "govkit/receipt-schema-4", None, "applied"))
+          and "steps" not in r3, str(r3))
+    r4 = {"schema": 4, "steps": []}
+    us.set_step_state(r4, "a/one", "0" * 40, "applied")
+    check("[dSP-3 AC7] on a schema-4 receipt it appends `{id, introduced, state}`",
+          r4["steps"] == [{"id": "a/one", "introduced": "0" * 40, "state": "applied"}], str(r4))
+    for label, call, why in (
+            ("`state` done", lambda: us.set_step_state(r4, "a/two", None, "done"), "is not one of"),
+            ("a failed row with no `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed"), "carries the keys"),
+            ("a `failure` on an applied row", lambda: us.set_step_state(r4, "a/two", None, "applied", "x"), "carries the keys"),
+            ("an empty `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed", ""), "non-empty string"),
+            ("an id that is not a string", lambda: us.set_step_state(r4, 7, None, "applied"), "`id` is not"),
+            ("an `introduced` that is not a commit", lambda: us.set_step_state(r4, "a/two", "abc", "applied"), "neither a 40-hex")):
+        got = refused(call)
+        check(f"[dSP-3 AC7] it refuses {label}, leaving the field as it was",
+              why in got and len(r4["steps"]) == 1, got)
+    us.set_step_state(r4, "a/two", None, "failed", "the up exited 1")
+    us.set_step_state(r4, "a/one", None, "rolled-back")
+    check("[dSP-3 AC7] a second call for an id moves its row to the end, and None keeps a known commit",
+          [r["id"] for r in r4["steps"]] == ["a/two", "a/one"] and r4["steps"][-1]["introduced"] == "0" * 40
+          and r4["steps"][0]["failure"] == "the up exited 1", str(r4))
+    # ---- ...and the one reader's refusals.
+    for label, rec, why in (
+            ("a `steps` field below schema 4", {"schema": 3, "steps": []}, "the field is schema 4's"),
+            ("a schema-4 receipt without the field", {"schema": 4}, "is absent"),
+            ("a `steps` that is not a list", {"schema": 4, "steps": {}}, "requires a list"),
+            ("a row that is not an object", {"schema": 4, "steps": ["a/one"]}, "not an object")):
+        got = refused(lambda: us.read_step_states(rec))
+        check(f"[dSP-3 S3] read_step_states refuses {label}", why in got, got)
+    check("[dSP-3 S3] ...and reads a receipt below schema 4 without the field as no rows",
+          us.read_step_states({"schema": 2}) == [], "")
+
+    # ---- AC8: `check` counts a malformed field as a problem naming the row, and a valid one as none.
+    for tag, rows, bad in (("rs-ac8a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "done"}], True),
+                           ("rs-ac8b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied"}], False)):
+        t, _p = installed(tag)
+        plant(t, lambda rec, _r=rows: rec.__setitem__("steps", _r))
+        p = run("check", "--target", str(t))
+        out = p.stdout + p.stderr
+        hit = [ln for ln in out.splitlines() if "step record is malformed" in ln]
+        check(f"[dSP-3 AC8] `check` over a {'malformed' if bad else 'valid'} `steps` "
+              + ("counts a problem naming the row" if bad else "counts none for the field"),
+              (any("'govkit/receipt-schema-4'" in ln and "'done'" in ln for ln in hit) and p.returncode == 1)
+              if bad else not hit, out[-600:])
+
+    # ---- AC14: a re-run keeps an existing receipt's schema and `steps`, by either verb.
+    row = {"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied"}
+    for verb in ("apply", "adopt"):
+        for label, fn in (("schema-4", lambda rec: rec.__setitem__("steps", [dict(row)])), ("schema-3", at(3))):
+            t, _p = installed(f"rs-ac14{verb[:2]}{label[-1]}")
+            plant(t, fn)
+            p = (run("apply", "--target", str(t), "--kits", kit) if verb == "apply"
+                 else run("adopt", "--target", str(t), "--re-adopt", "--write"))
+            rec = read(t)
+            want = 4 if label == "schema-4" else 3
+            check(f"[dSP-3 AC14] a re-run `{verb}` over a planted {label} receipt keeps it: schema {want}, "
+                  + ("the one row byte-equal" if want == 4 else "no `steps` key")
+                  + f", and prints `schema {want}`",
+                  p.returncode == 0 and rec.get("schema") == want
+                  and (json.dumps(rec.get("steps")) == json.dumps([row]) if want == 4 else "steps" not in rec)
+                  and f"schema {want}" in p.stdout, f"{p.returncode} {rec.get('schema')} {rec.get('steps')} "
+                  + (p.stdout + p.stderr)[-400:])
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -3507,6 +3714,7 @@ def main() -> int:
         check_upgrade_steps(tmp / "dsp")
         check_succession(tmp / "dsc")
         check_fanout_step(tmp / "dfs")
+        check_receipt_schema(tmp / "drs")
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
@@ -8669,13 +8877,15 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC5: the schema. `-2` had to land first for this fixture to reach a finding-free run
         # ---- at all — its `attributes` row used to take `refuse` and freeze the re-stamp forever.
         c5 = clone_crlf(i7, "id7-c5")
+        _s5 = json.loads((c5 / ".governance" / "install.json").read_text(encoding="utf-8")).get("schema")
         _a5 = run("update", "--target", str(c5), "--write")
         _r5 = json.loads((c5 / ".governance" / "install.json").read_text(encoding="utf-8"))
         _eng5 = [f for f in _r5["files"] if f.get("role") == "engine"]
         check("[-7] AC5 a --write run with no findings exits 0", _a5.returncode == 0,
               _a5.stdout + _a5.stderr)
-        check("[-7] AC5 ...and re-stamps the receipt at the engine's own schema",
-              _r5.get("schema") == govkit_module().RECEIPT_SCHEMA, str(_r5.get("schema")))
+        # The re-stamp caps at 3 since TOOL-dSafePassage-3, so a first install's receipt keeps its 4.
+        check("[-7] AC5 ...and re-stamps the receipt keeping its own schema",
+              _r5.get("schema") == _s5 == govkit_module().RECEIPT_SCHEMA, f"{_s5} -> {_r5.get('schema')}")
         check("[-7] AC5 the fixture's engine population is non-empty, so the next arm CAN fail",
               len(_eng5) > 0, str(len(_eng5)))
         check("[-7] AC5 every engine row carries gov_oid, oid AND sha256",
@@ -8875,9 +9085,9 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-7] AC9 the fixture's field-less row really carries neither identity",
               not _r9.get("commit") and not _r9.get("gov_oid")
               and _r9.get("evidence") == "unattributed", str(_r9)[:200])
-        check("[-7] AC9 ...and its receipt is at the CURRENT schema, so no migration fills them in",
+        check("[-7] AC9 ...and its receipt is at schema 3 or above, so no migration fills them in",
               json.loads((it9 / ".governance" / "install.json").read_text(
-                  encoding="utf-8")).get("schema") == govkit_module().RECEIPT_SCHEMA, "")
+                  encoding="utf-8")).get("schema") >= 3, "")
         _x9 = (it9 / PFX / "demo" / "extra.txt").read_bytes()
         _a9 = gov_update(ig, it9, "--write")
         check("[-7] AC9 the run completes over the field-less row and exits 0",
@@ -9792,7 +10002,7 @@ user_skills = "/tmp/gk-fake-skills"
               "carry" not in [f for f in _r7b["files"] if f["path"] == HAZ9][0],
               str([f for f in _r7b["files"] if f["path"] == HAZ9][0]))
         check("[-9] AC7 ...and the receipt still reads schema 3 — this unit moves no schema number",
-              _r7b.get("schema") == 3 == GK9.RECEIPT_SCHEMA, str(_r7b.get("schema")))
+              _r7b.get("schema") == 3, str(_r7b.get("schema")))
         for _sch9 in (1, 2):
             def _older(rec: dict, _s=_sch9) -> None:
                 rec["schema"] = _s
