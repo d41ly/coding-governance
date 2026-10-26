@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-3 — the receipt's schema 4: the `steps` field, its one writer, and the step that ships it
 
-**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0020@42c7d579 whole
 
@@ -14,6 +14,8 @@
 | [2026-10-23-build-TOOL-dSafePassage-3-deviation-125.md](../build/2026-10-23-build-TOOL-dSafePassage-3-deviation-125.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-26-prompt-TOOL-dSafePassage-3-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-3-1-spec-writer.md) | research | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-3-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-3-2-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-3-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-3-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
@@ -29,9 +31,9 @@ receipt's schema is inventoried by value.
 
 ## 2. Scope (IN)
 
-- **S1** — `RECEIPT_SCHEMA = 4` at `tools/govkit/govkit.py:49`, its comment saying readers accept 1
-  to 4 and that schema 4 is reached by the step `govkit/receipt-schema-4` or by a fresh `apply` or
-  `adopt`. Observed by AC3 and AC4.
+- **S1** — `RECEIPT_SCHEMA = 4` at `tools/govkit/govkit.py:50`, its comment saying readers accept 1
+  to 4 and that schema 4 is reached by the step `govkit/receipt-schema-4` or by a first install's
+  `apply` or `adopt`. Observed by AC3 and AC4.
 - **S2** — The field. `steps` is a list of objects `{"id", "introduced", "state"}`, `state` one of
   `applied`, `failed` or `rolled-back`, a `failed` row adding `"failure"`, and the list's last
   `applied` row naming the last completed step. `introduced` is the commit unit 1's reader derives,
@@ -40,16 +42,32 @@ receipt's schema is inventoried by value.
 - **S3** — One writer and one reader, in `tools/govkit/upgrade_steps.py`: `set_step_state` is the
   only code that mutates `steps`, and `read_step_states` the only code that parses it. The walk,
   the reverse walk and gov first write through the first (the brief's S4). `govkit check` reads
-  through the second and counts a malformed field as a problem. Observed by AC7 and AC8.
-- **S4** — The back-fill pinned. The `gov_oid` back-fill at `tools/govkit/govkit.py:9330` runs under
+  through the second, on the receipt it loads at `tools/govkit/govkit.py:5449`, and counts a
+  malformed field as a problem. Observed by AC7 and AC8.
+- **S4** — The back-fill pinned. The `gov_oid` back-fill at `tools/govkit/govkit.py:9387` runs under
   `schema < 3`, never `schema < RECEIPT_SCHEMA`, so a schema-3 receipt is never back-filled, and its
-  comment at :9320-9329 says why. The integrity message at :9380-9389 spells schema 3 where it
-  interpolates `RECEIPT_SCHEMA` today, and `apply`'s comment at :7678 names schema 4.
-  Observed by AC1, AC2 and AC3.
-- **S5** — Who moves the number. `apply` and `adopt` write a fresh receipt at schema 4 with
-  `"steps": []` (`tools/govkit/govkit.py:7981` and `:13030`). `update`'s re-stamp at :12407 never
-  raises a receipt past 3 by itself; schema 4 on an existing receipt is the step's alone.
-  Observed by AC4 and AC9.
+  comment at :9375-9386 says why. The integrity message at :9441-9445 spells schema 3 where it
+  interpolates `RECEIPT_SCHEMA` today, with `below schema 3` on one source line, and `apply`'s
+  comment at :7712 names the schema S5 gives. Observed by AC1, AC2 and AC3.
+- **S5** — Who moves the number, and what a re-run keeps. One function, `derive_receipt_schema` in
+  `tools/govkit/govkit.py`, gives the `schema` and `steps` keys of every receipt `apply` and `adopt`
+  write, from the receipt the run rewrites (§4 Data model):
+  - a first install, with no prior receipt, is born at schema 4 with `"steps": []` (first install);
+  - over a prior receipt whose `schema` is an `int` of 4 or more, its `schema` and, where it holds
+    one, its `steps` are carried verbatim. `steps` records EVENTS, so D2's rule
+    (`tools/govkit/govkit.py:13100-13113`) holds for it: a re-run never re-measures it, and every
+    `applied`, `failed` and `rolled-back` row survives a re-apply and a re-adopt;
+  - over any other prior receipt (below schema 4, without a `schema`, or one `--re-adopt` could not
+    parse) the write is schema 3 with no `steps` key: the lift to 3 a schema-1 or schema-2 receipt
+    gets from `apply` today, and never 4.
+  `apply` asks it of the receipt it reads at :7570 and builds its doc at :8014-8025 with `schema` in
+  place and `steps` its last key; its rewrites at :8330 and :8436 carry both unchanged. `adopt` asks
+  it of the receipt `--re-adopt` rewrites (:13114-13136), or of none, and sets both in the envelope
+  it opens at :13098, `steps` after D2's five carried keys at :13130, which stay as they are, so
+  `steps` is the envelope's last key. Each verb's
+  receipt line (:8441, :13142) prints the schema it wrote. `update`'s re-stamp at :12475 never raises
+  a receipt past 3 by itself (`max(schema, 3)`, §4); schema 4 on an existing receipt is the step's
+  alone. Observed by AC4, AC9 and AC14.
 - **S6** — The step `govkit/receipt-schema-4`, the FIRST row of `tools/govkit/steps.toml`, whose
   program is `tools/govkit/steps/receipt_schema_4.py`. Its up takes a schema-3 receipt to schema 4
   with an empty `steps`, in one atomic write; its down restores schema 3, the field gone, in
@@ -68,7 +86,9 @@ receipt's schema is inventoried by value.
   `tools/govkit/fixtures/make_adopter_receipt.py` · by value: `RECEIPT_SCHEMA` at every comparison §4
   Inventory lists, and `build_role_pair`'s `schema` argument.
 - **S8** — The help page `help/upgrade-steps.md` gains a section on what the receipt records: the
-  schema, `steps` and its three states. Observed by AC13.
+  schema, `steps` and its three states, and that a first install is born at schema 4 while an
+  existing receipt keeps its schema and its `steps` across a re-apply or a re-adopt, reaching 4 only
+  by the step. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -130,6 +150,21 @@ persists nothing; the caller writes the receipt.
 `read_step_states(receipt)` returns the rows, raising `Refusal` on a `steps` field below schema 4,
 a schema-4 receipt without the field, or any row the writer would refuse.
 
+`derive_receipt_schema(prior)` takes the parsed receipt a run rewrites, or `None` when there is none,
+and returns the dictionary of the two keys that run writes:
+
+| `prior` | Returned |
+|---|---|
+| `None`, a first install | `{"schema": RECEIPT_SCHEMA, "steps": []}`, the first install's shape |
+| `schema` an `int` of 4 or more | its `schema`, and its `steps` verbatim where the key is present |
+| anything else: below 4, no `schema`, a non-`int`, or `{}` for an unparsed `--re-adopt` prior | `{"schema": 3}` |
+
+It reads `prior` and writes nothing. A carried `steps` is never checked here: a malformed one, or a
+schema-4 prior without the key, is written back as it was and `check` counts it through
+`read_step_states` (S3), so a corrupt record is reported where it is read and never repaired by a
+re-run. A first install's empty list records no event; it is the field schema 4 requires, which is
+why a first `adopt` writes it while D2 has a first `adopt` omit the five install-record keys.
+
 The step row:
 
 ```toml
@@ -146,47 +181,54 @@ needs-target = false
 
 The program reads `<target>/.governance/install.json`. Its up exits 0 at schema 4 or above with
 `steps` a list; exits 1 naming the schema, writing nothing, below schema 3 (§8 F4); and otherwise
-sets `schema` to 4 in place and appends `"steps": []` as the last key, written to a temporary file
+sets `schema` to 4 in place and appends an empty `steps` list as the last key, written to a temporary file
 and renamed over the receipt, so a kill leaves either receipt and never half of one. Its down exits 0
 at schema 3 without the field; exits 1, writing nothing, while `steps` holds an `applied` row for any
 other step; and otherwise sets `schema` to 3 and takes the field out, by the same atomic write. A
 schema-4 receipt without the field, or a schema-3 one with it, the two shapes a foreign writer could
 leave, are normalised to schema 3 without the field. Both write `json.dumps(receipt, indent=2) +
-"\n"`, govkit's own serialization (`tools/govkit/govkit.py:12400-12443`), so the down's output equals
+"\n"`, govkit's own serialization (`tools/govkit/govkit.py:12468-12511`), so the down's output equals
 the up's input for every receipt `apply`, `adopt` or `update` wrote.
 
-`update`'s re-stamp at `tools/govkit/govkit.py:12407` becomes `max(<the receipt's schema>, 3)`: the
+`update`'s re-stamp at `tools/govkit/govkit.py:12475` becomes `max(<the receipt's schema>, 3)`: the
 preamble still lifts a schema-1 or schema-2 receipt to 3 and back-fills it, and nothing but the
 step lifts it to 4.
 
 ### Inventory
 
 Minted: `set_step_state`, `read_step_states` (`tools/govkit/upgrade_steps.py`, cell `py.function`
-snake, verbs set and read); `cmd_up`, `cmd_down`, `cmd_witness`, `main`
+snake, verbs set and read); `derive_receipt_schema` (`tools/govkit/govkit.py`, cell `py.function`,
+verb derive: `python tools/lexicon/lexicon.py --suggest derive_receipt_schema --as py.function`
+printed OK on 2026-10-26); `cmd_up`, `cmd_down`, `cmd_witness`, `main`
 (`tools/govkit/steps/receipt_schema_4.py`); the step id `govkit/receipt-schema-4`.
 
 The receipt's readers by value, from
-`git grep -n -E 'RECEIPT_SCHEMA|"schema"|get\("schema"' -- tools skills .githooks` at the base. The
-other readers `git grep -l install.json -- tools skills .githooks` lists read `files`, `kits` or
-`gov_commit`, and none compares the key set, so an added key reaches none of them.
+`git grep -n -E 'RECEIPT_SCHEMA|"schema"|get\("schema"' -- tools skills .githooks` at the base, each
+line re-read at HEAD `2ac1c347`, the lines cited here. The other readers
+`git grep -l install.json -- tools skills .githooks` lists read `files`, `kits` or `gov_commit`, and
+none compares the key set, so an added key reaches none of them.
 
 | Reader | What it does with the value | Disposition |
 |---|---|---|
-| `tools/govkit/govkit.py:49` | the constant | 4, comment re-worded (S1) |
-| `tools/govkit/govkit.py:5534-5539` | `check`'s comment on a receipt below schema 3 | unchanged: already spells 3 |
-| `tools/govkit/govkit.py:7678` | comment, "the receipt, schema 3" | names schema 4 (S4) |
-| `tools/govkit/govkit.py:7981`, `:13030` | `apply` and `adopt` write `RECEIPT_SCHEMA` | add `"steps": []` (S5) |
-| `tools/govkit/govkit.py:8407`, `:9483`, `:13074` | print the schema | unchanged |
-| `tools/govkit/govkit.py:9175` | `update` reads the receipt's schema | unchanged |
-| `tools/govkit/govkit.py:9320-9330` | the back-fill under `schema < RECEIPT_SCHEMA` | `schema < 3` (S4) |
-| `tools/govkit/govkit.py:9380-9389` | the integrity message interpolates `RECEIPT_SCHEMA` | spells 3 (S4) |
-| `tools/govkit/govkit.py:9696`, `:9720` | the schema-1 and schema-2 role arms | unchanged |
-| `tools/govkit/govkit.py:12407` | the re-stamp writes `RECEIPT_SCHEMA` | `max(schema, 3)` (S5) |
-| `tools/govkit/matrix.py:482-484` | `build_role_pair` forces a schema onto an `apply`-written receipt | forcing below 4 also takes `steps` out (S7) |
-| `tools/govkit/selftest.py:3063` | a fresh `apply` receipt equals `RECEIPT_SCHEMA` | unchanged: `apply` writes 4 |
-| `tools/govkit/selftest.py:8190-8191` | an `update --write` re-stamps at `RECEIPT_SCHEMA` | asserts the receipt keeps its schema, now that the re-stamp caps at 3 |
-| `tools/govkit/selftest.py:8390-8392` | "at the CURRENT schema, so no migration fills them in" | asserts schema 3 or above, the pin's real condition |
-| `tools/govkit/selftest.py:9305-9306` | `schema == 3 == GK9.RECEIPT_SCHEMA` | `schema == 3` |
+| `tools/govkit/govkit.py:50` | the constant | 4, comment re-worded (S1) |
+| `tools/govkit/govkit.py:5449` | `check` loads the receipt | reads `steps` through `read_step_states` (S3) |
+| `tools/govkit/govkit.py:5560-5565` | `check`'s comment on a receipt below schema 3 | unchanged: already spells 3 |
+| `tools/govkit/govkit.py:7712` | comment, "the receipt, schema 3" | names the schema S5 gives |
+| `tools/govkit/govkit.py:7570`, `:8014-8025`, `:8330`, `:8436` | `apply` reads the prior receipt, rebuilds the doc at `RECEIPT_SCHEMA` carrying only `orders`, `after` and `gate_runner` from it, and writes it three times | `schema` and `steps` from `derive_receipt_schema(receipt)`, `steps` last; both rewrites keep them (S5) |
+| `tools/govkit/govkit.py:13098`, `:13114-13136` | `adopt`'s envelope writes `RECEIPT_SCHEMA`, and `--re-adopt` carries D2's five install-record keys from the prior receipt | `schema` and `steps` from `derive_receipt_schema` of that prior, or of none; D2's five keys unchanged (S5) |
+| `tools/govkit/govkit.py:8441`, `:13142` | `apply` and `adopt` print `RECEIPT_SCHEMA` as the schema written | print the schema written (S5) |
+| `tools/govkit/govkit.py:9540` | `update` prints the receipt's schema | unchanged |
+| `tools/govkit/govkit.py:9209` | `update` reads the receipt's schema | unchanged |
+| `tools/govkit/govkit.py:9375-9387` | the back-fill under `schema < RECEIPT_SCHEMA` | `schema < 3` (S4) |
+| `tools/govkit/govkit.py:9441-9445` | the integrity message interpolates `RECEIPT_SCHEMA` | spells 3 (S4) |
+| `tools/govkit/govkit.py:9753`, `:9777` | the schema-1 and schema-2 role arms | unchanged |
+| `tools/govkit/govkit.py:12475` | the re-stamp writes `RECEIPT_SCHEMA` | `max(schema, 3)` (S5) |
+| `tools/govkit/matrix.py:484-486` | `build_role_pair` forces a schema onto an `apply`-written receipt | forcing below 4 also takes `steps` out (S7) |
+| `tools/govkit/selftest.py:3546` | a first `apply` receipt equals `RECEIPT_SCHEMA` | unchanged: a first `apply` writes 4 |
+| `tools/govkit/selftest.py:8677-8678` | an `update --write` re-stamps at `RECEIPT_SCHEMA` | asserts the receipt keeps its schema, now that the re-stamp caps at 3 |
+| `tools/govkit/selftest.py:8878-8880` | "at the CURRENT schema, so no migration fills them in" | asserts schema 3 or above, the pin's real condition |
+| `tools/govkit/selftest.py:9794-9795` | `schema == 3 == GK9.RECEIPT_SCHEMA` | `schema == 3` |
+| `tools/govkit/selftest.py:12970-12972` | a first `adopt` carries none of D2's five install-record keys | unchanged: its tuple names the five, and a first `adopt`'s empty `steps` records no event |
 | `tools/run-gates/check-receipt.py:198`, `:437` | writes a schema-3 fixture; prints the schema | unchanged |
 | `tools/govkit/fixtures/make_adopter_receipt.py:302`, the `ic` fixture | a real adopter's schema-3 vintage | unchanged: it is a schema-3 receipt |
 
@@ -198,13 +240,14 @@ anchor of `tools/govkit/refusal_join.py`, armed by a `tools/govkit/selftest.py` 
 
 A receipt at schema 1, 2 or 3 keeps working with no step run: every reader the inventory lists
 accepts it, and the field it lacks is one `read_step_states` refuses only at schema 4. An old govkit
-reading a schema-4 receipt finds one unknown key and no refusal (`tools/govkit/govkit.py:9175` reads
+reading a schema-4 receipt finds one unknown key and no refusal (`tools/govkit/govkit.py:9209` reads
 the number; no branch refuses a schema above its own).
 
 ### Rollout
 
-The step is live when `TOOL-dSafePassage-2`'s walk runs it; until then a fresh install writes schema 4
-and an existing receipt stays at 3, which every reader accepts.
+The step is live when `TOOL-dSafePassage-2`'s walk runs it; until then a first install writes schema
+4 and an existing receipt stays at 3 through every `apply`, `adopt --re-adopt` and `update`, which
+every reader accepts.
 
 ### Files touched (estimate)
 
@@ -222,6 +265,9 @@ and an existing receipt stays at 3, which every reader accepts.
 - Bumping the constant with the back-fill left under `schema < RECEIPT_SCHEMA`: SA-3's laundering.
 - A before-image for the receipt (§8 F5).
 - The re-stamp writing schema 4 (§8 F2).
+- `apply` and `adopt` writing schema 4 with an empty `steps` on every run (§8 F3 (c)).
+- Two copies of the rule, one in `apply` and one in `adopt`: the second instance of one decision,
+  which `derive_receipt_schema` holds once.
 
 ## 5. Production-readiness checklist
 
@@ -229,7 +275,8 @@ and an existing receipt stays at 3, which every reader accepts.
   `gov_oid` still refuses the whole run before any write. The writer refuses every malformed state.
 - perf / scale — one JSON read and one atomic write per step run.
 - error / empty / loading states — an empty `steps` is legal and means no step has run; a malformed
-  field refuses with the receipt's path and the row.
+  field refuses with the receipt's path and the row, and a re-run carries it as it was, for `check`
+  to report.
 - observability — `check` names a malformed field; the step's up and down print the schema they read
   and the one they wrote.
 - risks — a receipt not in govkit's serialization (the `ic` fixture uses a one-space indent) does not
@@ -252,12 +299,14 @@ and an existing receipt stays at 3, which every reader accepts.
   prints the constant with its comment naming readers 1 to 4, and the integrity message's
   "A receipt below schema 3".
   Red when: the message still interpolates `RECEIPT_SCHEMA` and would print 4.
-- **AC4** — When `govkit.py apply --target <t>` installs a scratch target, its
-  `.governance/install.json` reads `"schema": 4` and `"steps": []`.
-  Red when: the fresh receipt carries no `steps`.
+- **AC4** — When `govkit.py apply --target <t>` makes a first install on a scratch target with no
+  receipt, its `.governance/install.json` reads `"schema": 4` and, a first install, `"steps": []`
+  as its last key; when `govkit.py adopt --target <t> --write` makes a first install on a scratch
+  target with no receipt, its receipt reads the same.
+  Red when: either first receipt carries no `steps`, or reads a schema other than 4.
 - **AC5** — When the step's `witness` argv runs on a schema-3 receipt `apply` wrote and was forced
-  back to 3, it exits 1; after the `up` argv it exits 0 and the receipt reads schema 4 with
-  `"steps": []`; after the `down` argv the receipt's bytes equal the schema-3 bytes before the up.
+  back to 3, it exits 1; after the `up` argv it exits 0 and the receipt reads schema 4 with an
+  empty `steps` list; after the `down` argv the receipt's bytes equal the schema-3 bytes before the up.
   Red when: a byte differs after the down.
 - **AC6** — When the `up` argv runs on a schema-2 receipt, it exits 1 and the file is unchanged;
   when the `down` argv runs while `steps` holds an `applied` row for `lib/python-floor-3.15`, it exits
@@ -286,15 +335,26 @@ and an existing receipt stays at 3, which every reader accepts.
   nothing, and `tools/run-gates/check-receipt.py` is byte-identical to the base by
   `git diff --quiet <base> -- tools/run-gates/check-receipt.py`.
   Red when: the stale equality is still there, or `check-receipt.py` moved.
-- **AC13** — When `grep -n -E 'steps|rolled-back' help/upgrade-steps.md` runs, it prints the
-  receipt section naming `steps` and its three states.
-  Red when: the page names neither.
+- **AC13** — When `grep -n -E 'steps|rolled-back|first install' help/upgrade-steps.md` runs, it
+  prints the receipt section naming `steps`, its three states, and the sentence saying a first
+  install is born at schema 4 and an existing receipt reaches 4 only by the step.
+  Red when: the page names neither the states nor the first install.
+- **AC14** — Four scratch targets, each first installed by `govkit.py apply --target <t>`: on two,
+  the receipt is planted at schema 4 with `steps` holding the one row
+  `{"id": "govkit/receipt-schema-4", "introduced": null, "state": "applied"}`; on the other two, it
+  is forced to schema 3 with `steps` taken out. When `govkit.py apply --target <t>` re-runs on one
+  target of each plant and `govkit.py adopt --target <t> --re-adopt --write` runs on the other, the
+  planted schema-4 receipt reads schema 4 with that one row, byte-equal to the planted `steps`, after
+  both commands, and the planted schema-3 receipt reads schema 3 with no `steps` key after both; each
+  command's receipt line prints the schema it wrote.
+  Red when: a re-run writes an empty `steps` over the planted row, or a planted schema-3 receipt
+  reads 4 after either command.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `govkit selfcheck` · `govkit runbook parity` · `receipt sync (installed files match the receipt)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 · each case staged by its own scratch target, one forced schema, one taken-out field or one planted state per arm · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
+New arm: tools/govkit/selftest.py · covers AC1 AC2 AC4 AC5 AC6 AC7 AC8 AC9 AC14 · each case staged by its own scratch target, one forced schema, one taken-out field or one planted state per arm · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
 
 What these arms do not check: a receipt in a serialization govkit never writes, and whether a caller
 persists the receipt after `set_step_state`, which is the walk's.
@@ -310,10 +370,16 @@ persists the receipt after `set_step_state`, which is the walk's.
   stamps 4 on a receipt with no `steps`, which `read_step_states` refuses, and the step's witness
   holds on a receipt it never migrated. (b) fails AC8 and AC9. Recommendation (a). Rung 3.
   RESOLVED (agent, 2026-10-23, delegated): (a).
-- **F3 — What schema does a fresh `apply` or `adopt` write?** (a) 4, with `"steps": []`. (b) 3, left
-  for the step. Under (b) every fresh install owes a migration for a field it could have been born
-  with, and the walk's first act on it is a write. Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a).
+- **F3 — What schema and `steps` do `apply` and `adopt` write?** (a) A first install writes 4 and
+  `"steps": []` (first install); a re-run keeps a prior schema of 4 or more with its `steps` verbatim,
+  and writes any other prior as schema 3 with no `steps` (S5). (b) 3 on a first install too, left for
+  the step. (c) 4 with an empty `steps` on every run. Under (b) every first install owes a migration
+  for a field it could have been born with, and the walk's first act on it is a write. Under (c) a
+  re-run over schema 4 discards every row the walk reads, `TOOL-dSafePassage-2`'s pending set being
+  the step record (its §8 F1), so a rolled-back step is applied again; and over schema 3 it lifts an
+  existing receipt to 4 without the step, which F2's reasoning forbids. Recommendation (a). Rung 3.
+  RESOLVED (agent, 2026-10-26, delegated): (a), the re-run half from the 2026-10-26 build brief's
+  direction; the first-install half as resolved on 2026-10-23.
 - **F4 — What does the up do with a receipt below schema 3?** (a) Exit 1 and write nothing: the
   preamble lifts it to 3 first. (b) Lift it straight to 4. Under (b) the schema-1 or schema-2 rows
   would reach 4 without their `gov_oid` back-fill, which the pin then never runs, so S9 refuses that
@@ -337,7 +403,7 @@ persists the receipt after `set_step_state`, which is the walk's.
   update mid-way; (a) reports it where nothing is written. Recommendation (a), charter
   `[security]`. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a).
 - **F9 — Does the walk's copy of the receipt see this step's write?** The step rewrites the receipt
-  on disk while `update` holds it in memory (`tools/govkit/govkit.py:9174`). (a) The walk re-reads
+  on disk while `update` holds it in memory (`tools/govkit/govkit.py:9208`). (a) The walk re-reads
   the receipt from disk after every step, handed off to `TOOL-dSafePassage-2`. (b) This step is run
   in process. (b) breaks the brief's S1, which makes every step an argv. Recommendation (a). Rung 1,
   the brief's S1. RESOLVED (agent, 2026-10-23, delegated): (a).
@@ -351,21 +417,35 @@ persists the receipt after `set_step_state`, which is the walk's.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-33`; no other section moved.
 - rev-4 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-39`; no other section moved.
 - rev-5 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-43`; no other section moved.
+- rev-6 · 2026-10-26 · S1 S3 S4 S5 S8 · §4 · AC4 AC5 AC13 AC14 · §7 · §8 F3 F9 · §10 · from the
+  spec-writer brief `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-3-2-spec-writer.md`:
+  S5 said `apply` and `adopt` write a fresh schema-4 receipt with an empty `steps`, and also that
+  schema 4 on an existing receipt is the step's alone, while at HEAD `2ac1c347` `apply` rebuilds over
+  the prior receipt and `adopt --re-adopt` carries D2's five keys from it. S5 now states the
+  first-install and re-run cases through one function, `derive_receipt_schema`; the §4 Inventory rows
+  for `apply` and `adopt` name the re-run at their lines; F3 gains option (c); AC14 observes both
+  plants under both commands, and the selftest `New arm:` line covers it; AC4 adds a first `adopt`;
+  every `tools/govkit/govkit.py`, `tools/govkit/selftest.py` and `tools/govkit/matrix.py` line the
+  spec cites is re-read at HEAD `2ac1c347`. Cross-read against TOOL-dSafePassage-2, -4, -15, -16,
+  -19 and -20, which agree and are not changed.
 
 ## 10. Reuse audit
 
 The seams extended, found with `python tools/codebase-map/reuse_lookup.py "migrate the install
 receipt to a new schema version and record per-step progress"` and by reading the hits: the
-preamble's back-fill and S9 integrity arms (`tools/govkit/govkit.py:9319-9389`), narrowed rather than
-copied; govkit's receipt serialization (`tools/govkit/govkit.py:12400-12443`), whose bytes the step
-writes; `write_atomic`'s temporary-and-rename pattern (`tools/govkit/govkit.py:4198`), which the step
-program repeats because it runs isolated and cannot import govkit; matrix's `build_role_pair`
-(`tools/govkit/matrix.py:422`), the one place a fixture forces a schema; and unit 1's step row and
-reader. No existing seam records per-step progress: the lookup's `record` hits are run-log records
-(`tools/runlog/record.py`), another kit's, so the field's writer is new. Where a hit disagreed with
-source: the shape audit cites the messages at `govkit.py:5278` and `:9007-9011`, which are at
-`:5534-5539` and `:9380-9389` at the base, and the first already spells schema 3. The recall probe
-surfaced `TOOL-dRetiredFork-38`, named in §3.
+preamble's back-fill and S9 integrity arms (`tools/govkit/govkit.py:9375-9446`), narrowed rather than
+copied; govkit's receipt serialization (`tools/govkit/govkit.py:12468-12511`), whose bytes the step
+writes; `write_atomic`'s temporary-and-rename pattern (`tools/govkit/govkit.py:4224`), which the step
+program repeats because it runs isolated and cannot import govkit; `adopt`'s D2 carry
+(`tools/govkit/govkit.py:13100-13136`), whose verbatim-carry rule `derive_receipt_schema` applies to
+`steps` for both verbs, beside its five keys rather than inside its tuple, because the first-install
+case writes the field D2 would omit; matrix's `build_role_pair` (`tools/govkit/matrix.py:422`), the
+one place a fixture forces a schema; and unit 1's step row and reader. No existing seam records
+per-step progress: the lookup's `record` hits are run-log records (`tools/runlog/record.py`), another
+kit's, so the field's writer is new. Where a hit disagreed with source: the shape audit cites the
+messages at `govkit.py:5278` and `:9007-9011`, which are at `:5560-5565` and `:9436-9446` at HEAD
+`2ac1c347`, and the first already spells schema 3. The recall probe surfaced `TOOL-dRetiredFork-38`,
+named in §3.
 
 Recall terms used: `python tools/memory-recall/query.py "how was the receipt schema bumped before and
 which readers compare the schema number" --terms "receipt schema RECEIPT_SCHEMA gov_oid back-fill
