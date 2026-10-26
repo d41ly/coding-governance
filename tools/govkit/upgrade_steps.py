@@ -133,6 +133,9 @@ STEP_STATES = ("applied", "failed", "rolled-back")
 # (TOOL-dSafePassage-43); every down-stop text is built from an entry here, never retyped.
 DOWN_STOP_PREFIXES = ("down interrupted:", "down exit ", "witness still holds after down",
                       "reverted check exits ")
+# Why an attended row stops either walk: the forward walk records it as the row's failure, the
+# reverse walk prints it beside the order that names the down (TOOL-dSafePassage-2 S5, -4 S4).
+ATTENDED_STOP = "attended: the step needs the target's code"
 SHA_RE = re.compile(r"[0-9a-f]{40}")
 OID_RE = re.compile(r"[0-9a-f]{40}(?:[0-9a-f]{24})?")  # a blob oid, sha-1 or sha-256
 # The host a write lock and a reclaim guard name (TOOL-dSafePassage-2 S6): a holder is judged dead
@@ -1054,7 +1057,7 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
             continue
         if derive_step_mode(row) == "attended":
             out["order"] = write_attended_order(target, gov_root, row).relative_to(target).as_posix()
-            return stop(row, "attended: the step needs the target's code")
+            return stop(row, ATTENDED_STOP)
         persist(row, "failed", f"interrupted: started "
                 f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded")
         phase = "resume" if row.id in began_failed and isinstance(row.resume, list) else "up"
@@ -1123,7 +1126,7 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
             state = "applied"
         if derive_step_mode(row) == "attended":
             out["order"] = write_attended_order(target, gov_root, row, "down").relative_to(target).as_posix()
-            return stop(row, f"attended: the step needs the target's code — {out['order']} names its down")
+            return stop(row, f"{ATTENDED_STOP} — {out['order']} names its down")
         paths = read_image_paths(target, row.id)
         write_step_record(receipt_path, receipt, row, state, f"{DOWN_STOP_PREFIXES[0]} started "
                           f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded")
@@ -1902,7 +1905,7 @@ def run_walk_fixture(plant: str | None) -> int:
             text = orders[0].read_text(encoding="utf-8") if orders else ""
             print(f"walk: fx/s2 {s2.get('state')} · {s2.get('failure')} · order "
                   f"{orders[0].name if orders else 'absent'} · up canary {'present' if 's2.up' in canaries(t) else 'absent'}")
-            expect(s2.get("failure") == "attended: the step needs the target's code", "s2 is not failed attended")
+            expect(s2.get("failure") == ATTENDED_STOP, "s2 is not failed attended")
             expect("fx/s2" in text and "fx.py up" in text.replace("'", ""), "the order does not name s2 and its up argv")
             expect("s2.up" not in canaries(t) and rc == 1, "the attended step spawned, or the walk did not exit 1")
             # The person's turn: s2's up by hand, outside the walk.

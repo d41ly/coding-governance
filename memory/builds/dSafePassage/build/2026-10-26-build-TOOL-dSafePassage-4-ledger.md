@@ -35,6 +35,14 @@ the target`). Reds were staged in a scratch copy of `tools/govkit` and `tools/pr
 edit per case, the fixture run from the copy. The arm itself was not run: the role hook refuses a
 run that loads `selftest.py`.
 
+A FOLLOW-UP COMMIT acted on the M6 checklist. `two-answers-to-one-question`: the attended stop's
+text was spelled in both walks and the `walk` fixture; all three read `ATTENDED_STOP` now, and
+`fixture walk --plant attended` and `fixture rollback` re-ran clean.
+`test-oracle-read-from-a-historical-sha` and `suite-invalidated-by-a-commit-under-it`: the arm's in-process probe of
+`check_rollback_vintage` read gov's own `HEAD` and `HEAD~1`, which a shallow clone or a commit made
+mid-suite moves; it now builds a scratch repository of two commits, and a probe of the same five
+cases over one printed the three refusals and the two passes.
+
 Owed at the close: the `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`,
 `govkit selfcheck`, `recall floor arms`, `encoding posture`, `lexicon naming predicates` and
 `spec tokens` legs, and the RED-first observation of `check_step_rollback`.

@@ -3598,27 +3598,27 @@ def check_step_rollback() -> None:
         refused = str(e)
     check("[dSP-4] S3 the reverse set refuses a receipt row HEAD no longer declares, naming it",
           "gone/step" in refused and "no longer declares" in refused, refused)
-    head = subprocess.run(["git", "-C", str(HERE), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-    for case, base, rows, needle in (("no base", None, [], "records no gov_commit"),
-                                     ("a descendant", f"{head}~1", [], "is not an ancestor of"),
-                                     ("nothing to roll back", head, [], "nothing to roll back")):
-        base = subprocess.run(["git", "-C", str(HERE), "rev-parse", base], capture_output=True,
-                              text=True).stdout.strip() if base else None
-        try:
-            gk.check_rollback_vintage(HERE.parent.parent, base, head, rows)
-            refused = ""
-        except gk.Refusal as e:
-            refused = str(e)
-        check(f"[dSP-4] S2 check_rollback_vintage refuses {case}", needle in refused, refused)
-    try:
-        gk.check_rollback_vintage(HERE.parent.parent, head, f"{head}", ["a row"])
-        gk.check_rollback_vintage(HERE.parent.parent, head, subprocess.run(
-            ["git", "-C", str(HERE), "rev-parse", f"{head}~1"], capture_output=True, text=True).stdout.strip(), [])
-        refused = ""
-    except gk.Refusal as e:
-        refused = str(e)
-    check("[dSP-4] S2 check_rollback_vintage passes an ancestor, and its own commit with a step to down",
-          refused == "", refused)
+    # Over a scratch repository of two commits, `old` then `new`, never gov's own history, which a
+    # shallow clone or a commit made while the suite runs would move under the arm.
+    with tempfile.TemporaryDirectory(prefix="gk-rb-vintage-") as td:
+        repo = pathlib.Path(td) / "r"
+        us.run_fixture_git(td, "init", "-q", "-b", "main", "r")
+        sha = {}
+        for name in ("old", "new"):
+            us.run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", name)
+            sha[name] = us.run_fixture_git(repo, "rev-parse", "HEAD")
+        for case, base, to, rows, needle in (("no base", None, sha["old"], [], "records no gov_commit"),
+                                             ("a descendant", sha["old"], sha["new"], [], "is not an ancestor of"),
+                                             ("nothing to roll back", sha["new"], sha["new"], [], "nothing to roll back"),
+                                             ("an ancestor", sha["new"], sha["old"], [], ""),
+                                             ("its own commit with a step to down", sha["new"], sha["new"], ["a row"], "")):
+            try:
+                gk.check_rollback_vintage(repo, base, to, rows)
+                refused = ""
+            except gk.Refusal as e:
+                refused = str(e)
+            check(f"[dSP-4] S2 check_rollback_vintage {'refuses' if needle else 'passes'} {case}",
+                  needle in refused if needle else refused == "", refused or "passed")
 
 
 def check_receipt_schema(tmp: pathlib.Path) -> None:
