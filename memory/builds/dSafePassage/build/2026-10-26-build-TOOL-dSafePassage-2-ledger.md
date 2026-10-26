@@ -37,6 +37,17 @@ seconds, and the guard's and the lock's `O_EXCL` creates read `PermissionError`,
 deletion, as `busy`. Three runs of `lock-race` after the fix: each `[0, 1]` or `[1, 0]`, the loser
 `busy`.
 
+A FOLLOW-UP COMMIT acted on the M6 checklist. `containment-tested-one-way`: the walk staged the
+paths a step's before-image lists without asking whether they sit inside the target, and the image
+is the step's own output, so each path now goes through `check_contained` first. A probe of
+`run_step_walk` over a step whose image lists `../x.txt` printed `'../x.txt' is not a path inside the
+target, so no step may write it`; the same probe printed the walk's two other refusals, a receipt
+that `does not read back after the spawn` and a `git add` that `refused the step's writes`, and
+`check_step_walk` gains the escaping case beside them. `two-answers-to-one-question`: the journal's
+suffix was spelled twice, in `STAGING_JOURNAL_REL` and in `release_write_lock`; both read
+`STAGING_JOURNAL_SUFFIX` now. The arm's body was not re-run after the follow-up: the role hook
+refuses a run that loads `selftest.py`, so its three in-process cases are owed at the close.
+
 Owed at the close: the `govkit selftest`, `govkit refusal join`, `govkit acceptance matrix`,
 `govkit selfcheck`, `encoding posture` and `spec tokens` legs, and the RED-first observation of
 `check_step_walk`.

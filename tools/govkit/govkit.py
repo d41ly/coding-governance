@@ -7099,7 +7099,8 @@ WRITE_LOCK_REL = ".governance/outbox/.update.lock"
 # holder's lock, and the staging journal, one `{"path", "oid"}` line appended before each index write,
 # so the run that reclaims a killed holder's lock can tell that holder's staging from an operator's.
 RECLAIM_GUARD_SUFFIX = ".reclaim"
-STAGING_JOURNAL_REL = WRITE_LOCK_REL + ".staged"
+STAGING_JOURNAL_SUFFIX = ".staged"
+STAGING_JOURNAL_REL = WRITE_LOCK_REL + STAGING_JOURNAL_SUFFIX
 # S5. The order an `attended` step's stop writes, keyed by `render_order_slug` of the step id.
 ATTENDED_ORDER_PREFIX = "update-attended-step-"
 
@@ -7541,7 +7542,7 @@ def release_write_lock() -> None:
     if _HELD_LOCK is None:
         return
     try:
-        _HELD_LOCK.with_name(_HELD_LOCK.name + ".staged").unlink(missing_ok=True)
+        _HELD_LOCK.with_name(_HELD_LOCK.name + STAGING_JOURNAL_SUFFIX).unlink(missing_ok=True)
         _HELD_LOCK.unlink()
     except OSError:
         pass

@@ -3521,8 +3521,10 @@ def check_step_walk() -> None:
               "i.write_text(json.dumps({'step': 'fx/x', 'paths': {'x.txt': {'before': None, 'after': None}}}))",
               "{target}"]
     spoils = ["python", "-c", "import sys; open(sys.argv[1], 'w').write('not json')", "{target}/.governance/install.json"]
+    escapes = [a.replace("'x.txt': {", "'../x.txt': {") for a in writes]
     for case, witness, up, needle in (("spoiled", spoils, writes, "does not read back after the spawn"),
-                                      ("unstaged", seen, writes, "refused the step's writes")):
+                                      ("unstaged", seen, writes, "refused the step's writes"),
+                                      ("escaping", seen, escapes, "'../x.txt' is not a path inside the target")):
         with tempfile.TemporaryDirectory(prefix="gk-walk-ref-") as td:
             t = pathlib.Path(td)
             (t / ".governance").mkdir()

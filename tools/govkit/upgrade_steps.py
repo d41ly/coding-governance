@@ -1011,6 +1011,8 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
         image = derive_image_path(target, row.id)
         if image.is_file():
             paths = sorted(json.loads(image.read_text(encoding="utf-8"))["paths"])
+            for p in paths:
+                check_contained(target, p)  # the image is a step's output: no path outside the target
             paths.append(image.relative_to(target).as_posix())
             for p in paths:
                 write_staging_line(target, p)
