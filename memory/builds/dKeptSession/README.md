@@ -5,7 +5,6 @@ opened: 2026-10-21
 streams: kickoff
 roster: KICK
 ids: KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-29
-status: OPEN
 spec-audit: 2026-10-21
 parents: dDeclaredLoop dPlacedRequest
 may: PLAY-dClosedLoop-3
@@ -89,45 +88,102 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams kickoff
+**Build status:** OPEN · 28 unit(s) · node d · opened 2026-10-21 · streams kickoff
 ids KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14
 ids KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28
 ids KICK-dKeptSession-29
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [KICK-dKeptSession-1 — the named presets as data, their completeness check, pair rules and core-only load](spec/2026-10-26-spec-KICK-dKeptSession-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-19 — the catalogue's reader join, and the shrink-only list factory it extracts](spec/2026-10-26-spec-KICK-dKeptSession-19.md) | 2 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-2 — the preset step in dGroundRules' reader](spec/2026-10-26-spec-KICK-dKeptSession-2.md) | 3 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-3 — the charter's preset section: the posture and only the keys that differ](spec/2026-10-26-spec-KICK-dKeptSession-3.md) | 4 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-4 — the preset asked once at govkit intake and written into the scaffolded policy file](spec/2026-10-26-spec-KICK-dKeptSession-4.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-20 — a scenario's preset slot, scoped to the builds placed under it](spec/2026-10-26-spec-KICK-dKeptSession-20.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-16 — the policy namespaces' purposes, reviewed as `memory.map-purpose`'s default says](spec/2026-10-26-spec-KICK-dKeptSession-16.md) | 7 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-12 — a fresh session in the build's worktree recommended until the card-import fixture passes](spec/2026-10-26-spec-KICK-dKeptSession-12.md) | 8 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-13 — the card's pointers, updated at every item boundary by `card.pointers`](spec/2026-10-26-spec-KICK-dKeptSession-13.md) | 9 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-26 — the card showing the build's remaining rework budget beside its pointers](spec/2026-10-26-spec-KICK-dKeptSession-26.md) | 10 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-15 — a compaction's summary read as a lead, never a source](spec/2026-10-26-spec-KICK-dKeptSession-15.md) | 11 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-14 — what a session does as its window fills, by `context.on-full` and `context.threshold`](spec/2026-10-26-spec-KICK-dKeptSession-14.md) | 12 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-9 — orientation cost recorded per stage and held as `orient.budget` says](spec/2026-10-26-spec-KICK-dKeptSession-9.md) | 13 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-28 — a mailbox recipient names a build, a unit, a node by its fleet tag, or the whole project](spec/2026-10-26-spec-KICK-dKeptSession-28.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-22 — each message's id derived from what it says, never from its sender's session, and a retried post refused across the build's session refs](spec/2026-10-26-spec-KICK-dKeptSession-22.md) | 15 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-5 — the mailbox per build: one append-only ref per writing session, closed kinds, read and disposed at every transition](spec/2026-10-26-spec-KICK-dKeptSession-5.md) | 16 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-23 — every mail write appended to the change feed once its ref update lands, inside the feed's census](spec/2026-10-26-spec-KICK-dKeptSession-23.md) | 17 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-27 — each message carrying its session's sequence number, a take-over its predecessor, and an interface notice its content key](spec/2026-10-26-spec-KICK-dKeptSession-27.md) | 18 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-24 — a mail deadline judged by the observer clock: `flow.wait-ceiling` declared on each message, the asker's default past it](spec/2026-10-26-spec-KICK-dKeptSession-24.md) | 19 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-10 — the mailbox read at every item boundary: `mailbox.reads` arming the position engine's mail interrupt, with the `intake` kind](spec/2026-10-26-spec-KICK-dKeptSession-10.md) | 20 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-25 — `mailbox.answer`: a `question` to a build answered by its owning role, or by the asker's default until `next` dispatches it, the waiting build's lease renewed](spec/2026-10-26-spec-KICK-dKeptSession-25.md) | 21 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-21 — news shown as `mailbox.notice` says: one bounded fetch at each item boundary, a tool-call hook reading the local copy, and the live ring's payload](spec/2026-10-26-spec-KICK-dKeptSession-21.md) | 22 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-6 — live delivery where the harness has it: the post's tail rings the channels `deps.messaging` picks, with only the ref and the id](spec/2026-10-26-spec-KICK-dKeptSession-6.md) | 23 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-7 — dependency coordination: `deps.coordination` switching the dependency gate by the parent's lease, `deps.early-build` admitting Build, and the `confirmed`, `changed` and `landed` notices](spec/2026-10-26-spec-KICK-dKeptSession-7.md) | 24 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight](spec/2026-10-26-spec-KICK-dKeptSession-8.md) | 25 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-11 — progress reported by `notify.owner`: one `progress —` line at the events the value selects](spec/2026-10-26-spec-KICK-dKeptSession-11.md) | 26 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-17 — the attendance rule: `attendance` adds only the owner's interactions, its arm refusing any that swaps an actor](spec/2026-10-26-spec-KICK-dKeptSession-17.md) | 27 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [KICK-dKeptSession-18 — the `repeat` disposition and its `none` row, joined both ways to what the claim admits](spec/2026-10-26-spec-KICK-dKeptSession-18.md) | 28 | 2 | OPEN | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 2 record folder(s).
+Records: 14 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: KICK-dKeptSession-1 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-2
+KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7
+KICK-dKeptSession-8 KICK-dKeptSession-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 28 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 28 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 28
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 28 (cl-dClosedLoop-0139, cl-dClosedLoop-0140, cl-dClosedLoop-0141, cl-dClosedLoop-0142, cl-dClosedLoop-0143, cl-dClosedLoop-0144, cl-dClosedLoop-0145, cl-dClosedLoop-0146, cl-dClosedLoop-0147, cl-dClosedLoop-0148, cl-dClosedLoop-0149, cl-dClosedLoop-0150, cl-dClosedLoop-0151,
-  cl-dClosedLoop-0152, cl-dClosedLoop-0153, cl-dClosedLoop-0154, cl-dClosedLoop-0155, cl-dClosedLoop-0156, cl-dClosedLoop-0157, cl-dClosedLoop-0158, cl-dClosedLoop-0159, cl-dClosedLoop-0160, cl-dClosedLoop-0161, cl-dClosedLoop-0162, cl-dClosedLoop-0504, cl-dClosedLoop-0163, cl-dClosedLoop-0164,
-  cl-dClosedLoop-0165)
+- uncarried: 0 (none)
 - stale: 0 (none)
 - ambiguous: 0 (none)
-- owned nodes no spec names: item.mailbox.answer, policy-key.actions.free, policy-key.attendance, policy-key.card.pointers, policy-key.context.on-full, policy-key.context.threshold, policy-key.deps.coordination, policy-key.deps.early-build, policy-key.deps.messaging,
-  policy-key.mailbox.fetch-seconds, policy-key.mailbox.notice, policy-key.mailbox.reads, policy-key.notify.owner, policy-key.orient.budget, policy-key.preset, record-kind.mailbox-message
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0141, cl-dClosedLoop-0142, cl-dClosedLoop-0144, cl-dClosedLoop-0153, cl-dClosedLoop-0157, cl-dClosedLoop-0158, cl-dClosedLoop-0160, cl-dClosedLoop-0161, cl-dClosedLoop-0163, cl-dClosedLoop-0165
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `KICK-dKeptSession-1` | no |
+| 2 | `KICK-dKeptSession-19` | no |
+| 3 | `KICK-dKeptSession-2` | no |
+| 4 | `KICK-dKeptSession-3` | no |
+| 5 | `KICK-dKeptSession-4` | no |
+| 6 | `KICK-dKeptSession-20` | no |
+| 7 | `KICK-dKeptSession-16` | no |
+| 8 | `KICK-dKeptSession-12` | no |
+| 9 | `KICK-dKeptSession-13` | no |
+| 10 | `KICK-dKeptSession-26` | no |
+| 11 | `KICK-dKeptSession-15` | no |
+| 12 | `KICK-dKeptSession-14` | no |
+| 13 | `KICK-dKeptSession-9` | no |
+| 14 | `KICK-dKeptSession-28` | no |
+| 15 | `KICK-dKeptSession-22` | no |
+| 16 | `KICK-dKeptSession-5` | no |
+| 17 | `KICK-dKeptSession-23` | no |
+| 18 | `KICK-dKeptSession-27` | no |
+| 19 | `KICK-dKeptSession-24` | no |
+| 20 | `KICK-dKeptSession-10` | no |
+| 21 | `KICK-dKeptSession-25` | no |
+| 22 | `KICK-dKeptSession-21` | no |
+| 23 | `KICK-dKeptSession-6` | no |
+| 24 | `KICK-dKeptSession-7` | no |
+| 25 | `KICK-dKeptSession-8` | no |
+| 26 | `KICK-dKeptSession-11` | no |
+| 27 | `KICK-dKeptSession-17` | no |
+| 28 | `KICK-dKeptSession-18` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
