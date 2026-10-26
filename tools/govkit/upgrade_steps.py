@@ -60,7 +60,9 @@ WHAT A STEP CAN REACH (TOOL-dSafePassage-7). `run_step_isolated` is the one spaw
 from gov's checkout root, under an environment built from the `STEP_ENV_KEEP` allowlist and never
 from a copy of the parent's, home and temp in a fresh scratch, git's system and global config
 unread, `core.hooksPath` an empty directory and `credential.helper` empty through
-`GIT_CONFIG_COUNT`, and a leading `python` run `-I`. A row declaring `needs-target = true` is
+`GIT_CONFIG_COUNT`, and a leading `python` run `-I`. The target's own config, which that leaves
+live, refuses the step before any spawn where it declares a key `TARGET_CONFIG_REFUSED` matches
+(TOOL-dSafePassage-24). A row declaring `needs-target = true` is
 `attended` and spawns nothing. `check_needs_target` runs a row beside planted target hooks and
 modules and reads `isolated`, `breach`, `needs-target` or `attended`; `fixture isolation` observes
 all of it, a `-stub` plant swapping one half of the contract inside the fixture process only.
@@ -84,7 +86,7 @@ first down and finishes it before `update` returns. `fixture rollback|rollback-u
 
 Exit 0 clean, 1 a frozen-row finding or no base to compare against, 2 a refused row, an unreadable
 revision or a usage error. `fixture isolation` exits 0 green and 1 on a red, a `-stub` plant's,
-`needs-target`'s, `breach`'s and `token`'s by design; `fixture walk|lock|update|rollback|
+`needs-target`'s, `breach`'s, `token`'s and every `local-*` plant's by design; `fixture walk|lock|update|rollback|
 rollback-update` exit as the walk, the take, the reverse walk or `update` exits (a refusing
 `rollback-update` plant 1), and 1 with `<family>: FAILED` on an unmet expectation.
 """
@@ -163,7 +165,18 @@ CLIENT_HOOKS = ("applypatch-msg", "pre-applypatch", "post-applypatch", "pre-comm
                 "sendemail-validate", "fsmonitor-watchman", "p4-changelist", "p4-prepare-changelist",
                 "p4-post-changelist", "p4-pre-submit", "post-index-change", "reference-transaction")
 FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "credential-stub",
-                  "needs-target", "breach", "token", "callers")
+                  "needs-target", "breach", "token", "callers", "local-filter", "local-filter-stub",
+                  "local-process", "local-process-stub", "local-fsmonitor", "local-fsmonitor-stub",
+                  "local-include", "local-include-stub")
+# The target's own config keys git runs as a program or sends as a credential (TOOL-dSafePassage-24,
+# its §4 "Data model"), matched case-insensitively on the key git prints; `core.fsmonitor` only
+# where its value is not a git false. NOT covered: `merge.<driver>.driver`, which a step never
+# merges into and gov's own checkout declares, and a key git adds later as an executor until it is
+# listed here.
+TARGET_CONFIG_REFUSED = re.compile(r"filter\..+\.(?:clean|smudge|process)|core\.fsmonitor|diff\.external"
+                                   r"|diff\..+\.(?:textconv|command)|core\.(?:sshcommand|askpass)"
+                                   r"|http\.(?:.+\.)?extraheader|credential\..+", re.I)
+GIT_FALSE = ("false", "no", "off", "0", "")
 # How much later than a lock's `started` a census row of its pid may estimate its creation and still
 # be the holder (TOOL-dSafePassage-22 S3). It covers the census's rounding of `age_s` to whole
 # seconds and no latency: the clock is read before the census, so a slow census errs toward live.
@@ -788,6 +801,36 @@ def derive_step_mode(row: StepRow) -> str:
     return "attended" if row.needs_target else "isolated"
 
 
+def read_target_local_config(target) -> list[tuple[str, str, str | None]] | str:
+    """The target's own config rows (TOOL-dSafePassage-24 S1): `git config --list --show-scope
+    --show-origin --includes -z` under `build_step_env`'s environment, so system and global are off,
+    keeping the `local` and `worktree` rows, an included file's among them, as (origin file, key,
+    value or None for a bare key). A read that fails returns git's exit and stderr as a string."""
+    with tempfile.TemporaryDirectory(prefix="gk-cfg-", ignore_cleanup_errors=True) as td:
+        p = subprocess.run(["git", "-C", str(target), "config", "--list", "--show-scope", "--show-origin",
+                            "--includes", "-z"], env=build_step_env(td), stdin=subprocess.DEVNULL,
+                           capture_output=True)
+    if p.returncode != 0:
+        return f"exits {p.returncode}: {p.stderr.decode('utf-8', 'replace').strip()}"
+    f, rows = p.stdout.decode("utf-8", "replace").split("\0"), []
+    for scope, origin, kv in zip(f[0::3], f[1::3], f[2::3]):
+        if scope in ("local", "worktree"):
+            key, nl, value = kv.partition("\n")
+            rows.append((origin.removeprefix("file:"), key, value if nl else None))
+    return rows
+
+
+def check_target_local_config(target) -> list[str]:
+    """Each kept row of `read_target_local_config` whose key `TARGET_CONFIG_REFUSED` matches, as
+    `<key> in <file>`, a `core.fsmonitor` holding a git false excepted (S2); a read that failed is
+    the one entry, naming git's exit."""
+    rows = read_target_local_config(target)
+    if isinstance(rows, str):
+        return [f"`git config --list` {rows}"]
+    return [f"{key} in {origin}" for origin, key, value in rows if TARGET_CONFIG_REFUSED.fullmatch(key)
+            and not (key.lower() == "core.fsmonitor" and value is not None and value.strip().lower() in GIT_FALSE)]
+
+
 def run_step_isolated(row: StepRow, phase: str, target, gov_root) -> dict:
     """Run `phase` of `row` under the contract: the step kind's ONE spawn of a step argv (S3), so the
     walk, the reverse walk, gov first and the leg inherit the contract by calling it.
@@ -796,11 +839,17 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root) -> dict:
     after it, and `resolve_step_argv`'s argv; output decoded as `run_target_argv` decodes it.
     Returns `{"verdict": "ok" | "failed" | "attended", "rc", "tail"}`, `tail` stderr's last 20
     lines. A row that needs target code is `attended` and spawns nothing; a spawn error is
-    `failed` with `rc` None; a phase with no argv is a refusal."""
+    `failed` with `rc` None; a phase with no argv is a refusal, and so is a target whose own git
+    config `check_target_local_config` finds an executor or a credential in (TOOL-dSafePassage-24)."""
     if derive_step_mode(row) == "attended":
         return {"verdict": "attended", "rc": None, "tail": ""}
     if phase not in STEP_PHASES or not isinstance(getattr(row, phase), list):
         raise Refusal(f"{row.id}: no `{phase}` argv to run; a step runs one of {', '.join(STEP_PHASES)}")
+    found = check_target_local_config(target)
+    if found:
+        raise Refusal(f"{row.id} {phase}: the target's own git config declares what git runs as a program "
+                      f"or sends as a credential, {', '.join(found)}, so nothing was spawned: remove it, "
+                      f"or run the step attended")
     gov_root = pathlib.Path(gov_root).resolve()
     ctx = derive_step_context(row, target, gov_root)
     with tempfile.TemporaryDirectory(prefix="gk-step-", ignore_cleanup_errors=True) as td:
@@ -1449,7 +1498,7 @@ def run_isolation_fixture(plant: str | None) -> int:
               f"sanctioned site is inside run_step_isolated" + ("; the probe read nothing" if not sites else ""))
         return 1
     g, saved_env = globals(), dict(os.environ)
-    saved = {k: g[k] for k in ("build_step_env", "resolve_step_argv")}
+    saved = {k: g[k] for k in ("build_step_env", "resolve_step_argv", "check_target_local_config")}
     for k in [k for k in os.environ if k.upper().startswith("GIT_")]:
         del os.environ[k]  # a calling hook's GIT_DIR would point every fixture git call elsewhere
     try:
@@ -1598,6 +1647,54 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         except Refusal as e:
             print(f"isolation: {tok.id} · refused · {e}")
         expect(not report.exists(), "the row holding {unknown} spawned")
+        rc = 1
+    elif plant.startswith("local-"):
+        # TOOL-dSafePassage-24 S4: an executor in the target's own config, each canary naming itself.
+        kind = plant.removeprefix("local-").removesuffix("-stub")
+        canaries.mkdir()
+
+        def runs(name: str, then: str = "") -> str:
+            return f"\": > '{(canaries / name).as_posix()}'{then}\""
+
+        cfg, included = target / ".git" / "config", tmp / "included.gitconfig"
+        planted = {"filter": f"[filter \"canary\"]\n\tclean = {runs('filter-clean', '; cat')}\n",
+                   "process": f"[filter \"canary\"]\n\tprocess = {runs('filter-process')}\n",
+                   "fsmonitor": f"[core]\n\tfsmonitor = {runs('fsmonitor')}\n"}
+        if kind == "include":
+            included.write_text(planted["filter"], encoding="utf-8", newline="\n")
+            cfg.write_text(f"[include]\n\tpath = {included.as_posix()}\n", encoding="utf-8", newline="\n")
+        else:
+            with cfg.open("a", encoding="utf-8", newline="\n") as f:
+                f.write(planted[kind])
+        if kind != "fsmonitor":
+            (target / ".gitattributes").write_text("*.txt filter=canary\n", encoding="utf-8", newline="\n")
+        if plant.endswith("-stub"):
+            g["check_target_local_config"] = lambda t: []
+        key = {"filter": "filter.canary.clean", "process": "filter.canary.process",
+               "fsmonitor": "core.fsmonitor", "include": "filter.canary.clean"}[kind]
+        where = included.as_posix() if kind == "include" else ".git/config"
+        try:
+            run_clean()
+            refused = ""
+        except Refusal as e:
+            refused = str(e)
+            print(f"isolation: {clean.id} · refused · {e}")
+        hit = read_plant_canaries(canaries)
+        print(f"isolation: {kind} canary: {'present · ' + ', '.join(hit) if hit else 'absent'}")
+        if plant.endswith("-stub"):
+            expect(not refused and report.exists(), "the stubbed check still refused, so nothing spawned")
+        else:
+            expect(f"{key} in {where}" in refused, f"the step was not refused naming {key} in {where}")
+            expect(not report.exists() and not hit, "the refused step spawned, or its executor ran")
+        if kind == "fsmonitor" and not plant.endswith("-stub"):
+            cfg.write_text(cfg.read_text(encoding="utf-8").replace(planted["fsmonitor"], "[core]\n\tfsmonitor = false\n"),
+                           encoding="utf-8", newline="\n")
+            try:
+                rep = run_clean()
+                print(f"isolation: core.fsmonitor=false · not refused · git add exits {rep.get('add')}")
+                expect(rep.get("add") == 0, "core.fsmonitor=false: clean's git add did not run")
+            except Refusal as e:
+                expect(False, f"core.fsmonitor=false was refused: {e}")
         rc = 1
     for f in fails:
         print(f"isolation: FAILED · {f}")

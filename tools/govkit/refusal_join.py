@@ -38,7 +38,12 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 319    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 320    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 319 -> 320 at TOOL-dSafePassage-24, BY THE MEASURED DELTA: the matcher's two shapes read 53 in
+# `upgrade_steps.py` at that unit's base `a182f2c2` and 54 on the tree it left, by an AST probe of
+# that file alone. The one is `run_step_isolated`'s refusal of a target whose own git config
+# declares an executor or a credential, reached by `check_step_isolation`'s `local-*` plants; a
+# `git config` that fails to read is that same refusal, so it adds no site.
 # 314 -> 319 at TOOL-dSafePassage-4, BY THE MEASURED DELTA: the matcher read 384 at that unit's base
 # `f8262323` and 389 on the tree it left. Five are in the engine: `check_rollback_vintage`'s three
 # (no gov_commit, a --to that is not an ancestor, nothing to roll back), reached in process by

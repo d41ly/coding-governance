@@ -3406,7 +3406,9 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-7 AC1 to AC7 — `upgrade_steps.py fixture isolation` with every plant: each
     half of the contract green, each `-stub` plant red naming its canary, the needs-target check's
     four verdicts, the unknown-token refusal, and the callers probe green over the shipped files and
-    red over a planted spawn of `row["up"]`. The phase-without-argv refusal is reached in process."""
+    red over a planted spawn of `row["up"]`. The phase-without-argv refusal is reached in process.
+    TOOL-dSafePassage-24 AC1 to AC4 ride the same fixture: the four `local-*` plants refused, their
+    `-stub` twins red naming the executor's canary."""
     us_py = HERE / "upgrade_steps.py"
 
     def fixture(py: pathlib.Path, *plant: str) -> tuple[int, str]:
@@ -3437,6 +3439,24 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         check(f"[dSP-7] fixture isolation {' '.join(plant) or '(base)'} exits {want} and names "
               f"{', '.join(needles)}", rc == want and "isolation: FAILED" not in out
               and all(n in out for n in needles), out)
+
+    # TOOL-dSafePassage-24 AC1 to AC4: an executor in the target's own config refuses the step before
+    # any spawn, naming the key and its file; each `-stub` twin skips the check and its canary runs.
+    refused = "fixture/clean · refused · fixture/clean up: the target's own git config declares what git runs"
+    for plant, needles in (
+            ("local-filter", (refused, "filter.canary.clean in .git/config", "filter canary: absent")),
+            ("local-filter-stub", ("fixture/clean · up · ok", "filter canary: present · filter-clean")),
+            ("local-process", (refused, "filter.canary.process in .git/config", "process canary: absent")),
+            ("local-process-stub", ("fixture/clean · up · ok", "process canary: present · filter-process")),
+            ("local-fsmonitor", (refused, "core.fsmonitor in .git/config", "fsmonitor canary: absent",
+                                 "core.fsmonitor=false · not refused · git add exits 0")),
+            ("local-fsmonitor-stub", ("fixture/clean · up · ok", "fsmonitor canary: present · fsmonitor")),
+            ("local-include", (refused, "filter.canary.clean in ", "/included.gitconfig, so nothing was spawned",
+                               "include canary: absent")),
+            ("local-include-stub", ("fixture/clean · up · ok", "include canary: present · filter-clean"))):
+        rc, out = fixture(us_py, plant)
+        check(f"[dSP-24] fixture isolation {plant} exits 1 and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles), out)
 
     # AC6's red: the shipped pair copied, a direct spawn of `row["up"]` planted into the copy.
     planted = tmp / "callers"

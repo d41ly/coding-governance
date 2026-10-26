@@ -45,6 +45,16 @@ starts it:
   `credential.helper` to nothing. A step's `git add` or `git mv` fires none of your hooks.
 - **Python runs isolated (`-I`)**: it ignores `PYTHONPATH` and imports nothing from your tree or
   the working directory.
+- **Your repository's own config is read first, and can refuse the step.** Git has no switch that
+  drops a repository's config, and a step editing your repository needs it, so before every phase
+  gov reads it, `include.path` files included, and refuses the step, spawning nothing, when it
+  declares a key git runs as a program or sends as a credential: `filter.<x>.clean`, `smudge` or
+  `process`, `core.fsmonitor` set to anything but false, `diff.external`, `diff.<x>.textconv` or
+  `command`, `core.sshCommand`, `core.askPass`, `http.extraheader` or `http.<url>.extraheader`
+  (which actions/checkout persists), and any `credential.<anything>`. The refusal names each key
+  and the file declaring it. A repository with a filter it relies on, Git LFS's say, has every step
+  refused: remove the key for the run, or run the step attended. Not covered: `merge.<driver>.driver`,
+  since a step never merges, and a key git adds later as a program until gov lists it.
 
 A step that needs your repository's own code or hooks declares `needs-target = true`. The runner
 spawns nothing for such a step and reads it `attended`: a person runs it. The `update` walk still
