@@ -1,6 +1,6 @@
 # KICK-dKeptSession-36 — the transition guard runs the driver through a bash that shares this filesystem, never the bare name, and an unresolved shell refuses
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 17 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,9 @@
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-30-promoted-fix-return.md](../build/2026-10-26-build-KICK-dKeptSession-30-promoted-fix-return.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-30 |
 | [2026-10-26-build-KICK-dKeptSession-36-deviation-361.md](../build/2026-10-26-build-KICK-dKeptSession-36-deviation-361.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-36-deviation-362.md](../build/2026-10-26-build-KICK-dKeptSession-36-deviation-362.md) | deviation | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-30 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 KICK-dKeptSession-44 |
 
@@ -40,9 +43,15 @@ after it (order 17).
   `<cand> -c :` exits 0 and, on a Windows host, `uname -s` answers `MINGW` or `MSYS`. No candidate
   raises `LoopError`, never a fall-back to the bare name. Observed by AC1 and AC2.
 - **S2** — id 22. The guard's argv. `KICK-dKeptSession-5` S9's step runs `[resolve_bash(), <driver>,
-  "--mail", "read", <slug>, "--open"]`, `<driver>` an absolute path. Observed by AC3.
-- **S3** — id 22. Absent is a file test. The guard passes as "an absent driver" only when
-  `os.path.isfile(<driver>)` is false, tested in Python before any spawn. A present driver with no
+  "--mail", "read", <slug>, "--open"]`, `<driver>` being `resolve_kit_dir("unattended", "unattended.sh",
+  here) / "unattended.sh"`, found through `loop_lib.py`'s one inline `resolve_kit_dir` block
+  (TOOL-dDeclaredLoop-12 S4), the locator TOOL-dDeclaredLoop-52 S3 reads the same driver through: a kit
+  imports no sibling kit, and the block returns an absolute directory. Observed by AC3.
+- **S3** — id 22. Absent is the locator's refusal, tested in Python before any spawn. The guard passes
+  as "an absent driver" only when `resolve_kit_dir` raises its `LookupError`
+  (`tools/lib/resolve_kit_dir.py:23,49`), the NOTE carrying that error's text, which names the kit and
+  the three places looked; `os.path.isfile` is applied only to the resolved path, a resolved directory
+  whose `unattended.sh` is gone refusing as below rather than passing. A present driver with no
   usable shell refuses with exit 2, `refused — <slug> · mail unknown: <the LoopError's why>`, and
   writes nothing. Observed by AC4.
 - **S4** — id 22. `KICK-dKeptSession-5` S9's bare `bash` is superseded by name here, and that unit's
@@ -78,6 +87,10 @@ after it (order 17).
   corpus_ids, handoff, profile_bar, regen and three selftests, with a nested
   one in `tools/settings-merge.py`.
 - `KICK-dKeptSession-5` S9: "`mail — off`, an absent driver and zero rows each pass" (spec-5 S9).
+- The loop kit reaches a sibling only by subprocess through its one inline `resolve_kit_dir` block
+  (TOOL-dDeclaredLoop-12 S4), and TOOL-dDeclaredLoop-52 S3 finds this driver with
+  `resolve_kit_dir("unattended", "unattended.sh", here)`, printing `unarmed` where it does not resolve;
+  the block refuses with `LookupError` and never guesses a prefix (`tools/lib/resolve_kit_dir.py:23,49`).
 
 ### Inventory
 
@@ -123,9 +136,12 @@ None: the guard is new in `KICK-dKeptSession-5`.
   it raises `LoopError` naming `GOV_BASH`.
   Red when: an unusable override falls through to another candidate.
 - **AC3** — When the selftest records the guard's subprocess argv over a fixture build, `argv[0]` is
-  `resolve_bash()`'s path and `argv[1]` the driver's absolute path.
+  `resolve_bash()`'s path and `argv[1]` the absolute path `resolve_kit_dir("unattended",
+  "unattended.sh", here)` resolved, joined with `unattended.sh`.
   Red when: `argv[0]` is `bash`, as a copy of the base guard shows.
-- **AC4** — When the selftest runs the guard with the driver file removed, it passes with the NOTE;
+- **AC4** — When the selftest runs the guard with the unattended kit removed from every place
+  `resolve_kit_dir` searches (the receipt row, `<here>/unattended/` and `<here>/../unattended/`), it
+  passes with the NOTE naming the kit;
   with the driver present and `GOV_BASH` planted unusable, it exits 2 printing `mail unknown` and
   writes no transition.
   Red when: a present driver with no usable shell passes as absent.
@@ -145,6 +161,10 @@ none
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's H4 (id 22).
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-56` mirrored, the other ends of
   the edges the round-1 promotions' audit's disposal declared
+- rev-3 · 2026-10-26 · S2 · S3 · AC3 · AC4 · §4 Evidence · re-grounded on the cross-check record
+  `2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck`, row 100: `<driver>` is found through
+  `loop_lib.py`'s inline `resolve_kit_dir`, an absent driver is its `LookupError`, and AC4's plant
+  removes the kit from every place the block searches.
 
 ## 10. Reuse audit
 

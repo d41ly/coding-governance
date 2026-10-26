@@ -1,6 +1,6 @@
 # KICK-dKeptSession-44 — the round-1 spec audit's 42 minor findings, closed after every unit they land on is built
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 30 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 30 · advances KICK-dKeptSession-29
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,9 @@
 | [2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md](../build/2026-10-26-build-KICK-dKeptSession-1-agent-ledger.md) | journal | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-32 KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-39 KICK-dKeptSession-40 KICK-dKeptSession-41 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-45 KICK-dKeptSession-46 KICK-dKeptSession-47 KICK-dKeptSession-48 KICK-dKeptSession-49 KICK-dKeptSession-50 KICK-dKeptSession-51 KICK-dKeptSession-52 KICK-dKeptSession-53 KICK-dKeptSession-54 KICK-dKeptSession-55 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-58 KICK-dKeptSession-59 KICK-dKeptSession-60 KICK-dKeptSession-61 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
 | [2026-10-26-build-KICK-dKeptSession-30-promoted-fix-return.md](../build/2026-10-26-build-KICK-dKeptSession-30-promoted-fix-return.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-30 |
 | [2026-10-26-build-KICK-dKeptSession-44-deviation-441.md](../build/2026-10-26-build-KICK-dKeptSession-44-deviation-441.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-44-deviation-442.md](../build/2026-10-26-build-KICK-dKeptSession-44-deviation-442.md) | deviation | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-30-promoted-fix-brief.md) | research | KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-30 |
 | [2026-10-26-review-KICK-dKeptSession-30-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-30-spec-audit.md) | spec-audit | KICK-dKeptSession-33 KICK-dKeptSession-34 KICK-dKeptSession-40 KICK-dKeptSession-32 KICK-dKeptSession-37 KICK-dKeptSession-38 KICK-dKeptSession-30 KICK-dKeptSession-31 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-35 KICK-dKeptSession-42 KICK-dKeptSession-43 KICK-dKeptSession-41 |
 
@@ -66,8 +69,11 @@ text, it does so by name here, and that unit's acceptance ledger answers the sup
   `BOUNDARY_BOUND_S`' 10: each step's timeout is the lesser of its own bound and the time left, the
   mail reads of units 5 and 21 run with `--local`, and a publish with less than its bound left is
   skipped with one line. Observed by AC6.
-- **S9** — id 10, M7. `mail-notice.js` binds its build through `readCard` and `extractRouteUnits`,
-  exported by `tools/hooks/scratch-guard.js:1615`, and falls back to `resolveLease`. Observed by AC7.
+- **S9** — id 10, M7. `mail-notice.js` binds its build through `readCard` and `extractRouteUnits`, and
+  falls back to `resolveLease`. The two functions are the ones `tools/hooks/scratch-guard.js:1615`
+  exports, carried inline in `mail-notice.js` as KICK-dKeptSession-56 S23 states, never required: a
+  kit imports no sibling kit (TOOL-dGroundRules-1 §4; TOOL-dDeclaredLoop-12 S4), and the unattended
+  kit declares no edge to the hooks kit (`tools/unattended/kit.toml:12`). Observed by AC7.
 - **S10** — id 11, M8. `KICK-dKeptSession-13` S6 rewrites the `item —` line locally, in the session
   card and the build card file, at every crossing under both values of `card.pointers`;
   `at-transitions` gates only the publish. Unit 8's plants run under both values. Observed by AC8.
@@ -401,13 +407,18 @@ New arm: tools/runlog/selftest.py · covers AC9 AC34 · the two orient plants an
 - rev-1 · 2026-10-26 · initial draft, the round-1 spec audit's minors batch.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-56` mirrored, the other ends of
   the edges the round-1 promotions' audit's disposal declared
+- rev-3 · 2026-10-26 · S9 · §10 · re-grounded on the cross-check record
+  `2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck`, row 105: `mail-notice.js` carries
+  `readCard` and `extractRouteUnits` inline, aligned with KICK-dKeptSession-56 S23, and requires no
+  file of the hooks kit.
 
 ## 10. Reuse audit
 
 Every item extends the seam its repaired unit names, and the cross-cutting ones extend existing
 mechanisms: `fail` and the retirement review for S23 (`tools/memory-tree/README.md` "The ceiling"),
 the re-stamp of TOOL-dGroundRules-86 for S24, `map_lib.regen_cmd()` for S25
-(`tools/codebase-map/map_lib.py:149`), `readCard` and `extractRouteUnits` for S9, `_derive_quartiles`
+(`tools/codebase-map/map_lib.py:149`), `readCard` and `extractRouteUnits` for S9, carried inline as
+`tools/unattended/gate-guard.js:173-177` carries its copy of a `scratch-guard.js` function, `_derive_quartiles`
 for S40, and the index generator's inversion of `parents:` for S20. `python
 tools/codebase-map/reuse_lookup.py "resolve the bash that shares this filesystem by running each
 candidate"` ranked the eight `resolve_bash` copies, so S16 and S17 take unit 36's rather than a ninth.

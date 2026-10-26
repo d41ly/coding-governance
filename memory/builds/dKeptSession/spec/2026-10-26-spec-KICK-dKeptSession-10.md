@@ -1,6 +1,6 @@
 # KICK-dKeptSession-10 — the mailbox read at every item boundary: `mailbox.reads` arming the position engine's mail interrupt, with the `intake` kind
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 20 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 20 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0148@ab3d7b8c whole
 **Carries:** node:policy-key.mailbox.reads
@@ -13,6 +13,9 @@
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-b.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-b.md) | research | KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-1 |
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-10-deviation-101.md](../build/2026-10-26-build-KICK-dKeptSession-10-deviation-101.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-10-deviation-102.md](../build/2026-10-26-build-KICK-dKeptSession-10-deviation-102.md) | deviation | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -47,8 +50,10 @@ a session that does not hold the build's lease sends to the session that does.
   A mail interrupt changes no answer; refusing a transition over an open message is unit 5's guard.
   Observed by AC1.
 - **S3** — `mailbox.reads` (`every-item`, `transitions-only`, `every-item-amendments-at-transitions`;
-  default `every-item`), read through I8's Python form, `resolve("mailbox.reads")`
-  (TOOL-dGroundRules-2 S6); a refusal reads the catalogue default and prints one NOTE naming the key.
+  default `every-item`), read by running `<sys.executable> <prefix>/policy/policy.py get mailbox.reads`
+  as a subprocess (TOOL-dGroundRules-2 S7's verb), `policy.py` found through `loop_lib.py`'s inline
+  `resolve_kit_dir` block (TOOL-dDeclaredLoop-12 S4), never an import; a refusal, or no policy kit
+  found, reads the catalogue default and prints one NOTE naming the key.
   `every-item` lists every kind. `transitions-only` runs no read and prints one line,
   `interrupt — mail · read at transitions (mailbox.reads: transitions-only)`.
   `every-item-amendments-at-transitions` lists every kind but `intake` and prints one line counting the
@@ -86,7 +91,7 @@ a session that does not hold the build's lease sends to the session that does.
 
 - **consumes-from** `KICK-dKeptSession-13` — `derive_item_boundary` and the `--card --boundary` verb, the one item-boundary point the read runs inside
 - **consumes-from** `KICK-dKeptSession-5` — `read_mailbox`, read through `--mail read --open`, and the `intake` kind in I18's list
-- **consumes-from** external — TOOL-dDeclaredLoop-7's `derive_interrupts` and interrupt shape, TOOL-dDeclaredLoop-12's `resolve_kit_dir` pattern, and TOOL-dGroundRules-2's `resolve`
+- **consumes-from** external — TOOL-dDeclaredLoop-7's `derive_interrupts` and interrupt shape, TOOL-dDeclaredLoop-12's `resolve_kit_dir` pattern, and TOOL-dGroundRules-2's `policy.py get`, run as a subprocess
 - **hands-off** external — dDeclaredLoop's next pass amends TOOL-dDeclaredLoop-7 S4's text to name dKeptSession as the build arming the mailbox interrupt (§8 F3, an ask)
 - **hands-off** `KICK-dKeptSession-44` — `read_mail_interrupts` and its `--local` step, the batch's S3, S16 and S19 (ids 6, 23, 33)
 
@@ -152,7 +157,8 @@ no line.
 
 ## 5. Production-readiness checklist
 
-- security — read-only: one subprocess of the unattended kit with fixed argv; no shell string.
+- security — read-only: one subprocess each of the unattended kit and the policy kit with fixed argv;
+  no shell string.
 - perf / scale — one `--mail read` per crossing, none without one and none under `transitions-only`;
   with the notice's fetch, the read is local.
 - error / empty / loading states — a missing kit or a failed read prints `unarmed` with its cause and
@@ -238,6 +244,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC2 · the `mai
   v2:1233 and v2:1555.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-44` mirrored, the other ends of
   the edges the round-1 spec audit's promoted units declare; no other section moved.
+- rev-3 · 2026-10-26 · §2 S3 · §3 Edges · §5 · re-grounded on dDeclaredLoop at `783f1ad3a` by the
+  cross-check record `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, row 39:
+  `mailbox.reads` is read by `policy.py get` as a subprocess through `loop_lib.py`'s inline
+  `resolve_kit_dir`, never an in-process `resolve`.
 
 ## 10. Reuse audit
 

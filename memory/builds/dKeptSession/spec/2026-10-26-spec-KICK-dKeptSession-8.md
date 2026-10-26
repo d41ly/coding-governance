@@ -1,6 +1,6 @@
 # KICK-dKeptSession-8 — `actions.free` at the tool call: every write, spawn, commit or push belongs to the item in flight
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 25 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 25 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0146@a9c32df5 whole
 **Carries:** node:policy-key.actions.free
@@ -13,6 +13,9 @@
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-26 KICK-dKeptSession-1 |
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-8-deviation-81.md](../build/2026-10-26-build-KICK-dKeptSession-8-deviation-81.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-8-deviation-82.md](../build/2026-10-26-build-KICK-dKeptSession-8-deviation-82.md) | deviation | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-11 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -56,13 +59,17 @@ v2:1175, strict's `item-reads-only` at v2:1500).
   `<git-common-dir>/gov-free-actions.log`. A refusal exits 2 naming `actions.free`, its value, the class,
   the tool and `item none`, and its remedy: run the act inside the item that owns it, or file it as an
   intake. Observed by AC1, AC2, AC3 and AC4.
-- **S5** — The value, read once per armed call through dGroundRules' JS reader
-  `readPolicy("actions.free", { repo })` (TOOL-dGroundRules-5 S5, I8), located by `resolvePolicyHelper()`:
-  the policy kit's `policy-mirror.js` beside the hooks kit, the location rule 7 of `tools/hooks/agent-cap.js`
-  reads as its `POLICY_HELPER` (TOOL-dGroundRules-10 S5). This is that rule's second instance, so
-  `resolvePolicyHelper` is exported from `scratch-guard.js` and agent-cap's constant is re-pointed to it.
-  The value is read only when the pointer reads `none`. With no helper, or a `PolicyRefusal`, the arm reads
-  the catalogue default `read-only-probes` and prints one `NOTE` naming why. Observed by AC7.
+- **S5** — The value, read once per armed call by running dGroundRules' JS reader's own CLI as a
+  subprocess, `node <policy kit>/policy-mirror.js get actions.free --repo <repo>` (TOOL-dGroundRules-5 S5,
+  I8), `node` being `process.execPath`, under a bounded timeout. A kit imports no sibling kit
+  (TOOL-dGroundRules-1 §4), so the hook never `require`s the policy kit's module. The file is located by
+  `resolvePolicyHelper()`: `policy-mirror.js` in the policy kit beside the hooks kit, the location rule 7
+  of `tools/hooks/agent-cap.js` reads as its `POLICY_HELPER` (`:465`, TOOL-dGroundRules-10 S5). This is
+  that location's second instance, so `resolvePolicyHelper` is exported from `scratch-guard.js` and
+  agent-cap's constant is re-pointed to it; rule 7's own `require` of the module (`:469`) is dGroundRules'
+  and stays. The value is read only when the pointer reads `none`. With no helper, or a `get` that exits
+  non-zero or fails to spawn, the arm reads the catalogue default `read-only-probes` and prints one `NOTE`
+  naming why, the reader's stderr line among it. Observed by AC7.
 - **S6** — The wiring. In `main` (:1529) the arm runs after `checkRouted` admits a write-tool call and
   after `checkRoleGate` on a Bash or PowerShell call; in `tools/hooks/agent-cap.js` it runs as rule 8 on
   every `Agent` and `Workflow` call, after rule 6, outside any `--only=` selector, required from
@@ -72,7 +79,8 @@ v2:1175, strict's `item-reads-only` at v2:1500).
   Once armed, a throw anywhere in the arm refuses, as the write gate refuses (:1549-1556). Observed by AC6.
 - **S8** — The fixture, `bash tools/hooks/actions-free.fixture.sh --plant <case>`: a scratch repository
   under `%TEMP%` with a session card routed to `tFix`, a build card whose `## pointers` the plant writes,
-  copies of both hooks, a stub `policy-mirror.js` beside them answering the planted value and a stub
+  copies of both hooks, a stub `policy-mirror.js` beside them whose `get` prints the planted value (or,
+  for the `refusal` plant, exits 2 with a refusal line on stderr) and a stub
   kickoff checker answering `--card --path`; it pipes the case's payload to the hook and prints the exit
   code and stderr. Observed by AC1 to AC7.
 - **S9** — The page `help/orientation-card.md` (TOOL-dPlacedRequest-9's) gains a section: the item pointer,
@@ -95,7 +103,7 @@ v2:1175, strict's `item-reads-only` at v2:1500).
 
 - **consumes-from** `KICK-dKeptSession-13` — `## pointers`, the build card section whose `item —` line is the item in flight this arm reads; without it the arm is unarmed
 - **consumes-from** `KICK-dKeptSession-13` — `derive_item_boundary`, the boundary at which that unit rewrites the pointer, so this arm never derives one
-- **consumes-from** external — dGroundRules' `readPolicy` (TOOL-dGroundRules-5 S5) and agent-cap's rule 7 location (TOOL-dGroundRules-10 S5); dPlacedRequest's `--card --path --build` (TOOL-dPlacedRequest-2 S10); the policy-key factory (TOOL-dDeclaredLoop-6 S4)
+- **consumes-from** external — dGroundRules' `policy-mirror.js get` CLI, run by subprocess (TOOL-dGroundRules-5 S5) and agent-cap's rule 7 location (TOOL-dGroundRules-10 S5); dPlacedRequest's `--card --path --build` (TOOL-dPlacedRequest-2 S10); the policy-key factory (TOOL-dDeclaredLoop-6 S4)
 - **hands-off** `KICK-dKeptSession-41` — S1's `actions.free` row, which that unit grounds on the standing catalogue row (id 45)
 - **hands-off** `KICK-dKeptSession-43` — `readItemPointer` and `checkFreeAction`, whose pointer parse that unit closes over the `skipped:` form (id 57)
 - **hands-off** `KICK-dKeptSession-44` — the `actions.free` plants, run under both `card.pointers` values by the batch's S10 (id 11)
@@ -165,13 +173,17 @@ Live at landing, armed only where KICK-dKeptSession-13 writes a build card's `##
   every Bash call and gives two places the boundary is decided.
 - **Refusing reads off-item under `item-reads-only` with no exception.** It leaves no act that can move the
   pointer, so a strict session deadlocks between items.
+- **`require` of `policy-mirror.js`, declared by a `requires_if` row naming `policy` on
+  `tools/hooks/kit.toml`.** The rule admits an in-process sibling read only as such a declaration
+  (`tools/memory-tree/kit.toml:8`), and the reader already ships the `get` CLI a sibling runs instead
+  (TOOL-dGroundRules-5 §4 "The reader for hooks"), so S5 needs no exception and no parent change.
 
 ## 5. Production-readiness checklist
 
 - security — deny by default once armed: a throw refuses; the policy value comes only from the landed
   mirror through the one reader; the log line carries the class and tool, never the command text.
-- perf / scale — the pointer is one card read and one bounded checker call; the policy read runs only at
-  `item — none`.
+- perf / scale — the pointer is one card read and one bounded checker call; the policy read, one bounded
+  `node` spawn, runs only at `item — none`.
 - error / empty / loading states — unarmed cases print their witness and admit; a policy refusal reads the
   default with a `NOTE`.
 - observability — every refusal names the value, class, tool and the pointer; every recorded act is a log line.
@@ -243,6 +255,10 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC5 · rule 8 on an `Agent` pay
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-41`, `KICK-dKeptSession-43`,
   `KICK-dKeptSession-44` mirrored, the other ends of the edges the round-1 spec audit's promoted
   units declare; no other section moved.
+- rev-3 · 2026-10-26 · S5 · S8 · §3 Edges · §4 Alternatives rejected · §5 · §10 · re-grounded on the
+  cross-check record `2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck`, row 33: the arm reads
+  `actions.free` by spawning `policy-mirror.js get`, never requiring the policy kit's module; no fork,
+  since the reader's CLI already exists and the rule admits the `requires_if` route only as an exception.
 
 ## 10. Reuse audit
 
@@ -252,7 +268,8 @@ classification reuses `scanWriteTargets` (:339), `COMMIT_SHAPED` (:592), `scanCo
 `buildBaseName` (:1231), and the card reads reuse `readCard` (:667) and `extractRouteUnits` (:839). The
 spawn arm reuses agent-cap's existing require of `scratch-guard.js` (`tools/hooks/agent-cap.js:2278`). The
 policy location is dGroundRules' `POLICY_HELPER`, read on `branch/unattended-dgroundrules-e47ae1` at
-`tools/hooks/agent-cap.js:465` (cite GR); its second instance is extracted here. Scout C cited
+`tools/hooks/agent-cap.js:465` (cite GR); its second instance is extracted here, and the value is read
+through the reader's own `get` CLI by subprocess (TOOL-dGroundRules-5 §4), not by `require`. Scout C cited
 `agent-cap.js:112-117` for `resolveHarnessName`; source puts it at :109-117. Scout C's ":1530-1612" for
 `main` is :1529-1612 at base. `python tools/codebase-map/reuse_lookup.py "refuse a write or commit made
 outside the current item at the tool call"` ranked name stems only (`write`, `write_text`, `build_commit`),

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-18 — the `repeat` disposition and its `none` row, joined both ways to what the claim admits
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 28 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 28 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0156@c935df77 whole
 
@@ -12,6 +12,9 @@
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-17 KICK-dKeptSession-26 KICK-dKeptSession-1 |
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-18-deviation-181.md](../build/2026-10-26-build-KICK-dKeptSession-18-deviation-181.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-18-deviation-182.md](../build/2026-10-26-build-KICK-dKeptSession-18-deviation-182.md) | deviation | — |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-11 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-11 KICK-dKeptSession-17 |
 
@@ -194,13 +197,20 @@ absent from the manifest at base; the arm above is read by it once it lands.
   tolerance row, and TOOL-dDeclaredLoop-13, -16 and TOOL-dPlacedRequest-4, -21 read at origin's main.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-44` mirrored, the other ends of
   the edges the round-1 spec audit's promoted units declare; no other section moved.
+- rev-3 · 2026-10-26 · §10 · re-grounded on dPlacedRequest at `2740f0a3d` by the cross-check record
+  `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, row 65: TOOL-dPlacedRequest-3 S3
+  declares `item.entry.claim` and S4 prunes its stand-in, and the S2 join stays owed for the
+  `disposition` the entry rows carry; no other section moved.
 
 ## 10. Reuse audit
 
 The seam extended is TOOL-dDeclaredLoop-13's `check_transition_tables` in `tools/loop/loop_table.py`, which
-already reds a disposition outside the set and two rows matching one move; its route join (S7) joins only
-declared items, and `item.entry.claim` is a stand-in item with no `[[item]]` row, so its dispositions had
-no join. The admitted set is TOOL-dPlacedRequest-21 S1's refusal. Neither module exists at base: each cite
+already reds a disposition outside the set and two rows matching one move. Once dPlacedRequest lands,
+TOOL-dPlacedRequest-3 S3 declares `item.entry.claim`, actor `command:entry.claim`, with the outcomes
+`claimed`, `slug-taken`, `awaiting` and `refused`, `claimed` routed `transition`, and its S4 prunes the
+item's stand-in row. TOOL-dDeclaredLoop-13 S7's route join then covers `claimed → transition` for B1 to
+B3, but it joins an item's outcomes to rows, never the `disposition` those rows carry, so the join of S2
+is still owed. The admitted set is TOOL-dPlacedRequest-21 S1's refusal. Neither module exists at base: each cite
 is the parent spec read at origin's main `e5de11e9e`. The recipe mode the path stand-in rides on is
 verified at base (`tools/unattended/unattended.sh:1066`, `:3959`, `:4183-4192`). Scout C read the clause as
 needing "the ask row plus at most an arm checking B3"; the arm here gates the class instead (§4).

@@ -1,6 +1,6 @@
 # KICK-dKeptSession-11 — progress reported by `notify.owner`: one `progress —` line at the events the value selects
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 26 · advances KICK-dKeptSession-29
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base 462d20f3 · streams kickoff · order 26 · advances KICK-dKeptSession-29
 
 **Carries:** cl-dClosedLoop-0149@d9aa0a3a whole
 **Carries:** node:policy-key.notify.owner
@@ -14,7 +14,10 @@
 | [2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md](../build/2026-10-26-build-KICK-dKeptSession-1-reuse-scout-c.md) | research | KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-26 KICK-dKeptSession-1 |
 | [2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md](../build/2026-10-26-build-KICK-dKeptSession-1-spec-stage-returns.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-build-KICK-dKeptSession-11-deviation-111.md](../build/2026-10-26-build-KICK-dKeptSession-11-deviation-111.md) | deviation | — |
+| [2026-10-26-build-KICK-dKeptSession-11-deviation-112.md](../build/2026-10-26-build-KICK-dKeptSession-11-deviation-112.md) | deviation | — |
 | [2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-fix-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-5 KICK-dKeptSession-9 KICK-dKeptSession-12 KICK-dKeptSession-14 KICK-dKeptSession-28 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-crosscheck.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-22 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 KICK-dKeptSession-35 KICK-dKeptSession-36 KICK-dKeptSession-39 KICK-dKeptSession-41 KICK-dKeptSession-44 KICK-dKeptSession-45 KICK-dKeptSession-56 KICK-dKeptSession-57 KICK-dKeptSession-62 KICK-dKeptSession-63 KICK-dKeptSession-64 KICK-dKeptSession-65 |
+| [2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-parents-reground.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-5 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-18 KICK-dKeptSession-20 KICK-dKeptSession-25 KICK-dKeptSession-36 KICK-dKeptSession-44 KICK-dKeptSession-56 |
 | [2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md](../prompts/2026-10-26-prompt-KICK-dKeptSession-1-spec-brief.md) | research | KICK-dKeptSession-1 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-5 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-9 KICK-dKeptSession-10 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-14 KICK-dKeptSession-15 KICK-dKeptSession-16 KICK-dKeptSession-17 KICK-dKeptSession-18 KICK-dKeptSession-19 KICK-dKeptSession-20 KICK-dKeptSession-21 KICK-dKeptSession-22 KICK-dKeptSession-23 KICK-dKeptSession-24 KICK-dKeptSession-25 KICK-dKeptSession-26 KICK-dKeptSession-27 KICK-dKeptSession-28 |
 | [2026-10-26-review-KICK-dKeptSession-1-spec-audit.md](../reviews/2026-10-26-review-KICK-dKeptSession-1-spec-audit.md) | spec-audit | KICK-dKeptSession-1 KICK-dKeptSession-19 KICK-dKeptSession-2 KICK-dKeptSession-3 KICK-dKeptSession-4 KICK-dKeptSession-20 KICK-dKeptSession-16 KICK-dKeptSession-12 KICK-dKeptSession-13 KICK-dKeptSession-26 KICK-dKeptSession-15 KICK-dKeptSession-14 KICK-dKeptSession-9 KICK-dKeptSession-28 KICK-dKeptSession-22 KICK-dKeptSession-5 KICK-dKeptSession-23 KICK-dKeptSession-27 KICK-dKeptSession-24 KICK-dKeptSession-10 KICK-dKeptSession-25 KICK-dKeptSession-21 KICK-dKeptSession-6 KICK-dKeptSession-7 KICK-dKeptSession-8 KICK-dKeptSession-17 KICK-dKeptSession-18 |
 
@@ -42,9 +45,12 @@ owner-facing `progress —` line at the events each selects. Progress only: an o
   value's events, and `render_progress_line(slug, event, detail)` returning
   `progress — <slug> · <event> · <detail>`, the one producer of the line. Observed by AC1.
 - **S3** — The verb, `python tools/loop/loop_transition.py progress --build <slug> --event <park|landing|transition> --detail <text>`:
-  it reads `resolve("notify.owner")` (TOOL-dGroundRules-2 S6, I8) and prints the line when the event is
-  among the value's events, nothing otherwise, exit 0; an event outside the three exits 2 naming the
-  three. Until the reader lands it reads the catalogue default, said in one `NOTE`. Observed by AC1 and AC2.
+  it reads `notify.owner` by running `<sys.executable> <prefix>/policy/policy.py get notify.owner` as a
+  subprocess (TOOL-dGroundRules-2 S7's verb, I8), `policy.py` found through `loop_lib.py`'s inline
+  `resolve_kit_dir` block (TOOL-dDeclaredLoop-12 S4), since a kit imports no sibling kit, and prints
+  the line when the event is among the value's events, nothing otherwise, exit 0; an event outside the
+  three exits 2 naming the three. A refusal, or no policy kit found, reads the catalogue default, said
+  in one `NOTE`. Observed by AC1 and AC2.
 - **S4** — The transition emitter. `write_transition` (TOOL-dDeclaredLoop-3 S5) calls the renderer
   in-process after its commit, event `transition`, detail `<from> → <to> · <item tag>`, after the
   `transition —` line where `transitions.record` selects `micro-format`. Observed by AC1.
@@ -72,7 +78,7 @@ owner-facing `progress —` line at the events each selects. Progress only: an o
 
 ### Edges
 
-- **consumes-from** external — dDeclaredLoop's `write_transition` and `loop_transition.py --fixture` (TOOL-dDeclaredLoop-3 S5, its §6 plants), the policy-key factory (TOOL-dDeclaredLoop-6 S4); dGroundRules' `resolve` (TOOL-dGroundRules-2 S6)
+- **consumes-from** external — dDeclaredLoop's `write_transition` and `loop_transition.py --fixture` (TOOL-dDeclaredLoop-3 S5, its §6 plants), the policy-key factory (TOOL-dDeclaredLoop-6 S4); dGroundRules' `policy.py get` (TOOL-dGroundRules-2 S7), run as a subprocess
 - **hands-off** `KICK-dKeptSession-41` — S1's `notify.owner` row, which that unit grounds on the standing catalogue row (id 45)
 - **hands-off** `KICK-dKeptSession-44` — `emit_progress`, which the batch's S33 bounds (id 63)
 
@@ -208,6 +214,10 @@ declared here for that run.
 - rev-2 · 2026-10-26 · §3 · the Edges bullets to `KICK-dKeptSession-41`, `KICK-dKeptSession-44`
   mirrored, the other ends of the edges the round-1 spec audit's promoted units declare; no other
   section moved.
+- rev-3 · 2026-10-26 · §2 S3 · §3 Edges · re-grounded on dDeclaredLoop at `783f1ad3a` by the
+  cross-check record `build/2026-10-26-build-KICK-dKeptSession-1-parents-crosscheck.md`, row 43:
+  `notify.owner` is read by `policy.py get` as a subprocess through `loop_lib.py`'s inline
+  `resolve_kit_dir`, never an in-process `resolve`.
 
 ## 10. Reuse audit
 
