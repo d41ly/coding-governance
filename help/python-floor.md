@@ -11,8 +11,11 @@ when any tracked file outside `memory/` states a floor of its own instead of poi
 
 The resolver tries, in order, the caller's own override, `GOV_PYTHON`, then `python3`, `python` and
 `py`. It runs each one once and asks for its version and its own executable. The first at or above
-the floor wins, and the resolver hands back that executable's path, so nothing spawns the Windows
-App Execution Alias again. When none qualifies, it exits non-zero and names every candidate:
+the floor wins. For the three launcher names the resolver hands back that executable's path, so
+nothing spawns the Windows App Execution Alias again.
+An override, `GOV_PYTHON` or the caller's own, is handed back and spawned as named.
+That holds for a wrapper or a venv launcher, and for an override spelled `python`.
+When none qualifies, it exits non-zero and names every candidate:
 
 ```text
 resolve_python: no usable python launcher at the floor 3.15 (python-floor.txt in gov's lib dir).
@@ -32,8 +35,8 @@ prints the interpreter and its version and exits 0.
 - **With uv:** `uv python install 3.15`.
 - **On Windows:** `py install 3.15`, the Python install manager; `py -0p` then lists it.
 - **Any other way**, then point the resolver at it if it is not first on `PATH`:
-  `export GOV_PYTHON=/path/to/python3.15`. `GOV_PYTHON` names the interpreter; nothing lowers the
-  floor.
+  `export GOV_PYTHON=/path/to/python3.15`. `GOV_PYTHON` names the command every consumer spawns,
+  and it must still run at the floor; nothing lowers the floor.
 
 ## `platforms.provision` — what the refusal does about installing
 

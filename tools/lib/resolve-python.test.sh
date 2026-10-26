@@ -187,6 +187,24 @@ out=$(bash "$HERE/python-floor.sh" preflight 2>&1); rc=$?
 write_fake_launcher "$TMP/alias" python3 "$FLOOR $FLOORPY"
 got=$(env -u GOV_PYTHON PATH="$TMP/alias:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
 [ "$got" = "$FLOORPY" ] || bad "a fake alias at the floor yielded '$got', not the direct executable $FLOORPY it reported"; ok
+# (h) TOOL-dSafePassage-23: an override is echoed as given, whatever it is named; only the three
+# launcher names give way to the executable their probe printed, which (g) holds. A wrapper reporting
+# the floor and a real file's path yields the wrapper, from GOV_PYTHON and from the caller alike;
+# GOV_PYTHON=python with a fake `python` first on PATH yields `python`; a wrapper below the floor is
+# still passed over and named. WHAT THIS DOES NOT CHECK: a wrapper that forwards to a real
+# interpreter, which the install-prefix and manifest-check suites' own arms spawn.
+WRP="$TMP/override"
+write_fake_launcher "$WRP" wrap "$FLOOR $FLOORPY"
+got=$(PATH="$TMP/alias:$PATH" GOV_PYTHON="$WRP/wrap" bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
+[ "$got" = "$WRP/wrap" ] || bad "a GOV_PYTHON wrapper at the floor yielded '$got', not the wrapper as given"; ok
+got=$(env -u GOV_PYTHON bash -c '. "$1"; resolve_python "$2"' _ "$CANON" "$WRP/wrap" 2>/dev/null)
+[ "$got" = "$WRP/wrap" ] || bad "a caller override at the floor yielded '$got', not the override as given"; ok
+write_fake_launcher "$WRP/shim" python "$FLOOR $FLOORPY"
+got=$(PATH="$WRP/shim:$PATH" GOV_PYTHON=python bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
+[ "$got" = python ] || bad "GOV_PYTHON=python yielded '$got', not python as given"; ok
+write_fake_launcher "$WRP" wrap14 "3.14 $FLOORPY"
+out=$(PATH="$FLO:$PATH" GOV_PYTHON="$WRP/wrap14" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1); rc=$?
+{ [ "$rc" != 0 ] && [[ $out == *"$WRP/wrap14: ran 3.14, below the floor $FLOOR"* ]]; } || bad "a GOV_PYTHON wrapper at 3.14 was not passed over and named: rc=$rc $out"; ok
 
 # ---- 1c. THE INSTALL COMMAND AS platforms.provision SAYS (TOOL-dSafePassage-11) -------------------
 # A scratch repository with no remote holds the resolver and the policy kit at gov's paths. Its

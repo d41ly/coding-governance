@@ -163,10 +163,12 @@ resolve_python() {
     if [[ ${_rp_out%% *} =~ ^([0-9]+)\.([0-9]+)$ ]]; then
       _rp_cv=$(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} ))
       if [ "$_rp_cv" -ge "$_rp_fv" ]; then
-        # The direct executable where the probe named a file, so a consumer never spawns the
-        # Windows App Execution Alias again; the candidate's own name otherwise.
+        # An override, the caller's or GOV_PYTHON, names the command a consumer spawns, a wrapper
+        # or a venv launcher included, and is echoed as given. Only the three launcher names give
+        # way to the direct executable where the probe named a file, so a consumer never spawns
+        # the Windows App Execution Alias again; the launcher's own name otherwise.
         _rp_exe=${_rp_out#* }
-        if [ "$_rp_exe" != "$_rp_out" ] && [ -f "$_rp_exe" ]; then printf '%s\n' "$_rp_exe"; else printf '%s\n' "$_rp_c"; fi
+        if [ "$_rp_i" -gt 2 ] && [ "$_rp_exe" != "$_rp_out" ] && [ -f "$_rp_exe" ]; then printf '%s\n' "$_rp_exe"; else printf '%s\n' "$_rp_c"; fi
         return 0
       fi
       _rp_why="ran ${_rp_out%% *}, below the floor $_rp_floor"
