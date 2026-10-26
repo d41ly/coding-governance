@@ -3441,22 +3441,29 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               and all(n in out for n in needles), out)
 
     # TOOL-dSafePassage-24 AC1 to AC4: an executor in the target's own config refuses the step before
-    # any spawn, naming the key and its file; each `-stub` twin skips the check and its canary runs.
-    refused = "fixture/clean · refused · fixture/clean up: the target's own git config declares what git runs"
-    for plant, needles in (
-            ("local-filter", (refused, "filter.canary.clean in .git/config", "filter canary: absent")),
-            ("local-filter-stub", ("fixture/clean · up · ok", "filter canary: present · filter-clean")),
-            ("local-process", (refused, "filter.canary.process in .git/config", "process canary: absent")),
-            ("local-process-stub", ("fixture/clean · up · ok", "process canary: present · filter-process")),
-            ("local-fsmonitor", (refused, "core.fsmonitor in .git/config", "fsmonitor canary: absent",
-                                 "core.fsmonitor=false · not refused · git add exits 0")),
-            ("local-fsmonitor-stub", ("fixture/clean · up · ok", "fsmonitor canary: present · fsmonitor")),
-            ("local-include", (refused, "filter.canary.clean in ", "/included.gitconfig, so nothing was spawned",
-                               "include canary: absent")),
-            ("local-include-stub", ("fixture/clean · up · ok", "include canary: present · filter-clean"))):
+    # any spawn, naming the key and its file ON the refusal line; each `-stub` twin skips the check and
+    # its canary runs.
+    head = "isolation: fixture/clean · refused · fixture/clean up: the target's own git config declares what git runs"
+    for plant, on_refusal, needles in (
+            ("local-filter", ("a credential, filter.canary.clean in .git/config, so nothing was spawned",),
+             ("filter canary: absent",)),
+            ("local-filter-stub", (), ("fixture/clean · up · ok", "filter canary: present · filter-clean")),
+            ("local-process", ("a credential, filter.canary.process in .git/config, so nothing was spawned",),
+             ("process canary: absent",)),
+            ("local-process-stub", (), ("fixture/clean · up · ok", "process canary: present · filter-process")),
+            ("local-fsmonitor", ("a credential, core.fsmonitor in .git/config, so nothing was spawned",),
+             ("fsmonitor canary: absent", "core.fsmonitor=false · not refused · git add exits 0")),
+            ("local-fsmonitor-stub", (), ("fixture/clean · up · ok", "fsmonitor canary: present · fsmonitor")),
+            ("local-include", ("a credential, filter.canary.clean in ", "/included.gitconfig, so nothing was spawned"),
+             ("include canary: absent",)),
+            ("local-include-stub", (), ("fixture/clean · up · ok", "include canary: present · filter-clean"))):
         rc, out = fixture(us_py, plant)
-        check(f"[dSP-24] fixture isolation {plant} exits 1 and names {', '.join(needles)}",
-              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles), out)
+        line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
+        check(f"[dSP-24] fixture isolation {plant} exits 1, "
+              + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
+              + f"and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
 
     # AC6's red: the shipped pair copied, a direct spawn of `row["up"]` planted into the copy.
     planted = tmp / "callers"
