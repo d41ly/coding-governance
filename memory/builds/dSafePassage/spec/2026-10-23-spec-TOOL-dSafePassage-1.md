@@ -41,6 +41,7 @@
 | [2026-10-25-prompt-TOOL-dSafePassage-1-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-1-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md) | research | TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-26 |
 | [2026-10-26-prompt-TOOL-dSafePassage-1-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-1-build-brief.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-1-owner-builder-effort.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-1-owner-builder-effort.md) | research | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md) | research | TOOL-dSafePassage-61 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
