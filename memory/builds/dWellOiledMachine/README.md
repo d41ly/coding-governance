@@ -140,7 +140,7 @@ ids TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-5
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 10 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
