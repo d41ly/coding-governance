@@ -1,4 +1,4 @@
-**Serves:** journal KICK-dKeptSession-1
+**Serves:** journal KICK-dKeptSession-1 KICK-dKeptSession-30
 
 # gov-spec-writer handoff — KICK-dKeptSession-1
 

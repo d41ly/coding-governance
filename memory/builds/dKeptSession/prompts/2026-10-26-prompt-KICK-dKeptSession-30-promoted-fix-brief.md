@@ -1,4 +1,4 @@
-**Serves:** research KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44
+**Serves:** research KICK-dKeptSession-28 KICK-dKeptSession-36 KICK-dKeptSession-40 KICK-dKeptSession-43 KICK-dKeptSession-44 KICK-dKeptSession-30
 
 # Promoted-fix brief — dKeptSession, the fourteen check-spec-tokens hits over the round-1 promotions
 
