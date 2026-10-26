@@ -32,6 +32,7 @@ from __future__ import annotations
 import ast
 import functools
 import hashlib
+import importlib.util
 import io
 import json
 import ntpath
@@ -112,8 +113,33 @@ except ModuleNotFoundError:  # pragma: no cover - the message is the product on 
     raise SystemExit(2)
 
 
-class Refusal(RuntimeError):
-    """A condition that stops govkit before it reads or writes anything further."""
+def load_upgrade_steps():
+    """The upgrade-step reader beside this file, imported by its PATH (TOOL-dSafePassage-1).
+
+    `Refusal` lives there, and is bound here below, so the reader and this engine raise ONE class
+    and every catcher of `govkit.Refusal` still resolves. By path rather than by `sys.path`, because
+    a caller that loads this file by its own path adds no directory to it. Where the reader is
+    already loaded from that file, the running program included, it is that module, never a second
+    copy with a second `Refusal`. A copy of this engine without the file beside it stops here.
+    """
+    path = pathlib.Path(__file__).resolve().parent / "upgrade_steps.py"
+    mod = sys.modules.get("upgrade_steps")
+    if mod is not None and getattr(mod, "__file__", None) and pathlib.Path(mod.__file__).resolve() == path:
+        return mod
+    if not path.is_file():
+        sys.stderr.write(f"govkit: no upgrade_steps.py beside {path.parent.as_posix()} — the engine "
+                         f"reads its succession rows and its `Refusal` from it, so a copy of the "
+                         f"engine carries both files\n")
+        raise SystemExit(2)
+    spec = importlib.util.spec_from_file_location("upgrade_steps", path)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["upgrade_steps"] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+upgrade_steps = load_upgrade_steps()
+Refusal = upgrade_steps.Refusal
 
 
 # ---------------------------------------------------------------------------- repo + git plumbing
@@ -5673,9 +5699,17 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         print(f"govkit check — {_ln}")
     _owned_src = {f.get("source") for f in rows if f.get("role") == "adopter-owned"}
 
+    # TOOL-dSafePassage-1 S4. A claimed id a `[[retired]]` row names is a SUCCESSION, reported and
+    # counted as no problem; `update` carries the claim. One with no succession row still reds.
+    retired = upgrade_steps.read_retired(root, None, None)
     for eid in selection:
         if eid not in descs:
-            r.fail(f"the receipt claims kit '{eid}', which is not a registry entry")
+            try:
+                _ret = upgrade_steps.resolve_claim(eid, descs, retired)
+            except Refusal:
+                r.fail(f"the receipt claims kit '{eid}', which is not a registry entry")
+                continue
+            print(f"govkit check — {eid}: retired, successor {_ret.successor}")
             continue
         d, _ = descs[eid]
         ctx = target_context(target, deploy, eid, d)
@@ -9232,11 +9266,34 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     demand_published_vintage(root, to_commit)
 
     claimed = receipt.get("kits") or []
+    # ---- TOOL-dSafePassage-1 S4. SUCCESSION, read through the one reader. A claimed kit that is no
+    # ---- longer a registry entry and carries a `[[retired]]` row is CARRIED to its successor — the
+    # ---- claim and every row attributed to it move to that entry, whose descriptor classifies them
+    # ---- below — or RELEASED when the successor is `none`, its rows routed to the `withdrawn` arm:
+    # ---- a report and an outbox order, deleted only under `--write-withdrawals`. A claimed id with
+    # ---- no succession row is `resolve_claim`'s refusal, before anything is written. A row whose
+    # ---- kit an earlier release already dropped from the claim is carried or released the same way,
+    # ---- so a released kit's rows never fall back into the verdict table as an unknown kit's.
+    retired = upgrade_steps.read_retired(root, None, None)
+    successors: dict[str, str] = {}
     for eid in claimed:
-        if eid not in descs:
-            raise Refusal(f"the receipt claims kit '{eid}', which is no longer a registry entry — "
-                          f"refusing rather than dropping it, which would leave its files owned by "
-                          f"nobody")
+        _ret = upgrade_steps.resolve_claim(eid, descs, retired)
+        if _ret is not None:
+            successors[eid] = _ret.successor
+    for _ret in retired:
+        if _ret.id not in successors and any(w.get("kit") == _ret.id for w in receipt.get("files") or []):
+            successors[_ret.id] = _ret.successor
+    for _old, _new in successors.items():
+        print(f"govkit update — retired {_old}: " + (
+            f"claimed by its successor {_new}" if _new != "none" else
+            "released, its successor is none, so each of its rows reads withdrawn"))
+    released = {e for e, s in successors.items() if s == "none"}
+    if successors:
+        claimed = list(dict.fromkeys(successors.get(e, e) for e in claimed if e not in released))
+        receipt["kits"] = claimed
+        for _w in receipt.get("files") or []:
+            if successors.get(_w.get("kit"), "none") != "none":
+                _w["kit"] = successors[_w["kit"]]
     # ---- TOOL-aRoutedQuill-5 S4, owner F1: an entry that JOINED the registry's default set after
     # ---- this receipt's vintage is installed by `update`, as `apply --kits` would install it. The
     # ---- widening is the owner's, recorded in the registry; a `--kits`-scoped run gains nothing,
@@ -9950,6 +10007,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # below, once, rather than onto every row: the printed row is PARSED by name elsewhere —
         # `-7`'s AC9 arm reads the verdict off a line whose last field is the path — and a trailing
         # clause here made that arm read "(no row)" for a row this branch had just printed.
+        # TOOL-dSafePassage-1 S4. A RELEASED kit's row reads `withdrawn` without the classifier: gov
+        # retired the kit with no successor, so no vintage of it is gov's to land, and the existing
+        # arm is the disposition — under `--write` a report and an outbox order, a deletion only under
+        # `--write-withdrawals`; a role `update` never writes is reported only, as every row is.
+        if row.get("kit") in released:
+            tally["withdrawn"] = tally.get("withdrawn", 0) + 1
+            print(f"  {'withdrawn':<18} [{role:<13}] {row['path']}")
+            acted.append({"row": row, "c": {"verdict": "withdrawn", "renamed_to": None},
+                          "verdict": "withdrawn", "how": how})
+            continue
+
         if how == "table" and row.get("evidence") == "unattributed":
             tally["unattributed"] = tally.get("unattributed", 0) + 1
             print(f"  {'unattributed':<18} [{role:<13}] {row['path']}")
@@ -13418,6 +13486,43 @@ def derive_epoch_state(root: pathlib.Path, eid: str, desc: dict, base: str, head
     return "moved", f"FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}", w, n
 
 
+def derive_push_base(root: pathlib.Path, base: str | None) -> tuple[str, bool, str]:
+    """`(sha, boundary, why)`: the commit a push-boundary leg grades from, and whether it is one.
+
+    `--base` when given, else `GATE_PUSH_BASE`, else the merge-base with the remote ladder's default
+    branch, the remote's first, then the local branch. `boundary` is True for the first two. On no
+    base `sha` is "" and `why` completes the line `no base to compare against`, because no base is a
+    FAILED exit 1 for every caller and never a zero-status skip: run-gates judges a leg by its exit
+    code, and a silent 0 reads as a pass forever. Extracted from `cmd_epoch` at its second caller,
+    `upgrade_steps.py frozen` (TOOL-dSafePassage-1).
+    """
+    boundary = base is not None
+    # An ALL-ZERO value reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's old
+    # sha, forty zeros on a push that CREATES the default branch, and no commit carries that name.
+    if base is None and os.environ.get("GATE_PUSH_BASE", "").strip("0"):
+        base, boundary = os.environ["GATE_PUSH_BASE"], True
+    if base is None:
+        # The default base is `check-verdict-epoch.sh`'s. The remote and its branch are the
+        # ladder's (TOOL-dLadderedRemote-2); a refusal is the failed exit, naming it, and no remote
+        # at all leaves only the local branch.
+        remote, dflt, _observed, refusal = resolve_remote(root)
+        if refusal:
+            return "", boundary, f" · {refusal}"
+        dflt = dflt or "main"
+        for ref in ((f"{remote}/{dflt}", dflt) if remote else (dflt,)):
+            mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
+                                capture_output=True, text=True, encoding="utf-8")
+            if mb.returncode == 0 and mb.stdout.strip():
+                base = mb.stdout.strip()
+                break
+    rb = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
+                         f"{base}^{{commit}}"], capture_output=True, text=True, encoding="utf-8") if base else None
+    if rb is None or rb.returncode != 0:
+        return "", boundary, (f" ({base or 'no merge-base with the default branch'})"
+                              " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
+    return rb.stdout.strip(), boundary, ""
+
+
 def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
     """TOOL-aRepatriatedFork-15 S1, S5 — a kit whose shipped bytes move bumps its version.
 
@@ -13454,35 +13559,10 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
         for p in r.problems:
             sys.stderr.write(f"govkit: {p}\n")
         return 2
-    boundary = base is not None
-    # An ALL-ZERO value reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's old
-    # sha, forty zeros on a push that CREATES the default branch, and no commit carries that name.
-    if base is None and os.environ.get("GATE_PUSH_BASE", "").strip("0"):
-        base, boundary = os.environ["GATE_PUSH_BASE"], True
-    if base is None:
-        # The default base is `check-verdict-epoch.sh`'s: the merge-base with the default branch,
-        # the remote's first. No base is a FAILED exit 1 and never a zero-status skip, because
-        # run-gates judges a leg by its exit code and a silent 0 reads as a pass forever. The
-        # remote and its branch are the ladder's (TOOL-dLadderedRemote-2); a refusal is that
-        # failed exit, naming it, and no remote at all leaves only the local branch.
-        remote, dflt, _observed, refusal = resolve_remote(root)
-        if refusal:
-            print(f"epoch: FAILED · no base to compare against · {refusal}")
-            return 1
-        dflt = dflt or "main"
-        for ref in ((f"{remote}/{dflt}", dflt) if remote else (dflt,)):
-            mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
-                                capture_output=True, text=True, encoding="utf-8")
-            if mb.returncode == 0 and mb.stdout.strip():
-                base = mb.stdout.strip()
-                break
-    rb = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
-                         f"{base}^{{commit}}"], capture_output=True, text=True, encoding="utf-8") if base else None
-    if rb is None or rb.returncode != 0:
-        print(f"epoch: FAILED · no base to compare against ({base or 'no merge-base with the default branch'})"
-              " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
+    base, boundary, why = derive_push_base(root, base)
+    if not base:
+        print(f"epoch: FAILED · no base to compare against{why}")
         return 1
-    base = rb.stdout.strip()
     failed = 0
     for eid in sorted(descs):
         kind, text, w, n = derive_epoch_state(root, eid, descs[eid][0], base)

@@ -130,3 +130,15 @@ this kit ships a hook and a settings fragment and nothing that runs: its two sel
 [[lf_pin]]
 pattern = "*.fragment.json"
 why = "check-wiring.sh reads the fragment with sed; a trailing CR lands inside the captured matcher and the arm reports UNWIRED against a correctly wired repo"
+
+# TOOL-dSafePassage-1 S6: `.agent-cap.conf`'s FANOUT_CAP moves into `runtime.agents-in-flight` and
+# the file retires, the limit reading the same on either side. The program is gov's, run by its own
+# argv until the walk lands; `<prefix>/govkit/upgrade_steps.py list` prints the order. Once landed
+# this row is frozen: a correction is a new step, a retirement a `[[retired]]` row in the registry.
+[[upgrade]]
+id = "agent-cap/fanout-cap-to-agents-in-flight"
+up = ["python", "{gov}/govkit/steps/fanout_cap.py", "up", "{target}"]
+down = ["python", "{gov}/govkit/steps/fanout_cap.py", "down", "{target}"]
+witness = ["python", "{gov}/govkit/steps/fanout_cap.py", "witness", "{target}"]
+surfaces = ["conf-key:.agent-cap.conf#FANOUT_CAP"]
+needs-target = false

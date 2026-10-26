@@ -440,6 +440,8 @@ def build_role_pair(tmp: pathlib.Path, tag: str, *, schema: int, edits: dict[str
     (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True, exist_ok=True)
     (g / PFX / "demo").mkdir(parents=True, exist_ok=True)
     shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
+    # govkit.py imports its Refusal from the step reader beside it (TOOL-dSafePassage-1).
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")
     (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
         '[surface]' + NL + 'globs = ["{prefix}/*"]' + NL + NL
         + '[selection]' + NL + 'default = ["demo"]' + NL + NL

@@ -32,3 +32,11 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 ## Parked
 
 2026-10-26T09:06:44Z rescope · item add TOOL-dSafePassage-61 · reason TOOL-dSafePassage-1's build pass diverged at §8 F8: the landed policy guard (tools/policy/guard.py, TOOL-dGroundRules-6) refuses S8's seven-key write of .governance/policy.toml ('7 keys changed; one cap raised is the one agent shape'), and TOOL-dGroundRules-13, the ask that would admit it, is OPEN; F8 says the build run stops S8 if not granted, so the gov migration of template-size-limits.txt moves to this new unit, DEFERRED until TOOL-dGroundRules-13
+
+2026-10-26T09:58:28Z dispatch · item 2d20e0b5 TOOL-dSafePassage-1 · reason tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/steps/fanout_cap.py tools/govkit/govkit.py tools/govkit/registry.toml tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/subject-pins.tsv tools/govkit/matrix.py tools/check-install-prefix.test.sh tools/hooks/kit.toml tools/hooks/README.md tools/gate-legs.json help/upgrade-steps.md help/README.md memory/guides/SESSION-KICKOFF.md memory/map/features/govkit.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-1.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-1-ledger.md
+
+2026-10-26T09:58:34Z brief · item TOOL-dSafePassage-1 · reason 4ad3dd0f8071 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-1-build-brief.md
+
+2026-10-26T10:39:05Z dispatch · item 2d20e0b5 TOOL-dSafePassage-1 · reason tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/steps/fanout_cap.py tools/govkit/govkit.py tools/govkit/registry.toml tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/subject-pins.tsv tools/govkit/matrix.py tools/check-install-prefix.test.sh tools/hooks/kit.toml tools/hooks/README.md tools/gate-legs.json help/upgrade-steps.md help/README.md memory/guides/SESSION-KICKOFF.md memory/map/features/govkit.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-1.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-1-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-10-26T10:43:20Z dispatch · item 2d20e0b5 TOOL-dSafePassage-1 · reason .gitattributes

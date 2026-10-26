@@ -186,6 +186,14 @@ id = "check-install-prefix"
 descriptor = "{prefix}/govkit/entries/check-install-prefix.kit.toml"
 kind = "flat"
 
+# ------------------------------------------------------------------------------------- succession
+# TOOL-dSafePassage-1 S2. A `[[retired]]` row names an entry id or an upgrade-step id that left the
+# live population: `id`, `successor` (a live id of the same kind, or "none") and `surfaces`. The
+# retiring commit is DERIVED from the default branch's first-parent history and never typed. `update`
+# and `check` read these rows through `<prefix>/govkit/upgrade_steps.py`, never here: a claimed kit
+# with a successor is carried to it, one retired to "none" is released and its rows read
+# `withdrawn`. A landed row is frozen. None has retired yet.
+
 # ------------------------------------------------------------------------------------- exemptions
 # Each carries a non-empty reason. `selfcheck` reds on an exemption whose path no longer exists, so
 # a stale exemption cannot quietly widen the surface.
@@ -694,3 +702,7 @@ why = "it grades GOV's own tools and skills Python against `memory/project/encod
 [[exempt_leg]]
 name = "policy fixtures"
 why = "it runs `check_policy.py --fixture`, which plants each red case of the policy kit's arms into a scratch repository and asserts it red as planted and green without, so its subject is the arms and the catalogue in `<prefix>/policy/` and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. The file ships, because the same script is the `policy check` leg every adopter runs; the LEG is gov's, held on GOV's bar like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dGroundRules-1."
+
+[[exempt_leg]]
+name = "step-rows-frozen"
+why = "it runs `<prefix>/govkit/upgrade_steps.py frozen`, the deployer's own step reader grading gov's landed `[[upgrade]]` and `[[retired]]` rows against the push base. The deployer is a registry exemption that never travels into a target, and a step row is authored in gov's descriptors, so the rows are frozen where they land; an adopter has no deployer and no row to freeze. TOOL-dSafePassage-1."

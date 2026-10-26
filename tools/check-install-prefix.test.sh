@@ -61,6 +61,8 @@ build_source_fixture() { # $1 = dir · $2 = the line to put in the kit README
   git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
   cp "$GATE" "$d/$GATE_REL"
   cp "$ROOT/$GK_SRC" "$d/${PFX}$GK/govkit.py"
+  # The engine imports its Refusal from the step reader beside it (TOOL-dSafePassage-1).
+  cp "$ROOT/${GK_SRC%/*}/upgrade_steps.py" "$d/${PFX}$GK/upgrade_steps.py"
   printf 'version = 1\n\n[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["qdemo"]\n\n[[entry]]\nid = "qdemo"\ndescriptor = "{prefix}/qdemo/kit.toml"\n' \
     > "$d/${PFX}$GK/registry.toml"
   printf 'id = "qdemo"\nhome = "qdemo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n[[files]]\ninclude = "**"\nrole = "engine"\n\n[[files]]\ninclude = ["page.template.md"]\nrole = "rendered"\nto = "{kit}/page.md"\nplaceholders = ["KIT_DIR"]\n\n[adopt]\nargv = []\nmutates_index = false\n' \
@@ -249,6 +251,7 @@ case "$nout" in *"SKIPPED — this repo is not a kit SOURCE"*) good "...and SAYS
 E="$TMP/nokits"; mkdir -p "$E/solo" "$E/elsewhere/gk" "$E/.governance"
 git -C "$E" init -q; git -C "$E" config user.email t@t.test; git -C "$E" config user.name t
 cp "$GATE" "$E/solo/${GATE##*/}"; cp "$ROOT/$GK_SRC" "$E/elsewhere/gk/govkit.py"
+cp "$ROOT/${GK_SRC%/*}/upgrade_steps.py" "$E/elsewhere/gk/upgrade_steps.py"
 printf 'version = 1\n' > "$E/elsewhere/gk/registry.toml"
 printf '{"schema": 3, "files": [{"source": "x/%s/govkit.py", "path": "elsewhere/gk/govkit.py"}]}\n' "$GK" > "$E/.governance/install.json"
 git -C "$E" add -A >/dev/null 2>&1

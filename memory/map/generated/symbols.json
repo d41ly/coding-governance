@@ -270,7 +270,7 @@
     {
       "id": "Refusal",
       "kind": "class",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "Refusal",
@@ -301,6 +301,11 @@
       "id": "Report",
       "kind": "class",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "RetiredRow",
+      "kind": "class",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "RolesError",
@@ -351,6 +356,11 @@
       "id": "StaleHeader",
       "kind": "class",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "StepRow",
+      "kind": "class",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "StructureDrift",
@@ -2928,6 +2938,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "build_steps_gov",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "build_stub",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
@@ -3703,6 +3718,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_argv",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "check_argv_of",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4018,6 +4038,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_committed",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
       "id": "check_composed_run",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -4041,6 +4066,11 @@
       "id": "check_conservation",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_contained",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "check_contains",
@@ -4268,6 +4298,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "check_fanout_step",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_fences",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -4301,6 +4336,11 @@
       "id": "check_fragment_wiring",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_frozen",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "check_gate_wall",
@@ -5608,9 +5648,19 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "check_succession",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_superseded",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "check_surfaces",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "check_survivors",
@@ -5764,6 +5814,11 @@
     },
     {
       "id": "check_update_safety",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_upgrade_steps",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
@@ -6178,6 +6233,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "cmd_down",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
       "id": "cmd_emit_floors",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -6213,6 +6273,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "cmd_frozen",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "cmd_get",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -6231,6 +6296,11 @@
       "id": "cmd_land",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "cmd_list",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "cmd_lists",
@@ -6428,6 +6498,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "cmd_up",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
       "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -6436,6 +6511,11 @@
       "id": "cmd_verify",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "cmd_witness",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
       "id": "cmd_write",
@@ -7388,6 +7468,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_image_path",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "derive_index_repair",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -7461,6 +7546,11 @@
       "id": "derive_int_slots",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_introduced",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "derive_invocation",
@@ -7831,6 +7921,11 @@
       "id": "derive_prompt_name",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "derive_push_base",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_push_failure",
@@ -10223,6 +10318,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "load_govkit",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "load_half",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -10353,6 +10453,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "load_steps",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
       "id": "load_text",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -10366,6 +10471,11 @@
       "id": "load_tree_lib",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "load_upgrade_steps",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "load_waivers",
@@ -10556,6 +10666,16 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "main",
@@ -11975,6 +12095,11 @@
     {
       "id": "parse_conf",
       "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "parse_conf",
+      "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
@@ -12206,6 +12331,11 @@
       "id": "parse_status",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "parse_table_rows",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "parse_time",
@@ -13923,6 +14053,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "read_file_at",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_file_value",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -15098,6 +15233,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "read_registry_at",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_registry_tags",
       "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
@@ -15131,6 +15271,11 @@
       "id": "read_report",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "read_retired",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_retired_ids",
@@ -15551,6 +15696,11 @@
       "id": "read_stem",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_steps",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_stop_listing",
@@ -17158,6 +17308,16 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "render_policy_bytes",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "render_policy_text",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "render_prof_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -17456,6 +17616,11 @@
       "id": "render_tokens",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "render_toml_scalar",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "render_toml_value",
@@ -17866,6 +18031,11 @@
       "id": "resolve_cited_paths",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "resolve_claim",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "resolve_claim_remote",
@@ -18291,6 +18461,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -19308,6 +19483,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "resolve_rev",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "resolve_root",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -20276,6 +20456,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "run_git",
@@ -25443,6 +25628,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "write_before_image",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "write_bg_record",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -25666,6 +25856,11 @@
       "id": "write_fork_spec",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_from_before_image",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "write_gate_legs",

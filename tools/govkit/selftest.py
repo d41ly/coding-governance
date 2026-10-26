@@ -914,6 +914,7 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
     (fx / PFX / "demo").mkdir(parents=True, exist_ok=True)
     shutil.copy(GOVKIT, fx / PFX / KIT_NAMES["govkit"] / "govkit.py")
     shutil.copy2(GOVKIT.parent / "adopters.toml", fx / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", fx / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     (fx / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
         '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/govkit/entries/demo.kit.toml"\n',
         encoding="utf-8", newline="\n")
@@ -962,6 +963,7 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
         (fx / d).mkdir(parents=True, exist_ok=True)
     shutil.copy(GOVKIT, fx / PFX / KIT_NAMES["govkit"] / "govkit.py")
     shutil.copy2(GOVKIT.parent / "adopters.toml", fx / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", fx / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     files = {
         f"{PFX}{KIT_NAMES['govkit']}/registry.toml":
             '[[entry]]\nid = "vk"\ndescriptor = "{prefix}/govkit/entries/vk.kit.toml"\n\n'
@@ -1049,6 +1051,7 @@ def check_mint_verb(tmp: pathlib.Path) -> None:
     gk = fx / PFX / KIT_NAMES["govkit"] / "govkit.py"
     shutil.copy(GOVKIT, gk)
     shutil.copy2(GOVKIT.parent / "adopters.toml", gk.parent / "adopters.toml")
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", gk.parent / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     files = {
         f"{PFX}{KIT_NAMES['govkit']}/registry.toml":
             '[[entry]]\nid = "vk"\ndescriptor = "{prefix}/govkit/entries/vk.kit.toml"\n\n'
@@ -1245,6 +1248,7 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     (g / PFX / "demo").mkdir(parents=True)
     shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
     shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
         '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
         '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
@@ -1414,6 +1418,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
     (g / PFX / "demo").mkdir(parents=True)
     shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
     shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
     (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(SAFE_REG, encoding="utf-8", newline="\n")
     for name, body in (("kit.toml", OWN_KIT), ("run.py", OWN_RUN), ("seed.txt", "seed\n"),
                        ("use.py", "from run import alpha, beta\n"), ("tpl.md", "tpl\n")):
@@ -1730,6 +1735,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
         (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
         shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
         shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+        shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
         for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
                   ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
@@ -2407,6 +2413,7 @@ def measure_mode_carry(tmp: pathlib.Path, source: str, arms: set) -> dict:
         (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
         (g / PFX / KIT_NAMES["govkit"] / "govkit.py").write_bytes(source.encode("utf-8"))
         shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")
+        shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
         for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
                   ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
@@ -2873,6 +2880,472 @@ def check_roles_install(tmp: pathlib.Path, charter: bool = True, runner: bool = 
               for ln in lines), str(lines))
 
 
+# ================= TOOL-dSafePassage-1 — THE UPGRADE-STEP KIND, ITS READER AND ITS LEG =================
+# Every arm builds its own scratch gov: the engine and the step reader copied beside a registry and
+# descriptors written here, on a `main` branch with no remote, so the landed ref is the local `main`.
+STEPS_ENV = {k: v for k, v in os.environ.items() if k not in ("GOV_REMOTE", "GATE_PUSH_BASE")}
+STEPS_ENV.update(GOV_DEFAULT_BRANCH="main", GOVKIT_NO_REMOTE_PROBE="1")
+
+
+def build_steps_gov(g: pathlib.Path, files: dict) -> str:
+    """A scratch gov for TOOL-dSafePassage-1's arms: `govkit.py`, `upgrade_steps.py` and
+    `adopters.toml` copied, then `files` (paths under the install prefix), committed on `main`.
+    Returns the commit."""
+    gk = g / PFX / KIT_NAMES["govkit"]
+    gk.mkdir(parents=True, exist_ok=True)
+    for name in ("govkit.py", "upgrade_steps.py", "adopters.toml"):
+        shutil.copy2(GOVKIT.parent / name, gk / name)
+    for rel, body in files.items():
+        (g / PFX / rel).parent.mkdir(parents=True, exist_ok=True)
+        (g / PFX / rel).write_bytes(body.encode("utf-8"))
+    for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
+              ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
+        git(g, *a)
+    settle(g, "base")
+    return run_gov_git(g, "rev-parse", "HEAD")
+
+
+def check_upgrade_steps(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-1 AC1 AC2 AC3 AC4 AC5 AC16 — the step reader, its derived commit and order,
+    and the frozen leg, each planted case on its own scratch gov and each observed against a control
+    that stays green, so a reader that refused everything fails the controls."""
+    gkn = KIT_NAMES["govkit"]
+    prog = "{gov}/" + gkn + "/steps/s1.py"
+
+    def render_row(sid: str, extra: str = "", argv0: str = "python", program: str = prog,
+                   surfaces: str = '["conf-key:.demo.conf#KEY"]') -> str:
+        return (f'\n[[upgrade]]\nid = "{sid}"\n'
+                + "".join(f'{k} = ["{argv0}", "{program}", "{k}", "{{target}}"]\n'
+                          for k in ("up", "down", "witness"))
+                + f"surfaces = {surfaces}\nneeds-target = false\n{extra}")
+
+    reg = ('[surface]\nglobs = ["{prefix}/*"]\n\n'
+           '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+           '[[entry]]\nid = "other"\ndescriptor = "{prefix}/other/kit.toml"\n')
+    demo_head, other = 'id = "demo"\nhome = "demo"\n', 'id = "other"\nhome = "other"\n'
+    files = {f"{gkn}/registry.toml": reg, "demo/kit.toml": demo_head, "other/kit.toml": other,
+             f"{gkn}/steps/s1.py": "print('s1')\n", f"{gkn}/steps.toml": "# steps\n"}
+
+    def run_steps(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / PFX / gkn / "upgrade_steps.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=STEPS_ENV)
+
+    def write_file(g: pathlib.Path, rel: str, body: str) -> None:
+        (g / PFX / rel).write_bytes(body.encode("utf-8"))
+
+    def read_listed(out: str) -> list:
+        return [ln.split(" · ") for ln in out.splitlines()
+                if ln.startswith("upgrade-steps: ") and ln.split(" · ")[0][len("upgrade-steps: "):].isdigit()]
+
+    # ---- AC1: one commit adds a steps-file row and a descriptor row; the steps-file row is first.
+    g = tmp / "sp-order"
+    build_steps_gov(g, files)
+    write_file(g, "demo/kit.toml", demo_head + render_row("demo/one"))
+    write_file(g, f"{gkn}/steps.toml", "# steps\n" + render_row("lib/one"))
+    settle(g, "both rows")
+    head = run_gov_git(g, "rev-parse", "HEAD")
+    p = run_steps(g, "list")
+    rows = read_listed(p.stdout)
+    check("[dSP-1 AC1] one commit landing a steps-file row and a descriptor row lists the steps-file row first",
+          p.returncode == 0 and [r[1] for r in rows] == ["lib/one", "demo/one"]
+          and all(r[2] == head for r in rows) and rows[1][3] == f"{PFX}demo/kit.toml",
+          p.stdout + p.stderr)
+
+    # ---- AC2: each planted row exits 2 naming its file, row and key; the control lists green.
+    g = tmp / "sp-refuse"
+    build_steps_gov(g, {**files, "demo/kit.toml": demo_head + render_row("demo/first")})
+    p = run_steps(g, "list")
+    check("[dSP-1 AC2] CONTROL a well-formed row lists at exit 0",
+          p.returncode == 0 and "demo/first" in p.stdout, p.stdout + p.stderr)
+    kit = f"{PFX}demo/kit.toml [[upgrade]] row"
+    planted = (
+        ("an unknown key", "demo/kit.toml", demo_head + render_row("demo/first", "bogus = 1\n"), f"{kit} 1 key bogus"),
+        ("an authored introduced", "demo/kit.toml", demo_head + render_row("demo/first", 'introduced = "abc"\n'),
+         f"{kit} 1 key introduced"),
+        ("a {bogus} placeholder", "demo/kit.toml", demo_head + render_row("demo/first", program="{bogus}/s1.py"),
+         f"{kit} 1 key up"),
+        ("argv[0] node", "demo/kit.toml", demo_head + render_row("demo/first", argv0="node"), f"{kit} 1 key up"),
+        ("an untracked {gov}/ program", "demo/kit.toml",
+         demo_head + render_row("demo/first", program="{gov}/" + gkn + "/steps/nope.py"), f"{kit} 1 key up"),
+        ("a duplicate id", "demo/kit.toml", demo_head + render_row("demo/first") + render_row("demo/first"),
+         f"{kit} 2 key id"),
+        ("another entry's id in a descriptor", "demo/kit.toml", demo_head + render_row("other/x"), f"{kit} 1 key id"),
+        ("a registry entry's id in the steps file", f"{gkn}/steps.toml", "# steps\n" + render_row("demo/y"),
+         f"{PFX}{gkn}/steps.toml [[upgrade]] row 1 key id"),
+        ("a surfaces item with no colon", "demo/kit.toml", demo_head + render_row("demo/first", surfaces='["nocolon"]'),
+         f"{kit} 1 key surfaces"),
+        ("a [[retired]] successor that is not live", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = "nosuch"\nsurfaces = []\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key successor"),
+        ("an id that is not <entry>/<slug>", "demo/kit.toml", demo_head + render_row("demo/Bad_Slug"),
+         f"{kit} 1 key id"),
+        ("a row with no witness", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace('witness = ["python", "' + prog + '", "witness", "{target}"]\n', ""),
+         f"{kit} 1 key witness"),
+        ("a needs-target that is no bool", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace("needs-target = false", 'needs-target = "no"'),
+         f"{kit} 1 key needs-target"),
+        ("a descriptor that is not TOML", "demo/kit.toml", demo_head + "[[upgrade]\n",
+         f"{PFX}demo/kit.toml: not valid TOML"),
+        ("a [[retired]] id still live", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "demo"\nsuccessor = "none"\nsurfaces = []\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key id"),
+        ("an authored retired commit", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = "none"\nsurfaces = []\nretired = "abc"\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key retired"),
+        ("a step retired to an entry", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "demo/old"\nsuccessor = "other"\nsurfaces = []\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key successor"),
+        ("a descriptor the registry names and the tree lacks", f"{gkn}/registry.toml",
+         reg + '\n[[entry]]\nid = "ghost"\ndescriptor = "{prefix}/ghost/kit.toml"\n',
+         f"{PFX}ghost/kit.toml: the registry names this descriptor for 'ghost' and it is absent"),
+        ("an `upgrade` that is no array of tables", "demo/kit.toml", "upgrade = 1\n" + demo_head,
+         f"{PFX}demo/kit.toml: `upgrade` at the working tree is not an array of tables"),
+        ("an argv that is a string", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace('up = ["python", "' + prog + '", "up", "{target}"]', 'up = "python x"'),
+         f"{kit} 1 key up: an argv is a non-empty list"),
+        ("a row with no surfaces", "demo/kit.toml",
+         demo_head + render_row("demo/first").replace('surfaces = ["conf-key:.demo.conf#KEY"]\n', ""),
+         f"{kit} 1 key surfaces: required"),
+        ("a [[retired]] row with no surfaces", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = "none"\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key surfaces: required"),
+        ("an unknown [[retired]] key", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = "none"\nsurfaces = []\nbogus = 1\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key bogus"),
+        ("a [[retired]] successor that is no string", f"{gkn}/registry.toml",
+         reg + '\n[[retired]]\nid = "gone"\nsuccessor = 1\nsurfaces = []\n',
+         f"{PFX}{gkn}/registry.toml [[retired]] row 1 key successor: required"),
+    )
+    for label, rel, body, want in planted:
+        write_file(g, rel, body)
+        p = run_steps(g, "list")
+        check(f"[dSP-1 AC2] {label} exits 2 naming its file, row and key",
+              p.returncode == 2 and want in p.stderr, f"rc={p.returncode} " + p.stdout + p.stderr)
+        git(g, "checkout", "-q", "--", ".")
+    p = subprocess.run([sys.executable, str(g / PFX / gkn / "upgrade_steps.py"), "list"], capture_output=True,
+                       text=True, encoding="utf-8", env={**STEPS_ENV, "GOV_REMOTE": "nosuch"})
+    check("[dSP-1 S3] a remote ladder that refuses refuses `list`, naming GOV_REMOTE, at exit 2",
+          p.returncode == 2 and "GOV_REMOTE names nosuch" in p.stderr, p.stdout + p.stderr)
+
+    # ---- The reader's refusals no planted row reaches, called in process on this scratch gov.
+    steps = govkit_module().upgrade_steps
+
+    def read_refusal(call) -> str:
+        try:
+            call()
+        except steps.Refusal as e:
+            return str(e)
+        return ""
+
+    empty_tree = subprocess.run(["git", "-C", str(g), "mktree"], input="", capture_output=True,
+                                text=True, encoding="utf-8").stdout.strip()
+    bare = subprocess.run(["git", "-C", str(g), "commit-tree", empty_tree, "-m", "no registry"],
+                          capture_output=True, text=True, encoding="utf-8").stdout.strip()
+    check("[dSP-1 S3] a revision that names no commit is refused",
+          "names no commit" in read_refusal(lambda: steps.read_steps(g, "no-such-rev", None)))
+    check("[dSP-1 S3] a revision holding no registry is refused, never read as an empty population",
+          "no registry at" in read_refusal(lambda: steps.read_steps(g, bare, None)), bare)
+    check("[dSP-1 S3] a landed ref git cannot walk is refused, never read as every row unlanded",
+          "git log over no-such-ref failed" in read_refusal(
+              lambda: steps.derive_introduced(g, "no-such-ref", [f"{PFX}demo/kit.toml"], "upgrade", ["demo/first"])))
+    check("[dSP-1 S3] a malformed step id has no before-image path",
+          "is not a step id" in read_refusal(lambda: steps.derive_image_path(g, "nope")))
+    check("[dSP-1 S3] a before-image path climbing out of the target is refused",
+          "is not a path inside the target" in read_refusal(lambda: steps.check_contained(g, "../x")))
+    check("[dSP-1 S3] a value with no TOML scalar spelling is refused",
+          "no TOML scalar spelling" in read_refusal(lambda: steps.render_toml_scalar([1])))
+    im = tmp / "sp-image"
+    (im / ".governance" / "steps" / "demo").mkdir(parents=True)
+    (im / ".governance" / "steps" / "demo" / "first.before.json").write_text(
+        json.dumps({"step": "demo/first", "paths": {"a.txt": {"before": None, "after": "0" * 64}}}),
+        encoding="utf-8", newline="\n")
+    check("[dSP-1 S3] a re-run computing another after-state than the image records is refused",
+          "would not converge" in read_refusal(lambda: steps.write_before_image(im, "demo/first",
+                                                                                lambda before: {"a.txt": b"x"})))
+
+    # ---- AC3 and AC16: the commit is main's first-parent landing, never a branch commit.
+    g = tmp / "sp-land"
+    build_steps_gov(g, files)
+    write_file(g, "demo/kit.toml", demo_head + render_row("demo/first"))
+    settle(g, "first lands on main")
+    x = run_gov_git(g, "rev-parse", "HEAD")
+    git(g, "checkout", "-q", "-b", "feat")
+    write_file(g, f"{gkn}/steps.toml", "# steps\n" + render_row("lib/second", surfaces='["file:.second.txt"]'))
+    settle(g, "second on the branch")
+    git(g, "checkout", "-q", "main")
+    write_file(g, "other/kit.toml", other + "# main moves\n")
+    settle(g, "main moves")
+    git(g, "checkout", "-q", "feat")
+    git(g, "merge", "-q", "--no-ff", "-m", "main into feat", "main")
+    p = run_steps(g, "list")
+    got = {r[1]: r[2] for r in read_listed(p.stdout)}
+    check("[dSP-1 AC3] on a branch that merged main: the landed row reads main's commit, the branch's row unlanded",
+          got == {"demo/first": x, "lib/second": "unlanded"}, p.stdout + p.stderr)
+    p = run_steps(g, "list", "--window")
+    check("[dSP-1 AC16] a home only an unlanded step names prints open, a landed step's home closed",
+          "window: .second.txt · open" in p.stdout
+          and "window: .demo.conf · closed by demo/first" in p.stdout, p.stdout + p.stderr)
+    git(g, "checkout", "-q", "main")
+    git(g, "merge", "-q", "--no-ff", "-m", "land feat", "feat")
+    m = run_gov_git(g, "rev-parse", "HEAD")
+    p = run_steps(g, "list")
+    got = {r[1]: r[2] for r in read_listed(p.stdout)}
+    check("[dSP-1 AC3] once main merges the branch at M, the second row reads M, not its branch commit",
+          got == {"demo/first": x, "lib/second": m}, p.stdout + p.stderr)
+    p = run_steps(g, "list", "--window")
+    check("[dSP-1 AC16] ...and its home now prints closed by its step",
+          "window: .second.txt · closed by lib/second" in p.stdout, p.stdout + p.stderr)
+
+    # ---- AC4 and AC5: frozen landed rows, each case one commit on a branch off main.
+    g = tmp / "sp-frozen"
+    landed = demo_head + render_row("demo/first")
+    main_sha = build_steps_gov(g, {**files, "demo/kit.toml": landed})
+
+    def run_frozen_on(rel: str, body: str, more: tuple = ()) -> subprocess.CompletedProcess:
+        git(g, "checkout", "-q", "-B", "br", "main")
+        write_file(g, rel, body)
+        for mrel, mbody in more:
+            write_file(g, mrel, mbody)
+        settle(g, "branch change")
+        out = run_steps(g, "frozen", "--base", main_sha)
+        git(g, "checkout", "-q", "main")
+        return out
+
+    p = run_frozen_on("demo/kit.toml", landed.replace('"down", "{target}"]', '"down", "{target}", "--x"]'))
+    check("[dSP-1 AC4] an edited landed `down` argv exits 1 naming the id and the field",
+          p.returncode == 1 and "demo/first: its landed `down` was edited" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on("demo/kit.toml", demo_head)
+    check("[dSP-1 AC4] a removed landed row exits 1 naming the id",
+          p.returncode == 1 and "demo/first: the landed [[upgrade]] row is gone" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on(f"{gkn}/steps/s1.py", "print('s1')\n#\n")
+    check("[dSP-1 AC4] one edited byte of a landed {gov}/ program exits 1 naming the path",
+          p.returncode == 1 and f"demo/first: {PFX}{gkn}/steps/s1.py, a program" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on("demo/kit.toml", demo_head + render_row("demo/second"),
+                      ((f"{gkn}/registry.toml", reg + '\n[[retired]]\nid = "demo/first"\nsuccessor = "demo/second"\n'
+                                                     'surfaces = ["conf-key:.demo.conf#KEY"]\n'),))
+    check("[dSP-1 AC4] the removal with a [[retired]] row naming it and its successor exits 0",
+          p.returncode == 0 and "1 landed row(s)" in p.stdout, p.stdout + p.stderr)
+    p = run_frozen_on("demo/kit.toml", landed + render_row("demo/fixed"))
+    check("[dSP-1 AC5] a correction shipped as a new step beside the unchanged landed row exits 0",
+          p.returncode == 0 and "0 problem(s)" in p.stdout, p.stdout + p.stderr)
+    g = tmp / "sp-empty"
+    empty_sha = build_steps_gov(g, files)
+    p = run_steps(g, "frozen", "--base", empty_sha)
+    check("[dSP-1 AC5] over a base holding no rows the leg exits 0 printing `0 landed row(s)`",
+          p.returncode == 0 and "0 landed row(s)" in p.stdout, p.stdout + p.stderr)
+
+
+def check_succession(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-1 AC6 AC7 AC8 AC9 — `update` and `check` read a retired kit's succession.
+
+    Each target installs the kit `old` at gov commit A; gov then retires it at B, to `new` in one
+    scratch gov and to `none` in another. A receipt claiming an id neither live nor retired is the
+    control that still refuses, so an engine that dropped every unknown claim fails AC8."""
+    gkn = KIT_NAMES["govkit"]
+    kit_body = ('home = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+                '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
+    reg_a = '[surface]\nglobs = ["{prefix}/*"]\n\n[[entry]]\nid = "old"\ndescriptor = "{prefix}/demo/kit.toml"\n'
+
+    def run_gk(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, str(g / PFX / gkn / "govkit.py"), *args],
+                              capture_output=True, text=True, encoding="utf-8", env=STEPS_ENV)
+
+    def build_pair(tag: str, successor: str) -> tuple:
+        g = tmp / f"{tag}-gov"
+        build_steps_gov(g, {f"{gkn}/registry.toml": reg_a, "demo/kit.toml": 'id = "old"\n' + kit_body,
+                            "demo/a.txt": "a\n", "demo/b.txt": "b\n"})
+        t = make_target(tmp / f"{tag}-t", f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["old"]\n')
+        p = run_gk(g, "apply", "--target", str(t))
+        check(f"[dSP-1] the {tag} fixture installs `old`, or every arm over it grades nothing",
+              p.returncode == 0, p.stdout[-900:] + p.stderr[-600:])
+        settle(t, "the install")
+        reg_b = '[surface]\nglobs = ["{prefix}/*"]\n'
+        if successor != "none":
+            reg_b += f'\n[[entry]]\nid = "{successor}"\ndescriptor = "{{prefix}}/demo/kit.toml"\n'
+            (g / PFX / "demo" / "kit.toml").write_bytes((f'id = "{successor}"\n' + kit_body).encode("utf-8"))
+        else:
+            (g / PFX / "demo" / "kit.toml").unlink()
+        reg_b += f'\n[[retired]]\nid = "old"\nsuccessor = "{successor}"\nsurfaces = []\n'
+        (g / PFX / gkn / "registry.toml").write_bytes(reg_b.encode("utf-8"))
+        settle(g, "B: old retires")
+        return g, t
+
+    def read_receipt(t: pathlib.Path) -> dict:
+        return json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+    # ---- AC6, AC9: successor `new`.
+    g, t = build_pair("succ", "new")
+    p = run_gk(g, "check", "--target", str(t))
+    check("[dSP-1 AC9] `check` on a receipt claiming a retired kit prints its successor and counts no problem for it",
+          "old: retired, successor new" in p.stdout and "claims kit 'old'" not in p.stdout, p.stdout + p.stderr)
+    p = run_gk(g, "update", "--target", str(t))
+    check("[dSP-1 AC6] `update` carries a retired kit to its successor instead of refusing the run",
+          "govkit update — retired old: claimed by its successor new" in p.stdout
+          and "no longer a registry entry" not in p.stdout + p.stderr and p.returncode == 0,
+          p.stdout[-1500:] + p.stderr)
+    p = run_gk(g, "update", "--target", str(t), "--write")
+    rec = read_receipt(t)
+    check("[dSP-1 AC6] ...and with --write the receipt's `kits` holds `new`, not `old`, its rows carried",
+          p.returncode == 0 and rec.get("kits") == ["new"]
+          and {f.get("kit") for f in rec.get("files", []) if f.get("source")} == {"new"},
+          p.stdout[-1500:] + p.stderr + json.dumps(rec.get("kits")))
+
+    # ---- AC8, AC9: a claim neither live nor retired still refuses before writing, and `check` counts it.
+    rp = t / ".governance" / "install.json"
+    rec["kits"] = ["ghost"]
+    rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+    settle(t, "a ghost claim")
+    held = rp.read_bytes()
+    p = run_gk(g, "update", "--target", str(t), "--write")
+    check("[dSP-1 AC8] a claimed id with no succession row still refuses `update`, naming it, and writes nothing",
+          p.returncode == 2 and "claims kit 'ghost', which is no longer a registry entry" in p.stderr
+          and rp.read_bytes() == held, p.stdout[-900:] + p.stderr)
+    p = run_gk(g, "check", "--target", str(t))
+    check("[dSP-1 AC9] ...and `check` still counts it as a problem",
+          p.returncode == 1 and "the receipt claims kit 'ghost', which is not a registry entry" in p.stdout,
+          p.stdout[-900:] + p.stderr)
+
+    # ---- AC7: successor `none` — each row `withdrawn` with an order, no file deleted.
+    g, t = build_pair("rel", "none")
+    p = run_gk(g, "update", "--target", str(t), "--write")
+    outbox = t / ".governance" / "outbox"
+    rows = [f["path"] for f in read_receipt(t).get("files", []) if f.get("source")]
+    check("[dSP-1 AC7] a kit retired to `none` names each of its rows `withdrawn` with an outbox order",
+          "retired old: released" in p.stdout and rows
+          and all(f"withdrawn          [engine       ] {r}" in p.stdout for r in rows)
+          and all(any(o.name.startswith("update-withdrawn-") and r.split("/")[-1].split(".")[0] in o.name
+                      for o in outbox.glob("*.md")) for r in rows), p.stdout[-1800:] + p.stderr)
+    check("[dSP-1 AC7] ...and deletes none of their files",
+          all((t / r).is_file() for r in rows) and p.returncode == 0, p.stdout[-900:] + p.stderr)
+
+
+def check_fanout_step(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-1 AC10 AC11 AC12 — S6's up, down and witness argvs over scratch targets,
+    each run under `-I` as the runner runs it, the limit read back through gov's own policy reader."""
+    step_py = HERE / "steps" / "fanout_cap.py"
+    policy_py = KIT_DIRS["policy"] / "policy.py"
+    scaffold = subprocess.run([sys.executable, str(policy_py), "scaffold"], capture_output=True).stdout
+
+    def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
+        return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
+                              text=True, encoding="utf-8")
+
+    def read_limit(t: pathlib.Path, rev: str) -> str:
+        return subprocess.run([sys.executable, str(policy_py), "get", "runtime.agents-in-flight", "--rev", rev],
+                              cwd=str(t), capture_output=True, text=True, encoding="utf-8").stdout.strip()
+
+    def build_capped(tag: str, conf: bytes) -> pathlib.Path:
+        t = make_target(tmp / tag, None)
+        (t / ".governance").mkdir(exist_ok=True)
+        (t / ".governance" / "policy.toml").write_bytes(scaffold.replace(b"\r\n", b"\n"))
+        (t / ".agent-cap.conf").write_bytes(conf)
+        settle(t, "a capped target")
+        return t
+
+    def read_tree(t: pathlib.Path) -> dict:
+        return {p.relative_to(t).as_posix(): p.read_bytes() for p in t.rglob("*")
+                if p.is_file() and ".git" not in p.relative_to(t).parts}
+
+    t = build_capped("fs-ac10", b"FANOUT_CAP=2\n")
+    sha0 = run_gov_git(t, "rev-parse", "HEAD")
+    w0, up = run_step("witness", t), run_step("up", t)
+    settle(t, "the step")
+    w1 = run_step("witness", t)
+    check("[dSP-1 AC10] the up moves FANOUT_CAP=2 into the key: the limit reads 2 before and after, the file gone",
+          up.returncode == 0 and read_limit(t, sha0) == "2" and read_limit(t, "HEAD") == "2"
+          and not (t / ".agent-cap.conf").exists()
+          and "agents-in-flight = 2\n" in (t / ".governance" / "policy.toml").read_text(encoding="utf-8"),
+          up.stdout + up.stderr + read_limit(t, "HEAD"))
+    check("[dSP-1 AC10] ...and its witness exits 0 after, where it exited 1 before",
+          w0.returncode == 1 and w1.returncode == 0, w0.stdout + w1.stdout)
+
+    t = build_capped("fs-ac11", b"\xef\xbb\xbfFANOUT_CAP=\"3\"\r\n")
+    pre = read_tree(t)
+    up, down = run_step("up", t), run_step("down", t)
+    check("[dSP-1 AC11] a down after the up leaves a BOM-led CRLF conf and the policy file byte-identical",
+          up.returncode == 0 and down.returncode == 0 and read_tree(t) == pre
+          and not (t / ".governance" / "steps" / "agent-cap").exists(), up.stderr + down.stdout + down.stderr)
+
+    t = build_capped("fs-ac11k", b"FANOUT_CAP=2\n")
+    pre = read_tree(t)
+    run_step("up", t)
+    for rel, data in pre.items():
+        (t / rel).write_bytes(data)  # back to the before state with the image kept: an up killed after it
+    down = run_step("down", t)
+    check("[dSP-1 AC11] a down after an up killed once its before-image was written exits 0 and leaves the before state",
+          down.returncode == 0 and read_tree(t) == pre, down.stdout + down.stderr)
+
+    t = build_capped("fs-ac11e", b"FANOUT_CAP=2\n")
+    run_step("up", t)
+    pol = t / ".governance" / "policy.toml"
+    pol.write_bytes(pol.read_bytes() + b"# edited after the up\n")
+    mid = read_tree(t)
+    down = run_step("down", t)
+    check("[dSP-1 AC11] a down over a policy file edited after the up exits 1 naming it and changes nothing",
+          down.returncode == 1 and ".governance/policy.toml" in down.stderr and read_tree(t) == mid,
+          down.stdout + down.stderr)
+
+    for tag, conf in (("abc", b"FANOUT_CAP=abc\n"), ("other", b"FANOUT_CAP=2\nOTHER=1\n")):
+        t = build_capped(f"fs-ac12{tag}", conf)
+        pre = read_tree(t)
+        up = run_step("up", t)
+        check(f"[dSP-1 AC12] a conf holding {conf.decode('ascii').strip()!r}: the up exits 1 naming the file "
+              f"and writes no byte, before-image included",
+              up.returncode == 1 and ".agent-cap.conf" in up.stderr and read_tree(t) == pre, up.stdout + up.stderr)
+
+    t = build_capped("fs-dirty", b"FANOUT_CAP=2\n")
+    (t / ".agent-cap.conf").write_bytes(b"FANOUT_CAP=3\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dSP-1 S6] a conf differing from its blob at HEAD: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and ".agent-cap.conf: differs from its blob at HEAD" in up.stderr
+          and read_tree(t) == pre, up.stdout + up.stderr)
+    # F9: the one writer edits one line in place and refuses an edit tomllib does not read back.
+    steps = govkit_module().upgrade_steps
+    got = steps.render_policy_text("# kept\r\n[runtime]\r\nagents-in-flight = 6 # x\r\n", "runtime", "agents-in-flight", 2)
+    check("[dSP-1 S6 F9] render_policy_text rewrites the key's own line and keeps the file's CRLF and other lines",
+          got == "# kept\r\n[runtime]\r\nagents-in-flight = 2\r\n", repr(got))
+    try:
+        steps.render_policy_text("runtime.agents-in-flight = 6\n", "runtime", "agents-in-flight", 2)
+        _why = ""
+    except steps.Refusal as e:
+        _why = str(e)
+    check("[dSP-1 S6 F9] ...and refuses a key held as a dotted key, which a second table would shadow",
+          "setting runtime.agents-in-flight leaves text tomllib does not read" in _why, _why)
+    try:
+        steps.render_policy_text('[runtime]\nnote = """\nagents-in-flight = 6\n"""\n', "runtime", "agents-in-flight", 2)
+        _why = ""
+    except steps.Refusal as e:
+        _why = str(e)
+    check("[dSP-1 S6 F9] ...and refuses an edit that lands inside a string, so tomllib reads no value back",
+          "does not read back" in _why, _why)
+
+    t = build_capped("fs-utf8", b"\xff\n")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dSP-1 S6] a conf that is not UTF-8: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and ".agent-cap.conf: not UTF-8" in up.stderr and read_tree(t) == pre,
+          up.stdout + up.stderr)
+    t = make_target(tmp / "fs-badpol", None)
+    (t / ".governance").mkdir(exist_ok=True)
+    (t / ".governance" / "policy.toml").write_bytes(b"[runtime\n")
+    (t / ".agent-cap.conf").write_bytes(b"FANOUT_CAP=2\n")
+    settle(t, "a policy file no revision of which is valid")
+    pre = read_tree(t)
+    up = run_step("up", t)
+    check("[dSP-1 S6] a policy read the reader refuses at HEAD: the up exits 1 naming it and writes no byte",
+          up.returncode == 1 and "policy.py get runtime.agents-in-flight refused at HEAD" in up.stderr
+          and read_tree(t) == pre, up.stdout + up.stderr)
+
+    t = build_capped("fs-f10", b"FANOUT_CAP=9\n")
+    pol0 = (t / ".governance" / "policy.toml").read_bytes()
+    up = run_step("up", t)
+    check("[dSP-1 S6 F10] a FANOUT_CAP that lowers nothing retires the file and leaves the policy file byte-identical",
+          up.returncode == 0 and not (t / ".agent-cap.conf").exists()
+          and (t / ".governance" / "policy.toml").read_bytes() == pol0, up.stdout + up.stderr)
+
+
 def main() -> int:
     # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
     # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
@@ -3024,6 +3497,9 @@ def main() -> int:
         check_mode_carry(tmp / "mc")
         check_mode_never_down(tmp / "nd")
         check_hold_region()
+        check_upgrade_steps(tmp / "dsp")
+        check_succession(tmp / "dsc")
+        check_fanout_step(tmp / "dfs")
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
@@ -5852,6 +6328,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -5915,6 +6392,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -6152,6 +6630,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -7464,6 +7943,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -8253,6 +8733,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -8944,6 +9425,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -9371,6 +9853,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -9685,6 +10168,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -10212,6 +10696,7 @@ user_skills = "/tmp/gk-fake-skills"
         (_gs2 / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
         shutil.copy2(GOVKIT, _gs2 / PFX / KIT_NAMES["govkit"] / "govkit.py")
         shutil.copy2(GOVKIT.parent / "adopters.toml", _gs2 / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+        shutil.copy2(GOVKIT.parent / "upgrade_steps.py", _gs2 / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (_gs2 / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
             '[surface]\nglobs = ["{prefix}/*"]\n\n'
             '[selection]\ndefault = ["mvkit"]\n\n'
@@ -10399,6 +10884,7 @@ user_skills = "/tmp/gk-fake-skills"
         (_gl / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
         shutil.copy2(GOVKIT, _gl / PFX / KIT_NAMES["govkit"] / "govkit.py")
         shutil.copy2(GOVKIT.parent / "adopters.toml", _gl / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+        shutil.copy2(GOVKIT.parent / "upgrade_steps.py", _gl / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (_gl / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
             '[surface]\nglobs = ["{prefix}/*"]\n\n'
             '[selection]\ndefault = ["landkit"]\n\n'
@@ -10626,6 +11112,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -10803,6 +11290,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 "[selection]\ndefault = [" + ", ".join(f'"{e}"' for e in kits) + "]\n\n"
@@ -12267,6 +12755,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(HERE / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(HERE / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(A13_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / PFX / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
@@ -12616,6 +13105,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(HERE / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(HERE / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(A4_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / PFX / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
@@ -13715,6 +14205,7 @@ user_skills = "/tmp/gk-fake-skills"
         (_g5sib / PFX / "sib").mkdir(parents=True)
         shutil.copy2(HERE / "govkit.py", _g5sib / PFX / KIT_NAMES["govkit"] / "govkit.py")
         shutil.copy2(HERE / "adopters.toml", _g5sib / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+        shutil.copy2(HERE / "upgrade_steps.py", _g5sib / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
         (_g5sib / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
             '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo", "sib"]\n\n'
             '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
@@ -14104,6 +14595,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / "demo").mkdir(parents=True)
             shutil.copy2(HERE / "govkit.py", g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(HERE / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(HERE / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(A6_REG, encoding="utf-8",
                                                                   newline="\n")
             (g / PFX / "demo" / "kit.toml").write_text(a6_kit(leg_argv), encoding="utf-8",
@@ -14602,6 +15094,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["review-harness"]\n\n'
                 '[[entry]]\nid = "review-harness"\ndescriptor = "{prefix}/workflows/kit.toml"\n\n'
@@ -15978,6 +16471,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
             shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
             shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
             (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(M13_REG, encoding="utf-8",
                                                                   newline="\n")
             for eid, leg, eng, chk in (("demo", leg_name, leg_engine, with_check),

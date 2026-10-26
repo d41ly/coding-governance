@@ -38,7 +38,18 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 297    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 255 -> 297 at TOOL-dSafePassage-1, BY THE MEASURED DELTA and not to the live count, which keeps the
+# re-baselining below that row's own job: the matcher read 325 over four modules at the build's base
+# `60d90cb7` and 367 over six on the tree this unit left, so the floor moves by 42. The two new
+# modules are the upgrade-step reader `upgrade_steps.py` (36 `raise Refusal` sites) and the step
+# program `steps/fanout_cap.py` (5 sites, which the matcher counts as 7: two sit in a function nested
+# inside `cmd_up`, and `ast.walk` reaches them from both). The engine lost ONE: `update`'s whole-run
+# refusal of a claim that is no longer a registry entry moved into `resolve_claim`, its text
+# unchanged. 41/41 new sites are reached by a `selftest.py` arm: `check_upgrade_steps` plants every
+# grammar and succession refusal into a scratch gov's `list` and calls the rest in process,
+# `check_succession` reaches `resolve_claim`, and `check_fanout_step` reaches the step's conf, HEAD
+# and policy-read refusals, the down's edited-path refusal and the writer's two.
 # 255 UNMOVED ACROSS THE RECONCILE, deliberately. The merge of origin/main into cMendedVintage
 # unions two branch populations and the matcher reads 264 over the merged four modules. The pin
 # is a FLOOR — `len(branches) < BRANCH_PIN` is the whole test — so the larger of the two

@@ -137,6 +137,7 @@ shell-hygiene selftest	kit	selftests
 spawn budget (forks per hot entrypoint)	repo	product
 spec tokens (a spec's own names resolve)	repo	declarations
 spec-tokens self-test	kit	selftests
+step-rows-frozen	repo	declarations
 straggler-guard arms	repo	declarations
 template size <=48KiB	repo	product
 template size gate selftest	kit	selftests

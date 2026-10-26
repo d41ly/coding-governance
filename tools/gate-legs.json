@@ -1436,6 +1436,18 @@
     "ceiling": 300
   },
   {
+    "name": "step-rows-frozen",
+    "argv": [
+      "python",
+      "{prefix}/govkit/upgrade_steps.py",
+      "frozen"
+    ],
+    "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through govkit's derive_push_base (TOOL-dSafePassage-1).", "history": "it reads every landed row and program at that base out of the object store and compares them with HEAD's (TOOL-dSafePassage-1)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120
+  },
+  {
     "name": "govkit selftest",
     "argv": [
       "python",

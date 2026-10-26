@@ -1,0 +1,9 @@
+# steps.toml — the upgrade steps of surfaces no kit descriptor owns (TOOL-dSafePassage-1, S1).
+#
+# Each row is an `[[upgrade]]` table in the one grammar a descriptor's `[[upgrade]]` rows use, read
+# by `upgrade_steps.py` beside this file and by nothing else: `id = "<entry>/<slug>"`, where
+# `<entry>` names NO registry entry (`govkit`, `lib`); `up`, `down` and `witness` argvs; an optional
+# `resume`; `surfaces`; and `needs-target`. The introducing commit is derived from the default
+# branch's first-parent history and is never typed here. Within one commit this file's rows run
+# before every descriptor's. A landed row is frozen: correct it with a new step, retire it with a
+# `[[retired]]` row in the registry. `python <prefix>/govkit/upgrade_steps.py list` prints the order.

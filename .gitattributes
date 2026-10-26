@@ -214,6 +214,9 @@ memory/map/affordance-exempt.toml text eol=lf
 # is a class this repo has already paid for twice.
 tools/govkit/*.toml text eol=lf
 tools/govkit/*.py text eol=lf
+# The upgrade-step programs (TOOL-dSafePassage-1): a step's frozen bytes are its blob, so a checkout
+# filter must never be what moves them.
+tools/govkit/steps/*.py text eol=lf
 tools/run-gates/*.py text eol=lf
 tools/govkit/entries/*.toml text eol=lf
 tools/*/kit.toml text eol=lf
