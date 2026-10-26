@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-18 — the kind registry completed: every column declared, readers and writers rendered, the pockets witnessed, and `journal` renamed `log`
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 4 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0229@03c635cf whole
 **Carries:** node:record-kind.view
@@ -17,8 +17,12 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
+| [2026-10-26-build-TOOL-dTotalRecall-18-deviation-181.md](../build/2026-10-26-build-TOOL-dTotalRecall-18-deviation-181.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-18-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-18-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -46,13 +50,18 @@ example and the fixtures, each re-pointed or found to hold no reader (§8 F3).
 - **S2** — Readers and writers rendered: each row's `readers` lists the work-order read keys that
   hand it (the roles' closed `reads:` vocabulary, `READ_KEYS` at `tools/roles/roles_lib.py:36`), and
   `record_kinds.py --write` renders into the `gen:record-kinds` view two columns per kind: `read by`,
-  the roles whose `reads:` names one of those keys and the items whose `inputs` name the kind; and
-  `written by`, the roles whose `writes:` class's folder (`WRITE_FOLDERS`,
-  `tools/roles/check_roles.py:99`) covers the kind's `home` and the items whose `returns` is
-  `record-kind.<name>` (TOOL-dDeclaredLoop-12's item row). Observed by AC2.
-- **S3** — The render-parity arm: `--check` re-reads `tools/roles/agents/*.agent.md` and
-  `tools/loop/loop.toml` on their own, derives both columns again and compares them with the
-  committed view, red on any difference. Observed by AC2.
+  the roles whose `reads:` names one of those keys and the items whose `inputs` carry the typed
+  record reference `<layer tag>:record-kind.<name>@<n>` (TOOL-dDeclaredLoop-24 §4 "Records at a
+  version", on the seeded rows by TOOL-dDeclaredLoop-56 S15), a prose input joining nothing (§8 F5);
+  and `written by`, the roles whose `writes:` class's folder (`WRITE_FOLDERS`,
+  `tools/roles/check_roles.py:101` at `c8d46e188`) covers the kind's `home` and the items whose
+  `returns` is `record-kind.<name>@<n>` (TOOL-dDeclaredLoop-12's item row). A kit imports no sibling
+  kit (TOOL-dGroundRules-1 §4), so the roles kit is read through the channel §8 F6 settles, never an
+  undeclared import. Observed by AC2 and AC8.
+- **S3** — The render-parity arm: `--check` re-reads the roles through §8 F6's channel and
+  `tools/loop/loop.toml` with `tomllib`, found through the inline `resolve_kit_dir` block, derives
+  both columns again and compares them with the committed view, red on any difference. Observed by
+  AC2.
 - **S4** — The writer column is the door: for every record kind, `tools/playbook/doors.toml`
   (PLAY-dOrderedCharter-29 S5) carries no row, and its `one-door` check reads the registry's `writer`
   as the kind's door; a record kind with a row in both is red. Observed by AC3.
@@ -107,7 +116,7 @@ example and the fixtures, each re-pointed or found to hold no reader (§8 F3).
 - **consumes-from** `TOOL-dTotalRecall-1` — `record-kinds.toml` and `check_record_kinds`, whose optional columns this unit makes required and whose view it extends
 - **hands-off** `TOOL-dTotalRecall-19` — `log`, the Serves kind the door writes in each record's header, and `canonical_kind`
 - **hands-off** `TOOL-dTotalRecall-20` — `log` and the retired alias `journal`, whose upgrade step unit 20 ships
-- **consumes-from** external — PLAY-dOrderedCharter-29 S5 (`doors.toml` and `one-door`), TOOL-dDeclaredLoop-12 (`tools/loop/loop.toml` item rows), DEFERRED at base and re-grounded by the build run on their landed code
+- **consumes-from** external — PLAY-dOrderedCharter-29 S5 (`doors.toml` and `one-door`), TOOL-dDeclaredLoop-12 (`tools/loop/loop.toml` item rows), TOOL-dDeclaredLoop-24 (their typed record reference), DEFERRED at base and re-grounded by the build run on their landed code
 - **hands-off** `TOOL-dTotalRecall-40` — `canonical_kind` and `KIND_ALIASES`, which that unit's routing region calls and its alias census reads (the round-1 audit's id 36)
 - **hands-off** `TOOL-dTotalRecall-42` — the `home` column's grammar and `canonical_kind`, which that unit relaxes for a declared `unarmed` row and calls in `derive_record_kind` (the round-1 audit's id 51)
 - **hands-off** `TOOL-dTotalRecall-43` — the column grammar, `canonical_kind`, `GIT_OWN` and the rename's prose, which that unit extends and corrects for the round-1 audit's ids 2, 4, 9, 22, 42, 46 and 57
@@ -176,6 +185,7 @@ at the pass.
 
 - `tools/memory-tree/record-kinds.toml`
 - `tools/memory-tree/record_kinds.py`
+- `tools/memory-tree/kit.toml`: the `requires_if` rows naming `roles` and `loop`, under §8 F6 (a)
 - `tools/memory-tree/tree_lib.py`
 - `tools/memory-tree/check-memory-hygiene.sh`
 - `tools/memory-tree/check-memory-hygiene.test.sh`
@@ -200,17 +210,19 @@ at the pass.
   `journal` cells as `log`, a commit touching hundreds of specs for no reader's benefit.
 - **A new registry column for the read keys.** `readers` is I1's column; it holds the keys and the
   view renders the roles.
+- **Match a kind's name in an item input's free text.** An input names a layer tag and prose
+  (TOOL-dDeclaredLoop-12 S3); only the typed record reference is a declared join (§8 F5).
 
 ## 5. Production-readiness checklist
 
 - security — the pocket arm lists one directory and reads no file in it; no write path.
 - perf / scale — one directory listing, one read of each role file and of `loop.toml`.
-- error / empty / loading states — an empty role population or an absent `loop.toml` is `unarmed`
-  and red, never an empty column read as parity.
+- error / empty / loading states — an empty role population, a roles kit that does not resolve or
+  an absent `loop.toml` is `unarmed` naming it and red, never an empty column read as parity.
 - observability — `--check` prints each pocket entry with the row it matched, and each unmatched one.
 - risks — a node-local pocket reds the bar on that node only; the arm names it and the remedy (a row,
   or removing the stray).
-- testing — AC1 to AC7 by the pass; the new arms of §7 at the close.
+- testing — AC1 to AC8 by the pass; the new arms of §7 at the close.
 - migration — none here: TOOL-dTotalRecall-20 ships the adopter's step for the alias.
 - user docs — none under `help/`; `HYGIENE.md` is the rule set and changes by render (S9).
 
@@ -222,8 +234,12 @@ at the pass.
   Red when: a column stays optional.
 - **AC2** — When the fixture's role file `gov-builder.agent.md` gains `input:diff` in its `reads:` line
   with no `--write` run (`--plant role-reads-moved`), `--check` exits 1 naming the `read by` cell of
-  the kind that key hands; after `--write`, it exits 0.
-  Red when: the view is compared with itself rather than with a fresh read of the role files.
+  the kind that key hands; after `--write`, it exits 0. With one fixture item's `inputs` holding
+  `layer.memory:record-kind.log@1` and another's the prose `layer.memory:plan record`
+  (`--plant item-inputs`), the `read by` cell of `log` names the first item and no cell names the
+  second.
+  Red when: the view is compared with itself rather than with a fresh read of the role files, or a
+  prose input joins a kind.
 - **AC3** — When the fixture's `doors.toml` carries a row for the record kind `deviation`
   (`--plant door-twice`), the `one-door` check exits 1 naming the kind and both files; without it,
   the door it reports is the registry's `writer`.
@@ -244,12 +260,19 @@ at the pass.
 - **AC7** — When `git grep -n "Serves:\*\* journal" -- tools` runs at the pass tip, each hit is a
   fixture line of an arm that grades the alias, and no writer's output line remains.
   Red when: a writer still emits `journal`.
+- **AC8** — When `python record_kinds.py --check` runs over a fixture whose roles kit does not
+  resolve (`--plant roles-unresolved`), it exits 1 printing `unarmed` naming the roles kit; at the
+  pass tip a `tomllib` probe of `tools/memory-tree/kit.toml` prints a `requires_if` edge whose `kit`
+  is `roles` with a non-empty `why`. Written to §8 F6's recommendation; the pass re-writes it to the
+  owner's pick.
+  Red when: the roles kit is read through an undeclared import, or an unresolved kit reads as an
+  empty column.
 
 ## 7. Gates
 
 `memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `govkit acceptance matrix` · `playbook render selftest` · `build-index selftest` · `tier2-review self-test` · `backlog migration selftest`
 
-New arm: tools/memory-tree/record_kinds.py · covers AC1 AC2 AC4 · the `record-kinds` leg's `--selftest` gaining the plants `lifecycle-missing`, `role-reads-moved` and the pocket listing's `stray`, staged by clearing one row's `home` · none
+New arm: tools/memory-tree/record_kinds.py · covers AC1 AC2 AC4 AC8 · the `record-kinds` leg's `--selftest` gaining the plants `lifecycle-missing`, `role-reads-moved`, `item-inputs`, `roles-unresolved` and the pocket listing's `stray`, staged by clearing one row's `home` · none
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 · a `log` ledger record with a malformed line red, and a `journal` record graded green, staged by matching `journal` only in the ledger's `awk` · that suite's assertion count, raised by the two arms
 
 ## 8. Open questions
@@ -275,6 +298,38 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 · a `
 - **F4 — The parents this unit calls are DEFERRED at base.** RESOLVED (agent, 2026-10-26,
   delegated): the build run re-grounds `doors.toml` and the item rows on their landed code, rung 1.
   widens: none · relaxes: none
+- **F5 — From what declared field does `read by` take an item?** An item input is `<layer
+  tag>:<what it reads>` and names a layer tag, not a record kind (TOOL-dDeclaredLoop-12 S3 and its
+  data model). Options: (a) the typed record reference `<layer tag>:record-kind.<name>@<n>` that
+  TOOL-dDeclaredLoop-24 §4 "Records at a version" declares (its F2) and TOOL-dDeclaredLoop-56 S15
+  applies to every seeded row, a prose input joining nothing; (b) the role read keys alone, items
+  dropped from `read by`; (c) an ask to dDeclaredLoop for a typed input reference. (c) asks for what
+  (a) already declares, and (b) loses every command item's read. RESOLVED (agent, 2026-10-26,
+  delegated): (a), rung 1, TOOL-dDeclaredLoop-24 F2. widens: none · relaxes: none
+- **F6 — How does `record_kinds.py` read the roles kit, when a kit imports no sibling kit?** S2 needs
+  `READ_KEYS`, `WRITE_FOLDERS` and each role's `reads:` and `writes:`. `tools/memory-tree/kit.toml:8`
+  holds no roles row, and memory-tree cannot `require` roles, which requires it
+  (`tools/roles/kit.toml:12`). No roles verb prints them: `check_roles.py` takes `--write` and
+  `--root` (`:418-420`), and `handoff.py`'s verbs are `render`, `harness-args`, `stage-efforts`,
+  `check`, `roster` and `agents` (`:942-962`). Options: (a) a declared `requires_if` row on
+  `tools/memory-tree/kit.toml` naming `roles`, and one naming `loop` for S3's `loop.toml` read;
+  `record_kinds.py` finds `roles_lib.py` through its inline `resolve_kit_dir` block and calls
+  `load_roles` and `READ_KEYS` in process, reads `WRITE_FOLDERS` where the roles kit keeps it
+  (`check_roles.py:101`, or `roles_lib.py` after TOOL-dBoundRoles-9 S1), and prints `unarmed` where
+  roles does not resolve. The rule admits it as a declaration `govkit selfcheck` grades and that
+  installs nothing, the shape of memory-tree's six rows, and TOOL-dDeclaredLoop-9 F2 reads
+  `roles_lib.load_roles` from the loop kit the same way for the same cycle. (b) `ast.literal_eval`
+  over the roles files' text for the two constants, and a roles verb run by subprocess for each
+  role's `reads` and `writes`. `WRITE_FOLDERS` is a literal dict and reads, but `READ_KEYS` is a
+  `frozenset` over two comprehensions, which `ast.literal_eval` refuses (probed at `c8d46e188`), until
+  TOOL-dBoundRoles-14 S4's literal `READ_FAMILIES` lands; the verb is an ask. (c) `ast.literal_eval`
+  for the constants and memory-tree parsing the role files itself: a second front-matter parser,
+  which TOOL-dBoundRoles-14 §4 rejects. (a) needs no other build and matches a parent's read of the
+  same module, at the cost of one more declared in-process sibling read. (b) keeps memory-tree
+  import-free but waits on dBoundRoles, which is not a parent of this build. Recommendation (a).
+  Open for the owner. Under (b), the ask the build run files is "TOOL-dBoundRoles-14:
+  `check_roles.py --print-tag-rows` gains a mode printing each role's `reads` keys and `writes`
+  class".
 
 ## 9. Revision log
 
@@ -282,6 +337,13 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 AC6 · a `
   row for cl-0229 and the sources read at base `462d20f3`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-40, TOOL-dTotalRecall-42, TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · §2 S2, S3 · §3 the external edge · §4 Files touched, Alternatives rejected ·
+  §5 error states, testing · §6 AC2, AC8 · §7 the `record_kinds.py` arm · §8 F5 and F6 added · §10 ·
+  re-grounded on the parents at `c8d46e188` by
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck` rows 34 and 36: `read by` takes an item
+  through TOOL-dDeclaredLoop-24's typed record reference, never an input's prose, and the roles kit
+  is read through a channel §8 F6 leaves open for the owner, recommending a declared `requires_if`
+  row.
 
 ## 10. Reuse audit
 
@@ -290,7 +352,9 @@ and its classifier in `read_bindings` at `:471` (`:544`, `:565`); the roles' clo
 `READ_KEYS` at `tools/roles/roles_lib.py:36` and the write classes `WRITES` and `WRITE_FOLDERS` at
 `tools/roles/check_roles.py:94` and `:99`, which already type each role's `reads:` and `writes:`; the
 common-dir listing shape `rev-parse --path-format=absolute --git-common-dir` at
-`tools/branch-reconcile/branch_reconcile.py:329`. `python tools/codebase-map/reuse_lookup.py "rename a
+`tools/branch-reconcile/branch_reconcile.py:329`. At `c8d46e188` `WRITES` and `WRITE_FOLDERS` sit at
+`check_roles.py:96` and `:101`, and the in-process sibling-read precedent is memory-tree's own
+`requires_if` rows (`tools/memory-tree/kit.toml:8`). `python tools/codebase-map/reuse_lookup.py "rename a
 serves kind value and keep a retired read-only alias"` returned name-stem neighbours only (`read`,
 `read_text`, `read_records`): no alias mechanism exists, so `KIND_ALIASES` is new. Scout A's rename
 inventory agreed with source at base and missed four readers `git grep` found: `deviation_join.py:33`,

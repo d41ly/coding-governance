@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 16 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0230@63f11811 whole
 
@@ -15,6 +15,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-18 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-19-deviation-191.md](../build/2026-10-26-build-TOOL-dTotalRecall-19-deviation-191.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-19-deviation-192.md](../build/2026-10-26-build-TOOL-dTotalRecall-19-deviation-192.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
@@ -41,7 +44,9 @@ native-id mechanism, `[[native]]` rows in `tools/playbook/namespaces.toml`, and 
 (PLAY-dOrderedCharter-28 S2); the ledger factory `legacy_ledger.py` with its `[[ledger]]` registration
 and `seed_population` (TOOL-dWitnessedBar-13 S1, S2, S8; -15 S1); the build lease ref
 `refs/gov/leases/<slug>/build` (TOOL-dPlacedRequest-1 S1); the catalogue row `memory.legacy-anchors`
-with no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6); and the memory-tree policy adapter
+with no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6); `TYPED_RECORD_KINDS`
+(PLAY-dOrderedCharter-42 S1); the leg declaration and `leg_factory.py` (TOOL-dWitnessedBar-11 S1-S3);
+and the memory-tree policy adapter
 `read_policy_value` in `policy_value.py` (TOOL-dTotalRecall-8 S10).
 
 - **S1** — One header reader, `read_header_edges(path, text)` in `tools/memory-tree/tree_lib.py`, returning
@@ -84,7 +89,10 @@ with no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6); and the memory-tree p
   registration. Observed by AC6 and AC8.
 - **S8** — The causes check, `check_causes(root)` in `tools/memory-tree/record_causes.py`: a tracked record
   with no `<path> -` legacy row, whose kind is not a root, red when it carries no `Caused-by` or one that
-  does not resolve; a legacy record is never red, its cause read from its Serves unit. Observed by AC6.
+  does not resolve; a legacy record is never red, its cause read from its Serves unit. A record of a
+  member of `TYPED_RECORD_KINDS` whose factory fields declare no `Caused-by`, which its parent's own
+  command writes, is graded as §8 F7 settles, built as its recommendation until the owner picks: its
+  cause is its Serves unit, which must resolve. Observed by AC6.
 - **S9** — The orphan check, `check_orphans(root)` in the same module: the roots are each build whose
   `README.md` is tracked at the graded tree, or whose claim ref `refs/gov/claims/<slug>` the repository
   holds (I4); a unit id is reached when its build is rooted and the README's `ids:` names it, or, for a
@@ -102,8 +110,11 @@ with no `summary` or `usage` (TOOL-dGroundRules-1 S3, S6); and the memory-tree p
   line its row admits, `memory.legacy-anchors = "none"`, and its name leaves
   `tools/policy/unsummarised-keys.txt` through `policy.py lists --write`; the mirror lands in a second
   commit. Observed by AC9.
-- **S12** — The leg `record causes (causes and orphans over the legacy population)` in
-  `tools/gate-legs.json`, argv `python {prefix}/memory-tree/record_causes.py --check`, with its meta-gate
+- **S12** — The leg `record causes (causes and orphans over the legacy population)`, argv
+  `python {prefix}/memory-tree/record_causes.py --check`, declared once through `leg_factory.py` with
+  every manifest key, `enforces = ["principle.p35"]` among them (P35, "Every record names its cause",
+  v2:1049; PLAY-dOrderedCharter-7 S3 reds a leg with none), rendered into
+  `tools/gate-legs.json` by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1, S2), with its meta-gate
   rows, and the fixture `record_causes.py --fixture --plant <case>` building a scratch repository under
   the system temp directory, committed, with its own registry rows, records, README and claim ref.
   Observed by AC6 and AC7.
@@ -284,8 +295,11 @@ SHA. An adopter seeds its own at its update, through TOOL-dTotalRecall-20's step
 - **AC6** — When `python record_causes.py --check` runs at the tree after the seed, it prints `0
   causeless · 0 orphan(s)` and the legacy row count equal to `git ls-files` over the record folders; with
   `--fixture --plant causeless`, a new record serving a unit with no `Caused-by`, it names that record's
-  path under `causes`.
-  Red when: the seed counts fewer rows than the records, or the plant reads green.
+  path under `causes`; with `--plant typed-causeless`, a new `-card-1.md` record served `card` with no
+  `Caused-by` whose Serves unit resolves, it names nothing; and a `python -c` probe printing the leg's
+  row of `tools/gate-legs.json` shows `enforces` holding `principle.p35`.
+  Red when: the seed counts fewer rows than the records, the plant reads green, a parent's typed record
+  reds for a field its kind does not declare, or the leg carries no `enforces`.
   figure: DERIVED at observation; 4,244 records at `fb872a37`.
 - **AC7** — When `--fixture --plant orphan` runs, two new records each `Caused-by` the other, `--check`
   names both under `orphans`; with `--plant claim-root`, a record caused by a unit of a build whose README
@@ -308,7 +322,7 @@ SHA. An adopter seeds its own at its update, through TOOL-dTotalRecall-20's step
 
 `build-index selftest` · `memory hygiene` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `playbook render selftest` · `govkit acceptance matrix` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `straggler-guard arms` · `transition-audit arms`
 
-New arm: tools/memory-tree/record_causes.py · covers AC4 AC6 AC7 AC8 · the `record causes (causes and orphans over the legacy population)` leg and the fixture plants `legacy`, `causeless`, `orphan`, `claim-root` and `none`, staged by the walk seeded from the records instead of the roots · none
+New arm: tools/memory-tree/record_causes.py · covers AC4 AC6 AC7 AC8 · the `record causes (causes and orphans over the legacy population)` leg and the fixture plants `legacy`, `causeless`, `typed-causeless`, `orphan`, `claim-root` and `none`, staged by the walk seeded from the records instead of the roots · none
 New arm: tools/memory-tree/gov_record.py · covers AC1 AC2 AC3 AC5 · the door's selftest cases for a missing cause, both `Made-by` stand-ins and the three edge-line refusals, staged by the cause refusal cut · none
 
 ## 8. Open questions
@@ -346,6 +360,21 @@ New arm: tools/memory-tree/gov_record.py · covers AC1 AC2 AC3 AC5 · the door's
   RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, BUILD-METHOD M2 ("to diverge, change the spec
   first") and the brief's rule that a spec calls each parent surface as its spec names it.
   widens: none · relaxes: none
+- **F7 — How does the causes check grade a parent's typed kind that declares no `Caused-by`?** `card`
+  (fields `Build`, `Step`, `Ref`; TOOL-dPlacedRequest-2:107-108), `probe-trigger` and `probe`
+  (TOOL-dPlacedRequest-7:93-96) and `gate-health` (`Measured`, `Verdicts`, `Legs`;
+  TOOL-dWitnessedBar-1:78-79) are written by their parents' own commands, never by the door, so S8 as
+  first written reds every one written after the seed. Options: (a) those kinds as roots, `root =
+  true` on their rows, which also makes each a root of the orphan walk it is not; (b) a registry
+  exemption, so the check grades neither their cause nor their reach; (c) asks to dPlacedRequest and
+  dWitnessedBar to add `Caused-by` to those kinds' factory fields; (d) the cause read from the Serves
+  unit, as for a legacy record, for a member of `TYPED_RECORD_KINDS` whose factory field list holds no
+  `Caused-by`, derived from its TOOL-dTotalRecall-1 row, so the record is still graded on a resolving
+  unit and still reached by the walk. Recommendation: (d): no parent change, no list typed here, and a
+  kind whose parent later adds the field is graded on it with no edit. Under (c) the build run would
+  file in dPlacedRequest's `BACKLOG.md` "add `Caused-by` to the `card`, `probe-trigger` and `probe`
+  factory fields" and in dWitnessedBar's the same for `gate-health`. Until the owner picks, this unit
+  builds as (d). Open for the owner.
 
 ## 9. Revision log
 
@@ -358,6 +387,10 @@ New arm: tools/memory-tree/gov_record.py · covers AC1 AC2 AC3 AC5 · the door's
 - rev-4 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-66, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
 - rev-5 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-88, each the other end of an edge a
   unit the round-1 spec audit of units 71 to 76 promoted wrote; nothing else moved.
+- rev-6 · 2026-10-26 · §2 preconditions, S8, S12 · §6 AC6 · §7 the `record_causes.py` arm · §8 F7 added · the parents'
+  re-ground, rows 38 and 39 of `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`: the
+  parents' typed kinds that declare no `Caused-by` are graded as F7 settles, and the leg is declared
+  with `enforces`.
 
 ## 10. Reuse audit
 

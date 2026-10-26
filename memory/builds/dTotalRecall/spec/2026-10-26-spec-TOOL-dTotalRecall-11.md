@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-11 — the shape-run kind, the parsed view of the review-shape line
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 14 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0222@bc317ce6 whole
 
@@ -14,6 +14,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-11-deviation-111.md](../build/2026-10-26-build-TOOL-dTotalRecall-11-deviation-111.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-11-deviation-112.md](../build/2026-10-26-build-TOOL-dTotalRecall-11-deviation-112.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
@@ -35,7 +38,9 @@ Preconditions this unit calls and does not build, each cited by its parent spec:
 `gov_record.py` (TOOL-dTotalRecall-2, I2); the registry `record-kinds.toml` and `check_record_kinds`
 (TOOL-dTotalRecall-1, I1); the typed build-folder record factory `tools/memory-tree/build_records.py`
 (PLAY-dOrderedCharter-7 S7) and its one kind list `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`
-(PLAY-dOrderedCharter-42 S1, S2); and the four fields `review.cost` appends to the line, `trigger=`,
+(PLAY-dOrderedCharter-42 S1, S2), with the closed kind list of `tools/memory-tree/HYGIENE.template.md`
+(its S5); the leg's one declaration and `tools/run-gates/leg_factory.py` (TOOL-dWitnessedBar-11 S1 to
+S3), and `enforces` with its meta-check (PLAY-dOrderedCharter-7 S2, S3); and the four fields `review.cost` appends to the line, `trigger=`,
 `shape=`, `efforts=`, `role-sha=` (TOOL-dDeclaredLoop-20 S3).
 
 - **S1** — The parser, `tools/memory-tree/shape_run.py`: `SHAPE_RE`, the line's grammar of §4 "The
@@ -45,9 +50,13 @@ Preconditions this unit calls and does not build, each cited by its parent spec:
 - **S2** — The parser's CLI: `python shape_run.py --parse-line <line>` prints the fields as `key=value`
   lines and exits 0, or exits 2 naming the first field that does not match; `--parse-file <path>` does
   the same for every line of a file and prints `<n> parsed · <m> refused`. Observed by AC1 and AC2.
-- **S3** — The kind in the factory: `shape-run` joins `TYPED_RECORD_KINDS`, and the factory's per-kind
-  table gains its fields (§4 "The record"), so `**Serves:** shape-run <unit id>` binds and its records
-  are named `<date>-build-<unit id>-shape-run-<n>.md` in the build's `build/` folder. Observed by AC3.
+- **S3** — The kind in the factory: `shape-run` joins `TYPED_RECORD_KINDS`, the factory's per-kind
+  table gains its fields (§4 "The record"), and the closed `<kind>` list of
+  `tools/memory-tree/HYGIENE.template.md` (`:628-630`) gains `shape-run` with a half-line naming this
+  unit, carried into `memory/HYGIENE.md` by `adopt-memory-tree.sh --render`: the three lists
+  PLAY-dOrderedCharter-42 S2 and S5 keep one, all joined in this pass. So `**Serves:** shape-run <unit
+  id>` binds and its records are named `<date>-build-<unit id>-shape-run-<n>.md` in the build's `build/`
+  folder. Observed by AC3 and AC10.
 - **S4** — The door verb: `gov_record.py new shape-run --review <review record>` reads the review
   record, takes its line with `read_shape_line`, parses it, and writes the record through the factory,
   its `Caused-by` the review record's stem and its `<unit id>` the review file name's id. A record with
@@ -60,8 +69,14 @@ Preconditions this unit calls and does not build, each cited by its parent spec:
   difference names the record, the field and both values. Observed by AC6.
 - **S6** — The registry row in `tools/memory-tree/record-kinds.toml`, `name = "shape-run"`, every I1
   column filled as §4 "The row" states, and the leg `shape-run records (each record equals its review
-  line)` in `tools/gate-legs.json`, argv `python {prefix}/memory-tree/shape_run.py --check`, which runs
-  S5 and is the row's `check`. Observed by AC6 and AC7.
+  line)`, argv `python {prefix}/memory-tree/shape_run.py --check`, which runs S5 and is the row's
+  `check`. The leg is declared once, a `[[gate_leg]]` row of `tools/memory-tree/kit.toml` written by
+  `python tools/run-gates/leg_factory.py new` and rendered into `tools/gate-legs.json` by its `--write`
+  (TOOL-dWitnessedBar-11 S1 to S3), carrying `enforces = ["practice.one-fact"]`. cl-0222 sits in no v2
+  `[enforcement]` row, so the tag is step 2 of TOOL-dWitnessedBar-11 §4 "The enforces rule": the
+  practice whose line states the rule a red of this leg reports broken, the record and its review line
+  being one fact a gate compares (§4 "The record"). PLAY-dOrderedCharter-7 S3 reds a leg with no
+  `enforces`. Observed by AC6, AC7 and AC9.
 - **S7** — `SHAPE_RE` moves: `tools/workflows/tier2-review.test.sh` drops its regex, passes the resolved
   python (`bd_py`, `:2081`) to `run.js` beside the memory-tree kit dir it already passes (`:2114`), and
   checks each exit's `shape` with `shape_run.py --parse-line`, keeping its stage and `out-tokens=unknown`
@@ -169,14 +184,16 @@ check = "shape-run records (each record equals its review line)"
 ```
 
 The four optional fields stay out of `fields`, which lists the required ones S4 of TOOL-dTotalRecall-1
-grades. The `check` cell names the leg S5 adds: `python {prefix}/memory-tree/shape_run.py --check`, in
-`tools/gate-legs.json` with its meta-gate rows.
+grades. The `check` cell names the leg S6 declares: `python {prefix}/memory-tree/shape_run.py --check`,
+its `[[gate_leg]]` row in `tools/memory-tree/kit.toml` rendered into `tools/gate-legs.json`, with its
+meta-gate rows.
 
 ### Inventory
 
 Minted: `tools/memory-tree/shape_run.py` with `SHAPE_RE`, `parse_shape_line`, `read_shape_line`,
 `check_shape_runs` and the `--parse-line` and `--parse-file` modes; the `shape-run` member of
-`TYPED_RECORD_KINDS`; the factory's `shape-run` table; the door's `shape-run` handler; the registry row.
+`TYPED_RECORD_KINDS` and of HYGIENE's closed kind list; the factory's `shape-run` table; the door's
+`shape-run` handler; the registry row; the leg's `[[gate_leg]]` row.
 Naming cells: each function is asked of the lexicon's `--suggest` under `--as py.function` at the pass.
 
 ### Migration
@@ -191,7 +208,9 @@ shape-run record; a later writer may file them through the verb.
 - `tools/memory-tree/build_records.py`
 - `tools/memory-tree/tree_lib.py`
 - `tools/memory-tree/record-kinds.toml`
-- `tools/gate-legs.json`
+- `tools/memory-tree/HYGIENE.template.md`, `memory/HYGIENE.md` (the render, never the edit)
+- `tools/memory-tree/kit.toml` (the leg's `[[gate_leg]]` row)
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`)
 - `tools/workflows/tier2-review.test.sh`
 - `tools/workflows/README.md`
 
@@ -216,7 +235,7 @@ shape-run record; a later writer may file them through the verb.
 - observability — the door prints the written path or the existing one; the check names record, field
   and both values.
 - risks — a harness change to the line's bytes now reds the suite through the parser; that is the point.
-- testing — AC1 to AC8 by a pass; the arms of §7 at the close.
+- testing — AC1 to AC10 by a pass; the arms of §7 at the close.
 - migration — none, as §4 says.
 - user docs — none under `help/`: no page covers review records; `tools/workflows/README.md` points at
   the grammar (S7).
@@ -263,6 +282,16 @@ shape-run record; a later writer may file them through the verb.
   Red when: the suite keeps a regex of its own, so the parser and the suite can disagree.
   permission: the suite is the close's; this pass observes the `--parse-line` call the arm makes on the
   six stub lines, run by hand.
+- **AC9** — When a probe reads `tools/gate-legs.json` at the pass tip, the row named `shape-run records
+  (each record equals its review line)` carries `enforces` holding `practice.one-fact`, and `python
+  leg_factory.py --list` run from `tools/run-gates/` names its declaring file `tools/memory-tree/kit.toml`.
+  Red when: the declaration carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds
+  with no pending row to excuse it.
+- **AC10** — When a probe reads the bullet of `HYGIENE.template.md` that opens with the closed `<kind>`
+  list, from `tools/memory-tree/`, it names `shape-run` as a backticked kind, and the same bullet of
+  `memory/HYGIENE.md` is byte-equal to it.
+  Red when: the kind joins the tuple and the factory but not the doc's closed list, which
+  PLAY-dOrderedCharter-42 AC5 reds.
 
 ## 7. Gates
 
@@ -304,6 +333,12 @@ New arm: tools/memory-tree/shape_run.py · covers AC1 AC6 · its own `--selftest
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-42, TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted.
+- rev-4 · 2026-10-26 · §2 preconditions, S3, S6 · §4 The row, Inventory, Files touched · §5 testing · §6
+  AC9, AC10 · re-grounded on dWitnessedBar at `443775a2f`, PLAY-dOrderedCharter-7 and
+  PLAY-dOrderedCharter-42, by the cross-check record
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck`, rows 29 and 30: the leg is declared once
+  with `enforces = ["practice.one-fact"]`, read by AC9, and `shape-run` joins HYGIENE's closed kind
+  list and its render, read by AC10.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 3 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 3 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0219@62a3f369 whole
 **Carries:** node:record-kind.code
@@ -16,9 +16,13 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-2 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
 | [2026-10-26-build-TOOL-dTotalRecall-8-deviation-81.md](../build/2026-10-26-build-TOOL-dTotalRecall-8-deviation-81.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-8-deviation-82.md](../build/2026-10-26-build-TOOL-dTotalRecall-8-deviation-82.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-8-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
 <!-- /gen:spec-records -->
@@ -93,10 +97,16 @@ is never built.
   anchored dossier as stale only when an anchored definition's body hash at HEAD differs from its hash
   at the dossier's last commit. `memory/map/features/lexicon.md` anchors `read_defs_at` and
   `extract_text`. Observed by AC9.
-- **S13** — The leg `code record`, argv `python {prefix}/memory-tree/code_record.py --check`, and its
-  meta-gate rows in `tools/govkit/registry.toml`, `tools/govkit/subject-pins.tsv`,
+- **S13** — The leg `code record`, argv `python {prefix}/memory-tree/code_record.py --check`, declared
+  once where TOOL-dWitnessedBar-11 S1 puts a leg whose program an adopter receives: a `[[gate_leg]]`
+  row of `tools/memory-tree/kit.toml`, written by `python tools/run-gates/leg_factory.py new` and
+  rendered into `tools/gate-legs.json` by its `--write` (its S2, S3). The row holds every manifest key,
+  `enforces = ["principle.p32"]` among them: P32's v2 `[enforcement]` row names cl-0219, the clause this
+  unit carries (TOOL-dWitnessedBar-11 §4 "The enforces rule", step 1), and PLAY-dOrderedCharter-7 S3's
+  meta-check reds a leg with no `enforces`, its pending list taking no row after its pass (`:227-228`).
+  Observed by AC10. Its other meta-gate rows, `tools/govkit/subject-pins.tsv`,
   `tools/run-gates/ceiling-evidence.txt` and the `gate-legs` claim of
-  `memory/map/features/memory-tree-hygiene.md`. NOT OBSERVED by a criterion: each meta-gate grades
+  `memory/map/features/memory-tree-hygiene.md`, are NOT OBSERVED by a criterion: each meta-gate grades
   its row at the close.
 
 ## 3. Non-goals (OUT)
@@ -122,7 +132,7 @@ is never built.
 - **hands-off** `TOOL-dTotalRecall-7` — `policy_value.py`, the adapter the ask door reads `asks.acceptance` through
 - **hands-off** `TOOL-dTotalRecall-9` — `policy_value.py`, the adapter the budget and slice keys are read through
 - **hands-off** `TOOL-dTotalRecall-19` — `policy_value.py`, the adapter `memory.legacy-anchors` is read through
-- **consumes-from** external — PLAY-dOrderedCharter-19 S4 (the index, `build_index`, `blob_row`) and S10 (`common_dir.py`), PLAY-dOrderedCharter-19 S2 (`namespaces.toml`), TOOL-dGroundRules-1 S3 and -2 (the catalogue row and `policy.py get`); DEFERRED at base, re-grounded by the build run on their landed code
+- **consumes-from** external — PLAY-dOrderedCharter-19 S4 (the index, `build_index`, `blob_row`) and S10 (`common_dir.py`), PLAY-dOrderedCharter-19 S2 (`namespaces.toml`), TOOL-dGroundRules-1 S3 and -2 (the catalogue row and `policy.py get`), PLAY-dOrderedCharter-7 S2 and S3 (`enforces` and the meta-check), TOOL-dWitnessedBar-11 S1 to S3 (the leg declaration and `leg_factory.py`); DEFERRED at base, re-grounded by the build run on their landed code
 - **hands-off** external — dLinkedLibrary retires `symbols.json` and `reuse_lookup.py` onto this record (v2:1775); dBoundRoles' `code` slot reads it
 - **hands-off** `TOOL-dTotalRecall-37` — the `.gitattributes` registration of generated code, which that unit narrows to the four rendered workflow scripts (the round-1 audit's id 16)
 - **hands-off** `TOOL-dTotalRecall-43` — `policy_value.py`, `code_record.py`'s cache and the `code record` leg's meta-gate rows, which that unit routes through and changes for the round-1 audit's ids 11, 21, 32, 33, 40, 54 and 55
@@ -206,8 +216,8 @@ under `--as py.function` at the pass.
 - `memory/map/features/lexicon.md`
 - `memory/map/features/memory-tree-hygiene.md`
 - `.gitattributes`
-- `tools/gate-legs.json`
-- `tools/govkit/registry.toml`
+- `tools/memory-tree/kit.toml` (the leg's `[[gate_leg]]` row)
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`)
 - `tools/govkit/subject-pins.tsv`
 - `tools/run-gates/ceiling-evidence.txt`
 - `tools/memory-tree/README.md`
@@ -235,7 +245,7 @@ under `--as py.function` at the pass.
   mentions per language and skipped rows by reason.
 - risks — the record losing its re-timing (§8 F1); an ambiguity over 10% shipping a language's edges
   as mentions, which the meta line reports.
-- testing — AC1 to AC9 by the pass; the new arms of §7 at the close.
+- testing — AC1 to AC10 by the pass; the new arms of §7 at the close.
 - migration — none: no record or conf changes; `.gitattributes` gains lines that change no checkout.
 - user docs — `tools/memory-tree/README.md` gains the record's section; no `help/` page names the
   map's symbols today.
@@ -286,6 +296,12 @@ under `--as py.function` at the pass.
   body changes in a later commit while the file's other definitions do not, the dossier is stale; a
   change to another definition in `a.py` leaves it fresh; a key the record lacks is refused.
   Red when: staleness is still read at path granularity for an anchored dossier.
+- **AC10** — When a probe reads `tools/gate-legs.json` at the pass tip, the row named `code record`
+  carries `enforces` holding `principle.p32` and an argv naming `code_record.py --check`, and `python
+  leg_factory.py --list` run from `tools/run-gates/` names its declaring file
+  `tools/memory-tree/kit.toml`.
+  Red when: the declaration carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds
+  with no pending row to excuse it.
 
 ## 7. Gates
 
@@ -332,6 +348,11 @@ New arm: tools/codebase-map/selftest.py · covers AC9 · an anchored-dossier sta
   scout B's row for cl-0219 and the sources read at base `462d20f3`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-37, TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved. The Carries pin re-pinned from `927a3172` to `62a3f369`, the hash the as-built view gives cl-dClosedLoop-0219 once deviation 81 states its whole clause as After.
+- rev-3 · 2026-10-26 · §2 S13 · §3 Edges · §4 Files touched · §5 testing · §6 AC10 · re-grounded on
+  dWitnessedBar at `443775a2f` and PLAY-dOrderedCharter-7, by the cross-check record
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck`, row 25: the `code record` leg is declared
+  once, a memory-tree `[[gate_leg]]` row in place of a `tools/govkit/registry.toml` row, carrying
+  `enforces = ["principle.p32"]`, and AC10 reds a declaration without it.
 
 ## 10. Reuse audit
 

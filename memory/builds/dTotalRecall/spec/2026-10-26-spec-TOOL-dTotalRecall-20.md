@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-20 — this build's own upgrade steps: the journal alias, the scaffold verbs forwarded to record, the front matter graded, and the retag
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 21 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0231@392c9e56 whole
 
@@ -11,6 +11,9 @@
 | [2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-a.md](../build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-a.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-7 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
+| [2026-10-26-build-TOOL-dTotalRecall-20-deviation-201.md](../build/2026-10-26-build-TOOL-dTotalRecall-20-deviation-201.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
@@ -30,15 +33,23 @@ adopter's own records only under `memory.legacy-anchors: retag`.
 The step grammar, its reader and the walk are TOOL-dSafePassage-1 S1 and S3 (`[[upgrade]]` rows read
 by `tools/govkit/upgrade_steps.py`) and TOOL-dSafePassage-2 S2. The shim declaration, its generator
 and its call rule are TOOL-dSafePassage-6 S1 to S5 (`tools/govkit/shims.toml`,
-`tools/govkit/shims.py`, `install.on-shim-call`). The policy read is PLAY-dOrderedCharter-19 S8's
-`read_policy_value` (shared interface I8). All are DEFERRED at base `462d20f3`.
+`tools/govkit/shims.py`, `install.on-shim-call`). The policy read is govkit's own
+`read_policy_value(key, root, rev=None)` in `tools/govkit/govkit.py` (TOOL-dSafePassage-9 §4), which
+runs `policy.py get <key> --explain` in `root`; a step program reaches it by importing `govkit`, as
+`tools/govkit/matrix.py:51-52` does. A govkit module imports no playbook module (TOOL-dWitnessedBar-28
+S5; PLAY-dOrderedCharter-7 §4 "The policy reads"), so the playbook kit's `policy_value.py`
+(PLAY-dOrderedCharter-19 S8) is never read here, and memory-tree's code runs by subprocess, found
+through `govkit.resolve_kit_dir` (`tools/govkit/govkit.py:197`). All are DEFERRED at base `462d20f3`.
 
 - **S1** — The journal step, `memory-tree/serves-journal-read-as-log`, an `[[upgrade]]` row in
   `tools/memory-tree/kit.toml` with `surfaces = ["serves-kind:journal"]` and `resume = "atomic"`.
-  Its program, `tools/govkit/steps/memory_journal_alias.py`, runs gov's own `read_bindings` over the
-  target's records. It prints the count of records whose Serves kind is `journal` and exits 0 when
-  each is read as `log` through unit 18's alias. It exits 1 naming any that does not grade, and it
-  writes no file. The witness is the same read. Observed by AC1.
+  Its program, `tools/govkit/steps/memory_journal_alias.py`, runs gov's
+  `gen_build_index.py --print-bindings` as a subprocess in the target, so gov's `read_bindings` reads
+  the target's records and prints an `S` row per bound record with its kind
+  (`tools/memory-tree/gen_build_index.py:690`, dispatched at `:8761`). It prints the count of `S` rows
+  whose kind is `journal`, and exits 0 when each is read as `log` through unit 18's alias. It exits 1
+  naming each `A` row whose record's `**Serves:**` line opens with `journal`, on the run's exit 2, or
+  naming the memory-tree kit where it does not resolve, and it writes no file. The witness is the same read. Observed by AC1 and AC8.
 - **S2** — The two forwards, `[[shim]]` rows `memory-tree/new-build-to-record` and
   `memory-tree/new-spec-to-record` in `tools/govkit/shims.toml`, of a new kind `verb`. `from` is
   `{prefix}/memory-tree/gen_build_index.py --new-build` (and `--new-spec`), and `to` is
@@ -55,18 +66,20 @@ and its call rule are TOOL-dSafePassage-6 S1 to S5 (`tools/govkit/shims.toml`,
 - **S4** — The front-matter step, `memory-tree/readme-front-matter-graded`, with
   `surfaces = ["front-matter:build-readme"]`. Its program,
   `tools/govkit/steps/memory_front_matter.py`, grades every build README's front matter in the target
-  against unit 4's `FRONT_MATTER_KEYS`, read from gov's `gen_build_index.py`. It prints
-  `<path>: <key> unknown` or `<path>: <key> derived` per finding, and exits 1 on any finding, so the
-  walk stops before the adopter's next hygiene run refuses the key. It writes no file. The witness
-  is the same grade. Observed by AC4.
+  against unit 4's `FRONT_MATTER_KEYS` by running gov's `gen_build_index.py` as a subprocess in the
+  target, through the front-matter print verb §8 F5 settles, never an import of memory-tree. It
+  prints `<path>: <key> unknown` or `<path>: <key> derived` per finding, and exits 1 on any finding,
+  so the walk stops before the adopter's next hygiene run refuses the key. It writes no file. The
+  witness is the same grade. Observed by AC4 and AC8.
 - **S5** — The retag step, `memory-tree/legacy-anchors-retag`, with
   `surfaces = ["record-headings:memory-root"]`. Its program, `tools/govkit/steps/memory_retag.py`, has
   the verbs `plan`, `up [--dry-run]`, `down` and `witness`, after `migrate_backlog.py`'s
   `--plan`, `--dry-run` and `--write`. Each verb reads the target's `memory.legacy-anchors`
-  through `read_policy_value`. Under `derived` or `none` it writes nothing and exits 0. Under
-  `retag`, `plan` lists each untagged heading of the target's records with the anchor unit 19
-  derives for it (`derive_anchor`, I15), and `up` writes each as the heading's authored tag,
-  `## [<anchor>] <heading>`. Observed by AC5 and AC6.
+  through govkit's `read_policy_value("memory.legacy-anchors", target)`. Under `derived` or `none` it
+  writes nothing and exits 0. Under `retag`, `plan` lists each untagged heading of the target's
+  records with the anchor unit 19 derives for it (`derive_anchor`, I15, in the playbook kit's
+  `tools/playbook/tag_index.py`, reached as §8 F6 settles), and `up` writes each as the heading's
+  authored tag, `## [<anchor>] <heading>`. Observed by AC5, AC6 and AC8.
 - **S6** — The retag's conservation. Before writing, and again after, each rewritten record equals
   its earlier bytes once every inserted `[<anchor>] ` is cut. Every untagged heading it planned is
   then tagged, and no other byte moves. `up` writes through TOOL-dSafePassage-1's before-image
@@ -153,7 +166,8 @@ Minted: the step ids `memory-tree/serves-journal-read-as-log`, `memory-tree/read
 and `memory-tree/legacy-anchors-retag`; the shim ids `memory-tree/new-build-to-record` and
 `memory-tree/new-spec-to-record`; the shim kind `verb` and its template; the programs
 `tools/govkit/steps/memory_journal_alias.py`, `memory_front_matter.py` and `memory_retag.py`; the
-surface classes `serves-kind`, `front-matter` and `record-headings`.
+surface classes `serves-kind`, `front-matter` and `record-headings`; under §8's recommendations,
+the mode `gen_build_index.py --print-front-matter-findings` and the verb `gov_tag.py anchors`.
 
 ### Migration
 
@@ -173,7 +187,9 @@ S5 says.
 - `tools/govkit/steps/memory_journal_alias.py` (new)
 - `tools/govkit/steps/memory_front_matter.py` (new)
 - `tools/govkit/steps/memory_retag.py` (new)
-- `tools/memory-tree/gen_build_index.py`: the two rendered blocks and the dispatch lines that call them
+- `tools/memory-tree/gen_build_index.py`: the two rendered blocks and the dispatch lines that call
+  them, and the `--print-front-matter-findings` mode under §8 F5 (a)
+- `tools/playbook/gov_tag.py`: the `anchors` verb under §8 F6 (a)
 
 ### Alternatives rejected
 
@@ -183,6 +199,8 @@ S5 says.
   them, which fails the clause's "by dSafePassage's shim".
 - **Rewrite unknown front-matter keys.** An unknown key's meaning is the adopter's, and the clause
   asks for a grade before the refusal, not a migration.
+- **Import memory-tree's `read_bindings` into the journal step.** `--print-bindings` already prints
+  each bound record's kind, so a subprocess reaches the same reader with no sibling import.
 
 ## 5. Production-readiness checklist
 
@@ -195,7 +213,7 @@ S5 says.
   journal it.
 - risks — an adopter whose README carries an unknown key cannot finish `update` until it edits the
   key, which is the clause's grade-first order.
-- testing — AC1 to AC7 by a pass; the arms of §7 at the close.
+- testing — AC1 to AC8 by a pass; the arms of §7 at the close.
 - migration — the steps themselves.
 - user docs — none under `help/`: `update`'s own output carries each step's lines, and its page is
   dSafePassage's.
@@ -232,12 +250,19 @@ S5 says.
 - **AC7** — When `python upgrade_steps.py list` runs at the pass tip, it prints the three
   `memory-tree/` step rows; when each program's `witness` runs against gov's own root, each exits 0.
   Red when: a row is unread or out of order, or gov's own tree fails a step it ships.
+- **AC8** — When `grep -nE '^\s*(import|from) +(tree_lib|gen_build_index|tag_index|policy_value)\b|spec_from_file_location'
+  tools/govkit/steps/memory_*.py` runs at the pass tip, it prints nothing; `grep -n
+  'read_policy_value("memory.legacy-anchors"' tools/govkit/steps/memory_retag.py` prints the call;
+  and AC1's run, with gov's `gen_build_index.py` renamed in a scratch copy, exits 1 naming the
+  memory-tree kit.
+  Red when: a step imports a memory-tree or playbook module, reads the key through the playbook
+  kit's adapter, or grades with memory-tree absent.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `tier2-review self-test` · `build-index selftest` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC4 AC5 AC6 AC7 · the three step programs over a planted adopter, staged by the retag writing under `derived` · that suite's arm count, raised by the arms
+New arm: tools/govkit/selftest.py · covers AC1 AC4 AC5 AC6 AC7 AC8 · the three step programs over a planted adopter, and the journal step with memory-tree unresolved, staged by the retag writing under `derived` · that suite's arm count, raised by the arms
 New arm: tools/govkit/govkit.py · covers AC3 · selfcheck arm 11 grades the two `verb` rows, staged by one byte changed in a rendered block · none
 New arm: tools/memory-tree/gen_build_index.py · covers AC2 · a `--selftest` arm comparing the forwarded `--new-spec` with `new spec`'s bytes, staged by the forward dropping `--order` · none
 
@@ -264,6 +289,34 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC2 · a `--selftest` ar
 - **F4 — The step reader, the walk, the shim generator, the door, the schema and the anchors are
   unbuilt at base `462d20f3`.** RESOLVED (agent, 2026-10-26, delegated): this spec calls each as its
   spec names it, and the build run re-grounds on the landed code, rung 1. widens: none · relaxes: none
+- **F5 — How does the front-matter step reach unit 4's grader without importing memory-tree?** No
+  verb prints a README's front-matter findings: `gen_build_index.py`'s modes are those of `:8737-8739`,
+  and unit 4 adds `--print-front-matter <slug>` (the derived keys) and `--print-typed-derived`
+  (paths), neither a grade. Options: (a) this unit adds `--print-front-matter-findings` to
+  `gen_build_index.py`, which it already edits for the forwards, printing one `<path>: <key>
+  unknown|derived` line per finding of `check_front_matter`, the one grader `TOOL-dTotalRecall-43`
+  S20 has `gen_build_index.py` expose, over every build README of the working directory's tree; the
+  step runs it by subprocess in the target. (b) The step loads gov's `gen_build_index.py` in process
+  with `importlib`, stated as an exception: the one precedent is `tools/govkit/govkit.py:3137-3155`
+  loading memory-tree's `check-arms.py`, and the reason would be that the step and the grader ship in
+  one gov release. (c) `ast.literal_eval` of `FRONT_MATTER_KEYS` (a pure literal, unit 4 §4) and the
+  step's own parse of each README: a second grader, which `TOOL-dTotalRecall-43` S20 removes. (a)
+  costs one mode on a file this unit touches and keeps the legacy exception in the one grader; (b)
+  adds a second in-process reach the rule does not admit. Recommendation (a). Open for the owner.
+- **F6 — How does the retag step reach `derive_anchor`, which lives in the playbook kit?** A govkit
+  module imports no playbook module (TOOL-dWitnessedBar-28 S5), and no playbook verb prints a
+  heading's derived anchor: `gov_tag.py` and `tag_index.py` are unbuilt at `c8d46e188`, and the verbs
+  their specs name for `gov_tag.py` are `check`, `show`, `--rebuild` and `--fixture`.
+  Options: (a) a verb `gov_tag.py anchors <path>` printing each untagged heading outside fences and
+  generated regions with the anchor `derive_anchor` gives it, run by subprocess found through
+  `govkit.resolve_kit_dir`; the step exits 1 naming the playbook kit where it does not resolve
+  under `retag`. (b) A declared `requires_if` row naming `playbook` with an in-process import, the
+  shape of `tools/memory-tree/kit.toml:8`, which TOOL-dWitnessedBar-28's own open fork recommends
+  against for `leg_factory.py`, since an adopter often runs without the playbook kit. (c) An inline copy of the
+  fold: a second fold beside `TOOL-dTotalRecall-10` S2's one. (a) adds one verb to a sibling unit's
+  kit and keeps one fold; its cost is a wait on that verb. Recommendation (a). Open for the owner:
+  the ask the build run files is "TOOL-dTotalRecall-10: `gov_tag.py anchors <path>` prints each
+  untagged heading's derived anchor".
 
 ## 9. Revision log
 
@@ -271,6 +324,13 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC2 · a `--selftest` ar
   scout A's row for cl-0231, and the parents TOOL-dSafePassage-1, -2 and -6.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · §2 preamble, S1, S4, S5 · §4 Inventory, Files touched, Alternatives
+  rejected · §5 testing · §6 AC8 · §7 the `selftest.py` arm · §8 F5 and F6 added · §10 ·
+  re-grounded on the parents at `c8d46e188` by
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck` rows 40 and 41: the retag reads its key
+  through govkit's own `read_policy_value`, the journal step runs `--print-bindings` by subprocess,
+  and the front-matter grade and `derive_anchor` are reached by verbs §8 F5 and F6 leave open for
+  the owner.
 
 ## 10. Reuse audit
 
@@ -283,6 +343,10 @@ tools/codebase-map/reuse_lookup.py "upgrade step that rewrites adopter records w
 write"` ranked `write`, `records`, `plan` (`gen_build_index.py`) and `run_arms`, and did not list
 `migrate_backlog.py`'s verbs, which the scout found by reading. No existing seam forwards a flag of
 a script that stays, so the `verb` kind is new (§8 F1). Scout A's rows held at `462d20f3`. The
-scaffold verbs dispatch at `gen_build_index.py:8707-8709`.
+scaffold verbs dispatch at `gen_build_index.py:8707-8709`. The sibling reaches, read at
+`c8d46e188`: govkit's `read_policy_value` contract (TOOL-dSafePassage-9 §4) and the import of
+`govkit` by a module beside it (`tools/govkit/matrix.py:51-52`); `resolve_kit_dir` at
+`tools/govkit/govkit.py:197`; and `cmd_print_bindings` (`gen_build_index.py:690`), whose `S` rows
+carry each bound record's kind.
 
 Recall terms used: `python tools/memory-recall/query.py "how does an adopter upgrade carry the journal alias and the retag of its records" --terms "upgrade steps kit.toml shim journal alias retag legacy-anchors migrate_backlog adopter front matter"`
