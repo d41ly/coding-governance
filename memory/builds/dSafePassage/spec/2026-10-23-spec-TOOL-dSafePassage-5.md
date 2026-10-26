@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 whole
 
@@ -16,7 +16,9 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-5-phantom-label-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-5-phantom-label-fix.md) | research | — |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-5-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-build-brief.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 |
 
 <!-- /gen:spec-records -->
@@ -335,8 +337,9 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
   shows a lock whose pid is dead and the step `failed` with `interrupted:`, the re-run's digest
   equals the `up` digest, the rollback from the killed state reaches release-0's, and it exits 0;
   for `govkit/receipt-schema-4` the killed state holds no row for the step, and the re-run matches
-  `up` on every path but `.governance/install.json`, whose two receipts are equal once `carry` is
-  removed from every `files` row (TOOL-dSafePassage-15 S4 and AC4, DEPL-dCarriedReceipt-9 S2);
+  `up` on every path but the target's receipt, .governance/install.json, whose two receipts are
+  equal once `carry` is removed from every `files` row (TOOL-dSafePassage-15 S4 and AC4,
+  DEPL-dCarriedReceipt-9 S2);
   with `--inject witness-first`, and separately with `--inject not-rerunnable`, it exits 1 naming
   the arm.
   Red when: the kill lands before the step's first write or after the walk returns, so no partial
@@ -371,13 +374,13 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
 - **AC14** — When `git grep -n -e "def build_target" -e "def make_target" -e "make_target(" -- tools/govkit`
   runs, it prints one definition, `build_target` in the new factory module, and no `make_target`.
   Red when: the factory is copied into the leg, or the old name survives beside the new one.
-- **AC15** — When `git grep -n -e "upgrade_walk.py" -- help/ tools/govkit/usage.toml` runs, it finds
+- **AC15** — When `git grep -n -e "upgrade_walk.py" -- help/ "tools/govkit/usage.toml"` runs, it finds
   the section's command and its `script:` row, and `python "tools/govkit/docs_leg.py"` exits 0.
   Red when: the section ships a command the docs leg has no row for.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 The new legs `upgrade-walk` and, from TOOL-dSafePassage-13, `docs` are not on the list above, since
 it names legs the manifest holds today; the main loop observes them at the close through the arm
@@ -460,6 +463,10 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   `exit 1` row for it, and the killed re-run's receipt is compared without `carry`, the only key
   allowed to differ, by
   `2026-10-26-prompt-TOOL-dSafePassage-15-1-spec-writer.md`.
+- rev-6 · 2026-10-26 · AC7 · AC15 · §7 · the leg line names `policy fixtures`, whose guard
+  `tools/govkit/selftest.py` trips; AC7 names the receipt outside backticks and AC15 quotes the
+  usage file TOOL-dSafePassage-13 creates, so the path join reads neither as a tracked path, by
+  `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`.
 
 ## 10. Reuse audit
 

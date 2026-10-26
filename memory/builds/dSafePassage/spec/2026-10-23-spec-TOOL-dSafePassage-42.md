@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
 | [2026-10-23-prompt-TOOL-dSafePassage-42-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md) | research | TOOL-dSafePassage-38 TOOL-dSafePassage-39 |
+| [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-42-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-42-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-38 |
 
@@ -303,7 +304,7 @@ disjoint write sets, and the pass is one unit.
   after the walk, the retry prints that refusal naming a `.governance/steps` or `.governance/outbox`
   path.
   Red when: the retry's check cannot tell a leftover from the paths the retry makes again.
-- **AC3** — When `git show 3708a705:tools/push-main.sh | sed -n '918p;920p'` runs, it prints
+- **AC3** — When `git show "3708a705:tools/push-main.sh" | sed -n '918p;920p'` runs, it prints
   `rm -f "$rgsnap"` and the `git add -A` line.
   Red when: the cite S5 states names another line.
   figure: PINNED at `3708a705`.
@@ -354,7 +355,7 @@ disjoint write sets, and the pass is one unit.
   `(submodule nm, by name)`.
   Red when: the refusal spells the name where a path exists.
 - **AC14** — When `grep -n "^BRANCH_PIN" tools/govkit/refusal_join.py` and
-  `git show 3708a705:tools/govkit/govkit.py | sed -n '4684p;5061p'` run, the first prints line 41 and
+  `git show "3708a705:tools/govkit/govkit.py" | sed -n '4684p;5061p'` run, the first prints line 41 and
   only the first `govkit.py` line tests `missing`.
   Red when: either cite S24 states is wrong.
   figure: PINNED at `3708a705` and HEAD.
@@ -375,7 +376,7 @@ disjoint write sets, and the pass is one unit.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `drift-audit records` · `push-main self-test` · `measure-legs selftest` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `drift-audit records` · `push-main self-test` · `measure-legs selftest` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC4 AC5 AC13 · the self-test runs the two plants this unit adds and the widened class arm, its failing cases staged by a walk copy that reads the index first and by a table copy missing the `imap.tunnel` row · none
 New arm: tools/push-main.test.sh · covers AC1 AC9 · the compare-and-swap row under its `moved` expectation and the blanked derived count, their failing cases staged by a row expecting `old` and by a lander copy carrying a commented `return 1` · none
@@ -396,6 +397,11 @@ New arm: tools/push-main.test.sh · covers AC1 AC9 · the compare-and-swap row u
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 27 to 35's 12 MEDIUM and 15
   LOW findings, one scope item per raw id.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-45`, `TOOL-dSafePassage-46`; the existing `TOOL-dSafePassage-34` bullet names the move; no other section moved.
+- rev-3 · 2026-10-26 · AC3 · AC14 · §7 · AC3's and AC14's `git show` revision paths are quoted; the §7
+  leg line gains `policy fixtures`, whose guard a §4 Files touched path trips, per the spec-tokens
+  repair handoff
+  `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
+  criterion's meaning moved.
 
 ## 10. Reuse audit
 

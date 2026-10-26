@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-45 — the spec audit of units 36 to 42, the step contract's 21 minors: a derived pair count, a credential class over keys and values, a walk by git's own test, declared exits, and the readings that cite them
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-45-deviation-91.md](../build/2026-10-23-build-TOOL-dSafePassage-45-deviation-91.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-45-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-45-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-46 |
 
@@ -187,7 +188,7 @@ S11, S16 and S17 are one edit.
 - **consumes-from** `TOOL-dSafePassage-38` — `test_credential_bearing`, `render_redacted_config`, its credential-key table and §10, which S7 to S10, S19 and S21 amend and read
 - **consumes-from** `TOOL-dSafePassage-39` — S2's caller table, which S18 reads
 - **consumes-from** `TOOL-dSafePassage-42` — S7, S10, S22, AC3, AC7, AC14 and AC15, which S5, S6, S11, S13 to S16 amend and read
-- **consumes-from** `TOOL-dSafePassage-44` — the ssh-scheme exemption and its plant, which S8's whole-subsection text keeps green
+- **consumes-from** `TOOL-dSafePassage-44` — the ssh-scheme exemption and its `ssh-scheme-bare-user` plant, which S8's whole-subsection text keeps green
 - **hands-off** `TOOL-dSafePassage-47` — S12's walk test read as the directory shape git opens, a candidate's failed config read a refusal naming its config, and descent only through non-candidates and each candidate's `modules/`, so AC9 can go green, finding 9 of the spec audit of units 43 to 46
 - **hands-off** `TOOL-dSafePassage-48` — S6 read as a class, every send-email executor row in its `sendemail.<x>.` form, and `sendemail.sendmailCmd` refused though `git help --config` omits it, with §7 saying so, finding 10 of the spec audit of units 43 to 46
 - **hands-off** `TOOL-dSafePassage-49` — AC12 matched on the exact bytes git prints, AC2's help half scoped to its section, the `.gitmodules` read refusing a file that exists and does not read, the redactor covering a key's whole subsection to its last `@`, and S11's pin and the PINNED key count read by item and by filter, findings 4, 16, 31, 32, 25 and 12 of the spec audit of units 43 to 46
@@ -326,7 +327,7 @@ order 11 run concurrently (M6).
   reach" section.
   Red when: the order-2 isolation report holds a bare count that one of the two configs breaks.
 - **AC3** — When a `python -c` probe imports `tools/govkit/upgrade_steps.py` by path, `STEP_REFUSED_KEYS`
-  refuses `sendemail.smtpserver` valued `/usr/bin/x`, `C:/x/sendmail.exe` and `c:evil`, and
+  refuses `sendemail.smtpserver` valued `"/usr/bin/x"`, `"C:/x/sendmail.exe"` and `"c:evil"`, and
   `sendemail.work.smtpserver` valued `/x`; it does not refuse `sendemail.smtpserver` valued
   `smtp.example.com`.
   Red when: a drive-letter value or the identity form passes, or a host name is refused.
@@ -336,12 +337,13 @@ order 11 run concurrently (M6).
   of `test_credential_bearing` holds False for `("http.proxy", "proxy:3128")`.
   Red when: a scheme-less proxy credential passes, or a plain proxy host is refused.
 - **AC5** — When the same family runs with `--plant insteadof-dotted-userinfo`, whose key is
-  `url.https://first.last:dsppass45@host/.insteadof`, the step is refused, the password is absent from
-  the output and the run exits 1; and `test_credential_bearing("url.https://first.last:pw@host/.insteadof", "https://h/")`
-  holds True while `TOOL-dSafePassage-44`'s `url.ssh://git@github.com/.insteadof` case still holds False.
+  `"url.https://first.last:dsppass45@host/.insteadof"`, the step is refused, the password is absent from
+  the output and the run exits 1; and `test_credential_bearing` holds True for the key
+  `"url.https://first.last:pw@host/.insteadof"` valued `"https://h/"` while `TOOL-dSafePassage-44`'s
+  `"url.ssh://git@github.com/.insteadof"` case still holds False.
   Red when: a dotted user name splits the userinfo and passes.
-- **AC6** — When a probe calls `render_redacted_config("http.https://u:p@ss@h/.sslkey")`, it returns
-  `http.https://<redacted>@h/.sslkey`; and every plant of this unit and of TOOL-dSafePassage-38 run
+- **AC6** — When a probe calls `render_redacted_config` on `"http.https://u:p@ss@h/.sslkey"`, it returns
+  `"http.https://<redacted>@h/.sslkey"`; and every plant of this unit and of TOOL-dSafePassage-38 run
   through the family prints no substring of its planted password longer than 2 characters.
   Red when: the tail of a password holding `@` prints.
 - **AC7** — When `git help --config` runs on node d and a `python -c` probe applies
@@ -379,7 +381,7 @@ order 11 run concurrently (M6).
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 AC4 AC5 AC6 AC7 AC9 AC10 · the self-test runs the derived pair count under both configs, the six plants and the credential class arm, its failing cases staged by an environment copy asserting `3`, a predicate copy that splits the key on dots, a table copy missing `imap.pass` and a walk copy that lists any directory holding `config` · none
 
@@ -395,6 +397,12 @@ none
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 36 to 42's 13 MEDIUM and 8
   LOW findings of the step contract, one scope item per raw id.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-47`, `TOOL-dSafePassage-48`, `TOOL-dSafePassage-49`; no other section moved.
+- rev-3 · 2026-10-26 · §3 Edges · AC3 · AC5 · AC6 · §7 · the TOOL-dSafePassage-44 consumes-from bullet
+  names the `ssh-scheme-bare-user` plant; the config keys and values of AC3, AC5 and AC6 are string
+  literals; the §7 leg line gains `policy fixtures`, whose guard a §4 Files touched path trips, per the
+  spec-tokens repair handoff
+  `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
+  criterion's meaning moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0027@46290183 whole
 
@@ -15,6 +15,7 @@
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-10-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-10-1-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-10-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-10-build-brief.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -333,7 +334,7 @@ so the three passes sequence by M6's disjointness rule rather than run concurren
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 The new leg `step-gate` is not on the list above, since the list names legs the manifest holds
 today; the main loop observes it at the close through the arm lines below.
@@ -391,6 +392,9 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 · a
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-21`, `TOOL-dSafePassage-26`; no other section moved.
 - rev-3 · 2026-10-24 · §3 · §4 · §6 · §8 · re-grounded on dGroundRules' landed specs by the cross-check record `../build/2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md`, rows 33 and 34: the `policy` class reads `tools/policy/catalogue.toml`'s `[[key]]` names with `tomllib` under each side's root, the Edge, the class row, the plant and AC5 name that file, and F6 is re-resolved on rung 1.
+- rev-4 · 2026-10-26 · §7 · the leg line names `policy fixtures`, whose guard
+  `tools/govkit/govkit.py` from §4 Files touched trips, by
+  `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 

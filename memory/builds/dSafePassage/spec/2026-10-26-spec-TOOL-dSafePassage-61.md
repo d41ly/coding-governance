@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0018@d4cade33 part 2/2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 |
 | [2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md) | research | TOOL-dSafePassage-1 |
 | [2026-10-26-prompt-TOOL-dSafePassage-61-2-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-61-2-spec-writer.md) | journal | — |
 
@@ -257,11 +258,11 @@ TOOL-dSafePassage-35's AC15, and AC8 to AC10 are TOOL-dSafePassage-26's AC20 to 
   `govkit/template-size-limits-to-budgets`; on the unit's branch before the landing it prints it
   `open`.
   Red when: the unlanded step's home prints `closed`.
-- **AC6** — When `python tools/govkit/steps/template_size_limits.py witness <t> tools` runs on a
+- **AC6** — When `python "tools/govkit/steps/template_size_limits.py" witness <t> tools` runs on a
   scratch target that never held the file, and on gov's tree, each exits 0.
   Red when: the witness requires a before-image never written.
-- **AC7** — When `python tools/govkit/steps/template_size_limits.py down <t> tools` runs on a scratch
-  target with no limits file and no image under `.governance/steps/govkit/`, it exits 0 and
+- **AC7** — When `python "tools/govkit/steps/template_size_limits.py" down <t> tools` runs on a
+  scratch target with no limits file and no image under `.governance/steps/govkit/`, it exits 0 and
   `git -C <t> status --porcelain` prints nothing.
   Red when: the program refuses before the shared helper for want of an image.
 - **AC8** — When `bash tools/check-dead-paths.sh` runs, it names no hit in `tools/govkit/steps.toml`,
@@ -285,7 +286,7 @@ TOOL-dSafePassage-35's AC15, and AC8 to AC10 are TOOL-dSafePassage-26's AC20 to 
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `recall floor` · `kit/dogfood doc parity` · `kit epoch (shipped bytes move, the version moves)` · `dead-path carriers (deleted files still named)` · `dead-path carriers self-test` · `method carriers (every pointer declared)` · `template size <=48KiB` · `template size gate selftest` · `every held leg is budgeted, every budget row resolves` · `codebase-map coverage + freshness` · `spec-tokens self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `recall floor` · `kit/dogfood doc parity` · `kit epoch (shipped bytes move, the version moves)` · `dead-path carriers (deleted files still named)` · `dead-path carriers self-test` · `method carriers (every pointer declared)` · `template size <=48KiB` · `template size gate selftest` · `every held leg is budgeted, every budget row resolves` · `codebase-map coverage + freshness` · `spec-tokens self-test` · `memory hygiene` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `transition-audit arms` · `straggler-guard arms` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC6 AC7 · each case staged by its own scratch gov tree or target, one planted row or file per arm · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
 New arm: tools/check-template-size.test.sh · covers AC9 · a scratch policy file declaring a non-numeric limit · none
@@ -325,6 +326,13 @@ and a step program's imports, as TOOL-dSafePassage-1 §7 states for every frozen
   with AC7, AC20, AC21, AC22; TOOL-dSafePassage-35's S17 with AC15; and TOOL-dSafePassage-5's
   `size-limits` condition row, moved by `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`.
   AC3 folds TOOL-dSafePassage-26 S21's exclusions; S1's readers are re-derived at base 60d90cb7.
+- rev-2 · 2026-10-26 · AC6 · AC7 · §7 · the leg line names `run-gates canary`, `run-gates gov canary`
+  and `measure-legs selftest`, whose guard `tools/gate-legs.json` trips, `transition-audit arms`
+  and `straggler-guard arms`, whose guard `.memory-tree.conf` trips, and `policy fixtures`, whose
+  guard `tools/govkit/selftest.py` trips, each from §4 Files touched; AC6 and AC7 quote the step
+  program this unit creates, as sibling criteria quote a created file, so the path join does not
+  read it as tracked, by `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`; no
+  other section moved.
 
 ## 10. Reuse audit
 

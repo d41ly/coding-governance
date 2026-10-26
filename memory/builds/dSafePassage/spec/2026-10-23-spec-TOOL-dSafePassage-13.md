@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0030@e7612082 whole
 **Carries:** node:policy-key.help.enforce
@@ -24,6 +24,7 @@
 | [2026-10-24-prompt-TOOL-dSafePassage-13-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-13-1-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-26 |
 | [2026-10-26-prompt-TOOL-dSafePassage-13-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-13-build-brief.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -145,7 +146,7 @@ dSafePassage on".
 
 - **consumes-from** `TOOL-dSafePassage-10` — `read_surface_classes`, `read_surface_population` and `VERB_SOURCES` in `tools/govkit/step_gate.py`, and the nine class ids of its class table; without them the leg has no population and exits 2
 - **consumes-from** `TOOL-dSafePassage-6` — `read_policy_value(key, root)` in `tools/govkit/govkit.py`, the one govkit reader of a policy key, defined by it or by TOOL-dSafePassage-9, whichever builds first; without it the leg cannot read `help.enforce` and exits 2
-- **consumes-from** `TOOL-dSafePassage-9` — the same `read_policy_value`, where that unit builds before TOOL-dSafePassage-6 and defines it
+- **consumes-from** `TOOL-dSafePassage-9` — the same reader, `read_policy_value(key, root, rev=None)` as that unit defines it, where it builds before TOOL-dSafePassage-6; this leg passes no `rev`
 - **consumes-from** `TOOL-dSafePassage-11` — `help/python-floor.md` and the `platforms.provision` usage row, which S11 anchors and this leg fingerprints; without them the key sits on S6's list
 - **consumes-from** external — dGroundRules' policy kit: `tools/policy/catalogue.toml` (`cl-dClosedLoop-0007`, TOOL-dGroundRules-1), whose `[[key]]` rows give each policy key's `allowed` and `default` and hold the `help.enforce` row this unit fills, its shrink-only `unsummarised-keys.txt`, and its reader `policy.py get` (`cl-dClosedLoop-0008`, TOOL-dGroundRules-2 and 3), through which `help.enforce` is read; without them the `policy` class is empty and the leg exits 2
 - **hands-off** `TOOL-dSafePassage-5` — a `[[usage]]` row in `tools/govkit/usage.toml` and an anchor for each `upgrade_walk.py` command its help section shows, since that unit's page lands after this leg
@@ -450,7 +451,7 @@ of this build is graded at this pass, and S11 anchors it.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `drift-audit selftest` · `drift-audit records` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `drift-audit selftest` · `drift-audit records` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 The new leg `docs` is not on the list above, since that list names legs the manifest holds today; the
 main loop observes it at the close through the arm lines below. dGroundRules' `policy check` leg,
@@ -533,6 +534,10 @@ New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC8 · a new
   §10 · Item 7 of `2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`: a class's `rows` is a
   `<path>:<function>` reader or `usage.toml`, absent on a `page` or `none` class, with two plants;
   the later-builds hand-off no longer asks for restated rows.
+- rev-6 · 2026-10-26 · §3 Edges · §7 · the leg line names `policy fixtures`, whose guard
+  `tools/govkit/selftest.py` from §4 Files touched trips; the consumes-from TOOL-dSafePassage-9
+  names the reader by the signature that unit's hand-off gives, `rev=None` included, by
+  `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 

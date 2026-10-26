@@ -62,3 +62,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The floor step `lib/python-floor-3.15`'s down refuses on gov's own tree today: two lines that landed under the old floor do not compile under 3.11 — `tools/govkit/upgrade_steps.py:2864` (`b'v2
 '` inside an f-string's braces) and `tools/memory-recall/check-recall.py:394` (`'#'` inside one). If your criteria walk that step's down on gov's tree, and rewriting those two lines is outside your spec's Files touched, that is a DIVERGENCE hand-back, never a silent fixture exclusion.
 - `python_floor.py check` run from a hook does not drop `GIT_ENV_LEAKS` (`run_git`); the step runner strips them, so a step's down is safe.
+
+## From the first dispatch (handed back at --dispatch, check 49)
+
+- The refusal was spec 8's §7 missing `policy fixtures`; rev-5 adds it. The first builder's finished, staged build is at `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dsafepassage-567339/c5f50d22-89c6-41d7-84e5-2382dcd49faa/scratchpad/TOOL-dSafePassage-8-built.patch` (14 files, +518/-15, against 208c22606): `git apply` it, re-check it against HEAD, then record `--dispatch`/`--brief` and commit as the pass.
+- Its first landing re-renders four lines of `memory/guides/BUILD-METHOD.md` (the render reads the new source receipt). The main loop ruled that inside the PLAY-dClosedLoop-3 grant, since clause 0025 creates that receipt and the rendered meaning is unchanged; do not hand it back for that.
+- Untracked-receipt cleanup on a refused `--prepare` is TOOL-dSafePassage-25's, not yours.

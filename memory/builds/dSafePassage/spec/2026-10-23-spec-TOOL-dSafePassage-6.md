@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window
 
-**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14 · ratified 2026-10-24
+**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14 · ratified 2026-10-24
 
 **Carries:** cl-dClosedLoop-0023@6e1e2e99 whole
 **Carries:** node:policy-key.install.deprecation-window
@@ -22,6 +22,7 @@
 | [2026-10-24-prompt-TOOL-dSafePassage-6-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-6-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dSafePassage-6-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-6-2-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-26 |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
 | [2026-10-26-prompt-TOOL-dSafePassage-6-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-6-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
@@ -371,7 +372,7 @@ The last three are dGroundRules' files, which the build run adds to this unit's 
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`,
 `arm_mirror_parity`, `arm_mirror_readers` and the reader-coverage arm over this unit's files; they
@@ -451,6 +452,9 @@ New arm: tools/govkit/govkit.py · covers AC8 · selfcheck arm 11, its failing c
 - rev-5 · 2026-10-25 · §3 · the first shim rows drop dOrderedCharter's re-export, which its spec 31's
   `module-export` class row holds by the owner's F6 pick, from Item 4 of
   `2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`.
+- rev-6 · 2026-10-26 · §7 · the leg line names `policy fixtures`, whose guard
+  `tools/govkit/govkit.py` from §4 Files touched trips, by
+  `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-49-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-49-fork-resolution.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-fork-resolution.md) | research | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md) | research | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-50 |
 
@@ -231,7 +232,7 @@ Their items here add what the second finding found beyond the high's edit.
 - **consumes-from** `TOOL-dSafePassage-44` — AC1, AC2 and AC3 and the `ssh-scheme-bare-user` plant, which S6, S11 and S17 read
 - **consumes-from** `TOOL-dSafePassage-45` — S8's tested subsection, S9's redactor, S13's read, AC2, AC12, S11's pin and the PINNED figure, which S10, S14, S15, S17, S18 and S19 amend and read
 - **consumes-from** `TOOL-dSafePassage-47` — the candidate shape and the config-read refusal, beside which S7 adds the `rev-parse --git-dir` refusal
-- **consumes-from** `TOOL-dSafePassage-48` — the send-email rows in both forms and the `sendemail.sendmailCmd` row, which S8's arm holds to a derivation
+- **consumes-from** `TOOL-dSafePassage-48` — the send-email rows in both forms, each kept `sendemail.<key>` and its identity form, and the `sendemail.sendmailCmd` row, which S8's arm holds to a derivation
 - **hands-off** `TOOL-dSafePassage-51` — F1(a)'s sweep ending on AC2's header probe, with no roster handed out while TOOL-dSafePassage-4's order is not above TOOL-dSafePassage-43's and TOOL-dSafePassage-7's, and amending the Rollouts of TOOL-dSafePassage-2, -7 and -43 to `TOOL-dSafePassage-4 builds at order 3`; S7's `rev-parse` run only after a config read that exited 0; no `UNLISTED_EXECUTOR_KEYS` in the module, the expected key a literal in `tools/govkit/selftest.py`; a staged move-3 copy for AC3; fixture code comparing through `test_step_row`; S18's `stat` before any open, with the `gitmodules-fifo` plant; S6's Readers reason; §4's section probe; and §10's lookups, findings 1, 10, 19, 2, 9, 14, 4, 3, 24, 13, 8 and 18 of the spec audit of units 47 to 50
 - **hands-off** `TOOL-dSafePassage-55` — F1(a)'s sweep ending on AC2 run as that unit's one order probe, all four relations, TOOL-dSafePassage-18 and TOOL-dSafePassage-19 above TOOL-dSafePassage-4 included, so no roster is handed out while the probe exits non-zero; the bullet to TOOL-dSafePassage-51 above is read with the same four relations, finding 1 of the spec audit of units 51 and 52
 
@@ -382,7 +383,7 @@ in this write set: §8 F1 places it before the roster is handed out.
   pattern is `remote.<x>.url` or `remote.<x>.pushurl`.
   Red when: a table row refuses the ssh-scheme remote that the predicate keeps.
 - **AC8** — When a `python -c` probe runs TOOL-dSafePassage-44's AC2 with S11's floor over
-  `tools/runlog/redaction.tsv`, it holds and names `ssh://git@github.com/o/r.git` among its tokens; over a
+  `tools/runlog/redaction.tsv`, it holds and names `"ssh://git@github.com/o/r.git"` among its tokens; over a
   scratch copy of the table without the `url-userinfo` row, it fails naming the row.
   Red when: the probe passes with zero tokens tested.
 - **AC9** — When `python3 "tools/govkit/upgrade_steps.py" fixture isolation --plant submodule-format-unknown`
@@ -405,15 +406,15 @@ in this write set: §8 F1 places it before the roster is handed out.
 - **AC13** — When `python3 "tools/govkit/upgrade_steps.py" fixture isolation --plant gitmodules-unreadable`
   runs, the step is refused naming the `.gitmodules` path, and the run exits 1.
   Red when: the directory is read as a missing file and every name is marked `by name`.
-- **AC14** — When a probe calls `render_redacted_config("http.https://u:se cret@h/.sslkey")` and
-  `render_redacted_config("http.https://u:se/cret@h/.sslkey")`, each returns
-  `http.https://<redacted>@h/.sslkey`; and `--plant subsection-password-space` prints no substring of
+- **AC14** — When a probe calls `render_redacted_config` on `"http.https://u:se\x20cret@h/.sslkey"`,
+  `\x20` the space, and on `"http.https://u:se/cret@h/.sslkey"`, each returns
+  `"http.https://<redacted>@h/.sslkey"`; and `--plant subsection-password-space` prints no substring of
   `se cret` longer than 2 characters.
   Red when: a password holding a space or `/` prints.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC3 AC4 AC9 AC10 AC13 AC14 · the self-test runs the step-row agreement over §4's table and the four plants, and the widened class arm; its failing cases are staged by a writer copy admitting any `failure` on an `applied` row, a reader copy restating the rule, a walk copy without the `rev-parse` refusal, a table copy without `sendemail.<x>.ccCmd`, a `.gitmodules` read with no file test and a redactor copy stopping at a space · none
 
@@ -453,6 +454,12 @@ between units no `consumes-from` bullet joins.
   applies S4's order move before it hands out the roster.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotion `TOOL-dSafePassage-51` of the spec audit of units 47 to 50, written by the disposal stage; no other section moved.
 - rev-4 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotion `TOOL-dSafePassage-55` of the spec audit of units 51 and 52, written by the disposal stage; no other section moved.
+- rev-5 · 2026-10-26 · §3 Edges · AC8 · AC14 · §7 · the TOOL-dSafePassage-48 consumes-from bullet names
+  `sendemail.<key>`; AC8's URL and AC14's redactor texts are string literals, the space spelled `\x20`; the
+  §7 leg line gains `policy fixtures`, whose guard a §4 Files touched path trips, per the spec-tokens
+  repair handoff
+  `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
+  criterion's meaning moved.
 
 ## 10. Reuse audit
 

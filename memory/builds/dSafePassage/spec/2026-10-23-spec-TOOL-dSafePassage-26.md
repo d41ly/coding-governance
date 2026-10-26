@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** DEFERRED · rev-7 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-8 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -17,6 +17,7 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-26-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-26-hygiene-fix.md) | research | TOOL-dSafePassage-24 TOOL-dSafePassage-25 |
 | [2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 |
 | [2026-10-26-prompt-TOOL-dSafePassage-26-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-26-build-brief.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
 | [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-21 |
 
 <!-- /gen:spec-records -->
@@ -401,8 +402,8 @@ then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
   runs, it prints one line, the definition in `tools/govkit/upgrade_steps.py`.
   Red when: a second base function survives.
 - AC2. When `git grep -n "resolve_landing_base(" -- tools/govkit` runs, it prints calls in
-  `cmd_epoch`, `cmd_frozen` and `tools/govkit/step_gate.py`, and
-  `python tools/govkit/step_gate.py --print-base` prints the sha of `git merge-base origin/main HEAD`.
+  `cmd_epoch`, `cmd_frozen` and the step gate TOOL-dSafePassage-10 creates, and
+  `python "tools/govkit/step_gate.py" --print-base` prints the sha of `git merge-base origin/main HEAD`.
   Red when: a leg resolves its base by its own code.
 - AC3. When an `ast` probe parses `tools/govkit/upgrade_steps.py`, it finds no `govkit` import,
   and `git grep -c "^# >>> remote_ladder_py" -- tools/govkit/upgrade_steps.py` prints 1.
@@ -440,7 +441,7 @@ then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
   `tools/govkit/upgrade_steps.py`, and `git grep -n "write_atomic(" -- tools/govkit/steps/receipt_schema_4.py`
   prints its call.
   Red when: the step program keeps its own temp-and-rename.
-- AC15. When `git grep -n -e "derive_introduced(" -e "log.*-S" -- tools/govkit/shims.py` runs, it
+- AC15. When `git grep -n -e "derive_introduced(" -e "log.*-S" -- "tools/govkit/shims.py"` runs, it
   prints the call inside `resolve_shim_landing` and no `-S` pickaxe.
   Red when: the shim landing is found by a substring search.
 - AC16. When `python "tools/govkit/shims.py" --fixture --plant window-prefix-id` and
@@ -449,8 +450,8 @@ then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
 - AC17. When `git grep -n 'outbox / f"update-' -- tools/govkit/govkit.py tools/govkit/upgrade_steps.py`
   runs, every hit keyed on a row's path or a step's slug sits inside `write_row_order`.
   Red when: a row-keyed order is written inline.
-- AC18. When `git grep -n -F '"init", "-q", "-b", "main"' -- tools/govkit/upgrade_steps.py tools/govkit/fixtures/retired_edits.py tools/govkit/upgrade_walk.py tools/govkit/fixture_target.py`
-  runs, it prints lines in `tools/govkit/fixture_target.py` only.
+- AC18. When `git grep -n -F '"init", "-q", "-b", "main"' -- tools/govkit/upgrade_steps.py "tools/govkit/fixtures/retired_edits.py" "tools/govkit/upgrade_walk.py" "tools/govkit/fixture_target.py"`
+  runs, it prints lines in the last path it names, the factory module, only.
   Red when: a fixture module builds its own scratch repository.
 - AC19. When `PATH="<stubs>:$PATH" bash -c '. "$1"; resolve_python' _ tools/lib/resolve-python.sh`
   runs, every launcher a stub exiting 9009 and `GOV_PYTHON` unset, stderr's first line opens
@@ -513,11 +514,12 @@ then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
 - AC38. When `python "tools/govkit/fixtures/retired_edits.py" --plant edited-reshipped` runs, it
   exits 0, the row gov re-ships reading as a conflict candidate with an order.
   Red when: the row stays `retired-edited` while gov ships the path.
-- AC39. When `bash -c '. tools/unattended/lib-unattended.sh; read_consumes_from "$1"' _ <spec>`
+- AC39. When `bash -c '. "$1"; read_consumes_from "$2"' _ tools/unattended/lib-unattended.sh <spec>`
   runs over the specs of units 3, 8, 12, 11 and 19, each prints its same-order producer named in S40.
   Red when: a same-order pair has no edge `--dispatch` waits on.
 - AC40. When `PATH="<fakes>:$PATH" "<real interpreter>" tools/govkit/govkit.py update --target <scratch adopter> --to HEAD --write`
-  runs, the fakes printing `3.14`, the walk stops at `lib/python-floor-3.15` on the preflight's refusal.
+  runs, the fakes printing `3.14`, the walk stops at the step lib/python-floor-3.15 on the
+  preflight's refusal.
   Red when: a fake launches govkit itself.
 - AC41. When `git grep -n -F "runtime.agents-in-flight" -- tools/workflows/kit.toml tools/workflows/README.md`
   runs, each file prints its re-worded line.
@@ -545,12 +547,14 @@ then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
   `git ls-tree -r --name-only 3708a705 -- memory | wc -l` run, they print 5832 and 5382.
   Red when: a figure differs from S50's.
   figure: PINNED at `3708a705`.
-- AC49. When `git show 3708a705:tools/govkit/selftest.py | grep -c "make_target("` runs, it prints
+- AC49. When `git show "3708a705:tools/govkit/selftest.py" | grep -c "make_target("` runs, it prints
   80, one being the definition at line 679.
   Red when: the count differs, so S51's 79 is wrong.
   figure: PINNED at `3708a705`.
 - AC50. When `git grep -n 'resolve_kit_dir "$py"' -- tools/push-main.sh` runs, it prints one call,
-  inside `resolve_lander_kit`, and `tools/push-main.test.sh`'s arm shows each stage's lines unchanged.
+  inside `resolve_lander_kit`, and `git grep -n "resolve_lander_kit" -- tools/push-main.sh` prints a
+  call in every stage S52 names; each stage's lines before and after the extraction are the
+  push-main arm's comparison, declared on §7's `New arm:` line.
   Red when: a stage keeps its own copy of the pair.
 - AC51. When `bash tools/lib/python-floor.sh floor` runs over a `python-floor.txt` of `3.15`,
   `3.15\nx=1` and `3.\n15`, it prints `3.15` for the first and exits non-zero for the others, and
@@ -562,7 +566,7 @@ then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `python resolver (behaviour + inline parity + idiom ban)` · `template size gate selftest` · `dead-path carriers (deleted files still named)` · `dead-path carriers self-test` · `unattended skill wiring` · `row-grammar selftest` · `push-main self-test` · `spec-tokens self-test` · `unattended-build self-test` · `lexicon selftest` · `codebase-map kit selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `python resolver (behaviour + inline parity + idiom ban)` · `template size gate selftest` · `dead-path carriers (deleted files still named)` · `dead-path carriers self-test` · `unattended skill wiring` · `row-grammar selftest` · `push-main self-test` · `spec-tokens self-test` · `unattended-build self-test` · `lexicon selftest` · `codebase-map kit selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC9 AC12 AC14 AC30 AC31 AC32 AC37 AC38 · its new plants and the widened one-writer arms, each failing case staged by its plant or a direct write · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
 New arm: tools/lib/resolve-python.test.sh · covers AC19 AC46 · stubs exiting 9009 and a fake that fails only under `-I` · none
@@ -605,6 +609,13 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
   AC22 · §7 · the four items and their criteria moved to TOOL-dSafePassage-61, since the size-limits
   step they observe left TOOL-dSafePassage-1 at its §8 F8 stop, by
   `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`.
+- rev-8 · 2026-10-26 · AC2 · AC15 · AC18 · AC39 · AC40 · AC49 · AC50 · §7 · the leg line names
+  `policy fixtures`, whose guard `tools/govkit/govkit.py` from §4 Files touched trips; the
+  criteria quote the files earlier units create, as sibling criteria do, and the git revision
+  path; AC39 passes the library as an argument, as AC19 does, so no `;` joins its path; the
+  floor step's id leaves backticks; and AC50 observes the calls by grep, the stages' unchanged
+  lines staying the push-main arm's, by
+  `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-52 — the spec audit of units 47 to 50, its seven minors on TOOL-50: a misplaced arm that aborts the suite, one scan line, the arm's place read by content, the template repaired through its render, and the readings that cite them
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-52-deviation-98.md](../build/2026-10-23-build-TOOL-dSafePassage-52-deviation-98.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-52-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-52-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-51 |
 
@@ -170,7 +171,7 @@ order 13 are disjoint (M6).
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash -c 'set -u; HERE=tools; eval "$(grep "^_mt_rc=" tools/push-main.test.sh)"; [ -n "$_mt_rc" ] && [ -f "$HERE/$_mt_rc/check-arms.py" ] && echo ok-branch'`
+- **AC1** — When `bash -c 'set -u; HERE=tools; eval "$(grep "^_mt_rc=" "tools/push-main.test.sh")"; [ -n "$_mt_rc" ] && [ -f "$HERE/$_mt_rc/check-arms.py" ] && echo ok-branch'`
   runs from the repository root, it prints `ok-branch`. When
   `bash -c 'set -u; [ -n "$_mt_rc" ]; echo after'` runs, it prints `unbound variable`, exits 127 and
   prints no `after`.
@@ -211,6 +212,9 @@ none
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 47 to 50's 7 LOW findings
   on TOOL-dSafePassage-50, one scope item per raw id.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions `TOOL-dSafePassage-57` and `TOOL-dSafePassage-58` of the spec audit of units 51 and 52, written by the disposal stage; no other section moved.
+- rev-3 · 2026-10-26 · AC1 · AC1's grep operand is quoted, per the spec-tokens repair handoff
+  `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
+  criterion's meaning moved.
 
 ## 10. Reuse audit
 

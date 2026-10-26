@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0025@4e486ab9 whole
 
@@ -14,6 +14,7 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-8-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-8-1-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
 | [2026-10-26-prompt-TOOL-dSafePassage-8-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-8-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
@@ -328,7 +329,7 @@ receipt that the landing's own walk would also write.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `push-main self-test` · `receipt sync (installed files match the receipt)` · `verdict epoch (kit version dates the engine)` · `verdict-epoch self-test` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `push-main self-test` · `receipt sync (installed files match the receipt)` · `verdict epoch (kit version dates the engine)` · `verdict-epoch self-test` · `kit epoch (shipped bytes move, the version moves)` · `policy fixtures` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
 
 New arm: tools/push-main.test.sh · covers AC5 AC6 · a fixture landing whose branch carries a step row with a failing witness, and one with no deployer beside the lander · none
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC8 AC9 · gov's own deploy file planned in place, a planted metacharacter in an interpolated answer, and a planted step row with a failing witness on a source-mode clone · none
@@ -383,6 +384,9 @@ stands in for.
   migration moved from TOOL-dSafePassage-1 to TOOL-dSafePassage-61 at that unit's §8 F8 stop, so the
   guard binds TOOL-dSafePassage-61's pass and no landing walk writes gov's policy file, by
   `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`; no other section moved.
+- rev-5 · 2026-10-26 · §7 · the leg line names `policy fixtures`, whose guard
+  `tools/govkit/govkit.py` from §4 Files touched trips, by
+  `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 

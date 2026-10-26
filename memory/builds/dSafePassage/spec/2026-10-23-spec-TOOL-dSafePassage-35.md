@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-35 — the round-1 audit of units 15 to 26: its 39 minors, one filtered population, one plan source, pinned plants and the texts that cite them
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-35-deviation-128.md](../build/2026-10-23-build-TOOL-dSafePassage-35-deviation-128.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-35-deviation-81.md](../build/2026-10-23-build-TOOL-dSafePassage-35-deviation-81.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-35-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-35-build-brief.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-34 |
 
@@ -421,7 +422,7 @@ not reused here.
   run.
   Red when: any run reads the reused pid `live`.
 - **AC6** — When a `python -c` probe loads `tools/gate-legs.json`, the `govkit selftest` leg's guard
-  holds `{prefix}/process-monitor/census.py`.
+  holds `tools/process-monitor/census.py`, spelled under the leg file's `{prefix}`.
   Red when: an edit to the census alone selects no leg that runs the reclaim's arm.
 - **AC7** — When `git grep -n -A4 "REUSE_MARGIN_S =" -- tools/govkit/upgrade_steps.py` runs, the
   comment names `windows-join` with 0.5 s and `posix-ps` with 1 s.
@@ -509,7 +510,7 @@ not reused here.
   Red when: a real launcher or the override satisfies the resolver and the fake is never probed.
 - **AC27** — When `git grep -n "resolve_landing_base" -- tools/govkit` runs, it prints one definition in
   `tools/govkit/upgrade_steps.py`, govkit's import of it, and the calls in `cmd_epoch`, `cmd_frozen` and
-  `tools/govkit/step_gate.py`.
+  the step gate's module, step_gate.py in §4 Files touched.
   Red when: a second definition survives in govkit, or a named caller resolves its base itself.
 - **AC28** — When `git grep -n -e 'update-conflict-' -e 'outbox / f"update-' -- tools/govkit/govkit.py tools/govkit/upgrade_steps.py`
   runs, every hit keyed on a row's path or a step's slug sits inside `render_row_order_key`, comment
@@ -518,7 +519,7 @@ not reused here.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC5 AC8 AC17 AC23 AC24 AC25 · the self-test runs each plant this unit adds or pins, its failing cases staged by the staged judge copy, the stubs and committed direct writes · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by one
 New arm: tools/push-main.test.sh · covers AC10 AC11 · the unwritable-snapshot landing and the attended landing with a failing witness, each failing case staged by a lander copy whose snapshot site keeps its inline line · none
@@ -551,6 +552,11 @@ New arm: tools/lib/resolve-python.test.sh · covers AC26 · every launcher faked
 - rev-4 · 2026-10-26 · S17 · §3 Edges · §4 Files touched · AC15 · S17 and AC15 moved to
   TOOL-dSafePassage-61, since the size-limits step they observe left TOOL-dSafePassage-1 at its §8 F8
   stop, by `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`.
+- rev-5 · 2026-10-26 · AC6 · AC27 · §7 · AC6 names the census by its tracked path and AC27 the step
+  gate's module without a path token; the §7 leg line gains `policy fixtures`, whose guard a §4 Files
+  touched path trips, per the spec-tokens repair handoff
+  `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
+  criterion's meaning moved.
 
 ## 10. Reuse audit
 
