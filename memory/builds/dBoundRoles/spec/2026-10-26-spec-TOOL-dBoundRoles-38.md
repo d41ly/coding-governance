@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-38 — handed content fenced inside the work order, and every reader of a fact line or a marker line skips what a fence holds
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 11 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 |
+| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
+| [2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-37-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-37 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 |
 
 <!-- /gen:spec-records -->
 
@@ -86,6 +87,10 @@ marker line walk the text fence-aware, so nothing inside a fence is read as eith
 - **hands-off** `TOOL-dBoundRoles-4` — the fence-aware `extractHandoffMarker`, through which S4's exactly-one-marker check reads the prompt writer's file, whose `input:work-order` block now hands quoted markers inside a fence (id 52)
 - **hands-off** `TOOL-dBoundRoles-25` — the fence-aware marker and fact readers in `checkHandoffSpawn` and `readUnfencedLines` in `scratch-guard.js`'s exports, which the move into the roles pack carries as it finds them (id 52)
 - **hands-off** `TOOL-dBoundRoles-43` — `readUnfencedLines`, which id 54's item uses to name the one `### allowance` heading outside every fence
+- **hands-off** `TOOL-dBoundRoles-45` — S2's fence over typed values, which unit 45 narrows to every block but a typed input's; AC4's render half holds from unit 45 on, so this unit's ledger answers it AMENDED, naming unit 45 (id 17 of the round-1 audit of units 37 to 44)
+- **hands-off** `TOOL-dBoundRoles-46` — `readUnfencedLines` and the fence-aware readers in `checkHandoffSpawn`, which unit 46 applies to each typed block (id 1 of the round-1 audit of units 37 to 44)
+- **hands-off** `TOOL-dBoundRoles-48` — both walkers and S5's open-fence refusal, which unit 48 extends from the end of the walk to every block's extents (id 34 of the round-1 audit of units 37 to 44)
+- **hands-off** `TOOL-dBoundRoles-50` — the walkers, the marker readers, AC1's fixture and AC5's grep, which unit 50 completes (ids 10, 18, 25, 35, 36 and 39 of the round-1 audit of units 37 to 44)
 
 ## 4. Design
 
@@ -234,6 +239,7 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC3 AC4 · a rule-6 payload who
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 26 unit specs, id 52
   (HIGH, item H4), on the skeptic's corrected fix.
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dBoundRoles-45, -46, -48 and -50, promotions of the round-1 audit of units 37 to 44; the -45 bullet names AC4's AMENDED answer. Nothing else moved.
 
 ## 10. Reuse audit
 

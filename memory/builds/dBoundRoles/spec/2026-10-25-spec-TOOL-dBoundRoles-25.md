@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
+**Status:** OPEN · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0190@03bbbf1e whole
 
@@ -10,7 +10,7 @@
 |---|---|---|
 | [2026-10-25-build-TOOL-dBoundRoles-1-reuse-scout-c.md](../build/2026-10-25-build-TOOL-dBoundRoles-1-reuse-scout-c.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-16 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 |
 | [2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 |
-| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 |
+| [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 |
 | [2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 |
@@ -144,6 +144,9 @@ them.
 - **hands-off** `TOOL-dBoundRoles-42` — the deletion, S8's readers and AC14, whose `memory/` readers unit 42 classes and whose live-carrier population it restates (id 42 of the round-1 spec audit)
 - **hands-off** `TOOL-dBoundRoles-43` — the pack, the retirement and its step, whose AC3, hook policy reads, registries and rule-7 refusal unit 43 completes (ids 2, 19, 27, 44, 45 and 61 of the round-1 spec audit)
 - **hands-off** `TOOL-dBoundRoles-44` — the retirement, S8's readers and the close, whose memory half, frozen receipt, gotcha pages and harness swap unit 44 completes (ids 3, 26, 43 and 62 of the round-1 spec audit)
+- **consumes-from** `TOOL-dBoundRoles-46` — `TYPED_INPUTS` and the typed-block check in `checkHandoffSpawn`, which the move carries as it finds them (id 1 of the round-1 audit of units 37 to 44)
+- **consumes-from** `TOOL-dBoundRoles-48` — the block-fence check in `checkHandoffSpawn`, which the move carries as it finds it (id 34 of the round-1 audit of units 37 to 44)
+- **hands-off** `TOOL-dBoundRoles-50` — the leg rename, which this pass also makes on the §7 leg line of every non-terminal spec of this build naming `agent-cap self-test`, units 43 and 50, each a rev bump with its §9 line; and the deleted suite's spawn-idiom registry rows, which unit 50 answers (ids 4, 27, 29 and 33 of the round-1 audit of units 37 to 44)
 
 ## 4. Design
 
@@ -480,6 +483,7 @@ New arm: tools/check-wiring.test.sh · covers AC10 · a scratch settings file wi
   scout C's row for cl-0190, the night pass two's point 7, and TOOL-dGroundRules-10, TOOL-dFairHearing-16
   and -32 and TOOL-dSafePassage-1 and -10 at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **consumes-from** and **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-38, TOOL-dBoundRoles-42, TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-46, -48 and -50, promotions of the round-1 audit of units 37 to 44; the -50 bullet hands this pass the leg rename on two live §7 lines. Nothing else moved.
 
 ## 10. Reuse audit
 
