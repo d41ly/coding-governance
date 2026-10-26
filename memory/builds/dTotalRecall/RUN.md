@@ -110,3 +110,17 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T04:24:50Z rescope · item add TOOL-dTotalRecall-70 · reason spec-audit round 1 of units 61 to 66 (reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) the 25 confirmed minors batched into one unit: 23 MEDIUM, ids 2 3 4 5 6 9 10 11 12 13 14 17 18 22 24 25 26 27 28 29 30 31 32 (items M1 to M17), and 2 LOW, ids 8 33 (items L1 and L2); lands on several units, so repairs no unit in particular
 
 2026-10-26T04:39:22Z review · item dTotalRecall-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 25 · disposition promote
+
+2026-10-26T05:15:12Z review · item dTotalRecall-spec-set-r6 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 4 · minors 23 · disposition promote
+
+2026-10-26T05:22:41Z rescope · item add TOOL-dTotalRecall-71 · reason spec-audit round 1 of units 67 to 70 (reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) id 23 BLOCKER, item B1: unit 67's probe double-quotes the backticked edge string, so AC1's edge row is green whether or not unit 57's edge to unit 56 exists; repairs TOOL-dTotalRecall-67, landing at step 21 ahead of unit 57's order-30 pass
+
+2026-10-26T05:22:42Z rescope · item add TOOL-dTotalRecall-72 · reason spec-audit round 1 of units 67 to 70 (reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) id 10 HIGH, item H2: the same double-quote probe defect, by which unit 67's S1 reads unit 57's edge as present and its S2 never writes it; repairs TOOL-dTotalRecall-67, landing at step 21 ahead of unit 57's order-30 pass
+
+2026-10-26T05:22:42Z rescope · item add TOOL-dTotalRecall-73 · reason spec-audit round 1 of units 67 to 70 (reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) id 5 HIGH, item H1: unit 68's literal registration home and unit 65's conf-derived path give the census and its base compare two answers to where the registry lives; repairs TOOL-dTotalRecall-68
+
+2026-10-26T05:22:43Z rescope · item add TOOL-dTotalRecall-74 · reason spec-audit round 1 of units 67 to 70 (reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) id 11 HIGH, item H3: unit 70 reuses the double-quote probe on its backticked strings, so its absorbs row is green before unit 62's amendment exists; repairs TOOL-dTotalRecall-70
+
+2026-10-26T05:22:44Z rescope · item add TOOL-dTotalRecall-75 · reason spec-audit round 1 of units 67 to 70 (reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) id 17 HIGH, item H4: unit 69 re-stamps last-audit for manifest-check C5 and never advances last-body-change, so C9 keeps the ratchet leg red and its AC2 cannot pass; repairs TOOL-dTotalRecall-69
+
+2026-10-26T05:22:45Z rescope · item add TOOL-dTotalRecall-76 · reason spec-audit round 1 of units 67 to 70 (reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) the 23 confirmed minors batched into one unit: 16 MEDIUM, ids 1 2 3 4 6 12 13 18 19 20 21 26 27 29 30 31 (items M1 to M15), and 7 LOW, ids 7 8 9 15 16 25 28 (items L1 to L7); lands on several units, so repairs no unit in particular
