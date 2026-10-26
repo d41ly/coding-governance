@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: c8d46e188985ce49caad48cf874934661ad3fc7c · park · 43 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 7f9df190edf29fffd43d3114277eeb851aedf3d0
 phase: BUILDING
@@ -76,3 +77,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-26T15:25:29Z dispatch · item 16cfa267 TOOL-dSafePassage-15 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-15.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-15-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
 2026-10-26T15:25:38Z brief · item TOOL-dSafePassage-15 · reason 96f496fcf412 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-15-build-brief.md
+
+2026-10-26T15:36:53Z decision · item TOOL-dSafePassage-11 needs Python 3.15 on the build node: provision node a (and every node) at 3.15 final, or rule how the floor lands · reason options: (a) the owner provisions 3.15 per AP-31 and the run resumes 11 and its 38 dependants; (b) the owner rules a different landing for the floor. Refused to choose: node a resolves only 3.14.6 (py -0p; uv lists 3.15.0b2 only); provisioning is a §3 non-goal and an owner act; a resolver refusing below 3.15 would refuse every later hook and the close's bar; a floor switch is the fail-open override §3 rules out. Units outside 11's consumes-from closure build meanwhile
