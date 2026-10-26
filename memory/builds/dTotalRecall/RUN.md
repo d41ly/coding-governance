@@ -124,3 +124,29 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T05:22:44Z rescope · item add TOOL-dTotalRecall-75 · reason spec-audit round 1 of units 67 to 70 (reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) id 17 HIGH, item H4: unit 69 re-stamps last-audit for manifest-check C5 and never advances last-body-change, so C9 keeps the ratchet leg red and its AC2 cannot pass; repairs TOOL-dTotalRecall-69
 
 2026-10-26T05:22:45Z rescope · item add TOOL-dTotalRecall-76 · reason spec-audit round 1 of units 67 to 70 (reviews/2026-10-26-review-TOOL-dTotalRecall-67-spec-audit-round1.md) the 23 confirmed minors batched into one unit: 16 MEDIUM, ids 1 2 3 4 6 12 13 18 19 20 21 26 27 29 30 31 (items M1 to M15), and 7 LOW, ids 7 8 9 15 16 25 28 (items L1 to L7); lands on several units, so repairs no unit in particular
+
+2026-10-26T06:17:45Z review · item dTotalRecall-spec-set-r7 · reason verdict BLOCKED · blockers 4 · BOUNDED · highs 7 · minors 29 · disposition promote
+
+2026-10-26T06:26:57Z rescope · item add TOOL-dTotalRecall-77 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 23 BLOCKER, item B1 shared with ids 1, 16 and 34: unit 76's S19 sweep greps a failure line manifest-check.sh never prints and reads no exit code, so it prints nothing at a red or a green commit; repairs TOOL-dTotalRecall-76, landing at step 36
+
+2026-10-26T06:27:09Z rescope · item add TOOL-dTotalRecall-78 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 34 BLOCKER, item B1 shared with ids 1, 16 and 23: unit 76's sweep skips an unresolved pass commit and a failed worktree add without a line, so a sweep that checked nothing reads as green; repairs TOOL-dTotalRecall-76, landing at step 36
+
+2026-10-26T06:27:09Z rescope · item add TOOL-dTotalRecall-79 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 1 BLOCKER, item B1 shared with ids 16, 23 and 34: unit 76's AC13 red-span ledger and its tip clause are green whatever the leg did, because its sweep can never print a red; repairs TOOL-dTotalRecall-76, landing at step 36
+
+2026-10-26T06:27:10Z rescope · item add TOOL-dTotalRecall-80 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 16 BLOCKER, item B1 shared with ids 1, 23 and 34: unit 76's S20 answers unit 69's AC1 with the sweep's line for pass(69), which can never appear; repairs TOOL-dTotalRecall-76, landing at step 36
+
+2026-10-26T06:27:11Z rescope · item add TOOL-dTotalRecall-81 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 37 HIGH, item H2 shared with id 10: unit 71 never checks that PASS67 resolves and its AC3 recipe prints an empty line, so an empty value reads the index and no red names it; repairs TOOL-dTotalRecall-71, landing at step 22
+
+2026-10-26T06:27:11Z rescope · item add TOOL-dTotalRecall-82 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 10 HIGH, item H2 shared with id 37: with PASS67 empty, unit 71's probe reads the index where unit 72 already wrote the edge, prints pass67 1 and writes no record of unit 67; repairs TOOL-dTotalRecall-71, landing at step 22
+
+2026-10-26T06:27:12Z rescope · item add TOOL-dTotalRecall-83 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 9 HIGH, item H1 shared with id 36: unit 74's probe reads the index or an empty blob when pass(59) does not resolve, so its S3 deviation decision rests on a bogus count; repairs TOOL-dTotalRecall-74, landing at step 35
+
+2026-10-26T06:27:13Z rescope · item add TOOL-dTotalRecall-84 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 36 HIGH, item H1 shared with id 9: an unresolved pass(46) in unit 74's probe reads the current text or an empty string as a count, so its S4 record certifies or departs on nothing; repairs TOOL-dTotalRecall-74, landing at step 35
+
+2026-10-26T06:27:13Z rescope · item add TOOL-dTotalRecall-85 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 11 HIGH, item H3 shared with id 38: unit 76's blob probe never verifies REV, so an S1 to S4 row with no resolvable pass reads a silent 0 or the index text; repairs TOOL-dTotalRecall-76, landing at step 36
+
+2026-10-26T06:27:14Z rescope · item add TOOL-dTotalRecall-86 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 38 HIGH, item H3 shared with id 11: unit 76's blob probe yields a count, not a red, for an unresolved pass(T), so nothing enforces its AC2 red over S5 and S6; repairs TOOL-dTotalRecall-76, landing at step 36
+
+2026-10-26T06:27:15Z rescope · item add TOOL-dTotalRecall-87 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) id 39 HIGH, item H4 alone: resolve_kept_registration joins an unnormalised memory root, so a trailing slash gives a home git show cannot read and the ratchet reads a first seed forever; repairs TOOL-dTotalRecall-73, landing at step 34
+
+2026-10-26T06:27:15Z rescope · item add TOOL-dTotalRecall-88 · reason spec-audit round 1 of units 71 to 76 (reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) the 29 confirmed minors batched into one unit: 17 MEDIUM, ids 2 3 4 5 12 18 19 24 25 26 27 30 31 41 42 43 44 (items M1 to M15), and 12 LOW, ids 6 7 14 15 17 20 21 22 33 35 40 45 (items L1 to L9); lands on several units, so repairs no unit in particular

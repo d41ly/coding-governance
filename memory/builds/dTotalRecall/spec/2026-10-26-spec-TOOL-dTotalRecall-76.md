@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-76 — the round-6 minors: each reading units 67 to 70 made by a broken probe or a stale rule is made again at the tip, and each gap it hid is closed
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dTotalRecall-27
+**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 35 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 |
+| [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 |
+| [2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-71-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-75 TOOL-dTotalRecall-74 |
 
 <!-- /gen:spec-records -->
 
@@ -156,6 +157,13 @@ probe" is §4's. "The registry" is `census-kept-paths.txt` at the home
 - **consumes-from** `TOOL-dTotalRecall-69` — its re-stamp, its AC1 pair and the steps its argument left unnamed (ids 16, 31)
 - **consumes-from** `TOOL-dTotalRecall-70` — its §4 table and AC8 readings, its AC7 and S14 record, its messages, its fixture sweep, its check-3 admission and its S12 re-stamp (ids 2, 3, 4, 15, 18, 25, 30)
 - **consumes-from** `TOOL-dTotalRecall-73` — `resolve_kept_registration`, the one home S8 and S9 point every consumer at (ids 4, 20)
+- **hands-off** `TOOL-dTotalRecall-77` — its S19 sweep and its AC12 and AC13 lines, whose grep that unit's checker read replaces (the round-1 audit of units 71 to 76, id 23)
+- **hands-off** `TOOL-dTotalRecall-78` — its S19 population and loop, which that unit's sweep replaces (the round-1 audit of units 71 to 76, id 34)
+- **hands-off** `TOOL-dTotalRecall-79` — its AC13 answer and its S19 list of re-stamps, which that unit sets beside the derived spans (the round-1 audit of units 71 to 76, id 1)
+- **hands-off** `TOOL-dTotalRecall-80` — its S20 answer, which that unit replaces with the checker's C5 verdict at unit 69's pass (the round-1 audit of units 71 to 76, id 16)
+- **hands-off** `TOOL-dTotalRecall-85` — its S1 to S4 and its AC1 line, whose five counts that unit re-reads at verified revisions (the round-1 audit of units 71 to 76, id 11)
+- **hands-off** `TOOL-dTotalRecall-86` — its S5 and S6 and its AC2 line, whose counts that unit re-reads at verified revisions (the round-1 audit of units 71 to 76, id 38)
+- **hands-off** `TOOL-dTotalRecall-88` — its AC7, AC12 and §10, its plants and its S19 sweep's leftovers, which that batch re-reads or repairs (the round-1 audit of units 71 to 76, ids 5, 6, 7, 15, 18, 21, 22, 26, 31, 33, 42)
 
 ## 4. Design
 
@@ -373,6 +381,8 @@ New arm: tools/govkit/selftest.py · covers none · S12's sweep of its fixture b
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 67 to 70, its 23
   confirmed minors: 16 MEDIUM, ids 1 2 3 4 6 12 13 18 19 20 21 26 27 29 30 31 (items M1 to M15),
   and 7 LOW, ids 7 8 9 15 16 25 28 (items L1 to L7).
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-77, TOOL-dTotalRecall-78, TOOL-dTotalRecall-79, TOOL-dTotalRecall-80, TOOL-dTotalRecall-85, TOOL-dTotalRecall-86, TOOL-dTotalRecall-88, each the other end of an edge a
+  unit the round-1 spec audit of units 71 to 76 promoted wrote; nothing else moved.
 
 ## 10. Reuse audit
 
