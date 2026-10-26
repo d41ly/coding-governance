@@ -1712,7 +1712,8 @@ UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-e
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
                    "callers") + ROLLBACK_SCHEMA_PLANTS
-ROLLBACK_UPDATE_PLANTS = ("refused", "read-only", "descendant", "scoped", "no-base")
+ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp")  # TOOL-dSafePassage-19
+ROLLBACK_UPDATE_PLANTS = ("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
 
 
 def build_fixture_env(**extra: str) -> dict[str, str]:
@@ -1742,7 +1743,8 @@ def render_fixture_row(slug: str, resume: bool = False, needs: bool = False) -> 
 # The schema step's plants (TOOL-dSafePassage-15), each an (anchor, replacement) over a copy of
 # `steps/receipt_schema_4.py`, read in `<target>.fx` as `fx.py` reads its own: `schema.fail` exits
 # the up 1 before any write, `schema.block` blocks after the temporary file is written and before
-# its rename, writing the pid and `schema.blocking`, until the fixture kills it.
+# its rename, writing the pid and `schema.blocking`, until the fixture kills it; `schema.block-after`
+# does the same once the rename has landed (TOOL-dSafePassage-19).
 FIXTURE_SCHEMA_STEP_PLANTS = (
     ("    code, msg, out = verbs[argv[0]](receipt)\n",
      "    fx = path.parents[1].with_name(path.parents[1].name + \".fx\")\n"
@@ -1755,7 +1757,11 @@ FIXTURE_SCHEMA_STEP_PLANTS = (
      "            (fx / \"schema.pid\").write_text(str(os.getpid()), encoding=\"utf-8\")\n"
      "            (fx / \"schema.blocking\").touch()\n"
      "            __import__(\"time\").sleep(300)\n"
-     "        os.replace(tmp, path)\n"),
+     "        os.replace(tmp, path)\n"
+     "        if (fx / \"schema.block-after\").exists():\n"
+     "            (fx / \"schema.pid\").write_text(str(os.getpid()), encoding=\"utf-8\")\n"
+     "            (fx / \"schema.blocking\").touch()\n"
+     "            __import__(\"time\").sleep(300)\n"),
 )
 
 
@@ -2607,7 +2613,9 @@ def run_rollback_update_fixture(plant: str | None) -> int:
     with tempfile.TemporaryDirectory(prefix="gk-rbu-", ignore_cleanup_errors=True) as td:
         tmp = pathlib.Path(td)
         fails: list[str] = []
-        gov, targets, sha_a, sha_b, env = build_update_gov(tmp, ("t",), ("s1",), fails)
+        schema = plant in ROLLBACK_UPDATE_SCHEMA_PLANTS
+        gov, targets, sha_a, sha_b, env = build_update_gov(
+            tmp, ("t", "t2") if plant == "schema-step-kill-before-stamp" else ("t",), ("s1",), fails, schema3=schema)
         t = targets["t"]
         reports, rp = t.with_name("t.fx"), t / ".governance" / "install.json"
 
@@ -2626,20 +2634,90 @@ def run_rollback_update_fixture(plant: str | None) -> int:
         def spawns() -> dict[str, str]:
             return {p.name: p.read_text(encoding="utf-8") for p in reports.iterdir()} if reports.is_dir() else {}
 
-        if not fails and plant != "descendant":
-            rc0, out0 = run_fixture_govkit(gov, env, "update", "--target", str(t), "--to", sha_b, "--write")
-            s1 = {r["id"]: r["state"] for r in receipt().get("steps") or []}.get("fx/s1")
-            expect(rc0 == 0 and receipt().get("gov_commit") == sha_b and s1 == "applied",
+        def receipt_of(tt: pathlib.Path) -> dict:
+            return json.loads((tt / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+        def record_of(tt: pathlib.Path) -> list[str]:
+            rec = tt / ".governance" / "outbox" / f"update-reverted-{sha_b[:8]}-{sha_a[:8]}.md"
+            return rec.read_text(encoding="utf-8").splitlines() if rec.is_file() else []
+
+        for tt in targets.values() if not fails and plant != "descendant" else ():
+            rc0, out0 = run_fixture_govkit(gov, env, "update", "--target", str(tt), "--to", sha_b, "--write")
+            got0 = {r["id"]: r["state"] for r in receipt_of(tt).get("steps") or []}
+            expect(rc0 == 0 and receipt_of(tt).get("gov_commit") == sha_b and got0.get("fx/s1") == "applied"
+                   and (not schema or got0.get("govkit/receipt-schema-4") == "applied"),
                    f"the update from A to B did not apply s1 ({rc0}): {out0[-600:]}")
             if plant == "no-base":
                 rec = receipt()
                 rec.pop("gov_commit", None)
                 rp.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
-            run_fixture_git(t, "add", "-A")
-            run_fixture_git(t, "commit", "-qm", "at B")
+            run_fixture_git(tt, "add", "-A")
+            run_fixture_git(tt, "commit", "-qm", "at B")
         rc = 0
         if fails:
             pass
+        elif schema:
+            # TOOL-dSafePassage-19 AC1: a rollback past the schema step, over a target updated from a
+            # schema-3 receipt through it, stamps schema 3 with no `steps` and finishes its record.
+            twin = targets["t2" if plant == "schema-step-kill-before-stamp" else "t"]
+            rc_t, _o = run_fixture_govkit(gov, env, "update", "--target", str(twin), "--rollback", "--to", sha_a, "--write")
+            print(_o, end="")
+            rec, text = receipt_of(twin), record_of(twin)
+            print(f"rollback-update: {twin.name} exits {rc_t} · schema {rec.get('schema')} · "
+                  f"{'WITH' if 'steps' in rec else 'no'} steps · gov_commit "
+                  f"{'A' if rec.get('gov_commit') == sha_a else rec.get('gov_commit')}")
+            print("".join(f"rollback-update: record · {ln}\n" for ln in text), end="")
+            expect(rc_t == 0 and rec.get("schema") == 3 and "steps" not in rec and rec.get("gov_commit") == sha_a,
+                   "the rollback did not exit 0 with schema 3, no `steps` and gov_commit A")
+            expect("down govkit/receipt-schema-4: rolled-back" in text and f"gov_commit: moved to {sha_a[:8]}" in text
+                   and not any(ln.endswith("not finished") for ln in text),
+                   "the record does not name the schema step rolled-back and the stamp moved, finished")
+            rc = rc_t
+            if plant == "schema-step-kill-before-stamp":
+                # AC2: `t` killed once the schema step's down has renamed schema 3 into place, before
+                # the write loop moves a file row; its re-run is compared with the twin above.
+                reports.mkdir(exist_ok=True)
+                (reports / "schema.block-after").touch()
+                why = run_killed([sys.executable, str(gov / "tools" / HERE.name / "govkit.py"), "update", "--target",
+                                  str(t), "--rollback", "--to", sha_a, "--write"], reports, "schema", env)
+                expect(why is None, f"the kill was not staged: {why}")
+                (reports / "schema.block-after").unlink()
+                rec, text = receipt(), record_of(t)
+                print(f"rollback-update: after the kill · schema {rec.get('schema')} · "
+                      f"{'WITH' if 'steps' in rec else 'no'} steps · gov_commit "
+                      f"{'B' if rec.get('gov_commit') == sha_b else rec.get('gov_commit')} · record "
+                      f"{'not finished' if any(ln.endswith('not finished') for ln in text) else 'FINISHED'} with "
+                      f"{sum(ln.startswith('down ') for ln in text)} down line(s)")
+                expect(rec.get("schema") == 3 and "steps" not in rec and rec.get("gov_commit") == sha_b,
+                       "the killed receipt is not schema 3 with no `steps` and gov_commit unmoved")
+                expect(any(ln.endswith("not finished") for ln in text) and not any(ln.startswith("down ") for ln in text),
+                       "the killed run's record is not `not finished` with no down line")
+                rc, out = govkit("--rollback", "--to", sha_a, "--write")
+                text, twin_text = record_of(t), record_of(twin)
+
+                def outside(tt: pathlib.Path) -> dict[str, bytes]:
+                    got = {k: v for k, v in read_target_bytes(tt).items() if not k.startswith(".governance/outbox/")}
+                    got[":index"] = b"\n".join(ln for ln in got[":index"].split(b"\n") if b"\t.governance/outbox/" not in ln)
+                    return got
+
+                a, b = outside(t), outside(twin)
+                same_receipt = rp.read_bytes() == (twin / ".governance" / "install.json").read_bytes()
+                files = [ln for ln in text if ln.startswith("files: ")]
+                shape = (any(" · finished " in ln for ln in text) and not any(ln.endswith("not finished") for ln in text)
+                         and files and files == [ln for ln in twin_text if ln.startswith("files: ")]
+                         and f"gov_commit: moved to {sha_a[:8]}" in text)
+                downs = [ln for ln in text if ln.startswith("down ")]
+                print(f"rollback-update: the re-run exits {rc} · its receipt's bytes "
+                      f"{'equal' if same_receipt else 'DIFFER from'} the twin's · the target's bytes "
+                      f"{'equal' if a == b else 'DIFFER from'} the twin's"
+                      + ("" if a == b else f": {sorted(k for k in set(a) | set(b) if a.get(k) != b.get(k))}")
+                      + f" · the record {'has' if shape else 'LACKS'} the twin's finished shape")
+                print("".join(f"rollback-update: re-run record · {ln}\n" for ln in text), end="")
+                expect(rc == 0 and same_receipt and a == b and shape,
+                       "the re-run did not exit 0 matching the twin's receipt, target bytes and finished record")
+                expect(downs == ["down fx/s1: skipped (nothing applied)",
+                                 "down govkit/receipt-schema-4: skipped (nothing applied)"],
+                       "the re-run's down lines are not the two `skipped (nothing applied)` lines")
         elif plant is None:
             # First a rollback whose down fails: it stops before any file row moves, the stamp held.
             reports.mkdir(exist_ok=True)

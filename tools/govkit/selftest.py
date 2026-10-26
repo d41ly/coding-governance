@@ -3562,7 +3562,9 @@ def check_step_rollback() -> None:
     row downed, the one caller, and `update --rollback` with its preview, record, stamp and four
     refusals. Each plant's failing case is staged by the plant; the fixture prints `<family>: FAILED`
     on any unmet expectation. TOOL-dSafePassage-43's AC3 is the `down-fails` and `witness-stays` rows;
-    TOOL-dSafePassage-18's AC1 to AC3 are the `schema-step` rows, the schema step's down writing no row."""
+    TOOL-dSafePassage-18's AC1 to AC3 are the `rollback` family's `schema-step` rows, the schema step's
+    down writing no row; TOOL-dSafePassage-19's AC1 and AC2 are the `rollback-update` family's, a
+    rollback past the schema step stamping schema 3 with no `steps` and converging after a kill."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -3604,11 +3606,22 @@ def check_step_rollback() -> None:
             ("rollback-update", "scoped", 1, ("rollback-update: scoped · update exits 2 · receipt unchanged",
                                               "so it takes no --kits")),
             ("rollback-update", "no-base", 1, ("rollback-update: no-base · update exits 2 · receipt unchanged",
-                                               "receipt records no gov_commit"))):
+                                               "receipt records no gov_commit")),
+            ("rollback-update", "schema-step", 0, ("rollback-update: t exits 0 · schema 3 · no steps · gov_commit A",
+                                                   "rollback-update: record · down govkit/receipt-schema-4: rolled-back",
+                                                   "rollback-update: record · gov_commit: moved to ")),
+            ("rollback-update", "schema-step-kill-before-stamp", 0, (
+                "rollback-update: t2 exits 0 · schema 3 · no steps · gov_commit A",
+                "rollback-update: after the kill · schema 3 · no steps · gov_commit B · record not finished with 0 down line(s)",
+                "rollback-update: the re-run exits 0 · its receipt's bytes equal the twin's · the target's bytes equal "
+                "the twin's · the record has the twin's finished shape",
+                "rollback-update: re-run record · down fx/s1: skipped (nothing applied)\n"
+                "rollback-update: re-run record · down govkit/receipt-schema-4: skipped (nothing applied)"))):
         p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
-        tag = "dSP-18" if (plant or "").startswith("schema-step") else "dSP-4"
+        tag = ("dSP-4" if not (plant or "").startswith("schema-step")
+               else "dSP-19" if family == "rollback-update" else "dSP-18")
         check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
               p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
 
