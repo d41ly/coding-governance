@@ -100,3 +100,13 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T03:24:28Z rescope · item add TOOL-dTotalRecall-66 · reason spec-audit round 1 of units 54 to 60 (reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) the 40 confirmed minors batched into one unit: 27 MEDIUM, ids 4 5 6 7 8 12 13 14 15 16 24 25 28 31 32 33 34 37 39 40 41 42 43 44 45 46 47 (items M1 to M21), and 13 LOW, ids 9 10 11 18 19 20 21 23 29 35 38 48 50 (items L1 to L11); lands on several units, so repairs no unit in particular
 
 2026-10-26T03:42:08Z review · item dTotalRecall-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 40 · disposition promote
+
+2026-10-26T04:24:48Z rescope · item add TOOL-dTotalRecall-67 · reason spec-audit round 1 of units 61 to 66 (reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) id 1 HIGH, item H1 alone: unit 61's AC1 is green before its pass because the hands-off fold already wrote a section-9 line naming unit 61 into units 55, 56 and 57, so their amendments go unobserved; repairs TOOL-dTotalRecall-61, landing at step 20 ahead of the order-30 passes
+
+2026-10-26T04:24:49Z rescope · item add TOOL-dTotalRecall-68 · reason spec-audit round 1 of units 61 to 66 (reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) id 16 HIGH, item H2 alone: unit 65's keep registry is a memory/project txt file with no [[ledger]] registration and its own hand parser, so no shrink-only ratchet grades a keep added later; repairs TOOL-dTotalRecall-65
+
+2026-10-26T04:24:49Z rescope · item add TOOL-dTotalRecall-69 · reason spec-audit round 1 of units 61 to 66 (reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) id 21 HIGH, item H3 alone: unit 65 edits .memory-tree.conf, a watched file, after unit 60's last-audit re-stamp, so the kickoff-manifest ratchet leg is red from step 31 to the close; repairs TOOL-dTotalRecall-65
+
+2026-10-26T04:24:50Z rescope · item add TOOL-dTotalRecall-70 · reason spec-audit round 1 of units 61 to 66 (reviews/2026-10-26-review-TOOL-dTotalRecall-61-spec-audit-round1.md) the 25 confirmed minors batched into one unit: 23 MEDIUM, ids 2 3 4 5 6 9 10 11 12 13 14 17 18 22 24 25 26 27 28 29 30 31 32 (items M1 to M17), and 2 LOW, ids 8 33 (items L1 and L2); lands on several units, so repairs no unit in particular
+
+2026-10-26T04:39:22Z review · item dTotalRecall-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 25 · disposition promote
