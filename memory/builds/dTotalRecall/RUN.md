@@ -86,3 +86,17 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T02:12:52Z rescope · item add TOOL-dTotalRecall-60 · reason spec-audit round 1 of units 44 to 53 (reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md) the 35 confirmed minors batched into one unit: 26 MEDIUM, ids 2 3 5 6 7 8 12 14 16 17 18 19 20 21 25 26 27 29 30 32 33 38 39 40 42 44 (items M1 to M21), and 9 LOW, ids 9 10 11 22 23 31 34 35 36 (items L1 to L8); lands on several units, so repairs no unit in particular
 
 2026-10-26T02:27:23Z review · item dTotalRecall-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 35 · disposition promote
+
+2026-10-26T03:24:15Z rescope · item add TOOL-dTotalRecall-61 · reason spec-audit round 1 of units 54 to 60 (reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) id 1 HIGH, item H1: units 55 to 58 repair unit 53 but are ordered after its pass, so unit 53 retires the file-keyed keeps before their path-keyed home exists and its AC22, AC28, AC34 and AC35 are red at its own tip; repairs TOOL-dTotalRecall-50, the hand-off from its eight build-folder rows to unit 53's retirement, landing at step 19 ahead of unit 53's pass
+
+2026-10-26T03:24:25Z rescope · item add TOOL-dTotalRecall-62 · reason spec-audit round 1 of units 54 to 60 (reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) id 2 HIGH, item H2: unit 59 repairs unit 52 after unit 52's own pass, so unit 52's AC2 reads a first seed and its AC3 finds the absorbs line it wrote, both red at step 28; repairs TOOL-dTotalRecall-43, amending unit 52, the unit that carries 43's merge, in step 28 ahead of its pass
+
+2026-10-26T03:24:26Z rescope · item add TOOL-dTotalRecall-63 · reason spec-audit round 1 of units 54 to 60 (reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) id 3 HIGH, item H3 shared with id 22: unit 54 says unit 46 builds nothing it built while unit 46's spec still rebuilds parse_id_parts, and nothing observes unit 54's body at unit 46's pass; repairs TOOL-dTotalRecall-54
+
+2026-10-26T03:24:27Z rescope · item add TOOL-dTotalRecall-64 · reason spec-audit round 1 of units 54 to 60 (reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) id 22 HIGH, item H3 shared with id 3: unit 46's spec still rebuilds parse_id_parts on tree_lib._id_alternation with a read_root_conf that does not exist, the read unit 54 rejects; repairs TOOL-dTotalRecall-54
+
+2026-10-26T03:24:27Z rescope · item add TOOL-dTotalRecall-65 · reason spec-audit round 1 of units 54 to 60 (reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) id 27 HIGH, item H4: CENSUS_KEPT_PATHS ships gov-only build-script paths in tree_lib.py, engine bytes every adopter installs; repairs TOOL-dTotalRecall-55
+
+2026-10-26T03:24:28Z rescope · item add TOOL-dTotalRecall-66 · reason spec-audit round 1 of units 54 to 60 (reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) the 40 confirmed minors batched into one unit: 27 MEDIUM, ids 4 5 6 7 8 12 13 14 15 16 24 25 28 31 32 33 34 37 39 40 41 42 43 44 45 46 47 (items M1 to M21), and 13 LOW, ids 9 10 11 18 19 20 21 23 29 35 38 48 50 (items L1 to L11); lands on several units, so repairs no unit in particular
+
+2026-10-26T03:42:08Z review · item dTotalRecall-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 40 · disposition promote
