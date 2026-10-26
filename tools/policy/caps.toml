@@ -1,0 +1,386 @@
+# caps.toml - the cap census (TOOL-dGroundRules-9): one [[cap]] table per size cap the caps research
+# lists, read by `budgets.py` beside this file. The census is the population, so "every cap" is a join
+# over these rows and never a list typed in an arm: `check_policy.py`'s `arm_cap_census` holds it to
+# the tree both ways, and its fixture runs one `budgets-cap-<name>` case per row.
+#
+#   name      the key under `budgets.*` in .governance/policy.toml, quoted there when it carries a
+#             `/`, `.` or `*`. A row of template-size-limits.txt is named by that row's key.
+#   class     `switch`: a breach warns or refuses as `budgets.enforce` and `budgets.pinned` say;
+#             `consumer`: a limit its consumer enforces by dropping what is over, outside the switch;
+#             `correctness`: a check of correctness, outside the switch; `exempt`: outside the switch
+#             and never pinnable. No `exempt` row exists today; the schema refuses one in `pinned`.
+#   unit      `bytes`, `lines`, `chars` or `count`.
+#   enforcer  the file that measures the cap, `{prefix}`-relative as gate-legs.json spells one.
+#   home      where the value is declared today: `limits:<row key>` (a row of the template-size limits
+#             file, read by budgets.py alone), `file:<path>:<row key>`, `conf:<path>:<KEY>` or
+#             `constant:<path>:<NAME>`, the last three read by the enforcer and handed in.
+#   family    true where the value is per subject: the enforcer asks only the mode, and the policy
+#             file may not set a value.
+#   research  the caps research's row number.
+#   ships     optional, true when absent: `false` on a row whose enforcer is a `{prefix}` path the
+#             deployer's registry exempts, so no install holds it and an adopter's census arm
+#             announces the row rather than grading it (TOOL-dGroundRules-17). The `policy fixtures`
+#             case `budgets-ships-join` holds these flags to the registry's exemptions both ways.
+#   kit       on a shipped row only, and required there: the deployer's registry entry id that
+#             installs the enforcer, the id an install receipt's `kits` list names.
+#   installed on a shipped row only, and required there: where that entry writes the enforcer,
+#             `{prefix}`-spelled. An adopter's census arm grades the row there, `{prefix}` read as
+#             its receipt's `prefix` (TOOL-dGroundRules-22).
+#
+# No value is copied here: every cap keeps the value its home holds (help/size-caps.md).
+
+[[cap]]
+name = "coding-governance-agents.template.md"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/check-template-size.sh"
+home = "limits:coding-governance-agents.template.md"
+family = false
+research = 1
+ships = false
+
+[[cap]]
+name = "AGENTS.md"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/check-template-size.sh"
+home = "limits:AGENTS.md"
+family = false
+research = 2
+ships = false
+
+[[cap]]
+name = "skills/session-kickoff/SKILL.md"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/check-template-size.sh"
+home = "limits:skills/session-kickoff/SKILL.md"
+family = false
+research = 3
+ships = false
+
+[[cap]]
+name = "memory/guides/BUILD-METHOD.md"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/check-template-size.sh"
+home = "limits:memory/guides/BUILD-METHOD.md"
+family = false
+research = 4
+ships = false
+
+[[cap]]
+name = "memory/guides/UNATTENDED-PROTOCOL.md"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/check-template-size.sh"
+home = "limits:memory/guides/UNATTENDED-PROTOCOL.md"
+family = false
+research = 5
+ships = false
+
+[[cap]]
+name = ".claude/skills/unattended/SKILL.md"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/check-template-size.sh"
+home = "limits:.claude/skills/unattended/SKILL.md"
+family = false
+research = 6
+ships = false
+
+[[cap]]
+name = "memory/builds/*/spec/"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/check-spec-tokens.py"
+home = "limits:memory/builds/*/spec/"
+family = false
+research = 7
+ships = false
+
+[[cap]]
+name = "line-length"
+class = "switch"
+unit = "chars"
+enforcer = "{prefix}/check-line-length.sh"
+home = "file:{prefix}/line-length-limits.txt:<subject>"
+family = true
+research = 8
+kit = "check-line-length"
+installed = "{prefix}/check-line-length.sh"
+
+[[cap]]
+name = "guide-bytes"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:GUIDE_CAP_BYTES"
+family = false
+research = 9
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "guide-lines"
+class = "switch"
+unit = "lines"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:GUIDE_CAP_LINES"
+family = false
+research = 9
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "index-bytes"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:INDEX_CAP_BYTES"
+family = false
+research = 10
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "index-lines"
+class = "switch"
+unit = "lines"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:INDEX_CAP_LINES"
+family = false
+research = 10
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "readme-bytes"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:BUILD_README_CAP_BYTES"
+family = false
+research = 11
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "readme-lines"
+class = "switch"
+unit = "lines"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:BUILD_README_CAP_LINES"
+family = false
+research = 11
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "dossier-bytes"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:DOSSIER_CAP_BYTES"
+family = false
+research = 12
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "dossier-lines"
+class = "switch"
+unit = "lines"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:DOSSIER_CAP_LINES"
+family = false
+research = 12
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "entry-chars"
+class = "switch"
+unit = "chars"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:ENTRY_CAP_CHARS"
+family = false
+research = 13
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "readme-entry-chars"
+class = "switch"
+unit = "chars"
+enforcer = "{prefix}/memory-tree/check-memory-hygiene.sh"
+home = "conf:.memory-tree.conf:BUILD_README_ENTRY_CAP_CHARS"
+family = false
+research = 13
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/check-memory-hygiene.sh"
+
+[[cap]]
+name = "readme-slot"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/memory-tree/gen_build_index.py"
+home = "file:{prefix}/memory-tree/build-readme-slot-limits.txt:<slot>"
+family = true
+research = 14
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/gen_build_index.py"
+
+[[cap]]
+name = "role-body"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/roles/check_roles.py"
+home = "constant:{prefix}/roles/check_roles.py:BODY_CEILINGS"
+family = true
+research = 15
+kit = "roles"
+installed = "{prefix}/roles/check_roles.py"
+
+[[cap]]
+name = "one-line-rule"
+class = "switch"
+unit = "chars"
+enforcer = "{prefix}/playbook/render_playbook.py"
+home = "constant:{prefix}/playbook/render_playbook.py:ONE_LINE_MAX"
+family = false
+research = 16
+kit = "playbook-render"
+installed = "{prefix}/playbook/render_playbook.py"
+
+[[cap]]
+name = "roster-line"
+class = "switch"
+unit = "chars"
+enforcer = "{prefix}/roles/handoff.py"
+home = "constant:{prefix}/roles/handoff.py:ROSTER_LINE_MAX"
+family = false
+research = 17
+kit = "roles"
+installed = "{prefix}/roles/handoff.py"
+
+[[cap]]
+name = "manifest-bytes"
+class = "switch"
+unit = "bytes"
+enforcer = "skills/session-kickoff/manifest-check.sh"
+home = "constant:skills/session-kickoff/manifest-check.sh:MAX_MANIFEST_BYTES"
+family = false
+research = 18
+kit = "kickoff-manifest"
+installed = "{prefix}/manifest-check.sh"
+
+[[cap]]
+name = "manifest-line"
+class = "switch"
+unit = "bytes"
+enforcer = "skills/session-kickoff/manifest-check.sh"
+home = "constant:skills/session-kickoff/manifest-check.sh:MANIFEST_LINE_MAX"
+family = false
+research = 18
+kit = "kickoff-manifest"
+installed = "{prefix}/manifest-check.sh"
+
+[[cap]]
+name = "manifest-trap"
+class = "switch"
+unit = "bytes"
+enforcer = "skills/session-kickoff/manifest-check.sh"
+home = "constant:skills/session-kickoff/manifest-check.sh:MANIFEST_TRAP_MAX"
+family = false
+research = 18
+kit = "kickoff-manifest"
+installed = "{prefix}/manifest-check.sh"
+
+[[cap]]
+name = "universal-gotchas"
+class = "switch"
+unit = "count"
+enforcer = "{prefix}/memory-tree/gotchas.py"
+home = "conf:.memory-tree.conf:UNIVERSAL_BUDGET"
+family = false
+research = 20
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/gotchas.py"
+
+[[cap]]
+name = "recall-export"
+class = "switch"
+unit = "bytes"
+enforcer = "{prefix}/memory-recall/query.py"
+home = "constant:{prefix}/memory-recall/query.py:EXPORT_CAP"
+family = false
+research = 22
+kit = "memory-recall"
+installed = "{prefix}/memory-recall/query.py"
+
+[[cap]]
+name = "orientation-card"
+class = "consumer"
+unit = "bytes"
+enforcer = "skills/session-kickoff/manifest-check.sh"
+home = "constant:skills/session-kickoff/manifest-check.sh:CARD_CAP_BYTES"
+family = false
+research = 19
+kit = "kickoff-manifest"
+installed = "{prefix}/manifest-check.sh"
+
+[[cap]]
+name = "cited-file-cap"
+class = "correctness"
+unit = "bytes"
+enforcer = "{prefix}/memory-tree/corpus_ids.py"
+home = "conf:.memory-tree.conf:READ_PATH_WAIVER"
+family = false
+research = 21
+kit = "memory-tree"
+installed = "{prefix}/memory-tree/corpus_ids.py"
+
+[[cap]]
+name = "codex-instructions"
+class = "consumer"
+unit = "bytes"
+enforcer = "{prefix}/agent-instructions/adopt-agent-instructions.sh"
+home = "constant:{prefix}/agent-instructions/adopt-agent-instructions.sh:CODEX_MAX"
+family = false
+research = 23
+kit = "agent-instructions"
+installed = "{prefix}/agent-instructions/adopt-agent-instructions.sh"
+
+[[cap]]
+name = "runlog-record"
+class = "consumer"
+unit = "bytes"
+enforcer = "{prefix}/runlog/record.py"
+home = "constant:{prefix}/runlog/record.py:RECORD_CAP_BYTES"
+family = false
+research = 24
+kit = "runlog"
+installed = "{prefix}/runlog/record.py"
+
+[[cap]]
+name = "feature-card"
+class = "consumer"
+unit = "bytes"
+enforcer = "{prefix}/codebase-map/map_lib.py"
+home = "constant:{prefix}/codebase-map/map_lib.py:FEATURE_CARD_CAP_BYTES"
+family = false
+research = 24
+kit = "codebase-map"
+installed = "{prefix}/codebase-map/map_lib.py"
+
+[[cap]]
+name = "hook-context"
+class = "consumer"
+unit = "chars"
+enforcer = "{prefix}/hooks/scratch-guard.js"
+home = "constant:{prefix}/hooks/scratch-guard.js:ROUTE_CONTEXT_CAP"
+family = false
+research = 24
+kit = "agent-cap"
+installed = "{prefix}/hooks/scratch-guard.js"

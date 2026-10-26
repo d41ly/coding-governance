@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-56 — the round-1 audit of units 40 to 51, verdict-boundary minors batched: a lossless selection, one adoption rule on both readers, honest peer reads, and floors under the new arms
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 32 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 32 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,7 +12,10 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-57 |
 | [2026-10-25-build-TOOL-dWitnessedBar-56-deviation-561.md](../build/2026-10-25-build-TOOL-dWitnessedBar-56-deviation-561.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-56-deviation-562.md](../build/2026-10-25-build-TOOL-dWitnessedBar-56-deviation-562.md) | deviation | — |
+| [2026-10-26-build-TOOL-dWitnessedBar-56-deviation-563.md](../build/2026-10-26-build-TOOL-dWitnessedBar-56-deviation-563.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-57 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 |
 | [2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-52-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-57 |
 
 <!-- /gen:spec-records -->
@@ -109,7 +112,9 @@ That is 13 MEDIUM and 7 LOW findings by raw id.
 - **S17** — id 35. Unit 43's four peer plants run from `tools/run-gates/run-gates.gov.test.sh`, the suite
   `run-gates gov canary` runs, and this unit's §7 names that leg. Observed by AC15.
 - **S18** — id 11. Unit 43's AC3 rests on `tools/loop/guard.py`, which TOOL-dDeclaredLoop-2 creates
-  outside this build and the tree lacks today. At the close the main loop runs AC3's command when the file
+  outside this build and the tree lacks today. `--staged` runs at pre-commit, where no commit message
+  exists, so it reads no trailer (TOOL-dDeclaredLoop-2 §4 "The verdict"); what AC3 can observe is unit 6
+  S9's key-level `OWNER_ONLY_KEYS` refusal. At the close the main loop runs that check when the file
   exists, and otherwise records AC3 `NOT OBSERVED` in unit 43's acceptance ledger naming the absent file.
   Observed by AC16.
 - **S19** — id 37. Each floored suite an arm of units 40, 41, 42, 43, 45, 46 or 51 lands in raises its
@@ -290,9 +295,13 @@ Live at landing, after every other unit of the build, concurrent with `TOOL-dWit
   prints at least 4.
   Red when: the plants sit in a suite no named leg runs.
 - **AC16** — When the main loop tests at the close for `guard.py`, the file TOOL-dDeclaredLoop-2 creates at
-  the path S18 names, a present file makes AC3 of unit 43 run and exit 1 naming `verdict.peer.signers`; an
-  absent one leaves unit 43's ledger line for AC3 reading `NOT OBSERVED` and naming `guard.py`.
-  Red when: AC3 is recorded observed over a file that does not exist.
+  the path S18 names, a present file makes `python guard.py --staged` run in the loop kit's directory over
+  a fixture whose policy sets `policy-file.guard = "agents-with-reason"` and which stages a change to
+  `verdict.peer.signers` with its change record and `memory/DECISIONS.md` row, and exit 1 naming
+  `verdict.peer.signers`, unit 6 S9's key-level refusal; an absent one leaves unit 43's ledger line for
+  AC3 reading `NOT OBSERVED` and naming `guard.py`.
+  Red when: AC3 is recorded observed over a file that does not exist, or over a refusal that names only
+  the policy file's path, which the default `owner-only` gives for any agent write.
 - **AC17** — When `grep -n '^FLOOR_ASSERTIONS=' <suite>` runs for each of S19's four suites, each value
   exceeds its base figure, and a `RAISED` comment names each unit whose arm it counts.
   Red when: an arm of those units can be deleted and its suite stays green.
@@ -337,6 +346,10 @@ New arm: tools/run-gates/keep_tails.py · covers AC10 · a tail holding controls
   spec audit of units 52 to 57; nothing else moved.
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-68's
   consumes-from edge, promoted by the round-1 spec audit of units 66 and 67; nothing else moved.
+- rev-4 · 2026-10-26 · S18 · AC16 · re-grounded on the cross-check record
+  `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck`, row 98: AC16 observes unit 6 S9's
+  key-level `OWNER_ONLY_KEYS` refusal under `agents-with-reason`, not a trailer check, which
+  `--staged` cannot make at pre-commit.
 
 ## 10. Reuse audit
 

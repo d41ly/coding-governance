@@ -200,11 +200,23 @@ arm 'the shipped tree is clean' 'clean — no ref-keyed verdict join' \
 
 # ---- D7: a status this gate cannot interpret is a REFUSAL, never a verdict -----------------------
 # Both halves of one root: the loop read "the pipeline exited non-zero" as "rule 5 fired".
-# The false RED. agent-cap exits 2 on its own environment refusal BEFORE any rule runs, and that
+# The false RED. agent-cap exited 2 on its own environment refusal BEFORE any rule ran, and that
 # message has no line starting with two spaces and L, so the sed emptied it and the gate reported a
 # ref-keyed verdict join with a blank body - sending an operator off to rewrite a join that is not
-# there. Reproduced exactly this way against the shipped tree.
-arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refusal and not a join'   env AGENT_CAP=7 bash "$GATE"
+# there. Reproduced exactly this way against the shipped tree, through a set `AGENT_CAP`. That
+# refusal retired in TOOL-dGroundRules-10, so a stub predicate stands in for any
+# exit 2 that names no line, beside the stub for an unclassifiable status below.
+ER="$TMP/envrefusal"; mkdir -p "$ER/${KIT_REL}" "$ER/${PFX}${HOOKS}"
+( cd "$ER" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf "export const meta = { name: 'x' }
+await log('hi')
+" > $KIT_REL/w.js
+  printf 'process.stderr.write("BLOCKED by agent-cap: a refusal of its own environment\\n")
+process.exit(2)
+' > ${PFX}${HOOKS}/agent-cap.js
+  git add -A && git commit -qm envrefusal --no-verify )
+cp "$GATE" "$ER/${KIT_REL}/gate.sh"
+arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refusal and not a join'   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$ER"
 
 # The false GREEN, and the reason `set -o pipefail` is now set beside `set -u`: only the hook's
 # status was read, so a builder that threw fed empty stdin to a JSON.parse whose catch exits 0 and

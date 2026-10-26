@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-54 — the trap row's verdicts observed a second time through the whole overlap probe, which reads the pair from the suite and spells none
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
+**Status:** WONTDO · rev-2 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,9 @@
 | [2026-10-23-build-TOOL-dGroundRules-54-deviation-42.md](../build/2026-10-23-build-TOOL-dGroundRules-54-deviation-42.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-task.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 |
+| [2026-10-23-prompt-TOOL-dGroundRules-54-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-54-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md) | research | TOOL-dGroundRules-52 TOOL-dGroundRules-45 TOOL-dGroundRules-60 TOOL-dGroundRules-53 TOOL-dGroundRules-57 TOOL-dGroundRules-58 |
+| [2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 |
 
 <!-- /gen:spec-records -->
 
@@ -53,8 +56,9 @@ it builds at order 18.
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-44` — AC2, the trap row its S1 spells, `TRAP_PROBE` and the `RAW_BOTH` staging, which S1 and S2 observe the trap row's verdicts over; without them there is no criterion to witness
-- **consumes-from** `TOOL-dGroundRules-58` — `PAIRS_TABLE_WHOLE`, the probe that sources the library by its tracked path and reads each pair from the suite; without it the shell field is `127`
+none
+
+Retired WONTDO, superseded: every edge this unit declared is withdrawn.
 
 ## 4. Design
 
@@ -140,6 +144,8 @@ none
   review round 1 by the review's single-spelling route, through `PAIRS_TABLE_WHOLE` of
   `TOOL-dGroundRules-58`, with the probe's shell half run over a mock suite and a raw-prefix staging
   on 2026-10-23.
+- rev-2 · 2026-10-24 · §3 · retired WONTDO at `8eab342e0`, so every edge is withdrawn and the Edges block
+  reads `none`: consumes-from `TOOL-dGroundRules-44`, consumes-from `TOOL-dGroundRules-58`. No scope, design or criterion moved.
 
 ## 10. Reuse audit
 

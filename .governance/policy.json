@@ -1,0 +1,1306 @@
+{
+  "catalogue_blob": "79782691a9a1e4bedcc2dcd22589bfd3edd697c4",
+  "keys": {
+    "actions.free": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "read-only-probes"
+    },
+    "annotations.delivery": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "work-order"
+    },
+    "annotations.grammar": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "voluntary"
+    },
+    "annotations.lookup": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "query-and-map"
+    },
+    "annotations.resolve-scope": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-comment-ref"
+    },
+    "asks.acceptance": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "attendance": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "unattended"
+    },
+    "attendance.scope": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "build"
+    },
+    "autonomy": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "plan-only"
+    },
+    "budgets.enforce": {
+      "reason": "set in .governance/policy.toml at {rev}",
+      "source": "file",
+      "value": "warn"
+    },
+    "budgets.pinned": {
+      "reason": "set in .governance/policy.toml at {rev}",
+      "source": "file",
+      "value": []
+    },
+    "build.closes": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "at-landing"
+    },
+    "build.push": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-pass"
+    },
+    "build.release-ceiling": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 72
+    },
+    "build.release-hold": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "close-only"
+    },
+    "build.reuse-check.second-pass": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "off"
+    },
+    "build.scope": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "warn-and-ask"
+    },
+    "build.spend-cap": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "measured"
+    },
+    "build.unit-holders": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "any-session"
+    },
+    "build.worktree": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "shared"
+    },
+    "builds.agent-root": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "work-order"
+    },
+    "builds.slug-date": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "none"
+    },
+    "builds.slug-style": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "humorous"
+    },
+    "builds.slug-words": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "1-3"
+    },
+    "card.follows": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "re-render-at-transition"
+    },
+    "card.pointers": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-item"
+    },
+    "card.snapshot": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "terminal-only"
+    },
+    "card.store": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": [
+        "remote-ref",
+        "build-folder",
+        "local-clone"
+      ]
+    },
+    "charter.override": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "explicit-override"
+    },
+    "commits.edge-check": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "push-leg"
+    },
+    "commits.squash": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "re-emit-union"
+    },
+    "context.on-full": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "fresh-at-boundary"
+    },
+    "context.threshold": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "60%"
+    },
+    "core.bypass": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "with-hooks-report"
+    },
+    "core.exceptions": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "any-session-recorded"
+    },
+    "currency.max-behind": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 2
+    },
+    "currency.on-behind": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "owner-item"
+    },
+    "decisions.major": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "author-rubric"
+    },
+    "deploy.currency": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "pull-and-watch"
+    },
+    "deploy.on-verify-fail": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "roll-forward"
+    },
+    "deploy.promotion": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "auto-on-green"
+    },
+    "deploy.runs": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "landing-node"
+    },
+    "deps.coordination": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "message-then-progress"
+    },
+    "deps.early-build": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "confirmed-interfaces"
+    },
+    "deps.landing": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "hold-until-parent-lands"
+    },
+    "deps.messaging": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "live-and-mailbox"
+    },
+    "deps.on-parent-withdrawn": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "replan"
+    },
+    "design.coverage": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "design.coverage.semantic": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-exit"
+    },
+    "design.forks": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "agents-feature-rich-expandable"
+    },
+    "design.handoff": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "derived-ready"
+    },
+    "design.overlap": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "warn"
+    },
+    "design.reentry": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": [
+        "interface-change",
+        "review-cross-unit-flaw",
+        "planner-or-owner-flag"
+      ]
+    },
+    "design.streams-when": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "opt-in"
+    },
+    "deviation.approval": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "by-risk"
+    },
+    "deviation.gate": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "driver.reads": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "state-reads-only"
+    },
+    "flow.adapt": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "additive-recorded"
+    },
+    "flow.on-exhausted": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "best-effort-ending"
+    },
+    "flow.promote": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "loop-proposes"
+    },
+    "flow.rework-budget": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "4+2"
+    },
+    "flow.route-backs": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 3
+    },
+    "flow.scenario-conflict": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "flow.scenario-default": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "feature"
+    },
+    "flow.wait-ceiling": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 72
+    },
+    "help.atlas": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "committed"
+    },
+    "help.enforce": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "help.explanation": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "rendered"
+    },
+    "hooks.bypass": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "allowed"
+    },
+    "install.deprecation-window": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 2
+    },
+    "install.from": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "release-tag"
+    },
+    "install.guards": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "project"
+    },
+    "install.on-shim-call": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "warn"
+    },
+    "install.retired-edits": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "order"
+    },
+    "install.steps": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "offer"
+    },
+    "instructions.checks": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "instructions.edit": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "owner-command-agents-propose"
+    },
+    "instructions.exclude": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": []
+    },
+    "instructions.legacy": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "shrink-only"
+    },
+    "instructions.proof": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "tty-cli"
+    },
+    "instructions.slices": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "handed"
+    },
+    "instructions.stale": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "order"
+    },
+    "instructions.task-charter": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "when-not-static"
+    },
+    "integrations.tracker": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "none"
+    },
+    "kickoff.runs": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "no-ready-card"
+    },
+    "kits.cadence": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "weekly"
+    },
+    "kits.host": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "session-start"
+    },
+    "kits.watch-cadence": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "daily"
+    },
+    "landing.order": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "plan-priority-then-first-verified"
+    },
+    "leases": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "warn"
+    },
+    "leases.expiry-hours": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 24
+    },
+    "leases.granularity": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "build-and-unit"
+    },
+    "leases.offer-seconds": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 300
+    },
+    "leases.offline": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "warn"
+    },
+    "leases.overlap": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "kit-dirs"
+    },
+    "leases.queued-claim-days": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 7
+    },
+    "leases.renewal": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "progress"
+    },
+    "lexicon.at-commit": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "lexicon.drift": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse-new"
+    },
+    "lexicon.forced": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "verified"
+    },
+    "lexicon.packs": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "detected-and-declared"
+    },
+    "lexicon.pin": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "shrink-only"
+    },
+    "mailbox.fetch-seconds": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 60
+    },
+    "mailbox.notice": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-item"
+    },
+    "mailbox.reads": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-item"
+    },
+    "maintain.cadence": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "daily"
+    },
+    "maintain.dead-after": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 10
+    },
+    "maintain.events": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": [
+        "default-branch-red",
+        "release-verify-failed",
+        "session-start-breach"
+      ]
+    },
+    "maintain.host": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "session-start"
+    },
+    "maintain.interpreter-eol": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "file"
+    },
+    "maintain.node-readings": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-node"
+    },
+    "maintain.on-breach": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "file-ask"
+    },
+    "maintain.reading-admission": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse-unowned"
+    },
+    "maintain.reading-tree": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "clean-base"
+    },
+    "maintain.record-when": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-period"
+    },
+    "maintain.security-review": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "weekly"
+    },
+    "maintain.tiers": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "bands"
+    },
+    "memory.code-budget": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "16k"
+    },
+    "memory.code-enrich": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "symbol-hash-slots"
+    },
+    "memory.code-languages": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "builtin"
+    },
+    "memory.code-roles": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-role"
+    },
+    "memory.default-load": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "card-and-map"
+    },
+    "memory.item-budget": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "measured"
+    },
+    "memory.legacy-anchors": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "derived"
+    },
+    "memory.load-budget": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "8k"
+    },
+    "memory.map-budget": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "32k"
+    },
+    "memory.map-overflow": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "degrade"
+    },
+    "memory.map-purpose": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "review"
+    },
+    "memory.map-unfold": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "item-declared"
+    },
+    "memory.mirror": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "none"
+    },
+    "memory.over-budget": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "report"
+    },
+    "memory.project-map": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "structural-roles"
+    },
+    "memory.superseded-slices": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "notices.record": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "none"
+    },
+    "notify.channel": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "terminal"
+    },
+    "notify.owner": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "turn-micro-formats"
+    },
+    "notify.owner-items": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "push-when-away"
+    },
+    "observability.run-record": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "per-run"
+    },
+    "orient.budget": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "record-only"
+    },
+    "patch.ratify": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "auto"
+    },
+    "placement": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "agent-places"
+    },
+    "placement.check": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "plan.authority": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "planner-drafts-owner-ratifies"
+    },
+    "plan.kickoff": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "offer-next"
+    },
+    "plan.ratification": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "request"
+    },
+    "plan.triage": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "rules"
+    },
+    "plan.unplaced": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "warn"
+    },
+    "platforms.provision": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "name"
+    },
+    "platforms.supported": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": [
+        "windows-gitbash",
+        "linux"
+      ]
+    },
+    "platforms.verify": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "held"
+    },
+    "policy-file.guard": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "owner-only"
+    },
+    "policy-file.on-invalid": {
+      "reason": "set in .governance/policy.toml at {rev}",
+      "source": "file",
+      "value": "last-valid"
+    },
+    "policy-file.on-missing-expansion": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "policy-file.proof": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "tty-cli"
+    },
+    "preset": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "standard"
+    },
+    "probe.experiment.authority": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "within-cap"
+    },
+    "probe.observations": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "verify-before-place"
+    },
+    "probe.points": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": []
+    },
+    "probe.raise": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "roles-and-owner"
+    },
+    "prompts.author": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "prompt-writer"
+    },
+    "prompts.batch": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "per-batch"
+    },
+    "release.environments": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": []
+    },
+    "resume.context": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "fresh-when-idle"
+    },
+    "resume.partial": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "continue-item"
+    },
+    "retrofit.cadence": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "hot-first"
+    },
+    "retrofit.claim-cap": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 3
+    },
+    "retrofit.claim-on-touch": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "claim"
+    },
+    "retrofit.decisions": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "author-rubric"
+    },
+    "retrofit.drain": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "hunk"
+    },
+    "retrofit.drain-cap": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 20
+    },
+    "retrofit.practice-pending": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "alongside"
+    },
+    "retrofit.reconstruct": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "on-touch"
+    },
+    "retrofit.slot-bytes": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 1024
+    },
+    "retrofit.unseeded": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "unarmed"
+    },
+    "retrofit.widen": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "record-reason"
+    },
+    "reuse.delivery": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "rendered"
+    },
+    "reuse.propose": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "new-seam"
+    },
+    "review.blocks": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "every-review"
+    },
+    "review.breakpoints": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": []
+    },
+    "review.build.when": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "per-build"
+    },
+    "review.design-audit.runs": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 2
+    },
+    "review.design-audit.seed": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "reverted-escapes"
+    },
+    "review.design.round-count": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 2
+    },
+    "review.design.rounds": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "one"
+    },
+    "review.findings": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "blocker-high-own"
+    },
+    "review.follow-up": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "after-high"
+    },
+    "review.left-shift": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "second-occurrence"
+    },
+    "review.loop.cadence": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "weekly"
+    },
+    "review.loop.catch-source": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "verdict-records"
+    },
+    "review.loop.retire": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "propose-ratify"
+    },
+    "review.loop.window-days": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 60
+    },
+    "review.max-rounds": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 3
+    },
+    "review.opt-in": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": []
+    },
+    "review.recommendation": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "advice"
+    },
+    "review.recommendation.source": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "scored-signals-and-reasoning"
+    },
+    "review.twin": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "never"
+    },
+    "review.unclassed": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "review.unverified": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "ask"
+    },
+    "roles.answered-calls": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "roles.no-spawn": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "executor-role-session"
+    },
+    "roles.on-contradiction": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "repair-and-record"
+    },
+    "roles.orientation.house-index": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "handed"
+    },
+    "roles.retries": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 3
+    },
+    "roles.shape-enforce": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse"
+    },
+    "roles.trust": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "keyed"
+    },
+    "roles.verifier-context": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "cold"
+    },
+    "run.host": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "requesting-node"
+    },
+    "run.on-owner-question": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "best-effort-recorded"
+    },
+    "run.on-owner-silence": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "apply-recommendation"
+    },
+    "run.owner-deadline": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 24
+    },
+    "runtime.act-auth": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": [
+        "setup-token",
+        "oauth-shared"
+      ]
+    },
+    "runtime.act-ceiling": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 1.5
+    },
+    "runtime.act-harness": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "claude-code"
+    },
+    "runtime.admission-scope": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "pool"
+    },
+    "runtime.agents-in-flight": {
+      "reason": "set in .governance/policy.toml at {rev}",
+      "source": "file",
+      "value": 6
+    },
+    "runtime.attended-allowance": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": []
+    },
+    "runtime.attended-judge": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "classifier-or-person"
+    },
+    "runtime.binary": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "newest-conforming"
+    },
+    "runtime.harnesses": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": [
+        "claude-code"
+      ]
+    },
+    "runtime.hold-ceiling": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 6
+    },
+    "runtime.hook-failure": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "closed"
+    },
+    "runtime.journal": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 60
+    },
+    "runtime.no-progress": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 3
+    },
+    "runtime.owner-harness": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "auto"
+    },
+    "runtime.refusal-repeats": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 3
+    },
+    "runtime.relaunch": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "fresh"
+    },
+    "runtime.restarts": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 3
+    },
+    "runtime.secret-home": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "os-keychain"
+    },
+    "runtime.secret-scan": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "value-gate+shape-report"
+    },
+    "runtime.spawn-backend": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "in-session"
+    },
+    "tags.bare-refs": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "charter-only"
+    },
+    "tags.bundle": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "both"
+    },
+    "tags.bundle-rows": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 40
+    },
+    "tags.positional": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "shrink-only"
+    },
+    "tags.retired-cites": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "refuse-new"
+    },
+    "tags.slice": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "leaf"
+    },
+    "tests.landing-levels": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": [
+        "unit",
+        "integration"
+      ]
+    },
+    "tests.product": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "declared-with-runners"
+    },
+    "tests.without-cadence": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "run-at-landing"
+    },
+    "trace.cost": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "tokens+wall"
+    },
+    "trace.identity": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "session"
+    },
+    "trace.leg-output": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "tail-by-hash"
+    },
+    "trace.rows": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 120
+    },
+    "transitions.record": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": [
+        "trailer",
+        "log",
+        "micro-format"
+      ]
+    },
+    "verdict": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "local-hook"
+    },
+    "verdict.blocks": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "own-only"
+    },
+    "verdict.flakes": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "quarantine"
+    },
+    "verdict.flakes.entry": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "measured"
+    },
+    "verdict.flakes.release": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 3
+    },
+    "verdict.held": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "on-demand"
+    },
+    "verdict.red-route": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "fix-pass-or-design"
+    },
+    "verdict.remote.pin-scope": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "workflow"
+    },
+    "verdict.remote.trust": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "pinned-workflow"
+    },
+    "verdict.tree": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "prepared-merge"
+    }
+  },
+  "legacy_blobs": {
+    ".agent-cap.conf": null
+  },
+  "policy_blob": "43fa1bb1dbe35b80a185cc5c1c452285b74086c0"
+}

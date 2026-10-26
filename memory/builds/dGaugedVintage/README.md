@@ -119,11 +119,11 @@ Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carr
 |---|---|---|
 | 1 | `DEPL-dGaugedVintage-8` | no |
 | 2 | `DEPL-dGaugedVintage-3` | no |
-| 3 | `DEPL-dGaugedVintage-4`, `DEPL-dGaugedVintage-5` | yes |
-| 4 | `DEPL-dGaugedVintage-1`, `DEPL-dGaugedVintage-9` | yes |
-| 5 | `DEPL-dGaugedVintage-10`, `DEPL-dGaugedVintage-11` | yes |
+| 3 | `DEPL-dGaugedVintage-4`, `DEPL-dGaugedVintage-5` | unknown |
+| 4 | `DEPL-dGaugedVintage-1`, `DEPL-dGaugedVintage-9` | unknown |
+| 5 | `DEPL-dGaugedVintage-10`, `DEPL-dGaugedVintage-11` | unknown |
 | 6 | `DEPL-dGaugedVintage-7` | no |
-| 7 | `DEPL-dGaugedVintage-2`, `DEPL-dGaugedVintage-6` | yes |
+| 7 | `DEPL-dGaugedVintage-2`, `DEPL-dGaugedVintage-6` | unknown |
 | 8 | `DEPL-dGaugedVintage-12` | no |
 | 9 | `DEPL-dGaugedVintage-13` | no |
 <!-- /gen:build-order -->

@@ -28,6 +28,13 @@ same build commit. The row said 37, the suite carried 39, `install-prefix (shipp
 RED at the tip, and the ledger said `exited 0`. The closing diff review found it as its first
 high, and the bar would have refused the landing until the row moved.
 
+**The population form.** `TOOL-dGroundRules-46`, node `d`, 2026-10-23. A gate unit's §4 Evidence
+measured the population its join would grade, the specs sourcing a shell file by bare name, and
+the SAME disposal commit then wrote sibling units at its order, `TOOL-dGroundRules-44` and `-45`,
+whose criteria added operands to that population. The spec's count and its cutoff-key non-goal
+described a tree the commit never held, and the spec run's closing diff review found it (M1,
+finding ids 6, 15 and 21); `TOOL-dGroundRules-63` re-observed the premise at its own close.
+
 ## The fix
 
 **An observation names the tree it was taken on, and the LAST fold re-takes every observation
@@ -40,6 +47,9 @@ the fold could have moved.** Two rules, both cheap:
   read a COUNT or a POPULATION over those files. A ratchet row, a floor, a carrier count, a
   `PASS (<n> assertions)` line: each is an observation the fold can move without touching its
   line. Re-run those, not the whole set.
+- In the population form, a gate unit's §4 population claim is re-measured at the spec's own
+  commit, and a disposal that writes several units re-runs each new gate unit's predicate over its
+  own output, the siblings it just wrote included, before it commits.
 
 ## What it is not
 

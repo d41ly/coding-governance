@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-11 — the gate-leg factory and its conformance gate, every leg declaring the principles it enforces
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 8 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 8 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0349@79373aa7 whole
 
@@ -12,8 +12,11 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-b.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
+| [2026-10-26-build-TOOL-dWitnessedBar-11-deviation-111.md](../build/2026-10-26-build-TOOL-dWitnessedBar-11-deviation-111.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -278,7 +281,14 @@ S6) for its two new legs.
   population is refused, never rendered as `[]`.
 - observability — `--conform` prints `legs: <n> declared · <c> claimed · <e> exempt · <p> enforces-pending`.
 - risks — a govkit arm that walks every `[[gate_leg]]` value may meet the `gov` dict; the pass runs
-  `selfcheck` over the converted tree. Dispatch order among equal-prior legs changes (§4).
+  `selfcheck` over the converted tree. Dispatch order among equal-prior legs changes (§4). Under
+  `core.bypass = never` the meta-check reds any leg whose `enforces` is non-empty and which carries a
+  `guard` (PLAY-dOrderedCharter-7 S10), since a leg is core by the fact its `enforces` states (its §4
+  Alternatives rejected). Once S6 gives every reached leg `enforces`, an adopter who sets `never` turns
+  red every guarded leg the rule reaches: 71 of gov's 142 legs carry a `guard` (PINNED, measured
+  2026-10-26 over `tools/gate-legs.json`). The default `with-hooks-report` is unaffected, and gov
+  commits no `.governance/policy.toml`. AC10 observes the interaction; §8 F5 puts the narrowing ask to
+  the owner.
 - testing — `--selftest` plants every gate arm; the arm in §7 is observed RED then GREEN by the main
   loop at the close.
 - migration — §4, one commit, adopters unchanged.
@@ -326,6 +336,17 @@ S6) for its two new legs.
 - **AC9** — When `git grep -n "is in no leg of" -- tools/govkit/govkit.py` runs, it prints nothing, and
   `python tools/govkit/govkit.py selfcheck` on the landed tree exits 0 with 7h2 and 7j4 still grading.
   Red when: 7h's join is left beside the factory's, two graders for one fact.
+- **AC10** — When `python core.py fixture --plant bypass-never` runs in `tools/playbook/`, it reds as
+  PLAY-dOrderedCharter-7 AC10 states; and when `python core.py meta-check` runs in a scratch clone of
+  the built tree that commits a `.governance/policy.toml` setting `core.bypass = "never"`, it exits 1
+  naming exactly the legs of the generated `tools/gate-legs.json` that carry a non-empty `enforces` and
+  a `guard`, as many as `python -c "import json;L=json.load(open('tools/gate-legs.json',encoding='utf-8'));print(sum(1 for l in L if l.get('enforces') and l.get('guard')))"`
+  prints there; under `with-hooks-report` it names none of them.
+  Red when: the meta-check under `never` names fewer legs than the probe counts, so a guard skips a leg
+  the parent reads as core, or names one under the default.
+  fixture: a clone of the built tree under `%TEMP%/<short-name>`, none in the tree today.
+  figure: the count is DERIVED at observation; if §8 F5's ask lands, the probe takes the narrowed
+  predicate.
 
 ## 7. Gates
 
@@ -345,8 +366,10 @@ New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` bu
   one option keeping one declaration per leg and an adopter's manifest byte-identical.
   widens: none · relaxes: none
 - **F2 — What is the leg kind's tag?** Options: (a) `kind.gate-leg`, foundations C3's "gate leg" in the
-  segment grammar; (b) `kind.leg`. The only multi-word kind any spec spells is `kind.policy-key`
-  (PLAY-dOrderedCharter-7's family), which keeps C3's words. RESOLVED (agent, 2026-10-25, delegated):
+  segment grammar; (b) `kind.leg`. The only multi-word kind any spec spells is `kind.policy-key`,
+  spelled by TOOL-dDeclaredLoop-6 (its AC1, `:243` at `783f1ad3a`), which keeps C3's words;
+  PLAY-dOrderedCharter-7:133 is the source of the kind's name, "policy key", in words only.
+  RESOLVED (agent, 2026-10-25, delegated):
   (a), rung 1, foundations C3 and its precedent. widens: none · relaxes: none
 - **F3 — Does the conformance gate run as regen's check or as its own leg?** Options: (a) regen's row
   runs `--check`, freshness only, and the leg runs `--conform`; (b) one command for both. Under (b) a
@@ -358,6 +381,18 @@ New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` bu
   `:3499-3506`), both built by the manifest read at `:2790-2804`. Liveness: a later arm reading
   `claimed_legs` would print here. RESOLVED (agent, 2026-10-25, delegated): retire the arms at
   `:2805-2948` and keep the read, rung 2. widens: none · relaxes: none
+- **F5 — Under `core.bypass = never`, which legs are core once every leg carries `enforces`?**
+  PLAY-dOrderedCharter-7 S10 reds any leg whose `enforces` is non-empty and which carries a `guard`,
+  and its S3 reds a leg with no `enforces`, so after S6 `never` reds every guarded leg (§5 risks).
+  Options: (a) keep the parent's predicate: `never` means no leg may carry a guard, and an adopter who
+  sets it removes its guards, which AC10 observes; (b) an ask to dOrderedCharter to narrow the core-leg
+  predicate, for example to the legs a `tools/playbook/kinds.toml` row names as its `gate` and the
+  `core *` legs, so `never` binds the conformance checks and leaves the bar's other guards; (c) give
+  `enforces` only to unguarded legs, which the parent's S3 reds. Recommendation: (b). Under (a) a value
+  an adopter may choose reds 71 of gov's legs, so no repository that guards its legs can hold it green.
+  The ask the build run would file in dOrderedCharter's `BACKLOG.md`: "narrow the core-leg predicate
+  `core.bypass = never` reads (PLAY-dOrderedCharter-7 S10) to fewer than every leg carrying
+  `enforces`". Until the owner picks, this unit builds as (a) and AC10 observes it. Open for the owner.
 
 ## 9. Revision log
 
@@ -366,6 +401,12 @@ New arm: tools/run-gates/leg_factory.py · covers AC1 AC4 AC5 · `--selftest` bu
   at base `cdfbd1cf`, measured at `19d6aae6`.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dWitnessedBar-45, TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · §5 · §6 AC10 · §8 F2, F5 · re-grounded on dOrderedCharter at `462d20f35` and
+  dDeclaredLoop at `783f1ad3a` by the cross-check record
+  `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`, rows 24 and 29: §5 states how
+  `enforces` on every leg meets `core.bypass = never`, AC10 observes it, and F5 holds the narrowing ask
+  open for the owner; F2's precedent is re-cited to TOOL-dDeclaredLoop-6, with
+  PLAY-dOrderedCharter-7:133 kept as the source of the kind's name.
 
 ## 10. Reuse audit
 

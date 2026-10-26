@@ -124,6 +124,8 @@ UNATTENDED_DIR=$(resolve_kit_dir "$_rkd_py" unattended unattended.sh "$HERE") ||
 UNATTENDED="${UNATTENDED_DIR##*/}"
 HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
+POLICY_KIT_DIR=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE") || exit 2
+POLICY_KIT="${POLICY_KIT_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gotchas.py "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
 # In this suite KIT_REL names the TOOL ROOT, not the kit dir: the prefix without its slash.
@@ -1994,21 +1996,23 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   # it reds every check-mode run with a missing shipped copy.
   cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" "$HERE/check_by_design_parity.py" \
      "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
-  # THE RENDERER ASKS THE HOOK FOR FANOUT_CAP (TOOL-aRepatriatedFork-7 S11), through the fan-out
-  # gate's `--print-cap`, and refuses to render when nothing answers. `requires = ["agent-cap"]`, so a
-  # real install always has both: the gate beside the parity script, the hook where the gate's rung 2
-  # finds it, a directory up. A layout without them tests an install the kit forbids.
+  # THE RENDERER ASKS THE POLICY READER FOR FANOUT_CAP (TOOL-dGroundRules-10, which re-pointed it from
+  # the agent-cap hook): `policy.py get runtime.agents-in-flight --rev HEAD`, the policy kit a
+  # directory up where the inlined resolver's second probe finds it, and it refuses to render when
+  # nothing answers. `requires = ["agent-cap", "policy"]`, so a real install has the reader, the hook
+  # and the fan-out gate beside the parity script; the layout is committed so HEAD names a commit.
   cp "$HERE/check-verifier-fanout.sh" "$d/$kd/"
+  mkdir -p "$d/$kd/../${POLICY_KIT}"; cp "$ROOT/${POLICY_KIT_DIR}/policy.py" "$ROOT/${POLICY_KIT_DIR}/catalogue.toml" "$d/$kd/../${POLICY_KIT}/"
   # The three pairs S7 made rendered: the renderer refuses a set with a template missing, and
   # `--tracked-only` would SKIP an absent live copy, so an install carries both halves of each.
   cp "$HERE/tier2-review.template.js" "$HERE/drift-audit-code.template.js" "$HERE/drift-audit-code.js" \
      "$HERE/drift-audit-state.template.js" "$HERE/drift-audit-state.js" "$d/$kd/"
   mkdir -p "$d/$kd/../${HOOKS}"; cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$d/$kd/../${HOOKS}/"
   # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
-  # nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
+  # policy and nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
   if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
   if [ -n "$gp" ]; then mkdir -p "$(dirname "$d/$gp")"; printf '# a stub checklist\n' > "$d/$gp"; fi
-  ( cd "$d" && git add -A )
+  ( cd "$d" && git add -A && git commit -q --no-verify -m layout )
 }
 run_layout() { # dir · kit dir · [--render] -> the parity script's output, then `rc=<exit>`
   ( cd "$1" && bash "$2/check-protocol-parity.test.sh" ${3:-} 2>&1; echo "rc=$?" )
@@ -2077,6 +2081,59 @@ o=$(run_layout "$FL" scripts/$WFK)
 has "PV-AC2 flat: the parity leg passes on its own render" "$o" "rc=0"
 has "PV-AC2 flat: ...and names the directory it probed" "$o" "MEMORY_TREE_DIR 'scripts'"
 
+# ---- TOOL-dGroundRules-10: the `{{FANOUT_CAP}}` width is the agent limit as the POLICY READER answers it,
+# ---- and the renderer refuses, naming why, when no policy kit answers or the answer is not a positive
+# ---- integer. Every layout above renders through a real reader; these two take it away and stub it.
+PK="$LAY/nopolicy"; build_layout "$PK" scripts/$WFK scripts/$UNK scripts/gotchas.py
+rm -rf "$PK/scripts/$POLICY_KIT"
+o=$(run_layout "$PK" scripts/$WFK --render)
+has "DGR10 no policy kit: --render refuses" "$o" "rc=2"
+has "DGR10 ...naming the reader it could not find" "$o" "no policy kit answers the agent limit"
+PN="$LAY/nonint"; build_layout "$PN" scripts/$WFK scripts/$UNK scripts/gotchas.py
+printf 'print("abc")\n' > "$PN/scripts/$POLICY_KIT/policy.py"
+o=$(run_layout "$PN" scripts/$WFK --render)
+has "DGR10 a reader answering a non-integer: --render refuses" "$o" "rc=2"
+has "DGR10 ...naming the answer" "$o" "answered 'abc' for runtime.agents-in-flight, not a positive integer"
+absent_harness=yes; [ -e "$PN/scripts/$WFK/unattended-build.js" ] && absent_harness=no
+same "DGR10 ...and writes no harness" "$absent_harness" "yes"
+
+# ---- TOOL-dGroundRules-74: THE WRITER-SPLIT FALLBACK, from an adopter's side. A hook that predates
+# ---- `gov:fixed-writers` denies the split, and --render writes the verifier-bounded fallback with one
+# ---- stderr notice; a hook that denies the fallback too exits 2 and writes nothing. Gov's own tree
+# ---- always takes the split, so only a layout reaches this path. No layout carries the policy mirror,
+# ---- so its hook bounds the split at MAX_VERIFIERS and every layout above takes the fallback too, with
+# ---- nothing asserted. The old hook is staged by its marker here, never left to that accident.
+WS="$LAY/old-hook"; build_layout "$WS" scripts/$WFK scripts/$UNK scripts/gotchas.py
+sed -i "s/^const WRITER_MARK = 'gov:fixed-writers'\$/const WRITER_MARK = 'gov:an-older-writer-mark'/" "$WS/scripts/$HOOKS/agent-cap.js"
+same "DGR74 LIVENESS the layout's hook no longer carries the writer marker" "$(grep -c "^const WRITER_MARK = 'gov:an-older-writer-mark'\$" "$WS/scripts/$HOOKS/agent-cap.js")" "1"
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
+has "DGR74 a hook that predates the writer marker: --render still renders" "$o" "rc=0"
+has "DGR74 ...and stderr carries the hook's own reason" "$e" "does not admit the writer split: BLOCKED by agent-cap:"
+has "DGR74 ...and names the update" "$e" "Update it: govkit update --kits agent-cap"
+h=; [ -f "$WS/scripts/$WFK/unattended-build.js" ] && h=$(<"$WS/scripts/$WFK/unattended-build.js")
+has "DGR74 ...and the harness bounds its pool at the verify total" "$h" "async function boundedParallel(thunks, cap = 5)"
+has "DGR74 ...and its spec writers too" "$h" "const SPEC_WRITERS = 5"
+has "DGR74 ...and judges the split under the verifiers marker" "$h" "Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers"
+cp "$WS/scripts/$WFK/unattended-build.js" "$LAY/old-hook.js" 2>/dev/null
+printf '%s\n' "process.stdin.resume(); process.stdin.on('end', () => { console.error('a stub hook that denies every script'); process.exit(2) })" > "$WS/scripts/$HOOKS/agent-cap.js"
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
+has "DGR74 a hook that denies the fallback too: --render refuses" "$o" "rc=2"
+has "DGR74 ...naming the fallback" "$o" "denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded"
+has "DGR74 ...after a stderr notice carrying that hook's reason" "$e" "does not admit the writer split: a stub hook that denies every script. Update it"
+same "DGR74 ...and leaves the harness it rendered before unchanged" "$(cmp -s "$LAY/old-hook.js" "$WS/scripts/$WFK/unattended-build.js" && echo same || echo changed)" "same"
+# ---- TOOL-dGroundRules-83: A GATE THAT COULD NOT ASK THE HOOK IS NO VERDICT. A hook that denies
+# ---- printing nothing is said as one. With no hook at all the fan-out gate exits 2 naming why, and
+# ---- --render refuses at once with that answer on stderr, never as the hook's denial.
+printf '%s\n' "process.stdin.resume(); process.stdin.on('end', () => process.exit(2))" > "$WS/scripts/$HOOKS/agent-cap.js"
+( cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render >/dev/null 2>"$LAY/old-hook.err" ); e=$(<"$LAY/old-hook.err")
+has "DGR83 a hook that denies printing nothing: the notice says so" "$e" "does not admit the writer split: the agent-cap hook denied it and printed no reason"
+rm -f "$WS/scripts/$HOOKS/agent-cap.js"
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
+has "DGR83 no hook at all: --render refuses" "$o" "rc=2"
+has "DGR83 ...naming the gate that could not ask the hook" "$e" "the fan-out gate exited 2 and could not ask the agent-cap hook"
+has "DGR83 ...and the gate's own reason" "$e" "has no predicate to delegate to"
+hasnt_ "DGR83 ...never as the hook's denial" "$e" "does not admit the writer split"
+
 # ---- AC3: the NESTED layout, and two ROOT installs, one of each memory-tree shape.
 NE="$LAY/nested"; build_layout "$NE" scripts/$WFK scripts/$UNK scripts/$MTK/gotchas.py
 run_layout "$NE" scripts/$WFK --render >/dev/null
@@ -2113,7 +2170,7 @@ has "PV-AC4 a tracked override holding a space is refused" "$o" "holds a charact
 has "PV-AC4 ...at exit 2" "$o" "rc=2"
 
 # ---- ROUND 1 F3: A REFUSAL THAT BELONGS TO ONE PAIR'S TOKEN NEVER BLOCKS A PAIR WITHOUT IT. This
-# ---- kit requires agent-cap and nothing else, so an install with no memory-tree kit and no
+# ---- kit requires agent-cap and policy and nothing else, so an install with no memory-tree kit and no
 # ---- unattended kit is legal, and in it nothing tracks a `gotchas.py`. The probe used to exit 2
 # ---- before any pair was graded, so that install lost `REVIEW-PROTOCOL.md` too: the document that
 # ---- states the concurrency cap could be neither rendered nor graded, over a harness it never runs.
@@ -3058,7 +3115,11 @@ has    "OC27 AC15 audit OFF: ...and the hand-out leads with it" "$(printf '%s\n'
 # RAISED 691 -> 693 by TOOL-dTrueNorth-13: its 2 static sites, counted by hand off the TN13 lines — the
 # demanded Reviewed: line and the absent unprefixed one (2). Each runs once. Not measured by a run: the
 # pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=693
+# RAISED 693 -> 704 by TOOL-dGroundRules-74: its 11 static sites, counted by hand off the DGR74 block —
+# the liveness arm (1), the old hook's exit, two stderr lines and three harness spans (6), and the
+# denying hook's exit, two lines and the unchanged harness (4). Each runs once. Not measured by a run:
+# the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=704
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

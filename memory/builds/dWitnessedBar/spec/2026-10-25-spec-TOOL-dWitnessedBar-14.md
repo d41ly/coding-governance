@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-14 — the `ratchet` leg pack, and a population's growth admitted only as `retrofit.widen` says
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 9 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0352@2cbf95b4 whole
 **Carries:** node:policy-key.retrofit.widen
@@ -14,8 +14,11 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-fix-return.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-28 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-14-deviation-141.md](../build/2026-10-25-build-TOOL-dWitnessedBar-14-deviation-141.md) | deviation | — |
+| [2026-10-26-build-TOOL-dWitnessedBar-14-deviation-142.md](../build/2026-10-26-build-TOOL-dWitnessedBar-14-deviation-142.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-fix-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -47,10 +50,18 @@ through a widen record carrying its reason, or refuses it, as `retrofit.widen` s
   (v2:1384). `record-reason` admits a widened row whose `<record>` names a tracked widen record holding
   that population, that key and a non-empty `**Reason:**`; `refuse` admits none. Observed by AC2.
 - **S5** — The widen record and its door. The record kind `widen` joins PLAY-dOrderedCharter-7 S7's
-  factory `tools/memory-tree/build_records.py`, fields `Population`, `Keys`, `Reason` and `Caused-by`;
-  `python tools/memory-tree/ratchet.py widen <population> --key <k> --reason <text> --unit <id>` writes
-  the record through that factory and the row `widened:<record stem>` through the ledger's `write_rows`,
-  and refuses under `refuse`. Observed by AC2.
+  factory `tools/memory-tree/build_records.py`: name `<date>-build-<unit id>-widen-<n>.md`, served as
+  `**Serves:** widen <unit id>`, fields `Population`, `Keys`, `Reason` and `Caused-by`. The kind joins
+  the reader in the same pass: `widen` is added to `TYPED_RECORD_KINDS` in
+  `tools/memory-tree/tree_lib.py`, which the factory's kind table must equal at import
+  (PLAY-dOrderedCharter-42 S1, S2), and to the closed `<kind>` list of
+  `tools/memory-tree/HYGIENE.template.md` (its S5); under its S3 a `-widen-<n>.md` file served as any
+  other kind is malformed. `python tools/memory-tree/ratchet.py widen <population> --key <k> --reason
+  <text> --unit <id>` writes the record through that factory, passing it the build and unit `--unit`
+  names and the four fields, and the row `widened:<record stem>` through the ledger's `write_rows`, and
+  refuses under `refuse`. Whether the factory's `new` verb is generic per kind is unknown until
+  PLAY-dOrderedCharter-7 builds, so this unit claims no `new widen` door; `ratchet.py widen` is the
+  population's door. Observed by AC2 and AC11.
 - **S6** — `both ways`: for a registration naming no `leg`, its `seed` run at HEAD against its rows
   through `compare_counts`; a registration naming a leg is graded by that leg through the same call, and
   this leg prints it `graded by <leg>` so no population is measured twice. Observed by AC3.
@@ -98,7 +109,7 @@ through a widen record carrying its reason, or refuses it, as `retrofit.widen` s
 - **hands-off** `TOOL-dWitnessedBar-16` — `retrofit.widen` and the widen route of S5, the only way a converted registry's population grows
 - **hands-off** `TOOL-dWitnessedBar-17` — the `conf-scalar-pins` population of S11, whose seven rows the pins' conversion drains, and `ratchet.py`, to which it adds its `measure-cutoffs` verb
 - **hands-off** `TOOL-dWitnessedBar-18` — `ratchet.py`, whose `never gains` leg holds the `append-only` step population that unit registers and whose selftest takes its plant
-- **consumes-from** external — TOOL-dGroundRules-2's `policy.py get` and TOOL-dGroundRules-1's catalogue row `retrofit.widen`; PLAY-dOrderedCharter-7 S7's `build_records.py`; dScopedBuild's `build.scope` for the touch join
+- **consumes-from** external — TOOL-dGroundRules-2's `policy.py get` and TOOL-dGroundRules-1's catalogue row `retrofit.widen`; PLAY-dOrderedCharter-7 S7's `build_records.py`, and PLAY-dOrderedCharter-42's `TYPED_RECORD_KINDS`, file-name join and closed kind list, which the `widen` kind joins; dScopedBuild's `build.scope` for the touch join
 - **hands-off** `TOOL-dWitnessedBar-46` — the pack's legs and the `conf-scalar-pins` registration, whose shipping to adopters unit 46 decides (id 34)
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 7 and 58: `ratchet selftest`'s `enforces`, and a live leg's exit 1 with no base, each a scope item of that unit
 - **hands-off** `TOOL-dWitnessedBar-52` — `ratchet.py keys-not-scalar`, whose conf read unit 52 binds to the seed's `root_confs` (id 1)
@@ -132,7 +143,7 @@ never green (retrofit.md:440-442).
 
 ```
 python tools/memory-tree/ratchet.py widen unarmed-branches --key "tools/x.sh	exit	fail-sig" --reason "a new fail branch the arm lands with in unit TOOL-dY-4" --unit TOOL-dY-4
-  -> memory/builds/dY/build/<date>-build-TOOL-dY-4-widen-1.md   (**Population:** · **Keys:** · **Reason:** · **Caused-by:**)
+  -> memory/builds/dY/build/<date>-build-TOOL-dY-4-widen-1.md   (**Serves:** widen TOOL-dY-4 · **Population:** · **Keys:** · **Reason:** · **Caused-by:**)
   -> unarmed-branches row: tools/x.sh	exit	fail-sig	1	<sha>	widened:<date>-build-TOOL-dY-4-widen-1
 ```
 
@@ -157,7 +168,7 @@ this population. `UNIVERSAL_BUDGET` is a budget and no pin, and stays out.
 
 Minted: `tools/memory-tree/ratchet.py` with verbs `never-gains`, `both-ways`, `unarmed`, `populated`,
 `seed-laundering`, `rename`, `keys-not-scalar`, `key-shape`, `widen`, `--list` and `--fixture`; the nine
-legs of the table; the record kind `widen`; the population `conf-scalar-pins` and its file; the fixture
+legs of the table; the record kind `widen`, a member of `TYPED_RECORD_KINDS`; the population `conf-scalar-pins` and its file; the fixture
 cases of §6. Naming cells: each verb is asked of `python tools/lexicon/lexicon.py --suggest <name> --as
 cli.flag`, each function of the same with `--as py.function`, at the pass.
 
@@ -177,6 +188,8 @@ prints the population count, so it is not green over nothing. The pass runs
 - `tools/memory-tree/ratchet.py`
 - `tools/memory-tree/kit.toml`
 - `tools/memory-tree/build_records.py`
+- `tools/memory-tree/tree_lib.py`: `widen` in `TYPED_RECORD_KINDS`
+- `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: `widen` in the closed kind list
 - `tools/memory-tree/README.md`
 - `tools/gate-legs.json`
 - `memory/project/conf-scalar-pins.txt`
@@ -249,6 +262,11 @@ prints the population count, so it is not green over nothing. The pass runs
 - **AC10** — When `python -c "import json,sys; print(sorted(l['name'] for l in json.load(open(sys.argv[1], encoding='utf-8')) if l.get('pack') == 'ratchet'))" tools/gate-legs.json`
   runs, it prints the nine legs of §4's table.
   Red when: a leg is declared without `pack = "ratchet"`, so the pack's membership is typed elsewhere.
+- **AC11** — When `python ratchet.py widen` writes a record in a scratch clone and the record is
+  committed, `python gen_build_index.py --print-bindings` run in `tools/memory-tree/` over that clone
+  prints an `S` row for its `<date>-build-<id>-widen-1.md` with kind `widen`, and no `A` row for it.
+  Red when: the record serves as `journal`, or the kind is added to the factory alone, so the factory
+  refuses at import or the record reads malformed.
 
 ## 7. Gates
 
@@ -295,6 +313,11 @@ New arm: tools/memory-tree/ratchet.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 
   40 to 51; nothing else moved.
 - rev-4 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-62's
   consumes-from edge, promoted by the round-1 spec audit of units 52 to 57; nothing else moved.
+- rev-5 · 2026-10-26 · §2 S5 · §3 Edges · §4 The widen route, Inventory, Files touched · §6 AC11 ·
+  re-grounded on dOrderedCharter at `462d20f35` and dDeclaredLoop at `783f1ad3a` by the cross-check
+  record `build/2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck.md`, row 41: the record serves
+  as `widen`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list; the binding is observed; no
+  `new widen` door is claimed.
 
 ## 10. Reuse audit
 

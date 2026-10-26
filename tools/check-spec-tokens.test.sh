@@ -40,7 +40,16 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # its one date-pattern arm, each top-level. Counted by reading; OWED: observed at the close.
 # RAISED 181 -> 189 by TOOL-dTrueNorth-26: its planted-BinOp arm, its six minors probe arms and its
 # one-grammar grep arm, each top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=189
+# RAISED 189 -> 193 by TOOL-dGroundRules-9: the size line's home arm and the size join's three
+# switch arms, the padded spec and the grown held spec under warn and the pinned class cap, each
+# top-level. Counted by reading; OWED: observed at the close.
+# RAISED 193 -> 194 by TOOL-dGroundRules-32: its overlap-parity arm, top-level. Counted by reading;
+# OWED: observed at the close.
+# RAISED 194 -> 197 by TOOL-dGroundRules-46: its three source-join arms, bare fence, whole fence and
+# bare code span, each top-level. Counted by reading; OWED: observed at the close.
+# RAISED 197 -> 199 by TOOL-dGroundRules-63: its two packet-join arms, the live run's hit and the
+# landed run's silence, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=199
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -198,7 +207,10 @@ ARM_ARGS=()          # the checker's argv for the next `arm`; empty is the gate'
 
 scratch() {          # $1 = dir. A repo with one live spec, a manifest and an empty waiver file.
   local d=$1
-  git init -q "$d"; git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
+  # ON main: the size join reads its ceiling through the policy reader at the landed revision, which
+  # with no remote is local main (TOOL-dGroundRules-9), so a scratch repo on another branch refuses.
+  git init -q "$d"; git -C "$d" symbolic-ref HEAD refs/heads/main
+  git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
   mkdir -p "$d/memory/builds/tOne/spec" "$d/memory/project" "$d/${PFX}"
   printf '[{"name":"real leg"}]\n' > "$d/${PFX}gate-legs.json"
   # A tool root holds a gate script. At a root install the paths join grades a bare name only when
@@ -1234,6 +1246,9 @@ git -C "$d" reset -q --hard "$clean"
 
 # ---- TOOL-aMendedFleet-25: the size join. One fixture tree with a class row at a small ceiling, a
 #      second live spec over it HELD by a high-water row, and the first spec padded past it.
+#      TOOL-dGroundRules-9: the ceiling is the policy reader's, read from the limits file at the
+#      landed revision, local main here, so every edit to it or to the policy file is COMMITTED before
+#      its arm; the red arms run under `budgets.enforce = "refuse"`, and the warn arms after them.
 d=$base/size; scratch "$d"
 sp=memory/builds/tOne/spec
 cp "$d/$sp/2026-09-02-spec-TOOL-tOne-1.md" "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
@@ -1241,11 +1256,13 @@ printf '%0700d\n' 0 >> "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
 held=$(tr -d '\r' < "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md" | wc -c | tr -d '[:space:]')
 printf '# limits\nmemory/builds/*/spec/\t600\n' > "$d/${PFX}template-size-limits.txt"
 printf '%s\t%s\n' "$sp/2026-09-02-spec-TOOL-tOne-2.md" "$held" > "$d/${PFX}template-size-highwater.txt"
+mkdir -p "$d/.governance"; printf '[budgets]\nenforce = "refuse"\n' > "$d/.governance/policy.toml"
 git -C "$d" add -A >/dev/null; git -C "$d" commit -qm size --no-verify; sized=$(git -C "$d" rev-parse HEAD)
-arm "a spec over the class ceiling with a high-water row is HELD and the line counts it" 0 "$d" "size join · 2 live spec(s) · ceiling 600 from ${PFX}template-size-limits.txt · largest unheld"
+arm "a spec over the class ceiling with a high-water row is HELD and the line counts it" 0 "$d" "size join · 2 live spec(s) · ceiling 600 (default: "
+arm "the size line names the ceiling's home, read at the landed revision" 0 "$d" "${PFX}template-size-limits.txt:2 holds 600"
 arm "the held count rides the size line" 0 "$d" "1 held at a recorded high-water"
 printf '%0700d\n' 0 >> "$d/$sp/2026-09-02-spec-TOOL-tOne-1.md"
-arm "a live spec padded past the ceiling with no row REDS as [size]" 1 "$d" "[size] \`size <- $sp/2026-09-02-spec-TOOL-tOne-1.md\`"
+arm "a live spec padded past the ceiling with no row REDS as [size] under refuse" 1 "$d" "[size] \`size <- $sp/2026-09-02-spec-TOOL-tOne-1.md\`"
 git -C "$d" reset -q --hard "$sized"
 printf 'one more line\n' >> "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
 arm "a held spec grown by one line REDS naming its recorded high-water" 1 "$d" "held at its recorded high-water $held"
@@ -1254,9 +1271,26 @@ sed -i 's/^\*\*Status:\*\* OPEN/**Status:** CLOSED/' "$d/$sp/2026-09-02-spec-TOO
 arm "a high-water row for a terminal spec REDS as stale" 1 "$d" "STALE HIGH-WATER \`$sp/2026-09-02-spec-TOOL-tOne-2.md\` — in ${PFX}template-size-highwater.txt — terminal"
 git -C "$d" reset -q --hard "$sized"
 printf '# limits, no class row\n' > "$d/${PFX}template-size-limits.txt"
-arm "no class row turns the size join off, announced" 0 "$d" "no class row in ${PFX}template-size-limits.txt (arm off)"
+git -C "$d" commit -qam "no class row" --no-verify
+arm "no class row turns the size join off, announced" 0 "$d" "no class value for memory/builds/*/spec/"
 printf 'memory/builds/*/spec/\tlots\n' > "$d/${PFX}template-size-limits.txt"
-arm "a class row that is not a number REFUSES" 1 "$d" "REFUSING — the size join's row for memory/builds/*/spec/"
+git -C "$d" commit -qam "a non-number class row" --no-verify
+arm "a class row that is not a number REFUSES" 1 "$d" "REFUSING — the size join's ceiling for memory/builds/*/spec/ did not read"
+git -C "$d" reset -q --hard "$sized"
+# ---- TOOL-dGroundRules-9: the same two hits under `warn`, each printed and not counted, and a pin
+#      on the class cap that refuses whatever the switch says.
+printf '[budgets]\nenforce = "warn"\n' > "$d/.governance/policy.toml"
+git -C "$d" commit -qam warn --no-verify; warned=$(git -C "$d" rev-parse HEAD)
+printf '%0700d\n' 0 >> "$d/$sp/2026-09-02-spec-TOOL-tOne-1.md"
+arm "under warn a spec padded past the ceiling prints BUDGET WARN and is no hit" 0 "$d" "BUDGET WARN — memory/builds/*/spec/ · $sp/2026-09-02-spec-TOOL-tOne-1.md ·" "[size] \`size <- $sp/2026-09-02-spec-TOOL-tOne-1.md\`"
+git -C "$d" reset -q --hard "$warned"
+printf 'one more line\n' >> "$d/$sp/2026-09-02-spec-TOOL-tOne-2.md"
+arm "under warn a held spec grown prints BUDGET WARN naming its high-water" 0 "$d" "held at its recorded high-water $held in"
+git -C "$d" reset -q --hard "$warned"
+printf '[budgets]\nenforce = "warn"\npinned = ["memory/builds/*/spec/"]\n' > "$d/.governance/policy.toml"
+git -C "$d" commit -qam pinned --no-verify
+printf '%0700d\n' 0 >> "$d/$sp/2026-09-02-spec-TOOL-tOne-1.md"
+arm "a pinned class cap REDS under warn, naming budgets.pinned" 1 "$d" "budgets.pinned names it"
 git -C "$d" reset -q --hard "$sized"
 
 # ---- TOOL-aMendedFleet-75: the covers join. The scratch spec defines only AC1; each edit appends
@@ -1670,6 +1704,79 @@ if [ "$date_in_lint:$date_in_lib" = "0:1" ]; then
   echo "arm ok    the spec filename date's pattern is spelled in design_lib.py alone"; pass=$((pass+1))
 else
   echo "arm FAIL  the spec filename date's pattern is spelled in design_lib.py alone — checker $date_in_lint, design_lib $date_in_lib"; fail=$((fail+1))
+fi
+
+# TOOL-dGroundRules-46: the source join. One live spec whose acceptance fence sources a shell file by
+# bare name reds; the same by a path carrying `/` is no hit; a bullet whose code span opens on the
+# bare source reds too. $2 is the line planted after the AC1 bullet; a third word `fence` plants it
+# inside a fenced block. The backticks are octal escapes, so this file's shell scanner reads no quote.
+seed_source() {
+  local sp="$1/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" add="$2"
+  [ "${3:-}" = fence ] && printf -v add '\n\140\140\140text\n%s\n\140\140\140' "$2"
+  ADD="$add" awk '{print} /^- \*\*AC1\*\*/{print ENVIRON["ADD"]}' "$sp" > "$sp.tmp" && mv "$sp.tmp" "$sp"
+  git -C "$1" add -A >/dev/null
+}
+d=$base/source-bare; scratch "$d"
+seed_source "$d" "PROBE = bash -c '. helper.sh; f'" fence
+arm "TOOL-dGroundRules-46 a bare-name source in a fenced acceptance literal REDS as [source]" 1 "$d" '[source] `helper.sh` — sources a shell file by bare name'
+d=$base/source-whole; scratch "$d"
+seed_source "$d" "PROBE = bash -c '. sub/helper.sh; f'" fence
+arm "TOOL-dGroundRules-46 the same source by a path carrying a slash is no hit, and is counted" 0 "$d" "source join · 1 sourced file(s) examined in 1 live spec(s)" "[source]"
+d=$base/source-tick; scratch "$d"
+printf -v _tick -- '- When \140. helper.sh; f\140 runs, it prints \1400\140.'; seed_source "$d" "$_tick"
+arm "TOOL-dGroundRules-46 a bullet whose code span opens on a bare-name source REDS as [source]" 1 "$d" '[source] `helper.sh`'
+
+# TOOL-dGroundRules-63: the packet join. A stub at the packet instrument's path exits 1 printing a
+# finding, and one chain build holds a packet and a RUN.md; its last phase BUILDING reds the join
+# naming the build and the stub's summary line, and a later LANDED line takes the run out of it.
+d=$base/packet; scratch "$d"
+mkdir -p "$d/memory/builds/dClosedLoop/build" "$d/memory/builds/tChain/prompts"
+printf 'import sys\nprint("packet: tChain - stub - byte compare red")\nsys.exit(1)\n' \
+  > "$d/memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py"
+printf '# packet\n' > "$d/memory/builds/tChain/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md"
+printf '# tChain - run state\n\nphase: BUILDING\n' > "$d/memory/builds/tChain/RUN.md"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm packet --no-verify
+arm "TOOL-dGroundRules-63 a live chain run whose packet check exits 1 REDS as [packet] naming the build" 1 "$d" '[packet] `tChain` — packet.py --check exited 1: packet: tChain - stub - byte compare red'
+printf 'phase: LANDED\n' >> "$d/memory/builds/tChain/RUN.md"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm landed --no-verify
+arm "TOOL-dGroundRules-63 the same run once LANDED is not graded, and the join says so" 0 "$d" "packet join · 0 live chain run(s) · 0 packet(s) checked" "[packet]"
+
+# TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
+# dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to
+# ${PFX} and the answer containment gives: design_lib's check_writes_intersect must print True, and
+# lib-unattended.sh's `overlaps` exit 0, exactly on an `intersect` row. The `disjoint` row is the pair
+# a raw `startswith` calls overlapping, so staging both rules to a raw compare, in either direction,
+# reds the arm naming that row once per rule. A table that parses to no row reds it too.
+# TOOL-dGroundRules-44: a `disjoint` row neither of whose paths starts with the other as a string
+# is no trap, so a raw compare would pass it by accident; the arm reds naming it before either rule.
+# TOOL-dGroundRules-45: the OVERLAP_PAIRS table is the call lines below, one row each at column 0 with
+# no trailing comment, so grep '^check_overlap_pair ' lists exactly the rows the arm grades. The
+# function runs in this shell, so the count and the disagreements survive it; only the library is
+# sourced, in a subshell.
+# TOOL-dGroundRules-56: this arm stays the last before total=, so the row function, its call lines and
+# the one assertion run alone outside the suite; a new arm goes above this comment, never below it.
+UNATTENDED_DIR=$(resolve_kit_dir "$PY" unattended lib-unattended.sh "$HERE") || exit 2
+wi_lib="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$UNATTENDED_DIR/lib-unattended.sh"
+wi_rows=0; wi_bad=
+check_overlap_pair() {        # $1 a · $2 b · $3 intersect|disjoint · a and b relative to ${PFX}
+  local py sh wpy=False wsh=1
+  wi_rows=$((wi_rows+1))
+  if [ "$3" = disjoint ] && [[ "$1" != "$2"* && "$2" != "$1"* ]]; then
+    wi_bad+="[row $1 $2 $3: not a string-prefix trap] "; return 0
+  fi
+  if [ "$3" = intersect ]; then wpy=True wsh=0; fi
+  py=$("$PY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import design_lib as d
+print(d.check_writes_intersect([sys.argv[2]], [sys.argv[3]]))' "$MEMORY_TREE" "$PFX$1" "$PFX$2" 2>&1 | tr -d '\r')
+  if ( . "$wi_lib" >/dev/null 2>&1; overlaps "$PFX$1" "$PFX$2" ); then sh=0; else sh=1; fi
+  [ "$py" = "$wpy" ] || wi_bad+="[row $1 $2 $3: check_writes_intersect $py] "
+  [ "$sh" = "$wsh" ] || wi_bad+="[row $1 $2 $3: overlaps exit $sh] "
+}
+check_overlap_pair pkg/ pkg/x.py intersect
+check_overlap_pair pkg pkg-x.py disjoint
+if [ "$wi_rows" -ge 1 ] && [ -z "$wi_bad" ]; then
+  echo "arm ok    TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer"; pass=$((pass+1))
+else
+  echo "arm FAIL  TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer — rows $wi_rows, ${wi_bad:-no row disagreed}"; fail=$((fail+1))
 fi
 
 total=$((pass+fail))

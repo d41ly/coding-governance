@@ -15,8 +15,8 @@
 #
 # THE PAIRS, declared once in `PAIRS` below. The review protocol this repo RUNS ON, the unattended
 # BUILD HARNESS, and — since TOOL-aRepatriatedFork-7 — the review and drift-audit harnesses, which
-# render only so a repo that LOWERS the fan-out cap in `.agent-cap.conf` receives harnesses its own
-# hook admits, instead of a hand-kept fork of each. The build harness joined this list when it stopped shipping verbatim:
+# render only so a repo's agent limit, `runtime.agents-in-flight`, reaches the widths its harnesses
+# fan at, instead of a hand-kept fork of each. The build harness joined this list when it stopped shipping verbatim:
 # apply writes an engine file's bytes unchanged, so every install path it spelled arrived in a tree
 # installed at another prefix naming files that tree does not have — the driver, the bug-class
 # checklist, the sub-workflow it awaits and the child it hands the caller. A workflow script has no
@@ -38,7 +38,7 @@
 #   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
 #   TOOL_ROOT        the directory the kits sit in, with a trailing slash; empty at a root install
 #   MEMORY_TREE_DIR  the directory holding the memory-tree kit's `gotchas.py`
-#   FANOUT_CAP       the fan-out cap for this checkout, as the agent-cap hook ANSWERS it (`--print-cap`)
+#   FANOUT_CAP       the agent limit, runtime.agents-in-flight, as the policy reader answers it at HEAD
 # The third is NOT derivable from the second. Both adopters measured when this was written install
 # the memory-tree kit FLAT, directly in their tool root, so `TOOL_ROOT` plus `memory-tree/` names a
 # file neither of them has. It is PROBED instead: the first TRACKED of the nested and the flat
@@ -430,7 +430,7 @@ check_kit_cites() {
 # runs nothing either.
 #
 # WARN WHEN ABSENT, REFUSE WHEN MISPLACED, and only for the pair whose template carries the token.
-# This kit requires agent-cap and nothing else, so an install with no memory-tree kit is legal, and
+# This kit requires agent-cap and policy and nothing else, so an install with no memory-tree kit is legal, and
 # in one nothing tracks a `gotchas.py`. The probe used to exit 2 before any pair was graded, so that
 # install lost `REVIEW-PROTOCOL.md` as well: the document stating the concurrency cap could be
 # neither rendered nor graded, over a harness only the unattended kit runs (round 1, F3). An unset
@@ -482,6 +482,18 @@ render() { # template -> stdout
   render_kit_cites
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
   out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MTD"}
+  # THE VERIFIER-BOUNDED FALLBACK (TOOL-dGroundRules-30 S3), when the hook's verdict below set
+  # WRITER_SPLIT=0: three spans of the build harness's template, before the cap token, so the fallback
+  # is this one template rendered and never a second copy. A span a template edit moved keeps the agent
+  # limit, and the hook's verdict on the fallback below denies it.
+  if [ "${WRITER_SPLIT:-1}" = 0 ]; then
+    case "$1" in
+      unattended-build.template.js|*/unattended-build.template.js)
+        out=${out//"async function boundedParallel(thunks, cap = {{FANOUT_CAP}})"/"async function boundedParallel(thunks, cap = $VERIFY_TOTAL)"}
+        out=${out//"const SPEC_WRITERS = {{FANOUT_CAP}}"/"const SPEC_WRITERS = $VERIFY_TOTAL"}
+        out=${out//"Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-writers"/"Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers"} ;;
+    esac
+  fi
   out=${out//\{\{FANOUT_CAP\}\}/"$FANOUT_CAP"}
   printf '%s' "$out"
 }
@@ -526,27 +538,74 @@ KIT_PATHS=$(derive_kit_paths "$_cite_py" "$KITREL" "${_cite_tpls[@]}") \
   || { echo "protocol-parity: could not resolve the citations the templates make"; exit 2; }
 check_kit_cites protocol-parity "$KIT_PATHS" || exit 2
 
-# FANOUT_CAP, THE FOURTH TOKEN — TOOL-aRepatriatedFork-7 S7. ANSWERED BY THE HOOK, never parsed here
-# (closing review round 1 residual b): this used to re-read `.agent-cap.conf` with a sed of its own,
-# which matched nothing on a BOM-led line and rendered cap-5 harnesses under a hook enforcing 4. The
-# sibling gate's `--print-cap` locates the hook and relays its answer for this checkout, so the value
-# rendered is the value enforced. A refusal stops here as the hook denies there, because a harness
-# rendered at a cap its own hook will not admit is exactly the fork this token retires.
-# ASKED AFTER THE CITATIONS (TOOL-dRenderedAnchor-7 S8): with no python on the host the gate's own
-# notice polluted this answer and refused first, so the resolver's reason above was never printed.
-if ! FANOUT_CAP=$(bash "$HERE/check-verifier-fanout.sh" --print-cap 2>&1); then
-  echo "protocol-parity: the agent-cap hook would not answer the effective fan-out cap:"
+# FANOUT_CAP, THE FOURTH TOKEN — TOOL-aRepatriatedFork-7 S7, ANSWERED BY A READER, never parsed here:
+# a second parser of `.agent-cap.conf` matched nothing on a BOM-led line once. TOOL-dGroundRules-10
+# re-pointed it from the agent-cap hook to the policy kit: the token is the agent limit,
+# `runtime.agents-in-flight`, as the policy reader answers it at HEAD, the `.agent-cap.conf` lowering
+# included, so a policy write and the widths rendered from it land together. The policy kit is found
+# through the inlined resolver. The verify total is not this token: the templates write the hook's
+# MAX_VERIFIERS as a literal. A refusal stops here, because a harness rendered at a width nobody
+# declared is exactly the fork this token retires.
+# ASKED AFTER THE CITATIONS (TOOL-dRenderedAnchor-7 S8): with no python on the host the resolver's
+# reason above prints first.
+if ! _pk_dir=$(resolve_kit_dir "$_cite_py" policy policy.py "$HERE" 2>&1); then
+  echo "protocol-parity: no policy kit answers the agent limit the {{FANOUT_CAP}} token carries:"
+  printf '  %s\n' "${_pk_dir//$'\n'/$'\n'  }"
+  echo "  Nothing was rendered or graded."
+  exit 2
+fi
+if ! FANOUT_CAP=$("$_cite_py" -B "$_pk_dir/policy.py" get runtime.agents-in-flight --rev HEAD 2>&1); then
+  echo "protocol-parity: the policy reader would not answer runtime.agents-in-flight at HEAD:"
   printf '%s\n' "$FANOUT_CAP" | sed 's/^/  /'
   echo "  Nothing was rendered or graded."
   exit 2
 fi
+FANOUT_CAP=${FANOUT_CAP%$'\r'}
 case "$FANOUT_CAP" in
-  [1-9]) ;;
-  *) echo "protocol-parity: the agent-cap hook answered '$FANOUT_CAP' for the fan-out cap, not a digit 1-9. Nothing was rendered or graded."; exit 2 ;;
+  ''|0*|*[!0-9]*) echo "protocol-parity: the policy reader answered '$FANOUT_CAP' for runtime.agents-in-flight, not a positive integer. Nothing was rendered or graded."; exit 2 ;;
 esac
 
 TMPD=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPD"' EXIT
+
+# THE WRITER SPLIT, DECIDED BY THE HOOK'S OWN VERDICT (TOOL-dGroundRules-30). `unattended-build.js`
+# bounds its spec-writer split under `// gov:fixed-writers`, which a hook that predates the writer
+# marker denies, and that hook's rule 2 then refuses every `unattended-build` call. No version tells
+# the two hooks apart, because a version is minted only at the landing, so the installed hook judges
+# the candidate render through this kit's own gate, `check-verifier-fanout.sh`, in both modes. A
+# denial renders the verifier-bounded fallback `render` holds, with one stderr line naming the hook's
+# first line and the update; a hook that denies the fallback too exits 2 and nothing is written. A
+# gate exit other than 0 or 1 is no verdict: the gate could not ask the hook, which the kit
+# requires as `agent-cap`, for want of the hook, node or a checkout. The fallback would ask the same
+# gate, so the render refuses at once with the gate's own answer on stderr (TOOL-dGroundRules-83).
+# VERIFY_TOTAL is the hook's
+# MAX_VERIFIERS as a literal it resolves, as the templates write that total; a hook whose total falls
+# below it denies the fallback. A pair the memory-tree skip leaves unrendered asks nothing.
+VERIFY_TOTAL=5
+WRITER_SPLIT=1
+_ub_tpl="$KITREL/unattended-build.template.js"
+if [ -f "$_ub_tpl" ] && [ -z "$MTD_SKIP" ]; then
+  render "$_ub_tpl" > "$TMPD/writer-split.js" || { echo "protocol-parity: the render of $_ub_tpl FAILED — the template could not be read"; exit 2; }
+  _ub_out=$(bash "$HERE/check-verifier-fanout.sh" "$TMPD/writer-split.js" 2>&1); _ub_rc=$?
+  if [ "$_ub_rc" != 0 ] && [ "$_ub_rc" != 1 ]; then
+    printf 'protocol-parity: the fan-out gate exited %s and could not ask the agent-cap hook whether it admits the writer split, so nothing was rendered or graded. Its answer:\n  %s\n' "$_ub_rc" "${_ub_out//$'\n'/$'\n'  }" >&2
+    exit 2
+  fi
+  if [ "$_ub_rc" = 1 ]; then
+    _ub_why=$(printf '%s\n' "$_ub_out" | awk 'f { sub(/^ +/, ""); print; exit } /^verifier-fanout: FAILED/ { f = 1 }')
+    # An empty hook answer is said as one, never as the gate's header or the render's path (TOOL-dGroundRules-34 S31).
+    [ -n "$_ub_why" ] || _ub_why="the agent-cap hook denied it and printed no reason"
+    _ub_why=${_ub_why%.}
+    echo "protocol-parity: the agent-cap hook does not admit the writer split: $_ub_why. Update it: govkit update --kits agent-cap" >&2
+    WRITER_SPLIT=0
+    render "$_ub_tpl" > "$TMPD/writer-fallback.js" || { echo "protocol-parity: the render of $_ub_tpl FAILED — the template could not be read"; exit 2; }
+    if ! _ub_out=$(bash "$HERE/check-verifier-fanout.sh" "$TMPD/writer-fallback.js" 2>&1); then
+      echo "protocol-parity: the agent-cap hook denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded. Its answer:"
+      printf '  %s\n' "${_ub_out//$'\n'/$'\n'  }"
+      exit 2
+    fi
+  fi
+fi
 bad=0; i=0; skipped=" "; nskip=0; skipped_live=" "
 while IFS='|' read -r LIVE SHIP; do
   [ -n "$LIVE" ] || continue

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-28 — a repository's legs from its overlay's leg rows through the leg factory, gov's legs changed only by pinned patches, every other leg landing
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 30 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 30 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0366@337938da whole
 
@@ -14,8 +14,12 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-build-TOOL-dWitnessedBar-28-deviation-281.md](../build/2026-10-25-build-TOOL-dWitnessedBar-28-deviation-281.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
+| [2026-10-26-build-TOOL-dWitnessedBar-28-deviation-282.md](../build/2026-10-26-build-TOOL-dWitnessedBar-28-deviation-282.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-28-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-28-1-spec-writer.md) | journal | — |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 |
 
 <!-- /gen:spec-records -->
@@ -54,15 +58,40 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
   this unit adds two scalar
   directions to its reader `read_kind_schema` and classifier in `tools/playbook/row_checks.py`:
   `"changes"` (every change `widens`) and `"rises"` (a greater number `widens`, a lesser one
-  `narrows`, a non-number refused) (§8 F2). Observed by AC8.
-- **S5** — The composition at the emitter: `write_gate_legs`' manifest branch builds gov's rows from
-  the selected kits' declarations as today, reads the target's `[[gate-leg]]` rows through
-  `read_overlay_rows` and `instructions.exclude` through dGroundRules' reader, and composes with
-  `compose_rows("gate-leg", …)` and `check_rows` (PLAY-dOrderedCharter-35, -36), through
-  `compose_target_legs` in `tools/run-gates/leg_factory.py` (TOOL-dWitnessedBar-11's module). Every
-  composed row is written. A row the checks refuse, or a patch held as orphaned or stale, is named on
-  one line and recorded as a problem, and gov's row as shipped is written in its place; no refusal
-  withholds another leg. Observed by AC2, AC3, AC4 and AC6.
+  `narrows`, a non-number refused) (§8 F2), called only inside the playbook kit, by S5's composition.
+  Observed by AC8.
+- **S5** — The composition, once, reached by subprocess. A run-gates or govkit module imports no
+  playbook module (TOOL-dGroundRules-1 §4; PLAY-dOrderedCharter-7 §4 "The policy reads"), so the
+  gate-leg kind's rows are composed in the playbook kit only. The composition that governs is unit
+  33's drift verb, `tools/playbook/pins.py drift`, whose row pass composes every kind the kinds
+  register lists (PLAY-dOrderedCharter-33 S7), `kind.gate-leg` among them once S1's `schema` names its
+  schema. `cmd_update` already runs it as a subprocess before its write loop, found through govkit's
+  inlined `resolve_kit_dir` (`tools/govkit/govkit.py:197`). Under §8 F6's recommendation, an ask of
+  dOrderedCharter, `cmd_update` passes it the gov rows `write_gate_legs`' manifest branch builds from
+  the selected kits' declarations as today, the verb's JSON carries the kind's composed rows, states
+  and held patches, and `compose_target_legs` in `tools/run-gates/leg_factory.py` (TOOL-dWitnessedBar-11's module) maps them
+  onto manifest rows beside S7's legacy rows, composing nothing itself. Inside the verb,
+  `compose_rows("gate-leg", gov_rows, overlay_rows, exclude, stale_mode, records)`
+  (PLAY-dOrderedCharter-35 §4) reads the overlay through `read_overlay_rows` at `HEAD`, the node's last
+  commit (PLAY-dOrderedCharter-46 S1), and `instructions.exclude` at the target's `--rev HEAD` through
+  `policy_reader("instructions.exclude")` (35 S5, 46 S6): an exit 2 refuses the composition, naming
+  the key, and an unborn `HEAD` makes no read and passes `[]` (46 S2, S6). `stale_mode` is
+  `instructions.stale`, which `cmd_update` reads with `read_policy_value("instructions.stale", target,
+  rev="HEAD")` and passes as `--stale` (33 S3). This unit reads neither key itself.
+  A stale patch follows the mode (35 S8): under `order` it is applied over gov's new row and an order
+  is filed; under `warn` it is applied and the stale edge printed and journaled; under `refuse` the
+  update writes nothing, exits 1 and names the edge until `instructions.edit` re-pins it (33 S3).
+  Under `order` and `warn`, a patch that no longer applies is held and gov's row as shipped runs in its
+  place, and an orphaned amendment is held out (35 S7, S8). Each held or orphaned patch files an order,
+  which `cmd_update` writes with `write_row_order(outbox, "gate-leg", row, to_commit, body)`,
+  `row['path']` being `.governance/instructions.toml#<overlay row tag>` (35 §4; TOOL-dSafePassage-9
+  S4). Each held patch is named on one line and recorded as a problem, and every other composed row is
+  written. A check finding refuses the whole composition (PLAY-dOrderedCharter-36 S7); whether a
+  refused overlay row is held alone instead, so that one bad patch keeps no other leg out, is §8 F7,
+  open, and AC3, AC4 and AC9's `key-outside` case are written to its recommendation. A target that
+  does not select the playbook kit runs no drift verb (33 S7): its leg step writes gov's rows and S7's
+  legacy rows, and prints `gate-leg rows unarmed: no playbook kit` once. Observed by AC2, AC3, AC4,
+  AC6, AC13, AC14 and AC15.
 - **S6** — The drift refusal and the ceiling keep rule leave `write_gate_legs`: a target row differing
   from the receipt's record is either an overlay patch's result, a legacy row (S7) or unsourced
   (S8); a ceiling the adopter wants is an `amends` patch. Observed by AC6 and AC10.
@@ -82,7 +111,9 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
   `leg_factory.py new` as a `[[gate_leg]]` row of the run-gates kit so every adopter's bar runs it,
   runs `leg_factory.py --sources` over the target: each manifest row must be a receipt `emitted` row,
   an overlay `[[gate-leg]]` row or a legacy-list entry, and each overlay row must be in the manifest. A miss
-  exits 1 naming the row and its missing source. Observed by AC1.
+  exits 1 naming the row and its missing source. It reads the overlay's rows at `HEAD` by subprocess,
+  through the playbook verb §8 F6 names, and where the playbook kit is absent it counts no overlay row
+  and says so once. Observed by AC1 and AC15.
 - **S9** — A deleted gov leg comes back named: a gov row the composition produces and the target's
   manifest lacks is written with the line `restored leg '<name>' — a gov leg leaves a repository only
   through instructions.exclude`. Observed by AC6.
@@ -98,8 +129,9 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
   `run-gates/leg_factory.py:write_leg_plant` and witness `run-gates/leg_factory.py:read_leg_successors`,
   the `successor` of each leg row's change record (PLAY-dOrderedCharter-35 S7). Observed by AC11.
 - **S12** — The plants of §4, on `python leg_factory.py --fixture --plant <case>`, each building a
-  scratch target with a receipt, gov's packs and an overlay, running the composition, and printing
-  each observation beside what the case expects. Observed by AC1 to AC11.
+  scratch target with a receipt, gov's packs and an overlay, running the composition through S5's
+  verb, and printing each observation beside what the case expects. Observed by AC1 to AC11 and AC13
+  to AC15.
 - **S13** — `help/overlay-rows.md` (PLAY-dOrderedCharter-35 S12's page) gains a section on leg rows:
   adding a leg, patching a gov leg's arguments, guard or ceiling, excluding one, the fixed legs, the
   legacy list and the seen-red count. Observed by AC12.
@@ -123,7 +155,7 @@ directions are declared; and every other leg lands (FA-1, FA-2, FA-5, the flow a
 - **consumes-from** `TOOL-dWitnessedBar-12` — `tag`, the `leg.adopter.<name>` member of the `leg` namespace, the `pack.adopter` member a repository's pack yields, and `LEG_KEYS`, the key set the schema's fields equal
 - **consumes-from** `TOOL-dWitnessedBar-13` — `legacy_ledger.py`, the `shrink-only` population of today's hand-added rows
 - **consumes-from** `TOOL-dWitnessedBar-15` — `test.seed`, which seeds the hand-added population once from `leg_factory.py --legacy-rows`
-- **consumes-from** external — PLAY-dOrderedCharter-35 S1, S3, S5 to S7, S10 and S12, PLAY-dOrderedCharter-36 S1 to S7, PLAY-dOrderedCharter-17 S9 and TOOL-dSafePassage-10 S1 to S4, landed by the chain before this build run
+- **consumes-from** external — PLAY-dOrderedCharter-35 S1, S3, S5 to S8, S10 and S12, PLAY-dOrderedCharter-36 S1 to S7, PLAY-dOrderedCharter-33 S3 and S7, PLAY-dOrderedCharter-46 S1, S2 and S6, PLAY-dOrderedCharter-17 S9, TOOL-dSafePassage-9 S4 and TOOL-dSafePassage-10 S1 to S4, landed by the chain before this build run
 - **consumes-from** `TOOL-dWitnessedBar-45` — the govkit-free path of `leg_factory.py`, on which `--sources`, `--legacy-rows` and the composition must stay so that an adopter's bar can run them (id 33)
 - **hands-off** `TOOL-dWitnessedBar-51` — the round-1 minors ids 7 and 46: `leg sources`' `enforces`, and the composition `product_tests.py` detects before it reads `declared-with-runners`, each a scope item of that unit
 
@@ -192,7 +224,7 @@ home = ".governance/legacy-legs.tsv"
 | Case | Fixture | Expected |
 |---|---|---|
 | `unsourced-row` | a manifest row no receipt, overlay or legacy entry produces | `leg sources` exits 1 naming it |
-| `patch-vanished` | an `amends` on a gov leg whose row is gone and no record names a successor | held as orphaned, named; every other leg written |
+| `patch-vanished` | an `amends` on a gov leg whose row is gone and no record names a successor | held as orphaned, named, one order returned; every other leg written |
 | `exclude-fixed` | `instructions.exclude` naming the canary's tag | refused naming `principle.p16`; the canary written |
 | `patch-fixed` | an `amends` changing the canary's `argv` | refused; gov's canary row written |
 | `patch-ceiling` | an `amends` raising a gov leg's ceiling, and one lowering it | written; `widens` and `narrows` in the widening list |
@@ -202,14 +234,18 @@ home = ".governance/legacy-legs.tsv"
 | `unseen-adopter-leg` | a `[[gate-leg]]` row with no seen-red line, then with one | `unseen`, then counted |
 | `key-outside` | an overlay row carrying a key outside `LEG_KEYS` | refused naming the key |
 | `tag-removed` | a gov leg's tag gone at the tip with no change record, then with one naming a successor | step gate red, then green |
+| `exclude-at-head` | `instructions.exclude` naming a gov leg committed at `HEAD`, the landed ref's policy naming none | the leg excluded, `HEAD`'s value read |
+| `unborn-head` | a target repository with no commit | no policy read, `[]` passed; every gov leg written |
+| `stale-modes` | a pinned `amends` behind a `semantic` record, under `order`, `warn` and `refuse` | applied with an order; applied and journaled; update held naming the edge |
+| `no-playbook-kit` | a target that does not select the playbook kit | gov's and the legacy rows written; `gate-leg rows unarmed` printed once |
 
 ### Inventory
 
 Minted: `tools/run-gates/leg-schema.toml`; the scalar directions `changes` and `rises`;
 `compose_target_legs`, `read_leg_members`, `write_leg_plant`, `read_leg_successors` and the verbs
 `--legacy-rows`, `--sources`, `--fixture`, `--plant` in `leg_factory.py`; the leg `leg sources`; the
-population `hand-added-legs` and its home `.governance/legacy-legs.tsv`; the line `restored leg`; the
-problem word `unseen`; the step-gate class `leg`. Naming cells: each function is asked of `python
+population `hand-added-legs` and its home `.governance/legacy-legs.tsv`; the lines `restored leg` and
+`gate-leg rows unarmed`; the problem word `unseen`; the step-gate class `leg`. Naming cells: each function is asked of `python
 tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
 
 ### Migration
@@ -245,8 +281,9 @@ row keys reach a target only at or above `LEG_KEY_FLOORS`' floor (TOOL-dWitnesse
 
 ## 5. Production-readiness checklist
 
-- security — the overlay is read at the landed revision only, through PLAY-dOrderedCharter-35's
-  reader; a repository row may not claim gov's tag (`owned`), a fixed row refuses every patch, and
+- security — the overlay is read at `HEAD`, the node's last commit and never the index or the working
+  tree (PLAY-dOrderedCharter-46 S1), through PLAY-dOrderedCharter-35's reader, and
+  `instructions.exclude` and `instructions.stale` at that same `HEAD` (46 S6, 33 S3); a repository row may not claim gov's tag (`owned`), a fixed row refuses every patch, and
   every widening is named in the report; the emitter writes no overlay.
 - perf / scale — one composition per update over the selected kits' rows and the overlay; `leg
   sources` reads the manifest, the receipt, the overlay and one ledger file.
@@ -255,8 +292,10 @@ row keys reach a target only at or above `LEG_KEY_FLOORS`' floor (TOOL-dWitnesse
 - observability — the slot line with the pack's counts, one line per held, refused, restored or
   legacy row, and the widening list.
 - risks — `argv` widens on any change, so a patch that only reorders arguments is reported as a
-  widening; reporting a narrowing as wider is the safe direction.
-- testing — AC1 to AC12 by fixture and probe; the arms in §7.
+  widening; reporting a narrowing as wider is the safe direction. Until the owner settles §8 F6 and
+  F7, the verb S5 reads and a row-level hold are asks of dOrderedCharter, and under the parents as
+  written a refused patch withholds the leg step.
+- testing — AC1 to AC15 by fixture and probe; the arms in §7.
 - migration — per §4.
 - user docs — `help/overlay-rows.md` (S13).
 
@@ -266,13 +305,15 @@ row keys reach a target only at or above `LEG_KEY_FLOORS`' floor (TOOL-dWitnesse
   the fixture's `leg sources` exits 1 naming the planted row and `no source`.
   Red when: a manifest row with no source passes, the clause's planted unsourced row.
 - **AC2** — When `python leg_factory.py --fixture --plant patch-vanished` runs, the composition names
-  the patch `orphaned`, records one problem, and the written manifest holds every other leg.
-  Red when: the patch is silently dropped, or its problem withholds the manifest.
+  the patch `orphaned`, records one problem, returns one order whose `path` ends
+  `#<the patch's tag>`, and the written manifest holds every other leg.
+  Red when: the patch is silently dropped, files no order, or its problem withholds the manifest.
 - **AC3** — When `python leg_factory.py --fixture --plant exclude-fixed` runs, the exclusion is refused
-  naming `principle.p16` and the canary's row is in the written manifest.
+  naming `principle.p16` and the canary's row is in the written manifest (§8 F7's (a); under (b) the
+  leg step is withheld, naming the refusal).
   Red when: a fixed leg is dropped by `instructions.exclude`.
 - **AC4** — When `python leg_factory.py --fixture --plant patch-fixed` runs, the patch is refused, and
-  the written canary row equals gov's.
+  the written canary row equals gov's (§8 F7's (a)).
   Red when: a fixed leg's `argv` is patched.
 - **AC5** — When `python leg_factory.py --fixture --plant unseen-adopter-leg` runs, the first run
   prints `slot point.flow.leg-pack · filled` with the leg uncounted and named `unseen`, and after the
@@ -305,12 +346,25 @@ row keys reach a target only at or above `LEG_KEY_FLOORS`' floor (TOOL-dWitnesse
   names the leg, the legacy list and the seen-red count.
   Red when: the repository's route to its own legs is undocumented.
   fixture: the page is PLAY-dOrderedCharter-35 S12's, present once that build lands.
+- **AC13** — When `python leg_factory.py --fixture --plant exclude-at-head` runs, the leg `HEAD`'s
+  policy excludes is absent from the written manifest with its state `excluded`; and when
+  `--plant unborn-head` runs, no `policy.py get` is made, every gov leg is written, and the
+  `overlay — unarmed` line prints once.
+  Red when: the exclusions are read at the landed ref while the overlay is read at `HEAD`.
+- **AC14** — When `python leg_factory.py --fixture --plant stale-modes` runs, under `order` the patch is
+  applied over gov's new row with one order returned, under `warn` it is applied with the stale edge
+  printed and no order, and under `refuse` the update exits 1 naming the edge and writes nothing.
+  Red when: a stale patch is held under `order` or `warn`, or applied under `refuse`.
+- **AC15** — When `python leg_factory.py --fixture --plant no-playbook-kit` runs, the written manifest
+  holds gov's rows and the legacy rows, `gate-leg rows unarmed: no playbook kit` prints once, and
+  `leg sources` exits 0 counting no overlay row.
+  Red when: a tree without the playbook kit loses its legs, or fails on an import of a playbook module.
 
 ## 7. Gates
 
 `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `playbook render selftest` · `run-gates wiring` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC11 · each plant of §4 through `leg_factory.py --fixture`, staged red by removing the fixed-row check, the restored-leg line and the seen-red count · none
+New arm: tools/run-gates/run-gates.gov.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC11 AC13 AC14 AC15 · each plant of §4 through `leg_factory.py --fixture`, staged red by removing the fixed-row check, the restored-leg line and the seen-red count · none
 New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule plants re-pointed at the composition, staged red by restoring the drift refusal · none
 
 ## 8. Open questions
@@ -344,6 +398,42 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
   cl-dClosedLoop-0366's text, so the as-built view hashes it `337938da` where the baseline hashed `a7d91105`.
   RESOLVED (agent, 2026-10-25, delegated): rung 1, the line pins `cl-dClosedLoop-0366@337938da`, the view's hash,
   moved by deviation 281. widens: none · relaxes: none
+- **F6 — Which composition governs the gate-leg rows, and which playbook verb reaches it?** A run-gates
+  or govkit module imports no playbook module (TOOL-dGroundRules-1 §4; PLAY-dOrderedCharter-7 §4), and
+  once `kind.gate-leg` carries a `schema`, unit 33's drift verb composes the kind's rows in its row
+  pass (PLAY-dOrderedCharter-33 S7), so a second composition in `write_gate_legs` would compose them
+  twice and file their orders twice. Unit 33 S7 names neither where the row pass takes a kind's gov
+  rows from nor that its JSON carries composed rows, and only govkit knows the selected kits' legs;
+  `apply` runs no drift verb; and `overlay_rows.py` gives `compose_rows` and `read_overlay_rows` no
+  verb (PLAY-dOrderedCharter-35 §4), which S8's `leg sources` needs in an adopter's bar. Options: (a)
+  the drift verb governs: an ask to dOrderedCharter that `pins.py drift` take a kind's gov rows from
+  its caller and print each kind's composed rows, states and held patches, that `cmd_apply` run it as
+  `cmd_update` does, and that `overlay_rows.py` gain a verb printing one kind's overlay rows at `HEAD`
+  as JSON, for S8; (b) a `compose` verb on `overlay_rows.py`, the ask TOOL-dDeclaredLoop-26 §8 F5
+  names, run by `compose_target_legs` and S8, with an ask that the drift verb's row pass leave a kind
+  its consumer composes; but the leg step runs after `update`'s bytes are on disk
+  (`tools/govkit/govkit.py:12264-12266`), so a `refuse` hold would reach the leg step alone, not the
+  update unit 35 S8 holds; (c) a declared `requires_if` import row on `tools/run-gates/kit.toml` naming
+  playbook, in the shape of `tools/memory-tree/kit.toml:8`, so `leg_factory.py` imports
+  `overlay_rows` in process: the rule's precedent exception, but an adopter's bar runs `leg_factory.py`
+  without govkit (TOOL-dWitnessedBar-45 S3) and often without the playbook kit, and the drift verb
+  would still compose the kind a second time. Recommendation: (a), since the drift verb is already
+  the one composition per update, writing every kind's orders and holding the update under `refuse`
+  before a byte is written. The ask the build run would file is (a)'s three changes, beside
+  TOOL-dDeclaredLoop-26 F5's. OPEN for the owner.
+- **F7 — Does a refused overlay row withhold the leg step?** PLAY-dOrderedCharter-36 S7 makes a check
+  finding refuse the whole composition, so under the parents as written a patch to a fixed leg, an
+  exclusion of one, or a key outside `LEG_KEYS` withholds every leg, which is gap-test-21's withheld
+  manifest come back by another route; rev-2 of this spec wrote gov's row in the refused row's place
+  without saying it departs from 36 S7. Options: (a) an ask to dOrderedCharter that a row-level
+  finding of `check_rows` (36 S3's fixed-set refusals, a field the schema lacks) hold only the refused
+  overlay row, returned in `held` with gov's row standing, while a composition-level refusal (35 S5's
+  exit 2, 35 S8's `refuse`) still holds the update; (b) follow 36 S7 as written: the leg step writes
+  no composed row and names the refusal, and AC3, AC4 and AC9 observe the withheld step; (c) on a
+  refused composition, write gov's rows as shipped with no overlay row, which drops the adopter's valid
+  rows with the bad one. (b) misses §1's "every other leg lands"; (c) loses legs the adopter
+  wrote correctly. Recommendation: (a), the ask the build run would file of dOrderedCharter, recorded
+  as a deviation of 36 S7 until it lands. OPEN for the owner.
 
 ## 9. Revision log
 
@@ -353,13 +443,21 @@ New arm: tools/govkit/selftest.py · covers AC6 AC10 · the drift and keep-rule 
 - rev-2 · 2026-10-25 · §3 · the Edges block gains a consumes-from bullet mirroring the hands-off of
   TOOL-dWitnessedBar-45 and a hands-off bullet mirroring the consumes-from of TOOL-dWitnessedBar-51, written by the
   round-1 spec audit's disposal; the `**Carries:**` line re-pinned to `337938da`, deviation 281's amended text, with §8 F5; nothing else moved.
+- rev-3 · 2026-10-26 · §2 S4, S5, S8, S12 · §3 Edges · §4 The plants, Inventory · §5 security, risks,
+  testing · AC2, AC3, AC4, AC13 to AC15 (new) · §7 · §8 F6, F7 (new, open) · §10 · re-grounded by
+  `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck` rows 85, 86 and 87: S5 reads
+  `instructions.exclude` at the target's `--rev HEAD` (PLAY-dOrderedCharter-35 S5, -46 S6), reaches the
+  composer only by subprocess through unit 33's drift verb, which governs so the kind is composed
+  once (F6), and follows unit 35's stale and orphan modes with their orders (35 S7, S8; 33 S3); the
+  departure from 36 S7 is F7; four plants are added.
 
 ## 10. Reuse audit
 
 The seams extended: the emitter `write_gate_legs` (`tools/govkit/govkit.py:4245`), its drift refusal
 (`:4486-4490`), keep rule (`:4491-4504`), re-append (`:4506`) and withheld path (`:4555-4578`); the
 row mechanism of PLAY-dOrderedCharter-35 and -36 (`compose_rows`, `check_rows`, `read_kind_schema`),
-the factory of TOOL-dWitnessedBar-11, the ledger of TOOL-dWitnessedBar-13 and the step gate's class
+reached by subprocess through unit 33's drift verb and govkit's inlined `resolve_kit_dir`
+(`tools/govkit/govkit.py:197`), the factory of TOOL-dWitnessedBar-11, the ledger of TOOL-dWitnessedBar-13 and the step gate's class
 registry of TOOL-dSafePassage-10, all specced and built before this unit. `python
 tools/codebase-map/reuse_lookup.py "emit an adopter's gate legs into its manifest beside gov's"` ranked
 generic stems (`legs`, `manifest`, `adopt`) and missed `write_gate_legs`, which scout B found by

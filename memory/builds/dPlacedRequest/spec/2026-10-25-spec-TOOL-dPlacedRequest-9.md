@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-9 — the kickoff manifest's facts as level-2 instruction units the card reads
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0127@4f0c1452 whole
 
@@ -11,8 +11,12 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-fix-return.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-9-deviation-91.md](../build/2026-10-26-build-TOOL-dPlacedRequest-9-deviation-91.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -47,7 +51,9 @@ them.
   units, one `- <line>` per unit. Each line is cut at `POCKETS_LINE_BYTES = 160` with `…`; past
   `POCKETS_CAP_BYTES = 2048` the verb prints `- … (+<k>) — instruction_units.py pockets --all` and
   stops, and `--all` prints every line uncut. With no selected unit it prints `- none declared`.
-  Observed by AC3 and AC4.
+  `read_overlay` reads the overlay at the landed revision, never the working tree
+  (PLAY-dOrderedCharter-32 S1), so `pockets` shows a unit only once the commit that wrote its row is
+  `HEAD`; a row S5's `up` has written but not committed is not yet printed. Observed by AC3 and AC4.
 - **S4** — The card reads it. `render_card` in `skills/session-kickoff/manifest-check.sh` (:517)
   prints the verb's output immediately before its `recent —` line, through a new
   `derive_pockets_block` that resolves the module as an optional sibling
@@ -171,7 +177,12 @@ bullet is left behind half-moved.
 ### Migration
 
 The step is the migration: gov's §B moves at the build pass, an adopter's at its next `govkit
-update`. Its down restores the manifest and the overlay byte-identical.
+update`. Its down restores the manifest and the overlay byte-identical. Any overlay edit, a
+`[[unit]]` row's included, stales the policy mirror `.governance/policy.json`, its staleness key
+holding the overlay's blob id, and the guard refuses a staged mirror while the overlay's staged blob
+differs from `HEAD`'s (PLAY-dOrderedCharter-32 S7, §5). So gov's pass commits the step's two files
+first, then regenerates the mirror by `policy.py mirror --write` in its own commit; on an adopter, the
+landing regenerates it, as PLAY-dOrderedCharter-32 §5 states. The step itself never writes the mirror.
 
 ### Rollout
 
@@ -190,6 +201,8 @@ Live at landing. A card written before the step ran prints `- none declared` und
 - `skills/session-kickoff/SKILL.md`: the ratchet sentence; the installed skill is its machine-scoped link
 - `memory/guides/SESSION-KICKOFF.md`: §B, written by the step's `up`
 - `.governance/instructions.toml`: the `repo.kickoff.` rows, written by the step's `up`
+- `.governance/policy.json`: the mirror, regenerated by `policy.py mirror --write` in its own commit
+  after the step's commit, never by the step
 - `help/orientation-card.md`: new, the card's page, with its `## pockets` section
 - `help/README.md`: the index line for that page
 
@@ -224,22 +237,24 @@ Live at landing. A card written before the step ran prints `- none declared` und
 ## 6. Acceptance criteria
 
 - **AC1** — When `python kickoff_facts_to_overlay.py --fixture --plant up` runs over a manifest whose
-  §B holds three bullets, the fixture's overlay holds `repo.kickoff.f01` to `repo.kickoff.f03` at
-  `level = 2` with `scope = ["reader.card"]`, each `text` equal to its bullet, and §B holds only the
-  S6 bullet.
+  §B holds three bullets and then commits `up`'s write in the fixture, the overlay at `HEAD` holds
+  `repo.kickoff.f01` to `repo.kickoff.f03` at `level = 2` with `scope = ["reader.card"]`, each `text`
+  equal to its bullet, and §B holds only the S6 bullet.
   Red when: a bullet is left in §B, copied rather than moved, or a row's text differs from its bullet.
 - **AC2** — When `grep -n 'reader.card' readers.toml` runs in the playbook kit's directory, it prints the member's
   row, and `python gov_tag.py show reader.card` resolves it to that row.
   Red when: the selector is absent, so no unit can name the card as its reader.
-- **AC3** — When `python instruction_units.py pockets --root <fixture>` runs after AC1's plant, it
-  prints `## pockets` and three `- ` lines in tag order; with the plant `pockets-level`, a fourth
-  `reader.card` unit at level 3 is not printed.
-  Red when: a unit of another level, or one not naming `reader.card`, reaches the section.
+- **AC3** — When `python instruction_units.py pockets --root <fixture>` runs after AC1's plant has
+  committed `up`'s write, it prints `## pockets` and three `- ` lines in tag order; run over the same
+  write left uncommitted, it prints `- none declared`; with the plant `pockets-level`, a fourth
+  `reader.card` unit at level 3, committed, is not printed.
+  Red when: a unit of another level, or one not naming `reader.card`, reaches the section, or an
+  uncommitted row is read off the working tree.
 - **AC4** — When the plant `pockets-cap` holds 30 units of 150 bytes, the verb's output is at most
   2048 bytes and ends with a `- … (+<k>)` line whose `<k>` plus the printed lines equals 30, and
   `--all` prints all 30.
   Red when: the section grows past the cap, or the hidden count is wrong.
-- **AC5** — When the plant `card` runs `bash skills/session-kickoff/manifest-check.sh --card --write
+- **AC5** — When the plant `card`, its units committed, runs `bash skills/session-kickoff/manifest-check.sh --card --write
   --session t1` in the fixture tree, the card holds `## pockets` and its lines immediately before
   `recent —`; with the plant `card-no-playbook`, the card holds `pockets — skipped:` and still writes.
   Red when: the section lands after the READY anchor, or a failed read refuses the card.
@@ -247,7 +262,8 @@ Live at landing. A card written before the step ran prints `- none declared` und
   the bullet's position, and `git status --porcelain` in the fixture prints nothing.
   Red when: a refused bullet half-moves the section.
 - **AC7** — When the plant `down` runs `up` then `down`, both files equal their before-image byte for
-  byte, and `witness` exits 1 after the down and 0 after the up.
+  byte, and `witness` exits 1 after the down and 0 after the up; the fixture holds no policy mirror,
+  and neither verb writes one, nor does `witness` read one.
   Red when: the down leaves a row or loses a bullet.
 - **AC8** — When `grep -n "instructions_edit.py propose --manifest overlay" skills/session-kickoff/MANIFEST-TEMPLATE.md skills/session-kickoff/SKILL.md`
   runs, each file prints one line; and when `awk '/^## §B/{f=1;next} f&&/^###/{exit} f&&/^- /' memory/guides/SESSION-KICKOFF.md`
@@ -292,6 +308,11 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a stub p
   gap-orient-20 and PLAY-dOrderedCharter-9, -20, -31 and -32.
 - rev-2 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-3 · 2026-10-26 · §2 S3 · §4 Migration, Files touched · §6 AC1, AC3, AC5, AC7 · re-grounded on
+  dOrderedCharter at `462d20f35` by the cross-check record
+  `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, rows 58 and 59: the overlay
+  write stales the mirror, regenerated in its own commit after the step's; `pockets` reads the overlay
+  at `HEAD`, so the plants commit `up`'s write first.
 
 ## 10. Reuse audit
 

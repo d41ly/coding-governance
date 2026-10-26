@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-6 — the items' declarations of the `map` slot and their unfolds
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 14 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 14 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0124@b8ada8e4 whole
 
@@ -11,8 +11,12 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-fix-return.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-c.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-c.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-6-deviation-61.md](../build/2026-10-26-build-TOOL-dPlacedRequest-6-deviation-61.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -49,7 +53,10 @@ namespace.
   word. The namespace words are read from that file through `resolve_kit_dir("playbook",
   "namespaces.toml", here)`, as PLAY-dOrderedCharter-10 S7's lexicon side reads them, since the loop
   kit imports no sibling. With no registry resolved, the namespace arm prints
-  `unarmed — no namespace registry resolves` and the run is not green. Observed by AC2, AC3 and AC4.
+  `unarmed — no namespace registry resolves`, checks no unfold word, and the rest of the check runs
+  and passes, the absent-kit rule TOOL-dDeclaredLoop-12 S4 gives the same `--check` and its AC7's
+  `scope-no-kit` plant observes exiting 0 (§8 F3). With the registry resolved, every unfold word is
+  checked, so a misspelt word is refused, never read as early. Observed by AC2, AC3 and AC4.
 - **S4** — The page `help/loop.md` gains a sentence on `map` and `unfolds` beside TOOL-dPlacedRequest-8's
   `seed` section. Observed by AC5.
 
@@ -102,7 +109,8 @@ unfolds = ["kit", "policy"]
 
 1. `map` in `none`, `base`, an absent field reading `none`.
 2. `unfolds` empty unless `map` is `base`.
-3. Each unfold word an `ns` of the registry, or the run unarmed when no registry resolves.
+3. Each unfold word an `ns` of the registry, or the namespace arm `unarmed`, the check passing, when
+   no registry resolves (TOOL-dDeclaredLoop-12 AC7).
 
 ### Inventory
 
@@ -135,8 +143,9 @@ Live at landing; the declarations stay inert until dFurnishedOrders' slot reads 
 
 - security — declarations only; no write path.
 - perf / scale — one registry read per check.
-- error / empty / loading states — an absent registry prints `unarmed` and is not green; an absent
-  field reads `none`.
+- error / empty / loading states — an absent registry prints `unarmed` for the namespace arm and the
+  check passes, as TOOL-dDeclaredLoop-12 S4 rules for the absent playbook kit, so the arm's coverage
+  is never read off that run; an absent field reads `none`.
 - observability — each refusal names the item, the field and the value or word.
 - risks — the architect's unfolds are two of the delivery table's six until the other namespaces are
   registered.
@@ -157,9 +166,12 @@ Live at landing; the declarations stay inert until dFurnishedOrders' slot reads 
   `unfold-no-map` plants `unfolds = ["kit"]` beside `map = "none"`, `--check` exits 1 naming each item
   and, for the first, the word `legs`.
   Red when: an unfold names no registered namespace, or unfolds stand without a map.
-- **AC4** — When the plant `no-registry` hides `namespaces.toml`, `--check` prints
-  `unarmed — no namespace registry resolves` and exits non-zero.
-  Red when: an absent registry reads as every unfold registered.
+- **AC4** — When the plant `no-registry` hides `namespaces.toml` beside AC3's `unfolds = ["legs"]`
+  row, `--check` prints `unarmed — no namespace registry resolves`, names no unfold word, and exits 0,
+  as TOOL-dDeclaredLoop-12 AC7's `scope-no-kit` plant does; with the registry restored, the same row
+  exits 1 naming `legs`.
+  Red when: an absent registry prints no `unarmed` line and reads as every unfold registered, or reds
+  the run, so TOOL-dDeclaredLoop-12 AC7's plant goes red.
 - **AC5** — When `grep -n "unfolds" loop.md` runs in `help/`, it finds the sentence naming `map`'s two
   values and what an unfold lists.
   Red when: the fields land and the page does not name them.
@@ -183,6 +195,15 @@ New arm: tools/loop/loop_lib.py · covers AC2 AC3 AC4 · the `map-bad`, `unfold-
   read as `unarmed`. (b) spells namespaces later builds own; (c) lets a misspelt word pass. RESOLVED
   (agent, 2026-10-25, delegated): (a), rung 3, the survivor; `unfolds` widens by `add`
   (TOOL-dPlacedRequest-8 S1), so each later word is an additive change.
+- **F3 — When no namespace registry resolves, is `loop_lib.py --check` red?** TOOL-dDeclaredLoop-12
+  S4 rules that with the playbook kit absent the rest of the check runs, and its AC7 plant
+  `scope-no-kit` exits 0; `namespaces.toml` is that kit's. Options: (a) the namespace arm reds only
+  when some row declares `unfolds`; (b) the arm prints `unarmed` and the check passes, as that rule
+  says; (c) the arm reds whenever no registry resolves, rev-2's rule. (c) reds that AC7 plant; (a)
+  reds it too whenever the plant's rows carry this unit's `item.design.inventory` row, which is
+  TOOL-dDeclaredLoop-12's build to decide. RESOLVED (agent, 2026-10-26, delegated): (b), rung 1,
+  TOOL-dDeclaredLoop-12 S4 and AC7, one absent-kit rule for one command; with the kit present, AC3's
+  misspelt word still reds.
 
 ## 9. Revision log
 
@@ -190,6 +211,10 @@ New arm: tools/loop/loop_lib.py · covers AC2 AC3 AC4 · the `map-bad`, `unfold-
   `[delivery]` sections and v2:506.
 - rev-2 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-3 · 2026-10-26 · §2 S3 · §4 The check, in order · §5 · §6 AC4 · §8 F3 · re-grounded on
+  dDeclaredLoop at `783f1ad3a` by the cross-check record
+  `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 39: an absent registry
+  leaves the namespace arm `unarmed` and the check passing, TOOL-dDeclaredLoop-12 S4's absent-kit rule.
 
 ## 10. Reuse audit
 

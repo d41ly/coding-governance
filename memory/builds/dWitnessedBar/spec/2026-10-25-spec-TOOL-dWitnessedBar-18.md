@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-18 — the positional references, IW-1's legacy list and the unpinned facts registered from dOrderedCharter's keyed lists, and dSafePassage's landed step rows as an append-only population
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 12 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 12 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0356@4d098894 whole
 
@@ -11,7 +11,10 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 TOOL-dWitnessedBar-89 TOOL-dWitnessedBar-90 TOOL-dWitnessedBar-91 TOOL-dWitnessedBar-92 TOOL-dWitnessedBar-93 TOOL-dWitnessedBar-94 TOOL-dWitnessedBar-95 TOOL-dWitnessedBar-96 TOOL-dWitnessedBar-97 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-c.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-reuse-scout-c.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 |
 | [2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-spec-stage-returns.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
+| [2026-10-26-build-TOOL-dWitnessedBar-18-deviation-181.md](../build/2026-10-26-build-TOOL-dWitnessedBar-18-deviation-181.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -45,10 +48,17 @@ one engine and the `ratchet` pack, and adds no check of its own (retrofit.md:145
   tools/playbook/render_playbook.py --list-legacy`, `python tools/playbook/writing_practice.py check
   pinned-facts --list` and `python tools/govkit/upgrade_steps.py list --ids`. Each is the measurement
   its list's own check already makes, exposed and never re-derived. Observed by AC1.
-- **S5** — The three lists' readers re-pointed. `positional.py`'s check arm and its `shrink` verb,
-  `render_playbook.py --check-render`'s legacy half, and `writing_practice.py`'s `pinned-facts` arm with
-  its `--shrink` read rows through `read_rows` and drain through `write_rows`, each keeping its
-  messages, its policy key and its exit. Observed by AC2, AC3 and AC4.
+- **S5** — The three lists' readers and writers re-pointed. `positional.py`'s check arm and its
+  `shrink` verb, `render_playbook.py --check-render`'s legacy half, and `writing_practice.py`'s
+  `pinned-facts` arm with its `--shrink`; and the parents' other readers and writers of the two
+  playbook lists: `positional.py seed`, which writes the file:line rows once and refuses when the list
+  already holds one (PLAY-dOrderedCharter-26 S2), `positional.py pin`, which reads the list for the
+  unlisted citations it rewrites (-26 S5), the `positional-*` plants of `gov_tag.py --fixture`, which
+  write the fixture's list (-26 S8) and which the `tags positional selftest` leg runs (-26 S7), and
+  `instruction_units.py fixture --plant legacy`, which writes a listed row of `instructions-legacy.txt`
+  (PLAY-dOrderedCharter-20 AC8). Each reads rows through `read_rows` and writes through `write_rows`,
+  keeping its messages, its policy key and its exit, so no writer leaves a list in the old grammar for
+  `read_rows` to refuse. Observed by AC2, AC3, AC4 and AC7.
 - **S6** — The merge attribute. `.gitattributes` gains a `merge=rows` line for each of the four homes.
   Observed by AC6.
 
@@ -118,6 +128,8 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
 - `tools/playbook/instructions-legacy.txt`
 - `tools/playbook/unpinned-facts.txt`
 - `tools/playbook/positional.py`
+- `tools/playbook/gov_tag.py` (its `positional-*` fixture plants)
+- `tools/playbook/instruction_units.py` (its `fixture --plant legacy`)
 - `tools/playbook/render_playbook.py`
 - `tools/playbook/writing_practice.py`
 - `tools/playbook/kit.toml`
@@ -145,7 +157,7 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
 - observability — each check prints its population count, as today.
 - risks — the `verbatim` field is an interface ask to unit 13 (§8 F1); until it lands the file:line
   rows cannot be read.
-- testing — AC1 to AC6; the arm in §7 is observed RED then GREEN by the main loop at the close.
+- testing — AC1 to AC7; the arm in §7 is observed RED then GREEN by the main loop at the close.
 - migration — §4.
 - user docs — `tools/playbook/README.md` names the three lists as ledger populations; no page under
   `help/` documents them.
@@ -175,13 +187,20 @@ Live at landing; the populations join the `ratchet` pack's legs as data. The pas
 - **AC6** — When `git check-attr merge -- positional-refs.txt` runs in `tools/playbook/` and the same
   for `landed-steps.txt` in `tools/govkit/`, each prints `merge: rows`.
   Red when: a home lacks the line.
+- **AC7** — When `python gov_tag.py --fixture --plant positional-seed`, `--plant positional-pin` and
+  `python instruction_units.py fixture --plant legacy` run in `tools/playbook/`, each exits as
+  PLAY-dOrderedCharter-26 AC1 and AC8 and -20 AC8 state, and the list each fixture writes opens with
+  its ledger header line, `# ledger · positional-refs` and `# ledger · instructions-legacy`; and the
+  `tags positional selftest` leg's argv exits 0.
+  Red when: a writer of a list keeps the old grammar, so `read_rows` refuses the list it wrote.
 
 ## 7. Gates
 
 The `ratchet` pack's legs (unit 14) grade the four populations at the close; they are not on the leg
-line below, which the leg join reads against today's manifest.
+line below, which the leg join reads against today's manifest. `tags positional selftest` is on it:
+PLAY-dOrderedCharter-26 S7 adds it, landed before this build run.
 
-`playbook render wiring` · `playbook render selftest` · `playbook parity` · `govkit selfcheck` · `govkit selftest` · `row-keyed merge driver replay` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`playbook render wiring` · `playbook render selftest` · `tags positional selftest` · `playbook parity` · `govkit selfcheck` · `govkit selftest` · `row-keyed merge driver replay` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant in `ratchet selftest` over a fixture `landed-steps` population · none
 
@@ -211,6 +230,11 @@ New arm: tools/memory-tree/ratchet.py · covers AC5 · an `append-removed` plant
   S1, S3 and S9, and unit 13's spec as written, at base `cdfbd1cf`.
 - rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-51, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · §2 S5 · §4 Files touched · §5 testing · AC7 (new) · §7 · re-grounded by
+  `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck` row 59: S5 adds `positional.py seed` and
+  `pin`, the `positional-*` plants of `gov_tag.py --fixture` and `instruction_units.py fixture --plant
+  legacy` (PLAY-dOrderedCharter-26 S2, S5, S7, S8; -20 AC8), Files touched lists both modules, AC7
+  runs their plants, and the leg line gains `tags positional selftest`; no fork moved.
 
 ## 10. Reuse audit
 

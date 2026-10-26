@@ -44,9 +44,9 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map@1.29 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.30 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.29"
+KIT_CODEBASE_MAP_VERSION = "1.30"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -1499,32 +1499,46 @@ def resolve_remote(root):
 # <<< remote_ladder_py
 
 
-def resolve_compare_base(root: Path) -> tuple[str | None, str]:
-    """The sha the baseline's shrink-only assert compares against, and why — or None and why not.
+# The compare base (TOOL-dGroundRules-21 S7), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test: the merge bar's own rule,
+# copied rather than imported because a kit may not read a sibling kit (TOOL-dLadderedRemote-2,
+# TOOL-aStandingWrit-5).
+# >>> compare_base_py -- canonical copy: compare_base.py in the gov lib dir (byte-identical; gated)
+def resolve_compare_base(root):
+    """-> (sha or None, why): the revision a shrink-only list at <root> is compared against.
 
-    THE MERGE BAR'S OWN RULE, copied rather than imported because a kit may not read a sibling
-    kit: the remote the ladder inlined above resolves and the branch its HEAD names (`main` when no
-    branch is named), its merge-base with HEAD where that is a PROPER ancestor of HEAD, else the
-    remote tip itself. So a branch is graded on what IT changed, and a key the default branch
-    deleted after the branch opened is not misread as one the branch added. Fetches nothing: no
-    remote-tracking ref, no answer; a ladder refusal is no answer either, and says why
-    (TOOL-dLadderedRemote-2)."""
-    # The OBSERVED branch, never GOV_DEFAULT_BRANCH: an environment value must not move the base a
-    # shrink-only assert grades against, and this read never consulted it (TOOL-aStandingWrit-5).
+    The merge bar rule: the remote the inlined ladder resolves and the branch its HEAD names (`main`
+    when none is named), its merge-base with HEAD where that is a PROPER ancestor of HEAD, else the
+    remote tip. So a branch is graded on what IT changed, and a key the default branch deleted after
+    the branch opened is not misread as one the branch added. Fetches nothing: no remote-tracking
+    ref, no answer; a ladder refusal is no answer either, and says why. The OBSERVED branch, never
+    GOV_DEFAULT_BRANCH: an environment value must not move the base a shrink-only assert grades.
+    """
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
     remote, _branch, observed, refusal = resolve_remote(root)
     if refusal:
         return None, refusal
     if not remote:
         return None, "no remote to compare against"
     branch = observed or "main"
-    tip = (_read_git_text(root, "rev-parse", "--verify", "-q", f"refs/remotes/{remote}/{branch}^{{commit}}") or "").strip()
+    tip = read("rev-parse", "--verify", "-q", "refs/remotes/" + remote + "/" + branch + "^{commit}")
     if not tip:
-        return None, f"no {remote}/{branch} ref to compare against (never fetched)"
-    head = (_read_git_text(root, "rev-parse", "--verify", "-q", "HEAD") or "").strip()
-    mb = (_read_git_text(root, "merge-base", "HEAD", tip) or "").strip()
+        return None, "no %s/%s ref to compare against (never fetched)" % (remote, branch)
+    head = read("rev-parse", "--verify", "-q", "HEAD")
+    mb = read("merge-base", "HEAD", tip)
     if mb and mb != head:
-        return mb, f"merge-base of HEAD and {remote}/{branch}"
-    return tip, f"{remote}/{branch} tip"
+        return mb, "merge-base of HEAD and %s/%s" % (remote, branch)
+    return tip, "%s/%s tip" % (remote, branch)
+# <<< compare_base_py
 
 
 def derive_baseline_additions(root: Path, base: str) -> tuple[dict[str, list[str]] | None, str]:

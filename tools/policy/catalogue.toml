@@ -1,0 +1,1655 @@
+# catalogue.toml - the policy kit's catalogue, and the schema every key of `.governance/policy.toml`
+# is checked against. One [[key]] row per row of the design's [policies] table, in that table's
+# order, each row's `name` and `owner` that table's own. The fields and the `allowed` grammar are
+# this kit's README; the value check and the shape audit are `policy.py` beside this file.
+#
+# A row with no `summary` or no `usage` is named on `unsummarised-keys.txt`, a shrink-only list:
+# write both fields on a row, then drain it with `python <this kit>/policy.py lists --write`.
+
+[[key]]
+name = "preset"
+allowed = { type = "enum", of = ["velocity", "standard", "strict", "guarded"], registry = "a repo-declared preset" }
+default = "standard"
+owner = "dKeptSession"
+
+[[key]]
+name = "charter.override"
+allowed = ["explicit-override", "live-owner-wins", "absolute"]
+default = "explicit-override"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "charter.practices"
+allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "catalogue or repo-declared practices" }
+empty = "never"
+default = { derived = "the governance foundation set" }
+owner = "dOrderedCharter"
+
+[[key]]
+name = "core.bypass"
+allowed = ["with-hooks-report", "with-hooks-block", "never"]
+default = "with-hooks-report"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "core.exceptions"
+allowed = ["any-session-recorded", "owner-only-expiring", "none"]
+default = "any-session-recorded"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "design.forks"
+allowed = ["agents-feature-rich-expandable", "preference-forks-park", "owner-decides-all"]
+default = "agents-feature-rich-expandable"
+owner = "dIndexedDesign"
+
+[[key]]
+name = "design.reentry"
+allowed = { type = "set", of = ["interface-change", "two-plus-units", "review-cross-unit-flaw", "planner-or-owner-flag"] }
+empty = "never"
+default = ["interface-change", "review-cross-unit-flaw", "planner-or-owner-flag"]
+owner = "dIndexedDesign"
+
+[[key]]
+name = "autonomy"
+allowed = ["plan-only", "three-gates", "every-stage"]
+default = "plan-only"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "attendance"
+allowed = ["unattended", "announce", "confirm-steps", "confirm-acts"]
+default = "unattended"
+owner = "dKeptSession"
+
+[[key]]
+name = "attendance.scope"
+allowed = ["session", "build", "repository"]
+default = "build"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "policy-file.guard"
+allowed = ["owner-only", "agents-with-reason", "agents-within-mandate"]
+default = "owner-only"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "policy-file.proof"
+allowed = ["tty-cli", "signed", "both"]
+default = "tty-cli"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "policy-file.on-invalid"
+allowed = ["last-valid", "refuse"]
+default = "last-valid"
+summary = "What a malformed policy file, or a value outside its key's allowed set, reads as: the last valid landed revision, or a refusal."
+usage = 'policy-file.on-invalid = "refuse"'
+owner = "dGroundRules"
+
+[[key]]
+name = "floor"
+allowed = { type = "map", of = ["on", "off"], registry = "the four invariants, under the guard" }
+default = { derived = "all on" }
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "hooks.bypass"
+allowed = ["allowed", "refused"]
+default = "allowed"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "transitions.record"
+allowed = { type = "set", of = ["trailer", "log", "micro-format"] }
+empty = "never"
+default = ["trailer", "log", "micro-format"]
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "leases"
+allowed = ["warn", "refuse"]
+default = "warn"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "leases.granularity"
+allowed = ["build-and-unit", "build", "unit"]
+default = "build-and-unit"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "leases.renewal"
+allowed = ["progress", "activity", "fixed", "none"]
+default = "progress"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "leases.expiry-hours"
+allowed = { type = "hours", min = 0 }
+default = 24
+owner = "dPlacedRequest"
+direction = "raise-loosens"
+
+[[key]]
+name = "leases.overlap"
+allowed = ["kit-dirs", "files", "builds"]
+default = "kit-dirs"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "leases.offline"
+allowed = ["warn", "refuse", "follow-leases"]
+default = "warn"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "leases.queued-claim-days"
+allowed = { type = "days", min = 0 }
+default = 7
+owner = "dPlacedRequest"
+direction = "raise-loosens"
+
+[[key]]
+name = "leases.offer-seconds"
+allowed = { type = "seconds", min = 0 }
+default = 300
+owner = "dPlacedRequest"
+direction = "raise-loosens"
+
+[[key]]
+name = "deps.coordination"
+allowed = ["message-then-progress", "wait-for-landing", "order-only"]
+default = "message-then-progress"
+owner = "dKeptSession"
+
+[[key]]
+name = "deps.early-build"
+allowed = ["confirmed-interfaces", "design-only", "anything-coordinated"]
+default = "confirmed-interfaces"
+owner = "dKeptSession"
+
+[[key]]
+name = "deps.messaging"
+allowed = { type = "enum", of = ["live-and-mailbox", "live-only", "mailbox-only"], registry = "a registered doorbell" }
+default = "live-and-mailbox"
+owner = "dKeptSession"
+
+[[key]]
+name = "landing.order"
+allowed = ["plan-priority-then-first-verified", "first-verified", "owner-orders"]
+default = "plan-priority-then-first-verified"
+owner = "dShippedRelease"
+
+[[key]]
+name = "card.follows"
+allowed = ["re-render-at-transition", "card-per-step", "fixed-at-start"]
+default = "re-render-at-transition"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "placement"
+allowed = ["agent-places", "declared-checked", "owner-places"]
+default = "agent-places"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "placement.check"
+allowed = ["refuse", "record"]
+default = "refuse"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "kickoff.runs"
+allowed = ["no-ready-card", "opening-a-build", "every-session", "plan-absorbs"]
+default = "no-ready-card"
+owner = "dRankedPlan"
+
+[[key]]
+name = "card.store"
+allowed = { type = "set", of = ["remote-ref", "build-folder", "local-clone"] }
+empty = "never"
+default = ["remote-ref", "build-folder", "local-clone"]
+owner = "dPlacedRequest"
+
+[[key]]
+name = "card.snapshot"
+allowed = ["terminal-only", "every-transition"]
+default = "terminal-only"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "actions.free"
+allowed = ["read-only-probes", "item-reads-only", "recorded-anything"]
+default = "read-only-probes"
+owner = "dKeptSession"
+
+[[key]]
+name = "resume.partial"
+allowed = ["continue-item", "restart-item", "ask-owner"]
+default = "continue-item"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "resume.context"
+allowed = ["fresh-when-idle", "always-resume", "always-fresh"]
+default = "fresh-when-idle"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "orient.budget"
+allowed = ["record-only", "warn-at-evidence-ceiling", "owner-ceiling"]
+default = "record-only"
+owner = "dKeptSession"
+
+[[key]]
+name = "driver.reads"
+allowed = ["none-scout-only", "state-reads-only", "read-only-probes"]
+default = "state-reads-only"
+owner = "dBoundRoles"
+
+[[key]]
+name = "prompts.author"
+allowed = ["prompt-writer", "requesting-worker-rendered"]
+default = "prompt-writer"
+owner = "dBoundRoles"
+
+[[key]]
+name = "roles.retries"
+allowed = { type = "retry-count", min = 0 }
+default = 3
+owner = "dBoundRoles"
+direction = "raise-loosens"
+
+[[key]]
+name = "roles.no-spawn"
+allowed = ["executor-role-session", "recorded-stand-in", "refuse"]
+default = "executor-role-session"
+owner = "dBoundRoles"
+
+[[key]]
+name = "roles.trust"
+allowed = ["keyed", "witnessed-only"]
+default = "keyed"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "roles.answered-calls"
+allowed = ["refuse", "warn", "record"]
+default = "refuse"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "roles.verifier-context"
+allowed = ["cold", "warm"]
+default = "cold"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "roles.on-contradiction"
+allowed = ["repair-and-record", "return", "ask"]
+default = "repair-and-record"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "roles.effort.<role>"
+allowed = { type = "name", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "the role efforts" }
+default = { derived = "`roles.effort.default`, then the role's declared effort" }
+owner = "dBoundRoles"
+
+[[key]]
+name = "roles.effort.<workflow>.<stage>"
+allowed = { type = "name", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "the role efforts" }
+default = { derived = "`roles.effort.<role>` for the stage's role, then `roles.effort.default`, then that role's declared effort" }
+owner = "dBoundRoles"
+
+[[key]]
+name = "roles.effort.default"
+allowed = { type = "name", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "the role efforts" }
+default = { derived = "unset" }
+owner = "dBoundRoles"
+
+[[key]]
+name = "roles.model.<role>.<harness>"
+allowed = { type = "name", item = "\\S+", registry = "the models the harness adapter offers" }
+default = { derived = "that harness adapter's equivalent of the role's declared model" }
+owner = "dBoundRoles"
+
+[[key]]
+name = "roles.harness.<role>"
+allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "the harness adapters that pass the act rows" }
+empty = "never"
+default = { derived = "`runtime.act-harness`" }
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "roles.auth.<role>"
+allowed = { type = "list", of = ["setup-token", "oauth-shared", "api-key"], registry = "api-key only last and only when the owner adds it" }
+empty = "never"
+default = { derived = "`runtime.act-auth`" }
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "reuse.delivery"
+allowed = ["rendered", "on-demand"]
+default = "rendered"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "reuse.propose"
+allowed = ["new-seam", "every-unit", "owner-asks"]
+default = "new-seam"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "annotations.grammar"
+allowed = ["voluntary", "required", "pushed-at-read"]
+default = "voluntary"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "builds.agent-root"
+allowed = ["work-order", "readme"]
+default = "work-order"
+owner = "dTotalRecall"
+
+[[key]]
+name = "asks.acceptance"
+allowed = ["refuse", "grade"]
+default = "refuse"
+owner = "dTotalRecall"
+
+[[key]]
+name = "decisions.major"
+allowed = ["author-rubric", "author-owner-ratifies", "owner-only"]
+default = "author-rubric"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "builds.slug-words"
+allowed = { type = "pattern", regex = "[0-9]+-[0-9]+" }
+default = "1-3"
+owner = "dTotalRecall"
+
+[[key]]
+name = "builds.slug-style"
+allowed = ["humorous", "descriptive"]
+default = "humorous"
+owner = "dTotalRecall"
+
+[[key]]
+name = "builds.slug-date"
+allowed = ["none", "shown", "in-slug"]
+default = "none"
+owner = "dTotalRecall"
+
+[[key]]
+name = "lexicon.pin"
+allowed = ["shrink-only", "absorb", "no-gate"]
+default = "shrink-only"
+owner = "dMindYourWords"
+
+[[key]]
+name = "lexicon.forced"
+allowed = ["verified", "by-name", "by-annotation"]
+default = "verified"
+owner = "dMindYourWords"
+
+[[key]]
+name = "lexicon.at-commit"
+allowed = ["refuse", "warn", "off"]
+default = "refuse"
+owner = "dMindYourWords"
+
+[[key]]
+name = "lexicon.drift"
+allowed = ["refuse-new", "report", "off"]
+default = "refuse-new"
+owner = "dMindYourWords"
+
+[[key]]
+name = "lexicon.packs"
+allowed = ["detected-and-declared", "detected", "declared", "all"]
+default = "detected-and-declared"
+owner = "dMindYourWords"
+
+[[key]]
+name = "review.opt-in"
+allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "named lenses, each replacing a named default lens of its preset" }
+empty = "allowed"
+default = []
+owner = "dFairHearing"
+
+[[key]]
+name = "runtime.spawn-backend"
+allowed = { type = "enum", of = ["in-session", "headless"], registry = "a registered spawn backend" }
+default = "in-session"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.relaunch"
+allowed = ["fresh", "resume"]
+default = "fresh"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.act-ceiling"
+allowed = { type = "hours", min = 0 }
+default = 1.5
+owner = "dWellOiledMachine"
+direction = "raise-loosens"
+
+[[key]]
+name = "runtime.hold-ceiling"
+allowed = { type = "hours", min = 0 }
+default = 6
+owner = "dWellOiledMachine"
+direction = "raise-loosens"
+
+[[key]]
+name = "runtime.no-progress"
+allowed = { type = "retry-count", min = 0 }
+default = 3
+owner = "dWellOiledMachine"
+direction = "raise-loosens"
+
+[[key]]
+name = "runtime.refusal-repeats"
+allowed = { type = "retry-count", min = 1, max = 10 }
+default = 3
+owner = "dWellOiledMachine"
+direction = "raise-loosens"
+
+[[key]]
+name = "runtime.restarts"
+allowed = { type = "retry-count", min = 0 }
+default = 3
+owner = "dWellOiledMachine"
+direction = "raise-loosens"
+
+[[key]]
+name = "runtime.hook-failure"
+allowed = ["closed", "open"]
+default = "closed"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.agents-in-flight"
+allowed = { type = "agent-count", min = 1 }
+default = 6
+summary = "How many agents one session may have in flight, its direct spawns and its Workflow agents together."
+usage = "runtime.agents-in-flight = 4"
+owner = "dGroundRules"
+
+[[key]]
+name = "runtime.admission-scope"
+allowed = ["session", "project", "node", "pool"]
+default = "pool"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.attended-judge"
+allowed = ["classifier-or-person", "allowance", "person"]
+default = "classifier-or-person"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.attended-allowance"
+allowed = { type = "set", item = ".+", registry = "named tools and command patterns, read under `allowance`" }
+empty = "allowed"
+default = []
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.harnesses"
+allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "named harness adapters" }
+empty = "never"
+default = ["claude-code"]
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.journal"
+allowed = { type = "days", min = 0, or = ["all"] }
+default = 60
+owner = "dWellOiledMachine"
+direction = "raise-loosens"
+
+[[key]]
+name = "runtime.secret-home"
+allowed = ["os-keychain", "env-injected"]
+default = "os-keychain"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.secret-scan"
+allowed = ["value-gate", "value-gate+shape-report"]
+default = "value-gate+shape-report"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "plan.ratification"
+allowed = ["request", "hook-keyword", "terminal-command", "signed-commit"]
+default = "request"
+owner = "dRankedPlan"
+
+[[key]]
+name = "run.host"
+allowed = { type = "enum", of = ["requesting-node", "os-scheduler", "cloud-routine"], registry = "another registered host" }
+default = "requesting-node"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "notify.owner"
+allowed = ["turn-micro-formats", "park-and-landing", "every-transition", "park-only"]
+default = "turn-micro-formats"
+owner = "dKeptSession"
+
+[[key]]
+name = "notify.channel"
+allowed = { type = "enum", of = ["terminal"], registry = "another registered channel" }
+default = "terminal"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "notify.owner-items"
+allowed = ["push-when-away", "turn-end-only", "push-items-and-parks"]
+default = "push-when-away"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "run.owner-deadline"
+allowed = { type = "hours", min = 0 }
+default = 24
+owner = "dWellOiledMachine"
+direction = "raise-loosens"
+
+[[key]]
+name = "run.on-owner-silence"
+allowed = ["apply-recommendation", "remind-then-park", "wait"]
+default = "apply-recommendation"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "run.on-owner-question"
+allowed = ["best-effort-recorded", "park-item", "park-build", "stop-run"]
+default = "best-effort-recorded"
+owner = "dBoundRoles"
+
+[[key]]
+name = "deps.landing"
+allowed = ["hold-until-parent-lands", "test-decides"]
+default = "hold-until-parent-lands"
+owner = "dShippedRelease"
+
+[[key]]
+name = "mailbox.reads"
+allowed = ["every-item", "transitions-only", "every-item-amendments-at-transitions"]
+default = "every-item"
+owner = "dKeptSession"
+
+[[key]]
+name = "mailbox.notice"
+allowed = ["every-tool-call", "every-item", "off"]
+default = "every-item"
+owner = "dKeptSession"
+
+[[key]]
+name = "mailbox.fetch-seconds"
+allowed = { type = "seconds", min = 10 }
+default = 60
+owner = "dKeptSession"
+direction = "raise-loosens"
+
+[[key]]
+name = "review.follow-up"
+allowed = ["after-high", "while-finding", "never"]
+default = "after-high"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "prompts.batch"
+allowed = ["per-batch", "per-task"]
+default = "per-batch"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "context.on-full"
+allowed = ["compact-with-card", "fresh-at-boundary"]
+default = "fresh-at-boundary"
+owner = "dKeptSession"
+
+[[key]]
+name = "context.threshold"
+allowed = { type = "pattern", regex = "(100|[1-9]?[0-9])%" }
+default = "60%"
+owner = "dKeptSession"
+
+[[key]]
+name = "card.pointers"
+allowed = ["every-item", "at-transitions"]
+default = "every-item"
+owner = "dKeptSession"
+
+[[key]]
+name = "notices.record"
+allowed = ["none", "security-and-failures", "all"]
+default = "none"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "instructions.checks"
+allowed = ["refuse", "warn", "record"]
+default = "refuse"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "instructions.edit"
+allowed = ["owner-command-agents-propose", "flow-only", "command-for-all"]
+default = "owner-command-agents-propose"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "instructions.proof"
+allowed = ["tty-cli", "signed", "both"]
+default = "tty-cli"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "instructions.exclude"
+allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "gov tags of any kind the overlay holds, a fixed one, one another active row needs, names as its actor or grants, and one a policy value names refused, each refusal naming the requirer or the key" }
+empty = "allowed"
+default = []
+owner = "dOrderedCharter"
+
+[[key]]
+name = "instructions.stale"
+allowed = ["order", "refuse", "warn"]
+default = "order"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "review.breakpoints"
+allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "named item boundaries" }
+empty = "allowed"
+default = []
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "probe.points"
+allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "named item boundaries" }
+empty = "allowed"
+default = []
+owner = "dPlacedRequest"
+
+[[key]]
+name = "probe.raise"
+allowed = ["roles-and-owner", "owner-only", "off"]
+default = "roles-and-owner"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "probe.observations"
+allowed = ["verify-before-place", "verify-at-plan", "on-request"]
+default = "verify-before-place"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "probe.experiment.authority"
+allowed = ["within-cap", "owner-opts-in", "free"]
+default = "within-cap"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "deps.on-parent-withdrawn"
+allowed = ["replan", "adopt-parent-work", "withdraw-too"]
+default = "replan"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.design.rounds"
+allowed = ["one", "until-no-blocker", "until-no-high", "until-clean", "fixed-count"]
+default = "one"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.design.round-count"
+allowed = { type = "round-count", min = 0 }
+default = 2
+owner = "dDeclaredLoop"
+direction = "raise-loosens"
+
+[[key]]
+name = "review.max-rounds"
+allowed = { type = "round-count", min = 0 }
+default = 3
+owner = "dDeclaredLoop"
+direction = "raise-loosens"
+
+[[key]]
+name = "review.design-audit.runs"
+allowed = [1, 2, 3]
+default = 2
+owner = "dFairHearing"
+
+[[key]]
+name = "review.design-audit.seed"
+allowed = ["reverted-escapes", "synthetic", "none"]
+default = "reverted-escapes"
+owner = "dFairHearing"
+
+[[key]]
+name = "review.unverified"
+allowed = ["ask", "block", "record"]
+default = "ask"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.unclassed"
+allowed = ["refuse", "reason", "owner-rules"]
+default = "refuse"
+owner = "dFairHearing"
+
+[[key]]
+name = "flow.route-backs"
+allowed = { type = "route-back-count", min = 0 }
+default = 3
+owner = "dDeclaredLoop"
+direction = "raise-loosens"
+
+[[key]]
+name = "flow.rework-budget"
+allowed = { type = "route-back-count", min = 0, pattern = "[0-9]+\\+[0-9]+" }
+default = "4+2"
+owner = "dDeclaredLoop"
+direction = "raise-loosens"
+
+[[key]]
+name = "flow.on-exhausted"
+allowed = ["best-effort-ending", "park-for-owner", "close-incomplete"]
+default = "best-effort-ending"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "flow.wait-ceiling"
+allowed = { type = "hours", min = 0 }
+default = 72
+owner = "dDeclaredLoop"
+direction = "raise-loosens"
+
+[[key]]
+name = "flow.scenario-default"
+allowed = { type = "enum", of = ["feature", "amendment", "patch", "playbook-run", "design-only"], registry = "a registered scenario" }
+default = "feature"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "flow.scenario-conflict"
+allowed = ["refuse", "declared-order"]
+default = "refuse"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "flow.adapt"
+allowed = ["additive-recorded", "owner-approves", "off"]
+default = "additive-recorded"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "flow.promote"
+allowed = ["loop-proposes", "owner-only", "off"]
+default = "loop-proposes"
+owner = "dCalibratedLens"
+
+[[key]]
+name = "policy-file.on-missing-expansion"
+allowed = ["refuse", "fallback-reported"]
+default = "refuse"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "tests.without-cadence"
+allowed = ["run-at-landing", "report-unrun", "wait-for-expansion"]
+default = "run-at-landing"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict"
+allowed = { type = "enum", of = ["local-hook", "peer-node", "remote-ci"], registry = "another registered backend" }
+default = "local-hook"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.blocks"
+allowed = ["own-mixed-contended", "every-red", "own-only"]
+default = "own-only"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.held"
+allowed = ["peer-or-cadence", "push-selected", "on-demand"]
+default = "on-demand"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.flakes"
+allowed = ["quarantine", "record", "retry-only"]
+default = "quarantine"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.flakes.entry"
+allowed = { type = "pattern", regex = "[0-9]+/[0-9]+", or = ["measured"] }
+default = "measured"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.flakes.release"
+allowed = { type = "count", min = 0 }
+default = 3
+owner = "dWitnessedBar"
+
+[[key]]
+name = "tests.product"
+allowed = ["declared", "declared-with-runners", "none"]
+default = "declared-with-runners"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "tests.landing-levels"
+allowed = { type = "set", of = ["unit", "integration", "e2e", "performance"], or = ["every-declared"] }
+empty = "never"
+default = ["unit", "integration"]
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.tree"
+allowed = ["prepared-merge", "build-tip"]
+default = "prepared-merge"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.red-route"
+allowed = ["fix-pass-or-design", "always-new-unit"]
+default = "fix-pass-or-design"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.remote.trust"
+allowed = ["pinned-workflow", "owner-reviews-workflow-change", "app-only"]
+default = "pinned-workflow"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.remote.pin-scope"
+allowed = ["workflow", "dispatch-closure"]
+default = "workflow"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "verdict.remote.pin"
+allowed = { type = "pattern", regex = "[0-9a-f]{40}|[0-9a-f]{64}", registry = "the pinned files' blob ids" }
+default = { derived = "none, until the owner pins" }
+owner = "dWitnessedBar"
+
+[[key]]
+name = "plan.authority"
+allowed = ["planner-drafts-owner-ratifies", "planner-within-themes", "owner-orders"]
+default = "planner-drafts-owner-ratifies"
+owner = "dRankedPlan"
+
+[[key]]
+name = "plan.unplaced"
+allowed = ["warn", "refuse-new", "review-only"]
+default = "warn"
+owner = "dRankedPlan"
+
+[[key]]
+name = "plan.triage"
+allowed = ["owner-batches", "rules", "archive-legacy"]
+default = "rules"
+owner = "dRankedPlan"
+
+[[key]]
+name = "plan.kickoff"
+allowed = ["offer-next", "binding", "advisory"]
+default = "offer-next"
+owner = "dRankedPlan"
+
+[[key]]
+name = "design.handoff"
+allowed = ["derived-ready", "ready-plus-audit", "status-and-tier"]
+default = "derived-ready"
+owner = "dIndexedDesign"
+
+[[key]]
+name = "design.overlap"
+allowed = ["warn", "refuse", "index-only"]
+default = "warn"
+owner = "dIndexedDesign"
+
+[[key]]
+name = "design.streams-when"
+allowed = ["opt-in", "always", "off"]
+default = "opt-in"
+owner = "dIndexedDesign"
+
+[[key]]
+name = "design.coverage"
+allowed = ["refuse", "warn", "off"]
+default = "refuse"
+owner = "dIndexedDesign"
+
+[[key]]
+name = "design.coverage.semantic"
+allowed = ["every-exit", "with-spec-audit", "off"]
+default = "every-exit"
+owner = "dIndexedDesign"
+
+[[key]]
+name = "deviation.gate"
+allowed = ["refuse", "warn-and-ask", "report"]
+default = "refuse"
+owner = "dScopedBuild"
+
+[[key]]
+name = "deviation.approval"
+allowed = ["by-risk", "owner-all", "author-recorded"]
+default = "by-risk"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "help.enforce"
+allowed = ["refuse", "warn", "off"]
+default = "refuse"
+owner = "dSafePassage"
+
+[[key]]
+name = "help.explanation"
+allowed = ["rendered", "registry-only"]
+default = "rendered"
+owner = "dConvergedCharter"
+
+[[key]]
+name = "help.atlas"
+allowed = ["committed", "on-demand", "off"]
+default = "committed"
+owner = "dTotalRecall"
+
+[[key]]
+name = "build.scope"
+allowed = ["warn-and-ask", "refuse", "report"]
+default = "warn-and-ask"
+owner = "dScopedBuild"
+
+[[key]]
+name = "build.reuse-check.second-pass"
+allowed = ["off", "on"]
+default = "off"
+owner = "dScopedBuild"
+
+[[key]]
+name = "build.worktree"
+allowed = ["per-unit", "parallel-only", "shared"]
+default = "shared"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "build.push"
+allowed = ["every-item", "every-pass", "every-transition", "at-landing"]
+default = "every-pass"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "build.unit-holders"
+allowed = ["any-session", "driver-only"]
+default = "any-session"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "build.spend-cap"
+allowed = { type = "count", min = 0, or = ["measured"] }
+default = "measured"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "deploy.runs"
+allowed = ["landing-node", "adopter-ci", "operator"]
+default = "landing-node"
+owner = "dShippedRelease"
+
+[[key]]
+name = "deploy.promotion"
+allowed = ["owner-approves-prod", "auto-on-green", "owner-approves-each"]
+default = "auto-on-green"
+owner = "dShippedRelease"
+
+[[key]]
+name = "deploy.on-verify-fail"
+allowed = ["rollback-and-ask", "halt-and-alert", "roll-forward"]
+default = "roll-forward"
+owner = "dShippedRelease"
+
+[[key]]
+name = "deploy.currency"
+allowed = ["pull-and-watch", "push-branches", "pull-only"]
+default = "pull-and-watch"
+owner = "dShippedRelease"
+
+[[key]]
+name = "currency.max-behind"
+allowed = [0, 1, 2, 4]
+default = 2
+owner = "dShippedRelease"
+
+[[key]]
+name = "currency.on-behind"
+allowed = ["note", "owner-item", "red"]
+default = "owner-item"
+owner = "dShippedRelease"
+
+[[key]]
+name = "install.from"
+allowed = ["release-tag", "any-commit"]
+default = "release-tag"
+owner = "dShippedRelease"
+
+[[key]]
+name = "install.guards"
+allowed = ["project", "managed"]
+default = "project"
+owner = "dShippedRelease"
+
+[[key]]
+name = "build.closes"
+allowed = ["at-landing", "after-release-verifies", "at-landing-maintain-owns"]
+default = "at-landing"
+owner = "dShippedRelease"
+
+[[key]]
+name = "build.release-hold"
+allowed = ["close-only", "whole-close"]
+default = "close-only"
+owner = "dShippedRelease"
+
+[[key]]
+name = "build.release-ceiling"
+allowed = { type = "hours", min = 0 }
+default = 72
+owner = "dShippedRelease"
+direction = "raise-loosens"
+
+[[key]]
+name = "kits.cadence"
+allowed = ["every-landing", "daily", "weekly", "owner-cut"]
+default = "weekly"
+owner = "dShippedRelease"
+
+[[key]]
+name = "kits.host"
+allowed = { type = "enum", of = ["session-start", "os-scheduler", "cloud-routine"], registry = "another registered host" }
+default = "session-start"
+owner = "dShippedRelease"
+
+[[key]]
+name = "kits.watch-cadence"
+allowed = ["daily", "weekly", "every-session"]
+default = "daily"
+owner = "dShippedRelease"
+
+[[key]]
+name = "release.environments"
+allowed = { type = "list", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "registered environments" }
+empty = "allowed"
+default = []
+owner = "dShippedRelease"
+
+[[key]]
+name = "integrations.tracker"
+allowed = ["none", "mirror-out"]
+default = "none"
+owner = "dShippedRelease"
+
+[[key]]
+name = "maintain.host"
+allowed = { type = "enum", of = ["session-start", "os-scheduler", "cloud-routine"], registry = "another registered host" }
+default = "session-start"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.cadence"
+allowed = ["daily", "weekly", "every-session"]
+default = "daily"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.fixes"
+allowed = { type = "set", item = ".+", registry = "named safe fixes" }
+empty = "allowed"
+default = { derived = "reap, prune landed, regenerate stale, defer dormant, records-only fixes, close finished run records" }
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.on-breach"
+allowed = ["file-ask", "red-leg", "report"]
+default = "file-ask"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.events"
+allowed = { type = "set", of = ["default-branch-red", "release-verify-failed", "session-start-breach"] }
+empty = "allowed"
+default = ["default-branch-red", "release-verify-failed", "session-start-breach"]
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.reading-tree"
+allowed = ["clean-base", "worktree"]
+default = "clean-base"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.node-readings"
+allowed = ["every-node", "lease-holder"]
+default = "every-node"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.reading-admission"
+allowed = ["refuse-unowned", "report-unowned"]
+default = "refuse-unowned"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.dead-after"
+allowed = [5, 10, 20]
+default = 10
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.record-when"
+allowed = ["every-period", "on-finding"]
+default = "every-period"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.security-review"
+allowed = ["weekly", "every-landing", "off"]
+default = "weekly"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.tiers"
+allowed = ["bands", "pins"]
+default = "bands"
+owner = "dTendedCadence"
+
+[[key]]
+name = "maintain.interpreter-eol"
+allowed = ["file", "warn", "off"]
+default = "file"
+owner = "dTendedCadence"
+
+[[key]]
+name = "observability.run-record"
+allowed = ["per-run", "on-anomaly", "none"]
+default = "per-run"
+owner = "dTendedCadence"
+
+[[key]]
+name = "patch.ratify"
+allowed = ["auto", "owner"]
+default = "auto"
+owner = "dPlacedRequest"
+
+[[key]]
+name = "review.<stage>"
+allowed = ["off", "opt-in", "owed", "owed-above-tier"]
+default = { derived = "opt-in; Build owed" }
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.<stage>.effort"
+allowed = { type = "name", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "the role efforts" }
+default = { derived = "the role's declared effort" }
+owner = "dCalibratedLens"
+
+[[key]]
+name = "review.recommendation"
+allowed = ["advice", "binding", "binding-above-tier"]
+default = "advice"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.build.when"
+allowed = ["per-build", "per-unit", "per-landing"]
+default = "per-build"
+owner = "dScopedBuild"
+
+[[key]]
+name = "review.findings"
+allowed = ["blocker-high-own", "all-own", "blocker-own"]
+default = "blocker-high-own"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.blocks"
+allowed = ["every-review", "owed-only", "none"]
+default = "every-review"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.left-shift"
+allowed = ["second-occurrence", "every-class", "owner-selects"]
+default = "second-occurrence"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.recommendation.source"
+allowed = ["scored-signals-and-reasoning", "agent-judgment", "signals-only"]
+default = "scored-signals-and-reasoning"
+owner = "dDeclaredLoop"
+
+[[key]]
+name = "review.loop.cadence"
+allowed = ["weekly", "monthly", "every-n-landings"]
+default = "weekly"
+owner = "dCalibratedLens"
+
+[[key]]
+name = "review.loop.retire"
+allowed = ["propose-ratify", "demote-then-propose", "report"]
+default = "propose-ratify"
+owner = "dCalibratedLens"
+
+[[key]]
+name = "review.loop.window-days"
+allowed = { type = "days", min = 0 }
+default = 60
+owner = "dCalibratedLens"
+direction = "raise-loosens"
+
+[[key]]
+name = "review.loop.catch-source"
+allowed = ["verdict-records", "node-journal"]
+default = "verdict-records"
+owner = "dCalibratedLens"
+
+[[key]]
+name = "budgets.*"
+allowed = { type = "count", min = 0 }
+default = { derived = "the value its legacy home held, `template-size-limits.txt` moved by dSafePassage's step, then re-derived from evidence" }
+owner = "dGroundRules"
+
+[[key]]
+name = "budgets.enforce"
+allowed = ["warn", "refuse"]
+default = "warn"
+summary = "Whether a size cap's breach warns or refuses, for every cap not pinned."
+usage = 'budgets.enforce = "refuse"'
+owner = "dGroundRules"
+
+[[key]]
+name = "budgets.pinned"
+allowed = { type = "set", item = ".+", registry = "named caps under `budgets.enforce`, each refusing whatever the switch says, a name outside the switch, exempt from it or matching no cap the caps census lists refused at the schema" }
+empty = "allowed"
+default = []
+summary = "The caps whose breach refuses whatever `budgets.enforce` says."
+usage = 'budgets.pinned = ["AGENTS.md"]'
+owner = "dGroundRules"
+
+[[key]]
+name = "tags.slice"
+allowed = ["leaf", "subtree"]
+default = "leaf"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "tags.retired-cites"
+allowed = ["refuse-new", "warn", "allow"]
+default = "refuse-new"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "tags.positional"
+allowed = ["shrink-only", "refuse", "report"]
+default = "shrink-only"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "tags.bare-refs"
+allowed = ["charter-only", "unique", "never"]
+default = "charter-only"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "tags.bundle"
+allowed = ["manifest", "inline", "both"]
+default = "both"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "tags.bundle-rows"
+allowed = [20, 40, 80]
+default = 40
+owner = "dOrderedCharter"
+
+[[key]]
+name = "annotations.lookup"
+allowed = ["query-and-map", "query", "map-index"]
+default = "query-and-map"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "annotations.resolve-scope"
+allowed = ["notes", "every-comment-ref"]
+default = "every-comment-ref"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "annotations.delivery"
+allowed = ["work-order", "on-demand", "off"]
+default = "work-order"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "instructions.slices"
+allowed = ["handed", "pointer"]
+default = "handed"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "instructions.legacy"
+allowed = ["shrink-only", "refuse"]
+default = "shrink-only"
+owner = "dOrderedCharter"
+
+[[key]]
+name = "instructions.task-charter"
+allowed = ["when-not-static", "always"]
+default = "when-not-static"
+owner = "dBoundRoles"
+
+[[key]]
+name = "review.twin"
+allowed = ["never", "design-records", "design-and-landing", "always"]
+default = "never"
+owner = "dFairHearing"
+
+[[key]]
+name = "roles.shape-enforce"
+allowed = ["refuse", "record"]
+default = "refuse"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "roles.orientation.house-index"
+allowed = ["handed", "pointer", "off"]
+default = "handed"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "memory.default-load"
+allowed = ["card", "card-and-live", "card-and-map"]
+default = "card-and-map"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "memory.code-budget"
+allowed = { type = "pattern", regex = "[1-9][0-9]*k" }
+default = "16k"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "memory.code-roles"
+allowed = ["working-roles", "every-role", "structural-roles"]
+default = "every-role"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "memory.code-languages"
+allowed = ["builtin", "builtin+ctags", "ctags"]
+default = "builtin"
+owner = "dTotalRecall"
+
+[[key]]
+name = "memory.code-enrich"
+allowed = ["symbol-hash-slots", "in-code-notes", "derived-only"]
+default = "symbol-hash-slots"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "memory.load-budget"
+allowed = ["4k", "8k", "16k"]
+default = "8k"
+owner = "dTotalRecall"
+
+[[key]]
+name = "memory.item-budget"
+allowed = { type = "enum", of = ["measured", 96, 128], registry = "KB per role (each role's cap the owner's to adjust)" }
+default = "measured"
+owner = "dTotalRecall"
+
+[[key]]
+name = "memory.over-budget"
+allowed = ["refuse", "report", "off"]
+default = "report"
+owner = "dTotalRecall"
+
+[[key]]
+name = "memory.mirror"
+allowed = { type = "enum", of = ["none"], registry = "a registered memory-mirror adapter" }
+default = "none"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "memory.project-map"
+allowed = ["structural-roles", "every-role", "owner-only"]
+default = "structural-roles"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "memory.map-budget"
+allowed = ["16k", "24k", "32k"]
+default = "32k"
+owner = "dTotalRecall"
+
+[[key]]
+name = "memory.map-overflow"
+allowed = ["degrade", "refuse"]
+default = "degrade"
+owner = "dTotalRecall"
+
+[[key]]
+name = "memory.map-unfold"
+allowed = ["item-declared", "none", "all"]
+default = "item-declared"
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "memory.map-purpose"
+allowed = ["review", "ledger", "derive", "refuse"]
+default = "review"
+owner = "dTotalRecall"
+
+[[key]]
+name = "memory.legacy-anchors"
+allowed = ["derived", "none", "retag"]
+default = "derived"
+owner = "dTotalRecall"
+
+[[key]]
+name = "memory.superseded-slices"
+allowed = ["refuse", "mark"]
+default = "refuse"
+owner = "dTotalRecall"
+
+[[key]]
+name = "retrofit.drain"
+allowed = ["hunk", "file", "off"]
+default = "hunk"
+owner = "dScopedBuild"
+
+[[key]]
+name = "retrofit.drain-cap"
+allowed = [5, 20, 50]
+default = 20
+owner = "dScopedBuild"
+
+[[key]]
+name = "retrofit.claim-on-touch"
+allowed = ["claim", "carry", "off"]
+default = "claim"
+owner = "dScopedBuild"
+
+[[key]]
+name = "retrofit.claim-cap"
+allowed = [1, 3, 5]
+default = 3
+owner = "dScopedBuild"
+
+[[key]]
+name = "retrofit.widen"
+allowed = ["record-reason", "refuse"]
+default = "record-reason"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "retrofit.unseeded"
+allowed = ["unarmed", "refuse"]
+default = "unarmed"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "retrofit.reconstruct"
+allowed = ["on-touch", "at-adoption", "on-ask"]
+default = "on-touch"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "retrofit.decisions"
+allowed = ["author-rubric", "docs-owner-ratifies", "docs-and-trailers"]
+default = "author-rubric"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "retrofit.practice-pending"
+allowed = ["alongside", "propose-retire"]
+default = "alongside"
+owner = "dLinkedLibrary"
+
+[[key]]
+name = "retrofit.cadence"
+allowed = ["off", "hot-first"]
+default = "hot-first"
+owner = "dTendedCadence"
+
+[[key]]
+name = "retrofit.slot-bytes"
+allowed = [512, 1024, 2048]
+default = 1024
+owner = "dFurnishedOrders"
+
+[[key]]
+name = "commits.edge-check"
+allowed = ["push-leg", "commit-msg", "off"]
+default = "push-leg"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "commits.squash"
+allowed = ["re-emit-union", "refuse", "accept-loss"]
+default = "re-emit-union"
+owner = "dShippedRelease"
+
+[[key]]
+name = "trace.identity"
+allowed = ["act-only", "session", "salted"]
+default = "session"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "trace.cost"
+allowed = ["tokens+wall", "tokens", "none"]
+default = "tokens+wall"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "trace.leg-output"
+allowed = ["tail-by-hash", "node-local"]
+default = "tail-by-hash"
+owner = "dWitnessedBar"
+
+[[key]]
+name = "trace.rows"
+allowed = [60, 120, "all"]
+default = 120
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.binary"
+allowed = { type = "enum", of = ["newest-conforming", "path", "app-bundled"], registry = "a pinned path" }
+default = "newest-conforming"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.owner-harness"
+allowed = { type = "enum", of = ["auto"], registry = "a registered harness adapter" }
+default = "auto"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.act-harness"
+allowed = { type = "enum", of = ["claude-code", "codex"], registry = "another registered harness adapter that passes the act rows" }
+default = "claude-code"
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "runtime.act-auth"
+allowed = { type = "list", of = ["setup-token", "oauth-shared", "api-key"], registry = "api-key only last and only when the owner adds it" }
+empty = "never"
+default = ["setup-token", "oauth-shared"]
+owner = "dWellOiledMachine"
+
+[[key]]
+name = "platforms.supported"
+allowed = { type = "set", of = ["windows-gitbash", "linux", "macos", "pwsh-launch"] }
+empty = "never"
+default = ["windows-gitbash", "linux"]
+owner = "dShippedRelease"
+
+[[key]]
+name = "platforms.verify"
+allowed = ["held", "bar", "ci", "off"]
+default = "held"
+owner = "dShippedRelease"
+
+[[key]]
+name = "platforms.provision"
+allowed = ["name", "uv", "off"]
+default = "name"
+owner = "dSafePassage"
+
+[[key]]
+name = "install.deprecation-window"
+allowed = [0, 1, 2, 4]
+default = 2
+owner = "dSafePassage"
+
+[[key]]
+name = "install.on-shim-call"
+allowed = ["warn", "journal"]
+default = "warn"
+owner = "dSafePassage"
+
+[[key]]
+name = "install.retired-edits"
+allowed = ["order", "keep"]
+default = "order"
+owner = "dSafePassage"
+
+[[key]]
+name = "install.steps"
+allowed = ["offer", "attended"]
+default = "offer"
+owner = "dShippedRelease"

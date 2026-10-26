@@ -207,21 +207,21 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 64 spec(s) at
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `KICK-dKeptSession-1` | no |
-| 2 | `KICK-dKeptSession-19`, `KICK-dKeptSession-33` | yes |
+| 2 | `KICK-dKeptSession-19`, `KICK-dKeptSession-33` | no |
 | 3 | `KICK-dKeptSession-2` | no |
-| 4 | `KICK-dKeptSession-3`, `KICK-dKeptSession-34`, `KICK-dKeptSession-40` | yes |
-| 5 | `KICK-dKeptSession-4`, `KICK-dKeptSession-49`, `KICK-dKeptSession-50`, `KICK-dKeptSession-54` | yes |
-| 6 | `KICK-dKeptSession-20`, `KICK-dKeptSession-32`, `KICK-dKeptSession-58`, `KICK-dKeptSession-59`, `KICK-dKeptSession-60` | yes |
+| 4 | `KICK-dKeptSession-3`, `KICK-dKeptSession-34`, `KICK-dKeptSession-40` | no |
+| 5 | `KICK-dKeptSession-4`, `KICK-dKeptSession-49`, `KICK-dKeptSession-50`, `KICK-dKeptSession-54` | no |
+| 6 | `KICK-dKeptSession-20`, `KICK-dKeptSession-32`, `KICK-dKeptSession-58`, `KICK-dKeptSession-59`, `KICK-dKeptSession-60` | no |
 | 7 | `KICK-dKeptSession-16` | no |
 | 8 | `KICK-dKeptSession-12` | no |
-| 9 | `KICK-dKeptSession-13`, `KICK-dKeptSession-37`, `KICK-dKeptSession-38` | yes |
+| 9 | `KICK-dKeptSession-13`, `KICK-dKeptSession-37`, `KICK-dKeptSession-38` | no |
 | 10 | `KICK-dKeptSession-26` | no |
 | 11 | `KICK-dKeptSession-15` | no |
 | 12 | `KICK-dKeptSession-14` | no |
-| 13 | `KICK-dKeptSession-30`, `KICK-dKeptSession-9` | yes |
-| 14 | `KICK-dKeptSession-28`, `KICK-dKeptSession-45`, `KICK-dKeptSession-46`, `KICK-dKeptSession-47`, `KICK-dKeptSession-48` | yes |
+| 13 | `KICK-dKeptSession-30`, `KICK-dKeptSession-9` | no |
+| 14 | `KICK-dKeptSession-28`, `KICK-dKeptSession-45`, `KICK-dKeptSession-46`, `KICK-dKeptSession-47`, `KICK-dKeptSession-48` | no |
 | 15 | `KICK-dKeptSession-22` | no |
-| 16 | `KICK-dKeptSession-31`, `KICK-dKeptSession-5` | yes |
+| 16 | `KICK-dKeptSession-31`, `KICK-dKeptSession-5` | no |
 | 17 | `KICK-dKeptSession-23`, `KICK-dKeptSession-36`, `KICK-dKeptSession-39`, `KICK-dKeptSession-51` | yes |
 | 18 | `KICK-dKeptSession-27` | no |
 | 19 | `KICK-dKeptSession-24` | no |
@@ -230,9 +230,9 @@ Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 64 spec(s) at
 | 22 | `KICK-dKeptSession-21` | no |
 | 23 | `KICK-dKeptSession-6` | no |
 | 24 | `KICK-dKeptSession-7` | no |
-| 25 | `KICK-dKeptSession-35`, `KICK-dKeptSession-42`, `KICK-dKeptSession-8` | yes |
-| 26 | `KICK-dKeptSession-11`, `KICK-dKeptSession-43`, `KICK-dKeptSession-52`, `KICK-dKeptSession-53`, `KICK-dKeptSession-55` | yes |
-| 27 | `KICK-dKeptSession-17`, `KICK-dKeptSession-61` | yes |
+| 25 | `KICK-dKeptSession-35`, `KICK-dKeptSession-42`, `KICK-dKeptSession-8` | no |
+| 26 | `KICK-dKeptSession-11`, `KICK-dKeptSession-43`, `KICK-dKeptSession-52`, `KICK-dKeptSession-53`, `KICK-dKeptSession-55` | no |
+| 27 | `KICK-dKeptSession-17`, `KICK-dKeptSession-61` | no |
 | 28 | `KICK-dKeptSession-18` | no |
 | 29 | `KICK-dKeptSession-41` | no |
 | 30 | `KICK-dKeptSession-44` | no |
