@@ -58,7 +58,7 @@ No resolved fork was re-resolved, and no other fork was reopened.
 
 **Parent specs that look wrong:**
 - **TOOL-dGroundRules-10 S5, as built.** `tools/hooks/agent-cap.js:465-469` loads the policy kit's `policy-mirror.js` in process. `tools/hooks/kit.toml` declares no `requires_if` for it, so this is the same rule breach as row 33, in the parent's own code. Spec 8 leaves that line alone.
-- **TOOL-dDeclaredLoop-3:54-55** still says `resolve(...)`, as the record notes. It is not in this group.
+- **dl3:54-55** (TOOL-dDeclaredLoop-3) still says `resolve(...)`, as the record notes. It is not in this group.
 - **Possibly the same class in spec 1, not on the record.** S5's `arm_presets` compares the loads "both ways" with `[[selects]]` rows of `tools/loop/loop.toml`, reading another kit's data file directly. I left it unchanged because no row covers it.
 
 Files:
