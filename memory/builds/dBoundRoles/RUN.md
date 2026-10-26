@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-1793009494800065924-102954 c3480287
+asks-at-landing: TOOL-dBoundRoles-27=DEFERRED TOOL-dBoundRoles-28=DEFERRED TOOL-dBoundRoles-29=DEFERRED TOOL-dBoundRoles-30=DEFERRED TOOL-dBoundRoles-31=DEFERRED TOOL-dBoundRoles-32=DEFERRED TOOL-dBoundRoles-33=DEFERRED TOOL-dBoundRoles-34=DEFERRED TOOL-dBoundRoles-35=DEFERRED TOOL-dBoundRoles-36=DEFERRED
+units-at-landing: TOOL-dBoundRoles-14 TOOL-dBoundRoles-2 TOOL-dBoundRoles-1 TOOL-dBoundRoles-21 TOOL-dBoundRoles-37 TOOL-dBoundRoles-22 TOOL-dBoundRoles-49 TOOL-dBoundRoles-16 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-6 TOOL-dBoundRoles-13 TOOL-dBoundRoles-3 TOOL-dBoundRoles-38 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-48 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-7 TOOL-dBoundRoles-5 TOOL-dBoundRoles-10 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-4 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-12 TOOL-dBoundRoles-41 TOOL-dBoundRoles-11 TOOL-dBoundRoles-47 TOOL-dBoundRoles-26 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-20 TOOL-dBoundRoles-59 TOOL-dBoundRoles-19 TOOL-dBoundRoles-61 TOOL-dBoundRoles-18 TOOL-dBoundRoles-25 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69
+gates-run: unattended-17930114859075966583-35558 43418f1b
 parked-surfaced: yes, 59 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 4ba938acceb21af7e41ee5e5d88db7b7f8ea5f70
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -233,3 +235,7 @@ base: 462d20f3510072a1dddb5b948370937cfd3bbe0e
 2026-10-26T08:19:00Z rescope · item defer TOOL-dBoundRoles-68 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
 
 2026-10-26T08:19:01Z rescope · item defer TOOL-dBoundRoles-69 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dBoundRoles-27
+
+2026-10-26T10:57:48Z override · item specs-audited · reason the owner stopped the spec-audit chain after round 8 ('no more spec audits after this', memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-owner-review-stop.md), so round 8's promotions TOOL-dBoundRoles-67 to -69 close with no audit naming them, as M4 provides when a chain ends
+
+2026-10-26T10:57:48Z override · item closing-review-recorded · reason the spec run's closing diff review is not run: this run's whole diff is specs and records, already read by eight spec-audit rounds, and the owner stopped spec review ('no more spec audits after this', memory/builds/dBoundRoles/prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-owner-review-stop.md); the build run's closing diff review over its code meets it
