@@ -24,7 +24,9 @@ leg runs each after its real cases: an arm whose case stays green is a red.
 """
 from __future__ import annotations
 
+import ast
 import hashlib
+import inspect
 import json
 import os
 import pathlib
@@ -350,13 +352,13 @@ step, mode, first = cfg.get("step"), cfg.get("mode"), [True]
 extra = [us.StepRow(**r) for r in cfg.get("inject", [])]
 
 
-def run(row, phase, target, gov_root):
+def run(row, phase, target, gov_root, *args, **kwargs):
     if row.id == step:
         if phase == "witness" and first[0]:
             first[0] = False
             if mode == "skip":
                 return dict(uw.OK)
-            got = real_run(row, phase, target, gov_root)
+            got = real_run(row, phase, target, gov_root, *args, **kwargs)
             if got["verdict"] != "ok":
                 return got
             print(f"upgrade-walk: forced {row.id}", flush=True)
@@ -367,7 +369,7 @@ def run(row, phase, target, gov_root):
             target, shadow = pathlib.Path(target), pathlib.Path(cfg["shadow"])
             before = uw.read_tree_bytes(target)
             shutil.copytree(target, shadow, symlinks=True)
-            real_run(row, phase, shadow, gov_root)
+            real_run(row, phase, shadow, gov_root, *args, **kwargs)
             image = us.derive_image_path(shadow, row.id).relative_to(shadow).as_posix()
             try:
                 changed = uw.derive_first_write(before, shadow, image)
@@ -383,11 +385,11 @@ def run(row, phase, target, gov_root):
                     dst.unlink()
             print(f"upgrade-walk: killed {row.id} after " + (changed[0] if changed else "its end, no write"), flush=True)
             os._exit(137)
-    return real_run(row, phase, target, gov_root)
+    return real_run(row, phase, target, gov_root, *args, **kwargs)
 
 
-def read(root, rev, landed_ref):
-    rows = real_read(root, rev, landed_ref)
+def read(root, rev, landed_ref, *args, **kwargs):
+    rows = real_read(root, rev, landed_ref, *args, **kwargs)
     if extra and us.resolve_rev(root, rev or "HEAD") == cfg["tip"]:
         rows = rows + [r._replace(introduced=cfg["tip"] if landed_ref is not None else None) for r in extra]
     return rows
@@ -397,6 +399,54 @@ us.run_step_isolated, us.read_steps = run, read
 sys.argv = [str(gk_path), *cfg["argv"]]
 runpy.run_path(str(gk_path), run_name="__main__")
 '''
+
+
+def check_child_forwarding(us, child: str = CHILD) -> list[str]:
+    """TOOL-dSafePassage-68 S2: one problem per way a stand-in `child` rebinds on `us` fails to take
+    and pass on every parameter of the real function it replaces, read live by `inspect.signature`.
+    It reads the shape of the forwarding, never what a stand-in's branches do with the values."""
+    tree = ast.parse(child)
+    stand, real = {}, {}
+    for node in tree.body:
+        if not (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Tuple) and isinstance(node.value, ast.Tuple)):
+            continue
+        for t, v in zip(node.targets[0].elts, node.value.elts):
+            if isinstance(t, ast.Attribute) and isinstance(t.value, ast.Name) and t.value.id == "us" \
+                    and isinstance(v, ast.Name):
+                stand[t.attr] = v.id
+            elif isinstance(t, ast.Name) and isinstance(v, ast.Attribute) and isinstance(v.value, ast.Name) \
+                    and v.value.id == "us":
+                real[v.attr] = t.id
+    if not stand:
+        return ["the child rebinds nothing on `us`"]
+    defs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
+    out = []
+    for attr in sorted(stand):
+        name, rname = stand[attr], real.get(attr)
+        fn = defs.get(name)
+        if fn is None or rname is None or not hasattr(us, attr):
+            out.append(f"{attr}: no stand-in def or real binding found")
+            continue
+        names = list(inspect.signature(getattr(us, attr)).parameters)
+        own = [a.arg for a in fn.args.posonlyargs + fn.args.args]
+        va, kw = fn.args.vararg and fn.args.vararg.arg, fn.args.kwarg and fn.args.kwarg.arg
+        if own != names[:len(own)] or not va or not kw:
+            out.append(f"{attr}: stand-in {name}({', '.join(own)}) does not take and pass on ({', '.join(names)})")
+        calls = sorted((c for c in ast.walk(fn) if isinstance(c, ast.Call)
+                        and isinstance(c.func, ast.Name) and c.func.id == rname), key=lambda c: c.lineno)
+        if not calls:
+            out.append(f"{attr}: {name} never calls {rname}")
+        for c in calls:
+            pos, last = c.args[:-1], c.args[-1:]
+            if not (len(pos) == len(own) and not any(isinstance(a, ast.Starred) for a in pos)
+                    and last and isinstance(last[0], ast.Starred) and isinstance(last[0].value, ast.Name)
+                    and last[0].value.id == va
+                    and any(k.arg is None and isinstance(k.value, ast.Name) and k.value.id == kw
+                            for k in c.keywords)):
+                out.append(f"{attr}: CHILD line {c.lineno} calls {rname} without passing on "
+                           f"*{va or 'args'}, **{kw or 'kwargs'}")
+    return out
 
 
 def run_child_walk(ctx: dict, target, argv: list[str], mode: str | None = None, step: str | None = None,

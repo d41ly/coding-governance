@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-68 — the upgrade-walk child's stand-ins take and pass on every parameter of the functions they rebind, held by an arm that reads the live signature
 
-**Status:** DEFERRED · rev-1 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 7 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 7 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-26
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-26-build-TOOL-dSafePassage-68-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-68-ledger.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-68-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-68-1-spec-writer.md) | research | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-68-2-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-68-2-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-68-build-brief.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-68-build-brief.md) | journal | — |

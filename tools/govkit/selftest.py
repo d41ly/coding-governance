@@ -18516,6 +18516,24 @@ user_skills = "/tmp/gk-fake-skills"
     # ---- TOOL-dSafePassage-5 AC1, AC11. THE UPGRADE-WALK LEG's two observations that build no
     # ---- release-0 tree: `--list` names the pin and gov's landed ref and walks the schema step first
     # ---- and the floor step second; `--pin HEAD` refuses a pin that already carries a step row.
+    # ---- TOOL-dSafePassage-68 first, in process: the child's stand-ins take and pass on every
+    # ---- parameter of the real functions, read live, and two edits of the shipped CHILD are named.
+    import upgrade_walk as _uwm  # noqa: E402
+    _us = govkit_module().upgrade_steps
+    _got = _uwm.check_child_forwarding(_us)
+    check("[dSP-68] the upgrade-walk child's stand-ins take and pass on every parameter of what they rebind",
+          _got == [], "; ".join(_got))
+    _a = _uwm.CHILD.replace("def run(row, phase, target, gov_root, *args, **kwargs):",
+                            "def run(row, phase, target, gov_root):")
+    _kill = "real_run(row, phase, shadow, gov_root"
+    _b = _uwm.CHILD.replace(_kill + ", *args, **kwargs)", _kill + ")")
+    _got_a, _got_b = _uwm.check_child_forwarding(_us, _a), _uwm.check_child_forwarding(_us, _b)
+    _kill_line = next((i for i, ln in enumerate(_b.splitlines(), 1) if _kill + ")" in ln), 0)
+    check("[dSP-68] the predicate names a stand-in that cannot take `to`, and a call that stops passing on",
+          _a != _uwm.CHILD and _b != _uwm.CHILD
+          and any("run_step_isolated" in p and "to)" in p for p in _got_a)
+          and len(_got_b) == 1 and _got_b[0].startswith(f"run_step_isolated: CHILD line {_kill_line} "),
+          f"a: {_got_a} · b: {_got_b}")
     _uw = [sys.executable, str(HERE / "upgrade_walk.py"), "--list"]
     _p = subprocess.run(_uw, capture_output=True, text=True, encoding="utf-8", errors="replace")
     _uw_steps = _re.findall(r"^upgrade-walk: step \d+ · (\S+)", _p.stdout, _re.M)

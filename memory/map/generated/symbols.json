@@ -4063,6 +4063,11 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "check_child_forwarding",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "check_claim_canary",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
