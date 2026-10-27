@@ -12,7 +12,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 gates-run: unattended-17931145239669812136-1388702 10ab2148
 parked-surfaced: yes, 126 surfaced
 keepalive-reaped: yes
-refreshed-at: 2bd5e10d4e861245d1a5adea5d53b45f90826489 · park · 0 touching
+refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 5962b630365e5b68e424a37ba8c82204b3317556
 phase: VERIFYING
@@ -430,3 +430,5 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T12:19:04Z rescope · item defer TOOL-dWellOiledMachine-125 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
 
 2026-10-27T12:19:06Z rescope · item defer TOOL-dWellOiledMachine-126 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T16:32:01Z decision · item The close's bar is red only on two leg ceilings: spec tokens (packet join over this build's live chain) ran 512s alone against 390s, routed commits 358s alone against 300s; both green when unbounded. Raise the two ceilings in tools/gate-legs.json with evidence rows, or batch carries.py's per-revision git show behind an owner repin, then re-run the close? · reason options: (a) a unit in another build raising the two ceilings with ceiling-evidence rows, then --close and --land here; (b) carries.py batching under packet.py --repin, owner-only; refused as the run's own: this spec run writes no product code, and a run that edits the grader cannot self-land (KF3)
