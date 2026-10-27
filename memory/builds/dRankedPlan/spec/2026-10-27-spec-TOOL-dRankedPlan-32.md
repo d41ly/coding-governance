@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-32 — the caller predicate reads invocations by their structure, so an argv list counts and a resolver line does not
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md) | research | TOOL-dRankedPlan-30 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 | [2026-10-27-build-TOOL-dRankedPlan-32-deviation-321.md](../build/2026-10-27-build-TOOL-dRankedPlan-32-deviation-321.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md) | research | TOOL-dRankedPlan-30 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
+| [2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) | spec-audit | TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-36 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 
 <!-- /gen:spec-records -->
 
@@ -92,6 +93,11 @@ so flags on a later line are seen. It repairs `TOOL-dRankedPlan-22`, so it sits 
 - **consumes-from** `TOOL-dRankedPlan-22` — `check_predicate_callers`, its population and its lines, whose caller definition S5 re-points; without them there is no check to widen
 - **consumes-from** `TOOL-dRankedPlan-10` — S6's driver arm in `tools/unattended/unattended.sh`, the resolver line and `--exit` invocation AC4 reads in the real tree; without it AC4 sees no resolver line
 - **hands-off** `TOOL-dRankedPlan-37` — S2's shell reading, over which that unit's item for finding 31 plants the bare `ratify.py "$slug"` hook and its `--exit` twin
+- **hands-off** `TOOL-dRankedPlan-38` — S2's shell reading and S5's caller definition, beside which that unit restores unit 22's textual rule for a line naming the predicate (spec audit of units 30 to 37, id 1)
+- **hands-off** `TOOL-dRankedPlan-39` — S2's command-word rule, which that unit reads past the compound-command reserved words, and §5's security line, which it corrects (spec audit of units 30 to 37, id 2)
+- **hands-off** `TOOL-dRankedPlan-40` — S2's command-word rule, which that unit reads past the prefix commands and a case-arm pattern (spec audit of units 30 to 37, id 34)
+- **hands-off** `TOOL-dRankedPlan-41` — S2's joining, splitting and `shlex.split`, which that unit re-points to the shared shell tokenizer with an exit-2 rule (spec audit of units 30 to 37, id 33)
+- **hands-off** `TOOL-dRankedPlan-45` — S1's argv list, S3's JavaScript reader, S5's dispatch, AC4 and §10, which that unit's items for findings 3, 14, 17, 20, 21 and 42 extend or correct; carry AC4's two greps, S28's §10 sentence and S32's dispatch order into this unit's pass (spec audit of units 30 to 37)
 
 ## 4. Design
 
@@ -196,6 +202,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 30 (HIGH,
   item H7), repairing `TOOL-dRankedPlan-22`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-38`, the hands-off edge to `TOOL-dRankedPlan-39`, the hands-off edge to `TOOL-dRankedPlan-40`, the hands-off edge to `TOOL-dRankedPlan-41`, the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

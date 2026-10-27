@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-37 — the spec audit of units 19 to 29: its 25 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md) | research | TOOL-dRankedPlan-30 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 |
 | [2026-10-27-build-TOOL-dRankedPlan-37-deviation-371.md](../build/2026-10-27-build-TOOL-dRankedPlan-37-deviation-371.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md) | research | TOOL-dRankedPlan-30 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 |
+| [2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) | spec-audit | TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-36 TOOL-dRankedPlan-33 |
 
 <!-- /gen:spec-records -->
 
@@ -199,6 +200,8 @@ item, so its builder reads the change before building.
 - **consumes-from** `TOOL-dRankedPlan-35` — the reader's `why` list, which S25 writes its two lines into
 - **consumes-from** `TOOL-dRankedPlan-36` — the pin on a build's first move, over which S10 plants a `new` build's move into `planning`
 - **hands-off** external — the commit-time provenance check that a `Gov-Transition` trailer arrives only through `write_transition`, S17's named follow-up
+- **hands-off** `TOOL-dRankedPlan-42` — AC19's CLI half, which that unit respells quoted and observes through a selftest case on the literal `~/x` (spec audit of units 30 to 37, id 10)
+- **hands-off** `TOOL-dRankedPlan-45` — S13's guards, S19's correction of unit 16, S23's helper, S25's hold line and S24's gotcha render, which that unit's items for findings 15, 29, 28, 40, 18 and 31 correct; carry S11, S12, S18's AC11 reading, S27 and S30 of that unit into this unit's pass (spec audit of units 30 to 37)
 
 ## 4. Design
 
@@ -396,6 +399,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29: its 17 MEDIUM and
   8 LOW findings, ids 1 2 3 4 5 7 8 9 11 12 13 14 16 17 18 22 23 24 25 27 31 32 33 34 35, batched
   under BUILD-METHOD M4.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-42`, the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

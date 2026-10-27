@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 2bd5e10d4e861245d1a5adea5d53b45f90826489 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 phase: RUNNING
@@ -72,3 +73,23 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-26T23:53:48Z rescope · item add TOOL-dRankedPlan-37 · reason spec-audit of TOOL-dRankedPlan-19 to -29 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) the 25 MEDIUM and LOW findings batched into one unit: ids 1 2 3 4 5 7 8 9 11 12 13 14 16 17 18 22 23 24 25 27 31 32 33 34 35 (items M1 to M12 and L1 to L6)
 
 2026-10-27T00:14:02Z review · item dRankedPlan-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 25 · disposition promote
+
+2026-10-27T01:42:10Z rescope · item add TOOL-dRankedPlan-38 · reason spec-audit of TOOL-dRankedPlan-30 to -37 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) id 1 HIGH item H1: unit 32 drops the textual caller rule for shell and hook files that units 22, 30 and 31 plant against; repairs TOOL-dRankedPlan-32
+
+2026-10-27T01:42:12Z rescope · item add TOOL-dRankedPlan-39 · reason spec-audit of TOOL-dRankedPlan-30 to -37 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) id 2 HIGH item H2 (shared with id 34): a command led by a compound-command reserved word such as if or ! is never read as an invocation; repairs TOOL-dRankedPlan-32
+
+2026-10-27T01:42:14Z rescope · item add TOOL-dRankedPlan-40 · reason spec-audit of TOOL-dRankedPlan-30 to -37 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) id 34 HIGH item H2 (shared with id 2): a command led by exec or another prefix command, or by a case-arm pattern, is never read as an invocation; repairs TOOL-dRankedPlan-32
+
+2026-10-27T01:42:17Z rescope · item add TOOL-dRankedPlan-41 · reason spec-audit of TOOL-dRankedPlan-30 to -37 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) id 33 HIGH item H3: a shlex error on a split piece of a shell line has no rule; repairs TOOL-dRankedPlan-32
+
+2026-10-27T01:42:19Z rescope · item add TOOL-dRankedPlan-42 · reason spec-audit of TOOL-dRankedPlan-30 to -37 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) id 10 HIGH item H4: AC19's CLI half exercises the drive-letter rule because the shell expands an unquoted tilde; repairs TOOL-dRankedPlan-37
+
+2026-10-27T01:42:21Z rescope · item add TOOL-dRankedPlan-43 · reason spec-audit of TOOL-dRankedPlan-30 to -37 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) id 19 HIGH item H5: git log --follow dates a fresh near-copy disposition record to the older record's add; repairs TOOL-dRankedPlan-34
+
+2026-10-27T01:42:22Z rescope · item add TOOL-dRankedPlan-44 · reason spec-audit of TOOL-dRankedPlan-30 to -37 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) id 22 HIGH item H6: dormancy's read_build_disposition picks the newest answer across items with no order and no conflict hold; repairs TOOL-dRankedPlan-4, whose read_build_disposition the finding on unit 35 lands in
+
+2026-10-27T01:42:24Z rescope · item add TOOL-dRankedPlan-45 · reason spec-audit of TOOL-dRankedPlan-30 to -37 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) the 32 MEDIUM and LOW findings batched into one unit: ids 3 4 5 6 7 9 11 12 13 14 15 16 17 18 20 21 23 24 25 27 28 29 30 31 32 35 36 37 39 40 41 42 (items M1 to M18 and L1 to L9)
+
+2026-10-27T02:00:02Z review · item dRankedPlan-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 32 · disposition promote
+
+2026-10-27T02:17:14Z decision · item cap the dRankedPlan spec-audit promotion chain? · reason options: (a) keep promoting per M4 until a round's precision falls below the review protocol's floor — rounds 1-3 ran at 1.00, 0.91, 0.93 with 9, 7 and 7 highs, so no end is in sight; (b) stop at the first round confirming no BLOCKER and no HIGH, as the owner ruled for dPlacedRequest, dDeclaredLoop and dKeptSession; (c) another cap. Refused to choose: an owner cap on the chain is the owner's, and those rulings name their builds, not this one. The run keeps promoting under (a) meanwhile.

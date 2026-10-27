@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-4 — dormancy disposal: a dormant build moved by the owner's disposition, shown in the plan view
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0372@5c733981 whole
 
@@ -79,6 +79,7 @@ showing the disposed state where they showed `dormant`. The one threshold stays 
 - **consumes-from** `TOOL-dRankedPlan-24` — `read_item_disposition`, the one bounded reader S3's `read_build_disposition` is built on, so its "added after its newest transition" rule is spelled once (round-1 spec audit, id 21)
 - **hands-off** `TOOL-dRankedPlan-29` — the `paused`, `withdrawn` and `superseded` Activity words, which that unit's S4, S20 and S21 read (round-1 spec audit, ids 8, 24, 33)
 - **consumes-from** `TOOL-dRankedPlan-35` — the reader's conflict answer, which S4's `dispose` prints in its held line and writes nothing on (spec audit of units 19 to 29, id 28)
+- **hands-off** `TOOL-dRankedPlan-44` — `read_build_disposition` and `dispose`, whose per-item newest pick that unit orders across items with a conflict hold and a `dispose-conflict` plant (spec audit of units 30 to 37, id 22)
 
 ## 4. Design
 
@@ -245,6 +246,7 @@ New arm: tools/loop/loop_transition.py · covers AC3 AC4 AC5 · the four `dispos
   scout B's row -4.
 - rev-2 · 2026-10-27 · §3 · gains the consumes-from edge to `TOOL-dRankedPlan-24`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 - rev-3 · 2026-10-27 · §3 · gains the consumes-from edge to `TOOL-dRankedPlan-35`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
+- rev-4 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-44`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

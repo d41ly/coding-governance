@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-30 — the declared callers of the session-scoped predicate are kit anchors, resolved at run time
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md) | research | TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-30-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-30-1-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md) | research | TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
+| [2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) | spec-audit | TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-36 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,7 @@ resolver. It repairs `TOOL-dRankedPlan-22`, so it sits one order above it.
 
 - **consumes-from** `TOOL-dRankedPlan-22` — `SESSION_PREDICATE_CALLERS`, `check_predicate_callers` and the `caller-guard` plant, which S1 to S3 re-spell; without them there is no allowlist to derive
 - **hands-off** `TOOL-dRankedPlan-37` — the derived allowlist, over which that unit's item for finding 9 observes `check-install-prefix.sh --offenders` print no key for the loop kit's `ratify.py`
+- **hands-off** `TOOL-dRankedPlan-45` — S2's derivation, AC1 and the `caller-guard-prefix` plant, which that unit's items for findings 9, 35 and 4 correct; carry S1's git-normalised paths and S4's order-7 reading of AC1 into this unit's pass (spec audit of units 30 to 37)
 
 ## 4. Design
 
@@ -164,6 +166,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 19 (HIGH,
   item H1; finding 9 is its medium face), repairing `TOOL-dRankedPlan-22`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

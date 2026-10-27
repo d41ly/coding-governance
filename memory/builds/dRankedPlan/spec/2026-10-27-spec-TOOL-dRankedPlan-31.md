@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-31 — the caller check over the tree runs on its own unguarded repo leg, on every bar
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-31-deviation-311.md](../build/2026-10-27-build-TOOL-dRankedPlan-31-deviation-311.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) | spec-audit | TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-30 TOOL-dRankedPlan-32 TOOL-dRankedPlan-36 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,7 @@ sits one order above it.
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-22` — `ratify.py --check-callers` and the `caller-guard` plant, the check S1 runs as a leg and the arm S3 keeps; without them the leg has nothing to run
+- **hands-off** `TOOL-dRankedPlan-45` — the leg's row, Files touched, §7 and Rollout, which that unit's items for findings 6, 24, 16, 25, 41 and 23 complete; carry S6, S7, S13 to S15 and S29 of that unit into this unit's pass (spec audit of units 30 to 37)
 
 ## 4. Design
 
@@ -159,6 +161,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 20 (HIGH,
   item H2; finding 11 is the same class at medium), repairing `TOOL-dRankedPlan-22`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

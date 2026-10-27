@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-35 — the newest disposition is ordered by ancestry, and kept records the order cannot rank hold the gate when their words differ
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-35-deviation-351.md](../build/2026-10-27-build-TOOL-dRankedPlan-35-deviation-351.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) | spec-audit | TOOL-dRankedPlan-34 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-36 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 
 <!-- /gen:spec-records -->
 
@@ -67,6 +68,8 @@ above it, after units 24, 25 and 26 have all landed.
 - **consumes-from** `TOOL-dRankedPlan-26` — `check_releasing_disposition` and S2's "the owner's latest word governs", the rule S1 makes defined; without it no word holds the gate
 - **hands-off** `TOOL-dRankedPlan-4` — the reader's conflict answer, which that unit's `dispose` prints in its held line and writes nothing on
 - **hands-off** `TOOL-dRankedPlan-37` — the reader's `why` list, through which that unit's item for finding 27 names an uncommitted record in the caller's hold line
+- **hands-off** `TOOL-dRankedPlan-44` — `derive_newest_disposition`, whose conflict key that unit widens to the `(Item, Disposition)` pair so dormancy's pick across items is ordered (spec audit of units 30 to 37, id 22)
+- **hands-off** `TOOL-dRankedPlan-45` — S1's unranked clause and S3's `merged-sides` plant, which that unit's items for findings 12 and 7 make exact; carry S24 and S25 of that unit into this unit's pass (spec audit of units 30 to 37)
 
 ## 4. Design
 
@@ -160,6 +163,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 28 (HIGH,
   item H5), repairing `TOOL-dRankedPlan-26`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-44`, the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-16 — the artifact levels: one plan record per build, and a brief that renders it and never types it
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0498@e9d43f26 whole
 **Carries:** node:record-kind.plan
@@ -134,6 +134,7 @@ that types a plan field.
 - **hands-off** `TOOL-dRankedPlan-29` — `plan_record.py`, the handoff's `plan:` render and the `[[level]]` marker, which that unit's S10, S16, S22 and S33 correct (round-1 spec audit, ids 11, 19, 25, 40)
 - **hands-off** `TOOL-dRankedPlan-33` — S3's door and `plan_record.py check`, through which that unit's seed writes and asserts a witnessed plan record (spec audit of units 19 to 29, id 21)
 - **hands-off** `TOOL-dRankedPlan-37` — §4's population line and §5's perf line, whose figure 697 that unit corrects to 695 (spec audit of units 19 to 29, ids 18, 25)
+- **hands-off** `TOOL-dRankedPlan-45` — §3's hands-off line to `TOOL-dRankedPlan-37`, which that unit's item for finding 15 respells with no figure (spec audit of units 30 to 37)
 
 ## 4. Design
 
@@ -367,6 +368,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the `--selftest` 
   flow.md:98-145, flow-steps.md:127 and :184, and the two probes of §8 F3 and F5.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-19`, the hands-off edge to `TOOL-dRankedPlan-20`, the hands-off edge to `TOOL-dRankedPlan-27`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 - rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-33`, the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
+- rev-4 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 
