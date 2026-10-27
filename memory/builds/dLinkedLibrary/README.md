@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-26 TOOL-dLinkedLibrary-27 TOOL-dLinkedLibrary-28 TOOL-dLinkedLibrary-29 TOOL-dLinkedLibrary-30 TOOL-dLinkedLibrary-31 TOOL-dLinkedLibrary-32 TOOL-dLinkedLibrary-33 TOOL-dLinkedLibrary-34 TOOL-dLinkedLibrary-35 TOOL-dLinkedLibrary-36 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-38 TOOL-dLinkedLibrary-39 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-41 TOOL-dLinkedLibrary-42 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-44 TOOL-dLinkedLibrary-45 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-48 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-50 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-65 TOOL-dLinkedLibrary-66 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-68 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-70 TOOL-dLinkedLibrary-71 TOOL-dLinkedLibrary-72 TOOL-dLinkedLibrary-73 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80
+ids: TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-26 TOOL-dLinkedLibrary-27 TOOL-dLinkedLibrary-28 TOOL-dLinkedLibrary-29 TOOL-dLinkedLibrary-30 TOOL-dLinkedLibrary-31 TOOL-dLinkedLibrary-32 TOOL-dLinkedLibrary-33 TOOL-dLinkedLibrary-34 TOOL-dLinkedLibrary-35 TOOL-dLinkedLibrary-36 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-38 TOOL-dLinkedLibrary-39 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-41 TOOL-dLinkedLibrary-42 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-44 TOOL-dLinkedLibrary-45 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-48 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-50 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-65 TOOL-dLinkedLibrary-66 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-68 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-70 TOOL-dLinkedLibrary-71 TOOL-dLinkedLibrary-72 TOOL-dLinkedLibrary-73 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-81 TOOL-dLinkedLibrary-82 TOOL-dLinkedLibrary-83 TOOL-dLinkedLibrary-84 TOOL-dLinkedLibrary-85 TOOL-dLinkedLibrary-86
 spec-audit: 2026-10-21
 parents: dTotalRecall
 may: PLAY-dClosedLoop-3
@@ -88,14 +88,15 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 69 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 75 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13
 ids TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25
 ids TOOL-dLinkedLibrary-26 TOOL-dLinkedLibrary-27 TOOL-dLinkedLibrary-28 TOOL-dLinkedLibrary-29 TOOL-dLinkedLibrary-30 TOOL-dLinkedLibrary-31 TOOL-dLinkedLibrary-32 TOOL-dLinkedLibrary-33 TOOL-dLinkedLibrary-34 TOOL-dLinkedLibrary-35 TOOL-dLinkedLibrary-36 TOOL-dLinkedLibrary-37
 ids TOOL-dLinkedLibrary-38 TOOL-dLinkedLibrary-39 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-41 TOOL-dLinkedLibrary-42 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-44 TOOL-dLinkedLibrary-45 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-48 TOOL-dLinkedLibrary-49
 ids TOOL-dLinkedLibrary-50 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-61
 ids TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-65 TOOL-dLinkedLibrary-66 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-68 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-70 TOOL-dLinkedLibrary-71 TOOL-dLinkedLibrary-72 TOOL-dLinkedLibrary-73
-ids TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80
+ids TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-81 TOOL-dLinkedLibrary-82 TOOL-dLinkedLibrary-83 TOOL-dLinkedLibrary-84 TOOL-dLinkedLibrary-85
+ids TOOL-dLinkedLibrary-86
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -150,11 +151,14 @@ ids TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dL
 | [TOOL-dLinkedLibrary-72 — the CI census refuses an Azure job a template supplies at any level](spec/2026-10-27-spec-TOOL-dLinkedLibrary-72.md) | 23 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-73 — the CI census reads a block scalar across blank lines and as a list item](spec/2026-10-27-spec-TOOL-dLinkedLibrary-73.md) | 23 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-3 — `reuse_lookup.py` and its agent retired, every reader rewritten by name and by value, with its upgrade step, and memory-recall narrowed to its why-search](spec/2026-10-26-spec-TOOL-dLinkedLibrary-3.md) | 24 | 2 | OPEN | rev-3 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-76 — the CI census refuses a GitLab indirection key under `default:`, which reaches every job](spec/2026-10-27-spec-TOOL-dLinkedLibrary-76.md) | 24 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-77 — the CI census reads a block-scalar header that carries node properties or a comment](spec/2026-10-27-spec-TOOL-dLinkedLibrary-77.md) | 24 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-78 — the CI census folds a `>` block as YAML folds it and joins a continued command before matching](spec/2026-10-27-spec-TOOL-dLinkedLibrary-78.md) | 24 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-76 — the CI census refuses a GitLab indirection key under `default:`, which reaches every job](spec/2026-10-27-spec-TOOL-dLinkedLibrary-76.md) | 24 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-77 — the CI census reads a block-scalar header that carries node properties or a comment](spec/2026-10-27-spec-TOOL-dLinkedLibrary-77.md) | 24 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-78 — the CI census folds a `>` block as YAML folds it and joins a continued command before matching](spec/2026-10-27-spec-TOOL-dLinkedLibrary-78.md) | 24 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-23 — `adopt.instructions`: an adopter's own instruction files kept verbatim as a legacy block, every harness file wired at once, each paragraph ruled once](spec/2026-10-26-spec-TOOL-dLinkedLibrary-23.md) | 25 | 2 | OPEN | rev-3 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-42 — `MAP_CLI` pointed at the house index, a CLI that exists whichever way the map replay goes](spec/2026-10-26-spec-TOOL-dLinkedLibrary-42.md) | 25 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-83 — the CI census tests the `default:` line's own value for an indirection, in block or flow style](spec/2026-10-27-spec-TOOL-dLinkedLibrary-83.md) | 25 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-84 — the CI census runs the indirection test over every GitLab top-level block that reaches every job, and reads the global script keys](spec/2026-10-27-spec-TOOL-dLinkedLibrary-84.md) | 25 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-85 — the CI census reads a block-scalar header on a list item that opens with a key, the GitHub `- run: |` step](spec/2026-10-27-spec-TOOL-dLinkedLibrary-85.md) | 25 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-40 — `gov:legacy` registered as a `[[marker]]` row of the marker registry the markers arm reads](spec/2026-10-26-spec-TOOL-dLinkedLibrary-40.md) | 26 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-57 — the reuse-lookup step's witness keyed on the `MAP_CLI` value its before-image recorded](spec/2026-10-27-spec-TOOL-dLinkedLibrary-57.md) | 26 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-58 — the reuse-lookup step over a target that holds no `.unattended.conf`: nothing created, the witness green](spec/2026-10-27-spec-TOOL-dLinkedLibrary-58.md) | 26 | 2 | OPEN | rev-2 | 2026-10-27 |
@@ -163,31 +167,35 @@ ids TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dL
 | [TOOL-dLinkedLibrary-69 — the lookup's retirement step reads `MAP_CLI` the way bash `source` reads it](spec/2026-10-27-spec-TOOL-dLinkedLibrary-69.md) | 27 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-70 — the lookup's retirement step re-points every spelling of a lookup-naming `MAP_CLI`](spec/2026-10-27-spec-TOOL-dLinkedLibrary-70.md) | 27 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-59 — the decision log's diff against base read relative to unit 1's rotation, so a correct build reads additive](spec/2026-10-27-spec-TOOL-dLinkedLibrary-59.md) | 28 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-64 — the minors of the spec audit of units 37 to 53: 23 findings closed where the built code and records hold them](spec/2026-10-27-spec-TOOL-dLinkedLibrary-64.md) | 29 | 2 | OPEN | rev-3 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-64 — the minors of the spec audit of units 37 to 53: 23 findings closed where the built code and records hold them](spec/2026-10-27-spec-TOOL-dLinkedLibrary-64.md) | 29 | 2 | OPEN | rev-4 | 2026-10-27 |
 | [TOOL-dLinkedLibrary-68 — `log-diff` reads the decision log's rows and archives through the kit's row grammar](spec/2026-10-27-spec-TOOL-dLinkedLibrary-68.md) | 29 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-74 — the spec audit of units 54 to 64: its medium and low findings, batched](spec/2026-10-27-spec-TOOL-dLinkedLibrary-74.md) | 30 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-75 — the reuse-tag sweep reads a hyphenated feature name, and shows its red on a planted tag](spec/2026-10-27-spec-TOOL-dLinkedLibrary-75.md) | 31 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-79 — the CI census reads the credentials of every block that applies to a job, file-level blocks included](spec/2026-10-27-spec-TOOL-dLinkedLibrary-79.md) | 31 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dLinkedLibrary-80 — the spec audit of units 65 to 74: its medium and low findings, batched](spec/2026-10-27-spec-TOOL-dLinkedLibrary-80.md) | 32 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-74 — the spec audit of units 54 to 64: its medium and low findings, batched](spec/2026-10-27-spec-TOOL-dLinkedLibrary-74.md) | 30 | 2 | OPEN | rev-3 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-75 — the reuse-tag sweep reads a hyphenated feature name, and shows its red on a planted tag](spec/2026-10-27-spec-TOOL-dLinkedLibrary-75.md) | 31 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-79 — the CI census reads the credentials of every block that applies to a job, file-level blocks included](spec/2026-10-27-spec-TOOL-dLinkedLibrary-79.md) | 31 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-80 — the spec audit of units 65 to 74: its medium and low findings, batched](spec/2026-10-27-spec-TOOL-dLinkedLibrary-80.md) | 32 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-81 — the CI census reads an Azure `variables:` list as a closed set of item forms, refusing any other](spec/2026-10-27-spec-TOOL-dLinkedLibrary-81.md) | 32 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-82 — the CI census refuses the jobs an Azure variables template applies to, at every level](spec/2026-10-27-spec-TOOL-dLinkedLibrary-82.md) | 32 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dLinkedLibrary-86 — the spec audit of units 75 to 80: its medium and low findings, batched](spec/2026-10-27-spec-TOOL-dLinkedLibrary-86.md) | 33 | 2 | OPEN | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 69 bound to this build, across 4 record folder(s).
+Records: 79 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80.
+Ids no `spec-audit` record has ever named: TOOL-dLinkedLibrary-81 TOOL-dLinkedLibrary-82 TOOL-dLinkedLibrary-83 TOOL-dLinkedLibrary-84 TOOL-dLinkedLibrary-85 TOOL-dLinkedLibrary-86.
 
 Ids whose spec moved past its audited revision: TOOL-dLinkedLibrary-1@rev-1 TOOL-dLinkedLibrary-10@rev-1 TOOL-dLinkedLibrary-11@rev-1 TOOL-dLinkedLibrary-12@rev-1 TOOL-dLinkedLibrary-14@rev-1 TOOL-dLinkedLibrary-15@rev-1 TOOL-dLinkedLibrary-16@rev-1 TOOL-dLinkedLibrary-17@rev-1
 TOOL-dLinkedLibrary-18@rev-1 TOOL-dLinkedLibrary-19@rev-1 TOOL-dLinkedLibrary-2@rev-1 TOOL-dLinkedLibrary-20@rev-1 TOOL-dLinkedLibrary-21@rev-1 TOOL-dLinkedLibrary-22@rev-1 TOOL-dLinkedLibrary-23@rev-1 TOOL-dLinkedLibrary-24@rev-1 TOOL-dLinkedLibrary-25@rev-1 TOOL-dLinkedLibrary-3@rev-1
 TOOL-dLinkedLibrary-38@rev-1 TOOL-dLinkedLibrary-39@rev-1 TOOL-dLinkedLibrary-4@rev-1 TOOL-dLinkedLibrary-40@rev-1 TOOL-dLinkedLibrary-42@rev-1 TOOL-dLinkedLibrary-43@rev-1 TOOL-dLinkedLibrary-45@rev-1 TOOL-dLinkedLibrary-46@rev-1 TOOL-dLinkedLibrary-47@rev-1 TOOL-dLinkedLibrary-48@rev-1
 TOOL-dLinkedLibrary-49@rev-1 TOOL-dLinkedLibrary-5@rev-1 TOOL-dLinkedLibrary-50@rev-1 TOOL-dLinkedLibrary-51@rev-1 TOOL-dLinkedLibrary-52@rev-1 TOOL-dLinkedLibrary-53@rev-1 TOOL-dLinkedLibrary-6@rev-1 TOOL-dLinkedLibrary-7@rev-1 TOOL-dLinkedLibrary-8@rev-1 TOOL-dLinkedLibrary-9@rev-1
 TOOL-dLinkedLibrary-54@rev-1 TOOL-dLinkedLibrary-55@rev-1 TOOL-dLinkedLibrary-56@rev-1 TOOL-dLinkedLibrary-57@rev-1 TOOL-dLinkedLibrary-58@rev-1 TOOL-dLinkedLibrary-59@rev-1 TOOL-dLinkedLibrary-60@rev-1 TOOL-dLinkedLibrary-61@rev-1 TOOL-dLinkedLibrary-63@rev-1 TOOL-dLinkedLibrary-64@rev-1
-TOOL-dLinkedLibrary-66@rev-1 TOOL-dLinkedLibrary-67@rev-1 TOOL-dLinkedLibrary-68@rev-1 TOOL-dLinkedLibrary-69@rev-1 TOOL-dLinkedLibrary-71@rev-1 TOOL-dLinkedLibrary-72@rev-1 TOOL-dLinkedLibrary-73@rev-1 TOOL-dLinkedLibrary-74@rev-1.
+TOOL-dLinkedLibrary-66@rev-1 TOOL-dLinkedLibrary-67@rev-1 TOOL-dLinkedLibrary-68@rev-1 TOOL-dLinkedLibrary-69@rev-1 TOOL-dLinkedLibrary-71@rev-1 TOOL-dLinkedLibrary-72@rev-1 TOOL-dLinkedLibrary-73@rev-1 TOOL-dLinkedLibrary-74@rev-1 TOOL-dLinkedLibrary-75@rev-1 TOOL-dLinkedLibrary-76@rev-1
+TOOL-dLinkedLibrary-77@rev-1 TOOL-dLinkedLibrary-78@rev-1 TOOL-dLinkedLibrary-79@rev-1 TOOL-dLinkedLibrary-80@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 69 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 75 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 25
 - carried in parts: 0 (none)
@@ -207,7 +215,8 @@ Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 69 spec(s) 
   `spec/2026-10-27-spec-TOOL-dLinkedLibrary-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-69.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-70.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-71.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-27-spec-TOOL-dLinkedLibrary-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-73.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-74.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-75.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-27-spec-TOOL-dLinkedLibrary-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-77.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-79.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-27-spec-TOOL-dLinkedLibrary-80.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-27-spec-TOOL-dLinkedLibrary-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-81.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-82.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-83.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dLinkedLibrary-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-85.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dLinkedLibrary-86.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0242, cl-dClosedLoop-0243, cl-dClosedLoop-0247, cl-dClosedLoop-0248, cl-dClosedLoop-0256, cl-dClosedLoop-0261
 <!-- /gen:build-coverage -->
 
@@ -239,14 +248,15 @@ Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 69 spec(s) 
 | 22 | `TOOL-dLinkedLibrary-10`, `TOOL-dLinkedLibrary-37`, `TOOL-dLinkedLibrary-63` | yes |
 | 23 | `TOOL-dLinkedLibrary-2`, `TOOL-dLinkedLibrary-71`, `TOOL-dLinkedLibrary-72`, `TOOL-dLinkedLibrary-73` | no |
 | 24 | `TOOL-dLinkedLibrary-3`, `TOOL-dLinkedLibrary-76`, `TOOL-dLinkedLibrary-77`, `TOOL-dLinkedLibrary-78` | no |
-| 25 | `TOOL-dLinkedLibrary-23`, `TOOL-dLinkedLibrary-42` | yes |
+| 25 | `TOOL-dLinkedLibrary-23`, `TOOL-dLinkedLibrary-42`, `TOOL-dLinkedLibrary-83`, `TOOL-dLinkedLibrary-84`, `TOOL-dLinkedLibrary-85` | no |
 | 26 | `TOOL-dLinkedLibrary-40`, `TOOL-dLinkedLibrary-57`, `TOOL-dLinkedLibrary-58` | no |
 | 27 | `TOOL-dLinkedLibrary-52`, `TOOL-dLinkedLibrary-53`, `TOOL-dLinkedLibrary-69`, `TOOL-dLinkedLibrary-70` | no |
 | 28 | `TOOL-dLinkedLibrary-59` | no |
 | 29 | `TOOL-dLinkedLibrary-64`, `TOOL-dLinkedLibrary-68` | yes |
 | 30 | `TOOL-dLinkedLibrary-74` | no |
 | 31 | `TOOL-dLinkedLibrary-75`, `TOOL-dLinkedLibrary-79` | yes |
-| 32 | `TOOL-dLinkedLibrary-80` | no |
+| 32 | `TOOL-dLinkedLibrary-80`, `TOOL-dLinkedLibrary-81`, `TOOL-dLinkedLibrary-82` | no |
+| 33 | `TOOL-dLinkedLibrary-86` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
