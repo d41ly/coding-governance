@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them
 
-**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -174,12 +174,16 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 
 ### The `ac-order` join's key and write set (D-11, D-23, D-26)
 
-- **S9** — id 21. `cutoff_keys_armed` (`tools/drift-audit/drift_signals.py:351`, `weakens: up` at
-  `:459`) rises 36 -> 37 with an in-place comment naming TOOL-dSafePassage-34's
-  `SPEC_AC_ORDER_CUTOFF`, under a `memory/DECISIONS.md` row in TOOL-dTrueNorth-28's form (§8 F1).
-  TOOL-dSafePassage-34 §7 is read with `drift-audit records` and `drift-audit selftest`. Between
-  TOOL-dSafePassage-34's pass and this one the signal reads 37 against 36; no pass runs the bar
-  (BUILD-METHOD M6), and the bar's one run at the close reads this raise. Observed by AC6.
+- **S9** — id 21. `cutoff_keys_armed` (`tools/drift-audit/drift_signals.py:352`, `weakens: up` at
+  `:460`) rises 36 -> 37 in TOOL-dSafePassage-34's pass, the commit that arms `SPEC_AC_ORDER_CUTOFF`,
+  with an in-place comment naming TOOL-dSafePassage-34 and ER:388, as TOOL-dSafePassage-46 S1 reads
+  it and TOOL-dSafePassage-34 S6 builds it (§8 F1). Its `memory/DECISIONS.md` row, in
+  TOOL-dTrueNorth-28's form (`memory/DECISIONS.md:239`), is the main loop's, written at the close in a
+  `Pass: none` commit: `--dispatch` refuses a pass declaring a shared mutable record
+  (`tools/unattended/unattended.sh:14004`, check 49), and BUILD-METHOD M6 clause 3 names that file
+  one. This pass moves no pin and writes neither file. TOOL-dSafePassage-34 §7 is read with
+  `drift-audit records` and `drift-audit selftest`. Observed by AC6: its pin half at this pass, its
+  row half by the main loop at the close.
 - **S23** — id 7. TOOL-dSafePassage-34's write set is read with
   `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-8.md`, which joins its
   `--dispatch --writes` when its S3 edits that spec, as TOOL-dSafePassage-35 §4 declares its own spec
@@ -225,8 +229,8 @@ count = rows of body, not heredoc and not continued, whose code holds \breturn 1
 ### Inventory
 
 Minted: the plants `submodule-fsmonitor` and `submodule-name-differs`; the `reached_by` marker
-`by name`. No function, conf key, gate leg or policy key; S9 raises
-one drift pin and S27 re-prices one budget row. No new `raise Refusal` site: S7's rows and S8's order
+`by name`. No function, conf key, gate leg or policy key; S9 reads the
+drift pin TOOL-dSafePassage-34's pass raises, and S27 re-prices one budget row. No new `raise Refusal` site: S7's rows and S8's order
 use TOOL-dSafePassage-24's one site, so `tools/govkit/refusal_join.py`'s `BRANCH_PIN` does not move.
 
 ### Migration
@@ -247,9 +251,7 @@ disjoint write sets, and the pass is one unit.
 - `tools/govkit/upgrade_steps.py`
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
-- `tools/drift-audit/drift_signals.py`
 - `tools/run-gates/selftest-budgets.txt`
-- `memory/DECISIONS.md`
 - `help/upgrade-steps.md`
 
 ### Alternatives rejected
@@ -270,7 +272,8 @@ disjoint write sets, and the pass is one unit.
 - error / empty / loading states: S13's anchor matching nothing is a zero count, which
   TOOL-dSafePassage-28 §5 already reds.
 - observability: S22's refusal spells a submodule by its path, or says it names one by its name.
-- risks: S9 raises a shrink-only pin, recorded with its reason; S14's closure moves names other suites
+- risks: S9's shrink-only pin rises in TOOL-dSafePassage-34's pass, its reason in place and its
+  decision row the main loop's at the close; S14's closure moves names other suites
   may monkeypatch, and govkit re-imports each.
 - testing: the probes and fixtures of §6 and the arms of §7.
 - migration: none.
@@ -303,9 +306,10 @@ label is not reused here.
   Red when: the population walk's index read runs the fsmonitor before any config is graded.
 - **AC6** — When `python tools/drift-audit/drift_report.py --json` runs after the pass,
   `cutoff_keys_armed` reads a value equal to its tolerance, and
-  `git grep -n -e "TOOL-dSafePassage-34" -- tools/drift-audit/drift_signals.py memory/DECISIONS.md`
-  prints the raise comment and the decision row.
-  Red when: the armed count exceeds its pin.
+  `git grep -n -e "TOOL-dSafePassage-34" -- tools/drift-audit/drift_signals.py` prints the raise
+  comment. At the close, after the main loop's records commit,
+  `git grep -n -e "TOOL-dSafePassage-34" -- memory/DECISIONS.md` prints the decision row.
+  Red when: the armed count exceeds its pin, or the raise carries no comment naming its unit.
   figure: DERIVED by the run; 37 of 37 expected after TOOL-dSafePassage-34's key.
 - **AC7** — When a `python -c` probe calls `take_write_lock` with `read_boot_clock` stubbed to a float
   and `read_pid_namespace` to `pid:[4026532221]`, the record holds both `started_boot` and `pid_ns`, and
@@ -392,13 +396,21 @@ New arm: tools/push-main.test.sh · covers AC9 · the blanked derived count, its
   values, §7's push-main arm line and §10's `:938-942` seam follow; §4 Files touched is unchanged,
   because S12 and S18 still write `tools/push-main.test.sh` and `tools/push-main.sh`; by
   `memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-28-1-spec-writer.md`.
+- rev-5 · 2026-10-27 · S9 · AC6 · §4 · §5 · §10 · S9's pin raise lands in TOOL-dSafePassage-34's
+  pass, as TOOL-dSafePassage-46 S1 reads it, and its `memory/DECISIONS.md` row is the main loop's, at
+  the close in a `Pass: none` commit, because `--dispatch` refuses a pass declaring a shared mutable
+  record (check 49); S9's sentence on the signal reading 37 against 36 is gone; AC6 reads the raise
+  comment at this pass and the row at the close; §4 Files touched drops
+  `tools/drift-audit/drift_signals.py` and `memory/DECISIONS.md`, which this pass no longer writes,
+  and §4 Inventory, §5's risk and §10's pin cite follow; §8 F1's ruling is unchanged; by
+  `memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-34-2-spec-writer.md`.
 
 ## 10. Reuse audit
 
 The seams extended are named per item: `scan_shell_lines` (`tools/memory-tree/check-arms.py:305`), the
 lander's dirty-tree refusal (`tools/push-main.sh:860-865`) and `remove_new_untracked` (`:784-793`),
 the parity arm's population (`tools/lib/resolve-python.test.sh:169`, `:218`), `take_write_lock`
-(`tools/govkit/govkit.py:7430`), the drift pin (`tools/drift-audit/drift_signals.py:351`), the budget
+(`tools/govkit/govkit.py:7430`), the drift pin (`tools/drift-audit/drift_signals.py:352`), the budget
 row (`tools/run-gates/selftest-budgets.txt:88`), `SPEC_DATE` (`tools/check-spec-tokens.py:896`), and the
 specced seams of units 27 to 41. `python tools/codebase-map/reuse_lookup.py "carry a row field forward
 when its writer rewrites the row"` and the probes of units 36 to 41 ranked name-token matches only;

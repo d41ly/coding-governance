@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-34 — the `ac-order` join ships under a dated cutoff, over a population measured at HEAD with every current hit disposed
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-23-build-TOOL-dSafePassage-34-deviation-80.md](../build/2026-10-23-build-TOOL-dSafePassage-34-deviation-80.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-34-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-34-build-brief.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-34-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-34-1-spec-writer.md) | research | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-34-2-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-34-2-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-35 |
 
 <!-- /gen:spec-records -->
@@ -52,6 +54,17 @@ whole bar. This unit is id 29's promotion: the join is armed by a dated key in t
   ungraded and its build is not written to. Observed by AC4.
 - **S5** — TOOL-dSafePassage-26's AC43, read. Its second clause, "over this build's live specs it
   names none", is read as AC3 of this unit, over the population S2 states. Observed by AC3.
+- **S6** — The drift pin. The key is one more armed `_CUTOFF` key, and `cutoff_keys_armed`
+  (`tools/drift-audit/drift_signals.py:352`, `weakens: up` at `:460`) read 36 of 36 at `cb2811f6c`.
+  This pass raises the pin 36 -> 37 in place, with a comment directly above it, in the form of the
+  four raises above it (`:342-351`), carrying `36 -> 37` and naming TOOL-dSafePassage-34,
+  `SPEC_AC_ORDER_CUTOFF` and ER:388. The ruling is TOOL-dSafePassage-42 §8 F1 (a), resolved under
+  ER:388, so the raise needs no new decision. The ratchet reads only that comment, within 14 lines
+  above the pin (`tools/drift-audit/drift_report.py:268-275`), so the pass is green on
+  `drift-audit records` without a decision row. The `memory/DECISIONS.md` row F1 (a) owes is not this
+  pass's: `--dispatch` refuses a pass declaring a shared mutable record
+  (`tools/unattended/unattended.sh:14004`, check 49; `SHARED_RECORDS` at `.unattended.conf:417`), so
+  the main loop writes it at the close, as §3's `TOOL-dSafePassage-46` bullet says. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -65,7 +78,7 @@ whole bar. This unit is id 29's promotion: the join is armed by a dated key in t
 - **consumes-from** `TOOL-dSafePassage-26` — the `ac-order` join of `tools/check-spec-tokens.py` and its scratch arm; without them there is no join to arm by a key
 - **hands-off** `TOOL-dSafePassage-41` — the `ac-order` join itself, with AC1, AC3 and the arm covering AC1, built at that unit's pass reading this unit's key: this unit's pass declares, reads and validates `AC_ORDER_KEY` with nothing yet graded by it, the repair of finding 22 of the spec audit of units 27 to 35
 - **hands-off** `TOOL-dSafePassage-42` — finding 21 of the spec audit of units 27 to 35, the `cutoff_keys_armed` raise this unit's key costs, which `TOOL-dSafePassage-46` moves into this unit's pass and that batch's AC6 still reads; finding 7, TOOL-dSafePassage-8's spec in this unit's `--dispatch --writes` when S3 edits it; and finding 20, `SPEC_DATE` as the date the join reads
-- **hands-off** `TOOL-dSafePassage-46` — finding 25 of the spec audit of units 36 to 42: this unit's pass raises `cutoff_keys_armed` 36 -> 37 with its in-place comment and `memory/DECISIONS.md` row, in the commit that arms `SPEC_AC_ORDER_CUTOFF`, and its `--dispatch --writes` name `tools/drift-audit/drift_signals.py` and `memory/DECISIONS.md`
+- **hands-off** `TOOL-dSafePassage-46` — finding 25 of the spec audit of units 36 to 42: this unit's pass raises `cutoff_keys_armed` 36 -> 37 with its in-place comment naming this unit and ER:388, in the commit that arms `SPEC_AC_ORDER_CUTOFF`, and its `--dispatch --writes` name `tools/drift-audit/drift_signals.py` (S6); the `memory/DECISIONS.md` row recording the raise is the main loop's, written at the close in a `Pass: none` commit in TOOL-dTrueNorth-28's form (`memory/DECISIONS.md:239`, landed by `53321feef` at dTrueNorth's close)
 
 ## 4. Design
 
@@ -88,7 +101,8 @@ and a join seen grading nothing is not a gate.
 ### Inventory
 
 Minted: the conf key `SPEC_AC_ORDER_CUTOFF`; the constant `AC_ORDER_KEY` in
-`tools/check-spec-tokens.py`. No function, gate leg or policy key.
+`tools/check-spec-tokens.py`. No function, gate leg or policy key. Moved: the drift pin
+`cutoff_keys_armed`, 36 -> 37 (S6).
 
 ### Migration
 
@@ -104,6 +118,7 @@ Live at landing. It builds at order 7, after TOOL-dSafePassage-26 (order 6), who
 - `tools/check-spec-tokens.test.sh`
 - `.memory-tree.conf`
 - `memory/map/features/spec-tokens.md`
+- `tools/drift-audit/drift_signals.py`
 
 ### Alternatives rejected
 
@@ -121,7 +136,8 @@ Live at landing. It builds at order 7, after TOOL-dSafePassage-26 (order 6), who
   every run line.
 - observability: the run line names the key and the count.
 - risks: a spec dated before the key keeps an out-of-order list; it is graded by nobody, which the
-  conf comment states.
+  conf comment states. Arming the key raises a shrink-only pin (S6), under a standing ruling, its
+  reason written in place and its decision row the main loop's at the close.
 - testing: the scratch arm of §7.
 - migration: none.
 - user docs: N/A — `memory/map/features/spec-tokens.md` names the key beside its siblings; no `help/`
@@ -144,10 +160,19 @@ Live at landing. It builds at order 7, after TOOL-dSafePassage-26 (order 6), who
 - **AC4** — When `git grep -n -e "SPEC_AC_ORDER_CUTOFF" -- .memory-tree.conf memory/map/features/spec-tokens.md`
   runs, the conf prints the dated key and its comment, and the features page names it.
   Red when: the join is armed by no declared key.
+- **AC5** — When `git grep -n -e "cutoff_keys_armed" -e "36 -> 37" -- tools/drift-audit/drift_signals.py`
+  runs after the pass, it prints the pin at 37 and, within 14 lines above it, a comment carrying
+  `36 -> 37` that names TOOL-dSafePassage-34 and ER:388; and `python tools/drift-audit/drift_report.py --json`
+  reads `cutoff_keys_armed` at a value equal to its tolerance; and `git diff --cached --name-only`, run
+  as the pass commit is staged, lists `.memory-tree.conf` and `tools/drift-audit/drift_signals.py`, and
+  not `memory/DECISIONS.md`.
+  Red when: the key is armed with the pin still at 36, the raise carries no in-place `36 -> 37`
+  reason, or the pass commit carries the decision row.
+  figure: DERIVED by the run; 36 of 36 was read at `cb2811f6c`, so 37 of 37 is expected.
 
 ## 7. Gates
 
-`spec-tokens self-test` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`spec-tokens self-test` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `memory hygiene` · `drift-audit selftest` · `drift-audit records` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/check-spec-tokens.test.sh · covers AC1 AC2 · scratch repos whose conf sets the key, blanks it and malforms it, beside a spec dated before it, its failing case staged by a checker copy that ignores the key · none
 
@@ -161,6 +186,14 @@ none
   id 29 (HIGH, item D-7).
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-41`, `TOOL-dSafePassage-42`; no other section moved.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-46`; the existing `TOOL-dSafePassage-42` bullet names the move; no other section moved.
+- rev-4 · 2026-10-27 · S6 · §3 · §4 · §5 · AC5 · §7 · §10 · the pin raise TOOL-dSafePassage-46 S1 moved into
+  this pass is written down as S6 and observed by AC5, and `memory/DECISIONS.md` leaves this unit's
+  write set: `--dispatch` refuses a pass declaring a shared mutable record (check 49), so the
+  decision row is the main loop's, at the close in a `Pass: none` commit, as TOOL-dTrueNorth-28's
+  was; the §3 `TOOL-dSafePassage-46` bullet says so, §4 Files touched and Inventory gain the pin,
+  §5 its risk, §7 the two drift-audit legs TOOL-dSafePassage-42 S9 hands to this unit, and §10 the
+  pin's seam; by
+  `memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-34-2-spec-writer.md`.
 
 ## 10. Reuse audit
 
@@ -169,6 +202,8 @@ The seam extended is `tools/check-spec-tokens.py`'s dated-key reader, `read_cuto
 `SPEC_*_CUTOFF` declarations of `.memory-tree.conf`, `SPEC_HANDOFF_CUTOFF` (`:973`) among them.
 `python tools/codebase-map/reuse_lookup.py "cutoff key for a spec join"` ranked `read_conf_key`
 (`tools/check-spec-tokens.py`), `read_spec_revisions` and `read_design_keys`, and the first is the
-conf reader this seam sits on, so the hits and the source agree.
+conf reader this seam sits on, so the hits and the source agree. S6 extends the drift pin's in-place
+raise form (`tools/drift-audit/drift_signals.py:342-352`), which the ratchet's `_justified`
+(`tools/drift-audit/drift_report.py:268`) reads, and adds no reader of its own.
 
 Recall terms used: `python tools/memory-recall/query.py "how were spec audit findings promoted into repair units placed beside the unit they repair" --terms "spec audit promoted unit repair blocker high minors batch disposal order edges rescope"`
