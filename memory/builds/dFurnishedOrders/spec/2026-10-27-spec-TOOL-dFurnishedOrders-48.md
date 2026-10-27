@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-48 — the fifth spec audit's 26 govkit, parity-arm, guard and ratchet minors: the ratchet's own predicate and a landing re-stamp, two tool-root answers, one environment strip, isolated DEAD PROBE clauses, a guard derived from the registry, homes from the receipt, and a deploy descriptor refused at its boundary
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-4 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -202,6 +202,7 @@ and closed by its own scope item. Ids the report merged into one item still take
 - **hands-off** `TOOL-dFurnishedOrders-50` — S17's home rows and S16's guard arm, whose required set and reach unit 50 S1 to S5 settle (id 17 of the sixth audit)
 - **hands-off** `TOOL-dFurnishedOrders-52` — AC1, AC5, AC10, AC12, S16, S22, S25 and the write set, which unit 52 S1 to S7, S16 to S18, S21 and S26 settle (ids 1, 20, 28, 10, 2, 7, 23, 12, 18, 29, 11, 21 of the sixth audit)
 - **hands-off** `TOOL-dFurnishedOrders-58` — S14, S17 and S18's guard rows, the `dispatch` key and AC10's read, whose landing commit, union read and real ledger rows unit 58 S25, S11 to S13 and S10 settle (ids 22, 7, 15, 34 and 13 of the seventh audit)
+- **hands-off** `TOOL-dFurnishedOrders-61` — S25's shapes in `target_context` and S26's step route, which unit 61 S12 keeps standing through one check (id 18 of the ninth audit)
 
 ## 4. Design
 
@@ -449,6 +450,7 @@ The close also reads the `kickoff-manifest ratchet` leg on the prepared merge as
   guard and ratchet minors batched: 21 MEDIUM and 5 LOW.
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-50, TOOL-dFurnishedOrders-52, promoted from the spec audit of the round-5 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md`); nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-58, promoted from the spec audit of the round-6 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md`); nothing else moved.
+- rev-4 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-61, promoted from the spec audit of the round-8 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

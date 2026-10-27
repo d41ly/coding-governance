@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-59 — unit 53's one-way case planted: the guard fixture holds a `kit.toml` row below the home it drops, asserts the old rule would read that home covered, and shows the arm graded the planted row
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base dee9e867 · streams tooling · order 31 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base dee9e867 · streams tooling · order 31 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-59-round8-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-59-round8-fix-return.md) | research | TOOL-dFurnishedOrders-60 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-59-round8-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-59-round8-fix-brief.md) | research | TOOL-dFurnishedOrders-60 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-60 |
 
 <!-- /gen:spec-records -->
 
@@ -72,6 +73,7 @@ repairs unit 53 and builds one step after it (order 31).
 
 - **consumes-from** `TOOL-dFurnishedOrders-53` — AC1's scratch manifest and the §7 arm's staged break, whose fixture S1 plants a row below the dropped home and S2 proves distinguishing (id 19)
 - **consumes-from** `TOOL-dFurnishedOrders-56` — S1's returned dict from each required path to its covering row, which S3 reads to show the planted row was graded (id 19)
+- **hands-off** `TOOL-dFurnishedOrders-61` — S1, S2, AC1 and AC3, the planted row, its filter step and the patched trip rule, which unit 61 S7 to S9 and S18 to S20 settle (ids 13, 12, 19, 6, 7 and 31 of the ninth audit)
 
 ## 4. Design
 
@@ -198,6 +200,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC3 · the guard arm's one-way c
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-7 promotions, id 19
   (HIGH, item H1).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-61, promoted from the spec audit of the round-8 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -124,3 +124,7 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-27T04:36:32Z rescope · item add TOOL-dFurnishedOrders-60 · reason spec-audit round1 of the round-7 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 1 5 16 4 7 8 10 26 23 24 27 (items M1-M10) and LOW ids 2 3 6 9 11 17 12 13 14 15 18 21 28 (items L1-L12)
 
 2026-10-27T04:56:19Z review · item dFurnishedOrders-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 24 · disposition promote
+
+2026-10-27T06:01:39Z rescope · item add TOOL-dFurnishedOrders-61 · reason spec-audit round1 of the round-8 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 1 9 27 2 3 10 13 12 19 11 22 18 29 (items M1-M9) and LOW ids 28 4 5 14 6 7 31 15 16 17 20 24 25 30 (items L1-L12)
+
+2026-10-27T06:22:12Z review · item dFurnishedOrders-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 27 · disposition promote

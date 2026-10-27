@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-57 — unit 50's reach read from the spec-token checker itself: the `govkit selftest <- ` tokens its `[guards]` rows print over the whole resolved guard, and every waiver row keyed to one of them
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 29 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 29 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -76,6 +76,7 @@ This unit makes the checker's own output the reach. It repairs unit 50 and build
 - **consumes-from** `TOOL-dFurnishedOrders-50` — S3's reach, S5's waiver rows and asks and AC3, whose population S1 reads from the checker and whose keys S2 holds to its tokens (id 23)
 - **hands-off** `TOOL-dFurnishedOrders-58` — S1's population, the checker's printed `govkit selftest <- ` tokens, which unit 58 reads for unit 50 AC3 and for the reach of the `govkit selftest` row it adds (ids 23, 19 and 24)
 - **hands-off** `TOOL-dFurnishedOrders-60` — S1, S4, AC1, §4 and §5, the reach, its record and its risk line, which unit 60 S4 to S9 settle (ids 8, 11, 17, 12, 13 and 23 of the eighth audit)
+- **hands-off** `TOOL-dFurnishedOrders-61` — S1's reader and §5's empty-reach rule, which unit 61 S14 runs at each gaining commit and its parent (id 28 of the ninth audit)
 
 ## 4. Design
 
@@ -201,6 +202,7 @@ The close's `spec tokens` leg is the whole-tree reading of AC1.
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-6 promotions, id 23
   (HIGH, item H2).
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-60, promoted from the spec audit of the round-7 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-61, promoted from the spec audit of the round-8 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-58 — the seventh spec audit's 27 minors: an interrupt probe whose every branch has a fixture and whose kill spares a reused pid, budget and roles readings that count only what ran, criteria that read the ledgers they claim, guard rows that land with their reach, every deploy table refused by shape, and one receipt needle
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 31 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 31 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -204,6 +204,7 @@ it AMENDED, naming the item.
 - **consumes-from** `TOOL-dFurnishedOrders-54` — the in-process checker route, which S16 records and whose module S17 guards (ids 12, 24)
 - **consumes-from** `TOOL-dFurnishedOrders-57` — S1's population, the checker's printed `govkit selftest <- ` tokens, which S17 and S24 read (ids 24, 19)
 - **hands-off** `TOOL-dFurnishedOrders-60` — S1, S3, S8, S14, S15, S17, S18, S20, §5 and AC10 to AC20, which unit 60 S9 to S24 settle (ids 23, 1, 4, 5, 16, 24, 27, 2, 3, 6, 9, 14, 15, 18, 21 and 28 of the eighth audit)
+- **hands-off** `TOOL-dFurnishedOrders-61` — S10's ledger-read rule, AC8's attribution probe and the ask rows AC17 reads, which unit 61 S15, S22 and S24 read (ids 4, 16 and 20 of the ninth audit)
 
 ## 4. Design
 
@@ -410,6 +411,7 @@ New arm: tools/govkit/selftest.py · covers AC14 AC15 AC16 · four wrong-typed d
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-6 promotions' minors batched: 17
   MEDIUM and 10 LOW.
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-60, promoted from the spec audit of the round-7 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-61, promoted from the spec audit of the round-8 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-60 — the eighth spec audit's 24 minors: a guard arm that grades the population it claims and names every checker failure, a reach read on the checker's own separators, waiver rows that name what they waive, one pass predicate, an interrupt cleanup on the held child, every deploy key refused by shape, and criteria that read the line they claim
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base dee9e867 · streams tooling · order 32 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base dee9e867 · streams tooling · order 32 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-59-round8-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-59-round8-fix-return.md) | research | TOOL-dFurnishedOrders-59 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-59-round8-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-59-round8-fix-brief.md) | research | TOOL-dFurnishedOrders-59 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-59 |
 
 <!-- /gen:spec-records -->
 
@@ -235,6 +236,7 @@ token sits on its bullet's first physical line, and the read runs over joined bu
 - **consumes-from** `TOOL-dFurnishedOrders-56` — S1's returned dict, which S1 reads for the `scratch-kit` path (id 7)
 - **consumes-from** `TOOL-dFurnishedOrders-57` — S1, S4, AC1, §4 and §5, the reach, its record and its risk line, which S4 to S9 settle (ids 8, 11, 17, 12, 13, 23)
 - **consumes-from** `TOOL-dFurnishedOrders-58` — S1, S3, S8, S14, S15, S17, S18, S20, §5 and AC10 to AC20, which S9 to S24 settle (ids 23, 1, 4, 5, 16, 24, 27, 2, 3, 6, 9, 14, 15, 18, 21, 28)
+- **hands-off** `TOOL-dFurnishedOrders-61` — S2, S7, S10, S12 to S15, S19, §4, §5, F2, F3 and AC2, AC5, AC6, AC9, AC12 to AC15, AC17 and AC20, which unit 61 S1 to S6, S10 to S17 and S21 to S27 settle (ids 1, 9, 27, 2, 3, 10, 11, 22, 18, 29, 28, 4, 5, 14, 15, 16, 17, 20, 24, 25 and 30 of the ninth audit)
 
 ## 4. Design
 
@@ -488,6 +490,7 @@ New arm: tools/memory-tree/deviation_join.py · covers AC12 · `derive_pass_unit
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-7 promotions' minors batched: 11
   MEDIUM and 13 LOW.
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-61, promoted from the spec audit of the round-8 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 
