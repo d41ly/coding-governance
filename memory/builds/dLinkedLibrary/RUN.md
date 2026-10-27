@@ -152,3 +152,15 @@ base: 5fede642ad2ff1418f12b5d7117129edc8287d7e
 2026-10-27T04:33:34Z rescope · item add TOOL-dLinkedLibrary-91 · reason spec-audit of units 81 to 86 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-81-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 2 3 32 5 6 29 8 13 34 14 23 15 18 21 22 24 28 35 36 (items M1-M15) and LOW ids 4 7 25 9 11 12 16 26 17 19 37 (items L1-L9); repairs none
 
 2026-10-27T04:54:26Z review · item dLinkedLibrary-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 30 · disposition promote
+
+2026-10-27T05:42:55Z rescope · item add TOOL-dLinkedLibrary-92 · reason spec-audit of units 87 to 91 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-87-spec-audit.md) finding id 7 at HIGH, report item H1; repairs TOOL-dLinkedLibrary-90
+
+2026-10-27T05:42:56Z rescope · item add TOOL-dLinkedLibrary-93 · reason spec-audit of units 87 to 91 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-87-spec-audit.md) finding id 21 at HIGH, report item H2; repairs TOOL-dLinkedLibrary-90
+
+2026-10-27T05:42:57Z rescope · item add TOOL-dLinkedLibrary-94 · reason spec-audit of units 87 to 91 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-87-spec-audit.md) finding id 22 at HIGH, report item H3; repairs TOOL-dLinkedLibrary-88
+
+2026-10-27T05:42:58Z rescope · item add TOOL-dLinkedLibrary-95 · reason spec-audit of units 87 to 91 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-87-spec-audit.md) finding id 23 at HIGH, report item H4; repairs TOOL-dLinkedLibrary-91
+
+2026-10-27T05:42:58Z rescope · item add TOOL-dLinkedLibrary-96 · reason spec-audit of units 87 to 91 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-87-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 1 25 2 3 4 18 28 8 14 9 10 11 24 26 (items M1-M10) and LOW ids 5 6 13 15 19 20 27 (items L1-L7); repairs none
+
+2026-10-27T06:01:36Z review · item dLinkedLibrary-spec-set-r7 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 21 · disposition promote
