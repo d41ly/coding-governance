@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-22 — the session-scoped ratification predicate is asked only at the act it ratifies, gated over the tree
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-22-deviation-221.md](../build/2026-10-26-build-TOOL-dRankedPlan-22-deviation-221.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +65,10 @@ tree refuses every other caller, so neither instance nor a later one can ship.
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-9` — `read_plan_ratification`, its CLI form and `ratify.py`'s `--fixture`, the predicate whose callers S2 bounds and the fixture S3 plants into
+- **hands-off** `TOOL-dRankedPlan-30` — `SESSION_PREDICATE_CALLERS` and the `caller-guard` plant, which that unit re-spells as kit anchors resolved at run time, superseding S1's literal paths and AC2 (spec audit of units 19 to 29, id 19)
+- **hands-off** `TOOL-dRankedPlan-31` — S3's tree run of `--check-callers`, which that unit moves onto its own unguarded repo leg, leaving the selftest the plant (spec audit of units 19 to 29, id 20)
+- **hands-off** `TOOL-dRankedPlan-32` — S2's caller definition, which that unit re-points to a structural reading of Python, shell and JavaScript statements (spec audit of units 19 to 29, id 30)
+- **hands-off** `TOOL-dRankedPlan-37` — AC3, which that unit observes at order 18 after units 21, 23 and 29, and the `caller-guard` plant, which it extends with a bare and a continued shell call (spec audit of units 19 to 29, ids 4, 31)
 
 ## 4. Design
 
@@ -169,6 +174,7 @@ New arm: tools/loop/selftest.py · covers AC1 AC3 · the `caller-guard` plant an
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 37 (HIGH, item
   H2, shared with finding 3), repairing `TOOL-dRankedPlan-2`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-30`, the hands-off edge to `TOOL-dRankedPlan-31`, the hands-off edge to `TOOL-dRankedPlan-32`, the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-20 — a plan record's `Scenario: none` reads as no re-pick, and a build that never enters `planning` pins on its first transition
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-20-deviation-201.md](../build/2026-10-26-build-TOOL-dRankedPlan-20-deviation-201.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,7 @@ its first transition record.
 
 - **consumes-from** `TOOL-dRankedPlan-14` — `read_plan_scenario` and `check_plan_scenario`, the reader and check S1 and S2 correct; without them there is no pin to read
 - **consumes-from** `TOOL-dRankedPlan-16` — S8's patch and repeat plan record, the canonical writer output whose `Scenario: none` S3's plants feed to the reader
+- **hands-off** `TOOL-dRankedPlan-36` — S2's exit 2 and the `plan-patch` record, which that unit narrows to a build with no record and no pin given (spec audit of units 19 to 29, id 29)
 
 ## 4. Design
 
@@ -162,6 +164,7 @@ none
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 2 (HIGH, item H1),
   repairing `TOOL-dRankedPlan-14`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-36`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

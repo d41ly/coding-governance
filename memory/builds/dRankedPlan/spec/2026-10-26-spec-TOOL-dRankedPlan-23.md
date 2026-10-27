@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-23 — `show` reports a revision's ratification from the record of how the re-entering move was admitted
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 14 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 14 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-23-deviation-231.md](../build/2026-10-26-build-TOOL-dRankedPlan-23-deviation-231.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,7 @@ and `harness=` fields on the move, through `TOOL-dRankedPlan-21`'s reader. It re
 - **consumes-from** `TOOL-dRankedPlan-15` — `derive_revision_state`, `show` and their `--selftest` plants, whose ratification read S1 re-points; without them there is no revision to report
 - **consumes-from** `TOOL-dRankedPlan-21` — `read_exit_ratification`, the one reader of how a `plan.exit` move was admitted; without it `show` would parse the trailer a second way
 - **hands-off** `TOOL-dRankedPlan-29` — `show` over the recorded re-entry, against which that unit plants finding 38's later-session counter-case
+- **hands-off** `TOOL-dRankedPlan-37` — `show`, S3's plants and AC4, which that unit completes by removing every stub and printing `before-placement` as no owner act (spec audit of units 19 to 29, ids 2, 16, 33)
 
 ## 4. Design
 
@@ -153,6 +155,7 @@ none
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 4 (HIGH, item H3,
   related to finding 38), repairing `TOOL-dRankedPlan-15`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

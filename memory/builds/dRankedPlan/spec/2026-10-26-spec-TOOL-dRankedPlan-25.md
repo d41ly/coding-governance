@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-25 — `plan.exit`'s owner disposition counts only for the crossing it was written for
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 5 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 5 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-25-deviation-251.md](../build/2026-10-26-build-TOOL-dRankedPlan-25-deviation-251.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,9 @@ lands. This unit bounds `check_plan_exit`'s disposition admission to the current
 
 - **consumes-from** `TOOL-dRankedPlan-10` — `check_plan_exit` and its fixture, whose disposition admission S1 re-points; without them there is no gate to bound
 - **consumes-from** `TOOL-dRankedPlan-24` — `read_item_disposition`, the one bounded reader S1 calls; without it the bound would be spelled a second time
+- **hands-off** `TOOL-dRankedPlan-33` — the `fallback-reentry` and `codex-reentry` plants, which that unit re-runs over the seeded base (spec audit of units 19 to 29, id 21)
+- **hands-off** `TOOL-dRankedPlan-35` — `check_plan_exit`'s admission through the reader, where that unit prints a disposition conflict (spec audit of units 19 to 29, id 28)
+- **hands-off** `TOOL-dRankedPlan-37` — AC2's second move, spelled `--field harness=codex` by that unit, which observes its harness half at order 18, and the `fallback-reentry` plant it re-runs (spec audit of units 19 to 29, ids 3, 32)
 
 ## 4. Design
 
@@ -134,6 +138,7 @@ none
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 5 (HIGH, item H4,
   shared with findings 21 and 39), repairing `TOOL-dRankedPlan-10`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-33`, the hands-off edge to `TOOL-dRankedPlan-35`, the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

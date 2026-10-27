@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-14 — the plan record's scenario field, set from the placement and re-picked at Plan with its reason
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0382@182ba9ba whole
 
@@ -81,6 +81,7 @@ record's `Scenario` field its meaning: set from the placement, revisable by the 
 - **consumes-from** external — dDeclaredLoop's `derive_step_scenarios`, `members` and `scenario.py --fixture` (TOOL-dDeclaredLoop-27 S5, S8, S10) and `read_transitions` (-3 S7); dPlacedRequest's placement pin on the first transition record (TOOL-dPlacedRequest-10 S5, -21 S7)
 - **hands-off** `TOOL-dRankedPlan-20` — `read_plan_scenario` and `check_plan_scenario`, whose reading of `none` and whose pin for a build with no move into `planning` that unit corrects (round-1 spec audit, id 2)
 - **hands-off** `TOOL-dRankedPlan-29` — `read_plan_scenario`'s field read, which that unit holds to the field verb's exit codes (round-1 spec audit, id 40)
+- **hands-off** `TOOL-dRankedPlan-36` — `check_plan_scenario` and S3's call of it in `derive_step_scenarios`, which that unit gives the first move's own pin (spec audit of units 19 to 29, id 29)
 
 ## 4. Design
 
@@ -229,6 +230,7 @@ New arm: tools/loop/scenario.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the seven `
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 14, NT-1 and NT-2, TOOL-dDeclaredLoop-27
   S5, S8 and §4, TOOL-dPlacedRequest-10 and -21 at base, and scout A's row for unit 14.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-20`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-36`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

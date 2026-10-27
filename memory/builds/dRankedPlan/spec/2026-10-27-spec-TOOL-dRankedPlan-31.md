@@ -1,0 +1,174 @@
+# TOOL-dRankedPlan-31 — the caller check over the tree runs on its own unguarded repo leg, on every bar
+
+**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+
+**Derived:** PLAY-dClosedLoop-2
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-build-TOOL-dRankedPlan-31-deviation-311.md](../build/2026-10-27-build-TOOL-dRankedPlan-31-deviation-311.md) | deviation | — |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+The spec audit of units 19 to 29
+(`memory/builds/dRankedPlan/reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`) confirmed
+**finding 20 at HIGH**, item **H2**. Finding 11 is the same class at MEDIUM, item M8, and
+`TOOL-dRankedPlan-37` closes it. `TOOL-dRankedPlan-22` S3 runs `ratify.py --check-callers` over the
+tree from `tools/loop/selftest.py`, inside the `loop selftest` leg. That leg is guarded on
+`{prefix}/loop/` (TOOL-dDeclaredLoop-75 S21) and sits in the `selftests` chunk. `run-gates.sh` holds
+every leg whose chunk is `selftests` unless `GATE_SELFTESTS` is set (`tools/govkit/subject-pins.tsv`
+header), and remote CI runs `GATE_FULL=1` without it. So a new `read_plan_ratification(` call added
+only in `.githooks/pre-commit`, `gen_build_index.py` or `plan_revision.py` moves no loop path and passes
+the default bar and CI, which falsifies unit 22 §1's claim that a later instance "cannot ship". This
+unit moves the tree run onto its own repo-subject leg with no guard, outside the `selftests` chunk, as
+`review-join ban (no ref-keyed join)` runs its tree-wide ban. It repairs `TOOL-dRankedPlan-22`, so it
+sits one order above it.
+
+## 2. Scope (IN)
+
+- **S1** — The leg. A `[[gate_leg]]` in `tools/loop/kit.toml` named `session-predicate callers (asked
+  only at the act)`, with `subject = "repo"`, `argv = ["python3", "{kit}/ratify.py",
+  "--check-callers"]` and `guard = []`. Its row in `tools/gate-legs.json` carries the same name, argv
+  with `{prefix}/loop/ratify.py`, `subject` `repo`, `chunk` `declarations` and no `guard` key, as the
+  `review-join ban (no ref-keyed join)` row does (`tools/gate-legs.json:717`). Observed by AC1.
+- **S2** — The rows a new leg owes, as TOOL-dDeclaredLoop-75 S21 lists them for the loop kit's legs:
+  the `tools/govkit/subject-pins.tsv` row `<name>\trepo\tdeclarations`, written by `python
+  tools/govkit/govkit.py selfcheck --write`; the leg's name in the `gate-legs` list of the loop
+  kit's feature dossier, `memory/map/features/loop.md`; and its `ceiling` in the descriptor, with
+  its `tools/run-gates/ceiling-evidence.txt` row derived by `derive-ceilings.py --write` from the
+  close's measured run. Observed by AC1.
+- **S3** — The selftest keeps the plant only. `tools/loop/selftest.py` stops running
+  `--check-callers` over the repository it runs in, and keeps the `caller-guard` plant of
+  `TOOL-dRankedPlan-22` S3, which runs in a scratch repository. This supersedes the tree-run half of
+  unit 22 S3 and unit 22 §4's rejected alternative "A new gate leg". Observed by AC2.
+- **S4** — The staged break. In a scratch clone of the tree, a `read_plan_ratification(` call is
+  added to `.githooks/pre-commit` alone. The leg's argv, run there, exits 1 naming that file, and the
+  clone's `git diff --name-only` names no path under the loop kit. Observed by AC3.
+
+## 3. Non-goals (OUT)
+
+- The guards of `build-index selftest` and `loop selftest` for the sibling kits their suites read
+  (finding 11, item M8): `TOOL-dRankedPlan-37`'s.
+- What the check counts as a caller and which callers it admits: `TOOL-dRankedPlan-32` and
+  `TOOL-dRankedPlan-30`.
+- Who observes the tree run green at a tip after units 21 and 23 (finding 4): `TOOL-dRankedPlan-37`.
+- A self-test of the leg's own refusal over a fixture. The `caller-guard` plant in the loop selftest
+  is that arm.
+
+### Edges
+
+- **consumes-from** `TOOL-dRankedPlan-22` — `ratify.py --check-callers` and the `caller-guard` plant, the check S1 runs as a leg and the arm S3 keeps; without them the leg has nothing to run
+
+## 4. Design
+
+### Evidence
+
+- `tools/govkit/subject-pins.tsv`, header lines 4-7: `run-gates.sh` "HOLDS a leg when `subject ==
+  kit` OR `chunk == selftests`, and runs it otherwise".
+- `tools/gate-legs.json`: `review-join ban (no ref-keyed join)` has `subject` `repo`, `chunk`
+  `declarations` and no guard; `tools/workflows/kit.toml:147-151` declares it with `guard = []`.
+- TOOL-dDeclaredLoop-75 S21 gives `loop selftest` the guard `{prefix}/loop/` and names the meta rows a
+  new loop leg owes: `subject-pins.tsv`, `ceiling-evidence.txt` and the `gate-legs` list of
+  `memory/map/features/loop.md`.
+- `memory/gotchas/a-new-leg-trips-a-growing-set-of-meta-gates.md`: a new leg also needs its
+  `[[gate_leg]]` entry, and the set of meta-gates is found by running the bar, which the close does.
+- `tools/run-gates/ceiling-evidence.txt`, header: "GENERATED by `python
+  <prefix>/run-gates/derive-ceilings.py --write`", "Do not hand-edit".
+
+### The two routes
+
+| A new caller added in | `loop selftest` (unit 22 S3) | this leg |
+|---|---|---|
+| `.githooks/pre-commit` | skipped: no `{prefix}/loop/` path moved, and held without `GATE_SELFTESTS` | runs and reds |
+| `gen_build_index.py` | the same | runs and reds |
+| the loop kit | held without `GATE_SELFTESTS` | runs and reds |
+
+### Inventory
+
+| Minted | Kind | Lexicon cell |
+|---|---|---|
+| `session-predicate callers (asked only at the act)` | gate leg name | none declared |
+
+### Rollout
+
+Live at landing, on every bar and in remote CI. Between this unit and `TOOL-dRankedPlan-23`, the leg
+reds on `plan_revision.py` from order 13, when `TOOL-dRankedPlan-15` adds that caller, until order 14.
+The close's bar reads it after both have landed.
+
+### Files touched (estimate)
+
+- `tools/loop/kit.toml`: S1's `[[gate_leg]]`
+- `tools/gate-legs.json`: S1's row
+- `tools/govkit/subject-pins.tsv`: S2's row
+- `memory/map/features/loop.md`: S2's dossier entry
+- `tools/loop/selftest.py`: S3
+
+### Alternatives rejected
+
+- **Widen `loop selftest`'s guard to every population root.** The leg stays in the `selftests` chunk,
+  which an automatic bar holds without `GATE_SELFTESTS` and remote CI never sets, so a widened guard
+  still lets a new caller through CI.
+- **A check inside an existing always-run leg.** No repo-subject leg of the loop kit exists, and
+  another kit's leg would run the loop kit's module across a kit boundary its guard does not name.
+
+## 5. Production-readiness checklist
+
+- security — the ban now runs on every bar, so an unlisted caller cannot reach the default branch
+  through CI.
+- perf / scale — one `git ls-files` and one read of each tracked code file per bar, the shape of
+  `review-join ban (no ref-keyed join)`; its ceiling is measured at the close (S2).
+- error / empty / loading states — git failing exits 2 and reds the leg by name.
+- observability — the leg prints the refusing file and line.
+- risks — every bar pays the leg's cost; the declarations chunk already carries this shape.
+- testing — the staged break of S4 and the plant S3 keeps.
+- migration — none.
+- user docs — N/A — no user-facing surface; the kit README paragraph of unit 22 S4 names
+  `--check-callers`.
+
+## 6. Acceptance criteria
+
+- **AC1** — When a probe reads `tools/gate-legs.json` and `tools/govkit/subject-pins.tsv`, the row
+  named `session-predicate callers (asked only at the act)` has `subject` `repo`, a `chunk` other than
+  `selftests` and no guard, and the pins row carries the same name, subject and chunk.
+  Red when: the leg is guarded, kit-subject or in the `selftests` chunk.
+- **AC2** — When `grep -cE "check-callers|check_predicate_callers" selftest.py` runs over the loop
+  kit's selftest, it prints 0, while the selftest still runs `ratify.py --fixture --plant
+  caller-guard`.
+  Red when: the selftest still runs the tree check over its own repository.
+- **AC3** — When S4's scratch clone carries a `read_plan_ratification(` call in `.githooks/pre-commit`
+  alone, `python ratify.py --check-callers` run as the leg's argv there exits 1 naming
+  `.githooks/pre-commit`, and `git diff --name-only` in the clone lists that file alone.
+  Red when: a caller outside the loop kit passes the check that the default bar runs.
+  fixture: a clone under a short `%TEMP%` path.
+
+## 7. Gates
+
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+
+New arm: tools/loop/ratify.py · covers AC3 · the leg `session-predicate callers (asked only at the act)` running `--check-callers` over the tree, staged by a `read_plan_ratification(` call in `.githooks/pre-commit` alone · none
+
+## 8. Open questions
+
+none
+
+## 9. Revision log
+
+- rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 20 (HIGH,
+  item H2; finding 11 is the same class at medium), repairing `TOOL-dRankedPlan-22`.
+
+## 10. Reuse audit
+
+The seam extended is the repo-subject declarations leg, the shape `review-join ban (no ref-keyed
+join)` already takes (`tools/gate-legs.json:717`, `tools/workflows/kit.toml:147-151`), and the meta rows
+TOOL-dDeclaredLoop-75 S21 lists for a loop leg. `python tools/codebase-map/reuse_lookup.py "a tree-wide
+ban gate leg that runs on every bar with no guard"` ranked name stems only (`tree`, `run`, `legs`,
+`leg`), none of them a leg declaration, so no code seam fits beyond the manifest shape cited above,
+which is the one place legs are declared. The recall query returned
+TOOL-aGradedDialect-12 and the aScouredKit instrument review, both on held legs, and they agree with
+the subject-pins header.
+
+Recall terms used: `python tools/memory-recall/query.py "which gate leg runs a tree-wide ban on every automatic bar" --terms "repo-subject leg declarations chunk guard selftests held GATE_SELFTESTS subject-pins ceiling-evidence ban"`

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-26 — a disposition of `ask` or `none` keeps `plan.exit` shut
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 5 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 5 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-26-deviation-261.md](../build/2026-10-26-build-TOOL-dRankedPlan-26-deviation-261.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,8 @@ words and has both readers refuse a record carrying one. It repairs `TOOL-dRanke
 
 - **consumes-from** `TOOL-dRankedPlan-10` — `check_plan_exit`, whose disposition admission S2 holds on a holding word; without it there is no gate to hold
 - **consumes-from** `TOOL-dRankedPlan-9` — `read_plan_ratification`'s `terminal-command` arm, which S3 holds on a holding word
+- **hands-off** `TOOL-dRankedPlan-33` — the `holding-ask` plant, which that unit re-runs over the seeded base (spec audit of units 19 to 29, id 21)
+- **hands-off** `TOOL-dRankedPlan-35` — S2's "the owner's latest word governs", which that unit defines by ancestry and holds on a conflict (spec audit of units 19 to 29, id 28)
 
 ## 4. Design
 
@@ -133,6 +136,7 @@ none
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 39 (HIGH, item H4,
   shared with findings 5 and 21), repairing `TOOL-dRankedPlan-10`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-33`, the hands-off edge to `TOOL-dRankedPlan-35`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

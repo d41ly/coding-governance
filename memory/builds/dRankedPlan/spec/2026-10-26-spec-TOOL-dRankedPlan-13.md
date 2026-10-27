@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-13 — the plan record's intent fields: affected systems derived from the `code` record and checked, open questions as fork tags
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0381@634c7b47 whole
 
@@ -123,6 +123,7 @@ tag `fork.<build>.<name>` in a registered `fork` namespace, so Design's forks ca
 - **hands-off** external — dCalibratedLens' scope drift reads `Affected systems`; dIndexedDesign's `design.decompose` cites the `fork.*` tags
 - **hands-off** `TOOL-dRankedPlan-19` — S9's call of `check_plan_fields` inside `check_plan_record`, which carries the field refusals into the witness that unit's gate reads (round-1 spec audit, id 1)
 - **hands-off** `TOOL-dRankedPlan-29` — the `Scope` check, the `scope` verb and the `plan-fields selftest` leg, which that unit's S19, S25, S34 and S39 correct (round-1 spec audit, ids 23, 30, 41, 49)
+- **hands-off** `TOOL-dRankedPlan-37` — S2's `Scope` check, which that unit points at the shared `check_repo_relative_path` in `tree_lib.py` (spec audit of units 19 to 29, id 17)
 
 ## 4. Design
 
@@ -327,6 +328,7 @@ New arm: tools/loop/loop_lib.py · covers AC7 · TOOL-dPlacedRequest-8's `seed-s
   and S4), flow-steps.md:180-190, TOOL-dRankedPlan-16 S3, S4 and S9, TOOL-dTotalRecall-8 S6, S7, S9
   and S11, TOOL-dPlacedRequest-8 S4, PLAY-dOrderedCharter-19 S1, S2 and §4, and scout A's row 6.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-19`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

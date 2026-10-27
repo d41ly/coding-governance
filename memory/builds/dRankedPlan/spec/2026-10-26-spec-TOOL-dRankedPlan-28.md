@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-28 — the `triage` and `dupes` record kinds join the binding reader, the factory table and the HYGIENE kind list
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-28-deviation-281.md](../build/2026-10-26-build-TOOL-dRankedPlan-28-deviation-281.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,7 @@ triage or dupes record either cannot be written or reads as a malformed binding.
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-3` — the `triage` and `dupes` rows of `record-kinds.toml` and their fields, which S1 to S3 register in the reader, the factory and the kind list; without them there is no kind to register
+- **hands-off** `TOOL-dRankedPlan-37` — §3's reason for leaving the memory-tree version alone, which that unit restates by its `version_from` carrier (spec audit of units 19 to 29, id 24)
 
 ## 4. Design
 
@@ -141,6 +143,7 @@ none
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 28 (HIGH, item
   H6), repairing `TOOL-dRankedPlan-3`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

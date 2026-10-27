@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-19 — `plan.exit` admits a move only over a witnessed plan record
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-1-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,8 @@ its one owner: `check_plan_exit` refuses every move while `plan_record.py check 
 - **consumes-from** `TOOL-dRankedPlan-16` — `plan_record.py check`, `item.plan.record`'s witness line S1 reads; without it there is no witness to require
 - **consumes-from** `TOOL-dRankedPlan-12` — the `Probes owed` check inside `check_plan_fields`, whose refusal on an open probe is the case AC1 drives through the real move
 - **consumes-from** `TOOL-dRankedPlan-13` — S9's call of `check_plan_fields` inside `check_plan_record`, which carries the field refusals into the witness S1 reads
+- **hands-off** `TOOL-dRankedPlan-33` — S1's witnessed-record precondition and the three `plan-record-*` plants, around which that unit seeds every other plant of the shared fixture (spec audit of units 19 to 29, id 21)
+- **hands-off** `TOOL-dRankedPlan-37` — AC2's `pre-placement` variant, which that unit reconciles with unit 10 AC6, and the plants whose memory-tree reads it adds to the `loop selftest` guard (spec audit of units 19 to 29, ids 32, 11)
 
 ## 4. Design
 
@@ -191,6 +194,7 @@ New arm: tools/loop/ratify.py · covers AC1 AC2 AC3 AC4 · the three `plan-recor
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 1 (BLOCKER, item
   B1), repairing `TOOL-dRankedPlan-12`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-33`, the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-21 — a plan row is ratified by the recorded crossing of its build's `plan.exit`, read in any session
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-21-deviation-211.md](../build/2026-10-26-build-TOOL-dRankedPlan-21-deviation-211.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -78,6 +79,7 @@ asks in place of the predicate.
 - **consumes-from** `TOOL-dRankedPlan-2` — `check_ratified_order` and its `--ratified-order` plants, whose `ratified` input S3 re-points; without it there is no order to hold
 - **consumes-from** `TOOL-dRankedPlan-10` — S5's `ratification` and `harness` fields on the `plan.exit` move, the durable record S1 reads; without them no crossing says how it was ratified
 - **hands-off** `TOOL-dRankedPlan-23` — `read_exit_ratification`, which that unit's `show` reads for the re-entering move instead of re-asking the predicate
+- **hands-off** `TOOL-dRankedPlan-37` — `read_exit_ratification`, `RATIFYING_EXITS`, the `drafts-cross-session` plant and AC1's move: that unit adds `read_ratifying_exit`, seeds and forges in the plant, imports the set into `show`, guards S4's import and spells the move `--field harness=claude-code` (spec audit of units 19 to 29, ids 1, 3, 11, 16, 35)
 
 ## 4. Design
 
@@ -196,6 +198,7 @@ New arm: tools/loop/ratify.py · covers AC1 AC2 · the `--exited` reader over pl
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 3 (HIGH, item H2,
   shared with finding 37), repairing `TOOL-dRankedPlan-2`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

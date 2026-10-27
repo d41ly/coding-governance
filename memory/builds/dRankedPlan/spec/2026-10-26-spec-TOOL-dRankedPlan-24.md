@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-24 — one reader of a build's disposition records for an item, bounded to the current crossing
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-24-deviation-241.md](../build/2026-10-26-build-TOOL-dRankedPlan-24-deviation-241.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,9 @@ built on it. It repairs `TOOL-dRankedPlan-9`.
 - **consumes-from** `TOOL-dRankedPlan-9` — `read_plan_ratification`'s `terminal-command` arm and `ratify.py --fixture`, which S2 re-points and S3 plants into; without the module there is no home for the reader
 - **hands-off** `TOOL-dRankedPlan-25` — `read_item_disposition`, through which that unit bounds `check_plan_exit`'s disposition admission to the current crossing
 - **hands-off** `TOOL-dRankedPlan-4` — `read_item_disposition`, on which that unit's `read_build_disposition` is built so its freshness rule is not spelled twice
+- **hands-off** `TOOL-dRankedPlan-34` — S1's add commit, which that unit replaces with the record's first appearance under any name (spec audit of units 19 to 29, id 26)
+- **hands-off** `TOOL-dRankedPlan-35` — §4's "the kept record whose `added` is newest", which that unit orders by ancestry with a conflict hold (spec audit of units 19 to 29, id 28)
+- **hands-off** `TOOL-dRankedPlan-37` — the `reader-bound` plant, `read_item_disposition` and §10's missing `Hold` seam, which that unit extends with merged adds and uncommitted records and answers with an ask (spec audit of units 19 to 29, ids 13, 14, 27)
 
 ## 4. Design
 
@@ -162,6 +166,7 @@ none
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 21 (HIGH, item H4,
   shared with findings 5 and 39), repairing `TOOL-dRankedPlan-9`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-34`, the hands-off edge to `TOOL-dRankedPlan-35`, the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

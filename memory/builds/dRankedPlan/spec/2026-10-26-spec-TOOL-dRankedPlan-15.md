@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-15 — the plan revision record: a fork the goal cannot survive moves the build back to planning, and Design re-enters on the ratified revision
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 13 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 13 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0497@2b8de50e whole
 
@@ -118,6 +118,7 @@ plan is, and Design re-enters on the ratified revision, which a reader prints fo
 - **hands-off** external — dIndexedDesign: its `design.decompose` runs `revise` on a fork the goal cannot survive, and its `design.input` reads the ratified revision `show` prints
 - **hands-off** `TOOL-dRankedPlan-23` — `derive_revision_state` and `show`, whose ratification read that unit re-points to the recorded re-entry (round-1 spec audit, id 4)
 - **hands-off** `TOOL-dRankedPlan-29` — `revise`, `show` and the `loop plan revision` leg, which that unit's S26 and S36 correct (round-1 spec audit, ids 31, 46)
+- **hands-off** `TOOL-dRankedPlan-37` — S6's `--selftest` plants and AC1's expected line, which that unit seeds, de-stubs and supersedes (spec audit of units 19 to 29, ids 1, 2, 33)
 
 ## 4. Design
 
@@ -320,6 +321,7 @@ New arm: tools/loop/plan_revision.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 · th
   :223, :235-239 and :742, TOOL-dDeclaredLoop-3 S5 and S7, -10 S2 and S5, -13 §4, -15 S4 and §8 F2,
   and scout B's row for this unit.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-23`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

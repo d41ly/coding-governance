@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-10 — `plan.exit` falls back to the owner gate while the intake is not installed for the harness
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0378@ed811c10 whole
 **Carries:** node:item.plan.exit
@@ -106,6 +106,9 @@ the capability read it rests on, and the arming of `item.plan.exit`, whose witne
 - **hands-off** `TOOL-dRankedPlan-25` — `check_plan_exit`'s disposition admission, which that unit bounds to the current crossing (round-1 spec audit, id 5)
 - **hands-off** `TOOL-dRankedPlan-26` — `check_plan_exit`'s disposition admission, which that unit holds on a disposition of `ask` or `none` (round-1 spec audit, id 39)
 - **hands-off** `TOOL-dRankedPlan-29` — `check_plan_exit`'s harness and the capability reader, which that unit's S15 and S38 correct (round-1 spec audit, ids 18, 48)
+- **hands-off** `TOOL-dRankedPlan-32` — S6's driver arm, whose resolver line and `--exit` call that unit's caller predicate admits in the real tree (spec audit of units 19 to 29, id 30)
+- **hands-off** `TOOL-dRankedPlan-33` — §4's plants and AC8's driver fixture, which that unit seeds with a witnessed plan record (spec audit of units 19 to 29, id 21)
+- **hands-off** `TOOL-dRankedPlan-37` — AC2's move, spelled `--field harness=claude-code` by that unit, and AC6, which it re-reads over the seeded base (spec audit of units 19 to 29, ids 3, 32)
 
 ## 4. Design
 
@@ -350,6 +353,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 · the plan gate unde
   :164-194, flow-roles.md:173-199, layer-runtime.md:827-844, TOOL-dDeclaredLoop-3, -12, -13, -16, -19,
   -31 and -53 at base, and scout B's row -10.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-19`, the hands-off edge to `TOOL-dRankedPlan-21`, the hands-off edge to `TOOL-dRankedPlan-25`, the hands-off edge to `TOOL-dRankedPlan-26`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-32`, the hands-off edge to `TOOL-dRankedPlan-33`, the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

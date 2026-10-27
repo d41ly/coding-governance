@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-9 — the ratification predicate: the session's owner-origin intake read as the plan's ratification by `plan.ratification`
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0377@a78b3ac9 whole
 **Carries:** node:policy-key.plan.ratification
@@ -104,6 +104,7 @@ request record stands in, and every witness says so.
 - **hands-off** `TOOL-dRankedPlan-24` — the `terminal-command` arm and `ratify.py --fixture`, which that unit re-points to the bounded `read_item_disposition` (round-1 spec audit, id 21)
 - **hands-off** `TOOL-dRankedPlan-26` — the `terminal-command` arm, which that unit holds on a disposition of `ask` or `none` (round-1 spec audit, id 39)
 - **hands-off** `TOOL-dRankedPlan-29` — `read_plan_ratification`'s policy read and its fixture, which that unit's S14 corrects (round-1 spec audit, id 16)
+- **hands-off** `TOOL-dRankedPlan-33` — S7's `ratify.py --fixture`, whose base that unit seeds with a memory-tree kit and a witnessed plan record (spec audit of units 19 to 29, id 21)
 
 ## 4. Design
 
@@ -261,6 +262,7 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · `ratify.py 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 9, the brief's I6 and I7, scout B's row -9,
   FR-1, v2:401 and v2:1224, and TOOL-dPlacedRequest-5, -19, -21 and -31.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-22`, the hands-off edge to `TOOL-dRankedPlan-24`, the hands-off edge to `TOOL-dRankedPlan-26`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-33`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

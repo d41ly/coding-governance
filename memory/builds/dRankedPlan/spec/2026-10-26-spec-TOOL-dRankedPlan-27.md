@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-27 — the roles vocabulary admits the `plan:` reads keys gov-spec-writer gains
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-26-build-TOOL-dRankedPlan-27-deviation-271.md](../build/2026-10-26-build-TOOL-dRankedPlan-27-deviation-271.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
 
@@ -49,6 +50,7 @@ unit adds the three keys to the vocabulary and re-renders the region. It repairs
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-16` — S7's `plan:` keys on `gov-spec-writer`'s `reads:` line, which S1 admits and S2 renders; without them the vocabulary would hold keys no role reads
+- **hands-off** `TOOL-dRankedPlan-37` — S3's reason for leaving the roles version alone, which that unit restates by its `version_from` carrier (spec audit of units 19 to 29, id 24)
 
 ## 4. Design
 
@@ -130,6 +132,7 @@ none
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 27 (HIGH, item
   H5), repairing `TOOL-dRankedPlan-16`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

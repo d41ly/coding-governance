@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-29 — the round-1 spec audit's 39 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 17 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 17 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-29-deviation-291.md](../build/2026-10-26-build-TOOL-dRankedPlan-29-deviation-291.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 |
+| [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 |
 
 <!-- /gen:spec-records -->
 
@@ -265,6 +266,7 @@ write sets under M6's clauses.
 - **consumes-from** `TOOL-dRankedPlan-15` — `revise`, `show` and the `loop plan revision` leg, which S26 and S36 correct
 - **consumes-from** `TOOL-dRankedPlan-16` — `plan_record.py`, the handoff's `plan:` render and the `[[level]]` marker, which S10, S16, S22 and S33 correct
 - **consumes-from** `TOOL-dRankedPlan-23` — `show` over the recorded re-entry, against which S32 plants the later-session case
+- **hands-off** `TOOL-dRankedPlan-37` — S3, S15, S16, S19, S28 and S32 with AC2, AC12, AC15, AC22 and AC26: that unit spells S3's hold as `--park`, plants S32 without a stub, replaces AC12 by a read of unit 16's text, hosts S19's helper in `tree_lib.py` and extends the recipe checks (spec audit of units 19 to 29, ids 3, 4, 7, 8, 12, 17, 18, 22, 23, 25, 34)
 
 ## 4. Design
 
@@ -526,6 +528,7 @@ New arm: skills/session-kickoff/card-store.fixture.sh · covers AC3 AC5 · `plan
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's 39 MEDIUM and LOW findings,
   ids 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 22 23 24 25 26 29 30 31 32 33 34 35 36 38 40 41 42 43
   44 45 46 47 48 49, batched under BUILD-METHOD M4.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 
