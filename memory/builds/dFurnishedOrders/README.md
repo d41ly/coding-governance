@@ -155,7 +155,7 @@ ids TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 T
 | [TOOL-dFurnishedOrders-61 — the ninth spec audit's 27 minors: a reach and a landing rule read over the population and range they claim, one frozen parse compared, a guard fixture graded through the trip rule's own object, a registry-less root named, an empty prefix documented as `tools`, and every deploy key and row field refused at one check](spec/2026-10-27-spec-TOOL-dFurnishedOrders-61.md) | 33 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 93 bound to this build, across 4 record folder(s).
+Records: 94 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
