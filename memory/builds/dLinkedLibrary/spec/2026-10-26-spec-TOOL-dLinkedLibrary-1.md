@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-1 — decisions split by kind: reuse entries as level-3 units, the major-decision log, its rows routed by two raters, and the `[records]` rule reworded
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 8 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 8 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0238@b2c1827b whole
 **Carries:** node:policy-key.decisions.major
@@ -28,6 +28,7 @@
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-23 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-1-owner-review-until-no-high.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-1-owner-review-until-no-high.md) | research | — |
+| [2026-10-27-prompt-TOOL-dLinkedLibrary-1-owner-stop-chain.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-1-owner-stop-chain.md) | research | — |
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-54-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-54-1-spec-writer.md) | journal | TOOL-dLinkedLibrary-54 |
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-86-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-86-1-spec-writer.md) | journal | TOOL-dLinkedLibrary-86 |
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-87-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-87-1-spec-writer.md) | journal | TOOL-dLinkedLibrary-87 |

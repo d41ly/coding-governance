@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-13 — the research-return kind: its declared line, its check, and the dated backfill over the existing returns
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 6 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 6 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0250@9ea3dfcf whole
 **Carries:** node:record-kind.research-return

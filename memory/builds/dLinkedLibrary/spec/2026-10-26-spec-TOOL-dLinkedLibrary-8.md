@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-8 — retrofit's record kinds, the `origin` field, and the `adopt` program the core's own command runs
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 20 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 20 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0245@2d7af537 whole
 **Carries:** node:record-kind.baseline

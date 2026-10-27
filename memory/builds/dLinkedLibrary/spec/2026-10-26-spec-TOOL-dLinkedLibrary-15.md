@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-15 — code purposes: derived first from docstrings and headers, an agent's pass for the rest as `memory.code-enrich` says, keyed to body hashes and joined both ways with a pending population
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 18 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 18 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0252@5aa0f94b whole
 **Carries:** node:policy-key.memory.code-enrich

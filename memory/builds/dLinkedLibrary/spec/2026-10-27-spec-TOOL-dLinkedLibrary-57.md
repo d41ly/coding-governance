@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-57 — the reuse-lookup step's witness keyed on the `MAP_CLI` value its before-image recorded
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 26 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 26 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

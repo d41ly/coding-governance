@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-89 — the CI census reads GitLab's `spec:` header document and refuses a job an `inputs` interpolation reaches
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 26 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 26 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

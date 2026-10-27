@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-86 — the spec audit of units 75 to 80: its medium and low findings, batched
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 33 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 33 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

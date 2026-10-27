@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-3 — `reuse_lookup.py` and its agent retired, every reader rewritten by name and by value, with its upgrade step, and memory-recall narrowed to its why-search
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 24 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 24 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0240@5773ca81 whole
 **Carries:** node:record-kind.recall-index

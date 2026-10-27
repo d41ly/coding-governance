@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-54 — the shipped micro-format gate carries the `region_sh` block inline, so it runs where `<prefix>/lib/` never travels
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

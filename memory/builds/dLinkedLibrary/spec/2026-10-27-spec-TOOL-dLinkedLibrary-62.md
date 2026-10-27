@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-62 — an unresolved reader stays red on a row this repository's own builds own; only rows owned outside read `not installed`
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 5 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 5 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-12 — the `marker` namespace's members, one per existing `gov:` word, and the check that refuses an unregistered one
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 3 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 3 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0249@49ce83a8 whole
 

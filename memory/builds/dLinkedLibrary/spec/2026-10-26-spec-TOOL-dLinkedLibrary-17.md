@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-17 — typed edges from annotations, front matter, dossiers and decision rows, and the span rule with `gov:end <tag>`
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 13 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 13 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0254@e703feac whole
 

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-11 — the annotation resolve check's legacy and the untouched long comment blocks registered as ledger populations
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 14 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 14 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0248@8c261008 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-48 — the marker registry in an adopter: a reader resolved through the install, and "appears nowhere" graded only on this repository's own rows
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-71 — the CI census refuses a GitLab job whose text arrives by inheritance or include
 
-**Status:** OPEN · rev-4 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 23 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 23 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-14 — the code reader: `gov map code`, and `gov code show`, `callers`, `tests` and `where`, `git grep` its floor
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 17 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 17 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0251@23b8b8e1 whole
 

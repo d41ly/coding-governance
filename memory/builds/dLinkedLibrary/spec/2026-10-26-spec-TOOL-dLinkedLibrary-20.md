@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-20 — the `feature` namespace armed as an instruction selector
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 11 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 11 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0257@ac01a5f8 whole
 

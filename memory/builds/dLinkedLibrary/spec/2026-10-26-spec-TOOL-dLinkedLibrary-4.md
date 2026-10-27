@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-4 — the `gov:note` grammar, the generated annotation index, its resolve check and `gov:feature` anchors joined both ways with reuse entries
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 12 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 12 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0241@0e5185f1 whole
 **Carries:** node:policy-key.annotations.grammar

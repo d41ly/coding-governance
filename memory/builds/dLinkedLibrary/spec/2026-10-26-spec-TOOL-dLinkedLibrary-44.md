@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-44 — the resolve arm's default population: every comment line of every profiled file, not only files that carry a note
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 13 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 13 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

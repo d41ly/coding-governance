@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-37 — a `reconstructed` or `imported` origin graded on its provenance, so the adopt program's own records read green
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 22 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 22 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

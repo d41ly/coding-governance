@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-81 — the CI census reads an Azure `variables:` list as a closed set of item forms, refusing any other
 
-**Status:** OPEN · rev-4 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 32 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 32 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-90 — the CI census reads every CI file through one decoder that drops a UTF-8 BOM and every line's CR, in every dialect
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 34 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 34 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

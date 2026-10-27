@@ -470,17 +470,17 @@ Cite ids, never line numbers.
 | [TOOL-dIndexedDesign-17](../builds/dIndexedDesign/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dIndexedDesign-18](../builds/dIndexedDesign/BACKLOG.md) | OPEN | LOW | — | 2026-10-23 | THE CARRIES INSTRUMENT READS NO AMENDMENT. carries.py (the bootstrap… |
 | [TOOL-dIndexedDesign-19](../builds/dIndexedDesign/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE repeat ROUTE READS A PLAYBOOK BY PATH. dKeptSession carries… |
-| [TOOL-dLinkedLibrary-26](../builds/dLinkedLibrary/BACKLOG.md) | SPECCED | MED | TOOL-dLinkedLibrary-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dLinkedLibrary-27](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A REUSE ENTRY BESIDE ITS DOSSIER IS NO OVERLAY PART.… |
-| [TOOL-dLinkedLibrary-28](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE HOUSE INDEX HAS TWO SPECCED HOMES. TOOL-aScoutedSeam-1 S10 specs a… |
-| [TOOL-dLinkedLibrary-29](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A [[retired]] ROW CANNOT NAME A PART OF A LIVE ENTRY.… |
-| [TOOL-dLinkedLibrary-30](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | MEMORY-RECALL'S BENCH AND UNION HAVE NO experiment ENTRY.… |
-| [TOOL-dLinkedLibrary-31](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | PLAY-dOrderedCharter-28 §3 GIVES THE gov:note GRAMMAR TO dTotalRecall.… |
-| [TOOL-dLinkedLibrary-32](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | AN ADOPT-PROGRAM ITEM HAS NO STEP. TOOL-dLinkedLibrary-8 and… |
-| [TOOL-dLinkedLibrary-33](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE PER-ITEM code SLOT HAS NO SPEC. v2 and TOOL-dTotalRecall-8 §3 give… |
-| [TOOL-dLinkedLibrary-34](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE feature NAMESPACE ROW IS SPECCED WITHOUT ITS ROLE.… |
-| [TOOL-dLinkedLibrary-35](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | --all-ungated READS THE STAND-IN. TOOL-dFairHearing-15 S6 prints every… |
-| [TOOL-dLinkedLibrary-36](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A GATED OR JUDGEMENT CLASS EARNS A LEFT-SHIFT. TOOL-dDeclaredLoop-20… |
+| [TOOL-dLinkedLibrary-26](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dLinkedLibrary-27](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-1 | 2026-10-26 | A REUSE ENTRY BESIDE ITS DOSSIER IS NO OVERLAY PART.… |
+| [TOOL-dLinkedLibrary-28](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-2 | 2026-10-26 | THE HOUSE INDEX HAS TWO SPECCED HOMES. TOOL-aScoutedSeam-1 S10 specs a… |
+| [TOOL-dLinkedLibrary-29](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-3 | 2026-10-26 | A [[retired]] ROW CANNOT NAME A PART OF A LIVE ENTRY.… |
+| [TOOL-dLinkedLibrary-30](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-3 | 2026-10-26 | MEMORY-RECALL'S BENCH AND UNION HAVE NO experiment ENTRY.… |
+| [TOOL-dLinkedLibrary-31](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-4 | 2026-10-26 | PLAY-dOrderedCharter-28 §3 GIVES THE gov:note GRAMMAR TO dTotalRecall.… |
+| [TOOL-dLinkedLibrary-32](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-8 | 2026-10-26 | AN ADOPT-PROGRAM ITEM HAS NO STEP. TOOL-dLinkedLibrary-8 and… |
+| [TOOL-dLinkedLibrary-33](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-16 | 2026-10-26 | THE PER-ITEM code SLOT HAS NO SPEC. v2 and TOOL-dTotalRecall-8 §3 give… |
+| [TOOL-dLinkedLibrary-34](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-20 | 2026-10-26 | THE feature NAMESPACE ROW IS SPECCED WITHOUT ITS ROLE.… |
+| [TOOL-dLinkedLibrary-35](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-24 | 2026-10-26 | --all-ungated READS THE STAND-IN. TOOL-dFairHearing-15 S6 prints every… |
+| [TOOL-dLinkedLibrary-36](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-24 | 2026-10-26 | A GATED OR JUDGEMENT CLASS EARNS A LEFT-SHIFT. TOOL-dDeclaredLoop-20… |
 | [TOOL-dMindYourWords-18](../builds/dMindYourWords/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dMispairedQuote-4](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | agent-cap.js models no regex literal, which is the ROOT of every… |
 | [TOOL-dMispairedQuote-5](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | checkLiteralOpen's keyword clause admits a quote after any of eleven JS… |

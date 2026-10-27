@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-19 — the dossier's header becomes the feature node, and its prose moves into units and records
 
-**Status:** OPEN · rev-4 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 10 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 10 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0256@aea4db49 whole
 

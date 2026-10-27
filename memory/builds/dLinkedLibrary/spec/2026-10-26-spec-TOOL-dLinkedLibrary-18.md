@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-18 — the region-parser factory in `tools/lib`, and every region parser re-pointed to it
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 2 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 2 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0255@c0b78911 whole
 

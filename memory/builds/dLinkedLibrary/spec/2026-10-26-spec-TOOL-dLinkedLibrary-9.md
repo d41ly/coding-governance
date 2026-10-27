@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-9 — the origin check: each record's `origin` re-derived from history, shown in every slice and ranked in the reuse digest
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 21 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 21 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0246@96afa172 whole
 

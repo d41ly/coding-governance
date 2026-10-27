@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-22 — `decides` on every decision row, `Decided:` trailers read as decision rows, and every bug class naming its cause, language and platform
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0259@2b91da03 whole
 **Carries:** node:record-kind.gotcha

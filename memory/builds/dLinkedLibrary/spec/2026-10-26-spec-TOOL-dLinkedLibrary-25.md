@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-25 — eight records that contradict the code, each corrected at its source
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 1 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 1 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0500@84eb6d7a whole
 

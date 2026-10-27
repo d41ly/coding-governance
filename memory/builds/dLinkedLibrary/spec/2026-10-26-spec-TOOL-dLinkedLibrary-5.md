@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-5 — the generated views: the decision log's holds-now view and the reuse view
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 9 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 9 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0242@866cebbc whole
 

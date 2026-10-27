@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-10 — the progress cell: the retrofit's populations, seeded, now and drained, on the orientation card
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 22 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 22 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0247@87bb7e47 whole
 

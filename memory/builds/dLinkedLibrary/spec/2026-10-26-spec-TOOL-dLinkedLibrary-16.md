@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-16 — the code replay: a unit's files read and its lookups counted with the `code` slot and without, scored by the scorer factory against the seed alone
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 19 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 19 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0253@22d88118 whole
 

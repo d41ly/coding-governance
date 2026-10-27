@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-41 — the span arm reads `iter_family` on its own conventions: a top-level pair at depth 1, a lead that carries its space
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 14 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 14 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

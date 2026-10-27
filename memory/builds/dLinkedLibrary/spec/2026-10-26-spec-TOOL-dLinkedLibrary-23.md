@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-23 — `adopt.instructions`: an adopter's own instruction files kept verbatim as a legacy block, every harness file wired at once, each paragraph ruled once
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 25 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 25 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0260@c677f704 whole
 **Carries:** node:item.adopt.instructions

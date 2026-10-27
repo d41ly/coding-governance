@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-2 — the reuse scout's house index, delivered through the task card's `**Reuse:**` field and accepted on aScoutedSeam's benchmark
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 23 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 23 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0239@36d4c1c8 whole
 **Carries:** node:policy-key.reuse.delivery

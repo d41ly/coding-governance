@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-7 — the `annotations` leg, the lookup under `annotations.lookup`, the read hook on shell reads, and the follow-through test
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 15 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 15 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0244@e14fc5fd whole
 **Carries:** node:policy-key.annotations.lookup

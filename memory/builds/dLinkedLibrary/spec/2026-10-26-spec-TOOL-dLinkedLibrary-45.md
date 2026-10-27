@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-45 — govkit's `find_block` and `write_block` re-pointed to the factory, and a census arm that sees a parser with no marker constant
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 3 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 3 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

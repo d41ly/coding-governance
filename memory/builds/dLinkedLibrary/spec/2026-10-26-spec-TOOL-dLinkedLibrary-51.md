@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-51 — the CI census reads every workflow file, every line a job runs, and refuses a job that publishes, pushes or holds a write grant
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 21 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 21 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-56 — `region_nth` becomes a parity-gated block, and the run-gates canary carries it inline for its `mempause_sh` slice
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 4 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 
