@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-98 — one ordering probe, defined once in spec 95: an amendment is an ancestor of the amended unit's build commit, never the first subject a log prints
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -80,6 +80,11 @@ of the built unit's build commit.
 - **hands-off** `TOOL-dWellOiledMachine-119` — the predicate 119's ordering check calls for its rev bump of spec 115 (round-6 promotions audit, finding 21)
 - **hands-off** `TOOL-dWellOiledMachine-120` — the predicate 120's ordering check calls for its rev bump of spec 115 (round-6 promotions audit, finding 17)
 - **hands-off** `TOOL-dWellOiledMachine-121` — the predicate 121's ordering loop calls for its rev bumps of specs 110, 113, 114 and 115 (round-6 promotions audit, its 17 minor findings)
+- **hands-off** `TOOL-dWellOiledMachine-122` — the predicate 122's ordering check calls for its rev bump of spec 121 (round-7 promotions audit, finding 1)
+- **hands-off** `TOOL-dWellOiledMachine-123` — the predicate 123's ordering check calls for its rev bump of spec 121 (round-7 promotions audit, finding 9)
+- **hands-off** `TOOL-dWellOiledMachine-124` — the predicate 124's ordering check calls for its rev bump of spec 121 (round-7 promotions audit, finding 13)
+- **hands-off** `TOOL-dWellOiledMachine-125` — the predicate 125's ordering check calls for its rev bump of spec 121 (round-7 promotions audit, finding 2)
+- **hands-off** `TOOL-dWellOiledMachine-126` — the predicate 126's ordering loop calls for its rev bumps of specs 120 and 121 (round-7 promotions audit, its 11 minor findings)
 
 ## 4. Design
 
@@ -214,6 +219,8 @@ No arm is added or moved: the predicate is a probe in spec text, and each criter
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-109, TOOL-dWellOiledMachine-110, TOOL-dWellOiledMachine-111, TOOL-dWellOiledMachine-112, TOOL-dWellOiledMachine-113, TOOL-dWellOiledMachine-114, TOOL-dWellOiledMachine-115.
 - rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-6
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-116, TOOL-dWellOiledMachine-117, TOOL-dWellOiledMachine-118, TOOL-dWellOiledMachine-119, TOOL-dWellOiledMachine-120, TOOL-dWellOiledMachine-121.
+- rev-4 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-7
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-122, TOOL-dWellOiledMachine-123, TOOL-dWellOiledMachine-124, TOOL-dWellOiledMachine-125, TOOL-dWellOiledMachine-126.
 
 ## 10. Reuse audit
 

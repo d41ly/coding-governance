@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-116-deviation-1161.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-116-deviation-1161.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 |
 
 <!-- /gen:spec-records -->
 

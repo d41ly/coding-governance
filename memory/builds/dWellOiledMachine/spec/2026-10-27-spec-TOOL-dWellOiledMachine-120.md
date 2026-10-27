@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-120 — every path to the two unbuilt fixtures that the cross-read writes into a criterion is quoted, so the spec-token join skips it
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 73 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 73 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-120-deviation-1201.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-120-deviation-1201.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-121 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +70,7 @@ class in 115's §5 risks and §7.
 
 - **consumes-from** `TOOL-dWellOiledMachine-115` — S6, §5's risks line and §7, which this unit rewrites before spec 115's amendments land
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the ordering predicate AC3 loads from spec 95 and calls
+- **hands-off** `TOOL-dWellOiledMachine-126` — S1, §1, §4, §5, §6's preamble, AC1, AC2 and §10, amended before this unit's own amendment of spec 115 lands (round-7 promotions audit, findings 4, 5, 7, 8, 10, 12 and 14)
 
 ## 4. Design
 
@@ -156,6 +158,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-6 promotions, finding
   17 (H2).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-7
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-126.
 
 ## 10. Reuse audit
 

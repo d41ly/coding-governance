@@ -165,3 +165,15 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T10:19:36Z rescope · item add TOOL-dWellOiledMachine-121 · reason promoted from the spec audit of the round-6 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-109-spec-audit.md), its 17 minor findings batched into one unit, 9 MEDIUM (findings 2 3 10 13 22 24 25 27 28) and 8 LOW (findings 4 5 6 7 8 11 15 20), repairing no one unit since they land on specs 110 113 114 and 115
 
 2026-10-27T10:40:12Z review · item dWellOiledMachine-spec-set-r7 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 17 · disposition promote
+
+2026-10-27T11:30:42Z rescope · item add TOOL-dWellOiledMachine-122 · reason promoted from the spec audit of the round-7 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md), finding 1 at HIGH, item H1 (shared with findings 9 13), repairing TOOL-dWellOiledMachine-121
+
+2026-10-27T11:30:44Z rescope · item add TOOL-dWellOiledMachine-123 · reason promoted from the spec audit of the round-7 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md), finding 9 at HIGH, item H1 (shared with findings 1 13), repairing TOOL-dWellOiledMachine-121
+
+2026-10-27T11:30:46Z rescope · item add TOOL-dWellOiledMachine-124 · reason promoted from the spec audit of the round-7 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md), finding 13 at HIGH, item H1 (shared with findings 1 9), repairing TOOL-dWellOiledMachine-121
+
+2026-10-27T11:30:48Z rescope · item add TOOL-dWellOiledMachine-125 · reason promoted from the spec audit of the round-7 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md), finding 2 at HIGH, item H2, repairing TOOL-dWellOiledMachine-121
+
+2026-10-27T11:30:50Z rescope · item add TOOL-dWellOiledMachine-126 · reason promoted from the spec audit of the round-7 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md), its 11 minor findings batched into one unit, 7 MEDIUM (findings 3 4 7 10 11 14 16) and 4 LOW (findings 5 8 12 15), repairing no one unit since they land on specs 120 and 121
+
+2026-10-27T11:50:34Z review · item dWellOiledMachine-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 11 · disposition promote

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-121 — the round-6 promotions audit's 17 medium and low findings, batched: the walk's consumers and exemption, path spellings, flattened slices, bounded fixture ranges and criteria green at base
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 74 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 74 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-121-deviation-1211.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-121-deviation-1211.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 |
 
 <!-- /gen:spec-records -->
 
@@ -117,6 +118,11 @@ text once; an item points at it rather than restating it.
 - **consumes-from** `TOOL-dWellOiledMachine-113` — S1 and AC1, amended before 113's amendment of spec 103 lands (S9)
 - **consumes-from** `TOOL-dWellOiledMachine-114` — S1 and AC1, amended before 114's amendment of spec 106 lands (S9)
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the ordering predicate AC14 loads from spec 95 and calls
+- **hands-off** `TOOL-dWellOiledMachine-122` — AC4's spec-115 clause, which counts `not in ok` inside 115's walk alone, and its red case (round-7 promotions audit, finding 1)
+- **hands-off** `TOOL-dWellOiledMachine-123` — AC4's presence counts of the absence checks S5 writes into spec 115, and its red case (round-7 promotions audit, finding 9)
+- **hands-off** `TOOL-dWellOiledMachine-124` — AC4's reading over spec 115 at 454dbf8d7, its red case and §4 Evidence's record of both readings (round-7 promotions audit, finding 13)
+- **hands-off** `TOOL-dWellOiledMachine-125` — S2, §4's text for 115 S11 and AC1, which spell and read 97 AC1's files at their repository paths (round-7 promotions audit, finding 2)
+- **hands-off** `TOOL-dWellOiledMachine-126` — S15, §4's AC6 row and 115 Evidence text, AC1, AC10 and AC11, amended before this unit's own amendments land (round-7 promotions audit, findings 3, 11, 15 and 16)
 
 ## 4. Design
 
@@ -379,6 +385,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, the round-6 promotions audit's 17 medium and low findings
   batched.
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-7
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-122, TOOL-dWellOiledMachine-123, TOOL-dWellOiledMachine-124, TOOL-dWellOiledMachine-125, TOOL-dWellOiledMachine-126.
 
 ## 10. Reuse audit
 
