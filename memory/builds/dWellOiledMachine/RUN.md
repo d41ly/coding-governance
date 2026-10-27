@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dWellOiledMachine-62=DEFERRED
+units-at-landing: TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126
+hold-run: 
+hold-streak: 1 · at b5eca851
+resume-owed: none · owner
+held-at: 2026-10-27T16:32:32Z
+hold-reason: the close's bar is red only on two leg ceilings (spec tokens 512s alone vs 390s, routed commits 358s alone vs 300s, both green unbounded); once the owner raises them or rules otherwise, in the run worktree: bash tools/unattended/unattended.sh --close dWellOiledMachine with the two recorded overrides, then bash tools/push-main.sh --land --slug dWellOiledMachine and bash tools/unattended/unattended.sh --settle dWellOiledMachine
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
 gates-run: unattended-17931145239669812136-1388702 10ab2148
 parked-surfaced: yes, 126 surfaced
 keepalive-reaped: yes
-refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · park · 0 touching
+refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5962b630365e5b68e424a37ba8c82204b3317556
-phase: VERIFYING
+witness: b5eca851ada77d11d3a87bc8c60f05a69c9ab197
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -432,3 +442,7 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T12:19:06Z rescope · item defer TOOL-dWellOiledMachine-126 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
 
 2026-10-27T16:32:01Z decision · item The close's bar is red only on two leg ceilings: spec tokens (packet join over this build's live chain) ran 512s alone against 390s, routed commits 358s alone against 300s; both green when unbounded. Raise the two ceilings in tools/gate-legs.json with evidence rows, or batch carries.py's per-revision git show behind an owner repin, then re-run the close? · reason options: (a) a unit in another build raising the two ceilings with ceiling-evidence rows, then --close and --land here; (b) carries.py batching under packet.py --repin, owner-only; refused as the run's own: this spec run writes no product code, and a run that edits the grader cannot self-land (KF3)
+
+2026-10-27T16:32:39Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dWellOiledMachine && bash tools/push-main.sh --land --slug dWellOiledMachine && bash tools/unattended/unattended.sh --settle dWellOiledMachine
+
+2026-10-27T16:32:39Z hold · item owner-decision · reason until owner · reaped a9b3bb6f · resume none(owner)
