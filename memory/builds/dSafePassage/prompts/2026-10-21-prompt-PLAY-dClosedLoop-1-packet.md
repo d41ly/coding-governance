@@ -64,7 +64,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `eab5913af2b9bcc9b77efbe972c3ebc345d59c23`
+- rendered at: `4106239717757df97e9a1c6b66df799fd930f86d`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -182,6 +182,7 @@ The opened README's roster, every unit with its row:
 - unit id `TOOL-dSafePassage-58` · README:116 | 57 | `TOOL-dSafePassage-58` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 51 and 52, its ten minors on TOOL-52: the arm probe staged, the placement anchored on the block's `fi`, the abort's real exit, and the render's four outputs |
 - unit id `TOOL-dSafePassage-59` · README:117 | 58 | `TOOL-dSafePassage-59` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them |
 - unit id `TOOL-dSafePassage-61` · README:118 | 59 | `TOOL-dSafePassage-61` | **Derived:** TOOL-dSafePassage-1 | the size-limits step and gov's own migration, moved out of TOOL-dSafePassage-1 at its F8 stop and held until the guard admits a value-preserving write |
+- unit id `TOOL-dSafePassage-62` · README:119 | 60 | `TOOL-dSafePassage-62` | **Derived:** TOOL-dSafePassage-5 | `update` writes the receipt its file pass moved before the first step, so a walk killed below schema 4 leaves rows a rollback can return |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -205,8 +206,8 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dSafePassage`:
 
-Coverage of dSafePassage's 13 clauses and 5 owned nodes, over 59 specs:
-- carried whole: 12; carried in parts: 1 (cl-dClosedLoop-0018)
+Coverage of dSafePassage's 13 clauses and 5 owned nodes, over 60 specs:
+- carried whole: 11; carried in parts: 2 (cl-dClosedLoop-0018, cl-dClosedLoop-0022)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0018, cl-dClosedLoop-0028, cl-dClosedLoop-0030; ambiguous: none
 - owned nodes no spec names: none

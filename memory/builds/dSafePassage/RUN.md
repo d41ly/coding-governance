@@ -213,3 +213,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-27T05:52:36Z brief · item TOOL-dSafePassage-37 · reason 1878c1af8e39 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-37-build-brief.md
 
 2026-10-27T05:57:38Z dispatch · item 37152f04 TOOL-dSafePassage-37 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-37.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-37-ledger.md
+
+2026-10-27T07:21:29Z rescope · item add TOOL-dSafePassage-62 · reason TOOL-dSafePassage-5's second build pass measured a killed schema-step walk whose rollback writes 0 files and leaves 38 paths at the tip: below schema 4 the walk persists no receipt, so the file pass's new rows never reach disk and the rollback reads every moved file as patched; update writes its receipt before the first step, ordered before unit 5

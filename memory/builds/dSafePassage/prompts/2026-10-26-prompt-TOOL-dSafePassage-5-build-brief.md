@@ -70,3 +70,4 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## From the first dispatch (2026-10-27)
 
 - The first builder handed release-0 back: the pin's adopters refused it. Spec rev-7 takes four kits out by F3 and answers the rest; it adds `ci_file` and `lexicon_conf` answers from reading the pinned renderer, not from a measurement. Confirm on your first probe; if `apply` still does not exit 0, that is a DIVERGENCE hand-back naming the kit and its refusal (F3).
+- TOOL-dSafePassage-62 builds before you (spec rev-8 consumes it): `update` writes its receipt and sidecar, `gov_commit` unmoved, before the first step, so a kill below schema 4 leaves the rows on disk.

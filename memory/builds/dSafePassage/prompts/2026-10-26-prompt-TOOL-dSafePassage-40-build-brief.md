@@ -56,3 +56,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## Carried from TOOL-dSafePassage-5 rev-8
+
+- Once you land, the re-run after a forced floor-step kill records no `via` where `up` records `witness`, which turns TOOL-dSafePassage-5's `kill` case red (its §5 risks). Update that case's expectation in your pass if the spec lets you; otherwise name it in your summary.
