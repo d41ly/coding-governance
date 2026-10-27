@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-49 — the fifth spec audit's 6 roles-suite, budget and write-set minors: a disjointness read from what units 45 and 46 wrote, a budget re-pinned from every worktree's readings by an expression, and an interrupt probe that waits for its child
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-47-round5-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-47-round5-fix-return.md) | research | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-47-round5-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-47-round5-fix-brief.md) | research | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 |
 
 <!-- /gen:spec-records -->
 
@@ -80,6 +81,8 @@ item.
 
 - **consumes-from** `TOOL-dFurnishedOrders-45` — §4 clause 1's write-set record, which S1 re-reads from the pass commits (id 6)
 - **consumes-from** `TOOL-dFurnishedOrders-46` — Files touched, the dispatch row, S4's reading and AC4's bound, and AC17's interrupt probe, which S1 to S6 settle (ids 6, 27, 7, 16, 20, 26)
+- **hands-off** `TOOL-dFurnishedOrders-51` — S6's patched wait and AC5, whose stub, pid and live read unit 51 S1 to S5 pin (id 24 of the sixth audit)
+- **hands-off** `TOOL-dFurnishedOrders-52` — S1, S4 to S6, AC3, AC4 and the roles row's note, which unit 52 S12 to S15, S19 to S21, S24 and S25 settle (ids 8, 26, 22, 9, 4, 5, 11, 15, 16 of the sixth audit)
 
 ## 4. Design
 
@@ -209,6 +212,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC5 · unit 46's interrupt ar
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-4 promotions' roles-suite, budget and
   write-set minors batched: 6 LOW.
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-51, TOOL-dFurnishedOrders-52, promoted from the spec audit of the round-5 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

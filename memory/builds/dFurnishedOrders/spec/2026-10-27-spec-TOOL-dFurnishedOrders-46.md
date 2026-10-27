@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-46 — the fourth spec audit's 18 roles, run-gates, process-monitor, unattended and kickoff minors: one re-stamp last, one bounded runner that carries its imports and kills on any exception, criteria that read the real gate, and the guards and pins the new arms move
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -163,6 +163,7 @@ disjoint write sets by M6 (`TOOL-dFurnishedOrders-45` §4 "Why two units"):
 - **consumes-from** `TOOL-dFurnishedOrders-44` — the `apply --all` arm whose registry descriptors S8 guards (id 22)
 - **hands-off** `TOOL-dFurnishedOrders-48` — S1's re-stamp, AC1, S8's guard rows and AC8, which unit 48 S1 to S3 and S14 to S18 settle (ids 1, 12, 23, 9, 35, 21, 11, 28 of the fifth audit)
 - **hands-off** `TOOL-dFurnishedOrders-49` — Files touched, the dispatch row, S4's reading, AC4's bound and AC17's interrupt probe, which unit 49 S1 to S6 settle (ids 6, 27, 7, 16, 20, 26 of the fifth audit)
+- **hands-off** `TOOL-dFurnishedOrders-51` — AC17's interrupt arm, whose stub, pid and liveness read unit 51 S1 to S3 pin (id 24 of the sixth audit)
 
 ## 4. Design
 
@@ -403,6 +404,7 @@ the `kickoff-manifest ratchet` leg as S1's.
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-3 promotions' roles, run-gates,
   process-monitor, unattended, kickoff and gate-manifest minors batched: 9 MEDIUM and 9 LOW.
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-48, TOOL-dFurnishedOrders-49, promoted from the spec audit of the round-4 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-51, promoted from the spec audit of the round-5 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-48 — the fifth spec audit's 26 govkit, parity-arm, guard and ratchet minors: the ratchet's own predicate and a landing re-stamp, two tool-root answers, one environment strip, isolated DEAD PROBE clauses, a guard derived from the registry, homes from the receipt, and a deploy descriptor refused at its boundary
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-47-round5-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-47-round5-fix-return.md) | research | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-49 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-47-round5-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-47-round5-fix-brief.md) | research | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-49 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-49 |
 
 <!-- /gen:spec-records -->
 
@@ -198,6 +199,8 @@ and closed by its own scope item. Ids the report merged into one item still take
 - **consumes-from** `TOOL-dFurnishedOrders-45` — S4's environment, S7's tracked search, S8's shape guard and AC3, AC5, AC6 and AC7, which S4 to S9, S19, S20, S25 and S26 settle (ids 2, 31, 3, 19, 24, 30, 13, 22, 32, 18)
 - **consumes-from** `TOOL-dFurnishedOrders-46` — S1's re-stamp, AC1, S8's guard rows and AC8, which S1 to S3 and S14 to S18 settle (ids 1, 12, 23, 9, 35, 21, 11, 28)
 - **consumes-from** `TOOL-dFurnishedOrders-47` — the parity arm's receipt-alone outcome rule, under which S11's cases and S22's compare run their `apply --all` (ids 4, 15, 17, 34)
+- **hands-off** `TOOL-dFurnishedOrders-50` — S17's home rows and S16's guard arm, whose required set and reach unit 50 S1 to S5 settle (id 17 of the sixth audit)
+- **hands-off** `TOOL-dFurnishedOrders-52` — AC1, AC5, AC10, AC12, S16, S22, S25 and the write set, which unit 52 S1 to S7, S16 to S18, S21 and S26 settle (ids 1, 20, 28, 10, 2, 7, 23, 12, 18, 29, 11, 21 of the sixth audit)
 
 ## 4. Design
 
@@ -443,6 +446,7 @@ The close also reads the `kickoff-manifest ratchet` leg on the prepared merge as
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-4 promotions' govkit, parity-arm,
   guard and ratchet minors batched: 21 MEDIUM and 5 LOW.
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-50, TOOL-dFurnishedOrders-52, promoted from the spec audit of the round-5 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -96,3 +96,11 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-27T01:06:40Z rescope · item add TOOL-dFurnishedOrders-49 · reason spec-audit round1 of the round-4 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md) minors batched, the roles-suite budget, interrupt probe and write-set record half, a write set disjoint from TOOL-dFurnishedOrders-48 by M6: LOW ids 6 7 16 20 26 27 (items L3 L4 L7 L9)
 
 2026-10-27T01:22:33Z review · item dFurnishedOrders-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 32 · disposition promote
+
+2026-10-27T02:25:10Z rescope · item add TOOL-dFurnishedOrders-50 · reason spec-audit round1 of the round-5 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md) finding id 17 at HIGH, report item H1: unit 48 S17's guard rows red spec tokens across live specs in this and other builds
+
+2026-10-27T02:25:16Z rescope · item add TOOL-dFurnishedOrders-51 · reason spec-audit round1 of the round-5 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md) finding id 24 at HIGH, report item H2: unit 49's interrupt probe never pins whose pid it checks, so a pid from another namespace reads as gone and the arm passes unchecked
+
+2026-10-27T02:25:17Z rescope · item add TOOL-dFurnishedOrders-52 · reason spec-audit round1 of the round-5 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 1 20 28 2 7 23 6 13 27 8 26 9 12 18 29 (items M1-M8) and LOW ids 10 19 22 4 5 11 14 30 15 16 21 (items L1-L10)
+
+2026-10-27T02:45:26Z review · item dFurnishedOrders-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 26 · disposition promote

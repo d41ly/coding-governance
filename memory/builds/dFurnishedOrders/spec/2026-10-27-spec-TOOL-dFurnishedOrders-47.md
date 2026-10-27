@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-47 — unit 44's parity arm grades the receipt `apply` finishes: an adopter or render problem outside home parity is named and tolerated, and a refusal before the final receipt still fails the arm
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-47-round5-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-47-round5-fix-return.md) | research | TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-47-round5-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-47-round5-fix-brief.md) | research | TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 |
 
 <!-- /gen:spec-records -->
 
@@ -67,6 +68,7 @@ with every problem outside home parity printed and never failing the arm. It rep
 
 - **consumes-from** `TOOL-dFurnishedOrders-44` — the arm's `p.returncode != 0 -> FAIL` line and S1's refusal sentence, which S1 and S2 replace with the receipt-alone outcome rule (id 10)
 - **hands-off** `TOOL-dFurnishedOrders-48` — the outcome rule under which unit 48's DEAD PROBE cases and its rule-image compare run their `apply --all` (ids 4, 15, 17, 34)
+- **hands-off** `TOOL-dFurnishedOrders-52` — S1's receipt needle, S2's problem count and S3's budget input, which unit 52 S1, S3, S8 to S11, S22 and S23 settle (ids 1, 28, 6, 13, 27, 19, 14, 30 of the sixth audit)
 
 ## 4. Design
 
@@ -201,6 +203,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · unit 44's parity arm, mov
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-4 promotions, id 10
   (HIGH, item H1).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-52, promoted from the spec audit of the round-5 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

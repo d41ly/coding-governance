@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-43 — a receipt target's kit homes are the directories `apply` lands each kit's home at, derived through the entry's own destination rules, never a formula beside them
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -79,6 +79,7 @@ step after it (order 8).
 - **hands-off** `TOOL-dFurnishedOrders-45` — the deploy read and the descriptor unpack S1 performs, which unit 45 S1, S6 and S8 settle (ids 25, 13, 27)
 - **hands-off** `TOOL-dFurnishedOrders-46` — the files this unit's arm reads outside the `govkit selftest` guard, which unit 46 S8 adds to it (id 22)
 - **hands-off** `TOOL-dFurnishedOrders-48` — `derive_receipt_homes`, its S1 walk and its S2 guards, which unit 48 S21, S22 and S24 settle (ids 14, 17, 33 of the fifth audit)
+- **hands-off** `TOOL-dFurnishedOrders-52` — AC1's and AC2's fixtures and the arm over them, which unit 52 S17 gives `source` fields (id 18 of the sixth audit)
 
 ## 4. Design
 
@@ -227,6 +228,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · a receipt target with rev
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-3 promotions, id 1
   (HIGH, item H1, shared with id 14).
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-48, promoted from the spec audit of the round-4 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-52, promoted from the spec audit of the round-5 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 
