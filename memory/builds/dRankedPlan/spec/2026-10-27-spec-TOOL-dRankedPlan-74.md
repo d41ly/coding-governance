@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-74 — an ANSI-C or locale quoted segment of a shell carrier is rendered into quoting `shlex` reads before unquoting
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-68-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-68-promoted-fix-return.md) | research | TOOL-dRankedPlan-68 TOOL-dRankedPlan-70 TOOL-dRankedPlan-77 |
 | [2026-10-27-build-TOOL-dRankedPlan-74-deviation-741.md](../build/2026-10-27-build-TOOL-dRankedPlan-74-deviation-741.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-68-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-68-promoted-fix-brief.md) | research | TOOL-dRankedPlan-68 TOOL-dRankedPlan-70 TOOL-dRankedPlan-77 |
+| [2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) | spec-audit | TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,7 @@ runs. It repairs `TOOL-dRankedPlan-65`, so it sits one order above it.
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-65` — S1's `shlex` unquoting and the readers after it, which S1 feeds; without them the rendered word is read by nothing
+- **hands-off** `TOOL-dRankedPlan-81` — S1, S2, AC4, §3, §4, §5 and §7, which that unit's items for findings 2, 5, 8, 19, 20 and 9 correct; carry S3, S5, S6, S11, S13 and S19 of that unit into this unit's pass (spec audit of units 68 to 77)
 
 ## 4. Design
 
@@ -162,6 +164,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 63 to 67, finding 25
   (HIGH, item H4), repairing `TOOL-dRankedPlan-65`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-81`, the reciprocal of that promoted unit's own edge (spec audit of units 68 to 77, `reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

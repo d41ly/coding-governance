@@ -12,6 +12,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-68-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-68-promoted-fix-return.md) | research | TOOL-dRankedPlan-70 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-68-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-68-1-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-68-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-68-promoted-fix-brief.md) | research | TOOL-dRankedPlan-70 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 |
+| [2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) | spec-audit | TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 |
 
 <!-- /gen:spec-records -->
 

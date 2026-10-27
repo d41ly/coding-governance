@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-70 — every expression-end call of the JavaScript reader passes the lexer's facts, each declarator's included
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-68-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-68-promoted-fix-return.md) | research | TOOL-dRankedPlan-68 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 |
 | [2026-10-27-build-TOOL-dRankedPlan-70-deviation-701.md](../build/2026-10-27-build-TOOL-dRankedPlan-70-deviation-701.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-68-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-68-promoted-fix-brief.md) | research | TOOL-dRankedPlan-68 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 |
+| [2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) | spec-audit | TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 |
 
 <!-- /gen:spec-records -->
 
@@ -51,6 +52,9 @@ file. Finding 1 is `TOOL-dRankedPlan-68`'s, finding 8 `TOOL-dRankedPlan-69`'s an
 
 - **consumes-from** `TOOL-dRankedPlan-64` — S1's per-declarator extent call, which S1 gives the facts; without it no later declarator is bound
 - **consumes-from** `TOOL-dRankedPlan-68` — S1's `c` and `l` from the reader's one scan; without them there are no facts to pass
+- **hands-off** `TOOL-dRankedPlan-78` — S2's four-argument class, which that unit states as a predicate counting every call's arguments (spec audit of units 68 to 77, id 16)
+- **hands-off** `TOOL-dRankedPlan-79` — S2's observation and AC2, which that unit moves onto a loop selftest arm; carry S2 of that unit into this unit's pass (spec audit of units 68 to 77, id 1)
+- **hands-off** `TOOL-dRankedPlan-81` — §3, into which that unit's item for finding 4 carries the hands-off edge back from unit 72; carry S4 of that unit into this unit's pass (spec audit of units 68 to 77)
 
 ## 4. Design
 
@@ -135,6 +139,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 63 to 67, finding 16
   (HIGH, item H1, shared with findings 1, 8 and 22), repairing `TOOL-dRankedPlan-64`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-78`, the hands-off edge to `TOOL-dRankedPlan-79` and the hands-off edge to `TOOL-dRankedPlan-81`, each the reciprocal of that promoted unit's own edge (spec audit of units 68 to 77, `reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

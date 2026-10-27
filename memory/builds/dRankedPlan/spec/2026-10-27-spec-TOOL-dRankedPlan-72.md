@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-72 — a JavaScript declarator opens after every depth-0 comma that ends a declarator, valued or not
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-72-deviation-721.md](../build/2026-10-27-build-TOOL-dRankedPlan-72-deviation-721.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) | spec-audit | TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,8 @@ ends one, valued or not. It repairs `TOOL-dRankedPlan-64`, so it sits one order 
 
 - **consumes-from** `TOOL-dRankedPlan-64` — S1's declarator loop, whose opening rule S1 restates; without it no later declarator is collected
 - **hands-off** `TOOL-dRankedPlan-77` — S2's `caller-js-bound-unvalued-first`, which that unit's item for finding 3 names in unit 64's §4 row 3
+- **hands-off** `TOOL-dRankedPlan-80` — S1's walk, to which that unit adds the pattern declarator's rule (spec audit of units 68 to 77, id 15)
+- **hands-off** `TOOL-dRankedPlan-81` — S1 and §3, which that unit's item for finding 4 corrects; carry S4 of that unit into this unit's pass (spec audit of units 68 to 77)
 
 ## 4. Design
 
@@ -137,6 +140,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 63 to 67, finding 19
   (HIGH, item H2; finding 3 is its medium face), repairing `TOOL-dRankedPlan-64`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-80` and the hands-off edge to `TOOL-dRankedPlan-81`, each the reciprocal of that promoted unit's own edge (spec audit of units 68 to 77, `reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

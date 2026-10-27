@@ -183,3 +183,13 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T08:58:46Z hold · item owner-decision · reason until owner · reaped 08db21e2 · resume none(owner)
 
 2026-10-27T12:00:47Z resume · item dRankedPlan · reason held · keepalive 6cdb61ed · manual
+
+2026-10-27T13:42:38Z rescope · item add TOOL-dRankedPlan-78 · reason spec-audit of TOOL-dRankedPlan-68 to -77 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) id 16 HIGH item H1 (shared with id 1): unit 70 AC2 certifies S2's four-argument class by a regex that counts no arguments, over a reader whose facts are optional; repairs TOOL-dRankedPlan-70
+
+2026-10-27T13:42:41Z rescope · item add TOOL-dRankedPlan-79 · reason spec-audit of TOOL-dRankedPlan-68 to -77 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) id 1 HIGH item H1 (shared with id 16): unit 70 AC2 runs once at its tip, so the calls units 71 and 72 rewrite later are never checked against the four-argument class; repairs TOOL-dRankedPlan-70
+
+2026-10-27T13:42:44Z rescope · item add TOOL-dRankedPlan-80 · reason spec-audit of TOOL-dRankedPlan-68 to -77 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) id 15 HIGH item H2: unit 72's declarator walk has no rule for a destructuring declarator, so a plain declarator after one is never bound; repairs TOOL-dRankedPlan-72
+
+2026-10-27T13:42:47Z rescope · item add TOOL-dRankedPlan-81 · reason spec-audit of TOOL-dRankedPlan-68 to -77 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) the 20 MEDIUM and LOW findings batched into one unit: ids 2 3 4 5 6 7 8 9 10 11 12 13 14 17 18 19 20 21 22 23 (items M1 to M11 and L1 to L5)
+
+2026-10-27T14:01:18Z review · item dRankedPlan-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 20 · disposition promote

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-77 — the spec audit of units 63 to 67: its 16 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 26 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 26 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-68-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-68-promoted-fix-return.md) | research | TOOL-dRankedPlan-68 TOOL-dRankedPlan-70 TOOL-dRankedPlan-74 |
 | [2026-10-27-build-TOOL-dRankedPlan-77-deviation-771.md](../build/2026-10-27-build-TOOL-dRankedPlan-77-deviation-771.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-68-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-68-promoted-fix-brief.md) | research | TOOL-dRankedPlan-68 TOOL-dRankedPlan-70 TOOL-dRankedPlan-74 |
+| [2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) | spec-audit | TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 |
 
 <!-- /gen:spec-records -->
 
@@ -155,6 +156,7 @@ and observes every item at its tip.
 - **consumes-from** `TOOL-dRankedPlan-72` — S2's first plant, which S6 names
 - **consumes-from** `TOOL-dRankedPlan-73` — S1's readers and S2's plants, which S7 names
 - **consumes-from** `TOOL-dRankedPlan-75` — S1's scanner and S2's first plant, which S11 names
+- **hands-off** `TOOL-dRankedPlan-81` — S11 and §10, which that unit's item for finding 12 corrects; carry S9 of that unit into this unit's pass (spec audit of units 68 to 77)
 
 ## 4. Design
 
@@ -298,6 +300,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 63 to 67, its 16 MEDIUM
   and LOW findings batched into one unit.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-81`, the reciprocal of that promoted unit's own edge (spec audit of units 68 to 77, `reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

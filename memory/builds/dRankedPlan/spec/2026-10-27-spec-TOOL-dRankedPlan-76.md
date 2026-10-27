@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-76 — an arithmetic expansion of an expanded heredoc body is scanned, and its text is read by the line rule
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-76-deviation-761.md](../build/2026-10-27-build-TOOL-dRankedPlan-76-deviation-761.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) | spec-audit | TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-77 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ text by the line rule. It repairs `TOOL-dRankedPlan-66`, so it sits one order ab
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-66` — S1's scan, S2's span reading and line rule, S3's exit 2 and §3's arithmetic bullet, which S1 and S2 restate; without them no span is read
+- **hands-off** `TOOL-dRankedPlan-81` — §3 and §10, which that unit's item for finding 12 corrects; carry S9 of that unit into this unit's pass (spec audit of units 68 to 77)
 
 ## 4. Design
 
@@ -146,6 +148,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 63 to 67, finding 23
   (HIGH, item H6), repairing `TOOL-dRankedPlan-66`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-81`, the reciprocal of that promoted unit's own edge (spec audit of units 68 to 77, `reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

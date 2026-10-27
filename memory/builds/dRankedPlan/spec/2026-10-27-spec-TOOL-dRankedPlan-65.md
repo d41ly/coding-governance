@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-65 — a shell carrier in any other quoting is unquoted as the shell does, then read as a single-quoted one
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -69,6 +69,7 @@ corrects that row. This unit repairs `TOOL-dRankedPlan-56`, so it sits one order
 - **hands-off** `TOOL-dRankedPlan-73` — S1's readers, S2 and S3's third plant, which that unit restates by reader and replaces (spec audit of units 63 to 67, id 11)
 - **hands-off** `TOOL-dRankedPlan-74` — S1's `shlex` unquoting, before which that unit renders ANSI-C and locale quoted segments (spec audit of units 63 to 67, id 25)
 - **hands-off** `TOOL-dRankedPlan-77` — §4 Evidence and §7, which that unit's item for finding 4 corrects; carry S7 of that unit into this unit's pass (spec audit of units 63 to 67)
+- **hands-off** `TOOL-dRankedPlan-81` — S3, its Inventory, AC3 and §5, which that unit's item for finding 13 corrects; carry S12 of that unit into this unit's pass (spec audit of units 68 to 77)
 
 ## 4. Design
 
@@ -170,6 +171,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 53 to 62, finding 29 (HIGH,
   item H2; finding 12 is its medium face), repairing `TOOL-dRankedPlan-56`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-73`, the hands-off edge to `TOOL-dRankedPlan-74`, the hands-off edge to `TOOL-dRankedPlan-77`, each the reciprocal of that promoted unit's own edge (spec audit of units 63 to 67, `reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-81`, the reciprocal of that promoted unit's own edge (spec audit of units 68 to 77, `reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

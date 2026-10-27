@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-75 — a command substitution span of an expanded heredoc body does not count a `case` statement's parentheses
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-75-deviation-751.md](../build/2026-10-27-build-TOOL-dRankedPlan-75-deviation-751.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) | spec-audit | TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ close rule. It repairs `TOOL-dRankedPlan-66`, so it sits one order above it.
 
 - **consumes-from** `TOOL-dRankedPlan-66` — S1's span scan and close rule, which S1 amends; without it there is no span to close
 - **hands-off** `TOOL-dRankedPlan-77` — S1's amended scanner and S2's `caller-heredoc-cat-case`, which that unit's item for finding 17 names in unit 66's Inventory
+- **hands-off** `TOOL-dRankedPlan-81` — §3, §5 and §10, which that unit's items for findings 12, 21 and 7 correct; carry S9, S14 and S18 of that unit into this unit's pass (spec audit of units 68 to 77)
 
 ## 4. Design
 
@@ -133,6 +135,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 63 to 67, finding 13
   (HIGH, item H5; finding 17 shares the defect at medium), repairing `TOOL-dRankedPlan-66`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-81`, the reciprocal of that promoted unit's own edge (spec audit of units 68 to 77, `reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-69 — a `str` token of the `strs` stream carries the continuation facts its silent literal carried
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-69-deviation-691.md](../build/2026-10-27-build-TOOL-dRankedPlan-69-deviation-691.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) | spec-audit | TOOL-dRankedPlan-68 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,7 @@ This unit repairs `TOOL-dRankedPlan-63`, so it sits one order above it.
 - **consumes-from** `TOOL-dRankedPlan-48` — S1's `strs` mode and S2's copy set, which S1 and S2 complete; without them there is no `str` token
 - **consumes-from** `TOOL-dRankedPlan-68` — S1's facts handed to the extent call; without them the marks S1 places are never read
 - **hands-off** `TOOL-dRankedPlan-77` — S1's `lits` rule, which that unit's item for finding 9 cites in unit 63's §4 Evidence and §5
+- **hands-off** `TOOL-dRankedPlan-81` — AC4, which that unit's items for findings 6 and 23 correct; carry S16 and S17 of that unit into this unit's pass (spec audit of units 68 to 77)
 
 ## 4. Design
 
@@ -160,6 +162,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 63 to 67, finding 8 (HIGH,
   item H1, shared with findings 1, 16 and 22), repairing `TOOL-dRankedPlan-63`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-81`, the reciprocal of that promoted unit's own edge (spec audit of units 68 to 77, `reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 
