@@ -14218,6 +14218,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_descriptor_at",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

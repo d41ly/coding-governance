@@ -234,6 +234,9 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
 - **Files gov added after `<rev>`** read as withdrawals, as for any `update`: reported, with an order
   under `.governance/outbox/`, and deleted only under `--write-withdrawals`. A kit the receipt
   gained after `<rev>` stays claimed.
+- **Roles.** Each file is graded under the role `<rev>`'s descriptor gives it, not the one your gov
+  checkout's working tree gives it, so a file recorded `retired-edited` that `<rev>` still ships
+  returns to that role. A kit whose descriptor `<rev>` does not hold keeps the working tree's.
 
 To see it on this machine:
 

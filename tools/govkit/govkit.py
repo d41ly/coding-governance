@@ -330,8 +330,10 @@ def git(root: pathlib.Path, *args: str) -> str:
     return out.stdout
 
 
-def tracked(root: pathlib.Path) -> list[str]:
-    return [p for p in git(root, "ls-files", "-z").split("\0") if p]
+def tracked(root: pathlib.Path, at: str | None = None) -> list[str]:
+    """The index's paths, or with `at` the paths the tree at that commit holds (TOOL-dSafePassage-65 S2)."""
+    args = ("ls-tree", "-r", "--name-only", "-z", at) if at else ("ls-files", "-z")
+    return [p for p in git(root, *args).split("\0") if p]
 
 
 # ------------------------------------------------------------------------------------- the model
@@ -479,7 +481,8 @@ UNLANDED_REASON = {
 }
 
 
-def expand_rules(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> list[dict]:
+def expand_rules(root: pathlib.Path, desc: dict, ctx: dict[str, str],
+                 at: str | None = None) -> list[dict]:
     """Every (rule index, source, destination template, role) the descriptor names, BEFORE precedence.
 
     A `**` include enumerates the tracked files under `home`; everything else is literal. A rule that
@@ -498,16 +501,18 @@ def expand_rules(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> list[di
         # provides and measurably reaches further.
         if derive_opted_out(rule, ctx):
             continue      # neither its sources nor a source-less destination: the target declined
-        for src in resolve_rule_pool(root, desc, rule, ctx, home):
+        pool = resolve_rule_pool(root, desc, rule, ctx, home, at=at)
+        for src in pool:
             for dest, miss in resolve_dests(desc, rule, src, ctx, home):
                 out.append({"rule": i, "src": src, "dest": dest, "role": role, "miss": miss})
-        if not resolve_rule_pool(root, desc, rule, ctx, home):
+        if not pool:
             for dest in rule_destinations(desc, rule):
                 out.append({"rule": i, "src": None, "dest": dest, "role": role, "miss": []})
     return out
 
 
-def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> dict:
+def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str],
+                  at: str | None = None) -> dict:
     """Apply precedence. TWO operations, TWO keys — the distinction the whole unit turns on.
 
     A `project-owned` rule is a SOURCE-level carve-out: it removes its sources from every EARLIER
@@ -523,9 +528,10 @@ def resolve_entry(root: pathlib.Path, desc: dict, ctx: dict[str, str]) -> dict:
     called it `engine`.
 
     Returns writes (resolved destination -> row), unlanded rows with their reasons, the carved source
-    set, and the census of destinations whose winner is not the first rule that matched them.
+    set, and the census of destinations whose winner is not the first rule that matched them. With
+    `at`, a `**` rule pools the files gov tracks at that commit (TOOL-dSafePassage-65 S2).
     """
-    rows = expand_rules(root, desc, ctx)
+    rows = expand_rules(root, desc, ctx, at=at)
 
     carve_at: dict[str, int] = {}
     for r in rows:
@@ -6795,7 +6801,8 @@ def resolve_dests(desc: dict, rule: dict, src: str, ctx: dict, home: str) -> lis
     return [(f"{ctx['kit']}/{rel}", [])]
 
 
-def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, home: str) -> list[str]:
+def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, home: str,
+                      at: str | None = None) -> list[str]:
     """The source paths a rule actually lands. ONE spelling for `plan` AND `apply`.
 
     THIS SEAM EXISTS BECAUSE THE TWO DISAGREED. `plan` resolved sources through `rule_sources()`,
@@ -6814,7 +6821,7 @@ def resolve_rule_pool(root: pathlib.Path, desc: dict, rule: dict, ctx: dict, hom
     srcs = inc if isinstance(inc, list) else ([inc] if inc else [])
     if any(s == "**" for s in srcs):
         claimed = scan_claimed_paths(desc, rule, ctx, home)
-        return [f for f in tracked(root)
+        return [f for f in tracked(root, at)
                 if home and f.startswith(home + "/")
                 and not ({d for d, _m in resolve_dests(desc, rule, f, ctx, home)} & claimed)]
     return rule_sources(desc, rule)
@@ -10110,6 +10117,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _held_kits.setdefault(str(kit), []).append(str(path))
 
     _role_res: dict[str, dict] = {}
+    _head_commit = git(root, "rev-parse", "HEAD").strip()
     for row in rows_all:
         role = row.get("role", "engine")
         how = UPDATE_ROLE.get(role)
@@ -10142,9 +10150,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # decide what this run may do.
         if row.get("kit") in descs:
             if row["kit"] not in _role_res:
-                d, _ = descs[row["kit"]]
+                # TOOL-dSafePassage-65 S3. A `--to` other than the checkout's HEAD (a rollback, a
+                # fetched tip) resolves each role from the descriptor and pool AT `--to`, the vintage
+                # whose bytes this run moves to; a kit gained after it resolves as the working tree does.
+                d, dpath = descs[row["kit"]]
+                d_at = (read_descriptor_at(root, to_commit, dpath)
+                        if to_commit != _head_commit else None)
+                at = to_commit if d_at is not None else None
+                d = d_at if d_at is not None else d
                 _role_res[row["kit"]] = resolve_entry(
-                    root, d, target_context(target, deploy, row["kit"], d))
+                    root, d, target_context(target, deploy, row["kit"], d), at=at)
             res = _role_res[row["kit"]]
             w = res["writes"].get(row["path"])
             now = w["role"] if w else next(
@@ -13876,6 +13891,19 @@ def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tupl
             continue
         descs[eid] = (resolve_descriptor_paths(load_toml(p), tr), dpath)
     return descs
+
+
+def read_descriptor_at(root: pathlib.Path, commit: str, dpath: str) -> dict | None:
+    """TOOL-dSafePassage-65 S1. The descriptor at `dpath` as gov holds it AT `commit`, joined as
+    `read_descriptors` joins the working tree's. None where the blob is absent there."""
+    blob = blob_at(root, commit, dpath)
+    if blob is None:
+        return None
+    try:
+        desc = tomllib.loads(blob.decode("utf-8"))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as e:
+        raise Refusal(f"{dpath} at {commit[:8]} is not valid TOML: {e}") from e
+    return resolve_descriptor_paths(desc, derive_tool_root(root))
 
 
 def resolve_descriptor_paths(desc: dict, tool_root: str) -> dict:

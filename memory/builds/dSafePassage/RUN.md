@@ -235,3 +235,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-27T11:39:47Z rescope · item add TOOL-dSafePassage-65 · reason TOOL-dSafePassage-5's fourth build pass measured a rollback leaving a withdrawn row retired-edited: update reads gov's bytes at --to but roles from the checkout's working tree (govkit.py:9521, :10145), against help/upgrade-steps.md:206 and DEPL-dGaugedVintage-9 S1; the role re-resolution reads the kit's descriptor at --to, ordered before unit 5
 
 2026-10-27T11:39:50Z rescope · item add TOOL-dSafePassage-66 · reason TOOL-dSafePassage-5's fourth build pass measured a walk killed inside a step leaving a held kit's files at the tip: update restores a held kit only in its verify pass, after the step walk, and TOOL-dSafePassage-62's receipt records them; the restore runs straight after the HELD BACK lines, before the first step, ordered before unit 5
+
+2026-10-27T11:59:51Z dispatch · item 882f78e5 TOOL-dSafePassage-65 · reason tools/govkit/govkit.py tools/govkit/fixtures/retired_edits.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-65.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-65-ledger.md memory/map/generated/symbols.json memory/builds/dSafePassage/README.md
+
+2026-10-27T11:59:58Z brief · item TOOL-dSafePassage-65 · reason bee680c08075 memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-65-build-brief.md

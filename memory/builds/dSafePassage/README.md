@@ -170,7 +170,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-62 — `update` writes the receipt its file pass moved before the first step, so a walk killed below schema 4 leaves rows a rollback can return](spec/2026-10-27-spec-TOOL-dSafePassage-62.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-63 — `update` proves an edit to a rendered file from the sha256 its install recorded, when the row has no `oid`](spec/2026-10-27-spec-TOOL-dSafePassage-63.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-64 — a `retired-edited` row takes back the role gov's descriptor gives its path once gov ships that path again](spec/2026-10-27-spec-TOOL-dSafePassage-64.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
-| [TOOL-dSafePassage-65 — `update` resolves a row's role from the descriptor at `--to`, not from the gov checkout's working tree](spec/2026-10-27-spec-TOOL-dSafePassage-65.md) | 5 | 2 | DEFERRED | rev-1 | 2026-10-27 |
+| [TOOL-dSafePassage-65 — `update` resolves a row's role from the descriptor at `--to`, not from the gov checkout's working tree](spec/2026-10-27-spec-TOOL-dSafePassage-65.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-66 — `update` puts a held kit's writes back before the first upgrade step, so a walk killed inside a step leaves that kit at its pre-run bytes](spec/2026-10-27-spec-TOOL-dSafePassage-66.md) | 5 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | DEFERRED | rev-11 | 2026-10-27 |
 | [TOOL-dSafePassage-39 — the step row's `via` mark survives every rewrite that keeps the row `applied`, so the reverse walk's own records cannot erase it](spec/2026-10-23-spec-TOOL-dSafePassage-39.md) | 6 | 2 | DEFERRED | rev-3 | 2026-10-26 |
@@ -200,7 +200,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 296 bound to this build, across 4 record folder(s).
+Records: 297 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
