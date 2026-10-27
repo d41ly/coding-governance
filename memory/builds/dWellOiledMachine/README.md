@@ -271,7 +271,7 @@ ids TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine
 | [TOOL-dWellOiledMachine-126 — the round-7 promotions audit's 11 medium and low findings, batched: 97 S1's unquoted pathspec, criteria that observe 108 S8 and S10 and the edges, the token checker's own predicate, a positive count that can fail, a pinned held_halves read and observers that read 115](spec/2026-10-27-spec-TOOL-dWellOiledMachine-126.md) | 76 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 85 bound to this build, across 4 record folder(s).
+Records: 146 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
