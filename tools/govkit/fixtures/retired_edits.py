@@ -85,7 +85,10 @@ def run_git(root: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
 
 
 def read_clean_env(extra: dict | None = None) -> dict:
-    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    """The caller's environment without git's location variables or the two knobs `update` reads,
+    so an exported GOVKIT_RERENDER or GOV_SETTINGS_JSON cannot move a plant."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")
+           and k not in ("GOVKIT_RERENDER", "GOV_SETTINGS_JSON")}
     env["GOVKIT_NO_REMOTE_PROBE"] = "1"
     env.update(extra or {})
     return env
