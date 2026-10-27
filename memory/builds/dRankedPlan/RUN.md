@@ -21,20 +21,20 @@ hold-code: owner-decision
 held-from: RUNNING
 refreshed-at: 558b755a1e7e9fed1107cec2a5af7e33e4e363da · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: e501a1f1d65a544e980acb6c45b34adc8a051581
-phase: HELD
+witness: 3d57d3f168e568ccbdb48f41a67a98ea3740c7c4
+phase: RUNNING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-drankedplan-1fc3d7
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-26T18:31:05Z
+lease-utc: 2026-10-27T12:00:37Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 26296
 session: 43fa2011-5bb6-422a-bd52-776c30d97bd4
-keepalive: 08db21e2
+keepalive: 6cdb61ed
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 anchor-ref: refs/heads/main
@@ -181,3 +181,5 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T08:58:46Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dRankedPlan && bash tools/push-main.sh --land --slug dRankedPlan && bash tools/unattended/unattended.sh --settle dRankedPlan
 
 2026-10-27T08:58:46Z hold · item owner-decision · reason until owner · reaped 08db21e2 · resume none(owner)
+
+2026-10-27T12:00:47Z resume · item dRankedPlan · reason held · keepalive 6cdb61ed · manual

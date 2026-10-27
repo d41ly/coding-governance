@@ -164,7 +164,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-77 — the spec audit of units 63 to 67: its 16 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-77.md) | 26 | 2 | OPEN | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 99 bound to this build, across 4 record folder(s).
+Records: 100 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
