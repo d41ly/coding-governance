@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 2bd5e10d4e861245d1a5adea5d53b45f90826489 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 5a91830114df92e6f0655a423cd5cfe9d05bd0d4
 phase: REVIEWING
@@ -164,3 +165,19 @@ base: 5fede642ad2ff1418f12b5d7117129edc8287d7e
 2026-10-27T05:42:58Z rescope · item add TOOL-dLinkedLibrary-96 · reason spec-audit of units 87 to 91 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-87-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 1 25 2 3 4 18 28 8 14 9 10 11 24 26 (items M1-M10) and LOW ids 5 6 13 15 19 20 27 (items L1-L7); repairs none
 
 2026-10-27T06:01:36Z review · item dLinkedLibrary-spec-set-r7 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 21 · disposition promote
+
+2026-10-27T06:52:51Z rescope · item add TOOL-dLinkedLibrary-97 · reason spec-audit of units 92 to 96 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-92-spec-audit.md) finding id 9 at HIGH, report item H1 (id 28 binds the same gap at MEDIUM, item M10, batched in TOOL-dLinkedLibrary-102); repairs TOOL-dLinkedLibrary-96
+
+2026-10-27T06:52:52Z rescope · item add TOOL-dLinkedLibrary-98 · reason spec-audit of units 92 to 96 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-92-spec-audit.md) finding id 10 at HIGH, report item H2 (id 29 shares it, its own unit); repairs TOOL-dLinkedLibrary-96
+
+2026-10-27T06:52:53Z rescope · item add TOOL-dLinkedLibrary-99 · reason spec-audit of units 92 to 96 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-92-spec-audit.md) finding id 24 at HIGH, report item H3 (id 17 binds the same defect at MEDIUM, item M8, batched in TOOL-dLinkedLibrary-102); repairs TOOL-dLinkedLibrary-94
+
+2026-10-27T06:52:53Z rescope · item add TOOL-dLinkedLibrary-100 · reason spec-audit of units 92 to 96 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-92-spec-audit.md) finding id 27 at HIGH, report item H4; repairs TOOL-dLinkedLibrary-96
+
+2026-10-27T06:52:54Z rescope · item add TOOL-dLinkedLibrary-101 · reason spec-audit of units 92 to 96 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-92-spec-audit.md) finding id 29 at HIGH, report item H2 (id 10 shares it, its own unit); repairs TOOL-dLinkedLibrary-96
+
+2026-10-27T06:52:55Z rescope · item add TOOL-dLinkedLibrary-102 · reason spec-audit of units 92 to 96 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-92-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 1 2 3 4 26 11 23 12 15 17 25 28 31 (items M1-M11) and LOW ids 5 13 22 6 7 8 19 20 (items L1-L6); repairs none
+
+2026-10-27T07:06:06Z review · item dLinkedLibrary-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 21 · disposition promote
+
+2026-10-27T07:27:45Z decision · item The spec-audit chain does not converge: highs per round 15, 10, 9, 5, 5, 4, 4, 5 over eight rounds at precision 0.83 to 0.98, and every high since round 3 falls on TOOL-dLinkedLibrary-8's CI census, which reads CI YAML and its byte decoding by hand. The owner's ruling of 2026-10-27 stops the chain only at a round confirming no HIGH, and M4 ends it only below the precision floor, so neither bound is reachable. Which way does the spec run go? · reason Options: (a) keep auditing round after round under the ruling as written, each round about 1.8M subagent tokens and an hour; (b) stop the chain now, as the owner ruled for dKeptSession after its round 6: TOOL-dLinkedLibrary-97 to -102 close under a recorded override of specs-audited, every unit is deferred, and the run closes and lands; (c) re-scope the CI census: read CI files through a YAML parser, a new external dependency, or narrow the census to the CI forms it can read and refuse the rest, then audit that one redesign. Refused because (a) spends without a bound the ruling never set, (b) relaxes the owner's own stop rule, and (c) is a new dependency, M3 veto 2; none is the run's to take.
