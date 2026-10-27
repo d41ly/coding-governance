@@ -61,8 +61,8 @@ parses it; the writer persists nothing.
 WHAT A STEP CAN REACH (TOOL-dSafePassage-7). `run_step_isolated` is the one spawn of a step argv:
 from gov's checkout root, under an environment built from the `STEP_ENV_KEEP` allowlist and never
 from a copy of the parent's, home and temp in a fresh scratch, git's system and global config
-unread, `core.hooksPath` an empty directory and `credential.helper` empty through
-`GIT_CONFIG_COUNT`, and a leading `python` run `-I`. The target's own config, which that leaves
+unread, `core.hooksPath` an empty directory, `credential.helper` empty and `protocol.ext.allow`
+`never` (TOOL-dSafePassage-37) through `GIT_CONFIG_COUNT`, and a leading `python` run `-I`. The target's own config, which that leaves
 live, refuses the step before any spawn where it declares a key a `STEP_REFUSED_KEYS` row matches
 (TOOL-dSafePassage-24, TOOL-dSafePassage-29), and so does the config of every submodule repository
 `read_target_repositories` finds git can enter from the target (TOOL-dSafePassage-30). A row declaring `needs-target = true` is
@@ -183,7 +183,9 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "local-hook", "local-hook-stub", "submodule-filter", "submodule-filter-stub",
                   "submodule-nested", "submodule-nested-stub", "submodule-unpopulated",
                   "submodule-unpopulated-stub", "submodule-unpopulated-worktree",
-                  "submodule-unpopulated-worktree-stub", "submodule-main-only")
+                  "submodule-unpopulated-worktree-stub", "submodule-main-only",
+                  "local-recent-objects-hook", "local-recent-objects-hook-stub", "local-ext-transport",
+                  "local-ext-transport-stub")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -228,7 +230,8 @@ STEP_REFUSED_KEYS = (
     ("guitool.<x>.cmd", "any", "help -w, web--browse, gui"),
     ("sendemail.ccCmd", "any", "send-email"),
     ("sendemail.toCmd", "any", "send-email"),
-    ("sendemail.headerCmd", "any", "send-email"))
+    ("sendemail.headerCmd", "any", "send-email"),
+    ("gc.recentObjectsHook", "any", "gc, repack --cruft, and the auto-gc of commit and fetch"))
 # The executor-shaped keys the check does not refuse (TOOL-dSafePassage-29 S2), as (key pattern, why).
 STEP_UNREFUSED_KEYS = (
     ("merge.<driver>.driver", "a step does not merge, and gov's own checkout declares two (TOOL-dSafePassage-24 §3)"),
@@ -237,7 +240,9 @@ STEP_UNREFUSED_KEYS = (
     ("color.pager", "a boolean; it runs nothing"),
     ("column.clean", "a layout option; it runs nothing"),
     ("include.path", "read by --includes, so the included file's own keys are graded"),
-    ("includeIf.<condition>.path", "read by --includes, so the included file's own keys are graded"))
+    ("includeIf.<condition>.path", "read by --includes, so the included file's own keys are graded"),
+    ("advice.ignoredHook", "a boolean advice switch; it runs nothing"),
+    ("uploadpack.packObjectsHook", "honoured only from protected config, which the step environment does not set"))
 GIT_FALSE = ("false", "no", "off", "0", "")
 # How much later than a lock's `started` a census row of its pid may estimate its creation and still
 # be the holder (TOOL-dSafePassage-22 S3). It covers the census's rounding of `age_s` to whole
@@ -831,16 +836,18 @@ def build_step_env(scratch) -> dict[str, str]:
     `STEP_ENV_KEEP` names present in the parent, plus the contract's own. Home and temp point into
     `scratch`; git reads no system or global config and prompts for nothing, and through
     `GIT_CONFIG_COUNT`, which outranks the target's own config, runs hooks from the empty
-    `<scratch>/hooks` and holds the empty credential helper."""
+    `<scratch>/hooks`, holds the empty credential helper, and refuses the `ext::` transport
+    whatever a local `protocol.*`, `url.*` or `remote.*` key says (TOOL-dSafePassage-37 S3)."""
     scratch = pathlib.Path(scratch)
     env = {k: os.environ[k] for k in STEP_ENV_KEEP if k in os.environ}
     env.update(dict.fromkeys(("HOME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "XDG_CONFIG_HOME"),
                              str(scratch / "home")))
     env.update(dict.fromkeys(("TMP", "TEMP", "TMPDIR"), str(scratch / "tmp")))
     env.update({"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_TERMINAL_PROMPT": "0",
-                "GCM_INTERACTIVE": "never", "GIT_CONFIG_COUNT": "2",
+                "GCM_INTERACTIVE": "never", "GIT_CONFIG_COUNT": "3",
                 "GIT_CONFIG_KEY_0": "core.hooksPath", "GIT_CONFIG_VALUE_0": str(scratch / "hooks"),
-                "GIT_CONFIG_KEY_1": "credential.helper", "GIT_CONFIG_VALUE_1": ""})
+                "GIT_CONFIG_KEY_1": "credential.helper", "GIT_CONFIG_VALUE_1": "",
+                "GIT_CONFIG_KEY_2": "protocol.ext.allow", "GIT_CONFIG_VALUE_2": "never"})
     return env
 
 
@@ -1726,6 +1733,19 @@ FIXTURE_STEPS = {
         "                    '-q', '--init'], capture_output=True, timeout=60)\n"
         "p = subprocess.run(['git', '-C', sys.argv[1], 'status', '--porcelain'], capture_output=True, timeout=60)\n"
         "open(sys.argv[2], 'w', encoding='utf-8').write(f'{u.returncode} {p.returncode}')\n"),
+    # TOOL-dSafePassage-37 S4: an unreachable object, then the gc that prunes it; a plain fetch.
+    "gc.py": (
+        "import subprocess, sys\n"
+        "subprocess.run(['git', '-C', sys.argv[1], 'hash-object', '-w', '--stdin'], input=b'gk-unreachable\\n',\n"
+        "               capture_output=True, timeout=60)\n"
+        "p = subprocess.run(['git', '-C', sys.argv[1], 'gc', '-q', '--prune=now'], capture_output=True, timeout=120)\n"
+        "open(sys.argv[2], 'w', encoding='utf-8').write(str(p.returncode))\n"),
+    "fetch.py": (
+        "import subprocess, sys\n"
+        "p = subprocess.run(['git', '-C', sys.argv[1], 'fetch', '-q', 'origin'], capture_output=True, timeout=60)\n"
+        "sys.stderr.write(p.stderr.decode('utf-8', 'replace'))\n"
+        "open(sys.argv[2], 'w', encoding='utf-8').write(str(p.returncode))\n"
+        "sys.exit(p.returncode)\n"),
     "reaches.py": "import sys\nopen(sys.argv[1], 'w').close()\nimport adopter_only\n",
     "opens.py": "import sys\nsys.path.insert(0, sys.argv[1])\nimport adopter_only\n",
 }
@@ -1829,8 +1849,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
               f"{rep.get('hooks')} · sys.flags.isolated {rep.get('isolated')} · cwd {rep.get('cwd')}")
         expect(bool(rep) and rep.get("add") == 0, "clean's report is missing, or its git add failed")
         expect(not extra, f"names outside the allowlist reached the step: {extra}")
-        expect(rep.get("count") == "2" and rep.get("key0") == "core.hooksPath" and rep.get("hooks") == [],
-               "GIT_CONFIG_COUNT is not 2 with core.hooksPath naming an empty directory")
+        expect(rep.get("count") == "3" and rep.get("key0") == "core.hooksPath" and rep.get("hooks") == [],
+               "GIT_CONFIG_COUNT is not 3 with core.hooksPath naming an empty directory")
         expect(rep.get("isolated") == 1, "the leading python ran without -I")
         expect(bool(rep) and pathlib.Path(rep["cwd"]).resolve() == gov.resolve(), "the working directory is not gov's root")
         expect(rep.get("prefix") == "tools", "{prefix} did not resolve to the target's install prefix")
@@ -1913,6 +1933,12 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             return f"\": > '{(canaries / name).as_posix()}'{then}\""
 
         cfg, included, gpg = target / ".git" / "config", tmp / "included.gitconfig", tmp / "gpg-canary.sh"
+        # TOOL-dSafePassage-37 S4: `recent-objects-hook` gc's a step, `ext-transport` fetches from a
+        # remote whose `ext::` command writes the canary, `% ` being that transport's escaped space.
+        ran = {"recent-objects-hook": "gc", "ext-transport": "fetch"}.get(kind)
+        done = reports / f"{ran}.rc" if ran else report
+        step = row(ran, ["python", f"{{gov}}/steps/{ran}.py", "{target}", done.as_posix()]) if ran else clean
+        ext = "ext::sh -c " + f": > '{(canaries / 'ext-transport').as_posix()}'".replace("%", "%%").replace(" ", "% ")
         if kind == "gpg":
             gpg.write_text(f"#!/bin/sh\n: > '{(canaries / 'gpg-program').as_posix()}'\nexit 1\n",
                            encoding="utf-8", newline="\n")
@@ -1921,7 +1947,10 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                    "process": f"[filter \"canary\"]\n\tprocess = {runs('filter-process')}\n",
                    "fsmonitor": f"[core]\n\tfsmonitor = {runs('fsmonitor')}\n",
                    "gpg": f"[commit]\n\tgpgsign = true\n[gpg]\n\tprogram = {gpg.as_posix()}\n",
-                   "hook": f"[hook \"canary\"]\n\tcommand = {runs('hook-command')}\n\tevent = pre-commit\n"}
+                   "hook": f"[hook \"canary\"]\n\tcommand = {runs('hook-command')}\n\tevent = pre-commit\n",
+                   "recent-objects-hook": f"[gc]\n\trecentObjectsHook = {runs('recent-objects-hook')}\n",
+                   "ext-transport": f"[protocol]\n\tallow = always\n[remote \"origin\"]\n\turl = \"{ext}\"\n"
+                                    "\tfetch = +refs/heads/*:refs/remotes/origin/*\n"}
         if kind == "include":
             included.write_text(planted["filter"], encoding="utf-8", newline="\n")
             cfg.write_text(f"[include]\n\tpath = {included.as_posix()}\n", encoding="utf-8", newline="\n")
@@ -1930,25 +1959,36 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                 f.write(planted[kind])
         if kind in ("filter", "process", "include"):
             (target / ".gitattributes").write_text("*.txt filter=canary\n", encoding="utf-8", newline="\n")
-        if plant.endswith("-stub"):
+        if plant == "local-ext-transport-stub":
+            g["build_step_env"] = lambda scratch: drop_pair(saved_build(scratch), "protocol.ext.allow")
+        elif plant.endswith("-stub"):
             g["check_target_local_config"] = lambda t: []
         key = {"filter": "filter.canary.clean", "process": "filter.canary.process",
                "fsmonitor": "core.fsmonitor", "include": "filter.canary.clean", "gpg": "gpg.program",
-               "hook": "hook.canary.command"}[kind]
+               "hook": "hook.canary.command", "recent-objects-hook": "gc.recentobjectshook"}.get(kind)
         where = included.as_posix() if kind == "include" else ".git/config"
+        r = {}
         try:
-            run_clean()
+            if ran:
+                r = run_step_isolated(step, "up", target, gov)
+                print(f"isolation: {step.id} · up · {r['verdict']}" + (f" · rc {r['rc']}: {r['tail']}" if r["verdict"] != "ok" else ""))
+            else:
+                run_clean()
             refused = ""
         except Refusal as e:
             refused = str(e)
-            print(f"isolation: {clean.id} · refused · {e}")
+            print(f"isolation: {step.id} · refused · {e}")
         hit = read_plant_canaries(canaries)
         print(f"isolation: {kind} canary: {'present · ' + ', '.join(hit) if hit else 'absent'}")
-        if plant.endswith("-stub"):
-            expect(not refused and report.exists(), "the stubbed check still refused, so nothing spawned")
+        if kind == "ext-transport" and not plant.endswith("-stub"):
+            expect(not refused and r.get("verdict") == "failed" and "transport 'ext' not allowed" in r.get("tail", ""),
+                   "the step's fetch did not fail with git's own refusal of the ext transport")
+            expect(not hit, "the ext:: remote's command ran inside the step")
+        elif plant.endswith("-stub"):
+            expect(not refused and done.exists(), "the stubbed check still refused, so nothing spawned")
         else:
             expect(f"{key} in {where}" in refused, f"the step was not refused naming {key} in {where}")
-            expect(not report.exists() and not hit, "the refused step spawned, or its executor ran")
+            expect(not done.exists() and not hit, "the refused step spawned, or its executor ran")
         if kind == "fsmonitor" and not plant.endswith("-stub"):
             cfg.write_text(cfg.read_text(encoding="utf-8").replace(planted["fsmonitor"], "[core]\n\tfsmonitor = false\n"),
                            encoding="utf-8", newline="\n")

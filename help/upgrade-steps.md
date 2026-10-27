@@ -40,9 +40,12 @@ starts it:
   and the like) are copied in; everything else, every token and credential variable included, is
   left out. Home and temp point at a fresh scratch directory that is removed after the step.
 - **No git config of yours or the machine's, no hooks, no credentials.** Git reads no system or
-  global config and never prompts, and two settings passed through `GIT_CONFIG_COUNT`, which
-  outrank your repository's own config, point `core.hooksPath` at an empty directory and set
-  `credential.helper` to nothing. A step's `git add` or `git mv` fires none of your hooks.
+  global config and never prompts, and three settings passed through `GIT_CONFIG_COUNT`, which
+  outrank your repository's own config, point `core.hooksPath` at an empty directory, set
+  `credential.helper` to nothing, and set `protocol.ext.allow` to `never`. A step's `git add` or
+  `git mv` fires none of your hooks, and a step can never use the `ext::` transport, whose remote
+  URL is a command: whatever your `protocol.allow`, `url.<base>.insteadOf` or `remote.<x>.url`
+  says, git itself refuses it inside the step with `transport 'ext' not allowed`.
 - **Python runs isolated (`-I`)**: it ignores `PYTHONPATH` and imports nothing from your tree or
   the working directory.
 - **Your repository's own config is read first, and can refuse the step.** Git has no switch that
@@ -55,24 +58,28 @@ starts it:
   too, is read the same way, and a refusal names the submodule's path beside the key. The check
   reads the submodules of the target's own worktree: in a linked worktree (`git worktree add`)
   that is `.git/worktrees/<name>/modules/`, never the main worktree's `.git/modules/`, which a step
-  run in the linked worktree never enters. The refused keys are that whole class as git itself
-  documents it: every key `git help --config` lists whose name says it runs something (a
-  `program`, `command`, `cmd`, `editor`, `path`, `driver`, `helper`, `pager` and the like), and
+  run in the linked worktree never enters. The refused keys are the class the check names among
+  the keys `git help --config` lists: every key whose name says it runs something (a `program`,
+  `command`, `cmd`, `editor`, `path`, `driver`, `helper`, `pager`, a name ending in `hook` and
+  the like), and
   gov's self-test re-reads that list on every run, so a key a later git adds fails the test until
   gov classifies it. Among them: `filter.<x>.clean`, `smudge` or `process`,
   `core.fsmonitor` set to anything but false, `diff.external`, `diff.<x>.textconv` or `command`,
   `core.sshCommand`, `core.askPass`, `http.extraheader` or `http.<url>.extraheader` (which
   actions/checkout persists), any `credential.<anything>`, `gpg.program` (run by a signed commit),
   `core.editor`, `sequence.editor`, `core.gitProxy`, `remote.<x>.uploadpack` and `receivepack`,
-  `hook.<x>.command`, a `submodule.<x>.update` or `alias.<x>` beginning with `!`, and the trailer,
+  `hook.<x>.command`, `gc.recentObjectsHook` (run by `gc` and the auto-gc a commit or fetch
+  starts), a `submodule.<x>.update` or `alias.<x>` beginning with `!`, and the trailer,
   difftool, mergetool, browser, man, guitool and send-email commands. The refusal names each key
   and the file declaring it. A repository with a filter it relies on, Git LFS's say, in its own
   config or a submodule's, or a local `core.editor` or difftool, has every step refused: remove
-  the key for the run, or run the step attended. Seven keys of that shape are not refused: `merge.<driver>.driver`, since a step never
+  the key for the run, or run the step attended. Nine keys of that shape are not refused: `merge.<driver>.driver`, since a step never
   merges and gov's own checkout declares two; `core.hooksPath`, since the setting gov passes
   outranks it; `core.pager`, since git pages only to a terminal and a step's output is captured;
   `color.pager` and `column.clean`, which run nothing; and `include.path` and
-  `includeIf.<condition>.path`, since the files they include are read and graded themselves.
+  `includeIf.<condition>.path`, since the files they include are read and graded themselves;
+  `advice.ignoredHook`, a switch that runs nothing; and `uploadpack.packObjectsHook`, which git
+  honours only from system, global or command-line config, none of which a step sets.
 
 A step that needs your repository's own code or hooks declares `needs-target = true`. The runner
 spawns nothing for such a step and reads it `attended`: a person runs it. The `update` walk still

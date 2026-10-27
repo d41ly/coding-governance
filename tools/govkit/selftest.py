@@ -3427,7 +3427,9 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     `-stub` twins red naming the executor's canary; TOOL-dSafePassage-29 AC1, AC2 and AC4 add
     `local-gpg`, `local-hook` and the class arm over `git help --config`; TOOL-dSafePassage-30 AC1
     to AC3 add the three `submodule-*` plants and their `-stub` twins; TOOL-dSafePassage-36 AC1 and
-    AC2 add the two linked-worktree plants and a walk copy rooted at the common dir."""
+    AC2 add the two linked-worktree plants and a walk copy rooted at the common dir;
+    TOOL-dSafePassage-37 AC1 to AC3 add `local-recent-objects-hook`, `local-ext-transport`, their
+    `-stub` twins, the step environment's third pair and the class arm's `hook` suffix."""
     us_py = HERE / "upgrade_steps.py"
 
     def fixture(py: pathlib.Path, *plant: str) -> tuple[int, str]:
@@ -3437,7 +3439,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
 
     for plant, want, needles in (
             ((), 0, ("fixture/clean · up · ok", "outside the allowlist and the contract: none",
-                     "GIT_CONFIG_COUNT 2 · core.hooksPath holds []", "sys.flags.isolated 1",
+                     "GIT_CONFIG_COUNT 3 · core.hooksPath holds []", "sys.flags.isolated 1",
                      "fixture/clean · isolated")),
             (("hook",), 0, ("hook canary: absent",)),
             (("hook-stub",), 1, ("hook canary: present · ", "hook-post-index-change", "hook-pre-commit")),
@@ -3531,6 +3533,30 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               + f"and names {', '.join(needles)}",
               rc == want and "isolation: FAILED" not in out and all(n in out for n in needles)
               and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+    # TOOL-dSafePassage-37 AC1 and AC2: a target's gc.recentObjectsHook refuses a gc step before any
+    # spawn, its `-stub` twin's gc running the hook; an ext:: remote under a local protocol.allow =
+    # always meets git's own refusal inside the step, its `-stub` twin, lacking the pair, running it.
+    for plant, on_refusal, needles in (
+            ("local-recent-objects-hook", ("isolation: fixture/gc · refused · fixture/gc up: ",
+                                           "gc.recentobjectshook in .git/config, so nothing was spawned"),
+             ("recent-objects-hook canary: absent",)),
+            ("local-recent-objects-hook-stub", (), ("fixture/gc · up · ok",
+                                                    "recent-objects-hook canary: present · recent-objects-hook")),
+            ("local-ext-transport", (), ("fixture/fetch · up · failed · rc ", "transport 'ext' not allowed",
+                                         "ext-transport canary: absent")),
+            ("local-ext-transport-stub", (), ("fixture/fetch · up · failed", "ext-transport canary: present · ext-transport"))):
+        rc, out = fixture(us_py, plant)
+        line = next((ln for ln in out.splitlines() if " · refused · " in ln), None)
+        check(f"[dSP-37] fixture isolation {plant} exits 1, "
+              + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
+              + f"and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+    env = govkit_module().upgrade_steps.build_step_env(tmp)
+    check("[dSP-37] AC2 build_step_env carries GIT_CONFIG_COUNT 3 and the pair protocol.ext.allow = never",
+          env.get("GIT_CONFIG_COUNT") == "3" and (env.get("GIT_CONFIG_KEY_2"), env.get("GIT_CONFIG_VALUE_2"))
+          == ("protocol.ext.allow", "never"), str({k: v for k, v in env.items() if k.startswith("GIT_CONFIG_")}))
+
     rooted = tmp / "common-rooted"
     rooted.mkdir(parents=True)
     shutil.copy(HERE / "govkit.py", rooted / "govkit.py")
@@ -3547,6 +3573,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     # TOOL-dSafePassage-29 S3 and AC4, the class arm: every executor-shaped key `git help --config`
     # lists matches a `STEP_REFUSED_KEYS` or a `STEP_UNREFUSED_KEYS` row, the counts re-derived on
     # every run; an empty listing reds, and a table copy missing `gpg.program` names it.
+    # TOOL-dSafePassage-37 S1: a last segment ending in `hook` is kept too.
     us = govkit_module().upgrade_steps
     names = ("program", "command", "cmd", "editor", "gitproxy", "uploadpack", "receivepack", "driver", "clean",
              "smudge", "process", "textconv", "external", "fsmonitor", "sshcommand", "askpass", "helper",
@@ -3554,7 +3581,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     hp = subprocess.run(["git", "help", "--config"], capture_output=True, text=True, encoding="utf-8",
                         errors="replace", timeout=120)
     kept = [k for k in (ln.strip() for ln in hp.stdout.splitlines()) if k
-            and (k.rsplit(".", 1)[-1].lower() in names or k.lower().endswith(("command", "cmd")))]
+            and (k.rsplit(".", 1)[-1].lower() in names or k.lower().endswith(("command", "cmd", "hook")))]
     matched = lambda table: [k for k in kept if any(  # noqa: E731
         _re.fullmatch(_re.sub(r"<[^>]+>", ".+", _re.escape(r[0])), k, _re.I) for r in table)]
     refused, unrefused = matched(us.STEP_REFUSED_KEYS), matched(us.STEP_UNREFUSED_KEYS)
@@ -3567,6 +3594,12 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     less = [r for r in us.STEP_REFUSED_KEYS if r[0] != "gpg.program"]
     check("[dSP-29 AC4] with the gpg.program row taken out of a copy of the table, the arm names gpg.program",
           bool(kept) and [k for k in kept if k not in matched(less) and k not in unrefused] == ["gpg.program"])
+    hooked = {"gc.recentObjectsHook", "advice.ignoredHook", "uploadpack.packObjectsHook"}
+    less = [r for r in us.STEP_REFUSED_KEYS if r[0] != "gc.recentObjectsHook"]
+    check("[dSP-37] AC3 the kept set holds the three hook-named keys, and with the gc.recentObjectsHook row "
+          "taken out of a copy of the table, the arm names it",
+          hooked <= set(kept) and [k for k in kept if k not in matched(less) and k not in unrefused]
+          == ["gc.recentObjectsHook"], f"hook-named keys kept: {sorted(hooked & set(kept))}")
 
     # AC6's red: the shipped pair copied, a direct spawn of `row["up"]` planted into the copy.
     planted = tmp / "callers"
