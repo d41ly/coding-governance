@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-84 — the record door matches a namespace entry exactly or by prefix, so the single attendance ref sits behind its session rule
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 64 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 64 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-84-deviation-841.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-84-deviation-841.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-90 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,7 @@ the exact ref, and proves a foreign session's attendance write is refused.
 
 - **consumes-from** `TOOL-dWellOiledMachine-79` — S47's extension of the door's session rule to the attendance namespace, whose spelling this unit corrects
 - **consumes-from** `TOOL-dWellOiledMachine-58` — `write_gov_ref`'s namespace list, `check_writer_binding` and `door_fixture.py`, which this unit gives the exact-entry kind and its cases
+- **hands-off** `TOOL-dWellOiledMachine-94` — S3's population and exempt list, and §7's parity leg (findings 6, 28, 35, 36)
 
 ## 4. Design
 
@@ -132,6 +134,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   39 (H5).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

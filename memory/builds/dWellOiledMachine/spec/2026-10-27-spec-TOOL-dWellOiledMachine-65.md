@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-65 — the stall journal line carries the limit's reset, and the limit hold reads it there
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 54 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 54 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -64,6 +64,7 @@ line and points every reader of the retired sidecar at the journal.
 - **consumes-from** `TOOL-dWellOiledMachine-47` — `limits_fixture.py`, whose stub this unit re-points
 - **hands-off** `TOOL-dWellOiledMachine-81` — `extractResetUtc` and the stall line's `reset`, which that unit reads from the transcript's measured limit record (finding 16)
 - **hands-off** `TOOL-dWellOiledMachine-90` — the stall line's format, the hold's line filter and `reset=none` rule, and the retired-sidecar grep (findings 8, 12, 33, 53, 54, 55)
+- **hands-off** `TOOL-dWellOiledMachine-94` — AC2's and AC3's limit plants, which the batch re-points to a dated transcript (finding 18)
 
 ## 4. Design
 
@@ -138,6 +139,8 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 3 (H2).
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-81, TOOL-dWellOiledMachine-90.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

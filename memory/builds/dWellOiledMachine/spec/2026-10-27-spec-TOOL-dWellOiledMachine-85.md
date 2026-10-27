@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-85 — the node salt carried from its old store names to the new ones, so no digest written before the rename stops joining
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 64 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 64 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-85-deviation-851.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-85-deviation-851.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-90 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,7 @@ and proves a seeded old salt yields the same digest afterwards.
 
 - **consumes-from** `TOOL-dWellOiledMachine-79` — S7's `read_node_salt` through `read_secret_ref` and its `write_secret_ref`, whose rename this unit migrates
 - **consumes-from** `TOOL-dWellOiledMachine-33` — S6's store names `gov-node-salt`, `service gov key node-salt` and `GOV_NODE_SALT`, the old names this unit reads and copies from
+- **hands-off** `TOOL-dWellOiledMachine-94` — the salt fixtures' store, AC3's verb, S2's failed copy, §6's environment scrub and §4's citation (findings 2, 3, 20, 21, 32, 42)
 
 ## 4. Design
 
@@ -139,6 +141,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   40 (H6).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

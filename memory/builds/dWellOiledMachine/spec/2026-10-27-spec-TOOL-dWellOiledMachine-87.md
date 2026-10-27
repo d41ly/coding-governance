@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-87 — the record door's node writer admits the sessions and keepalive the `mine` row admits, prior sessions included
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 28 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 28 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-87-deviation-871.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-87-deviation-871.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-90 |
 
 <!-- /gen:spec-records -->
 
@@ -58,6 +59,7 @@ proves the two agree on one claim matrix.
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-63` — `read_node_writer`, the node writer's rules and `door_fixture.py`'s node cases, whose session set and keepalive this unit aligns with the `mine` row
+- **hands-off** `TOOL-dWellOiledMachine-94` — S2's keepalive rule for claim records and S4's parity matrix (finding 41)
 
 ## 4. Design
 
@@ -136,6 +138,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   50 (H8).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

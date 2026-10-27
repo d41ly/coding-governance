@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-47 — every wait the supervisor holds given its deadline and outcome: the hold ceiling's hand-over, the act ceiling, nested spawns, restarts and `invalid-input`
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 46 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 46 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0325@54802c5c whole
 **Carries:** node:policy-key.runtime.act-ceiling
@@ -118,6 +118,7 @@ owner item at once (P39, the parked debt's review).
 - **hands-off** `TOOL-dWellOiledMachine-46` — `runtime.act-ceiling`, the reaps S4 journals, which that unit counts per instance
 - **consumes-from** external — TOOL-dPlacedRequest-1's `--claims` and `--lease`, -16's hand-over, and TOOL-dDeclaredLoop-7's `invalid-input` answer
 - **hands-off** `TOOL-dWellOiledMachine-65` — `limits_fixture.py`, whose stub that unit re-points to plant the limit through `stall-recorder.js` (finding 3)
+- **hands-off** `TOOL-dWellOiledMachine-94` — S10's stub, which the batch re-points to plant a dated transcript (finding 18)
 
 ## 4. Design
 
@@ -265,6 +266,8 @@ New arm: tools/runtime/limits_fixture.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 A
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-65.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

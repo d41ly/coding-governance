@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-80 — a supervisor start claim left incomplete by a dead tick is judged by its age, so it never blocks every later start
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 30 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 30 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-80-deviation-801.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-80-deviation-801.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-90 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,7 @@ the directory's own age, so a torn claim is reaped once it is older than two bea
 
 - **consumes-from** `TOOL-dWellOiledMachine-78` — the start claim of S3 and the stale test of S4, whose incomplete-claim case this unit decides
 - **hands-off** `TOOL-dWellOiledMachine-90` — `check_supervisor_claim_stale`, whose `unknown` reading the batch adds (finding 64)
+- **hands-off** `TOOL-dWellOiledMachine-94` — S1's and AC2's claim layout, S3's reap line, §4's citations and the symbol render (findings 4, 21, 29, 30)
 
 ## 4. Design
 
@@ -124,6 +126,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-1 promotions, finding 1
   (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

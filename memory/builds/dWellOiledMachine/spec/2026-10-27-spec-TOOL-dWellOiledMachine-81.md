@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-81 — the stall line's reset read from the transcript's measured limit record, never from an unmeasured payload field
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 55 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 55 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-81-deviation-811.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-81-deviation-811.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-90 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,8 @@ back the measurement 65 dropped, by recording which top-level keys the payload c
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-65` — `extractResetUtc`, the stall line's `reset` field and the hold that reads it, which this unit grounds on the transcript's measured record
+- **hands-off** `TOOL-dWellOiledMachine-91` — `extractResetUtc` and the stall fixture, which that unit bounds by session, record age and reset (finding 17)
+- **hands-off** `TOOL-dWellOiledMachine-94` — S1's sentence, §10's seam, AC3's payload and the symbol render (findings 15, 24, 30, 31)
 
 ## 4. Design
 
@@ -147,6 +150,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   16 (H2).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-91, TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

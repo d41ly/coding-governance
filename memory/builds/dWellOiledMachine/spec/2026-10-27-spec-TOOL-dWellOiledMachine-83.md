@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-83 — the supervisor start claim taken and broken through the tree's guarded mkdir lock, lifted into the kit library
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 30 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 30 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-83-deviation-831.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-83-deviation-831.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-90 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,8 @@ rename break.
 
 - **consumes-from** `TOOL-dWellOiledMachine-78` — the start claim of S3 and the stale test and rename break of S4, which this unit puts behind the guarded lock
 - **consumes-from** external — TOOL-aGraftedHelix-37's `write_claim_push_lock`, `check_claim_push_lock_stale` and `remove_claim_push_lock` in `tools/unattended/unattended.sh`, the landed lock this unit lifts
+- **hands-off** `TOOL-dWellOiledMachine-92` — S1's lifted factory and §8 F1's claim on TOOL-dPlacedRequest-24, which that unit hands to the other build by an ask row (finding 22)
+- **hands-off** `TOOL-dWellOiledMachine-94` — S3's claim layout, S1's stale tests, the claim-push lock's criterion, the call-site count and the symbol render (findings 4, 19, 21, 29, 30, 44)
 
 ## 4. Design
 
@@ -162,6 +165,8 @@ New arm: tools/runtime/supervise.py · covers AC1 AC2 · the race plant staged a
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   30 (H4).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-92, TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-33 — the `Gov-*` trailers written from the binding at every commit site, and the commit-key check at the push and in `commit-msg`
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0311@d9f33c79 whole
 **Carries:** node:policy-key.commits.edge-check
@@ -127,6 +127,7 @@ SA-4; memory-plan `[doors]`).
 - **hands-off** `TOOL-dWellOiledMachine-79` — `commit_keys.py`'s trailers and node salt (findings 10, 12), which the spec audit's minors batch repairs
 - **hands-off** `TOOL-dWellOiledMachine-85` — S6's store names `gov-node-salt`, `service gov key node-salt` and `GOV_NODE_SALT`, which that unit reads as a fallback and copies to the new names (finding 40)
 - **hands-off** `TOOL-dWellOiledMachine-90` — the `Gov-*` trailer filler keyed on `owner`, the salt fixtures under a scratch policy and the first-use lock (findings 5, 38, 69)
+- **hands-off** `TOOL-dWellOiledMachine-94` — AC7's stub store, which the batch names `fixture-store` (finding 2)
 
 ## 4. Design
 
@@ -328,6 +329,8 @@ New arm: tools/runtime/commit_keys.py · covers AC3 AC5 · the filler and the st
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-79.
 - rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-85, TOOL-dWellOiledMachine-90.
+- rev-4 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

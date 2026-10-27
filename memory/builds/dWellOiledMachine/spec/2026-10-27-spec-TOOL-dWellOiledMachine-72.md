@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-72 — runlog verify reports a record whose journal lines retention pruned as `pruned`, never as tampering
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -56,6 +56,7 @@ verdict. This unit teaches `verify` to recognise a journal whose head retention 
 - **hands-off** `TOOL-dWellOiledMachine-86` — S1's `pruned` predicate, which reads an empty or absent producer file as consistent with it (finding 41)
 - **hands-off** `TOOL-dWellOiledMachine-88` — S1's `pruned` predicate, whose population and head that unit defines (finding 61)
 - **hands-off** `TOOL-dWellOiledMachine-90` — the combined idle-and-unparseable case over S1's predicate (finding 20)
+- **hands-off** `TOOL-dWellOiledMachine-94` — S3's stated limit, which the batch extends to an unparseable line read as deleted (finding 16)
 
 ## 4. Design
 
@@ -129,6 +130,8 @@ New arm: tools/runlog/selftest.py · covers AC1 AC2 · the pruned and edited cas
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 49 (H9).
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-86, TOOL-dWellOiledMachine-88, TOOL-dWellOiledMachine-90.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-88 — runlog verify's `pruned` test names its population and reads each file's first parseable line as its head
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-88-deviation-881.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-88-deviation-881.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-90 |
 
 <!-- /gen:spec-records -->
 
@@ -50,6 +51,7 @@ no `t`. Either way the predicate is undefined or false on a pruned journal, whic
 
 - **consumes-from** `TOOL-dWellOiledMachine-72` — S1's `pruned` predicate, whose population and head this unit defines
 - **hands-off** `TOOL-dWellOiledMachine-90` — the population and head, combined with unit 86's empty-file reading in one case (finding 20)
+- **hands-off** `TOOL-dWellOiledMachine-94` — §5's security line, which reads an unparseable line as deleted (finding 16)
 
 ## 4. Design
 
@@ -117,6 +119,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   61 (H7).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

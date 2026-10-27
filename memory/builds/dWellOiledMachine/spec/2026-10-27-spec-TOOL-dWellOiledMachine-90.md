@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-90 — the promotions audit's 55 medium and low findings, batched: claims, fixtures, readers, registries and the sibling records that drifted
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 65 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 65 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-90-deviation-901.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-90-deviation-901.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 |
 
 <!-- /gen:spec-records -->
 
@@ -272,6 +273,8 @@ bump" means spec N is amended at this unit's pass, its §9 line naming this unit
 - **consumes-from** `TOOL-dWellOiledMachine-80` — `check_supervisor_claim_stale`, whose `unknown` reading S50 adds (S50)
 - **consumes-from** `TOOL-dWellOiledMachine-86` — the empty-file reading of `pruned` (S16)
 - **consumes-from** `TOOL-dWellOiledMachine-88` — the population and head of `pruned` (S16)
+- **hands-off** `TOOL-dWellOiledMachine-93` — S1's arm paths in the build-order write set, which that unit moves out of `read_spec_writes` into the caller (finding 25)
+- **hands-off** `TOOL-dWellOiledMachine-94` — S1, S4, S10, S22, S23, S48 and S54, and AC4, AC6, AC7, AC14, AC19, AC20, AC23, AC31, AC48 and AC55 (findings 2, 4, 7, 8, 9, 10, 11, 12, 13, 14, 26, 27, 30, 32, 34)
 
 ## 4. Design
 
@@ -495,6 +498,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, the promotions audit's 55 medium and low findings batched.
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-93, TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-82 — govkit's stale probe asks the pack table whether a fragment was wired, so a pre-existing guard is never recorded as added
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 13 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 13 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-82-deviation-821.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-82-deviation-821.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-80-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-90 |
 
 <!-- /gen:spec-records -->
 
@@ -50,6 +51,7 @@ silently dropping a guard. This unit makes the probe compare the scratch pack ta
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-71` — S3's one-fragment `--unwire` and the scratch copy of the pack table its probe makes, which this unit reads
+- **hands-off** `TOOL-dWellOiledMachine-94` — AC2's rollback and the stale probe's table and exit handling (findings 1, 10, 33, 40)
 
 ## 4. Design
 
@@ -119,6 +121,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   18 (H3).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
 
 ## 10. Reuse audit
 
