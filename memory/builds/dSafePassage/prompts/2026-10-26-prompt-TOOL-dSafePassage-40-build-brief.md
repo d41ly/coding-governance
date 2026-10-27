@@ -60,3 +60,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Carried from TOOL-dSafePassage-5 rev-8
 
 - Once you land, the re-run after a forced floor-step kill records no `via` where `up` records `witness`, which turns TOOL-dSafePassage-5's `kill` case red (its §5 risks). Update that case's expectation in your pass if the spec lets you; otherwise name it in your summary.
+
+## Carried from TOOL-dSafePassage-5 (7c51ef25f, 31b078c33)
+
+- TOOL-dSafePassage-5's §5 risks line hands one consequence to your pass. Its `kill` case expects a killed step's re-run to carry `"via": "witness"` exactly when the killed state's witness holds (AC7, rev-11). After your move-1 rule, a killed floor step leaves a `failed` `interrupted:` row, so its re-run carries no `via` although its witness holds. Run `python tools/govkit/upgrade_walk.py --case kill --step <the floor step's id>` before and after your change (it takes about 12 minutes). If it goes red, your pass owes the leg's expectation the same rule. If that needs a path outside your declared write set, hand the unit back as a DIVERGENCE naming the path.
