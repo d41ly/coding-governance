@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-49 — a shell word naming a variable bound to a `ratify.py` path names `ratify.py`
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-49-deviation-491.md](../build/2026-10-27-build-TOOL-dRankedPlan-49-deviation-491.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) | spec-audit | TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-52 |
 
 <!-- /gen:spec-records -->
 
@@ -63,6 +64,10 @@ twin, so it sits one order above it.
 
 - **consumes-from** `TOOL-dRankedPlan-45` — S3's bound-name rule for Python, whose shell twin this unit adds; without it the two readers would disagree on the same shape
 - **consumes-from** `TOOL-dRankedPlan-41` — S3's commands and words from the shared tokenizer, over which S1 collects the assignments; without them there is no word to resolve
+- **hands-off** `TOOL-dRankedPlan-55` — S1's bindings and S2's resolution, which that unit carries into a shell-fed heredoc body (spec audit of units 46 to 52, id 32)
+- **hands-off** `TOOL-dRankedPlan-57` — S1's collector, whose value rule that unit widens to a command substitution's words (spec audit of units 46 to 52, id 28)
+- **hands-off** `TOOL-dRankedPlan-58` — S2's resolution, which that unit makes the one test every `ratify.py` comparison calls (spec audit of units 46 to 52, id 29)
+- **hands-off** `TOOL-dRankedPlan-62` — S1, §7, §10 and its Alternatives rejected, which that unit's items for findings 12, 21 and 24 extend or correct; carry S6 and S23's text of that unit into this unit's pass (spec audit of units 46 to 52)
 
 ## 4. Design
 
@@ -147,6 +152,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 38 to 45, finding 33 (HIGH,
   item H3), repairing `TOOL-dRankedPlan-45`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-55`, the hands-off edge to `TOOL-dRankedPlan-57`, the hands-off edge to `TOOL-dRankedPlan-58`, the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

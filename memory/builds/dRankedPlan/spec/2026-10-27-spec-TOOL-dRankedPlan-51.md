@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-51 — the op tokens `(`, `)`, `{` and `}` end a command, so a brace group, a subshell or a function body is read
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-51-deviation-511.md](../build/2026-10-27-build-TOOL-dRankedPlan-51-deviation-511.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) | spec-audit | TOOL-dRankedPlan-50 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,7 @@ repairs `TOOL-dRankedPlan-41`, so it sits one order above it.
 - **consumes-from** `TOOL-dRankedPlan-39` — `SHELL_RESERVED_WORDS`, from which S2 takes the unreachable `{`
 - **consumes-from** `TOOL-dRankedPlan-40` — S2's case-arm rule and the `caller-shell-case` plant, which S3 restates over the `)` op
 - **hands-off** `TOOL-dRankedPlan-52` — S1's command model and S2's set, over which that unit's item for finding 2 observes that every member of each matching set is producible as a `word` token
+- **hands-off** `TOOL-dRankedPlan-62` — S1's command model, §4, §7 and §10, which that unit's items for findings 20, 24 and 34 read or correct; carry S6, S12's §10 sentence and S16's two §4 rows of that unit into this unit's pass (spec audit of units 46 to 52)
 
 ## 4. Design
 
@@ -158,6 +160,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 38 to 45, finding 35 (HIGH,
   item H5; finding 2 is its medium face), repairing `TOOL-dRankedPlan-41`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

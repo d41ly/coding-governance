@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-35 — the newest disposition is ordered by ancestry, and kept records the order cannot rank hold the gate when their words differ
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -70,6 +70,7 @@ above it, after units 24, 25 and 26 have all landed.
 - **hands-off** `TOOL-dRankedPlan-37` — the reader's `why` list, through which that unit's item for finding 27 names an uncommitted record in the caller's hold line
 - **hands-off** `TOOL-dRankedPlan-44` — `derive_newest_disposition`, whose conflict key that unit widens to the `(Item, Disposition)` pair so dormancy's pick across items is ordered (spec audit of units 30 to 37, id 22)
 - **hands-off** `TOOL-dRankedPlan-45` — S1's unranked clause and S3's `merged-sides` plant, which that unit's items for findings 12 and 7 make exact; carry S24 and S25 of that unit into this unit's pass (spec audit of units 30 to 37)
+- **hands-off** `TOOL-dRankedPlan-61` — S1's render rule, which this unit's function makes owed: carry `memory/map/generated/symbols.json` into this unit's Files touched and `codebase-map coverage + freshness`, `recall floor` and `recall floor arms` onto its leg line, in this unit's pass (spec audit of units 46 to 52, id 22)
 
 ## 4. Design
 
@@ -164,6 +165,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 28 (HIGH,
   item H5), repairing `TOOL-dRankedPlan-26`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-44`, the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-61`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

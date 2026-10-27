@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-34 — a disposition record is dated by its first appearance under any name, so a rename does not refresh it
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 5 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 5 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -57,6 +57,7 @@ sits one order above it.
 - **hands-off** `TOOL-dRankedPlan-37` — `read_first_appearance`, over which that unit's items for findings 13 and 27 add the merge-delivered case and the uncommitted record's own hold line
 - **hands-off** `TOOL-dRankedPlan-43` — S1's `--follow` date, which that unit replaces with a rename-only walk so a near-copy is dated by its own add (spec audit of units 30 to 37, id 19)
 - **hands-off** `TOOL-dRankedPlan-45` — the `reader-bound` rename cases, beside which that unit's item for finding 36 plants the replace-in-one-commit case (spec audit of units 30 to 37)
+- **hands-off** `TOOL-dRankedPlan-61` — S1's render rule, which this unit's function makes owed: carry `memory/map/generated/symbols.json` into this unit's Files touched and `codebase-map coverage + freshness`, `recall floor` and `recall floor arms` onto its leg line, in this unit's pass (spec audit of units 46 to 52, id 22)
 
 ## 4. Design
 
@@ -151,6 +152,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 26 (HIGH,
   item H4), repairing `TOOL-dRankedPlan-24`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-43`, the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-61`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

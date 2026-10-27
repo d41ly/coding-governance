@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-47 — a heredoc body fed to a Python interpreter is read by the Python reader, over unit 32's interpreter class
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-47-deviation-471.md](../build/2026-10-27-build-TOOL-dRankedPlan-47-deviation-471.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) | spec-audit | TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-46 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,7 @@ Finding 1, the shell arm of the same item, is `TOOL-dRankedPlan-46`'s. This unit
 
 - **consumes-from** `TOOL-dRankedPlan-45` — S10's `heredoc` token, its routing table and the `caller-heredoc-argv` plant, whose Python arm S1 restates; without them no body reaches a reader
 - **hands-off** `TOOL-dRankedPlan-52` — S1's Python arm, over which that unit's items for findings 31, 32 and 36 add the unparsable-body rule, the `-c` and `<<<` sources and the body's file line
+- **hands-off** `TOOL-dRankedPlan-62` — S1's exclusion, §4, §5 and §7, which that unit's items for findings 15, 16, 18, 19 and 24 rely on or correct; carry S6, S15's §4 and §5 sentences, S21 and S22 of that unit into this unit's pass (spec audit of units 46 to 52)
 
 ## 4. Design
 
@@ -146,6 +148,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 38 to 45, finding 30 (HIGH,
   item H1, shared with finding 1), repairing `TOOL-dRankedPlan-45`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

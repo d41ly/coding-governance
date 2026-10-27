@@ -109,3 +109,27 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T03:26:52Z rescope · item add TOOL-dRankedPlan-52 · reason spec-audit of TOOL-dRankedPlan-38 to -45 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) the 25 MEDIUM and LOW findings batched into one unit: ids 2 3 4 5 6 9 11 12 14 15 16 18 19 20 21 23 24 25 26 27 28 29 31 32 36 (items M1 to M12 and L1 to L11)
 
 2026-10-27T03:48:14Z review · item dRankedPlan-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 25 · disposition promote
+
+2026-10-27T04:40:17Z rescope · item add TOOL-dRankedPlan-53 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 3 HIGH item H1 (shared with id 23): S13's heredoc-expanded body fed to a shell has no shell-arm reader; repairs TOOL-dRankedPlan-52
+
+2026-10-27T04:40:20Z rescope · item add TOOL-dRankedPlan-54 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 23 HIGH item H1 (shared with id 3): the heredoc kind split reaches no router built against the single kind; repairs TOOL-dRankedPlan-52
+
+2026-10-27T04:40:22Z rescope · item add TOOL-dRankedPlan-55 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 32 HIGH item H2: a shell-fed heredoc body never sees the enclosing file's bindings; repairs TOOL-dRankedPlan-46
+
+2026-10-27T04:40:25Z rescope · item add TOOL-dRankedPlan-56 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 27 HIGH item H3: bash -c and bash here-strings reach no reader that compares against ratify.py; repairs TOOL-dRankedPlan-52, whose S14 reads the inline carriers for Python only
+
+2026-10-27T04:40:28Z rescope · item add TOOL-dRankedPlan-57 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 28 HIGH item H4: a resolver substitution binding g=$(resolve_kit_gate ... ratify.py) is unread; repairs TOOL-dRankedPlan-49
+
+2026-10-27T04:40:31Z rescope · item add TOOL-dRankedPlan-58 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 29 HIGH item H5: unit 49 S2 resolves a bound name only at unit 32's two comparison sites; repairs TOOL-dRankedPlan-49
+
+2026-10-27T04:40:33Z rescope · item add TOOL-dRankedPlan-59 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 30 HIGH item H6: an interpreter option before the script word breaks unit 50's wrapper rule; repairs TOOL-dRankedPlan-50
+
+2026-10-27T04:40:36Z rescope · item add TOOL-dRankedPlan-60 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 31 HIGH item H7: a JavaScript script path bound by path.join is unread and not named as unread; repairs TOOL-dRankedPlan-48
+
+2026-10-27T04:40:38Z rescope · item add TOOL-dRankedPlan-61 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) id 22 HIGH item H8: unit 52 AC11 is red by construction over specs it never reaches; repairs TOOL-dRankedPlan-52
+
+2026-10-27T04:40:40Z rescope · item add TOOL-dRankedPlan-62 · reason spec-audit of TOOL-dRankedPlan-46 to -52 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) the 23 MEDIUM and LOW findings batched into one unit: ids 1 2 4 5 8 9 10 11 12 13 14 15 16 17 18 19 20 21 24 25 26 33 34 (items M1 to M14 and L1 to L7)
+
+2026-10-27T05:06:09Z review · item dRankedPlan-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 23 · disposition promote
+
+2026-10-27T05:11:28Z decision · item the audit chain feeds on one unbounded mechanism: the static caller check of read_plan_ratification · reason rounds 3-5 promoted 22 highs, nearly all refining the shell, Python and JS caller readers of TOOL-dRankedPlan-22/30-32/38-41/46-51/53-60 (heredocs, -c words, here-strings, wrappers, bindings); a static parser of arbitrary shell is never complete, so M4's precision bound (0.93, 0.86, 0.94) will not end it. Options: (a) keep promoting; (b) cap the chain as for dPlacedRequest, dDeclaredLoop and dKeptSession; (c) re-scope TOOL-dRankedPlan-22 from a static caller check to a runtime guard in the predicate itself, retiring the parser units. Refused: (b) is an owner cap, and (c) retires units and changes a design the audit confirmed, a fork the mandate does not delegate. The run keeps promoting under (a).

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-52 — the spec audit of units 38 to 45: its 25 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-52-deviation-521.md](../build/2026-10-27-build-TOOL-dRankedPlan-52-deviation-521.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md) | spec-audit | TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 |
 
 <!-- /gen:spec-records -->
 
@@ -199,6 +200,13 @@ items to carry into its own pass. This unit builds the rest and observes every i
 - **consumes-from** `TOOL-dRankedPlan-47` — the Python arm of the heredoc routing, over which S13, S14 and S25 add the unparsable-body rule, the inline carriers and the file line
 - **consumes-from** `TOOL-dRankedPlan-50` — `SHELL_WRAPPER_COMMANDS` and the wrapper call, which S1 probes and beside which S8 and S20 stand
 - **consumes-from** `TOOL-dRankedPlan-51` — the command model over the four ops and the `{`-free reserved set, which S1 observes for the class
+- **consumes-from** `TOOL-dRankedPlan-58` — `resolve_ratify_word`, which S13's line rule calls for its `ratify.py` comparison; without it a bound name on a body line is compared unresolved (spec audit of units 46 to 52, id 29)
+- **hands-off** `TOOL-dRankedPlan-53` — S13's `heredoc-expanded` kind and its line rule, which that unit applies to a shell-fed body (spec audit of units 46 to 52, id 3)
+- **hands-off** `TOOL-dRankedPlan-54` — S13's two heredoc kinds, which that unit names as one set for the router (spec audit of units 46 to 52, id 23)
+- **hands-off** `TOOL-dRankedPlan-56` — S14's `herestring` token and `-c` reading and S13's line rule, which that unit extends to the shell class (spec audit of units 46 to 52, id 27)
+- **hands-off** `TOOL-dRankedPlan-57` — S7's `piece` tokens and rebuilt word, through which that unit reads a substitution's words in an assignment (spec audit of units 46 to 52, id 28)
+- **hands-off** `TOOL-dRankedPlan-61` — S11 and AC11, whose selector that unit replaces with an Inventory-row reading (spec audit of units 46 to 52, id 22)
+- **hands-off** `TOOL-dRankedPlan-62` — S3 to S5, S7, S10, AC3 to AC5, AC10 and §7, which that unit's items for findings 1, 4, 5, 13, 14, 24, 25 and 26 narrow, restate or observe; carry S1, S2, S4, S5, S6 and S17 of that unit into this unit's pass (spec audit of units 46 to 52)
 
 ## 4. Design
 
@@ -364,6 +372,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 38 to 45: its 14 MEDIUM and
   11 LOW findings, ids 2 3 4 5 6 9 11 12 14 15 16 18 19 20 21 23 24 25 26 27 28 29 31 32 36, batched
   under BUILD-METHOD M4.
+- rev-2 · 2026-10-27 · §3 · gains the consumes-from edge to `TOOL-dRankedPlan-58`, the hands-off edge to `TOOL-dRankedPlan-53`, the hands-off edge to `TOOL-dRankedPlan-54`, the hands-off edge to `TOOL-dRankedPlan-56`, the hands-off edge to `TOOL-dRankedPlan-57`, the hands-off edge to `TOOL-dRankedPlan-61`, the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

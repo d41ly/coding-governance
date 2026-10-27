@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-32 — the caller predicate reads invocations by their structure, so an argv list counts and a resolver line does not
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -98,6 +98,7 @@ so flags on a later line are seen. It repairs `TOOL-dRankedPlan-22`, so it sits 
 - **hands-off** `TOOL-dRankedPlan-40` — S2's command-word rule, which that unit reads past the prefix commands and a case-arm pattern (spec audit of units 30 to 37, id 34)
 - **hands-off** `TOOL-dRankedPlan-41` — S2's joining, splitting and `shlex.split`, which that unit re-points to the shared shell tokenizer with an exit-2 rule (spec audit of units 30 to 37, id 33)
 - **hands-off** `TOOL-dRankedPlan-45` — S1's argv list, S3's JavaScript reader, S5's dispatch, AC4 and §10, which that unit's items for findings 3, 14, 17, 20, 21 and 42 extend or correct; carry AC4's two greps, S28's §10 sentence and S32's dispatch order into this unit's pass (spec audit of units 30 to 37)
+- **hands-off** `TOOL-dRankedPlan-61` — S1's render rule, which this unit's function makes owed: carry `memory/map/generated/symbols.json` into this unit's Files touched and `codebase-map coverage + freshness`, `recall floor` and `recall floor arms` onto its leg line, in this unit's pass (spec audit of units 46 to 52, id 22)
 
 ## 4. Design
 
@@ -203,6 +204,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 30 (HIGH,
   item H7), repairing `TOOL-dRankedPlan-22`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-38`, the hands-off edge to `TOOL-dRankedPlan-39`, the hands-off edge to `TOOL-dRankedPlan-40`, the hands-off edge to `TOOL-dRankedPlan-41`, the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-61`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

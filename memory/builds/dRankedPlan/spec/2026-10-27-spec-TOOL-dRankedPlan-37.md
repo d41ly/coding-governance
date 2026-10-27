@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-37 — the spec audit of units 19 to 29: its 25 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -202,6 +202,7 @@ item, so its builder reads the change before building.
 - **hands-off** external — the commit-time provenance check that a `Gov-Transition` trailer arrives only through `write_transition`, S17's named follow-up
 - **hands-off** `TOOL-dRankedPlan-42` — AC19's CLI half, which that unit respells quoted and observes through a selftest case on the literal `~/x` (spec audit of units 30 to 37, id 10)
 - **hands-off** `TOOL-dRankedPlan-45` — S13's guards, S19's correction of unit 16, S23's helper, S25's hold line and S24's gotcha render, which that unit's items for findings 15, 29, 28, 40, 18 and 31 correct; carry S11, S12, S18's AC11 reading, S27 and S30 of that unit into this unit's pass (spec audit of units 30 to 37)
+- **hands-off** `TOOL-dRankedPlan-61` — S1's render rule, which this unit's function makes owed: carry `memory/map/generated/symbols.json` into this unit's Files touched and `codebase-map coverage + freshness`, `recall floor` and `recall floor arms` onto its leg line, in this unit's pass (spec audit of units 46 to 52, id 22)
 
 ## 4. Design
 
@@ -400,6 +401,7 @@ none
   8 LOW findings, ids 1 2 3 4 5 7 8 9 11 12 13 14 16 17 18 22 23 24 25 27 31 32 33 34 35, batched
   under BUILD-METHOD M4.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-42`, the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-61`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

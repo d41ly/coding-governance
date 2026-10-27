@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-30 — the declared callers of the session-scoped predicate are kit anchors, resolved at run time
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -68,6 +68,7 @@ resolver. It repairs `TOOL-dRankedPlan-22`, so it sits one order above it.
 - **consumes-from** `TOOL-dRankedPlan-22` — `SESSION_PREDICATE_CALLERS`, `check_predicate_callers` and the `caller-guard` plant, which S1 to S3 re-spell; without them there is no allowlist to derive
 - **hands-off** `TOOL-dRankedPlan-37` — the derived allowlist, over which that unit's item for finding 9 observes `check-install-prefix.sh --offenders` print no key for the loop kit's `ratify.py`
 - **hands-off** `TOOL-dRankedPlan-45` — S2's derivation, AC1 and the `caller-guard-prefix` plant, which that unit's items for findings 9, 35 and 4 correct; carry S1's git-normalised paths and S4's order-7 reading of AC1 into this unit's pass (spec audit of units 30 to 37)
+- **hands-off** `TOOL-dRankedPlan-61` — S1's render rule, which this unit's function makes owed: carry `memory/map/generated/symbols.json` into this unit's Files touched and `codebase-map coverage + freshness`, `recall floor` and `recall floor arms` onto its leg line, in this unit's pass (spec audit of units 46 to 52, id 22)
 
 ## 4. Design
 
@@ -167,6 +168,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 19 (HIGH,
   item H1; finding 9 is its medium face), repairing `TOOL-dRankedPlan-22`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-61`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

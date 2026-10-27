@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-33 — the shared `plan.exit` fixtures plant a witnessed plan record, so the precondition holds only where a plant removes it
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -75,6 +75,7 @@ except the three that remove it on purpose and by unit 10's driver fixture. It r
 - **consumes-from** external — dTotalRecall's door `gov_record.py new` (TOOL-dTotalRecall-2 S1), run from the copied memory-tree kit
 - **hands-off** `TOOL-dRankedPlan-37` — S1's `--fixture --seed`, through which that unit's item for finding 1 seeds the `drafts-cross-session` plant and `plan_revision.py --selftest`
 - **hands-off** `TOOL-dRankedPlan-45` — `seed_plan_witness`, `--seed`, S2's plants and §5's perf line, which that unit's items for findings 5, 11, 37 and 32 correct; carry S5, S8, S21 and S31 of that unit into this unit's pass (spec audit of units 30 to 37)
+- **hands-off** `TOOL-dRankedPlan-61` — S1's render rule, which this unit's function makes owed: carry `memory/map/generated/symbols.json` into this unit's Files touched and `codebase-map coverage + freshness`, `recall floor` and `recall floor arms` onto its leg line, in this unit's pass (spec audit of units 46 to 52, id 22)
 
 ## 4. Design
 
@@ -181,6 +182,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 19 to 29, finding 21 (HIGH,
   item H3; findings 1 and 32 are its medium face), repairing `TOOL-dRankedPlan-19`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-61`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 
