@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-51 — the op tokens `(`, `)`, `{` and `}` end a command, so a brace group, a subshell or a function body is read
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 

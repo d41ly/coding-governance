@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-27 — the roles vocabulary admits the `plan:` reads keys gov-spec-writer gains
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 

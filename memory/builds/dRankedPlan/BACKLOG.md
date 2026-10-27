@@ -8,4 +8,5 @@
 ## Dispositions
 
 - SEV · TOOL-dRankedPlan-17 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dRankedPlan-17 · until TOOL-dRankedPlan-81 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dRankedPlan-81 at order 27 today, closes it (README rule 1)
 - SEV · TOOL-dRankedPlan-18 · MED · a Plan Review's confirmed findings reach no plan draft

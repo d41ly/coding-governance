@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-1 — `priority:` beside `parents:`, and the generated plan view `PLAN.md`
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0369@9f2afd12 whole
 **Carries:** node:policy-key.plan.unplaced

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-8 — the full kickoff only where `kickoff.runs` says: a `kickoff —` line beside the card
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 15 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 15 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0376@f1c33063 whole
 **Carries:** node:policy-key.kickoff.runs

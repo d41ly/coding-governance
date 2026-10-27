@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-4 — dormancy disposal: a dormant build moved by the owner's disposition, shown in the plan view
 
-**Status:** OPEN · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0372@5c733981 whole
 

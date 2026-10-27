@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-6 — Plan Review: the plan record a review subject, run with the lenses of the preset `review.pin` passes until dCalibratedLens's Plan lenses land
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 14 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 14 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0374@c6143eda whole
 

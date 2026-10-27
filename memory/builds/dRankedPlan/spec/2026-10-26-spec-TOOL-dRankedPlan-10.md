@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-10 — `plan.exit` falls back to the owner gate while the intake is not installed for the harness
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0378@ed811c10 whole
 **Carries:** node:item.plan.exit

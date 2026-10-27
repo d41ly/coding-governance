@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0371@3ec4f25f whole
 **Carries:** node:policy-key.plan.triage

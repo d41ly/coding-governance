@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-48 — the TypeScript tokenizer emits string literal text behind an opt-in keyword, so the JavaScript reader reads argv arrays
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 

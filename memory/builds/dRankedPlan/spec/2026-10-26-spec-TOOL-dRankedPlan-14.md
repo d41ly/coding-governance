@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-14 — the plan record's scenario field, set from the placement and re-picked at Plan with its reason
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0382@182ba9ba whole
 

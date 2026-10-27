@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-81 — the spec audit of units 68 to 77: its 20 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 27 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 27 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 

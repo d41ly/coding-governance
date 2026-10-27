@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-7 — kickoff reads the plan as `plan.kickoff` says, and the attended brief is gated
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dRankedPlan-17
 **Carries:** cl-dClosedLoop-0375@33084fbd whole
 **Carries:** node:policy-key.plan.kickoff
 

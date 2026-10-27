@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-16 — the artifact levels: one plan record per build, and a brief that renders it and never types it
 
-**Status:** OPEN · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0498@e9d43f26 whole
 **Carries:** node:record-kind.plan

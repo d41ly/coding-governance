@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-12 — `plan.record` declaring the probes owed before Design
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0380@1e2f59a7 whole
 

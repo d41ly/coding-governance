@@ -193,3 +193,161 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T13:42:47Z rescope · item add TOOL-dRankedPlan-81 · reason spec-audit of TOOL-dRankedPlan-68 to -77 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-68-spec-audit.md) the 20 MEDIUM and LOW findings batched into one unit: ids 2 3 4 5 6 7 8 9 10 11 12 13 14 17 18 19 20 21 22 23 (items M1 to M11 and L1 to L5)
 
 2026-10-27T14:01:18Z review · item dRankedPlan-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 20 · disposition promote
+
+2026-10-27T14:51:03Z rescope · item defer TOOL-dRankedPlan-16 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:14Z rescope · item defer TOOL-dRankedPlan-1 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:18Z rescope · item defer TOOL-dRankedPlan-27 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:20Z rescope · item defer TOOL-dRankedPlan-9 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:22Z rescope · item defer TOOL-dRankedPlan-10 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:25Z rescope · item defer TOOL-dRankedPlan-24 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:27Z rescope · item defer TOOL-dRankedPlan-2 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:29Z rescope · item defer TOOL-dRankedPlan-25 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:31Z rescope · item defer TOOL-dRankedPlan-26 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:32Z rescope · item defer TOOL-dRankedPlan-34 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:34Z rescope · item defer TOOL-dRankedPlan-14 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:36Z rescope · item defer TOOL-dRankedPlan-21 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:39Z rescope · item defer TOOL-dRankedPlan-22 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:41Z rescope · item defer TOOL-dRankedPlan-35 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:42Z rescope · item defer TOOL-dRankedPlan-43 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:44Z rescope · item defer TOOL-dRankedPlan-13 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:46Z rescope · item defer TOOL-dRankedPlan-20 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:48Z rescope · item defer TOOL-dRankedPlan-30 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:51Z rescope · item defer TOOL-dRankedPlan-31 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:53Z rescope · item defer TOOL-dRankedPlan-32 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:55Z rescope · item defer TOOL-dRankedPlan-11 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:51:57Z rescope · item defer TOOL-dRankedPlan-36 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:00Z rescope · item defer TOOL-dRankedPlan-38 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:02Z rescope · item defer TOOL-dRankedPlan-39 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:04Z rescope · item defer TOOL-dRankedPlan-40 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:08Z rescope · item defer TOOL-dRankedPlan-41 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:11Z rescope · item defer TOOL-dRankedPlan-12 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:13Z rescope · item defer TOOL-dRankedPlan-50 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:16Z rescope · item defer TOOL-dRankedPlan-51 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:18Z rescope · item defer TOOL-dRankedPlan-19 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:21Z rescope · item defer TOOL-dRankedPlan-3 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:24Z rescope · item defer TOOL-dRankedPlan-59 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:26Z rescope · item defer TOOL-dRankedPlan-28 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:28Z rescope · item defer TOOL-dRankedPlan-33 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:29Z rescope · item defer TOOL-dRankedPlan-4 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:32Z rescope · item defer TOOL-dRankedPlan-44 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:34Z rescope · item defer TOOL-dRankedPlan-5 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:36Z rescope · item defer TOOL-dRankedPlan-15 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:38Z rescope · item defer TOOL-dRankedPlan-23 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:40Z rescope · item defer TOOL-dRankedPlan-6 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:42Z rescope · item defer TOOL-dRankedPlan-8 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:44Z rescope · item defer TOOL-dRankedPlan-7 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:46Z rescope · item defer TOOL-dRankedPlan-29 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:48Z rescope · item defer TOOL-dRankedPlan-37 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:51Z rescope · item defer TOOL-dRankedPlan-42 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:53Z rescope · item defer TOOL-dRankedPlan-45 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:54Z rescope · item defer TOOL-dRankedPlan-46 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:56Z rescope · item defer TOOL-dRankedPlan-47 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:52:59Z rescope · item defer TOOL-dRankedPlan-48 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:01Z rescope · item defer TOOL-dRankedPlan-49 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:04Z rescope · item defer TOOL-dRankedPlan-52 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:06Z rescope · item defer TOOL-dRankedPlan-55 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:08Z rescope · item defer TOOL-dRankedPlan-57 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:10Z rescope · item defer TOOL-dRankedPlan-58 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:13Z rescope · item defer TOOL-dRankedPlan-60 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:14Z rescope · item defer TOOL-dRankedPlan-53 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:17Z rescope · item defer TOOL-dRankedPlan-54 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:20Z rescope · item defer TOOL-dRankedPlan-56 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:24Z rescope · item defer TOOL-dRankedPlan-61 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:25Z rescope · item defer TOOL-dRankedPlan-63 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:28Z rescope · item defer TOOL-dRankedPlan-64 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:31Z rescope · item defer TOOL-dRankedPlan-62 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:35Z rescope · item defer TOOL-dRankedPlan-65 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:37Z rescope · item defer TOOL-dRankedPlan-66 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:39Z rescope · item defer TOOL-dRankedPlan-68 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:41Z rescope · item defer TOOL-dRankedPlan-69 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:43Z rescope · item defer TOOL-dRankedPlan-70 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:46Z rescope · item defer TOOL-dRankedPlan-71 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:49Z rescope · item defer TOOL-dRankedPlan-72 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:51Z rescope · item defer TOOL-dRankedPlan-67 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:54Z rescope · item defer TOOL-dRankedPlan-73 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:53:57Z rescope · item defer TOOL-dRankedPlan-74 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:54:00Z rescope · item defer TOOL-dRankedPlan-75 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:54:02Z rescope · item defer TOOL-dRankedPlan-76 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:54:06Z rescope · item defer TOOL-dRankedPlan-78 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:54:11Z rescope · item defer TOOL-dRankedPlan-79 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:54:13Z rescope · item defer TOOL-dRankedPlan-80 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:54:16Z rescope · item defer TOOL-dRankedPlan-77 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T14:54:19Z rescope · item defer TOOL-dRankedPlan-81 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17

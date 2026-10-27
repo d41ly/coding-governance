@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-11 — each role item's memory read set sized at Plan, as `id#tag` keys
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0379@f1807fe1 whole
 
