@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-93 — a new arm's suite path joins the build-order write set in the caller, never in the token read the guard-legs join shares
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 66 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 66 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-93-deviation-931.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-93-deviation-931.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-91-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-91-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-94 |
 
 <!-- /gen:spec-records -->
 
@@ -73,6 +74,9 @@ reader of `New arm:` lines that the spec-token checker's covers join shares, and
 
 - **consumes-from** `TOOL-dWellOiledMachine-90` — S1's arm paths in the build-order write set and the re-render of this build's README, which this unit moves out of `read_spec_writes` into the caller
 - **hands-off** `TOOL-dWellOiledMachine-94` — the tree-wide re-render this unit makes, which the batch's item for finding 26 records against spec 90 and checks with `gen_build_index.py --check`
+- **hands-off** `TOOL-dWellOiledMachine-95` — S3's revert clause and S5's rev bump of spec 90, deleted before this unit builds, since 90's S1 no longer widens the shared token read (round-3 promotions audit, finding 1)
+- **hands-off** `TOOL-dWellOiledMachine-96` — S3's suite-path parse, S2's field split and the annotated-arm selftest case, amended into this spec before it builds (round-3 promotions audit, finding 25)
+- **hands-off** `TOOL-dWellOiledMachine-97` — S1's and S2's Gates slice and AC3, amended into this spec before it builds (round-3 promotions audit, findings 2 and 18)
 
 ## 4. Design
 
@@ -185,6 +189,8 @@ New arm: tools/check-spec-tokens.test.sh · covers AC3 · a fixture spec whose a
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-2 promotions, finding
   25 (H3).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-3
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-95, TOOL-dWellOiledMachine-96, TOOL-dWellOiledMachine-97.
 
 ## 10. Reuse audit
 

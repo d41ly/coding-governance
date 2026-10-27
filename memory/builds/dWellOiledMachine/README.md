@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-62 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94
+ids: TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-62 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97
 spec-audit: 2026-10-21
 parents: dBoundRoles dTotalRecall dKeptSession
 may: PLAY-dClosedLoop-3
@@ -127,7 +127,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 93 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 96 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11
 ids TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22
 ids TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33
@@ -136,7 +136,7 @@ ids TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-4
 ids TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-62 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66
 ids TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77
 ids TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88
-ids TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94
+ids TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -188,7 +188,7 @@ ids TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-9
 | [TOOL-dWellOiledMachine-83 — the supervisor start claim taken and broken through the tree's guarded mkdir lock, lifted into the kit library](spec/2026-10-27-spec-TOOL-dWellOiledMachine-83.md) | 30 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-89 — the supervisor start claim made on a fresh node, and only a claim that exists read as a rival](spec/2026-10-27-spec-TOOL-dWellOiledMachine-89.md) | 30 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-8 — the persisted-return store, keyed per spawn site, and the shared deferral block](spec/2026-10-26-spec-TOOL-dWellOiledMachine-8.md) | 31 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dWellOiledMachine-92 — the lifted node lock handed to TOOL-dPlacedRequest-24 and -11 by an ask row, and unit 83's claim on their contract withdrawn](spec/2026-10-27-spec-TOOL-dWellOiledMachine-92.md) | 31 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-92 — the lifted node lock handed to TOOL-dPlacedRequest-24 and -11 by an ask row, and unit 83's claim on their contract withdrawn](spec/2026-10-27-spec-TOOL-dWellOiledMachine-92.md) | 31 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-7 — act binding and the epoch check at the Workflow, Agent and shell call, decided in the dispatcher's PermissionRequest entry, with in-script spawns declared and reconciled](spec/2026-10-26-spec-TOOL-dWellOiledMachine-7.md) | 32 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-74 — a kept return reused only for the same spawn input: the input print joins the spawn site's label](spec/2026-10-27-spec-TOOL-dWellOiledMachine-74.md) | 32 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-19 — act binding against the resolved shape's digest, `roles.shape-enforce`, the journal reconciled against the shape, and each non-review act's shape-run row](spec/2026-10-26-spec-TOOL-dWellOiledMachine-19.md) | 33 | 2 | OPEN | rev-1 | 2026-10-26 |
@@ -221,7 +221,7 @@ ids TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-9
 | [TOOL-dWellOiledMachine-24 — the journal's count of map reads outside a slice: a record pack on every shell call that runs `gov map`, judged against the role's slice](spec/2026-10-26-spec-TOOL-dWellOiledMachine-24.md) | 55 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-81 — the stall line's reset read from the transcript's measured limit record, never from an unmeasured payload field](spec/2026-10-27-spec-TOOL-dWellOiledMachine-81.md) | 55 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-59 — a cadence run's own rework budget on its period lease, the cadence-items point, and the tick that runs them](spec/2026-10-26-spec-TOOL-dWellOiledMachine-59.md) | 56 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-91 — the stall reset taken only from a limit record that is this session's, recent and still in force](spec/2026-10-27-spec-TOOL-dWellOiledMachine-91.md) | 56 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-91 — the stall reset taken only from a limit record that is this session's, recent and still in force](spec/2026-10-27-spec-TOOL-dWellOiledMachine-91.md) | 56 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-44 — the memory-mirror point: a stand-in adapter fed from the change feed, four reads that consult it, and every verdict computed locally](spec/2026-10-26-spec-TOOL-dWellOiledMachine-44.md) | 57 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-29 — the measured `browser` row and the `visual.capture` command adapter: a pinned tree served, the cache busted, the viewports taken, screenshots kept by hash after the scan](spec/2026-10-26-spec-TOOL-dWellOiledMachine-29.md) | 58 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-26 — the `step —` announcement before each act while attended, and once when attendance begins, rendered from `next` and the item's declaration](spec/2026-10-26-spec-TOOL-dWellOiledMachine-26.md) | 59 | 2 | OPEN | rev-1 | 2026-10-26 |
@@ -231,16 +231,19 @@ ids TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-9
 | [TOOL-dWellOiledMachine-79 — the spec audit's 49 medium and low findings, batched: capability rows, pack shapes, launch environment, registries, renders and the records that miscount](spec/2026-10-27-spec-TOOL-dWellOiledMachine-79.md) | 63 | 2 | OPEN | rev-3 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-84 — the record door matches a namespace entry exactly or by prefix, so the single attendance ref sits behind its session rule](spec/2026-10-27-spec-TOOL-dWellOiledMachine-84.md) | 64 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-85 — the node salt carried from its old store names to the new ones, so no digest written before the rename stops joining](spec/2026-10-27-spec-TOOL-dWellOiledMachine-85.md) | 64 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dWellOiledMachine-90 — the promotions audit's 55 medium and low findings, batched: claims, fixtures, readers, registries and the sibling records that drifted](spec/2026-10-27-spec-TOOL-dWellOiledMachine-90.md) | 65 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dWellOiledMachine-93 — a new arm's suite path joins the build-order write set in the caller, never in the token read the guard-legs join shares](spec/2026-10-27-spec-TOOL-dWellOiledMachine-93.md) | 66 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dWellOiledMachine-94 — the round-2 promotions audit's 37 medium and low findings, batched: verbs, stores, claim layout, coverage lists, renders and citations](spec/2026-10-27-spec-TOOL-dWellOiledMachine-94.md) | 67 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-90 — the promotions audit's 55 medium and low findings, batched: claims, fixtures, readers, registries and the sibling records that drifted](spec/2026-10-27-spec-TOOL-dWellOiledMachine-90.md) | 65 | 2 | OPEN | rev-3 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-93 — a new arm's suite path joins the build-order write set in the caller, never in the token read the guard-legs join shares](spec/2026-10-27-spec-TOOL-dWellOiledMachine-93.md) | 66 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-95 — unit 90 never widens the shared spec token read: its S1 is handed whole to unit 93's caller-side join before unit 90 builds](spec/2026-10-27-spec-TOOL-dWellOiledMachine-95.md) | 66 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-94 — the round-2 promotions audit's 37 medium and low findings, batched: verbs, stores, claim layout, coverage lists, renders and citations](spec/2026-10-27-spec-TOOL-dWellOiledMachine-94.md) | 67 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-96 — an arm line's suite path is its first path-shaped token, so an annotated arm still joins the build-order write set](spec/2026-10-27-spec-TOOL-dWellOiledMachine-96.md) | 67 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-97 — the round-3 promotions audit's 23 medium and low findings, batched: pathspecs, the fixture session, probe environments, the ask row, renders and criteria green before their build](spec/2026-10-27-spec-TOOL-dWellOiledMachine-97.md) | 68 | 2 | OPEN | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 47 bound to this build, across 4 record folder(s).
+Records: 51 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94.
+Ids no `spec-audit` record has ever named: TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97.
 
 Ids whose spec moved past its audited revision: TOOL-dWellOiledMachine-1@rev-1 TOOL-dWellOiledMachine-10@rev-1 TOOL-dWellOiledMachine-11@rev-1 TOOL-dWellOiledMachine-12@rev-1 TOOL-dWellOiledMachine-13@rev-1 TOOL-dWellOiledMachine-14@rev-1 TOOL-dWellOiledMachine-16@rev-1
 TOOL-dWellOiledMachine-17@rev-1 TOOL-dWellOiledMachine-2@rev-1 TOOL-dWellOiledMachine-20@rev-1 TOOL-dWellOiledMachine-21@rev-1 TOOL-dWellOiledMachine-23@rev-1 TOOL-dWellOiledMachine-24@rev-1 TOOL-dWellOiledMachine-27@rev-1 TOOL-dWellOiledMachine-28@rev-1 TOOL-dWellOiledMachine-31@rev-1
@@ -249,12 +252,12 @@ TOOL-dWellOiledMachine-40@rev-1 TOOL-dWellOiledMachine-41@rev-1 TOOL-dWellOiledM
 TOOL-dWellOiledMachine-57@rev-1 TOOL-dWellOiledMachine-58@rev-1 TOOL-dWellOiledMachine-6@rev-1 TOOL-dWellOiledMachine-60@rev-1 TOOL-dWellOiledMachine-7@rev-1 TOOL-dWellOiledMachine-8@rev-1 TOOL-dWellOiledMachine-9@rev-1 TOOL-dWellOiledMachine-63@rev-1 TOOL-dWellOiledMachine-64@rev-1
 TOOL-dWellOiledMachine-65@rev-1 TOOL-dWellOiledMachine-67@rev-1 TOOL-dWellOiledMachine-68@rev-1 TOOL-dWellOiledMachine-70@rev-1 TOOL-dWellOiledMachine-71@rev-1 TOOL-dWellOiledMachine-72@rev-1 TOOL-dWellOiledMachine-73@rev-1 TOOL-dWellOiledMachine-74@rev-1 TOOL-dWellOiledMachine-75@rev-1
 TOOL-dWellOiledMachine-77@rev-1 TOOL-dWellOiledMachine-78@rev-1 TOOL-dWellOiledMachine-79@rev-1 TOOL-dWellOiledMachine-80@rev-1 TOOL-dWellOiledMachine-81@rev-1 TOOL-dWellOiledMachine-82@rev-1 TOOL-dWellOiledMachine-83@rev-1 TOOL-dWellOiledMachine-84@rev-1 TOOL-dWellOiledMachine-85@rev-1
-TOOL-dWellOiledMachine-86@rev-1 TOOL-dWellOiledMachine-87@rev-1 TOOL-dWellOiledMachine-88@rev-1 TOOL-dWellOiledMachine-89@rev-1 TOOL-dWellOiledMachine-90@rev-1.
+TOOL-dWellOiledMachine-86@rev-1 TOOL-dWellOiledMachine-87@rev-1 TOOL-dWellOiledMachine-88@rev-1 TOOL-dWellOiledMachine-89@rev-1 TOOL-dWellOiledMachine-90@rev-1 TOOL-dWellOiledMachine-91@rev-1 TOOL-dWellOiledMachine-92@rev-1 TOOL-dWellOiledMachine-93@rev-1 TOOL-dWellOiledMachine-94@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 93 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 96 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 61
 - carried in parts: 0 (none)
@@ -271,7 +274,7 @@ Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 93 spec(
   `spec/2026-10-27-spec-TOOL-dWellOiledMachine-82.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-85.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-27-spec-TOOL-dWellOiledMachine-86.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-88.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-89.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-27-spec-TOOL-dWellOiledMachine-90.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-92.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-93.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-27-spec-TOOL-dWellOiledMachine-94.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-27-spec-TOOL-dWellOiledMachine-94.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-96.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-97.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0283, cl-dClosedLoop-0285, cl-dClosedLoop-0286, cl-dClosedLoop-0290, cl-dClosedLoop-0291, cl-dClosedLoop-0292, cl-dClosedLoop-0296, cl-dClosedLoop-0299, cl-dClosedLoop-0300, cl-dClosedLoop-0302, cl-dClosedLoop-0308, cl-dClosedLoop-0309,
   cl-dClosedLoop-0330, cl-dClosedLoop-0335, cl-dClosedLoop-0337, cl-dClosedLoop-0338
 <!-- /gen:build-coverage -->
@@ -345,8 +348,9 @@ Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 93 spec(
 | 63 | `TOOL-dWellOiledMachine-79` | no |
 | 64 | `TOOL-dWellOiledMachine-84`, `TOOL-dWellOiledMachine-85` | yes |
 | 65 | `TOOL-dWellOiledMachine-90` | no |
-| 66 | `TOOL-dWellOiledMachine-93` | no |
-| 67 | `TOOL-dWellOiledMachine-94` | no |
+| 66 | `TOOL-dWellOiledMachine-93`, `TOOL-dWellOiledMachine-95` | no |
+| 67 | `TOOL-dWellOiledMachine-94`, `TOOL-dWellOiledMachine-96` | no |
+| 68 | `TOOL-dWellOiledMachine-97` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-90 — the promotions audit's 55 medium and low findings, batched: claims, fixtures, readers, registries and the sibling records that drifted
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 65 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 65 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -275,6 +275,7 @@ bump" means spec N is amended at this unit's pass, its §9 line naming this unit
 - **consumes-from** `TOOL-dWellOiledMachine-88` — the population and head of `pruned` (S16)
 - **hands-off** `TOOL-dWellOiledMachine-93` — S1's arm paths in the build-order write set, which that unit moves out of `read_spec_writes` into the caller (finding 25)
 - **hands-off** `TOOL-dWellOiledMachine-94` — S1, S4, S10, S22, S23, S48 and S54, and AC4, AC6, AC7, AC14, AC19, AC20, AC23, AC31, AC48 and AC55 (findings 2, 4, 7, 8, 9, 10, 11, 12, 13, 14, 26, 27, 30, 32, 34)
+- **hands-off** `TOOL-dWellOiledMachine-95` — S1, AC1, Files touched and the sentences naming S1 as built here, rewritten before this unit builds so S1 is 93's caller-side join and this unit edits no `design_lib` spec reader (round-3 promotions audit, finding 1)
 
 ## 4. Design
 
@@ -500,6 +501,8 @@ none
 - rev-1 · 2026-10-27 · initial draft, the promotions audit's 55 medium and low findings batched.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-93, TOOL-dWellOiledMachine-94.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-3
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-95.
 
 ## 10. Reuse audit
 

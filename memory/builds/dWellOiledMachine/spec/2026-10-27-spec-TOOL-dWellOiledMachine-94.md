@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-94 — the round-2 promotions audit's 37 medium and low findings, batched: verbs, stores, claim layout, coverage lists, renders and citations
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-94-deviation-941.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-94-deviation-941.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-91-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-91-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-93 |
 
 <!-- /gen:spec-records -->
 
@@ -219,6 +220,7 @@ are those at this unit's order: TOOL-dWellOiledMachine-28 (order 61) has moved `
 - **consumes-from** `TOOL-dWellOiledMachine-90` — AC4, AC6, AC7, AC14, AC19, AC20, AC23, AC31, AC48, AC54 and AC55, S1, S4, S10, S22, S23, S48 and S54 (S3, S6, S14 to S21, S26 to S28, S30, S31)
 - **consumes-from** `TOOL-dWellOiledMachine-91` — the freshness rule the re-pointed limit plants must satisfy (S25)
 - **consumes-from** `TOOL-dWellOiledMachine-93` — the tree-wide re-render S26 records against spec 90
+- **hands-off** `TOOL-dWellOiledMachine-97` — S14, S25, AC2, AC8, AC15, AC17, AC18, AC19, AC29, §4 Evidence and the §7 leg line, amended before this unit builds (round-3 promotions audit, findings 3, 5, 7, 8, 9, 11, 13, 14, 20, 22, 26, 27 and 28)
 
 ## 4. Design
 
@@ -456,6 +458,8 @@ New arm: tools/runtime/stall-recorder.test.sh · covers AC22 · the payload case
 
 - rev-1 · 2026-10-27 · initial draft, the round-2 promotions audit's 37 medium and low findings
   batched.
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-3
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-97.
 
 ## 10. Reuse audit
 

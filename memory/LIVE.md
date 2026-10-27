@@ -25,14 +25,14 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dLinkedLibrary](builds/dLinkedLibrary/README.md) | OPEN | d | 2026-10-21 | tooling | 26 | 2026-10-21 | active | 0 |
 | [dMindYourWords](builds/dMindYourWords/README.md) | OPEN | d | 2026-10-21 | tooling | 18 | 2026-10-21 | active | 0 |
 | [dOrderedCharter](builds/dOrderedCharter/README.md) | DEFERRED | d | 2026-10-21 | playbook | 55 | 2026-10-25 | active | 0 |
-| [dPlacedRequest](builds/dPlacedRequest/README.md) | DEFERRED | d | 2026-10-21 | tooling | 69 | 2026-10-26 | active | 0 |
+| [dPlacedRequest](builds/dPlacedRequest/README.md) | DEFERRED | d | 2026-10-21 | tooling | 70 | 2026-10-26 | active | 0 |
 | [dRankedPlan](builds/dRankedPlan/README.md) | OPEN | d | 2026-10-21 | tooling | 17 | 2026-10-21 | active | 0 |
 | [dSafePassage](builds/dSafePassage/README.md) | DEFERRED | d | 2026-10-21 | tooling | 60 | 2026-10-25 | active | 0 |
 | [dScopedBuild](builds/dScopedBuild/README.md) | OPEN | d | 2026-10-21 | tooling | 16 | 2026-10-21 | active | 0 |
 | [dShippedRelease](builds/dShippedRelease/README.md) | OPEN | d | 2026-10-21 | deployer | 32 | 2026-10-21 | active | 0 |
 | [dTendedCadence](builds/dTendedCadence/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-10-21 | active | 0 |
 | [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 103 | 2026-10-26 | active | 0 |
-| [dWellOiledMachine](builds/dWellOiledMachine/README.md) | OPEN | d | 2026-10-21 | tooling | 94 | 2026-10-27 | active | 0 |
+| [dWellOiledMachine](builds/dWellOiledMachine/README.md) | OPEN | d | 2026-10-21 | tooling | 97 | 2026-10-27 | active | 0 |
 | [dWitnessedBar](builds/dWitnessedBar/README.md) | DEFERRED | d | 2026-10-21 | tooling | 98 | 2026-10-26 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 | 2026-08-18 | dormant | 0 |

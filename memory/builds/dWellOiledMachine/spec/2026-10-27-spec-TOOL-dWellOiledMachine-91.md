@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-91 — the stall reset taken only from a limit record that is this session's, recent and still in force
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 56 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 56 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-91-deviation-911.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-91-deviation-911.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-91-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-91-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,7 @@ so the first real stall measures the flush ordering this spec cannot.
 
 - **consumes-from** `TOOL-dWellOiledMachine-81` — `extractResetUtc`, the transcript window it reads, the stall fixture and the stall line's `payload-keys`, which this unit bounds by session, age and reset
 - **hands-off** `TOOL-dWellOiledMachine-94` — the freshness rule, which the batch's re-pointed plants for 65 and 47 must satisfy by writing a transcript dated now with a reset an hour ahead (finding 18)
+- **hands-off** `TOOL-dWellOiledMachine-97` — S4's rev bump of spec 81, AC7, the hands-off line to unit 94 and Files touched, amended before this unit builds (round-3 promotions audit, findings 6, 12, 19, 24 and 27)
 
 ## 4. Design
 
@@ -184,6 +186,8 @@ New arm: tools/unattended/stall-recorder.test.sh · covers AC1 AC2 AC3 AC4 AC5 A
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-2 promotions, finding
   17 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-3
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-97.
 
 ## 10. Reuse audit
 

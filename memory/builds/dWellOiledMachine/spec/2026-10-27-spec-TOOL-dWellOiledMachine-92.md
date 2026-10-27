@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-92 — the lifted node lock handed to TOOL-dPlacedRequest-24 and -11 by an ask row, and unit 83's claim on their contract withdrawn
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 31 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 31 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-92-deviation-921.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-92-deviation-921.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-91-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-91-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +65,7 @@ nothing about that build's contract.
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-83` — S1's lifted factory and its signature, which the ask row hands to TOOL-dPlacedRequest-24 and -11, and §8 F1, which this unit restates
+- **hands-off** `TOOL-dWellOiledMachine-97` — S1's ask row, its content key and its caller list, AC1, Files touched and §4 Evidence, amended before this unit builds (round-3 promotions audit, findings 16, 17, 21 and 30)
 
 ## 4. Design
 
@@ -141,6 +143,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-2 promotions, finding
   22 (H2).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-3
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-97.
 
 ## 10. Reuse audit
 
