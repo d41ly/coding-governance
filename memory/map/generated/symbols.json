@@ -463,6 +463,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "add_boot_start",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "add_card_body",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -13721,6 +13726,11 @@
       "id": "read_block",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_boot_clock",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_boot_epoch",

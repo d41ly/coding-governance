@@ -3626,6 +3626,10 @@ def check_step_walk() -> None:
             ("lock", "lock-live", 1, ("refusing rather than joining in: live, ", "reclaimed by the next run")),
             ("lock", "lock-live-slow-census", 1, ("refusing rather than joining in: live, ",
                                                   "reclaimed by the next run", "lock: the planted lock unchanged")),
+            ("lock", "lock-wall-step", 1, ("refusing rather than joining in: live, ",
+                                           "lock: the planted lock unchanged")),
+            ("lock", "lock-wall-step-no-boot", 1, ("refusing rather than joining in: unknown, pid ",
+                                                   "lock: the planted lock unchanged")),
             ("lock", "lock-foreign-host", 1, ("unknown, it was taken on host 'gk-elsewhere.invalid'",
                                               "is reclaimed by the next run")),
             ("lock", "lock-unreadable", 1, ("unknown, its record names no readable pid",
@@ -3651,7 +3655,8 @@ def check_step_walk() -> None:
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
         tag = ("dSP-15" if (plant or "").startswith("schema-3")
-               else "dSP-22" if plant == "lock-live-slow-census" else "dSP-2")
+               else "dSP-22" if plant == "lock-live-slow-census"
+               else "dSP-32" if (plant or "").startswith("lock-wall-step") else "dSP-2")
         check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
               p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
 

@@ -1450,13 +1450,32 @@ def read_lock_holder(lock) -> tuple[bytes | None, dict | None]:
     return raw, rec if ok else None
 
 
+def read_boot_clock() -> float | None:
+    """Seconds on the kernel's boot clock, the origin `ps`'s `etimes` counts from, or None where
+    `time` defines no `CLOCK_BOOTTIME` (TOOL-dSafePassage-32 S1)."""
+    clock = getattr(time, "CLOCK_BOOTTIME", None)
+    return None if clock is None else time.clock_gettime(clock)
+
+
+def add_boot_start(record: dict) -> dict:
+    """`record` with `started_boot`, the `read_boot_clock` reading, beside its `started`, the key
+    left out where the reading is None (TOOL-dSafePassage-32 S2)."""
+    boot = read_boot_clock()
+    return record if boot is None else {**record, "started_boot": boot}
+
+
 def check_holder_dead(record: dict | None) -> tuple[str, str]:
     """(`dead`, `live` or `unknown`, why) for a lock or guard holder (S7). `dead`: its `host` is this
     host or absent, and the process-monitor census holds no row with its pid, or one created more
     than `REUSE_MARGIN_S` after its `started`, a reused pid; `live`: a row with that pid created no
     later than that; `unknown`: an unreadable record, another host, or a census that cannot run. The
     clock is read once BEFORE the census is spawned and no later reading enters the estimate, so a
-    slow census makes a holder look older, toward `live` (TOOL-dSafePassage-22 S1)."""
+    slow census makes a holder look older, toward `live` (TOOL-dSafePassage-22 S1).
+
+    A `windows-join` row's age is wall against wall and is estimated on `time.time()` against
+    `started`; a `posix-ps` row's `etimes` counts from boot, so it is estimated on `read_boot_clock()`
+    against `started_boot`; where either boot reading is missing it falls back to the wall and
+    never reads reused: a would-be reused holder reads `unknown` (TOOL-dSafePassage-32 S4, S5)."""
     if record is None:
         return "unknown", "its record names no readable pid and start time"
     host = record.get("host")
@@ -1468,13 +1487,25 @@ def check_holder_dead(record: dict | None) -> tuple[str, str]:
         spec = importlib.util.spec_from_file_location("gk_lock_census", pm_dir / "census.py")
         census = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(census)
-        now = time.time()
+        now, now_boot = time.time(), read_boot_clock()
         rows, _counts = census.scan_processes()
     except Exception as e:  # ponytail: any census failure proves nothing, and `unknown` refuses
         return "unknown", f"the process census could not run ({type(e).__name__}: {e})"
-    born = [now - float(r["age_s"]) for r in rows if r.get("winpid") == pid]
-    if any(b <= record["started"] + REUSE_MARGIN_S for b in born):
-        return "live", f"pid {pid} is still running and was started before it took the lock"
+    started_boot = record.get("started_boot")
+    if isinstance(started_boot, bool) or not isinstance(started_boot, (int, float)):
+        started_boot = None
+    unjudged = False
+    born = [r for r in rows if r.get("winpid") == pid]
+    for r in born:
+        posix = r.get("backend") != "windows-join"
+        boot = posix and now_boot is not None and started_boot is not None
+        t0, start = (now_boot, started_boot) if boot else (now, record["started"])
+        if t0 - float(r["age_s"]) <= start + REUSE_MARGIN_S:
+            return "live", f"pid {pid} is still running and was started before it took the lock"
+        unjudged = unjudged or (posix and not boot)  # S5: a wall estimate never reads reused here
+    if unjudged:
+        return "unknown", (f"pid {pid} is still running, and its lock records no boot-clock start "
+                           f"to compare its age with, so a reused pid cannot be told from the holder")
     if born:
         return "dead", f"pid {pid} now names a process started after the lock was taken, a reused pid"
     return "dead", f"no process on this host has pid {pid} any more"
@@ -1508,7 +1539,8 @@ def write_reclaimed_lock(lock, record: dict) -> tuple[str, dict | None, str]:
         return "busy", holder, f"another run holds the guard {guard.name} and is reclaiming this lock"
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write(json.dumps({"pid": os.getpid(), "started": time.time(), "host": THIS_HOST}) + "\n")
+            fh.write(json.dumps(add_boot_start({"pid": os.getpid(), "started": time.time(),
+                                                  "host": THIS_HOST})) + "\n")
         if read_lock_holder(lock)[0] != raw:
             return "busy", holder, "the lock changed while this run judged it: another run took it"
         remove_shared_file(lock)
@@ -2050,14 +2082,22 @@ sys.exit(1 if out["stopped"] else 0)
 # One take of a target's write lock through govkit's `take_write_lock`, held until `<release>`
 # exists; `<gate>` makes two racers start together. `-` waits for neither. A sixth argument, seconds,
 # delays every return of the census `check_holder_dead` loads, in this process only, so the census
-# answers that much after it sampled (TOOL-dSafePassage-22 S4).
+# answers that much after it sampled (TOOL-dSafePassage-22 S4). `wall-step <pid> <born>` instead
+# makes the census one `posix-ps` row of <pid>, its age counted on `time.monotonic` from <born>,
+# stands `time.monotonic` in for the boot clock and steps `time.time` 10 s forward, in this process
+# only (TOOL-dSafePassage-32 S6).
 FIXTURE_LOCK_CHILD = r'''import importlib.machinery, importlib.util, os, pathlib, sys, time
 sys.stdout.reconfigure(encoding="utf-8")
+wall_step = len(sys.argv) > 5 and sys.argv[5] == "wall-step"
 if len(sys.argv) > 5:
     _exec = importlib.machinery.SourceFileLoader.exec_module
     def _slow_exec(self, module):
         _exec(self, module)
-        if module.__name__ == "gk_lock_census":
+        if module.__name__ == "gk_lock_census" and wall_step:
+            row = {"winpid": int(sys.argv[6]), "backend": "posix-ps"}
+            module.scan_processes = lambda *a, **k: (
+                [{**row, "age_s": float(int(time.monotonic() - float(sys.argv[7])))}], {})
+        elif module.__name__ == "gk_lock_census":
             scan = module.scan_processes
             def slow_scan(*a, **k):
                 out = scan(*a, **k)
@@ -2070,6 +2110,10 @@ us = importlib.util.module_from_spec(spec)
 sys.modules["upgrade_steps"] = us
 spec.loader.exec_module(us)
 gk = us.load_govkit()
+if wall_step:
+    us.read_boot_clock = time.monotonic
+    _wall = time.time
+    time.time = lambda: _wall() + 10
 print(f"lock: taker pid {os.getpid()}", flush=True)
 deadline = time.time() + 300
 while sys.argv[3] != "-" and not pathlib.Path(sys.argv[3]).exists() and time.time() < deadline:
@@ -2086,7 +2130,7 @@ while sys.argv[4] != "-" and not pathlib.Path(sys.argv[4]).exists() and time.tim
 WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSafePassage-15
 WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending") + WALK_SCHEMA_PLANTS
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-unreadable",
-               "lock-race", "guard-dead", "lock-live-slow-census")
+               "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot")
 UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update")
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
 NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePassage-17: s2 is the floor row's shape
@@ -2473,17 +2517,21 @@ def run_lock_fixture(plant: str) -> int:
             p.wait()
             return p.pid
 
-        def plant_lock(pid: int, started: float, host: str | None = THIS_HOST) -> bytes:
+        def plant_lock(pid: int, started: float, host: str | None = THIS_HOST,
+                       started_boot: float | None = None) -> bytes:
             rec = {"pid": pid, "verb": "update", "started": started,
                    "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(started))}
             if host:
                 rec["host"] = host
+            if started_boot is not None:
+                rec["started_boot"] = started_boot
             lock.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
             return lock.read_bytes()
 
         def take(gate: str = "-", release: str = "-", out_file: pathlib.Path | None = None):
             argv = [sys.executable, "-c", FIXTURE_LOCK_CHILD, str(HERE / "upgrade_steps.py"), str(t), gate, release]
             argv += ["3"] if plant == "lock-live-slow-census" else []
+            argv += ["wall-step", str(holder), str(born)] if plant.startswith("lock-wall-step") else []
             if out_file is None:
                 p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace",
                                    env=env, timeout=600)
@@ -2502,7 +2550,7 @@ def run_lock_fixture(plant: str) -> int:
         try:
             rc = 0
             if plant in ("lock-dead", "lock-reused", "lock-live", "lock-foreign-host", "lock-unreadable",
-                         "lock-live-slow-census"):
+                         "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot"):
                 if plant == "lock-dead":
                     holder = dead_pid()
                     before = plant_lock(holder, time.time() - 30)
@@ -2517,6 +2565,15 @@ def run_lock_fixture(plant: str) -> int:
                     sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)"])
                     holder = sleeper.pid
                     before = plant_lock(holder, time.time())
+                elif plant.startswith("lock-wall-step"):
+                    # TOOL-dSafePassage-32: the holder's age on the boot clock, its lock read on
+                    # both clocks (the wall alone for -no-boot), and the judge's wall 10 s ahead.
+                    born = time.monotonic()
+                    sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)"])
+                    holder = sleeper.pid
+                    time.sleep(0.5)
+                    before = plant_lock(holder, time.time(), started_boot=None if plant.endswith("-no-boot")
+                                        else time.monotonic())
                 elif plant == "lock-foreign-host":
                     holder = dead_pid()
                     before = plant_lock(holder, time.time() - 30, "gk-elsewhere.invalid")
@@ -2538,8 +2595,13 @@ def run_lock_fixture(plant: str) -> int:
                            "the take did not refuse with the holder described and the remedy naming the reclaim")
                     expect(lock.read_bytes() == before, "a refusing take changed the lock")
                     expect({"lock-live": f"pid {holder} ", "lock-live-slow-census": f"pid {holder} ",
+                            "lock-wall-step": f"pid {holder} ", "lock-wall-step-no-boot": f"pid {holder} ",
                             "lock-foreign-host": "gk-elsewhere.invalid",
                             "lock-unreadable": "no readable pid"}[plant] in out, "the refusal does not describe the holder")
+                    if plant.startswith("lock-wall-step"):
+                        verdict = "unknown" if plant.endswith("-no-boot") else "live"
+                        expect(f"refusing rather than joining in: {verdict}, " in out,
+                               f"the stepped wall clock did not leave the holder {verdict}")
             elif plant == "lock-race":
                 plant_lock(dead_pid(), time.time() - 30)
                 gate, release = tmp / "go", tmp / "release"

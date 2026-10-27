@@ -7520,9 +7520,9 @@ def take_write_lock(target: pathlib.Path, verb: str) -> dict[str, str | None] | 
     lock = target.joinpath(*WRITE_LOCK_REL.split("/"))
     journal_path = target.joinpath(*STAGING_JOURNAL_REL.split("/"))
     lock.parent.mkdir(parents=True, exist_ok=True)
-    record = {"pid": os.getpid(), "verb": verb, "started": time.time(),
-              "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-              "host": upgrade_steps.THIS_HOST}
+    record = upgrade_steps.add_boot_start({"pid": os.getpid(), "verb": verb, "started": time.time(),
+                                           "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                                           "host": upgrade_steps.THIS_HOST})
     try:
         fd = os.open(str(lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError:
