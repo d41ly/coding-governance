@@ -22,16 +22,17 @@ needs-target = false
 
 # TOOL-dSafePassage-11: the interpreter floor raised to Python 3.15, declared in python-floor.txt in
 # gov's lib dir. Its up and witness are the preflight, which refuses below the floor exactly as the
-# resolver does; its down grades, under the floor it restores, 3.11, the files the rollback restores,
+# resolver does; its down grades, under the floor it restores, 3.12, the files the rollback restores,
 # read at its --to commit `{to}` (TOOL-dSafePassage-26 S10), and restores the declaration only
-# where the target carries it. Its witness reads the node, which no down changes, so
+# where the target carries it. 3.12, not 3.11 (TOOL-dSafePassage-69): the pin declared no floor, and
+# its own code needs 3.12 since 9d41abb16 put a PEP 701 f-string at check-recall.py:394. Its witness reads the node, which no down changes, so
 # `reverted = "down-exit"` lets the down's own exit 0 judge it (TOOL-dSafePassage-17). A later
 # raise appends its own row after the newest one, its down naming
 # the floor it replaces, and never edits this one.
 [[upgrade]]
 id = "lib/python-floor-3.15"
 up = ["bash", "{gov}/lib/python-floor.sh", "preflight"]
-down = ["bash", "{gov}/lib/python-floor.sh", "down", "3.11", "{target}", "{to}"]
+down = ["bash", "{gov}/lib/python-floor.sh", "down", "3.12", "{target}", "{to}"]
 witness = ["bash", "{gov}/lib/python-floor.sh", "preflight"]
 reverted = "down-exit"
 surfaces = []

@@ -3641,6 +3641,19 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
           us.run_step_isolated(row._replace(needs_target=True), "up", tmp, tmp)
           == {"verdict": "attended", "rc": None, "tail": ""})
 
+    # TOOL-dSafePassage-69 S4: an up that fails with nothing on stderr stops with a tail naming that and
+    # stdout's last line, and a witness, a verdict, keeps its empty tail.
+    quiet_target = tmp / "dsp69-target"
+    quiet_target.mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", str(quiet_target)], check=True, capture_output=True)
+    quiet = row._replace(up=["python", "-c", "print('the reason'); raise SystemExit(3)"],
+                         witness=["python", "-c", "print('the reason'); raise SystemExit(3)"])
+    up, wit = (us.run_step_isolated(quiet, ph, quiet_target, GOV_ROOT) for ph in ("up", "witness"))
+    check("[dSP-69] an up that fails with nothing on stderr stops with a tail naming that and its stdout",
+          up["verdict"] == "failed" and up["rc"] == 3 and "\n" not in up["tail"]
+          and all(n in up["tail"] for n in ("fixture/x up", "nothing on stderr", "the reason"))
+          and wit["tail"] == "", f"up {up}; witness {wit}")
+
 
 def check_step_gate_fixture() -> None:
     """TOOL-dSafePassage-10 AC2 to AC9 — `step_gate.py --fixture` over every class row's own plant,

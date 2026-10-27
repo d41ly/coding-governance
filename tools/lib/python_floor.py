@@ -19,9 +19,12 @@ gov shipped ending `.py` or `.toml`, its source read from gov at `<to>`, and eve
 of the target, never the adopter's other files; on gov's own tree, gov's tracked set at `<to>`. By a
 real interpreter at that floor where `resolve_floor_interpreter` finds one, mode
 `interpreter <path>`; elsewhere, mode `static`, by `ast.parse` at that floor's feature version, the
-four PEP 701 shapes over the tokens, the running `tomllib`, and the four TOML 1.1 deltas. WHAT THE
-STATIC MODE DOES NOT SEE: every other grammar change after the restored floor that `feature_version`
-does not model (deviation-31). The down executes no target code; a finding writes nothing.
+four PEP 701 shapes over the tokens below 3.12, the running `tomllib`, and the four TOML 1.1 deltas.
+WHAT THE STATIC MODE DOES NOT SEE: every other grammar change after the restored floor that
+`feature_version` does not model (deviation-31), and no PEP 701 shape at a restored floor of 3.12 or
+newer, where they are legal (TOOL-dSafePassage-69). The down executes no target code; a finding
+writes nothing. It reports on stderr, one stream, its count line naming the first finding, since a
+step's `tail` is stderr and the walk keeps only its last line (TOOL-dSafePassage-69 S3).
 
 A LATER RAISE copies this unit: `write_floor` the new value, a `lib/python-floor-<X.Y>` step row whose
 down names the floor it replaces, and every statement the query finds rewritten as a pointer.
@@ -354,7 +357,8 @@ def check_down_floor(target, prior, to_commit):
             except SyntaxError as e:
                 found.append(f"{rel}:{e.lineno or 0}: {e.msg}")
                 continue
-            found += [f"{rel}:{ln}: {what}" for ln, what in _scan_pep701(data)]
+            if feature < (3, 12):  # PEP 701 made these four shapes legal in 3.12 (TOOL-dSafePassage-69)
+                found += [f"{rel}:{ln}: {what}" for ln, what in _scan_pep701(data)]
         else:
             import tomllib
             try:
@@ -408,17 +412,19 @@ def main(argv):
             print(f"python-floor down: {exc}", file=sys.stderr)
             return 2
         why = "" if mode != "static" else f", because no interpreter at {prior} resolves here"
-        print(f"python-floor down: mode {mode}{why}")
+        print(f"python-floor down: mode {mode}{why}", file=sys.stderr)
         if found:
             for f in found:
-                print(f)
-            print(f"python-floor down: {len(found)} finding(s) under the floor {prior}; nothing was written")
+                print(f, file=sys.stderr)
+            print(f"python-floor down: {len(found)} finding(s) under the floor {prior}, the first {found[0]}; "
+                  "nothing was written", file=sys.stderr)
             return 1
         if not (target / derive_lib_rel() / DECLARATION).is_file():
-            print("python-floor down: no finding; the target carries no floor declaration, so nothing is restored here")
+            print("python-floor down: no finding; the target carries no floor declaration, so nothing is restored here",
+                  file=sys.stderr)
             return 0
         written = write_floor(target, prior)
-        print(f"python-floor down: no finding; the floor {prior} restored in {len(written)} file(s)")
+        print(f"python-floor down: no finding; the floor {prior} restored in {len(written)} file(s)", file=sys.stderr)
         return 0
     print(__doc__.split("\n\n")[0] + "\n\n" + __doc__.split("\n\n")[1], file=sys.stderr)
     return 2

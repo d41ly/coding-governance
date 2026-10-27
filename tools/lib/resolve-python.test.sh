@@ -295,6 +295,20 @@ run_down_git init -q && run_down_git config core.autocrlf false && run_down_git 
 run_down "$FD" "$(run_down_git rev-parse HEAD)"
 { [ "$rc" = 1 ] && [[ $out == "python-floor down: mode "* ]] && [[ $out == *"planted.py:2: "* ]]; } || bad "the down over a planted PEP 701 f-string did not exit 1 naming planted.py:2: rc=$rc $out"; ok
 [ "$(tr -d '\r\n' < "$FD/$KIT_REL/python-floor.txt")" = "$FLOOR" ] || bad "the down wrote the declaration before grading"; ok
+# TOOL-dSafePassage-69 S3, S2: the step's tail is stderr and the walk keeps its last line, so the down
+# reports there alone, its count line naming the first finding; and the static mode grades the PEP 701
+# shapes only below 3.12, the version that made them legal (`resolve_floor_interpreter` stubbed out).
+out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FD" "$(run_down_git rev-parse HEAD)" 2>/dev/null)
+[ -z "$out" ] || bad "the down printed on stdout, which the step's tail never reads: $out"; ok
+out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FD" "$(run_down_git rev-parse HEAD)" 2>&1 >/dev/null); out=${out//$'\r'/}
+[[ ${out##*$'\n'} == "python-floor down: 1 finding(s) under the floor 3.11, the first planted.py:2: "* ]] \
+  || bad "the down's last stderr line does not count its finding and name the first: $out"; ok
+printf '%s\n' "v = f\"{'#':>3}\"" > "$FD/hash.py" && run_down_git add hash.py && run_down_git commit -qm "a # in a replacement field"
+out=$("$REALPY" -I -c 'import sys; sys.path.insert(0, sys.argv[1]); import python_floor as pf; pf.resolve_floor_interpreter = lambda v: None
+for prior in ("3.12", "3.11"): print(pf.check_down_floor(sys.argv[2], prior, sys.argv[3]))' "$FD/$KIT_REL" "$FD" "$(run_down_git rev-parse HEAD)" 2>&1); out=${out//$'\r'/}
+{ [[ ${out%%$'\n'*} == "('static', "* && ${out%%$'\n'*} != *"hash.py"* ]] && [[ ${out#*$'\n'} == *"hash.py:1: "* ]]; } \
+  || bad "the static grade of a committed '#' in a replacement field did not pass under 3.12 and name hash.py:1 under 3.11: $out"; ok
+run_down_git rm -q hash.py && run_down_git commit -qm "unplant the #"
 run_down_git rm -q planted.py && run_down_git commit -qm unplant
 TO=$(run_down_git rev-parse HEAD)
 printf "$PF701" > "$FD/planted.py" && run_down_git add planted.py && run_down_git commit -qm "the tip plants again"

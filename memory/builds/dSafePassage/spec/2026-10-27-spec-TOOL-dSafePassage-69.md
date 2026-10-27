@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-69 — the floor step's down grades a rollback to the pin under the floor the pin's code needs, and a refused down's reason reaches the step's tail
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 7 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 7 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-26
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-26-build-TOOL-dSafePassage-69-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-69-ledger.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-69-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-69-1-spec-writer.md) | research | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-69-2-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-69-2-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-69-build-brief.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-69-build-brief.md) | journal | — |

@@ -1100,7 +1100,8 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root, to: str | None
     From gov's checkout root, with `build_step_env` over a scratch made for the call and cleared
     after it, and `resolve_step_argv`'s argv; output decoded as `run_target_argv` decodes it.
     Returns `{"verdict": "ok" | "failed" | "attended", "rc", "tail"}`, `tail` stderr's last 20
-    lines. A row that needs target code is `attended` and spawns nothing, but for its witness on
+    lines, or, for an up or a down that exits non-zero with nothing on stderr, one line naming that
+    and stdout's last line (TOOL-dSafePassage-69 S4). A row that needs target code is `attended` and spawns nothing, but for its witness on
     gov's own tree, source mode, where the target's code is gov's (TOOL-dSafePassage-26 S32); a
     spawn error is `failed` with `rc` None; a phase with no argv is a refusal, and so is a target whose own git
     config `check_target_local_config` finds an executor or a credential in (TOOL-dSafePassage-24).
@@ -1126,8 +1127,14 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root, to: str | None
                                text=True, encoding="utf-8", errors="replace")
         except OSError as e:
             return {"verdict": "failed", "rc": None, "tail": f"{row.id} {phase}: could not spawn: {e}"}
-    return {"verdict": "ok" if p.returncode == 0 else "failed", "rc": p.returncode,
-            "tail": "\n".join(p.stderr.splitlines()[-20:])}
+    tail = "\n".join(p.stderr.splitlines()[-20:])
+    if phase in ("up", "down") and p.returncode != 0 and not p.stderr.strip():
+        # TOOL-dSafePassage-69 S4: the walk reads a failing up's or down's stderr only, so a step that
+        # wrote its failure elsewhere is named here rather than stopping the walk with an empty reason.
+        last = next((ln.strip() for ln in reversed(p.stdout.splitlines()) if ln.strip()), "(none)")
+        tail = (f"{row.id} {phase}: exit {p.returncode} with nothing on stderr, where a step writes its "
+                f"failure; stdout's last line: {last}")
+    return {"verdict": "ok" if p.returncode == 0 else "failed", "rc": p.returncode, "tail": tail}
 
 
 def build_tree_git_env() -> dict[str, str]:

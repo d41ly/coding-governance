@@ -279,3 +279,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-27T19:33:00Z brief · item TOOL-dSafePassage-68 · reason 92985e38aea1 memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-68-build-brief.md
 
 2026-10-27T19:53:45Z rescope · item add TOOL-dSafePassage-69 · reason after TOOL-dSafePassage-68 the main loop's floor-step kill case went red: since TOOL-dSafePassage-26 S10/S11 the floor down grades the files a rollback restores at <to> under prior 3.11, and the pin's own tools/memory-recall/check-recall.py:394 needs 3.12 (a # in an f-string replacement field), so every rollback to the pin is refused at the floor step; its finding prints on stdout while the step's tail keeps stderr, so the refusal named nothing
+
+2026-10-27T20:35:26Z dispatch · item 4ef2e9fb TOOL-dSafePassage-69 · reason tools/govkit/steps.toml tools/lib/python_floor.py tools/govkit/upgrade_steps.py tools/lib/resolve-python.test.sh tools/govkit/selftest.py help/python-floor.md help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-69.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-69-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-27T20:35:33Z brief · item TOOL-dSafePassage-69 · reason 6ec486fb01fd memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-69-build-brief.md

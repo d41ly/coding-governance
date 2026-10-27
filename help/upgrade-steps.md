@@ -158,7 +158,8 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
   paths it lists changed after it, and is written again. Where one did change, the up stops with
   exit 1 and names the image: its before bytes are gone, so put those paths back by hand and
   remove the image.
-- **A stopped walk.** An up that exits non-zero (`exit <rc>: <its last stderr line>`), or a witness
+- **A stopped walk.** An up that exits non-zero (`exit <rc>: <its last stderr line>`, or a line
+  saying it wrote nothing on stderr and giving its last stdout line), or a witness
   that still fails after it (`witness does not hold after up`), stops the walk. The steps before it
   stay applied, no down runs, the run exits 1, and the receipt's `gov_commit` does not move.
 - **An attended step** (`needs-target = true`) stops the walk before its up, recorded `failed` with
@@ -237,7 +238,8 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
   0 decides even where an image exists; `lib/python-floor-3.15` does. A row may instead declare
   `reverted` as a command, under the same rules as `up`, `down` and `witness`, whose exit 0 means
   the down took effect. A landed row's `reverted` is frozen, like its `down`.
-- **A stopped rollback.** A down that exits non-zero (`down exit <rc>: <its last stderr line>`), a
+- **A stopped rollback.** A down that exits non-zero (`down exit <rc>: <its last stderr line>`, or
+  a line saying it wrote nothing on stderr and giving its last stdout line), a
   witness that still holds after it (`witness still holds after down`), or a `reverted` command that
   exits non-zero (`reverted check exits <rc>`), stops the rollback with that step's state kept: no
   file moves, `gov_commit` does not move, and the run exits 1. Fix the cause and run the same
