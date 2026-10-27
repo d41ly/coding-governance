@@ -149,3 +149,11 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-26T23:46:15Z dispatch · item da77d7ac TOOL-dSafePassage-29 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-29.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-29-ledger.md
 
 2026-10-26T23:46:21Z brief · item TOOL-dSafePassage-29 · reason 3003603fc35d memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-29-build-brief.md
+
+2026-10-27T00:05:27Z dispatch · item 22be190d TOOL-dSafePassage-30 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-30.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-30-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-27T00:05:35Z brief · item TOOL-dSafePassage-30 · reason 76ca538419c7 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-30-build-brief.md
+
+2026-10-27T00:15:37Z dispatch · item 22be190d TOOL-dSafePassage-30 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-30.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-30-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-30-deviation-171.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-27T00:24:38Z dispatch · item 22be190d TOOL-dSafePassage-30 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-30.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-30-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-30-deviation-171.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

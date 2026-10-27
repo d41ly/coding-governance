@@ -16078,6 +16078,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "read_target_repositories",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_target_specs",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"

@@ -3425,7 +3425,8 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     red over a planted spawn of `row["up"]`. The phase-without-argv refusal is reached in process.
     TOOL-dSafePassage-24 AC1 to AC4 ride the same fixture: the four `local-*` plants refused, their
     `-stub` twins red naming the executor's canary; TOOL-dSafePassage-29 AC1, AC2 and AC4 add
-    `local-gpg`, `local-hook` and the class arm over `git help --config`."""
+    `local-gpg`, `local-hook` and the class arm over `git help --config`; TOOL-dSafePassage-30 AC1
+    to AC3 add the three `submodule-*` plants and their `-stub` twins."""
     us_py = HERE / "upgrade_steps.py"
 
     def fixture(py: pathlib.Path, *plant: str) -> tuple[int, str]:
@@ -3485,6 +3486,28 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         rc, out = fixture(us_py, plant)
         line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
         check(f"[dSP-24] fixture isolation {plant} exits 1, "
+              + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
+              + f"and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+
+    # TOOL-dSafePassage-30 AC1 to AC3: a filter in a submodule's own config, one level down, two levels
+    # down, or not checked out, refuses the superproject's `git status` step naming the key, its file
+    # and the submodule path; each `-stub` twin skips the check, and a populated one's filter runs.
+    head = "isolation: fixture/status · refused · fixture/status up: the target's own git config declares what git runs"
+    for plant, on_refusal, needles in (
+            ("submodule-filter", ("filter.canary.clean in .git/modules/sub/config (submodule sub), so nothing",),
+             ("filter canary: absent",)),
+            ("submodule-filter-stub", (), ("fixture/status · up · ok", "filter canary: present · filter-clean")),
+            ("submodule-nested", ("filter.canary.clean in .git/modules/sub/modules/inner/config (submodule sub/inner)",),
+             ("nested canary: absent",)),
+            ("submodule-nested-stub", (), ("fixture/status · up · ok", "nested canary: present · filter-clean")),
+            ("submodule-unpopulated", ("filter.canary.clean in .git/modules/sub/config (submodule sub), so nothing",),
+             ("unpopulated canary: absent",)),
+            ("submodule-unpopulated-stub", (), ("fixture/status · up · ok",))):
+        rc, out = fixture(us_py, plant)
+        line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
+        check(f"[dSP-30] fixture isolation {plant} exits 1, "
               + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
               + f"and names {', '.join(needles)}",
               rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)

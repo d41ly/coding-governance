@@ -150,7 +150,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-23 — the resolver keeps an override's own name, and prefers the direct executable only for the launcher names](spec/2026-10-23-spec-TOOL-dSafePassage-23.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-27 |
 | [TOOL-dSafePassage-25 — a refused gov-first landing removes the untracked files its walk made](spec/2026-10-23-spec-TOOL-dSafePassage-25.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-27 |
 | [TOOL-dSafePassage-29 — the step contract's refused keys are the class git's own config list derives, held to it by an arm](spec/2026-10-23-spec-TOOL-dSafePassage-29.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-27 |
-| [TOOL-dSafePassage-30 — the step contract's config check reads every repository git can enter from the target, its submodules included](spec/2026-10-23-spec-TOOL-dSafePassage-30.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-26 |
+| [TOOL-dSafePassage-30 — the step contract's config check reads every repository git can enter from the target, its submodules included](spec/2026-10-23-spec-TOOL-dSafePassage-30.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-27 |
 | [TOOL-dSafePassage-32 — the reuse estimate compares like clocks: a POSIX census row is judged on the kernel's boot clock, never the wall clock](spec/2026-10-23-spec-TOOL-dSafePassage-32.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window](spec/2026-10-23-spec-TOOL-dSafePassage-6.md) | 4 | 2 | DEFERRED | rev-6 | 2026-10-26 |
 | [TOOL-dSafePassage-9 — withdrawn hook fragments unwired, and an edited file gov stopped shipping kept as `retired-edited` and ordered](spec/2026-10-23-spec-TOOL-dSafePassage-9.md) | 4 | 2 | DEFERRED | rev-5 | 2026-10-26 |
@@ -190,7 +190,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 260 bound to this build, across 4 record folder(s).
+Records: 262 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
