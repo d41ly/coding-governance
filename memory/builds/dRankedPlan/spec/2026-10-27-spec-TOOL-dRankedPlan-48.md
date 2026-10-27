@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-48 — the TypeScript tokenizer emits string literal text behind an opt-in keyword, so the JavaScript reader reads argv arrays
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -60,6 +60,8 @@ points `read_js_callers` at it. It repairs `TOOL-dRankedPlan-45`, so it sits one
 - **consumes-from** external — dTotalRecall's `tools/lib/extract_code.py`, its `scan_ts_tokens` and its parity row (TOOL-dTotalRecall-13 S1, S3), built before this build run
 - **hands-off** `TOOL-dRankedPlan-60` — S1's `str` tokens and S3's array elements, over which that unit resolves a same-file binding (spec audit of units 46 to 52, id 31)
 - **hands-off** `TOOL-dRankedPlan-62` — §4's probe and §7, which that unit's items for findings 11 and 24 correct; carry S6 and S20 of that unit into this unit's pass (spec audit of units 46 to 52)
+- **hands-off** `TOOL-dRankedPlan-68` — S3's `scan_ts_tokens(text, strs=True)` call and S1's clause that `read_js_callers` passes no facts, which that unit supersedes by passing `conts` and `lits` (spec audit of units 63 to 67, id 1)
+- **hands-off** `TOOL-dRankedPlan-69` — S1's `strs` mode and S2's copy set, in which that unit pins where a `str` token puts `conts` and `lits` (spec audit of units 63 to 67, id 8)
 
 ## 4. Design
 
@@ -158,6 +160,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 38 to 45, finding 8 (HIGH,
   item H2), repairing `TOOL-dRankedPlan-45`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-60`, the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-68`, the hands-off edge to `TOOL-dRankedPlan-69`, each the reciprocal of that promoted unit's own edge (spec audit of units 63 to 67, `reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

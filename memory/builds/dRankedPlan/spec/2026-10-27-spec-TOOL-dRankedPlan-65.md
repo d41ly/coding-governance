@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-65 — a shell carrier in any other quoting is unquoted as the shell does, then read as a single-quoted one
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-65-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-65-promoted-fix-return.md) | research | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-65-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-65-1-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-65-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-65-promoted-fix-brief.md) | research | — |
+| [2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) | spec-audit | TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 |
 
 <!-- /gen:spec-records -->
 
@@ -65,6 +66,9 @@ corrects that row. This unit repairs `TOOL-dRankedPlan-56`, so it sits one order
 
 - **consumes-from** `TOOL-dRankedPlan-56` — S1's shell carriers, their single-quoted reading and the `SHELL_BODY_WORDS` command test, which S1 extends to every other quoting; without them no shell carrier is selected
 - **hands-off** `TOOL-dRankedPlan-67` — S1's unquoted reading, over which that unit's item for finding 35 plants a double-quoted carrier naming a bound path and its item for finding 12 corrects unit 56's §4 row 3
+- **hands-off** `TOOL-dRankedPlan-73` — S1's readers, S2 and S3's third plant, which that unit restates by reader and replaces (spec audit of units 63 to 67, id 11)
+- **hands-off** `TOOL-dRankedPlan-74` — S1's `shlex` unquoting, before which that unit renders ANSI-C and locale quoted segments (spec audit of units 63 to 67, id 25)
+- **hands-off** `TOOL-dRankedPlan-77` — §4 Evidence and §7, which that unit's item for finding 4 corrects; carry S7 of that unit into this unit's pass (spec audit of units 63 to 67)
 
 ## 4. Design
 
@@ -165,6 +169,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 53 to 62, finding 29 (HIGH,
   item H2; finding 12 is its medium face), repairing `TOOL-dRankedPlan-56`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-73`, the hands-off edge to `TOOL-dRankedPlan-74`, the hands-off edge to `TOOL-dRankedPlan-77`, each the reciprocal of that promoted unit's own edge (spec audit of units 63 to 67, `reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

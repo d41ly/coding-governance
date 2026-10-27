@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-67 — the spec audit of units 53 to 62: its 30 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-67-deviation-671.md](../build/2026-10-27-build-TOOL-dRankedPlan-67-deviation-671.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) | spec-audit | TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 |
 
 <!-- /gen:spec-records -->
 
@@ -218,6 +219,7 @@ that builder carries. This unit builds the four plants of S13, S14, S16 and S18 
 - **consumes-from** `TOOL-dRankedPlan-61` — AC1, AC2 and §10, which S19, S22 and S29 correct
 - **consumes-from** `TOOL-dRankedPlan-62` — §3, §4, §5, §7, S4, S12, S18 and AC1 to AC4, AC6, AC19, AC20 and AC24, which S1, S4 to S7, S9, S10, S20, S21, S23, S24 to S27 and S30 correct
 - **consumes-from** `TOOL-dRankedPlan-65` — S1's unquoted carrier reading, over which S14 plants a bound path and S15 names the reader
+- **hands-off** `TOOL-dRankedPlan-77` — S2, S3, S12, AC2, AC6, AC25, §4 and the population command, which that unit's items for findings 5, 14, 20, 27, 6, 26, 7 and 15 correct; carry S1 to S4, S8, S13, S14 and S16 of that unit into this unit's pass (spec audit of units 63 to 67)
 
 ## 4. Design
 
@@ -423,6 +425,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 53 to 62: its 20 MEDIUM and
   10 LOW findings, ids 1 2 3 4 5 6 7 8 10 11 12 13 14 15 16 17 18 19 20 22 23 24 25 26 30 33 34 35 36
   37, batched under BUILD-METHOD M4.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-77`, each the reciprocal of that promoted unit's own edge (spec audit of units 63 to 67, `reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

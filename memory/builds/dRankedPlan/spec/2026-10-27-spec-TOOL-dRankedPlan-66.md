@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-66 — the command substitutions of an expanded heredoc body fed to any other command are read as commands
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-66-deviation-661.md](../build/2026-10-27-build-TOOL-dRankedPlan-66-deviation-661.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) | spec-audit | TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-67 |
 
 <!-- /gen:spec-records -->
 
@@ -72,6 +73,9 @@ the deny-by-default ban. This unit reads those spans as the commands they are. I
 - **consumes-from** `TOOL-dRankedPlan-53` — S1's expansion reading and its line rule beside the shell reader, which S2 extends past the shell class
 - **consumes-from** `TOOL-dRankedPlan-54` — `HEREDOC_KINDS` and the router's membership test, to which S2 adds the row for any other command word; without them no expanded body reaches a reader
 - **consumes-from** `TOOL-dRankedPlan-55` — the enclosing file's bindings a body inherits, which S2 gives each span
+- **hands-off** `TOOL-dRankedPlan-75` — S1's span close rule, to which that unit adds the `case` … `esac` skip (spec audit of units 63 to 67, id 13)
+- **hands-off** `TOOL-dRankedPlan-76` — S1's arithmetic skip, S2, S3 and §3's arithmetic bullet, which that unit restates (spec audit of units 63 to 67, id 23)
+- **hands-off** `TOOL-dRankedPlan-77` — S1, S3, S4, §4 and §7, which that unit's items for findings 12, 24, 17 and 21 amend; carry S9 to S12 of that unit into this unit's pass (spec audit of units 63 to 67)
 
 ## 4. Design
 
@@ -174,6 +178,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 53 to 62, finding 31 (HIGH,
   item H3), repairing `TOOL-dRankedPlan-53`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-75`, the hands-off edge to `TOOL-dRankedPlan-76`, the hands-off edge to `TOOL-dRankedPlan-77`, each the reciprocal of that promoted unit's own edge (spec audit of units 63 to 67, `reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

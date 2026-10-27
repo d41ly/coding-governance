@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-63 — a JavaScript binding runs to the end its expression reader finds, across lines
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 23 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 23 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-63-deviation-631.md](../build/2026-10-27-build-TOOL-dRankedPlan-63-deviation-631.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) | spec-audit | TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,9 @@ typed-rule reuse half of the same item, is `TOOL-dRankedPlan-64`'s. This unit re
 
 - **consumes-from** `TOOL-dRankedPlan-60` — S1's declaration collector and S2's resolution, whose binding extent S1 restates; without them there is no binding to bound
 - **hands-off** `TOOL-dRankedPlan-64` — S1's extent, which ends at a depth-0 `,` and over which that unit starts each later declarator's binding
+- **hands-off** `TOOL-dRankedPlan-68` — S1's extent call, to which that unit passes the lexer's `conts` and `lits` (spec audit of units 63 to 67, id 1)
+- **hands-off** `TOOL-dRankedPlan-71` — S1's extent, which that unit reads through one binding-end reader past the ceiling of a line opening with `(` or `[` (spec audit of units 63 to 67, id 22)
+- **hands-off** `TOOL-dRankedPlan-77` — §4 Evidence and §5, which that unit's item for finding 9 restates; carry S15 of that unit into this unit's pass (spec audit of units 63 to 67)
 
 ## 4. Design
 
@@ -144,6 +148,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 53 to 62, finding 32 (HIGH,
   item H1, shared with finding 21), repairing `TOOL-dRankedPlan-60`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-68`, the hands-off edge to `TOOL-dRankedPlan-71`, the hands-off edge to `TOOL-dRankedPlan-77`, each the reciprocal of that promoted unit's own edge (spec audit of units 63 to 67, `reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

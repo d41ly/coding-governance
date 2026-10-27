@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-62 — the spec audit of units 46 to 52: its 23 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 24 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -200,6 +200,7 @@ own pass. This unit builds the rest in `tools/loop/ratify.py` and observes every
 - **consumes-from** `TOOL-dRankedPlan-59` — the restated wrapper arm, which S11's table row reads
 - **consumes-from** `TOOL-dRankedPlan-61` — the Inventory selector, which S3 observes over unit 52's spec
 - **hands-off** `TOOL-dRankedPlan-67` — §3, §4, §5, §7, S4, S12, S18 and AC1 to AC4, AC6, AC19, AC20 and AC24, which that unit's items for findings 1 to 5, 7, 13 to 19, 23 to 26 and 37 correct; carry S1, S2, S4 to S10, S20, S21, S23 to S27 and S30 of that unit into this unit's pass (spec audit of units 53 to 62)
+- **hands-off** `TOOL-dRankedPlan-77` — AC2, §4 and S15's pass, into which that unit's items for findings 14, 6 and 7 carry a pinned red state, a fixture case and a sentence; carry S2, S8 and S14 of that unit into this unit's pass (spec audit of units 63 to 67)
 
 ## 4. Design
 
@@ -389,6 +390,7 @@ none
   7 LOW findings, ids 1 2 4 5 8 9 10 11 12 13 14 15 16 17 18 19 20 21 24 25 26 33 34, batched under
   BUILD-METHOD M4.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-77`, each the reciprocal of that promoted unit's own edge (spec audit of units 63 to 67, `reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -145,3 +145,25 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T06:23:36Z rescope · item add TOOL-dRankedPlan-67 · reason spec-audit of TOOL-dRankedPlan-53 to -62 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) the 30 MEDIUM and LOW findings batched into one unit: ids 1 2 3 4 5 6 7 8 10 11 12 13 14 15 16 17 18 19 20 22 23 24 25 26 30 33 34 35 36 37 (items M1 to M14 and L1 to L8)
 
 2026-10-27T06:39:39Z review · item dRankedPlan-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 30 · disposition promote
+
+2026-10-27T07:42:28Z rescope · item add TOOL-dRankedPlan-68 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 1 HIGH item H1 (shared with ids 8, 16 and 22): unit 63 S1 calls read_ts_expr_end without the lexer's conts and lits, so a member-chain binding ends on its first line; repairs TOOL-dRankedPlan-63
+
+2026-10-27T07:42:30Z rescope · item add TOOL-dRankedPlan-69 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 8 HIGH item H1 (shared with ids 1, 16 and 22): unit 63 grounds the extent on the default stream only, and the strs stream never states where its str tokens put the continuation facts; repairs TOOL-dRankedPlan-63
+
+2026-10-27T07:42:33Z rescope · item add TOOL-dRankedPlan-70 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 16 HIGH item H1 (shared with ids 1, 8 and 22): the reused read_ts_expr_end is called without the arguments parse_ts_source passes, and unit 64 inherits it per declarator; repairs TOOL-dRankedPlan-64
+
+2026-10-27T07:42:35Z rescope · item add TOOL-dRankedPlan-71 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 22 HIGH item H1 (shared with ids 1, 8 and 16): a binding whose continuation the reader cannot see ends early and passes the ban, and no plant observes a continuation other than a trailing open paren; repairs TOOL-dRankedPlan-63
+
+2026-10-27T07:42:37Z rescope · item add TOOL-dRankedPlan-72 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 19 HIGH item H2 (id 3 is its medium face): unit 64 S1 opens a later declarator only after an extent end, so let a, s = ... binds nothing; repairs TOOL-dRankedPlan-64
+
+2026-10-27T07:42:39Z rescope · item add TOOL-dRankedPlan-73 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 11 HIGH item H3 (id 4 is its medium face): unit 65's broken-carrier plant exits 2 at the file tokenizer and never reaches the shlex fallback; repairs TOOL-dRankedPlan-65
+
+2026-10-27T07:42:42Z rescope · item add TOOL-dRankedPlan-74 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 25 HIGH item H4: an ANSI-C quoted carrier is read as if shlex unquoted it, so its escaped quotes hide ratify.py; repairs TOOL-dRankedPlan-65
+
+2026-10-27T07:42:44Z rescope · item add TOOL-dRankedPlan-75 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 13 HIGH item H5 (id 17 shares the defect at medium): unit 66's span closes at a case pattern's paren; repairs TOOL-dRankedPlan-66
+
+2026-10-27T07:42:46Z rescope · item add TOOL-dRankedPlan-76 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) id 23 HIGH item H6: unit 66 skips arithmetic expansion whole, nested command substitutions included; repairs TOOL-dRankedPlan-66
+
+2026-10-27T07:42:48Z rescope · item add TOOL-dRankedPlan-77 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) the 16 MEDIUM and LOW findings batched into one unit: ids 2 3 4 5 6 7 9 12 14 15 17 20 21 24 26 27 (items M1 to M9 and L1 to L3)
+
+2026-10-27T08:02:23Z review · item dRankedPlan-spec-set-r7 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 16 · disposition promote

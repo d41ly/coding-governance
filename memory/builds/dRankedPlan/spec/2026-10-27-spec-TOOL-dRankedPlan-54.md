@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-54 — every heredoc token kind reaches the body router, through one declared kind set
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 23 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 23 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -63,6 +63,7 @@ unit repairs `TOOL-dRankedPlan-52`, so it sits one order above it.
 - **hands-off** `TOOL-dRankedPlan-53` — `HEREDOC_KINDS` and the router's membership test, through which that unit's expanded shell body reaches `read_shell_callers`
 - **hands-off** `TOOL-dRankedPlan-66` — `HEREDOC_KINDS` and the router's membership test, to which that unit adds the row for any other command word (spec audit of units 53 to 62, id 31)
 - **hands-off** `TOOL-dRankedPlan-67` — the router table, `heredoc-kinds-routed` and §4 Evidence, which that unit's items for findings 10 and 20 correct; carry S12 and S28 of that unit into this unit's pass (spec audit of units 53 to 62)
+- **hands-off** `TOOL-dRankedPlan-77` — the `$`-variable spelling of the class probe that unit 67 S12 gives this unit, which that unit's item for finding 6 moves to unit 62's pass; carry S8 of that unit into this unit's pass (spec audit of units 63 to 67)
 
 ## 4. Design
 
@@ -151,6 +152,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 46 to 52, finding 23 (HIGH,
   item H1, shared with finding 3), repairing `TOOL-dRankedPlan-52`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-66`, the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-77`, each the reciprocal of that promoted unit's own edge (spec audit of units 63 to 67, `reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 
