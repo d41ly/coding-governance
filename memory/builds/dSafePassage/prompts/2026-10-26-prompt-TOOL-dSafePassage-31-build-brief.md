@@ -56,3 +56,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## Carried from TOOL-dSafePassage-32 (601b888c4)
+
+- The lock record now carries `started_boot` (POSIX boot clock), and a `posix-ps` row missing either boot reading refuses as `unknown` where the wall clock would say reused. The "After a kill" paragraph of `help/upgrade-steps.md` does not say so yet; your pass touches the same lock reader and its help text, so make that paragraph say what the reclaim now refuses.
