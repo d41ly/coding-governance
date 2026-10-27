@@ -1472,6 +1472,18 @@
     "doc_reads": ["help/", "memory/project/docs-undocumented.txt"]
   },
   {
+    "name": "upgrade-walk",
+    "argv": [
+      "python",
+      "{prefix}/govkit/upgrade_walk.py"
+    ],
+    "reads": {"history": "it clones gov with no tags, checks out the pinned commit in tools/govkit/fixtures/release-0/pin.txt to apply release-0, and reads each step's introducing commit along the landed ref gov's own resolve_landed_ref names (TOOL-dSafePassage-5)."},
+    "chunk": "e2e",
+    "subject": "kit",
+    "ceiling": 7200,
+    "doc_reads": []
+  },
+  {
     "name": "govkit selftest",
     "argv": [
       "python",

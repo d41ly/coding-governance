@@ -1,0 +1,59 @@
+# arms.toml — the upgrade-walk leg's declared defects (TOOL-dSafePassage-5 S7).
+#
+# Each [[arm]] joins the walk only under `--inject <name>`, and the leg runs every arm after its real
+# cases: the arm's `case` must go red (exit 1, or the row's `exit`), and an arm whose case stays green
+# is itself a red. A row carries ONE of:
+#   step   a defective step: `up`, `down` and `witness` argv, run under the step contract like any
+#          step and introduced at the clone's tip, so it walks last; its id is upgrade-walk/<name>
+#   plant  a plant-shaped edit joining release-0's plants
+#   shim   a `[[shim]]`-shaped row (id, kind, from, to, closed) read beside the clone's own
+# `with` names arms injected beside it, run as one set. Tokens the leg resolves before the walk:
+# {arms} this fixture's arms/ directory, {plant:<id>} a plant's path, {shim:<arm>} a shim arm's `from`.
+
+[[arm]]
+name = "witness-first"
+case = "kill"
+step = { up = ["python", "{arms}/arm_step.py", "witness-first", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "witness-first", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "witness-first", "witness", "{target}"] }
+
+[[arm]]
+name = "not-rerunnable"
+case = "kill"
+step = { up = ["python", "{arms}/arm_step.py", "not-rerunnable", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "not-rerunnable", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "not-rerunnable", "witness", "{target}"] }
+
+[[arm]]
+name = "no-op"
+case = "skip"
+step = { up = ["python", "{arms}/arm_step.py", "no-op", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "no-op", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "no-op", "witness", "{target}"] }
+
+[[arm]]
+name = "lossy-down"
+case = "down"
+step = { up = ["python", "{arms}/arm_step.py", "lossy-down", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "lossy-down", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "lossy-down", "witness", "{target}"] }
+
+[[arm]]
+name = "drops-plant"
+case = "plants"
+step = { up = ["python", "{arms}/arm_step.py", "drops-plant", "up", "{target}", "{plant:engine-edit}"], down = ["python", "{arms}/arm_step.py", "drops-plant", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "drops-plant", "witness", "{target}", "{plant:engine-edit}"] }
+
+[[arm]]
+name = "held-shim"
+case = "shims"
+with = ["drops-shim"]
+shim = { id = "upgrade-walk/held-shim", kind = "command", from = "tools/check-kit-versions.sh", to = "tools/check-kit-versions-moved.sh", closed = false }
+
+[[arm]]
+name = "drops-shim"
+case = "shims"
+with = ["held-shim"]
+step = { up = ["python", "{arms}/arm_step.py", "drops-shim", "up", "{target}", "{shim:held-shim}"], down = ["python", "{arms}/arm_step.py", "drops-shim", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "drops-shim", "witness", "{target}", "{shim:held-shim}"] }
+
+[[arm]]
+name = "breaks-isolation"
+case = "isolation"
+step = { up = ["python", "{arms}/arm_step.py", "breaks-isolation", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "breaks-isolation", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "breaks-isolation", "witness", "{target}"] }
+
+[[arm]]
+name = "missing-plant"
+case = "up"
+exit = 2
+plant = { id = "missing-plant", path = "tools/upgrade-walk-no-such-file.md", edit = "append", text = "x\n", expect = "carried", unchanged = true }

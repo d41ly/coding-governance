@@ -283,3 +283,47 @@ python tools/govkit/steps/fanout_cap.py down <repo>     # exit 1 if a file chang
 
 Then commit the result, `.governance/steps/agent-cap/` included: the before-image there is what the
 down restores from.
+
+## How gov proves a step before you meet it
+
+Before a step reaches your repository, gov walks it over an install of an older vintage. The
+`upgrade-walk` leg builds **release-0**: a scratch clone of gov, made without tags and checked out at
+the commit `tools/govkit/fixtures/release-0/pin.txt` pins, runs its own `apply` into a scratch
+repository with the kits and answers of the fixture's `deploy.toml`. The adopter edits in
+`plants.toml` are committed on top, and the clone then moves to today's tip, so `update` walks every
+declared step over that tree the way it would over yours. Every compare reads the tree outside `.git/`
+and `.governance/outbox/`, with the index, and reads the receipt's re-measured fields the way the
+records that own them declare. Run it from this checkout: <!-- usage: script:tools/govkit/upgrade_walk.py 0cfca8d3 -->
+
+```sh
+python tools/govkit/upgrade_walk.py                           # every case, then every arm
+python tools/govkit/upgrade_walk.py --list                    # the pin, the steps in walk order, the rows
+python tools/govkit/upgrade_walk.py --case kill --step lib/python-floor-3.15
+python tools/govkit/upgrade_walk.py --case down --inject lossy-down   # watch a case go red
+```
+
+Each case starts from a fresh copy of release-0, and each prints one line per step:
+
+- `up` — every step reads `applied` in the receipt and its witness exits 0 afterwards.
+- `down` — after `up`, `update --rollback --to <pin> --write` leaves a tree equal to release-0.
+- `reup` — walking up again from that rolled-back tree equals the first walk.
+- `plants` — each adopter edit is carried (still there, or read back through the policy reader) or
+  ordered (an order under `.governance/outbox/` names it).
+- `skip` — each step, passed unrun, changes the outcome: a step that changes nothing is not
+  load-bearing. A step that only matters under a condition, like the Python floor under an older
+  interpreter, is proven under that condition.
+- `kill` — each step's up is killed after its first write, leaving a dead holder's lock; the re-run
+  equals `up`, and a rollback from the killed state equals release-0. A step whose witness already
+  holds on release-0 is forced into its up, and the line says `forced`.
+- `fail` — each step's up fails with exit 1: the walk stops there, every earlier step `applied`, that
+  one `failed`, and nothing later recorded.
+- `shims` — the tagless clone has no release, so no shim reads closable, and every installed
+  forwarder is still in the walked tree; with none declared it prints `shims: 0 declared`.
+- `isolation` — each step's up and witness, run beside planted canaries over a scratch copy, reach
+  none of your code.
+
+After the cases, the leg injects each defective step or plant of `arms.toml` and expects its case to
+go red; one that stays green is a red. Exit 0 is green, 1 a red, and 2 when nothing could be measured:
+the pin carries a step row, release-0 does not apply clean, a plant's path is absent at release-0, or
+no step is declared. The whole leg takes over an hour, so it is held: it runs on demand and in remote
+CI's self-test job, never on every push.

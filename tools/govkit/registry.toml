@@ -714,3 +714,7 @@ why = "it runs `<prefix>/govkit/step_gate.py`, which diffs gov's adopter-visible
 [[exempt_leg]]
 name = "docs"
 why = "it runs `<prefix>/govkit/docs_leg.py`, which grades gov's own pages under `help/` against gov's own user-facing population through the step gate's class readers and the rows of `usage.toml`, and reads `help.enforce` through the deployer's policy reader. The deployer is a registry exemption that never travels into a target, and the pages, the rows and the shrink-only list are gov's, so the leg grades gov's landings; an adopter has no deployer and no help tree it grades. TOOL-dSafePassage-13."
+
+[[exempt_leg]]
+name = "upgrade-walk"
+why = "it runs `<prefix>/govkit/upgrade_walk.py`, which builds release-0 with the `apply` of a scratch clone of gov at the commit `<prefix>/govkit/fixtures/release-0/pin.txt` pins, then walks every declared `[[upgrade]]` step over it up, down, up again, skipped, killed and failed through the deployer's own `update`. The deployer is a registry exemption that never travels into a target, and the steps, the pin and the fixture are gov's, so the leg grades gov's kit source; an adopter has no deployer and no step to prove. TOOL-dSafePassage-5."

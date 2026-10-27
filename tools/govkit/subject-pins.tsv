@@ -152,6 +152,7 @@ unattended protocol size	repo	product
 unattended skill size	repo	product
 unattended skill wiring	repo	wiring
 unattended-build self-test	kit	selftests
+upgrade-walk	kit	e2e
 verdict epoch (kit version dates the engine)	repo	declarations
 verdict-epoch self-test	kit	selftests
 verifier fan-out	repo	declarations

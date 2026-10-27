@@ -9,7 +9,8 @@ decisions = []
 
 [claims]
 gate-legs = ["govkit selfcheck", "govkit selftest", "govkit refusal join", "govkit acceptance matrix", "govkit runbook parity",
-  "kit epoch (shipped bytes move, the version moves)", "step-rows-frozen", "step-gate", "docs"]
+  "kit epoch (shipped bytes move, the version moves)", "step-rows-frozen", "step-gate", "docs",
+  "upgrade-walk"]
 kits = ["govkit"]
 git-hooks = []
 harness-hooks = []

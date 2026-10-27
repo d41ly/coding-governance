@@ -1,0 +1,130 @@
+# plants.toml — the adopter edits and gov commits the upgrade-walk leg walks over (TOOL-dSafePassage-5 S3).
+#
+# [[plant]]      an adopter edit committed onto release-0 before every case: `id`, `path`, `edit`
+#                (`append` its `text`, `replace` `old` by `new` once, or `create` the file holding
+#                `text`), `expect` (`carried` or `ordered`), and for `carried` one observation:
+#                `contains` (a text the walked file holds), `unchanged = true` (the bytes as planted)
+#                or `policy` (`key`, `value`, and `absent`, the paths the walked commit must not hold,
+#                read by the clone's own `policy.py get <key> --rev <walked commit>`). `ordered` holds
+#                when an order under .governance/outbox/ names the path. An `append` or `replace`
+#                whose path release-0 lacks is a refusal, exit 2.
+# [[gov_plant]]  a commit on the clone's tip: `id`, `what`, and a plant-shaped edit over gov's tree.
+# [[condition]]  `step`, and `plant` (a plant-shaped edit) or `fakes` (launcher names and the version
+#                each prints, put first on the walk's PATH): applied only in that step's `skip` case,
+#                where the walk without the skip must stop at the step and with it get past it.
+#
+# Each path is release-0's, re-read against the pin's tree when the row was written, and every row is
+# drawn from a kit the fixture's `kits` line keeps.
+
+[[plant]]
+id = "engine-edit"
+path = "tools/memory-tree/README.md"
+edit = "append"
+text = "<!-- upgrade-walk plant engine-edit: an adopter's own note -->\n"
+expect = "carried"
+contains = "<!-- upgrade-walk plant engine-edit: an adopter's own note -->"
+
+[[plant]]
+id = "project-owned"
+path = "tools/drift-audit/drift_signals.py"
+edit = "replace"
+old = 'TRACE_CUTOFF: str = ""'
+new = 'TRACE_CUTOFF: str = "2026-01-01"'
+expect = "carried"
+unchanged = true
+
+[[plant]]
+id = "fanout-cap"
+path = ".agent-cap.conf"
+edit = "create"
+text = "FANOUT_CAP=2\n"
+expect = "carried"
+policy = { key = "runtime.agents-in-flight", value = "2", absent = [".agent-cap.conf"] }
+
+[[plant]]
+id = "wired-hook"
+path = ".claude/settings.json"
+edit = "replace"
+old = '''
+    "PreToolUse": [
+'''
+new = '''
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo upgrade-walk-adopter-own-hook"
+          }
+        ]
+      },
+'''
+expect = "carried"
+contains = "echo upgrade-walk-adopter-own-hook"
+
+[[plant]]
+id = "old-shape-record"
+path = "memory/builds/uwOldShape/spec/2026-01-02-spec-TOOL-uwOldShape-1.md"
+edit = "create"
+text = """# TOOL-uwOldShape-1 — a spec of the nine-section canon, dated before SPEC10_CUTOFF
+
+**Status:** CLOSED · rev-1 · 2026-01-02 · node a · Tier-1 · streams tooling
+
+## 1. Goal
+
+## 2. Scope (IN)
+
+## 3. Non-goals (OUT)
+
+## 4. Design
+
+## 5. Production-readiness checklist
+
+## 6. Acceptance criteria
+
+## 7. Gates
+
+## 8. Open questions
+
+## 9. Revision log
+"""
+expect = "carried"
+unchanged = true
+
+[[plant]]
+id = "edited-render"
+path = ".claude/skills/lexicon/SKILL.md"
+edit = "append"
+text = "<!-- upgrade-walk plant edited-render: an adopter's own line in a rendered file -->\n"
+expect = "ordered"
+
+[[plant]]
+id = "edited-retired"
+path = "tools/hooks/README.md"
+edit = "append"
+text = "<!-- upgrade-walk plant edited-retired: an adopter's own line in a file gov withdraws -->\n"
+expect = "ordered"
+
+[[gov_plant]]
+id = "withdraw-one"
+what = "the hooks README dropped from its descriptor's [[files]], so gov no longer ships an installed file"
+path = "tools/hooks/kit.toml"
+edit = "replace"
+old = '''[[files]]
+include = ["README.md"]
+role = "engine"
+to = "{prefix}/hooks/README.md"
+'''
+new = ""
+
+[[gov_plant]]
+id = "withdraw-one-source"
+what = "the hooks README's source removed with its rule, so no descriptor ships it"
+path = "tools/hooks/README.md"
+edit = "remove"
+
+[[condition]]
+step = "lib/python-floor-3.15"
+id = "floor-below"
+fakes = { python3 = "3.14", python = "3.14", py = "3.14" }

@@ -184,6 +184,12 @@ entry = "tools/govkit/step_gate.py"
 flags = ["--base=", "--list", "--print-base", "--fixture", "--plant=", "--with-row"]
 
 [[usage]]
+id = "script:tools/govkit/upgrade_walk.py"
+shape = "verb"
+entry = "tools/govkit/upgrade_walk.py"
+flags = ["--list", "--case=", "--step=", "--inject=", "--pin="]
+
+[[usage]]
 id = "script:tools/govkit/upgrade_steps.py#list"
 shape = "verb"
 entry = "tools/govkit/upgrade_steps.py"

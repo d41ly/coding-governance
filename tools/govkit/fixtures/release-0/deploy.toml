@@ -1,0 +1,55 @@
+# deploy.toml - the release-0 target's own answers (TOOL-dSafePassage-5 S2). `apply` runs with
+# no selection flag, so `kits` is its selection: every non-conditional registry entry at the pin
+# less the four the spec's F3 takes out (review-harness, unattended, process-monitor,
+# check-agent-cap-restatement). The answers are gov's own at the pin rewritten to the characters
+# ANSWER_VALUE_RE admits, plus the five gov's file does not carry; the leg writes the run's
+# scratch root for {scratch} before `apply` reads the file.
+gov_source = "local"
+prefix = "tools"
+kits = [
+  "check-microformats",
+  "playbook-render",
+  "memory-tree",
+  "codebase-map",
+  "memory-recall",
+  "run-gates",
+  "drift-audit",
+  "runlog",
+  "roles",
+  "branch-reconcile",
+  "agent-instructions",
+  "pytest-parallel-guardrails",
+  "gate-lint",
+  "lexicon",
+  "policy",
+  "agent-cap",
+  "playbook",
+  "kickoff-manifest",
+  "settings-merge",
+  "check-testsuite-counts",
+  "check-wiring",
+  "push-main",
+  "check-kit-versions",
+]
+
+[answers]
+project_name = "coding-governance"
+stream_ownership = "no fixed ownership - a solo tooling repo, one stream per work-unit"
+doc_routing_table = "playbook to the charter template , kickoff to skills/session-kickoff/ , tooling to tools/ , deployer to WIRE-INTO-PROJECT.md"
+product_preamble = "coding-governance ships project-agnostic governance and tooling for running agents across several machines on one repo, and dogfoods every kit it ships"
+repo_layout_map = "root holds the charter template and the runbook , tools/ the deployable kits , skills/session-kickoff/ the kickoff engine , memory/ the dogfooded memory tree"
+command_catalog = "bash tools/run-gates/run-gates.sh the bar , GATE_JOBS=1 for the serial rollback , GATE_FULL=1 to ignore every leg guard , bash tools/push-main.sh the lander"
+product_context_home = "README.md, plus memory/DECISIONS.md for why anything is the way it is"
+gate_commands = "the legs are single-sourced from tools/gate-legs.json read that, never a list typed elsewhere"
+commit_trailer = "Co-Authored-By: Claude Opus 5 noreply@anthropic.com"
+worktree_script = "none yet - worktrees are created by hand under .claude/worktrees/"
+kind_factory_map = "kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter"
+shared_primitives_location = "tools/lib/ - gov-internal, and every copy-installed kit carries its contents inline instead"
+toolchain_notes = "bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers command -v and exits 9009"
+manifest_path = "memory/guides/SESSION-KICKOFF.md"
+user_skills = "{scratch}/skills"
+playbook_path = "docs/PARALLEL.md"
+playbook_dir = "docs"
+memory_root = "memory"
+ci_file = "none yet"
+lexicon_conf = ".lexicon.conf"

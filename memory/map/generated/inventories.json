@@ -145,6 +145,7 @@
       "unattended skill size",
       "unattended skill wiring",
       "unattended-build self-test",
+      "upgrade-walk",
       "verdict epoch (kit version dates the engine)",
       "verdict-epoch self-test",
       "verifier fan-out",

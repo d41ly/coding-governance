@@ -363,6 +363,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "Stop",
+      "kind": "class",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "StructureDrift",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
@@ -2603,6 +2608,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "build_release_tree",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "build_relocation",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3021,6 +3031,11 @@
       "id": "build_table",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_target",
+      "kind": "function",
+      "file": "tools/govkit/fixture_target.py"
     },
     {
       "id": "build_target",
@@ -4678,6 +4693,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_inject",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "check_inplace_preconditions",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -5118,6 +5138,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "check_plant_rows",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "check_playbook_hole_modes",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -5346,6 +5371,11 @@
       "id": "check_relations",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "check_release_pin",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "check_render",
@@ -5623,6 +5653,11 @@
       "file": "tools/govkit/shims.py"
     },
     {
+      "id": "check_shim_paths",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "check_shim_windows",
       "kind": "function",
       "file": "tools/govkit/shims.py"
@@ -5781,6 +5816,11 @@
       "id": "check_step_isolation",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_step_isolation",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "check_step_rollback",
@@ -6033,6 +6073,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_walk_exit",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "check_watched",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -6271,6 +6316,11 @@
       "id": "cleanup",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "clear",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/release-0/arms/arm_step.py"
     },
     {
       "id": "cli_card",
@@ -7383,6 +7433,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_digest_diff",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "derive_dir_segments",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -7526,6 +7581,11 @@
       "id": "derive_first_set_row",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_first_write",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "derive_floor_breaches",
@@ -8776,6 +8836,11 @@
       "id": "derive_transition",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "derive_tree_digest",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "derive_tree_digest",
@@ -10533,6 +10598,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "load_engine",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "load_fixture_report",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -10955,6 +11025,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
     {
@@ -11251,11 +11326,6 @@
       "id": "make_repo",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "make_target",
-      "kind": "function",
-      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "mandate_of",
@@ -12933,6 +13003,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "print_line",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "print_liveness",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -13231,6 +13306,11 @@
       "id": "prose",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
+    },
+    {
+      "id": "put",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/release-0/arms/arm_step.py"
     },
     {
       "id": "py_verdict",
@@ -13611,6 +13691,11 @@
       "id": "read_arm_marker",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "read_arm_rows",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "read_ask_back",
@@ -14048,6 +14133,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "read_condition_rows",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "read_conf",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
@@ -14456,6 +14546,11 @@
       "id": "read_fixture_row",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "read_fixture_rows",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "read_fixture_skip",
@@ -15443,6 +15538,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "read_plant_rows",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "read_pm_key",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -15691,6 +15791,11 @@
       "id": "read_relation_gate",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "read_release_pin",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "read_releases",
@@ -16398,6 +16503,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "read_tree_bytes",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "read_tree_clocks",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -16951,6 +17061,11 @@
       "id": "remove_stubs",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
+    },
+    {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "remove_tree",
@@ -18476,6 +18591,11 @@
       "id": "resolve_argv",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "resolve_arm_rows",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "resolve_ask_path",
@@ -20798,6 +20918,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_case_arms",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "run_census_adopter_receipt",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -20836,6 +20961,11 @@
       "id": "run_checks",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "run_child_walk",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "run_claim_cell",
@@ -20881,6 +21011,11 @@
       "id": "run_commit_on",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_condition",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "run_constant_control",
@@ -21115,6 +21250,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/govkit/fixture_target.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
@@ -21126,6 +21266,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "run_git",
@@ -22176,6 +22321,11 @@
       "id": "run_vr_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_walk_case",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "run_walk_fixture",
@@ -26558,6 +26708,11 @@
       "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
+      "id": "write_commit",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "write_conf",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
@@ -27006,6 +27161,11 @@
       "id": "write_plant_edit",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "write_plant_edits",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "write_planted",
