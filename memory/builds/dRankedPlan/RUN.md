@@ -12,20 +12,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 gates-run: unattended-179312353485620824614-1561043 4146b83d
 parked-surfaced: yes, 82 surfaced
 keepalive-reaped: yes
-asks-at-landing: TOOL-dRankedPlan-17=SPECCED TOOL-dRankedPlan-18=OPEN
-units-at-landing: TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-27 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-24 TOOL-dRankedPlan-2 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-34 TOOL-dRankedPlan-14 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-35 TOOL-dRankedPlan-43 TOOL-dRankedPlan-13 TOOL-dRankedPlan-20 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-11 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-12 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-19 TOOL-dRankedPlan-3 TOOL-dRankedPlan-59 TOOL-dRankedPlan-28 TOOL-dRankedPlan-33 TOOL-dRankedPlan-4 TOOL-dRankedPlan-44 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-23 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-62 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-67 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77
+asks-at-landing: TOOL-dRankedPlan-17=DEFERRED TOOL-dRankedPlan-18=DEFERRED
+units-at-landing: TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-27 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-24 TOOL-dRankedPlan-2 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-34 TOOL-dRankedPlan-14 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-35 TOOL-dRankedPlan-43 TOOL-dRankedPlan-13 TOOL-dRankedPlan-20 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-11 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-12 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-19 TOOL-dRankedPlan-3 TOOL-dRankedPlan-59 TOOL-dRankedPlan-28 TOOL-dRankedPlan-33 TOOL-dRankedPlan-4 TOOL-dRankedPlan-44 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-23 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-62 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-67 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81
 hold-run: 
-hold-streak: 1 · at e501a1f1
+hold-streak: 1 · at be042d1e
 resume-owed: none · owner
-held-at: 2026-10-27T08:58:40Z
-hold-reason: the spec-audit promotion chain does not converge: seven rounds promoted 61 units (TOOL-dRankedPlan-19 to -77) with highs 9, 7, 7, 6, 9, 4, 9 at precision 0.86-1.00, nearly all refining one unbounded mechanism, TOOL-dRankedPlan-22's static caller check of read_plan_ratification; M4 ends a chain only below the precision floor, so whether to cap it, re-scope the caller check to a runtime guard, or keep promoting is the owner's — both options are parked in RUN.md. TOOL-dRankedPlan-68 to -77 are specced and committed but unaudited; no unit is deferred and the spec run is not closed
+held-at: 2026-10-27T18:50:53Z
+hold-reason: the spec run is complete and closed in substance — 79 units specced, audited to the owner's round-8 cap and DEFERRED, the departures report at its fixed point with 0 findings, authorization met, every bar leg green but one — and the close's bar cannot pass the spec-tokens leg, whose packet join over the live chain's 954 specs outruns its 390 s ceiling; raising that ceiling or re-pinning carries.py is the owner's, as at dGroundRules' close
 hold-until: owner
 hold-code: owner-decision
-held-from: RUNNING
-refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · park · 0 touching
+held-from: VERIFYING
+refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: de997afe9a050c75185625e6b50b8160a2a948ff
-phase: VERIFYING
+witness: be042d1e29a70aa5e09e05e0391fa4cc53cb683b
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -356,3 +356,7 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T14:54:19Z rescope · item defer TOOL-dRankedPlan-81 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
 
 2026-10-27T18:50:10Z decision · item the close's bar cannot pass the spec-tokens leg while this chain run is live · reason the leg (ceiling 390 s in tools/gate-legs.json) timed out twice at the close: its packet join runs packet.py --check dRankedPlan, whose carries.py --report spawns git per chain spec revision over 954 chain specs, 344 s alone at idle and killed (exit 143) inside the leg; every other leg is green after b02b55c97. Options: (a) the owner raises the leg's ceiling; (b) the owner re-pins carries.py to a batched reader (packet.py --repin), the instrument pin being the owner's; (c) the owner lands the prepared merge by hand. Refused: the ceiling and the pin are owner-moved, and --override gates-green is refused for a red that is not INHERITED
+
+2026-10-27T18:50:59Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dRankedPlan && bash tools/push-main.sh --land --slug dRankedPlan && bash tools/unattended/unattended.sh --settle dRankedPlan
+
+2026-10-27T18:50:59Z hold · item owner-decision · reason until owner · reaped 6cdb61ed · resume none(owner)
