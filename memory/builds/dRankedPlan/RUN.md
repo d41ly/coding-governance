@@ -10,7 +10,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gates-run: unattended-179312353485620824614-1561043 4146b83d
-parked-surfaced: yes, 82 surfaced
+parked-surfaced: yes
 keepalive-reaped: yes
 asks-at-landing: TOOL-dRankedPlan-17=DEFERRED TOOL-dRankedPlan-18=DEFERRED
 units-at-landing: TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-27 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-24 TOOL-dRankedPlan-2 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-34 TOOL-dRankedPlan-14 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-35 TOOL-dRankedPlan-43 TOOL-dRankedPlan-13 TOOL-dRankedPlan-20 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-11 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-12 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-19 TOOL-dRankedPlan-3 TOOL-dRankedPlan-59 TOOL-dRankedPlan-28 TOOL-dRankedPlan-33 TOOL-dRankedPlan-4 TOOL-dRankedPlan-44 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-23 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-62 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-67 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81
@@ -24,8 +24,8 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: ef0ac519801e86ef87071973e4f698da57217c97
-phase: BUILDING
+witness: 448fb3dfca403eb3002f94d334ffa525e083eba9
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
