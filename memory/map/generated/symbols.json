@@ -15528,6 +15528,11 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_pid_namespace",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_pid_start",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"

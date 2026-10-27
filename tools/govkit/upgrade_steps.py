@@ -1625,13 +1625,24 @@ def read_boot_id() -> str:
         return ""
 
 
+PID_NS_LINK = "/proc/self/ns/pid"
+
+
+def read_pid_namespace() -> str:
+    """This process's pid namespace, the `PID_NS_LINK` text `pid:[<inode>]`, or "" where the link
+    does not exist, Windows and macOS (TOOL-dSafePassage-31 S1). A link that exists and cannot be
+    read raises its OSError, which names the path."""
+    return os.readlink(PID_NS_LINK) if os.path.lexists(PID_NS_LINK) else ""
+
+
 def add_boot_start(record: dict) -> dict:
     """`record` with `started_boot`, the `read_boot_clock` reading, beside its `started`, the key
     left out where the reading is None (TOOL-dSafePassage-32 S2); and the pid namespace it was taken
     in, `platform` (`sys.platform`) and `boot_id` (`read_boot_id`), so WSL and Windows runs on one
-    tree, one host name, never judge each other's pid (TOOL-dSafePassage-26 S33)."""
+    tree, one host name, never judge each other's pid (TOOL-dSafePassage-26 S33), and `pid_ns`
+    (`read_pid_namespace`), which tells apart two WSL distros sharing one kernel (TOOL-dSafePassage-31 S2)."""
     boot = read_boot_clock()
-    record = {**record, "platform": sys.platform, "boot_id": read_boot_id()}
+    record = {**record, "platform": sys.platform, "boot_id": read_boot_id(), "pid_ns": read_pid_namespace()}
     return record if boot is None else {**record, "started_boot": boot}
 
 
@@ -1640,7 +1651,8 @@ def check_holder_dead(record: dict | None) -> tuple[str, str]:
     host or absent, and the process-monitor census holds no row with its pid, or one created more
     than `REUSE_MARGIN_S` after its `started`, a reused pid; `live`: a row with that pid created no
     later than that; `unknown`: an unreadable record, another host, another `platform` or `boot_id`
-    where the record carries one (TOOL-dSafePassage-26 S33), or a census that cannot run. The
+    where the record carries one (TOOL-dSafePassage-26 S33), a `pid_ns` other than this process's,
+    an absent one reading "" (TOOL-dSafePassage-31 S3), or a census that cannot run. The
     clock is read once BEFORE the census is spawned and no later reading enters the estimate, so a
     slow census makes a holder look older, toward `live` (TOOL-dSafePassage-22 S1).
 
@@ -1657,6 +1669,15 @@ def check_holder_dead(record: dict | None) -> tuple[str, str]:
         if key in record and record[key] != here:
             return "unknown", (f"it was taken under {key} {record[key]!r}, not this process's {here!r}, so "
                                f"its pid names a process in another namespace this table cannot speak for")
+    # TOOL-dSafePassage-31 S3: an absent `pid_ns` is "", so a Linux judge never reads an older lock as its own.
+    try:
+        here_ns = read_pid_namespace()
+    except OSError as e:
+        return "unknown", f"this process's pid namespace could not be read ({e})"
+    if (record.get("pid_ns") or "") != here_ns:
+        taken = f"under pid_ns {record['pid_ns']!r}" if record.get("pid_ns") else "with no pid_ns recorded"
+        return "unknown", (f"it was taken {taken}, not this process's {here_ns!r}, so its pid may name a "
+                           f"process in another pid namespace this table cannot speak for")
     pid = record["pid"]
     try:
         pm_dir = load_govkit().resolve_kit_dir("process-monitor", "census.py", HERE)
@@ -2516,11 +2537,13 @@ sys.exit(1 if out["stopped"] else 0)
 # answers that much after it sampled (TOOL-dSafePassage-22 S4). `wall-step <pid> <born>` instead
 # makes the census one `posix-ps` row of <pid>, its age counted on `time.monotonic` from <born>,
 # stands `time.monotonic` in for the boot clock and steps `time.time` 10 s forward, in this process
-# only (TOOL-dSafePassage-32 S6).
+# only (TOOL-dSafePassage-32 S6). `pidns <value>` stands <value> in for this process's
+# `read_pid_namespace`, in this process only (TOOL-dSafePassage-31 S4).
 FIXTURE_LOCK_CHILD = r'''import importlib.machinery, importlib.util, os, pathlib, sys, time
 sys.stdout.reconfigure(encoding="utf-8")
 wall_step = len(sys.argv) > 5 and sys.argv[5] == "wall-step"
-if len(sys.argv) > 5:
+pidns = sys.argv[6] if len(sys.argv) > 5 and sys.argv[5] == "pidns" else None
+if len(sys.argv) > 5 and pidns is None:
     _exec = importlib.machinery.SourceFileLoader.exec_module
     def _slow_exec(self, module):
         _exec(self, module)
@@ -2541,6 +2564,8 @@ us = importlib.util.module_from_spec(spec)
 sys.modules["upgrade_steps"] = us
 spec.loader.exec_module(us)
 gk = us.load_govkit()
+if pidns is not None:
+    us.read_pid_namespace = lambda: pidns
 if wall_step:
     us.read_boot_clock = time.monotonic
     _wall = time.time
@@ -2562,7 +2587,7 @@ WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSaf
 WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending",
                "truncated-image", "kill-after-up") + WALK_SCHEMA_PLANTS
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-foreign-namespace", "lock-unreadable",
-               "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot")
+               "lock-foreign-pidns", "lock-no-pidns", "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot")
 UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update",
                  "needs-target-source")
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
@@ -3025,9 +3050,11 @@ def run_lock_fixture(plant: str) -> int:
             return p.pid
 
         def plant_lock(pid: int, started: float, host: str | None = THIS_HOST,
-                       started_boot: float | None = None) -> bytes:
+                       started_boot: float | None = None, ns: dict | None = None) -> bytes:
+            # `ns` replaces the namespace keys; by default this process's `pid_ns` (TOOL-dSafePassage-31).
             rec = {"pid": pid, "verb": "update", "started": started,
-                   "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(started))}
+                   "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(started)),
+                   **({"pid_ns": read_pid_namespace()} if ns is None else ns)}
             if host:
                 rec["host"] = host
             if started_boot is not None:
@@ -3035,8 +3062,10 @@ def run_lock_fixture(plant: str) -> int:
             lock.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
             return lock.read_bytes()
 
-        def take(gate: str = "-", release: str = "-", out_file: pathlib.Path | None = None):
+        def take(gate: str = "-", release: str = "-", out_file: pathlib.Path | None = None,
+                 pidns: str | None = None):
             argv = [sys.executable, "-c", FIXTURE_LOCK_CHILD, str(HERE / "upgrade_steps.py"), str(t), gate, release]
+            argv += ["pidns", pidns] if pidns is not None else []
             argv += ["3"] if plant == "lock-live-slow-census" else []
             argv += ["wall-step", str(holder), str(born)] if plant.startswith("lock-wall-step") else []
             if out_file is None:
@@ -3057,7 +3086,7 @@ def run_lock_fixture(plant: str) -> int:
         try:
             rc = 0
             if plant in ("lock-dead", "lock-reused", "lock-live", "lock-foreign-host", "lock-foreign-namespace",
-                         "lock-unreadable",
+                         "lock-unreadable", "lock-foreign-pidns", "lock-no-pidns",
                          "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot"):
                 if plant == "lock-dead":
                     holder = dead_pid()
@@ -3092,16 +3121,24 @@ def run_lock_fixture(plant: str) -> int:
                     lock.write_text(json.dumps({**rec, "platform": "gk-elsewhere", "boot_id": ""}, indent=2) + "\n",
                                     encoding="utf-8", newline="\n")
                     before = lock.read_bytes()
+                elif plant in ("lock-foreign-pidns", "lock-no-pidns"):
+                    # TOOL-dSafePassage-31 S4: this host, platform and boot, a dead pid, and another
+                    # Linux pid namespace's `pid_ns` or none; the judge's own reading a Linux one.
+                    holder = dead_pid()
+                    ns = {"platform": sys.platform, "boot_id": read_boot_id()}
+                    before = plant_lock(holder, time.time() - 30, ns={**ns, "pid_ns": "pid:[4026532244]"}
+                                        if plant == "lock-foreign-pidns" else ns)
                 else:
                     holder = None
                     lock.write_text("not a lock\n", encoding="utf-8", newline="\n")
                     before = lock.read_bytes()
-                rc, out = take()
+                rc, out = take(pidns="pid:[4026532221]" if plant.endswith("-pidns") else None)
                 if plant in ("lock-dead", "lock-reused"):
                     rec = held()
-                    print(f"lock: held by pid {rec.get('pid')} · host {rec.get('host')}")
+                    print(f"lock: held by pid {rec.get('pid')} · host {rec.get('host')} · pid_ns {rec.get('pid_ns')!r}")
                     expect(rc == 0 and f"reclaimed {lock.as_posix()}" in out and f"pid {holder} " in out,
                            f"the dead holder pid {holder} was not reclaimed, naming it")
+                    expect(rec.get("pid_ns") == read_pid_namespace(), "the lock does not record the taker's pid_ns")
                     expect(rec.get("pid") == taker_pid(out) and rec.get("host") == THIS_HOST,
                            "the lock does not name the taker's pid and this host")
                 else:
@@ -3113,7 +3150,16 @@ def run_lock_fixture(plant: str) -> int:
                             "lock-wall-step": f"pid {holder} ", "lock-wall-step-no-boot": f"pid {holder} ",
                             "lock-foreign-host": "gk-elsewhere.invalid",
                             "lock-foreign-namespace": "unknown, it was taken under platform 'gk-elsewhere'",
-                            "lock-unreadable": "no readable pid"}[plant] in out, "the refusal does not describe the holder")
+                            "lock-unreadable": "no readable pid",
+                            "lock-foreign-pidns": "unknown, it was taken under pid_ns 'pid:[4026532244]'",
+                            "lock-no-pidns": "unknown, it was taken with no pid_ns recorded"}[plant] in out,
+                           "the refusal does not describe the holder")
+                    if plant == "lock-no-pidns":
+                        # AC3: with this process's `pid_ns` "", as off Linux, the census judges it dead.
+                        rc2, out2 = take(pidns="")
+                        print(f"lock: with no pid_ns here, the take exits {rc2}")
+                        expect(rc2 == 0 and f"reclaimed {lock.as_posix()}" in out2 and f"pid {holder} " in out2,
+                               "with no pid_ns on either side the census did not reclaim the dead holder")
                     if plant.startswith("lock-wall-step"):
                         verdict = "unknown" if plant.endswith("-no-boot") else "live"
                         expect(f"refusing rather than joining in: {verdict}, " in out,
@@ -3145,7 +3191,8 @@ def run_lock_fixture(plant: str) -> int:
                     expect("busy" in texts[1 - won[0]], "the losing racer did not refuse busy")
             elif plant == "guard-dead":
                 before = plant_lock(dead_pid(), time.time() - 30)
-                guard.write_text(json.dumps({"pid": dead_pid(), "started": time.time() - 10, "host": THIS_HOST}) + "\n",
+                guard.write_text(json.dumps({"pid": dead_pid(), "started": time.time() - 10, "host": THIS_HOST,
+                                             "pid_ns": read_pid_namespace()}) + "\n",
                                  encoding="utf-8", newline="\n")
                 rc1, out1 = take()
                 print(f"lock: first take exits {rc1} · guard {'present' if guard.exists() else 'cleared'} · "

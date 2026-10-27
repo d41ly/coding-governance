@@ -3763,6 +3763,13 @@ def check_step_walk() -> None:
             ("lock", "lock-foreign-namespace", 1, ("refusing rather than joining in: unknown, it was taken "
                                                    "under platform 'gk-elsewhere'",
                                                    "lock: the planted lock unchanged")),
+            # TOOL-dSafePassage-31 AC2, AC3: a dead pid's lock from another pid namespace, or with
+            # none recorded, is not reclaimed by a Linux judge; with no namespace on either side it is.
+            ("lock", "lock-foreign-pidns", 1, ("refusing rather than joining in: unknown, it was taken under "
+                                               "pid_ns 'pid:[4026532244]'", "lock: the planted lock unchanged")),
+            ("lock", "lock-no-pidns", 1, ("refusing rather than joining in: unknown, it was taken with no pid_ns",
+                                          "lock: the planted lock unchanged",
+                                          "lock: with no pid_ns here, the take exits 0")),
             ("lock", "lock-race", 0, ("busy, ",)),
             ("lock", "guard-dead", 0, ("busy, cleared the guard .update.lock.reclaim",
                                        "lock: first take exits 1 · guard cleared · lock unchanged")),
@@ -3790,6 +3797,7 @@ def check_step_walk() -> None:
                else "dSP-40" if plant == "kill-after-up"
                else "dSP-33" if family == "walk" and plant in ("witness-holds", "fail-k")
                else "dSP-22" if plant == "lock-live-slow-census"
+               else "dSP-31" if plant in ("lock-foreign-pidns", "lock-no-pidns")
                else "dSP-26" if plant in ("truncated-image", "lock-foreign-namespace", "needs-target-source")
                else "dSP-32" if (plant or "").startswith("lock-wall-step") else "dSP-2")
         check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",

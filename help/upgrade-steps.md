@@ -180,7 +180,12 @@ lock from another host, one it cannot read, or one it cannot judge because the p
 run is not reclaimed: the refusal names the holder, and you delete the lock by hand once you know
 that run has ended. The lock also records the platform it was taken on and, on Linux, the kernel's
 boot id; a lock from another platform or boot is not reclaimed either, so a WSL run and a Windows
-run on one tree, which share a host name, never take each other's live lock. Before each index write a run appends the path and the blob it stages to
+run on one tree, which share a host name, never take each other's live lock. On Linux it records the
+pid namespace too, `pid_ns`, because two WSL distros, or a distro and a Docker Desktop container,
+share one kernel boot id; a lock from another pid namespace is not reclaimed, and neither is a lock
+with no `pid_ns` judged on Linux, which a govkit older than this one leaves. A lock carrying the
+boot clock's start reading is judged against a running pid's boot-clock age; where either boot
+reading is missing, a pid that may have been reused is not reclaimed either. Before each index write a run appends the path and the blob it stages to
 `.governance/outbox/.update.lock.staged`; the run that reclaims the lock reads that journal, so the
 paths the killed run staged are not refused as dirty, while a different blob you staged at one of
 them still is. The step the kill interrupted reads `failed` with its `interrupted:` text, and the
