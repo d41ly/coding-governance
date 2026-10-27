@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-65-deviation-651.md](../build/2026-10-27-build-TOOL-dRankedPlan-65-deviation-651.md) | deviation | — |
+| [2026-10-27-build-TOOL-dRankedPlan-65-deviation-652.md](../build/2026-10-27-build-TOOL-dRankedPlan-65-deviation-652.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-65-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-65-promoted-fix-return.md) | research | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-65-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-65-1-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-65-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-65-promoted-fix-brief.md) | research | — |

@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md) | research | TOOL-dRankedPlan-30 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 | [2026-10-27-build-TOOL-dRankedPlan-32-deviation-321.md](../build/2026-10-27-build-TOOL-dRankedPlan-32-deviation-321.md) | deviation | — |
+| [2026-10-27-build-TOOL-dRankedPlan-32-deviation-322.md](../build/2026-10-27-build-TOOL-dRankedPlan-32-deviation-322.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md) | research | TOOL-dRankedPlan-30 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 | [2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) | spec-audit | TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-36 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 

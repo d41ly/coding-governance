@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-30-deviation-301.md](../build/2026-10-27-build-TOOL-dRankedPlan-30-deviation-301.md) | deviation | — |
+| [2026-10-27-build-TOOL-dRankedPlan-30-deviation-302.md](../build/2026-10-27-build-TOOL-dRankedPlan-30-deviation-302.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md) | research | TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-30-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-30-1-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md) | research | TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |

@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-54-deviation-541.md](../build/2026-10-27-build-TOOL-dRankedPlan-54-deviation-541.md) | deviation | — |
+| [2026-10-27-build-TOOL-dRankedPlan-54-deviation-542.md](../build/2026-10-27-build-TOOL-dRankedPlan-54-deviation-542.md) | deviation | — |
 | [2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) | spec-audit | TOOL-dRankedPlan-59 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 |
 
 <!-- /gen:spec-records -->
