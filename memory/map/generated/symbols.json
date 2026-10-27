@@ -4408,6 +4408,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_fixture_target",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_fixtures",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
@@ -4686,6 +4691,11 @@
       "id": "check_index_input",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_inherited_config",
+      "kind": "function",
+      "file": "tools/govkit/fixture_target.py"
     },
     {
       "id": "check_inherited_override",

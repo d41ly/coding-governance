@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-67 — the fixture factory pins commit signing and hooks in every repository it builds, and refuses a git command that fails
 
-**Status:** DEFERRED · rev-1 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-26
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-26-build-TOOL-dSafePassage-67-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-67-ledger.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-67-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-67-1-spec-writer.md) | research | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-67-2-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-67-2-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-67-build-brief.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-67-build-brief.md) | journal | — |

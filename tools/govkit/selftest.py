@@ -3673,6 +3673,19 @@ def check_step_gate_fixture() -> None:
                   p.returncode == want and named, out[-3000:])
 
 
+def check_fixture_target() -> None:
+    """TOOL-dSafePassage-67 AC1 — `fixture_target.py --selftest`: under a planted global config,
+    live on an unpinned control first, the factory's target holds `base` with no canary and no
+    copied hook, and `run_git` raises on a refused commit."""
+    p = subprocess.run([sys.executable, "-I", str(HERE / "fixture_target.py"), "--selftest"],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       timeout=300)
+    out = p.stdout + p.stderr
+    check("[dSP-67] fixture_target.py --selftest exits 0 and prints its PASS line",
+          p.returncode == 0 and bool(_re.search(r"^fixture-target: PASS · (\d+) of \1 observations hold$",
+                                                out, _re.M)), out[-3000:])
+
+
 def check_step_walk() -> None:
     """TOOL-dSafePassage-2 AC1 to AC9 — `upgrade_steps.py fixture walk|lock|update` with every plant:
     the walk's order, skip, stop, kill and resume, its attended stop, the lock's reclaim of a dead or
@@ -4473,6 +4486,7 @@ def main() -> int:
         check_step_rollback()
         check_source_mode(tmp / "dgf")
         check_step_gate_fixture()
+        check_fixture_target()
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
