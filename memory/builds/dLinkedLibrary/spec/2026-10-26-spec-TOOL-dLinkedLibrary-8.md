@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-8 — retrofit's record kinds, the `origin` field, and the `adopt` program the core's own command runs
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 20 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 20 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0245@2d7af537 whole
 **Carries:** node:record-kind.baseline
@@ -23,7 +23,10 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md) | research | TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-8-deviation-81.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-8-deviation-81.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-8-deviation-82.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-8-deviation-82.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -45,7 +48,9 @@ and `adopt.reconstruct`, which `retrofit.reconstruct` governs. A decision the ow
 
 Build-run preconditions this unit calls and does not build, each specced and DEFERRED at base
 `5fede642`: the kind registry and its factory `record_kinds.py new` (TOOL-dTotalRecall-1 S1, S3, S9)
-with the `home`, `lifecycle`, `readers` and `layer` columns (TOOL-dTotalRecall-18 S1); the record
+with the `home`, `lifecycle`, `readers` and `layer` columns (TOOL-dTotalRecall-18 S1), the `purpose`
+column (TOOL-dTotalRecall-16 S1, S2) and the `unarmed` key (TOOL-dTotalRecall-42 S2);
+`TYPED_RECORD_KINDS` and the factory's per-kind table (PLAY-dOrderedCharter-42 S1 to S3); the record
 door `gov_record.py new <kind>` over `write_new_record` in `tools/memory-tree/build_records.py`
 (TOOL-dTotalRecall-2 S1 to S6, PLAY-dOrderedCharter-7 S7); `tools/playbook/core.py` and its owner
 proof (PLAY-dOrderedCharter-7 S6, S9; PLAY-dOrderedCharter-15); the item schema in
@@ -53,16 +58,29 @@ proof (PLAY-dOrderedCharter-7 S6, S9; PLAY-dOrderedCharter-15); the item schema 
 `test.seed` (TOOL-dWitnessedBar-13 S1, S2, S10; TOOL-dWitnessedBar-15 S1); the one trailer reader
 `commit_trailers.decided(commit)` (TOOL-dDeclaredLoop-23 S3); and TOOL-dLinkedLibrary-1's rubric
 module `tools/memory-tree/decision_rubric.py` with `CLASSES`, `RUBRIC`, its labels-file form and
-`derive_kappa` (its S5). dGroundRules' `resolve` (`tools/policy/policy.py:752`) is landed.
+`derive_kappa` (its S5); and the memory-tree policy adapter `tools/memory-tree/policy_value.py`
+(TOOL-dTotalRecall-8 S10).
 
 - **S1** — The kinds, each a `[[record-kind]]` row of `tools/memory-tree/record-kinds.toml` written
-  by `record_kinds.py new` (shared interface I3, node `record-kind.<name>`, tag `record.<name>`):
-  `census` and `ruling`, form `fields`, writer `gov_record.py new <kind>`, check `memory hygiene`,
-  their fields §4 "The kinds" lists; and `baseline`, form `rows`, writer `legacy_ledger.py seed`
+  by `record_kinds.py new <name> --tag record.<name> --writer <door> --check <leg> --purpose "<line>"`
+  (shared interface I3, node `record-kind.<name>`), the `--purpose` TOOL-dTotalRecall-16 S2 requires,
+  with every column TOOL-dTotalRecall-18 S1 requires, as TOOL-dTotalRecall-25 S1 spells its row; each
+  row's values are §4 "The kinds"'s. S9's verb takes no flag for `layer`, `home`, `id-rule`, `schema`,
+  `lifecycle`, `readers` or `unarmed` (TOOL-dTotalRecall-1:101-102), so the build run sets them
+  through TOOL-dTotalRecall-18's landed verb. `census` and `ruling` are typed kinds: this unit adds
+  both to `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py` (PLAY-dOrderedCharter-42 S1), which
+  `RECORD_KIND_TOKENS` concatenates (TOOL-dTotalRecall-18 S7), so their Serves lines bind and a
+  `-census-<n>.md` or `-ruling-<n>.md` record serving another kind reads malformed (its S3); each
+  gains a row in `tools/memory-tree/build_records.py`'s per-kind table of required fields and closed
+  sets, refused at import when its keys differ from the tuple (its S2); and each registry row is a
+  factory kind's (TOOL-dTotalRecall-1 §4 "The rows"), form `fields`, its `schema.source` that table,
+  writer `gov_record.py new <kind>`, the door being the factory's adapter (TOOL-dTotalRecall-2 S1,
+  S2), check `memory hygiene`. `baseline`, form `rows`, writer `legacy_ledger.py seed`
   (`test.seed`), whose `home` and `check` are the sentinel `ledger`: each `[[ledger]]`
   registration's own `home` and `leg`, read by `read_registrations`. `check_record_kinds` admits the
-  sentinel and grades it as it grades a literal, every registered `home` tracked or recorded
-  unarmed and every registered `leg` a leg of `tools/gate-legs.json`. Observed by AC9.
+  sentinel beside TOOL-dTotalRecall-18 S1's three home forms and grades it as it grades a literal,
+  every registered `home` tracked or recorded unarmed and every registered `leg` a leg of
+  `tools/gate-legs.json`. Observed by AC9.
 - **S2** — The `origin` field (shared interface I20): every record the door writes carries one
   `- **Origin:** <value>` line after its `**Serves:**` line, its value `written`,
   `reconstructed@<sha8> <sources>` or `imported:<path>`, derived by the door and never typed. The door
@@ -123,9 +141,19 @@ module `tools/memory-tree/decision_rubric.py` with `CLASSES`, `RUBRIC`, its labe
   schema, tags `item.adopt.census`, `item.adopt.practices`, `item.adopt.decisions`,
   `item.adopt.decisions-ratify` and `item.adopt.reconstruct`, transcribed from flow-steps' `[adopt]`
   rows (flow-steps.md:712-717) per §4 "The items", each naming `program = "adopt"` in place of
-  `step` (§8 F2's ask). `item.test.seed`'s `needs` gains `item.adopt.census`. Observed by AC10.
+  `step` (§8 F2's ask), one actor of one kind (TOOL-dDeclaredLoop-12:125, TOOL-dDeclaredLoop-9 S1),
+  `inputs`, `allowance` and `returns` on every non-role item (TOOL-dDeclaredLoop-12:127-128), each
+  input naming a layer tag, each `returns` written `record-kind.<name>@<n>` (TOOL-dDeclaredLoop-24 §4
+  "Records at a version"), and `routes` holding exactly the outcomes as keys, each naming a declared
+  item (TOOL-dDeclaredLoop-12 §4 "The program check") or, for a terminal outcome, §8 F5's target.
+  `tools/loop/item-schema.toml` gains the `[[record-version]]` rows pinning `record-kind.census` and
+  `record-kind.ruling` at version 1, their hashes from S1's factory rows; the `research` and `dossier`
+  versions are their owners'. `item.test.seed`'s `needs` gains `item.adopt.census`. Observed by AC10.
 - **S10** — The keys: `retrofit.decisions`, `retrofit.practice-pending` and `retrofit.reconstruct`,
-  each read once per verb through `resolve`; their catalogue rows (`tools/policy/catalogue.toml:1524`,
+  each read once per verb, and `flow.route-backs` read by S6, by `read_policy_value(<key>, root)` from
+  the memory-tree adapter `tools/memory-tree/policy_value.py` (TOOL-dTotalRecall-8 S10), which runs
+  `policy.py get` as a subprocess, since a kit imports no sibling kit (PLAY-dOrderedCharter-7 §4 "The
+  policy reads"); the three keys' catalogue rows (`tools/policy/catalogue.toml:1524`,
   `:1530`, `:1536`, owner dLinkedLibrary) gain `summary` and `usage`, their names leave
   `tools/policy/unsummarised-keys.txt` through `policy.py lists --write`, and `.governance/policy.json`
   is regenerated by `policy.py mirror --write`. Observed by AC11.
@@ -134,9 +162,11 @@ module `tools/memory-tree/decision_rubric.py` with `CLASSES`, `RUBRIC`, its labe
   practices of §4 "The census"; rater route files and an owner-proof stub as the plants need. The
   plants are §6's. Observed by AC1 to AC8.
 - **S12** — The docs: `help/adopt.md`, the program's verbs in order, each policy value, the census
-  classes, and what `origin` means on a record, linked from `help/README.md`; the `origin` field and
-  the three kinds named in `tools/memory-tree/HYGIENE.template.md`, rendered into `memory/HYGIENE.md`
-  by `adopt-memory-tree.sh --render`. Observed by AC12.
+  classes, and what `origin` means on a record, linked from `help/README.md`; in
+  `tools/memory-tree/HYGIENE.template.md`, the `origin` field, `baseline`, and `census` and `ruling`
+  in the closed kind list with a half-line each naming this unit, as PLAY-dOrderedCharter-42 S5 adds
+  its three kinds there, rendered into `memory/HYGIENE.md` by `adopt-memory-tree.sh --render`.
+  Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -156,7 +186,7 @@ module `tools/memory-tree/decision_rubric.py` with `CLASSES`, `RUBRIC`, its labe
 - **hands-off** `TOOL-dLinkedLibrary-9` — `origin`, the field and its three values the door writes, which that unit re-derives from history, renders and ranks
 - **hands-off** `TOOL-dLinkedLibrary-10` — `baseline`, the kind whose records are the ledger's population files, whose progress the cell reports
 - **hands-off** `TOOL-dLinkedLibrary-23` — `origin`, the `imported:<path>` value its paragraph proposals carry, beside the `adopt` dispatcher whose `instructions` verb it adds and the census class `instruction-file`
-- **consumes-from** external — TOOL-dTotalRecall-1, -2 and -18, PLAY-dOrderedCharter-7 and -15, TOOL-dDeclaredLoop-12 and -23, TOOL-dWitnessedBar-13 and -15, DEFERRED at base and built before this unit's pass
+- **consumes-from** external — TOOL-dTotalRecall-1, -2, -8, -16, -18 and -42, PLAY-dOrderedCharter-7, -15 and -42, TOOL-dDeclaredLoop-9, -12, -23 and -24, TOOL-dWitnessedBar-13 and -15, DEFERRED at base and built before this unit's pass
 - **hands-off** `TOOL-dLinkedLibrary-37` — `adopt_program.py decisions --rate` and the door's `--imported-from`, through which unit 37 mints its two planted records (id 58)
 - **hands-off** `TOOL-dLinkedLibrary-47` — `adopt program selftest`, the leg unit 47 adds to run this unit's plants; this unit's ledger names it for the arm line (id 50)
 - **hands-off** `TOOL-dLinkedLibrary-51` — `CI_REFUSE_PATTERNS` and the `ci-job` class, which unit 51 widens (id 67)
@@ -177,17 +207,26 @@ module `tools/memory-tree/decision_rubric.py` with `CLASSES`, `RUBRIC`, its labe
 
 ### The kinds
 
-| Kind | Form | Fields, in order | Writer |
-|---|---|---|---|
-| `census` | `fields` | `Class`, `Practice`, `Instances`, `Paths`, `Rank`, `State`, `Taken at` | `gov_record.py new census` |
-| `ruling` | `fields` | `Subject`, `Ruling`, `Ruled by`, `Reason` | `gov_record.py new ruling` |
-| `baseline` | `rows` | none: each ledger file's header, graded by the factory | `legacy_ledger.py seed` |
+| Kind | Form | Fields, in order | Writer | Home | Lifecycle |
+|---|---|---|---|---|---|
+| `census` | `fields` | `Class`, `Practice`, `Instances`, `Paths`, `Rank`, `State`, `Taken at` | `gov_record.py new census` | `memory/builds/*/build/*-census-*.md` | `append-only` |
+| `ruling` | `fields` | `Subject`, `Ruling`, `Ruled by`, `Reason` | `gov_record.py new ruling` | `memory/builds/*/build/*-ruling-*.md` | `append-only` |
+| `baseline` | `rows` | none: each ledger file's header, graded by the factory | `legacy_ledger.py seed` | the sentinel `ledger` | `current-state` |
+
+Every row's `layer` is `layer.memory`, its `readers` `[]` with `readers-none = "no work-order read key
+hands it; adopt_program.py reads it"`, and its purpose one line naming the verb that writes it. The
+`id-rule` is `<date>-build-<unit id>-<kind>-<n>.md` for `census` and `ruling`, `""` for `baseline`.
+Gov's own tree holds no adoption build, so the `census` and `ruling` rows carry
+`unarmed = "no adoption in this tree; core.py adopt arms it"` (TOOL-dTotalRecall-42 S2).
 
 `State` is `importable` or `refused: <why>`. `Ruling` is closed by its subject: `import`, `translate`,
 `alongside` or `retire` for a census record; `ratified` or `declined` for a routing record's
 candidate; `unit`, `amend <tag>` or `drop` for an instruction paragraph (TOOL-dLinkedLibrary-23 S7).
-`Ruled by` is `owner`. Records are named
-`<date>-build-<unit id>-<kind>-<n>.md` in the adoption build's `build/` folder, the factory's grammar.
+`Ruled by` is `owner`. These closed sets sit on the `ruling` row of the factory's per-kind table
+(PLAY-dOrderedCharter-42 S2), which the door's write-boundary refusal reads for a factory kind
+through the factory's `read_record` refusals (TOOL-dTotalRecall-2 S4). Records are named
+`<date>-build-<unit id>-<kind>-<n>.md` in the adoption build's `build/` folder, the typed kinds'
+grammar (PLAY-dOrderedCharter-42 S1, S3).
 
 ### The pending practice
 
@@ -231,15 +270,21 @@ labels, its settled class and its origin `reconstructed@<sha8> <source>`.
 
 ### The items
 
-| Tag | Actor | Needs | Returns | Outcomes and routes |
-|---|---|---|---|---|
-| `item.adopt.census` | `command:adopt.census` | none | `record-kind.census` | `taken` to `item.test.seed` |
-| `item.adopt.practices` | `owner` | census | `record-kind.ruling` | `ruled` to done; `pending` to itself |
-| `item.adopt.decisions` | `role:reviewer`, two raters | census | `record-kind.research` | `routed` to ratify; `below-floor` to itself, within `flow.route-backs` |
-| `item.adopt.decisions-ratify` | `owner` | decisions | `record-kind.ruling` | `ratified`, `declined` to done |
-| `item.adopt.reconstruct` | `command:adopt.reconstruct` | census | `record-kind.dossier` | `done`; `skipped` under `on-touch` |
+| Tag | Actor | Needs | Inputs | Allowance | Returns | Outcomes and routes |
+|---|---|---|---|---|---|---|
+| `item.adopt.census` | `command:adopt.census` | none | `layer.memory:the tracked tree at HEAD` | `records` | `record-kind.census@1` | `taken` to `item.test.seed` |
+| `item.adopt.practices` | `owner` | census | `layer.memory:record-kind.census@1` | `records` | `record-kind.ruling@1` | `ruled` to `item.test.seed`; `pending` to itself |
+| `item.adopt.decisions` | `role:gov-researcher` | census | the role's | the role's | `record-kind.research@1` | `routed` to `item.adopt.decisions-ratify`; `below-floor` to itself, within `flow.route-backs` |
+| `item.adopt.decisions-ratify` | `owner` | decisions | `layer.memory:record-kind.research@1` | `records` | `record-kind.ruling@1` | `ratified`, `declined` to §8 F5's target |
+| `item.adopt.reconstruct` | `command:adopt.reconstruct` | census | `layer.memory:record-kind.census@1` | `records` | `record-kind.dossier@1` | `done`, `skipped` (under `on-touch`) to §8 F5's target |
 
-Each row's `owner` is `dLinkedLibrary`, its `witness` the record its `returns` names.
+Each row's `owner` is `dLinkedLibrary`, its `witness` the record its `returns` names, and each
+`allowance` a word of `WRITES` (`tools/roles/check_roles.py:96`). A ruling routes to `item.test.seed`,
+the practice's migration flow-steps names (`flow-steps.md:713-714`: the seed imports or translates
+each practice its ruling names). `item.adopt.decisions` has one actor: flow-steps' "reviewer, as two
+raters" (:715) is one role dispatched twice, and TOOL-dDeclaredLoop-9 refuses only a list, a comma or
+two kinds in `actor` (its §4 "The actor"); the slot is `gov-researcher`, the raters'
+(TOOL-dLinkedLibrary-1 §4 "The rubric"), as TOOL-dDeclaredLoop-9 S1 spells a role `role:<slot>`.
 
 ### Inventory
 
@@ -264,9 +309,11 @@ The program runs only when called. Every default is the passive one: no owner wa
 - `tools/memory-tree/adopt_program.py` (new)
 - `tools/playbook/core.py`: the `adopt` dispatcher
 - `tools/playbook/render_playbook.py`: `KIT_PLAYBOOK_RENDER_VERSION` moved
-- `tools/memory-tree/gov_record.py` and `tools/memory-tree/build_records.py`: S2
+- `tools/memory-tree/gov_record.py` and `tools/memory-tree/build_records.py`: S2, and S1's two per-kind rows
+- `tools/memory-tree/tree_lib.py`: `census` and `ruling` in `TYPED_RECORD_KINDS`, S1
 - `tools/memory-tree/record_kinds.py`: the `ledger` sentinel
 - `tools/memory-tree/record-kinds.toml`: the three rows
+- `tools/loop/item-schema.toml`: the two `[[record-version]]` pins, S9
 - `tools/memory-tree/check-memory-hygiene.sh`: `KIT_MEMORY_TREE_VERSION` moved
 - `tools/memory-tree/HYGIENE.template.md` (the source) and `memory/HYGIENE.md` (its render)
 - `tools/loop/loop.toml`: the five items and `item.test.seed`'s need
@@ -345,16 +392,19 @@ The program runs only when called. Every default is the passive one: no owner wa
   `--reconstructed-from <sha> --source <path>` carries `reconstructed@<sha8> <path>`, and one naming
   a source absent at that sha exits 2.
   Red when: an origin value is accepted as typed, or an unverifiable source is recorded.
-- **AC9** — When `python record_kinds.py --check` reads the registry with the three rows, it exits 0;
-  with a planted `[[ledger]]` registration whose `leg` names no leg of the manifest, it exits 1 naming
-  `baseline` and that leg.
-  Red when: the `ledger` sentinel is read as a literal home or passes an unknown leg.
+- **AC9** — When `python record_kinds.py --check` reads the registry with the three rows, it exits 0,
+  printing `census: unarmed` and `ruling: unarmed` while gov's tree holds no record of either; with a
+  planted `[[ledger]]` registration whose `leg` names no leg of the manifest, it exits 1 naming
+  `baseline` and that leg. When `python build_records.py --fixture --plant typed-kinds`
+  (PLAY-dOrderedCharter-42 S4) runs, it writes a `census` and a `ruling` record and reads each `bound`.
+  Red when: the `ledger` sentinel is read as a literal home or passes an unknown leg, or a census or
+  ruling record reads malformed.
 - **AC10** — When `python loop_lib.py --check` runs at the pass tip, its population holds the five
   `item.adopt.*` rows and `item.test.seed` needing `item.adopt.census`; with a planted need naming an
   undeclared item, it exits 1 naming it.
   Red when: an adopt item is outside the program check.
-  fixture: needs §8 F2's ask landed in dDeclaredLoop; until then the rows are a stand-in the check
-  names.
+  fixture: needs §8 F2's and F5's asks landed in dDeclaredLoop; until then the rows are a stand-in
+  the check names.
 - **AC11** — When `python policy.py get retrofit.reconstruct` runs with no value set it prints
   `on-touch`, and after `policy.py lists --write` the summary list names none of the three keys.
   Red when: a row is missing or still unsummarised.
@@ -400,6 +450,18 @@ New arm: tools/memory-tree/adopt_program.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC
   installed; (b) every record kind a unit pass writes; (c) code purposes. (b) names kinds whose
   first-touch writers are dScopedBuild's and unbuilt; (c) are not records and are
   TOOL-dLinkedLibrary-15's. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes: none
+- **F5 — Where does an adopt item's terminal outcome route, when the program has no step and so no
+  exit item?** `item.adopt.decisions-ratify`'s `ratified` and `declined` and `item.adopt.reconstruct`'s
+  `done` and `skipped` end the program, and a route names a declared item, `transition` or
+  `stand-in:<path>` (TOOL-dDeclaredLoop-12 S3). Options: (a) join F2's ask: on a `program = "adopt"`
+  row, `check_program` admits the target `end`; (b) a declared exit item `item.adopt.exit`, a node
+  flow-steps' `[adopt]` table (`flow-steps.md:710-719`) does not name, so the design owns no such
+  node; (c) `transition`, which reads a cross-step move the transition tables join both ways
+  (TOOL-dDeclaredLoop-12 §3), from a program with no step. (b) mints an undesigned node and (c) a
+  transition no table holds. Recommendation: (a). The ask the build run would file in dDeclaredLoop's
+  `BACKLOG.md`, with F2's: "an adopt-program item's terminal outcome routes to `end`" · accept
+  `check_program` admits `end` on a `program = "adopt"` row and refuses it on a step row, seen on one
+  planted row of each. Open for the owner.
 
 ## 9. Revision log
 
@@ -407,6 +469,7 @@ New arm: tools/memory-tree/adopt_program.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC
   `[practices]` and RF-3, RF-4 (:343-372, :445-470, :471-484, :579-582), flow-steps.md `[adopt]`
   (:702-718), layer-memory.md:463-465, and scout D's row for cl-0245.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-37, TOOL-dLinkedLibrary-47, TOOL-dLinkedLibrary-51, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
+- rev-3 · 2026-10-28 · §2 preconditions, S1, S9, S10, S12 · §3 Edges · §4 "The kinds", "The items", Files touched · §6 AC9, AC10 · §8 F5 added, open · §10 · re-grounded on the parents at `1a61f21a2` per the cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md`, rows 22, 24, 25, 26 and 27: the three calls spell their purpose and every column; `census` and `ruling` join `TYPED_RECORD_KINDS`, the factory's per-kind table and the HYGIENE closed list; the item rows take TOOL-dDeclaredLoop-12's and -24's schema; the `retrofit.*` keys are read through the memory-tree policy adapter. Row 26's split of `item.adopt.decisions` is not made: one role dispatched twice is one actor. F2 stays as it stands.
 
 ## 10. Reuse audit
 
@@ -421,8 +484,11 @@ repository's own practices lint configs ci jobs decision documents codeowners"` 
 processes, an install receipt), so no existing seam fits the practice census, and
 `tools/govkit/census.py` is a fork census, read only for its read-only shape. Scout D's lines
 agreed with source at base (`govkit.py:12611`, `catalogue.toml:1524-1539`); its proposal to edit
-`tree_lib.py:406` is not needed, since door-written kinds join the Serves kinds through
-TOOL-dTotalRecall-18 S7. The recall query returned scout D's row, the brief's row and
+`tree_lib.py:406` stands in the form the parents now give it: S1 adds `census` and `ruling` to
+`TYPED_RECORD_KINDS` (PLAY-dOrderedCharter-42 S1), since `RECORD_KIND_TOKENS` is the four untyped
+tokens plus that tuple and no registry row joins it on its own (TOOL-dTotalRecall-18 S7). The policy
+keys are read through the memory-tree adapter (TOOL-dTotalRecall-8 S10), not the policy kit's
+`resolve` in process. The recall query returned scout D's row, the brief's row and
 PLAY-dOrderedCharter-1's spec, and nothing that takes a practice census.
 
 Recall terms used: `python tools/memory-recall/query.py "how does the adopt program take a census of practices and reconstruct decisions with two raters" --terms "adopt census practices ruling retrofit.decisions reconstructed rejected origin baseline two raters kappa FK-4-6"`

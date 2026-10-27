@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-4 — the `gov:note` grammar, the generated annotation index, its resolve check and `gov:feature` anchors joined both ways with reuse entries
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 12 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 12 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0241@0e5185f1 whole
 **Carries:** node:policy-key.annotations.grammar
@@ -16,8 +16,11 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-b.md) | research | TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-4-deviation-41.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-4-deviation-41.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-4-deviation-42.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-4-deviation-42.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -42,8 +45,8 @@ this build run: the lexer block `tools/lib/extract_code.py` with `_LEX_PROFILES`
 kit copies (TOOL-dTotalRecall-13 S1, S3, S6; the memory-tree copy TOOL-dTotalRecall-8 S2), the
 memory-tree policy adapter `tools/memory-tree/policy_value.py` (TOOL-dTotalRecall-8 S10), the id
 grammar `tools/memory-tree/id_grammar.py` (PLAY-dOrderedCharter-18 S1), the join factory
-`tools/memory-tree/coverage_join.py` (PLAY-dOrderedCharter-19 S9), `TAG_RE` (PLAY-dOrderedCharter-19
-S1), the edge-target form and the code-site adapter (PLAY-dOrderedCharter-24 S2, -28 S5), and the
+`tools/memory-tree/coverage_join.py` (PLAY-dOrderedCharter-19 S9), `TAG_RE` and `TAG_MAX_BYTES`
+(PLAY-dOrderedCharter-19 S1), the edge-target form and the code-site adapter (PLAY-dOrderedCharter-24 S2, -28 S5), and the
 record-kind factory `record_kinds.py new` (TOOL-dTotalRecall-1 S9). The reuse entries are
 TOOL-dLinkedLibrary-1's, the `marker` namespace TOOL-dLinkedLibrary-12's.
 
@@ -57,8 +60,11 @@ TOOL-dLinkedLibrary-1's, the `marker` namespace TOOL-dLinkedLibrary-12's.
 - **S2** — The grammar and its one parser, `parse_note_line(text)` in `tools/memory-tree/annotations.py`
   (I9), over the text of one comment line with its comment marker stripped:
   `gov:note <tag>[,<tag>…] — <definition> → <target> [refs=<ref>[,<ref>…]]`, `gov:feature <tag>` and
-  `gov:end <tag>`. A tag fits `TAG_RE`, read through `resolve_kit_dir("playbook", "tag_index.py",
-  here)`; an anchor's `<tag>` is one tag segment, the feature's `<name>`, and its node is `feature.<name>`, the spelling
+  `gov:end <tag>`. A tag fits `TAG_RE` within `TAG_MAX_BYTES`, carried inline, since a kit imports no
+  sibling kit (TOOL-dGroundRules-1 §4): the two constants move from `tools/playbook/tag_index.py` into a
+  canonical block `tag_re` in `tools/lib/tag_re.py`, `tag_index.py` keeping them inline under a new
+  `tag_re` `PARITY_ROWS` row of `tools/lib/resolve-python.test.sh` and `annotations.py` carrying a copy,
+  as TOOL-dTotalRecall-8 S5 moves `invocation_segments`; an anchor's `<tag>` is one tag segment, the feature's `<name>`, and its node is `feature.<name>`, the spelling
   TOOL-dLinkedLibrary-1's entries and TOOL-dLinkedLibrary-19's nodes write
   (`anchors = ["gov:feature <tag>"]`); the definition is at most 80 characters; `<target>` is a unit tag, a repo path or a
   backticked command; each `<ref>` is an id or a repo path in PLAY-dOrderedCharter-24 S2's edge-target
@@ -81,10 +87,20 @@ TOOL-dLinkedLibrary-1's, the `marker` namespace TOOL-dLinkedLibrary-12's.
   `_artifacts` (`tools/codebase-map/gen_map.py:137`) gains `generated/annotations.json`, the rows of
   `scan_annotations` rendered by `render_annotation_index(rows)` in `annotations.py`, sorted by path and
   line, one JSON object per row, `[]` when the tree holds none; `gen_map.py --check` byte-compares it as
-  it does `symbols.json`. The kind's row lands through `python record_kinds.py new annotation-index
-  --tag record.annotation-index --writer generator:tools/codebase-map/gen_map.py --check
-  "codebase-map coverage + freshness"`. Where the map is not installed there is no index file, and the
-  checks of S6 to S8 read `scan_annotations` directly. Observed by AC5.
+  it does `symbols.json`. `gen_map.py` takes the bytes from the stdout of `annotations.py index` (S9),
+  run as a subprocess found by `resolve_kit_dir("memory-tree", "annotations.py", …)`, the inline copy
+  `tools/codebase-map/map_extractors.py:45-82` carries, and never imports `annotations.py`; no kit
+  found raises `MapError` naming memory-tree. The kind's row lands through `python record_kinds.py new
+  annotation-index --tag record.annotation-index --writer generator:tools/codebase-map/gen_map.py
+  --check "codebase-map coverage + freshness" --purpose "gov:note and gov:feature rows of tracked
+  code, queried by tag and never loaded whole"`, its purpose source
+  `memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md:809`
+  (TOOL-dTotalRecall-16 S1, S2), with every column TOOL-dTotalRecall-18 S1 requires: layer
+  `layer.memory`, home `memory/map/generated/annotations.json`, id-rule `""`, schema form `generated`,
+  lifecycle `generated`, and `readers = []` with `readers-none` naming TOOL-dLinkedLibrary-7's lookup,
+  which no work-order key hands. TOOL-dTotalRecall-1 S9's verb has no flag for those columns, so the
+  build run sets them through TOOL-dTotalRecall-18's landed verb. Where the map is not installed there
+  is no index file, and the checks of S6 to S8 read `scan_annotations` directly. Observed by AC5.
 - **S6** — The grammar arm, `check_grammar(rows, value)`, under `annotations.grammar` read once per run
   by `read_policy_value("annotations.grammar", root)`: every row S2 refused is red with its path, line
   and rule; a note whose comment block holds a `MUST` or `NEVER` line carries `refs=`; a note's block
@@ -98,8 +114,11 @@ TOOL-dLinkedLibrary-1's, the `marker` namespace TOOL-dLinkedLibrary-12's.
   `read_policy_value("annotations.resolve-scope", root)`. The defined set is `derive_defined_ids(root)`,
   the definitions half of `build_source_cited_ids_with_no_record` (`drift_report.py:2214-2234`, ids on an
   anchor line under the memory root plus each spec's own H1, with the slug set) moved into
-  `annotations.py` over `id_grammar.grammar_for(root)`; the drift builder imports it through
-  `resolve_kit_dir("memory-tree", "annotations.py", here)`, its value and `of` unchanged. Under
+  `annotations.py` over `id_grammar.grammar_for(root)`. The drift builder reads it from the stdout of
+  `annotations.py defined-ids --json` (S9), run as a subprocess found through its inline
+  `resolve_kit_dir`, as `read_asks_projection` runs `gen_build_index.py --asks --json`
+  (`tools/drift-audit/drift_report.py:1627-1650`), its value and `of` unchanged, and no kit found
+  leaving the signal unread with its note, as that reader does. Under
   `notes`, every `refs=` id must be defined and every `refs=` path tracked. Under `every-comment-ref`,
   the default, so must every id the id grammar finds in any comment line of the scanned files whose
   slug some record anchors, and every `memory/` path such a line cites. Each unresolved citation is red
@@ -114,7 +133,9 @@ TOOL-dLinkedLibrary-1's, the `marker` namespace TOOL-dLinkedLibrary-12's.
   `annotations.grammar` says (layer-memory:1087). Observed by AC9 and AC11.
 - **S9** — The CLI. `tools/memory-tree/annotations.py` and its `check [--only <arm>]` verb, `ARMS` table
   and `--selftest` are TOOL-dLinkedLibrary-12's (its S5); this unit adds three `ARMS` entries,
-  `grammar`, `resolve` and `feature`, each a named function (I10), and `--base <rev>`. Each finding
+  `grammar`, `resolve` and `feature`, each a named function (I10), `--base <rev>`, and the two verbs
+  other kits run by subprocess: `index`, printing `render_annotation_index(scan_annotations(root))`,
+  and `defined-ids --json`, printing `derive_defined_ids(root)` as one object, `ids` and `slugs`. Each finding
   prints `annotations: <arm>: <path>:<line> · <rule>`, the prefix TOOL-dLinkedLibrary-12 fixes, and
   each arm one summary line, `annotations: <arm>: <n> rows · <k> findings`, or `annotations: <arm>:
   unarmed: no gov:note or gov:feature line in the tree` while S3 finds no row; exit 1 on any finding,
@@ -122,9 +143,11 @@ TOOL-dLinkedLibrary-1's, the `marker` namespace TOOL-dLinkedLibrary-12's.
   repository, its `.governance/policy.toml` planted where a case names a value, and runs the arm;
   `--selftest` runs every plant. Observed by AC3 to AC9.
 - **S10** — The code-site adapter of PLAY-dOrderedCharter-28 S5 in `tools/playbook/edge_grammar.py`
-  reads a note's `refs=` segment by calling `parse_note_line` through `resolve_kit_dir("memory-tree",
-  "annotations.py", here)`, its own parse of the segment deleted, its plants' verdicts unchanged.
-  Observed by AC10.
+  reads each note's `refs=` from the `refs` field of the rows `annotations.py index` prints, run as a
+  subprocess found through the module's inline `resolve_kit_dir`, so `parse_note_line` stays the one
+  parser and the playbook kit imports no memory-tree module (TOOL-dGroundRules-1 §4); its own scan and
+  parse of the segment are deleted, its plants' verdicts unchanged, and no memory-tree kit found exits
+  2 naming it. Observed by AC10 and AC15.
   **Readers:** by name: the adapter's `refs=` parse is spelled only in `tools/playbook/edge_grammar.py`,
   which is READER NOT IN TREE at base, since PLAY-dOrderedCharter-28 lands it · by value:
   NO VALUE READERS — the adapter's edges are what its readers compare, and they are unchanged; at
@@ -201,11 +224,13 @@ TOOL-dLinkedLibrary-1's, the `marker` namespace TOOL-dLinkedLibrary-12's.
   False`), its definitions loop at `:2214-2234`, its citation scan over whole tracked non-memory text
   at `:2236-2250`, the slug discriminator at `:2252-2259`; its pin is
   `"source_cited_ids_resolving_to_no_record": 2` (`tools/drift-audit/drift_signals.py:308`) with a
-  RATCHETS row at `:456-457`. drift-audit already requires memory-tree (`tools/drift-audit/kit.toml:14`),
-  so it may import from memory-tree and memory-tree may not import from it.
+  RATCHETS row at `:456-457`. drift-audit requires memory-tree (`tools/drift-audit/kit.toml:14`) and
+  reaches it by subprocess (`drift_report.py:1620-1650`); a kit imports no sibling kit
+  (TOOL-dGroundRules-1 §4).
 - The lexer `_LEX_PROFILES` is at `tools/codebase-map/map_lib.py:663` at base (scout B's `:714` is
   stale) and strips comments; `DEFINITION_CARRYING_EXTS` is derived from it. codebase-map requires
-  memory-tree (`tools/codebase-map/kit.toml:7`), so `gen_map.py` may import `annotations.py`.
+  memory-tree (`tools/codebase-map/kit.toml:7`), and no codebase-map module imports a memory-tree one
+  at base, so `gen_map.py` reads the index through S9's `index` verb.
 - `compute_coverage` is at `map_lib.py:1404`, moving to `coverage_join` with PLAY-dOrderedCharter-19 S9.
 - The catalogue rows are at `tools/policy/catalogue.toml:345-349` and `:1343-1347`, both on
   `tools/policy/unsummarised-keys.txt` (lines 7 and 9).
@@ -239,7 +264,8 @@ alternative is admitted, so one line has one spelling.
 | `parse_note_line`, `scan_annotations`, `render_annotation_index`, `derive_touched_blocks`, `derive_defined_ids`, `check_grammar`, `check_resolve`, `check_feature_anchors` | functions, `annotations.py` | `py.function`, asked at the pass |
 | `Note`, `NoteRefused` | classes, `annotations.py` | `py.class`, asked at the pass |
 | `extract_comment_spans`, `resolve_lex_profile` | functions, the `extract_code` block | `py.function`, asked at the pass |
-| `--base`, `--fixture`, `--plant`; the `grammar`, `resolve` and `feature` arms | flags and `ARMS` entries of `annotations.py` | none |
+| `--base`, `--fixture`, `--plant`; the `grammar`, `resolve` and `feature` arms; the `index` and `defined-ids` verbs | flags, `ARMS` entries and verbs of `annotations.py` | none |
+| `tools/lib/tag_re.py`, the `tag_re` block and `PARITY_ROWS` row | canonical file, marker block, parity row | none |
 | `note`, `feature`, `end` | rows of `marker-words.toml` | none |
 | `memory/map/generated/annotations.json` | generated file, `gen_map.py` | none |
 | `annotation-index` | record kind row, `tools/memory-tree/record-kinds.toml` | none |
@@ -264,8 +290,9 @@ same build run. Under the defaults a repository with no note sees the grammar an
 - `tools/lib/extract_code.py`, `tools/memory-tree/extract_code.py`, `tools/codebase-map/extract_code.py`,
   `tools/lexicon/extract_code.py`: S4, the block and its copies
 - `tools/lib/resolve-python.test.sh`: the `extract_code` parity row's behaviour section gains the
-  comment-span cases
-- `tools/drift-audit/drift_report.py`: S1, S7's import; `KIT_DRIFT_AUDIT_VERSION`
+  comment-span cases, and the `tag_re` row is new
+- `tools/lib/tag_re.py` (new), `tools/playbook/tag_index.py`: S2's canonical block and its inline copy
+- `tools/drift-audit/drift_report.py`: S1, S7's subprocess read; `KIT_DRIFT_AUDIT_VERSION`
 - `tools/drift-audit/selftest.py`: S1's plant
 - `tools/codebase-map/gen_map.py`: S5; `tools/codebase-map/map_lib.py`: `KIT_CODEBASE_MAP_VERSION`
 - `memory/map/generated/annotations.json`: rendered by `gen_map.py --write`, never edited
@@ -369,6 +396,11 @@ same build run. Under the defaults a repository with no note sees the grammar an
   planted `gov:note`, one `gov:feature` and one `gov:end` line, it names no unregistered word; with the
   `end` row deleted from `marker-words.toml`, it exits 1 naming `end`.
   Red when: a grammar word is missing from the registry.
+- **AC15** — When `git grep -n -E "(import|from) annotations\b" -- tools/drift-audit tools/codebase-map
+  tools/playbook` and `git grep -n -E "(import|from) tag_index\b" -- tools/memory-tree` run after the
+  pass, each prints nothing; `python annotations.py index` prints the bytes of `memory/map/generated/annotations.json`,
+  and `python annotations.py defined-ids --json` one object holding `ids` and `slugs`.
+  Red when: a kit imports another kit's module for a note, a tag or the defined set.
 
 ## 7. Gates
 
@@ -379,7 +411,7 @@ leg that runs S9's CLI is TOOL-dLinkedLibrary-7's, so neither is graded here as 
 
 New arm: tools/memory-tree/annotations.py · covers AC3 AC4 AC6 AC7 AC8 AC9 AC14 · its `--fixture` plants, each failing case staged by deleting the rule's predicate from its arm · none
 New arm: tools/drift-audit/selftest.py · covers AC2 · the `note-refs-not-evidence` plant, staged by reverting Signal 2's grep to `-l` · none
-New arm: tools/lib/resolve-python.test.sh · covers AC4 · the `extract_code` behaviour section's comment-span cases, staged by a string literal yielding a comment line · none
+New arm: tools/lib/resolve-python.test.sh · covers AC4 AC15 · the `extract_code` behaviour section's comment-span cases, staged by a string literal yielding a comment line, and the `tag_re` row, staged by one byte changed in `annotations.py`'s copy · none
 New arm: tools/codebase-map/selftest.py · covers AC5 · a stale `annotations.json` reds `--check` · none
 
 ## 8. Open questions
@@ -396,19 +428,21 @@ New arm: tools/codebase-map/selftest.py · covers AC5 · a stale `annotations.js
   readers. widens: none · relaxes: none
 - **F2 — Where does the resolve arm's id resolution live?** Options: (a) the definitions half of
   `build_source_cited_ids_with_no_record` moves into `annotations.py` and the drift builder imports it;
-  (b) the arm calls the drift builder; (c) a second copy in `annotations.py`. (b) makes a core check
-  require an optional kit that already requires memory-tree, a cycle; (c) is a second answer to "is
-  this id defined". RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the most feature-rich
-  survivor, and the tie-break's reuse of the seam M5 found: the drift signal's value is unchanged and
-  layer-memory's "built on its function" holds. widens: none · relaxes: none
+  (b) the arm calls the drift builder; (c) a second copy in `annotations.py`; (d) as (a), the drift
+  builder running `annotations.py defined-ids --json` by subprocess. (b) makes a core check require an
+  optional kit that already requires memory-tree, a cycle; (c) is a second answer to "is this id
+  defined". RESOLVED (agent, 2026-10-28, delegated): (d), rung 1: TOOL-dGroundRules-1 §4 and
+  PLAY-dOrderedCharter-7 §4 "The policy reads" ("A kit may not import a sibling kit") rule out the
+  import in (a), the rev-1 pick, and (d) keeps its seam, the drift signal's value and layer-memory's
+  "built on its function". widens: none · relaxes: none
 - **F3 — PLAY-dOrderedCharter-28 §3 gives the `gov:note` grammar to dTotalRecall.** v2's
   `cl-dClosedLoop-0241` and the packet's owned nodes give it to this build, and TOOL-dTotalRecall-9 §3
   agrees ("The annotations system … dLinkedLibrary's"). Options: (a) build it here and ask
   dOrderedCharter to correct its non-goal; (b) wait for dTotalRecall. RESOLVED (agent, 2026-10-26,
   delegated): (a), rung 1, v2 answers; the ask for the main loop to file: target build dOrderedCharter,
   accept PLAY-dOrderedCharter-28 §3 names dLinkedLibrary's TOOL-dLinkedLibrary-4 as owner of the
-  `gov:note` grammar and its checks beyond `refs=`, and S5's code-site adapter reads `refs=` through
-  `parse_note_line`. widens: none · relaxes: none
+  `gov:note` grammar and its checks beyond `refs=`, and S5's code-site adapter reads `refs=` from the
+  rows of `annotations.py index`, which `parse_note_line` parsed. widens: none · relaxes: none
 - **F4 — What does `required` require?** Options: (a) a head line on each comment block a hunk touches
   since the compare base, as the retrofit round settled
   (`2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md:155`); (b) a head line on every comment block in
@@ -422,6 +456,13 @@ New arm: tools/codebase-map/selftest.py · covers AC5 · a stale `annotations.js
   aKeyedAnnotation design pass, v2:1195 and :1356, and scout B's row for this unit.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-39, TOOL-dLinkedLibrary-44, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-64, promoted from the spec audit of units 37 to 53; nothing else moved.
+- rev-4 · 2026-10-28 · §2 preconditions, S2, S5, S7, S9 and S10 · §4 Evidence, Inventory and Files
+  touched · §6 AC15 · §7 New arm · §8 F2 re-resolved, F3's ask text · §10 · re-grounded on
+  TOOL-dTotalRecall-1, -16 and -18 and TOOL-dGroundRules-1 §4, by the cross-check record
+  `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, rows 13, 15 and 16: the
+  `annotation-index` row spells every column; `TAG_RE` is carried inline under a `tag_re` parity row;
+  drift-audit, codebase-map and the playbook kit reach `annotations.py` through its `defined-ids` and
+  `index` verbs by subprocess; the "may import" reasoning is gone.
 
 ## 10. Reuse audit
 
@@ -430,7 +471,9 @@ whose definitions half moves into `annotations.py`; `signal_spec_status` (`:713`
 the lexer block's `_LEX_PROFILES` and single-pass scanner (`tools/codebase-map/map_lib.py:663`, moving
 to `tools/lib/extract_code.py` with TOOL-dTotalRecall-13 S6), gaining its comment half;
 `compute_coverage` (`map_lib.py:1404`, moving to `coverage_join` with PLAY-dOrderedCharter-19 S9);
-`gen_map.py`'s `_artifacts` (`:137`); and the record-kind factory (TOOL-dTotalRecall-1 S9).
+`gen_map.py`'s `_artifacts` (`:137`); the record-kind factory (TOOL-dTotalRecall-1 S9); the
+subprocess read `read_asks_projection` (`drift_report.py:1627`), the shape S7 and S10's cross-kit reads
+take; and the canonical-block move TOOL-dTotalRecall-8 S5 makes, which S2's `tag_re` follows.
 `python tools/codebase-map/reuse_lookup.py "parse a structured comment annotation line and resolve its
 references"` ranked name stems (`parse` in `query.py`, `resolve`, `parse_args`, `resolve_kit_dir`,
 `build_reference_index`); none parses a comment grammar, so no existing seam fits the parser and S2

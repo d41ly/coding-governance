@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-12 — the `marker` namespace's members, one per existing `gov:` word, and the check that refuses an unregistered one
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 3 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 3 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0249@49ce83a8 whole
 
@@ -13,7 +13,10 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-b.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-12-deviation-121.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-12-deviation-121.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-12-deviation-122.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-12-deviation-122.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -30,9 +33,12 @@ with the check that reads it, and refuses a `gov:` word no member declares.
 
 ## 2. Scope (IN)
 
-Build-run precondition: TOOL-dTotalRecall-9 S1's `extract_marker` and its `marker` row in
-`tools/playbook/namespaces.toml`, read through PLAY-dOrderedCharter-19 S2's `read_namespaces`. Neither
-exists at base; the unit's build pass waits for both and adds no second extractor.
+Build-run precondition: TOOL-dTotalRecall-9 S1's `extract_marker` in
+`tools/memory-tree/record_extract.py` and its `marker` row in `tools/playbook/namespaces.toml`, which
+names it as `record_extract:extract_marker`. A kit imports no sibling kit (TOOL-dGroundRules-1 §4), and
+PLAY-dOrderedCharter-19 S2's `read_namespaces` is the playbook kit's (`tools/playbook/tag_index.py`), so
+this unit calls the extractor in its own kit and reads no namespace row. Neither exists at base; the
+unit's build pass waits for both and adds no second extractor.
 
 - **S1** — The member registry, `tools/memory-tree/marker-words.toml`: one `[[marker]]` row per word,
   with `word`, `reader` (the tracked path that reads it, or `none`), `reads` (one line: what the reader
@@ -44,8 +50,9 @@ exists at base; the unit's build pass waits for both and adds no second extracto
   nineteen whole words and two family stems, `argv` and `conf-allow`, which name a begin and end pair
   and are written as stems in two places. Observed by AC1.
 - **S3** — The check, `check_marker_words(root, conf)` in `tools/memory-tree/annotations.py`, the first
-  arm of the module's CLI `python tools/memory-tree/annotations.py check [--only markers]`. It calls the
-  `marker` namespace's extractor over every tracked file outside `MEMORY_ROOT`, strips one trailing
+  arm of the module's CLI `python tools/memory-tree/annotations.py check [--only markers]`. It calls
+  `record_extract.extract_marker`, the `marker` namespace's extractor, over every tracked file outside
+  `MEMORY_ROOT`, strips one trailing
   hyphen from a word (a stem written as a prefix), and refuses both ways: a word no row declares, printed
   `annotations: markers: unregistered gov: word <word> at <path>:<line>`; a row whose word no file
   carries, printed `annotations: markers: <word> is registered and appears nowhere`. A row whose
@@ -79,7 +86,7 @@ exists at base; the unit's build pass waits for both and adds no second extracto
 - **hands-off** `TOOL-dLinkedLibrary-4` — `marker`, the namespace's member registry it adds the `note`, `feature` and `end` rows to, and `annotations.py`'s `ARMS` table its arms join
 - **hands-off** `TOOL-dLinkedLibrary-7` — `marker`, the members whose rows the lookup's query arm reads, and `annotations.py --selftest` the `annotations selftest` leg runs
 - **hands-off** `TOOL-dLinkedLibrary-23` — `marker`, the member registry its `legacy` row joins
-- **consumes-from** external — dTotalRecall's `extract_marker` and the `marker` namespace row (TOOL-dTotalRecall-9 S1); dOrderedCharter's `read_namespaces` (PLAY-dOrderedCharter-19 S2)
+- **consumes-from** external — dTotalRecall's `extract_marker` and the `marker` namespace row (TOOL-dTotalRecall-9 S1); dOrderedCharter's namespace registry (PLAY-dOrderedCharter-19 S2), whose `marker` row names the extractor this unit calls in its own kit
 - **hands-off** `TOOL-dLinkedLibrary-40` — `marker-words.toml`, the registry the `legacy` row joins (id 3)
 - **hands-off** `TOOL-dLinkedLibrary-48` — `read_marker_words` and `check_marker_words`, whose reader resolution and owned-row rule unit 48 states for an adopter (id 59)
 - **hands-off** `TOOL-dLinkedLibrary-52` — `annotations.py`'s selftest plants, which unit 52 composes at run time (id 14)
@@ -204,6 +211,10 @@ Live as a CLI at landing; the bar reads it once TOOL-dLinkedLibrary-7's leg land
   Red when: a word quoted in a record is refused.
 - **AC6** — When `git grep -n "gov:root-fixture" -- . ':!memory'` runs at the pass tip, it prints nothing.
   Red when: the comment still claims the marker.
+- **AC7** — When `git grep -n -E "read_namespaces|tag_index" --
+  tools/memory-tree/annotations.py` runs at the pass tip, it prints nothing, and `git grep -n
+  "extract_marker" -- tools/memory-tree/annotations.py` prints the call.
+  Red when: the check reaches the namespace through a playbook-kit function.
 
 ## 7. Gates
 
@@ -240,12 +251,17 @@ The arm runs under the `annotations` leg TOOL-dLinkedLibrary-7 lands, which runs
   census, every word re-counted and its reader verified at base `5fede642`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-40, TOOL-dLinkedLibrary-48, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-62, promoted from the spec audit of units 37 to 53; nothing else moved.
+- rev-4 · 2026-10-28 · §2 precondition and S3 · §3 Edges · §6 AC7 · §10 · re-grounded on
+  TOOL-dGroundRules-1 §4 and PLAY-dOrderedCharter-19 S2, by the cross-check record
+  `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, row 38: `check_marker_words` calls
+  memory-tree's own `record_extract.extract_marker`, never the playbook kit's `read_namespaces`, and AC7
+  reds a read through it.
 
 ## 10. Reuse audit
 
-The seams extended are TOOL-dTotalRecall-9 S1's `extract_marker` and `marker` namespace row, read through
-PLAY-dOrderedCharter-19 S2's `read_namespaces`, so this unit adds members and a check and no second
-scan; and the both-ways registry check `check_invariant` and `load_leg_names` already make for a token
+The seams extended are TOOL-dTotalRecall-9 S1's `extract_marker`, called in memory-tree's own
+`record_extract.py`, the function its `marker` namespace row names, so this unit adds members and a
+check and no second scan; and the both-ways registry check `check_invariant` and `load_leg_names` already make for a token
 against a declared set (`tools/memory-tree/gotchas.py:191`, :400-447), whose refusal shapes S1 and S3
 follow. `python tools/codebase-map/reuse_lookup.py "refuse a comment marker word that no registry
 declares"` ranked name stems (`declares` in `gotchas.py`, two refusal classes, `declared_list`); none

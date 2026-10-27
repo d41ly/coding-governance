@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-52 — the code half of the round-1 audit's minors: 53 findings closed where the built code holds them
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 27 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 27 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,9 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md) | journal | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-38 TOOL-dLinkedLibrary-39 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-41 TOOL-dLinkedLibrary-42 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-44 TOOL-dLinkedLibrary-45 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-48 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-50 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-65 TOOL-dLinkedLibrary-66 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-68 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-70 TOOL-dLinkedLibrary-71 TOOL-dLinkedLibrary-72 TOOL-dLinkedLibrary-73 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-81 TOOL-dLinkedLibrary-82 TOOL-dLinkedLibrary-83 TOOL-dLinkedLibrary-84 TOOL-dLinkedLibrary-85 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-87 TOOL-dLinkedLibrary-88 TOOL-dLinkedLibrary-89 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-93 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-95 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-52-deviation-521.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-52-deviation-521.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-52-deviation-522.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-52-deviation-522.md) | deviation | — |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-74 |
 | [2026-10-27-review-TOOL-dLinkedLibrary-37-spec-audit.md](../reviews/2026-10-27-review-TOOL-dLinkedLibrary-37-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-45 TOOL-dLinkedLibrary-48 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-38 TOOL-dLinkedLibrary-50 TOOL-dLinkedLibrary-39 TOOL-dLinkedLibrary-44 TOOL-dLinkedLibrary-41 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-42 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-53 |
 
 <!-- /gen:spec-records -->
@@ -66,16 +69,22 @@ criterion AMENDED, naming this unit and the item.
 - **S10** — id 9, R19. `adopt_instructions.py` writes and parses the paragraph ruling `drop`, the value
   `TOOL-dLinkedLibrary-8` §4 closes the set with, in place of `discard`.
   **Readers:** by name: READER NOT IN TREE, since `discard` is spelled only by `TOOL-dLinkedLibrary-23`'s
-  module and help page, which land with that unit · by value: the door's `Ruling` field check, `--rule`'s
-  parser and `help/adopting-instructions.md`'s option list, each reading the value. Observed by AC6.
-- **S11** — id 40, R19. The `ruling` kind's row holds `TOOL-dLinkedLibrary-8`'s values alone; where
-  unit 23's pass wrote three values again, they are cut from the row.
-  **Readers:** by name: READER NOT IN TREE, the row lands with TOOL-dTotalRecall-1's registry · by value:
-  NO VALUE READERS — the door's field check that reads the row lands with TOOL-dTotalRecall-1, absent at HEAD. Observed by AC6.
-- **S12** — id 63, R19. `core.py adopt instructions --rule <key> drop` passes the door's field check and
+  module and help page, which land with that unit · by value: the factory's closed-set refusal on the
+  `ruling` row (S11), `--rule`'s parser and `help/adopting-instructions.md`'s option list, each reading
+  the value. Observed by AC6.
+- **S11** — id 40, R19. The paragraph `Ruling` values sit once, on the `ruling` row of the factory's
+  per-kind table in `tools/memory-tree/build_records.py` (PLAY-dOrderedCharter-42 S2), where
+  `TOOL-dLinkedLibrary-8` §4 puts every subject's closed set. TOOL-dTotalRecall-1's `ruling` row in
+  `record-kinds.toml` carries no value column and its field check grades presence and order alone (its
+  S4), so it reads no value.
+  **Readers:** by name: READER NOT IN TREE, the row lands with `TOOL-dLinkedLibrary-8` · by value:
+  `read_record`'s closed-set refusal (PLAY-dOrderedCharter-7 S7), which the door runs at its write
+  boundary (TOOL-dTotalRecall-2 S4), and `--rule`'s parser. Observed by AC6.
+- **S12** — id 63, R19. `core.py adopt instructions --rule <key> drop` passes the door's write-boundary
+  refusal, the factory's `read_record` over the `ruling` row's closed set (TOOL-dTotalRecall-2 S4), and
   writes its `ruling` record.
-  **Readers:** by name: READER NOT IN TREE, as S10 · by value: `gov_record.py new ruling`'s field check.
-  Observed by AC6.
+  **Readers:** by name: READER NOT IN TREE, as S10 · by value: that refusal, through `gov_record.py new
+  ruling`. Observed by AC6.
 - **S13** — id 21, R26. A harness file carrying the `gov:playbook` marker pair, or byte-equal to the
   charter at any revision of its history, is stale wiring: the capture re-wires it and holds no pair for
   it. Observed by AC7.
@@ -89,8 +98,9 @@ criterion AMENDED, naming this unit and the item.
   occurrence is ruled; a plant of two identical `---` paragraphs under `refuse` drains to zero. Observed by
   AC8.
 - **S17** — id 36, R65. The paragraph key is `<src>#p` + `derive_pin_hash(text)`
-  (`tools/memory-tree/design_lib.py`, PLAY-dOrderedCharter-24 S7), read through `resolve_kit_dir`.
-  Observed by AC8.
+  (`tools/memory-tree/design_lib.py`, PLAY-dOrderedCharter-24 S7), carried inline in
+  `adopt_instructions.py` under a `pin_hash_py` row of `PARITY_ROWS` in `tools/lib/resolve-python.test.sh`
+  whose canonical is the marked block in `design_lib.py` (§8 F4). Observed by AC8.
 - **S18** — id 11, R20. `reuse_entries.py --fixture --plant convention-part` tracks
   `memory/map/conventions/x.reuse.toml` in a scratch clone; hygiene check 3 names it without
   `D:conventions` and is silent with it. Observed by AC9.
@@ -138,18 +148,25 @@ criterion AMENDED, naming this unit and the item.
   whose `tests` (TOOL-dWitnessedBar-22) lacks `class.<name>`, and a `class.<name>` in a leg's `tests`
   whose record's `gate:` names another leg, each red; one ask row in `memory/builds/dWitnessedBar/BACKLOG.md`
   proposes recording `observed:` as a seen-red record (TOOL-dWitnessedBar-7). Observed by AC15.
-- **S32** — id 37, R35. The legs units 7, 9, 10 and 23 wrote into `tools/gate-legs.json` are declared
-  through `leg_factory.py new` in `tools/memory-tree/kit.toml`, `tools/hooks/kit.toml` and
-  `tools/playbook/kit.toml`; `leg_factory.py --check` exits 0. Observed by AC16.
-- **S33** — id 45, R39. `TOOL-dLinkedLibrary-9`'s two legs carry chunk, subject and ceiling, and rows in
+- **S32** — id 37, R35. The legs units 7, 9, 10 and 23 add stay one declaration each, written by
+  `leg_factory.py new` at those units' passes in `tools/memory-tree/kit.toml`, `tools/hooks/kit.toml` and
+  `tools/playbook/kit.toml` and rendered into `tools/gate-legs.json`, each carrying the `enforces` its
+  unit names: `annotations` `["practice.one-fact"]`, `record origin (stored origin against history)`
+  `["practice.derive"]`, and `annotations selftest`, `annotations-read self-test`, `record origin
+  selftest`, `retrofit progress selftest` and `adopt instructions selftest` `["practice.verify"]`
+  (TOOL-dWitnessedBar-51 S12). S33 to S36 edit those declarations and no manifest row, and
+  `leg_factory.py --check` exits 0. Observed by AC16.
+- **S33** — id 45, R39. `TOOL-dLinkedLibrary-9`'s two legs, declared with their subject, ceiling and
+  `enforces` by that unit's S4, gain the check leg's chunk and rows in
   `tools/govkit/subject-pins.tsv`, `tools/run-gates/selftest-budgets.txt`,
   `tools/run-gates/ceiling-evidence.txt`, `tools/run-gates/foreign-prefix.gov.test.sh`
   (`WHOLE_RUN`) and the claiming dossier. Observed by AC16.
-- **S34** — id 46, R40. `TOOL-dLinkedLibrary-10`'s `retrofit progress selftest` leg: argv `python
-  {prefix}/memory-tree/retrofit_progress.py --selftest`, its chunk, subject, guard and ceiling, and S33's
-  meta rows. Observed by AC16.
+- **S34** — id 46, R40. `TOOL-dLinkedLibrary-10`'s `retrofit progress selftest` leg, declared with its
+  argv, chunk, subject, ceiling and `enforces` by that unit's S7, gains its guard and S33's meta rows.
+  Observed by AC16.
 - **S35** — id 47, R41. `TOOL-dLinkedLibrary-23`'s `adopt instructions selftest` leg, declared in
-  `tools/playbook/kit.toml`, with S33's meta rows and the playbook dossier's claim. Observed by AC16.
+  `tools/playbook/kit.toml` by that unit's S11, gains S33's meta rows and the playbook dossier's claim.
+  Observed by AC16.
 - **S36** — id 48, R42. `TOOL-dLinkedLibrary-7`'s `annotations selftest` and `annotations-read
   self-test` legs gain `WHOLE_RUN` rows; the map's generated artifacts are re-rendered. Observed by AC16.
 - **S37** — id 55, R45. `tools/codebase-map/gen_map.py:121` (render `memory/map/README.md:30`) and
@@ -167,9 +184,10 @@ criterion AMENDED, naming this unit and the item.
   deleted.
   **Readers:** by name: `tools/codebase-map/kit.toml`, `tools/codebase-map/selftest.py` · by value: govkit's
   install walk over `[[files]]` and the selftest's arm count. Observed by AC19.
-- **S42** — id 29, R64. `house_index.py` reads the legs through `gotchas.load_leg_names`, loaded by
-  `resolve_kit_dir("memory-tree", "gotchas.py", here)`; it holds no manifest reader of its own.
-  Observed by AC20.
+- **S42** — id 29, R64. `house_index.py` reads the legs by running `gotchas.py --leg-names`, a verb this
+  item adds to memory-tree's `gotchas.py` printing `load_leg_names`'s set one name per line, or exiting
+  3 with one line when `LEG_MANIFEST` is blank, as a subprocess found by its inline `resolve_kit_dir`
+  (§8 F4); it holds no manifest reader of its own. Observed by AC20.
 - **S43** — id 41, R64. The scout role's body is measured as `check_roles.py` measures it; this unit's
   ledger records the figure against the 1536-byte ceiling. Observed by AC20.
 - **S44** — id 54, R68. `HOUSE_INDEX_DIRS` and `HOUSE_INDEX_KINDS` move to catalogue keys
@@ -193,9 +211,11 @@ criterion AMENDED, naming this unit and the item.
   passes paths to the launcher on stdin, reads a pathless Grep as its working directory, and appends to
   the pushed list only the paths it emitted. Observed by AC23.
 - **S51** — id 42, R67. One definition of a shell read, `derive_read_paths(command)` in
-  `tools/runlog/extract.py` over `_derive_program` and `_derive_segment` (:479, :506); the code replay's
-  `measure_read_files` and the hook's `annotations.py lookup --command` call it, the latter printing
-  `shell reads — runlog not installed` where it is absent. Observed by AC23.
+  `tools/runlog/extract.py` over `_derive_program` and `_derive_segment` (:479, :506), printed by a
+  `runlog.py read-paths` verb this item adds, one path per line for the command on stdin. The hook's
+  `annotations.py lookup --command` runs that verb as a subprocess found by its inline `resolve_kit_dir`
+  (§8 F4), printing `shell reads — runlog not installed` where it does not resolve; the code replay's
+  `measure_read_files` reaches it as `TOOL-dLinkedLibrary-16` reaches runlog's readers. Observed by AC23.
 - **S52** — id 78, R57. `splice_region` raises `RegionError` naming the body line when a body line is a
   marker line for the call's marks, labelled or not, in every `region_py` copy. Observed by AC24.
 - **S53** — id 75, R55. `drained` is derived per key after `carry_renames` maps period-start keys to
@@ -223,8 +243,8 @@ criterion AMENDED, naming this unit and the item.
 - **consumes-from** `TOOL-dLinkedLibrary-6` — `LIBRARY_VIEWS`, which S26 moves to the catalogue (id 52)
 - **consumes-from** `TOOL-dLinkedLibrary-24` — `GOTCHA_KEYS`, `gate:` and `--observe`, which S28, S30 and S31 settle (ids 17, 25, 33)
 - **consumes-from** `TOOL-dLinkedLibrary-7` — the legs and the read hook, which S32, S36 and S50 complete (ids 37, 48, 73)
-- **consumes-from** `TOOL-dLinkedLibrary-9` — the two `record origin` legs, which S32 and S33 declare (ids 37, 45)
-- **consumes-from** `TOOL-dLinkedLibrary-10` — the `retrofit progress selftest` leg and `drained`, which S34 and S53 define (ids 46, 75)
+- **consumes-from** `TOOL-dLinkedLibrary-9` — the two `record origin` legs, which S32 re-reads and S33 completes (ids 37, 45)
+- **consumes-from** `TOOL-dLinkedLibrary-10` — the `retrofit progress selftest` leg and `drained`, which S34 completes and S53 defines (ids 46, 75)
 - **consumes-from** `TOOL-dLinkedLibrary-19` — the dossier move's readers and `apply`, which S37 and S39 complete (ids 55, 66)
 - **consumes-from** `TOOL-dLinkedLibrary-38` — the `<feature>.<n>` proposal names S39 keys its re-run on (id 66)
 - **consumes-from** `TOOL-dLinkedLibrary-50` — `apply`'s `--build` and `--unit`, under which S39's re-run writes (id 66)
@@ -266,13 +286,14 @@ output.
 - `tools/memory-tree/adopt_program.py`, `tools/memory-tree/decision_rubric.py`: S1 to S3
 - `tools/memory-tree/row_grammar.py`, `memory/DECISIONS.md`, `.memory-tree.conf`: S4 to S8, S26, S27
 - `tools/memory-tree/ANNOTATION-STYLE.template.md`, `memory/guides/ANNOTATION-STYLE.md`: S9
-- `tools/playbook/adopt_instructions.py`, `tools/memory-tree/record-kinds.toml`, `help/adopting-instructions.md`: S10 to S17
+- `tools/playbook/adopt_instructions.py`, `help/adopting-instructions.md`: S10 to S17
+- `tools/memory-tree/design_lib.py` (the `pin_hash_py` markers), `tools/lib/resolve-python.test.sh` (its `PARITY_ROWS` row): S17
 - `tools/memory-tree/reuse_entries.py`: S18
 - `tools/memory-tree/annotations.py`: S19 to S24, S51's `--command`
 - `tools/memory-tree/library_views.py`, `tools/memory-tree/gen_build_index.py`: S25, S26
 - `tools/policy/catalogue.toml`, `tools/policy/unsummarised-keys.txt`, `.governance/policy.toml`, `.governance/policy.json`, `tools/memory-tree/.memory-tree.conf.example`: S26, S27, S44
-- `tools/memory-tree/gotchas.py`, `tools/memory-tree/HYGIENE.template.md`, `memory/HYGIENE.md`, `memory/gotchas/INDEX.md`: S27 to S31
-- `tools/run-gates/leg_factory.py`'s declarations in `tools/memory-tree/kit.toml`, `tools/hooks/kit.toml`, `tools/playbook/kit.toml`; `tools/gate-legs.json`: S32 to S36
+- `tools/memory-tree/gotchas.py`, `tools/memory-tree/HYGIENE.template.md`, `memory/HYGIENE.md`, `memory/gotchas/INDEX.md`: S27 to S31, S42's `--leg-names`
+- the declarations units 9 and 10 wrote in `tools/memory-tree/kit.toml`, and `tools/gate-legs.json`, rendered by `leg_factory.py --write`: S33, S34
 - `tools/govkit/subject-pins.tsv`, `tools/run-gates/selftest-budgets.txt`, `tools/run-gates/ceiling-evidence.txt`, `tools/run-gates/foreign-prefix.gov.test.sh`: S33 to S36
 - `tools/codebase-map/gen_map.py`, `tools/codebase-map/INVENTORY-DERIVATION.md`, `memory/map/README.md`: S37, S38
 - `tools/codebase-map/dossier_move.py`, `tools/codebase-map/house_index.py`: S39, S42 to S45
@@ -280,7 +301,7 @@ output.
 - `memory/map/features/memory-tree-hygiene.md`, `memory/map/features/review-harnesses.md`, `memory/map/generated/MAP.md`, `memory/map/generated/inventories.json`, `memory/map/generated/symbols.json`: S33 to S36, S44, regenerated
 - `tools/memory-tree/gov_code.py`, `tools/drift-audit/drift_report.py` (the `grep_words` copy): S46, S47
 - `tools/memory-tree/code_enrich.py`, `tools/memory-tree/code_ctags.py`: S48, S49
-- `tools/hooks/annotations-read.js`, `tools/runlog/extract.py`, `tools/workflows/replay_scorer.py`: S50, S51
+- `tools/hooks/annotations-read.js`, `tools/runlog/extract.py`, `tools/runlog/runlog.py` (`read-paths`), `tools/workflows/replay_scorer.py`: S50, S51
 - `tools/lib/region.py` and every `region_py` copy `TOOL-dLinkedLibrary-18` S6 placed: S52
 - `tools/memory-tree/retrofit_progress.py`: S53
 - `memory/builds/dOrderedCharter/BACKLOG.md`, `memory/builds/dWitnessedBar/BACKLOG.md`, `memory/builds/aScoutedSeam/BACKLOG.md`: one ask row each
@@ -360,10 +381,14 @@ output.
   names carries `gate:` or reads `partly-gated`, and a planted class whose `gate:` leg's `tests` omits it
   reds `--check`.
   Red when: the population is not derived, or the two spellings disagree silently.
-- **AC16** — When `python leg_factory.py --check` runs in `tools/run-gates`, it exits 0, and for each leg
-  of S33 to S36 `grep -c "<leg>" tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt tools/run-gates/foreign-prefix.gov.test.sh`
+- **AC16** — When `python leg_factory.py --check` runs in `tools/run-gates`, it exits 0;
+  `python -c "import json,sys; [print(r['name'], r.get('enforces')) for r in json.load(open('tools/gate-legs.json', encoding='utf-8')) if r['name'] in sys.argv[1:]]" <leg>…`
+  run at the root over S32's seven legs prints `['practice.one-fact']` for `annotations`,
+  `['practice.derive']` for `record origin (stored origin against history)` and `['practice.verify']`
+  for each of the five self-test legs; and for each leg of S33 to S36
+  `grep -c "<leg>" tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt tools/run-gates/foreign-prefix.gov.test.sh`
   prints 1 or more per file.
-  Red when: a leg is hand-written or owes a meta row.
+  Red when: a leg is hand-written, carries an `enforces` other than its unit's, or owes a meta row.
 - **AC17** — When `grep -n "Shared seams" tools/codebase-map/gen_map.py tools/codebase-map/INVENTORY-DERIVATION.md`
   runs, it prints no instruction to write that prose; an edited map README survives `gen_map.py --write`
   with the `authored` line.
@@ -374,7 +399,8 @@ output.
 - **AC19** — When
   `grep -c "rank_harness\|replay-phrases" memory/project/encoding-posture-sites.txt tools/codebase-map/kit.toml` runs at this pass's tip, it prints 0 for each.
   Red when: a reader of a deleted file remains.
-- **AC20** — When `grep -c "LEG_MANIFEST" house_index.py` runs in `tools/codebase-map`, it prints 0;
+- **AC20** — When `grep -c "LEG_MANIFEST" house_index.py` runs in `tools/codebase-map`, it prints 0, and
+  `python gotchas.py --leg-names` in `tools/memory-tree` prints the manifest's leg names;
   `python house_index.py --slot` over a 9 KiB `## Matches` section prints at most 2 KiB and `… <n> more`;
   and `python policy.py get reuse.house-index-dirs` prints a value.
   Red when: the index re-reads the manifest, copies agent text uncapped, or keeps conf keys.
@@ -386,7 +412,8 @@ output.
   Red when: a string reads as a header, or an extensionless file degrades silently.
 - **AC23** — When the hook's fixture pipes a pathless Grep payload over a 200-file tree, the launcher call
   carries at most 50 paths on stdin and the pushed list holds only the emitted paths; `python -c` calls
-  `derive_read_paths("git show HEAD:a.py")` and gets `a.py`.
+  `derive_read_paths("git show HEAD:a.py")` and gets `a.py`, and `python runlog.py read-paths` given that
+  command on stdin prints `a.py`.
   Red when: argv grows with the tree, or the two counters read reads two ways.
 - **AC24** — When `splice_region` is called with a body holding the open marker line, it raises naming
   the body line, in the canonical and in each copy the parity discovery finds.
@@ -402,6 +429,7 @@ output.
 New arm: tools/memory-tree/annotations.py · covers AC10 AC11 AC12 · the `citation-shapes`, `no-remote` and `banner-insert` plants, the failing case staged by the rev-1 cut and ordinal key · none
 New arm: tools/playbook/adopt_instructions.py · covers AC6 AC7 AC8 · the `rule-drop`, `stale-copy`, `ignored-file`, `marker-body` and `repeat-under-refuse` plants, the failing case a captured marker-bearing body · none
 New arm: tools/memory-tree/marker-contract.test.sh · covers AC24 · the marker-bearing body case, the failing case a `splice_region` that writes it · none
+New arm: tools/lib/resolve-python.test.sh · covers AC8 · the `pin_hash_py` `PARITY_ROWS` row, staged by one byte changed in `adopt_instructions.py`'s copy · that suite's assertion count, raised by the row
 
 ## 8. Open questions
 
@@ -417,12 +445,29 @@ New arm: tools/memory-tree/marker-contract.test.sh · covers AC24 · the marker-
   catalogue keys read through `read_policy_value`; (b) conf keys, red under `policy check`'s shrink-only
   legacy list. (b) fails that leg (veto 1). RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
   report's sound fix. widens: none · relaxes: none
+- **F4 — How do S17, S42 and S51 reach another kit's code, when a kit imports no sibling kit
+  (TOOL-dGroundRules-1 §4)?** Options: (a) S17 carries `derive_pin_hash` inline under a `PARITY_ROWS`
+  row, the rule's own path for shared code, and S42 and S51 run a verb this unit adds to the owning
+  module, `gotchas.py --leg-names` and `runlog.py read-paths`, as subprocesses; (b) declared
+  `requires_if` rows on the playbook, codebase-map and memory-tree descriptors, as
+  `tools/memory-tree/kit.toml:8` declares its own, keeping the in-process reads; (c) asks to the owning
+  builds for the verbs. Both modules are this build's to edit, so (c) asks for nothing; (b) keeps an
+  import the rule admits only as a graded declaration, where a verb needs none. RESOLVED (agent,
+  2026-10-28, delegated): (a), rung 1 for S17, TOOL-dGroundRules-1 §4's inline carry, and rung 3 for
+  S42 and S51, the option needing no admitted edge. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of the 25 unit specs, 42
   MEDIUM and 11 LOW findings batched, split by write set from `TOOL-dLinkedLibrary-53`.
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-59, TOOL-dLinkedLibrary-64, promoted from the spec audit of units 37 to 53; nothing else moved.
+- rev-3 · 2026-10-28 · §2 S10 to S12, S17, S32 to S35, S42, S51 · §3 Edges · §4 Files touched · §6
+  AC16, AC20, AC23 · §7 arm line · §8 F4 · re-grounded by the cross-check record
+  `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, rows 80, 81 and 82: the `Ruling` set is
+  closed by the factory's per-kind `ruling` row and `read_record`'s refusal the door runs, not by
+  TOOL-dTotalRecall-1's check, which reads no value; the legs of units 7, 9, 10 and 23 are declared at those units' passes with the `enforces` S32
+  names and AC16 reads; and S17, S42 and S51 reach other kits by an inline parity copy and two
+  subprocess verbs.
 
 ## 10. Reuse audit
 

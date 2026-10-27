@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-3 — `reuse_lookup.py` and its agent retired, every reader rewritten by name and by value, with its upgrade step, and memory-recall narrowed to its why-search
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 24 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 24 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0240@5773ca81 whole
 **Carries:** node:record-kind.recall-index
@@ -13,7 +13,10 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-a.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-3-deviation-31.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-3-deviation-31.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-3-deviation-32.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-3-deviation-32.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -123,10 +126,19 @@ grammar and record, and `gen_build_index.py --reuse-scouts` (TOOL-dLinkedLibrary
   the kit as the why-search, a plain-English question over decisions and records answered through
   `record find`'s ranking (TOOL-dTotalRecall-9 S3, `query.py` its adapter), and say it leaves the
   reuse obligation, since it holds no code; its bench and union stay as they are until dBoundRoles
-  declares them an `experiment` entry (§3). The kind row `recall-index` lands through `python
-  record_kinds.py new recall-index`: its home the FTS tables of `<git-common-dir>/gov/index.db`
-  (TOOL-dTotalRecall-21 S2), writer `tag_index.build_index`, reader `record find`, check the `recall
-  floor` leg. Observed by AC9 and AC10.
+  declares them an `experiment` entry (§3). The kind row `recall-index` lands through
+  TOOL-dTotalRecall-1 S9's factory, `python record_kinds.py new recall-index --tag record.recall-index
+  --writer generator:tools/playbook/tag_index.py --check "recall floor" --purpose "the FTS tables
+  record find ranks for recall's why-search"`, the `--purpose` TOOL-dTotalRecall-16 S2 requires, with
+  every column TOOL-dTotalRecall-18 S1 requires, as TOOL-dTotalRecall-25 S1 spells its row: layer
+  `layer.memory.recall` (PLAY-dOrderedCharter-16's row, "the record finder for why-questions"), home
+  `<git-common-dir>/gov/index.db`, whose FTS tables TOOL-dTotalRecall-21 S2 adds, id-rule `""`, schema
+  `{ form = "generated" }`, lifecycle `generated`, and `readers = []` with `readers-none = "no
+  work-order read key hands the tables; record find and query.py read them"`. The `writer` is a door,
+  `generator:<path>` for a generated kind (TOOL-dTotalRecall-1 §4), and the tables' one writer is
+  `build_index` in that module (TOOL-dTotalRecall-21 S1, S2). S9's verb takes no flag for those six
+  columns, so the build run sets them through TOOL-dTotalRecall-18's landed verb. Observed by AC9 and
+  AC10.
 - **S9** — The docs: `help/reuse.md` (TOOL-dLinkedLibrary-2 S12) gains a section on what now stands
   where the lookup stood, the derived cutoff and the upgrade step. Observed by AC11.
 
@@ -144,7 +156,7 @@ grammar and record, and `gen_build_index.py --reuse-scouts` (TOOL-dLinkedLibrary
 ### Edges
 
 - **consumes-from** `TOOL-dLinkedLibrary-2` — `house_index.py`, the scout's `## Matches` record and `gen_build_index.py --reuse-scouts`, which S2, S4 and S5 read in place of the lookup; without them nothing replaces the evidence
-- **consumes-from** external — dTotalRecall, built before this build run: `record find`, `gov_map.py`, `record_kinds.py new` and the one index (TOOL-dTotalRecall-9 S3, -14 S2, -1 S9, -21 S2)
+- **consumes-from** external — dTotalRecall, built before this build run: `record find`, `gov_map.py`, `record_kinds.py new` with its purpose and columns, and the one index (TOOL-dTotalRecall-9 S3, -14 S2, -1 S9, -16 S2, -18 S1, -21 S2)
 - **consumes-from** external — dSafePassage: the `[[upgrade]]` and `[[retired]]` rows and `upgrade_steps.py` (TOOL-dSafePassage-1 S1 to S3)
 - **hands-off** external — dBoundRoles: recall's bench and union as an `experiment` workflow entry (TOOL-dBoundRoles-16 S4), the ask of §8 F3
 - **hands-off** `TOOL-dLinkedLibrary-42` — `MAP_CLI` and the step's `up`, which unit 42 points at the house index; this unit's ledger answers AC4 and AC7 AMENDED (id 8)
@@ -272,8 +284,9 @@ date, so every spec landed before it keeps its verdict.
   Red when: either row is missing or refused.
   fixture: the reader admits the row's id once dSafePassage accepts §8 F2's ask.
 - **AC9** — When `python record_kinds.py --template recall-index` runs, it prints the kind's skeleton,
-  exit 0.
-  Red when: the kind has no row.
+  exit 0, and `python record_kinds.py --check` exits 0 with the row's writer
+  `generator:tools/playbook/tag_index.py` and S8's purpose and six columns.
+  Red when: the kind has no row, or its writer is not a door TOOL-dTotalRecall-1 §4 admits.
 - **AC10** — When `grep -n "why-search" README.md SKILL.template.md` runs in `tools/memory-recall`,
   each file names the why-search and the reuse scout as the reuse evidence.
   Red when: either still offers recall as a reuse probe.
@@ -328,6 +341,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 AC5 · the stale-doss
   disagreements 2 to 4 and 7 for this unit.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-42, TOOL-dLinkedLibrary-52, TOOL-dLinkedLibrary-53, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-57, TOOL-dLinkedLibrary-58, promoted from the spec audit of units 37 to 53; nothing else moved.
+- rev-4 · 2026-10-28 · §2 S8 · §3 Edges · §6 AC9 · re-grounded on the parents at `1a61f21a2` per the cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md`, row 11: the `recall-index` call spells its purpose and every column, and its writer is `generator:tools/playbook/tag_index.py`, not a function.
 
 ## 10. Reuse audit
 

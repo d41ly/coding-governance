@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-10 — the progress cell: the retrofit's populations, seeded, now and drained, on the orientation card
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 22 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 22 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0247@87bb7e47 whole
 
@@ -11,7 +11,10 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md) | journal | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-38 TOOL-dLinkedLibrary-39 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-41 TOOL-dLinkedLibrary-42 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-44 TOOL-dLinkedLibrary-45 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-48 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-50 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-65 TOOL-dLinkedLibrary-66 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-68 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-70 TOOL-dLinkedLibrary-71 TOOL-dLinkedLibrary-72 TOOL-dLinkedLibrary-73 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-81 TOOL-dLinkedLibrary-82 TOOL-dLinkedLibrary-83 TOOL-dLinkedLibrary-84 TOOL-dLinkedLibrary-85 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-87 TOOL-dLinkedLibrary-88 TOOL-dLinkedLibrary-89 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-93 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-95 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-build-TOOL-dLinkedLibrary-10-deviation-101.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-10-deviation-101.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -64,6 +67,15 @@ declares the ledger's files as records (TOOL-dLinkedLibrary-8).
   what the cell does not show, with its line in `help/README.md`; the cell list in the comment above
   `derive_head_state` (`manifest-check.sh:485-498`) names the `retrofit —` cell; and
   `KIT_MANIFEST_VERSION` (:46) moves. Observed by AC6.
+- **S7** — The leg `retrofit progress selftest`, argv `python
+  {prefix}/memory-tree/retrofit_progress.py --selftest`, chunk `selftests`, subject `kit`, declared once
+  by `python tools/run-gates/leg_factory.py new` as a `[[gate_leg]]` row of `tools/memory-tree/kit.toml`,
+  the kit that ships `retrofit_progress.py`, and rendered into `tools/gate-legs.json` by its `--write`
+  (TOOL-dWitnessedBar-11 S1 to S3). It holds every manifest key the factory's gate grades, a `ceiling`
+  measured at its first clean run and a `purpose` among them, and `enforces = ["practice.verify"]`, the
+  tag TOOL-dWitnessedBar-51 S12 gives a self-test leg, since this unit's clause is in no v2
+  `[enforcement]` row and PLAY-dOrderedCharter-7 S3's meta-check reds a leg with no `enforces`.
+  Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -81,7 +93,7 @@ declares the ledger's files as records (TOOL-dLinkedLibrary-8).
 - **consumes-from** external — dWitnessedBar, built before this build run: `read_registrations`, `read_rows` and the memory-tree kit's inline `legacy_ledger.py` (TOOL-dWitnessedBar-13 S2, S8) and the seed's states (TOOL-dWitnessedBar-15 S2)
 - **hands-off** external — dTendedCadence: the `reads <share>` segment, from `maintain.retrofit-heat`
 - **hands-off** external — dFurnishedOrders: the `retrofit —` cell, carried when its orientation scout composes the card
-- **hands-off** `TOOL-dLinkedLibrary-52` — the `retrofit progress selftest` leg and `drained`, which unit 52 defines (ids 46, 75)
+- **hands-off** `TOOL-dLinkedLibrary-52` — the `retrofit progress selftest` leg and `drained`, which unit 52 completes with the leg's guard and meta rows and defines (ids 46, 75)
 
 ## 4. Design
 
@@ -152,7 +164,8 @@ Live at landing for every card; the module's selftest leg holds the derivation's
 - `tools/memory-tree/retrofit_progress.py` (new): S1, S2, its plants
 - `skills/session-kickoff/manifest-check.sh`: S3, S4, the comment and `KIT_MANIFEST_VERSION`
 - `skills/session-kickoff/manifest-check.test.sh`: the arm the §7 line declares
-- `tools/gate-legs.json`: the `retrofit progress selftest` leg
+- `tools/memory-tree/kit.toml`: S7's `[[gate_leg]]` declaration
+- `tools/gate-legs.json`: rendered by `leg_factory.py --write`
 - `help/retrofit.md` (new) and `help/README.md`: S6
 
 ### Alternatives rejected
@@ -208,13 +221,19 @@ Live at landing for every card; the module's selftest leg holds the derivation's
 - **AC6** — When `grep -n "retrofit —" retrofit.md` runs over the help page, it finds the cell's
   section naming each state and the 30-day period.
   Red when: the page is absent or omits a state.
+- **AC7** — When a probe reads `tools/gate-legs.json` at the pass tip, the row named `retrofit progress
+  selftest` carries `enforces` holding `practice.verify` and an argv naming `retrofit_progress.py
+  --selftest`, and `python leg_factory.py --list` run from `tools/run-gates/` names its declaring file
+  `tools/memory-tree/kit.toml`.
+  Red when: the leg is hand-written into the manifest or carries no `enforces`, which
+  PLAY-dOrderedCharter-7 S3's meta-check reds with no pending row to excuse it.
 
 ## 7. Gates
 
 `manifest-check self-test` · `scratch-guard self-test` · `kickoff-manifest ratchet` · `memory hygiene` · `memory-hygiene self-test` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `policy fixtures` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
-The `retrofit progress selftest` leg this unit adds is declared by the arm line below, since the leg
-join resolves names against the manifest at base.
+The `retrofit progress selftest` leg S7 adds is named by the arm line below, since the leg join
+resolves names against the manifest at base.
 
 New arm: tools/memory-tree/retrofit_progress.py --selftest (the `retrofit progress selftest` leg) · covers AC1 AC2 · the `two-populations` and `unarmed` plants, the failing case a drain read from the seed commit, staged by making the period start the seed always · none
 
@@ -245,6 +264,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC3 AC4 AC5 · 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 10, retrofit.md `[progress]` :516-521
   and `[seed]` :341-343, TOOL-dWitnessedBar-13 and -15, I22 and scout D's row for this unit.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
+- rev-3 · 2026-10-28 · §2 S7 · §3 Edges · §4 Files touched · §6 AC7 · §7 · re-grounded by the
+  cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, row 34: the
+  `retrofit progress selftest` leg is declared through `leg_factory.py new` in
+  `tools/memory-tree/kit.toml` with `enforces`, and `tools/gate-legs.json` is its render.
 
 ## 10. Reuse audit
 
