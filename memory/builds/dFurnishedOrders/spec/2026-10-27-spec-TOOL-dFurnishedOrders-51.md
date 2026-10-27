@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-51 — unit 49's interrupt probe reads the pid its kill path targets: a Python stub writing `os.getpid()`, that pid read live before the interrupt in the kill's own namespace, and a no-op tree kill that reds the arm
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 28 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 28 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-50-round6-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-50-round6-fix-return.md) | research | TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-50-round6-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-50-round6-fix-brief.md) | research | TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 |
 
 <!-- /gen:spec-records -->
 
@@ -83,6 +84,7 @@ unit 49 and builds one step after it (order 28).
 - **consumes-from** `TOOL-dFurnishedOrders-46` — AC17's interrupt arm in the roles adopter suite, whose stub, pid and liveness read S1 to S3 pin (id 24)
 - **consumes-from** `TOOL-dFurnishedOrders-49` — S6's patched `Popen.wait` and AC5, whose readiness wait S3 extends with a live read (id 24)
 - **hands-off** `TOOL-dFurnishedOrders-52` — the patched wait with its live read and the arm's cleanup, which unit 52 S15 and S20 hold to a whole kill path and an early exit (ids 24, 9 and 5)
+- **hands-off** `TOOL-dFurnishedOrders-58` — the stub, the state read, the cleanup and AC2, which unit 58 S1 to S5 settle (ids 1, 30, 2, 29, 33 of the seventh audit)
 
 ## 4. Design
 
@@ -194,6 +196,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · unit 46's interrup
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-5 promotions, id 24
   (HIGH, item H2).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-58, promoted from the spec audit of the round-6 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

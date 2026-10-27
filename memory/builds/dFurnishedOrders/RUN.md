@@ -104,3 +104,17 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-27T02:25:17Z rescope · item add TOOL-dFurnishedOrders-52 · reason spec-audit round1 of the round-5 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 1 20 28 2 7 23 6 13 27 8 26 9 12 18 29 (items M1-M8) and LOW ids 10 19 22 4 5 11 14 30 15 16 21 (items L1-L10)
 
 2026-10-27T02:45:26Z review · item dFurnishedOrders-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 26 · disposition promote
+
+2026-10-27T03:26:15Z review · item dFurnishedOrders-spec-set-r7 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 4 · minors 27 · disposition promote
+
+2026-10-27T03:34:47Z rescope · item add TOOL-dFurnishedOrders-53 · reason spec-audit round1 of the round-6 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) finding id 11 at BLOCKER, report item B1: unit 52 S16's --legs-for route reads every home directory as covered by its own kit.toml descriptor row, so the guard arm never reds on a dropped home row
+
+2026-10-27T03:34:47Z rescope · item add TOOL-dFurnishedOrders-54 · reason spec-audit round1 of the round-6 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) finding id 3 at HIGH, report item H1, shared with ids 18 and 25: unit 52 AC6's scratch legs copy cannot reach the --legs-for reader S16 mandates, so the arm grades gov's own manifest
+
+2026-10-27T03:34:48Z rescope · item add TOOL-dFurnishedOrders-55 · reason spec-audit round1 of the round-6 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) finding id 18 at HIGH, report item H1, shared with ids 3 and 25: read_legs_for drops every UNEVALUATED line, so unit 52 S16's glob row has no source in the seam the arm reads
+
+2026-10-27T03:34:49Z rescope · item add TOOL-dFurnishedOrders-56 · reason spec-audit round1 of the round-6 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) finding id 25 at HIGH, report item H1, shared with ids 3 and 18: unit 52 AC6 certifies a covered rule it never exercises, since nothing shows the rows it graded came from the copy it was handed
+
+2026-10-27T03:34:50Z rescope · item add TOOL-dFurnishedOrders-57 · reason spec-audit round1 of the round-6 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) finding id 23 at HIGH, report item H2: unit 50 computes its reach over home rows only, so its waiver table keys tokens the spec-token checker never prints
+
+2026-10-27T03:34:54Z rescope · item add TOOL-dFurnishedOrders-58 · reason spec-audit round1 of the round-6 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 1 30 2 4 28 6 13 7 8 9 12 19 22 24 27 29 31 (items M1-M14) and LOW ids 5 26 10 21 15 34 17 20 32 33 (items L1-L7)

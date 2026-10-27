@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-50 — unit 48's `govkit selftest` home rows priced in the guards join: a home only where `apply` runs or renders from it, no guard pushed into the broad set, and every live spec the rows reach carrying the leg or a waived, asked row
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 28 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 28 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-50-round6-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-50-round6-fix-return.md) | research | TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-50-round6-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-50-round6-fix-brief.md) | research | TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 |
 
 <!-- /gen:spec-records -->
 
@@ -110,6 +111,8 @@ It disposes of the specs the rows reach under the standing ruling the earlier wi
 
 - **consumes-from** `TOOL-dFurnishedOrders-48` — S17's home rows, S14's descriptor rows and S16's `check_selftest_guard_coverage`, whose required set S1 narrows and whose reach S2 to S5 dispose of (id 17)
 - **hands-off** `TOOL-dFurnishedOrders-52` — the narrowed required set of `check_selftest_guard_coverage`, over which unit 52 S16 moves the covered rule onto `check_guard_trips` (ids 17 and 12)
+- **hands-off** `TOOL-dFurnishedOrders-57` — S3's reach, S5's waiver rows and asks and AC3, whose population unit 57 S1 reads from the checker and whose keys unit 57 S2 holds to its tokens (id 23 of the seventh audit)
+- **hands-off** `TOOL-dFurnishedOrders-58` — S1, S5, AC2 to AC4, the Inventory, the Rollout and the write set, which unit 58 S22 to S27 settle (ids 4, 28, 19, 22, 5, 26 of the seventh audit)
 
 ## 4. Design
 
@@ -278,6 +281,7 @@ The close's `spec tokens` leg is the whole-tree reading of AC3.
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-5 promotions, id 17
   (HIGH, item H1).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-57, TOOL-dFurnishedOrders-58, promoted from the spec audit of the round-6 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

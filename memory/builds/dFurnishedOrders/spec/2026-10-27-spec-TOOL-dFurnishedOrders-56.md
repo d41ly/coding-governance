@@ -1,0 +1,180 @@
+# TOOL-dFurnishedOrders-56 — the guard arm returns the row that covered each required path, so a criterion over a scratch manifest proves the copy's own spelling was graded and reds when another manifest was read
+
+**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
+
+**Derived:** PLAY-dClosedLoop-2
+
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+The spec audit of the round-6 promotions
+(`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md`)
+confirmed finding **id 25 at HIGH**, report item **H1**. Item H1 merges ids 3, 18 and 25. Each takes
+its own unit: id 3 is `TOOL-dFurnishedOrders-54` and id 18 is `TOOL-dFurnishedOrders-55`.
+
+`TOOL-dFurnishedOrders-52` AC6 grades the arm by its verdict alone: "it reports no path under
+`tools/process-monitor/` as uncovered". The real manifest and a slashless copy give that same
+verdict, so the criterion cannot tell which one the arm read. The finding is that it certifies a
+rule it never exercises. The fix asks that the criterion assert the copy's rows reached the checker,
+with a staged break that reds when the arm reads gov's manifest instead.
+
+This unit makes the arm's answer carry its source. It repairs unit 52 and builds one step after it
+(order 30).
+
+## 2. Scope (IN)
+
+- **S1** — The arm returns what covered each path. `check_selftest_guard_coverage` returns a dict
+  from each required path, spelled as the required set spells it, to the guard row that covered it,
+  or `None` when none did. The row is the `guard` field of the first tuple
+  `derive_tripped_legs` returns for that path (`tools/check-spec-tokens.py:621-630`), as
+  `TOOL-dFurnishedOrders-54` S1 calls it, so it is the copy's own spelling. Observed by AC1.
+- **S2** — The verdict is unchanged. The arm's printed lines and its pass or fail stay as units 48,
+  53, 54 and 55 leave them. Its one production caller ignores the return value. Observed by AC2.
+- **S3** — The staged break reds. With the arm's rows read from gov's own `tools/gate-legs.json`
+  instead of `legs`, AC1's slashless case returns `tools/process-monitor/`, with its slash, for a
+  path under it. AC1 then reds. That break is the one §7's `New arm:` line stages. Observed by AC1.
+
+## 3. Non-goals (OUT)
+
+- Printing a line per required path. The return value serves the criterion, and the bar's output
+  keeps unit 48 S16's one coverage line.
+- The route itself: `TOOL-dFurnishedOrders-54` (id 3). The glob rows: `TOOL-dFurnishedOrders-55`
+  (id 18). The one-way rule: `TOOL-dFurnishedOrders-53` (id 11).
+- The report's left-shift gate (a spec-lint on fixtures "passed as arguments"): no clause of this
+  build names it.
+- Where a landed criterion of unit 52 cannot hold as written, its ledger answers it AMENDED, naming
+  this unit.
+
+### Edges
+
+- **consumes-from** `TOOL-dFurnishedOrders-52` — AC6's slashless case, whose verdict alone S1 and S3 replace with the covering row the arm returns (id 25)
+- **consumes-from** `TOOL-dFurnishedOrders-54` — S1's per-path answer from `derive_tripped_legs`, whose `guard` field S1 returns (ids 3 and 25)
+
+## 4. Design
+
+### The arm's return, after this unit
+
+```
+for p in required:
+    hits := cst.derive_tripped_legs(p_probe, rows)     unit 54 S1 (p_probe: unit 53 S1's spelling)
+    out[p] := hits[0].guard if hits else None          S1
+return out                                             S2: prints and verdict unchanged
+```
+
+| case | `out["tools/process-monitor/"]` |
+|---|---|
+| slashless copy, read from `legs` | `tools/process-monitor` |
+| slashless copy, rows read from gov's manifest (the staged break) | `tools/process-monitor/` |
+| row deleted from the copy | `None` |
+
+The key is unit 48 S17's required home directory for the process-monitor kit, which unit 50 S1
+keeps. Its descriptor key may map to its own exact-file row (unit 48 S14), so no criterion reads it.
+
+### What it does not check
+
+- That the returned row is the most specific one. It is the first literal row in manifest order that
+  trips the path, which is `derive_tripped_legs`' own rule.
+- Required paths outside the arm's set. Only those are keys.
+
+### Inventory
+
+Minted: nothing named. The function's return value changes from `None` to the dict S1 states.
+
+### Migration
+
+None: the arm lands at unit 48's pass in the same build run.
+
+### Rollout
+
+Live at landing, at order 30, after unit 54's pass in the same group, since S1 reads unit 54's answer
+and `--dispatch` sequences units whose write sets meet (BUILD-METHOD M6, clauses 1 and 2). Before the
+first code pass, M2's cross-read (`memory/guides/BUILD-METHOD.md:66-71`) holds unit 52 AC6 to S1.
+govkit's version moves for the kit epoch leg where its shipped bytes move.
+
+### Files touched (estimate)
+
+- `tools/govkit/selftest.py`
+- `memory/map/generated/symbols.json` (regenerated by `python tools/codebase-map/gen_map.py --write`
+  when the staged `.py` edit moves it)
+
+### Alternatives rejected
+
+- **A canary row only the copy carries.** It proves the copy was read once, but a row that covers no
+  required path says nothing about the rows that did.
+- **A printed trace line per required path.** It puts dozens of lines in every bar run for a fact
+  only a criterion reads.
+- **Grade AC6 by its verdict, with a staged break alone.** The verdict is the same on both manifests
+  in the slashless case, so the break cannot red it.
+
+## 5. Production-readiness checklist
+
+- security — N/A — a self-test arm's return value; no surface moves.
+- perf / scale — one dict entry per required path.
+- error / empty / loading states — an uncovered path maps to `None`. An empty required set is still
+  unit 48 S16's DEAD PROBE.
+- observability — the return names each path's covering row.
+- risks — none beyond the arm's: S2 keeps its verdict and output.
+- testing — AC1 and AC2 by probes over scratch copies; the arm of §7 at the close.
+- migration — none.
+- user docs — none: a self-test arm.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `python -B -c` calls `check_selftest_guard_coverage` with a scratch legs copy whose
+  `govkit selftest` row spells `{prefix}/process-monitor` with no trailing slash, the returned dict
+  maps `tools/process-monitor/` to `tools/process-monitor`. With that row deleted from a second copy,
+  it maps `tools/process-monitor/` to `None`.
+  Red when: the arm returns a row the copy does not spell, so another manifest was read.
+  fixture: two parsed copies of `tools/gate-legs.json` under `%TEMP%`, each passed as `legs`.
+- **AC2** — When the probe captures the arm's stdout over the unedited manifest, with and without
+  this unit's change, the printed lines are identical and both runs pass.
+  Red when: the return value changes the arm's verdict or its output.
+  fixture: the pass's parent and tip, each run in a scratch clone under `%TEMP%`.
+
+## 7. Gates
+
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `policy fixtures` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+
+New arm: tools/govkit/selftest.py · covers AC1 · the guard arm's returned covering rows over a slashless copy and a copy with the row deleted, staged by reading the rows from gov's own manifest instead of `legs` after deleting `tools/govkit/__pycache__` and running Python with `-B` · none
+
+## 8. Open questions
+
+- **F1 — How does a criterion show the copy's rows reached the checker?** Options: (a) the arm
+  returns each path's covering row; (b) a canary row only the copy carries; (c) a trace line per path.
+  (b) proves a read but not the rows that decided the verdict. (c) floods the bar's output. (a)
+  names the deciding row in the copy's own spelling at no output cost. RESOLVED (agent, 2026-10-27,
+  delegated): (a), rung 3, the skeptic-judged fix of id 25 ("assert that both rows reached the
+  checker ... the scratch row reds when the arm reads gov's manifest instead"). widens: none ·
+  relaxes: none
+- **F2 — Which binding line does a unit the spec audit promoted carry?** RESOLVED (agent,
+  2026-10-27, delegated): `**Derived:**` naming `PLAY-dClosedLoop-2`, rung 3, the precedent
+  `TOOL-dBoundRoles-39` §8 F1 records. widens: none · relaxes: none
+- **F3 — The unit this one repairs is unbuilt.** `TOOL-dFurnishedOrders-52` and the arm of
+  `TOOL-dFurnishedOrders-48` are specced and unbuilt at `5647189e`. RESOLVED (agent, 2026-10-27,
+  delegated): the build run re-grounds on them at the pass and records any item a landed unit
+  already left in S1's end state, rung 1, the brief's rule. widens: none · relaxes: none
+
+## 9. Revision log
+
+- rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-6 promotions, id 25
+  (HIGH, item H1, shared with ids 3 and 18).
+
+## 10. Reuse audit
+
+The seam extended is `derive_tripped_legs` (`tools/check-spec-tokens.py:621-630`), whose tuples
+already carry the tripping guard, through unit 54's call. Nothing new is derived.
+
+`python tools/codebase-map/reuse_lookup.py "decide whether a manifest guard row covers a required
+directory path"` ranked `rows`, `row`, `manifest` and `covers`, name-token neighbours none of which
+reports a covering row. The recall probe returned this report's H1, unit 52 S16 and AC6, and
+TOOL-aMendedFleet-87's `--legs-for` spec, which prints the same `<leg> <- <guard>` pair this unit
+returns. None disagrees with source.
+
+Recall terms used: `python tools/memory-recall/query.py "how does a coverage arm decide a guard
+covers a directory without the symmetric trip" --terms "guard coverage check_guard_trips one-way
+directory descriptor row legs-for UNEVALUATED glob GLOB_MAGIC fixture manifest"`

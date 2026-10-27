@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-52 — the sixth spec audit's 26 minors: a `govkit selftest` row priced for unit 48's runs, the ratchet observed through C5, apply's problems read by their total, one receipt needle, gov's one trip rule, live fixtures, every path token refused, a roles reading any directory reproduces, an interrupt that grades the whole kill, and ledger reads that survive a wrap
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 29 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 29 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-50-round6-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-50-round6-fix-return.md) | research | TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-50-round6-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-50-round6-fix-brief.md) | research | TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 |
 
 <!-- /gen:spec-records -->
 
@@ -218,6 +219,11 @@ unit already left it so, as `TOOL-dFurnishedOrders-41` §4 does.
 - **consumes-from** `TOOL-dFurnishedOrders-49` — S1, S4 to S6, AC3 and AC4 and the roles row's note, which S12 to S15, S19 to S21, S24 and S25 settle (ids 8, 26, 22, 9, 4, 5, 11, 15, 16)
 - **consumes-from** `TOOL-dFurnishedOrders-50` — the narrowed required set of `check_selftest_guard_coverage`, whose covered rule S16 moves onto `check_guard_trips` (id 12)
 - **consumes-from** `TOOL-dFurnishedOrders-51` — the patched wait with its live read and cleanup, which S15 and S20 hold to a whole kill path and an early exit (ids 9, 5)
+- **hands-off** `TOOL-dFurnishedOrders-53` — S16's covered rule over the required set, which unit 53 S1 makes one-way for a required directory (id 11 of the seventh audit)
+- **hands-off** `TOOL-dFurnishedOrders-54` — S16's `--legs-for` route and AC6's scratch legs copy, whose trip answer unit 54 S1 and S2 move onto the `legs` argument (id 3 of the seventh audit)
+- **hands-off** `TOOL-dFurnishedOrders-55` — S16's unevaluated glob row and AC6's glob case, whose source unit 55 S1 moves onto the `legs` rows (id 18 of the seventh audit)
+- **hands-off** `TOOL-dFurnishedOrders-56` — AC6's slashless case, whose verdict alone unit 56 S1 and S3 replace with the covering row the arm returns (id 25 of the seventh audit)
+- **hands-off** `TOOL-dFurnishedOrders-58` — S9, S13, S15 to S26, AC1, AC4 to AC6, AC8, AC9, AC11 to AC13, AC15 and §7, which unit 58 S5 to S21 settle (ids 33, 9, 8, 32, 6, 13, 7, 15, 34, 27, 20, 12, 24, 31, 10, 21, 17 of the seventh audit)
 
 ## 4. Design
 
@@ -412,6 +418,7 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC5 AC10 · the interrupt arm
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-5 promotions' minors batched: 15
   MEDIUM and 11 LOW.
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-53, TOOL-dFurnishedOrders-54, TOOL-dFurnishedOrders-55, TOOL-dFurnishedOrders-56, TOOL-dFurnishedOrders-58, promoted from the spec audit of the round-6 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 
