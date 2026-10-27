@@ -111,6 +111,7 @@ receipt sync (installed files match the receipt)	1.0	2	a	2026-09-24	runner
 review-join ban (no ref-keyed join)	10.8	2	a	2026-09-24	runner
 review-join self-test	110.3	2	a	2026-09-24	runner
 review-protocol parity (kit vs dogfood)	7.0	2	a	2026-09-24	runner
+routed commits name a specced unit	378.7	1	a	2026-10-28	taken by the main loop, the leg alone at ce91bfc2 on node a, its deviation join armed, read twice one after the other: GATE_PUSH_BASE unset so it graded WHOLE as the close's bar does, rc 0, real 378.7s, host free at its start but for an idle run-gates.sh orphan from Oct 23 and an idle python one-off from Oct 26, and a foreign spec-tokens of dSafePassage's dispatch and a staged memory-hygiene check overlapped its last ~2 min; then GATE_PUSH_BASE=1a61f21a from ls-remote so it graded RANGE and WHOLE beside it as the landing push's bar does, rc 0, real 322.1s, no foreign gate work at its start or end; the unset reading governs; killed at its 300 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 358 s beside spec tokens at ec8ad036
 row-grammar selftest	42.7	2	a	2026-09-24	runner
 row-keyed merge driver replay	269.1	2	a	2026-09-24	runner
 run-gates adopter e2e	49.4	2	a	2026-09-24	runner
@@ -129,7 +130,7 @@ selftest harness self-test	26.8	2	a	2026-09-24	runner
 settings-merge selftest	6.8	2	a	2026-09-24	runner
 shell hygiene (a loop fed by a command substitution)	1.1	1	a	2026-09-24	runner
 shell-hygiene selftest	0.9	2	a	2026-09-24	runner
-spec tokens (a spec's own names resolve)	195.0	1	a	2026-10-26	the leg alone in the worktree at 0d9b531f on a host running no other gate suite, its packet join over 1 live chain run, real 195.0s; killed at its 180 s ceiling twice under the close's bar at 263d31d5, in the pool and on its serial retry
+spec tokens (a spec's own names resolve)	465.2	1	a	2026-10-28	taken by the main loop, the leg alone at ce91bfc2 on node a, rc 0, its packet join over 1 live chain run, real 465.2s; host free at its start but for an idle run-gates.sh orphan from Oct 23 and an idle python one-off from Oct 26, and a foreign spec-tokens of dSafePassage's dispatch overlapped its last ~20 s; killed at its 390 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 512 s beside routed commits at ec8ad036
 spec-tokens self-test	156.8	1	a	2026-09-24	runner
 template size <=48KiB	5.1	1	a	2026-09-06	runner
 template size gate selftest	74.8	2	a	2026-09-24	runner
