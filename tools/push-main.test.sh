@@ -1277,8 +1277,37 @@ PY
       ok "34 --prepare walks every declared step on gov first into the prepared merge, and refuses a step whose witness never holds, the branch unmoved and no file of the walk left behind, so the retry's merge holds none" ;;
     *) bad "34 the prepared merge lacks gov's receipt of every applied step, or a failing step was not refused with the branch unmoved and the tree clean, or the retry folded the refused walk's leftovers: $out34" ;;
   esac
+  # 36 — TOOL-dSafePassage-27 AC1/AC2: the walk passes and a committed regen.py exits 1. The
+  #      regeneration's refusal cleans against the snapshot taken BEFORE the walk, so the tree is
+  #      clean after it, and the retry with the regen.py reverted prepares (exit 0) a merge holding no
+  #      leftover of the refused run. Staged red by a lander copy whose regeneration refusal cleans
+  #      against a snapshot taken after the walk. Needs regen.py beside the lander too.
+  if [ -n "$_rg_k" ]; then
+    out36=$(
+      build_regen_fixture "$tmp/remote16.git" "$tmp/work16" || exit 1
+      git checkout -q -b feat
+      printf 'import sys\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
+      git commit -q --no-verify -am "TOOL-tFix-36: a failing regeneration"
+      B36=$(git rev-parse HEAD)
+      unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tRegenAfterWalk 2>&1 >/dev/null; echo "fail-rc=$?"
+      [ "$(git rev-parse refs/heads/feat)" = "$B36" ] && echo unmoved=1
+      st36=$(git status --porcelain); [ -z "$st36" ] && echo fail-clean=1 || echo "fail-left=[$st36]"
+      git checkout -q main -- "${KIT_REL}$_rg_k/regen.py"
+      git commit -q --no-verify -m "TOOL-tFix-36: the failing regeneration reverted"
+      bash "$lander" --prepare --slug tRegenAfterWalkRetry >/dev/null 2>&1; echo "retry-rc=$?"
+      git rev-parse -q --verify 'HEAD^2' >/dev/null && echo merge=1
+      printf 'steps-outbox=[%s]\n' "$(git ls-tree -r --name-only HEAD -- .governance/steps .governance/outbox | tr '\n' ' ')"
+    )
+    case "$out36" in
+      *"could NOT be regenerated"*"fail-rc=1"*"unmoved=1"*"fail-clean=1"*"retry-rc=0"*"merge=1"*)
+        ok "36 a regeneration refused after a passing gov-first walk leaves no file of the walk behind, and the retry prepares a clean merge" ;;
+      *) bad "36 a refused regeneration after a passing walk left the walk's files untracked, or the retry folded or refused on them: $out36" ;;
+    esac
+  else
+    echo "  skip — 36 no run-gates kit holding regen.py beside this lander, so the walk-then-regeneration arm did not run"
+  fi
 else
-  echo "  skip — 34 no govkit deployer beside this lander or no python launcher, so the gov-first arm did not run"
+  echo "  skip — 34 and 36 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
 fi
 
 # 35 — TOOL-dSafePassage-8 AC6: `run_gov_first` cut from the lander. No deployer beside it, with or

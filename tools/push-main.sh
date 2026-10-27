@@ -1054,13 +1054,14 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
     return 1
   fi
   # GOV FIRST INTO THE MERGE (TOOL-dSafePassage-8 S4): after the mint and before the regeneration,
-  # so gov's receipt joins the one rewritten merge. The snapshot is taken before it, so a refused
-  # walk (TOOL-dSafePassage-25) and a refused regeneration below both clean the receipt, the
-  # before-images and the orders the walk created, which the reset leaves untracked.
-  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
+  # so gov's receipt joins the one rewritten merge. ONE snapshot, taken before it and kept until the
+  # regeneration passes (TOOL-dSafePassage-27), so a refused walk (TOOL-dSafePassage-25) and a
+  # refused regeneration below both clean the receipt, the before-images and the orders the walk
+  # created, which the reset leaves untracked. A snapshot taken after the walk would hold them.
+  gfsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$gfsnap"
   if ! run_gov_first; then
     git reset -q --hard "$t" >/dev/null 2>&1 || true
-    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
+    remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: the upgrade steps this landing declares did not hold on gov first (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
@@ -1069,12 +1070,12 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
   # itself stale an output that stamps it; folded by the same rewrite, same parents and subject.
   if ! run_regen; then
     git reset -q --hard "$t" >/dev/null 2>&1 || true
-    remove_new_untracked "$rgsnap"; rm -f "$rgsnap"
+    remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
     git checkout "$branch" >/dev/null 2>&1 || true
     echo "push-main: the generated outputs this landing owes could not be regenerated (named above). Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
     return 1
   fi
-  rm -f "$rgsnap"
+  rm -f "$gfsnap"
   if [ -n "$(git status --porcelain --ignore-submodules=untracked 2>/dev/null)" ]; then
     git add -A
     if ! t=$(git commit-tree "$(git write-tree)" -p "$R" -p "$oldb" -m "$msg") || ! git update-ref --no-deref HEAD "$t"; then
