@@ -3603,9 +3603,10 @@ def check_step_walk() -> None:
                                "step fx/s4 · applied", "walk: fx/s3 introduced at M")),
             ("walk", "not-pending", 0, ("walk: canaries of s2 and s5: none",)),
             ("walk", "witness-holds", 0, ("step fx/s2 · skipped (witness holds)",
-                                          "walk: fx/s2 up canary absent · row applied")),
+                                          "walk: fx/s2 up canary absent · row applied · via witness")),
             ("walk", "fail-k", 1, ("step fx/s3 · failed · exit 1: fx: s3 up fails by its plant",
-                                   "walk: 4 pending · 2 applied · 0 skipped · stopped at fx/s3")),
+                                   "walk: 4 pending · 2 applied · 0 skipped · stopped at fx/s3",
+                                   "walk: rows whose up ran carrying via: none")),
             ("walk", "kill-step", 0, ("last applied ['fx/s2'] · fx/s3 failed · interrupted: started ",
                                       "walk: the re-run's target and receipt equal an uninterrupted walk's",
                                       "walk: fx/s3 up spawned 2 time(s) · resume not spawned")),
@@ -3655,6 +3656,7 @@ def check_step_walk() -> None:
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
         tag = ("dSP-15" if (plant or "").startswith("schema-3")
+               else "dSP-33" if family == "walk" and plant in ("witness-holds", "fail-k")
                else "dSP-22" if plant == "lock-live-slow-census"
                else "dSP-32" if (plant or "").startswith("lock-wall-step") else "dSP-2")
         check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
@@ -3701,7 +3703,11 @@ def check_step_rollback() -> None:
     rollback past the schema step stamping schema 3 with no `steps` and converging after a kill.
     TOOL-dSafePassage-17's AC2 to AC4 are the `witness-only`, `node-witness`, `node-witness-refuses`
     and `witness-stays` rows: a down with no before-image, or under `reverted = "down-exit"`, is
-    judged by its exit, and one whose image was present still by its witness."""
+    judged by its exit, and one whose image was present still by its witness. TOOL-dSafePassage-33's
+    AC2 and AC3 are the `image-lost` and `witness-only` rows, the scoped no-image rule: a row its up
+    applied whose image went missing stops naming the image, and one applied `via` its witness is
+    still downed by its exit; AC4 is the `schema-step-kill-before-stamp` row, and the in-process
+    verdict table below covers the no-record branch that row's re-run reaches."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -3719,7 +3725,12 @@ def check_step_rollback() -> None:
             ("rollback", "witness-stays", 1, ("step fx/s2 · STOPPED · witness still holds after down",
                                               "stop text opens with an entry of DOWN_STOP_PREFIXES: yes")),
             ("rollback", "unrecorded", 0, (rolled, same)),
-            ("rollback", "witness-only", 0, ("rollback: fx/s2 applied by witness alone, no before-image", rolled, same)),
+            ("rollback", "witness-only", 0, ("rollback: fx/s2 applied by witness alone, no before-image",
+                                             "rollback: fx/s2 recorded via witness", rolled, same)),
+            ("rollback", "image-lost", 1, ("rollback: fx/s4 applied · via None · image present before the plant deletes it",
+                                           "step fx/s4 · STOPPED · witness still holds after down; before-image "
+                                           ".governance/steps/fx/s4.before.json absent\nrollback: 1 reached",
+                                           "· s4.txt in place")),
             ("rollback", "node-witness", 0, ("rollback: fx/s2 applied by witness alone, no before-image", rolled, same)),
             ("rollback", "node-witness-refuses", 1, ("step fx/s3 · rolled-back\nstep fx/s2 · STOPPED · down exit 1: "
                                                      "fx: s2 down fails by its plant\nrollback: 3 reached",
@@ -3762,7 +3773,8 @@ def check_step_rollback() -> None:
         p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
-        tag = ("dSP-17" if plant in ("witness-only", "node-witness", "node-witness-refuses")
+        tag = ("dSP-33" if plant == "image-lost"
+               else "dSP-17" if plant in ("witness-only", "node-witness", "node-witness-refuses")
                else "dSP-4" if not (plant or "").startswith("schema-step")
                else "dSP-19" if family == "rollback-update" else "dSP-18")
         check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
@@ -3772,6 +3784,29 @@ def check_step_rollback() -> None:
     # a --to equal to the receipt's commit with nothing to roll back.
     gk = govkit_module()
     us = gk.upgrade_steps
+    # TOOL-dSafePassage-33 AC1, S3: the mark's writer refuses it off `applied` or under another
+    # value, and the verdict table's no-image rows split on the last record.
+    for state33, via33, admit33 in (("applied", "witness", True), ("failed", "witness", False),
+                                    ("rolled-back", "witness", False), ("applied", "up", False)):
+        r33 = {"schema": 4, "steps": []}
+        try:
+            us.set_step_state(r33, "a/one", None, state33, "boom" if state33 == "failed" else None, via33)
+            got33 = ""
+        except us.Refusal as e:
+            got33 = str(e)
+        check(f"[dSP-33 AC1] the writer {'admits' if admit33 else 'refuses'} `via` {via33!r} on a {state33} row",
+              (not got33 and r33["steps"][0].get("via") == via33) if admit33
+              else ("'a/one'" in got33 and r33["steps"] == []), got33 or str(r33))
+    row33 = us.StepRow("fx/x", ["u"], ["d"], ["w"], None, [], False, "fx", 1, None)
+    for image33, record33, want33 in (
+            (False, None, (True, "down")),
+            (False, {"id": "fx/x", "introduced": None, "state": "applied", "via": "witness"}, (True, "down")),
+            (False, {"id": "fx/x", "introduced": None, "state": "applied"}, (None, "witness")),
+            (False, {"id": "fx/x", "introduced": None, "state": "failed", "failure": "exit 1: x"}, (None, "witness")),
+            (True, {"id": "fx/x", "introduced": None, "state": "applied", "via": "witness"}, (None, "witness"))):
+        got33 = us.derive_down_verdict(row33, image33, 0, record33)
+        check(f"[dSP-33 S3] derive_down_verdict, image {'present' if image33 else 'absent'}, last record "
+              f"{record33 and (record33['state'], record33.get('via'))}, reads {want33}", got33 == want33, str(got33))
     try:
         us.derive_reverse_steps(HERE.parent.parent, {"schema": 4, "steps": [
             {"id": "gone/step", "introduced": None, "state": "applied"}]}, "HEAD")

@@ -99,7 +99,9 @@ step that has run on this repository: its `id`, the commit that `introduced` it 
 that ran before its row landed), and its `state`, one of `applied`, `failed` (with the `failure`
 text) or `rolled-back` (with none). An `applied` row carries a `failure` only where a rollback's
 down stopped on it, and that text opens with `down interrupted:`, `down exit `, `witness still holds
-after down` or `reverted check exits `. The last `applied` row is the last step completed.
+after down` or `reverted check exits `. An `applied` row the walk recorded because the step's witness
+already held, its up never run, carries `"via": "witness"`; a row whose up ran carries no `via`, and
+`via` is legal on no other state. The last `applied` row is the last step completed.
 `govkit.py check` reports a malformed `steps` field as a problem naming the row.
 
 A first install, by `apply` or `adopt`, is born at schema 4 with an empty `steps`. An existing
@@ -129,8 +131,8 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
 
 - **The order.** Every step row in `--to`'s tree, in the order `list` prints, minus each step the
   receipt's `steps` records `applied`. A step landed after `--to` is not walked.
-- **The skip.** Each step's witness runs first. Where it holds, the step is recorded `applied` and
-  its up never runs: `step <id> · skipped (witness holds)`.
+- **The skip.** Each step's witness runs first. Where it holds, the step is recorded `applied` with
+  `"via": "witness"` and its up never runs: `step <id> · skipped (witness holds)`.
 - **A step that runs** is recorded `failed`, `interrupted: started <utc>, no exit recorded`, before
   its up starts, and `applied` once the up exits 0 and the witness holds. Its writes and its
   before-image under `.governance/steps/` are staged, never committed.
@@ -194,8 +196,13 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
   <id>` for each step and runs none.
 - **How a down is judged.** By default, by the step's witness: it must no longer hold after the
   down. A step with no before-image (`.governance/steps/<entry>/<slug>.before.json`) when its down
-  starts, such as one recorded `applied` because its witness already held, wrote nothing to undo,
-  so its down's exit 0 is the verdict instead. A row whose witness reads something no down
+  starts that the receipt records `applied` with `"via": "witness"`, or records nowhere, wrote
+  nothing to undo, so its down's exit 0 is the verdict instead. A missing before-image does not
+  mean the step never ran when its up did run: an image lost after the up (an index discarded
+  before the commit, say) leaves that step judged by its witness, and where the witness still holds
+  the rollback stops at it with `witness still holds after down; before-image <path> absent`,
+  naming the image. Restore the image, or undo the up's writes by hand, then run the rollback
+  again. A row whose witness reads something no down
   changes, such as the node's own interpreter, declares `reverted = "down-exit"`, so its down's exit
   0 decides even where an image exists; `lib/python-floor-3.15` does. A row may instead declare
   `reverted` as a command, under the same rules as `up`, `down` and `witness`, whose exit 0 means
