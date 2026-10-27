@@ -2780,6 +2780,11 @@
     {
       "id": "build_scratch",
       "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "build_scratch",
+      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
     {
@@ -5566,6 +5571,16 @@
       "id": "check_shape_run",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "check_shim_parity",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "check_shim_windows",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "check_shipped_verb",
@@ -8543,6 +8558,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_shim_window",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
       "id": "derive_short_sha",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -10840,6 +10860,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/govkit/step_gate.py"
     },
     {
@@ -12851,6 +12876,11 @@
       "id": "print_note",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.sh"
+    },
+    {
+      "id": "print_observations",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "print_ok",
@@ -15343,6 +15373,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "read_policy_value",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_population",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -15521,6 +15556,11 @@
       "id": "read_relation_gate",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "read_releases",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "read_remote_ci_runs",
@@ -15766,6 +15806,11 @@
       "id": "read_shell_sources",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "read_shim_rows",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "read_shipped_descriptors",
@@ -17841,6 +17886,11 @@
       "id": "render_shards",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_shim",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "render_skill",
@@ -19928,6 +19978,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_shim_landing",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
       "id": "resolve_sidecar_dir",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -20635,6 +20690,11 @@
     {
       "id": "run_commit",
       "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "run_commit",
+      "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
@@ -20740,6 +20800,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
@@ -20791,6 +20856,11 @@
       "id": "run_format",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "run_forward_plant",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "run_fragment_merges",
@@ -20846,6 +20916,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "run_git",
@@ -21286,6 +21361,11 @@
       "id": "run_owned_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
+    },
+    {
+      "id": "run_parity_plant",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "run_pathless",
@@ -21896,6 +21976,11 @@
       "id": "run_wf",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_window_plant",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "run_without_git_env",
@@ -26700,6 +26785,11 @@
     {
       "id": "write_policy",
       "kind": "function",
+      "file": "tools/govkit/shims.py"
+    },
+    {
+      "id": "write_policy",
+      "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
     {
@@ -26976,6 +27066,11 @@
       "id": "write_shard",
       "kind": "function",
       "file": "tools/memory-tree/transition-audit.test.sh"
+    },
+    {
+      "id": "write_shims",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "write_skill",

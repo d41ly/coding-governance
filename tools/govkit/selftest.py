@@ -18175,6 +18175,37 @@ user_skills = "/tmp/gk-fake-skills"
         check("[aPrimedIndex-1] the verdict reader skips the runner's preflight, so a leg still reads",
               _rvm.get("fixture leg") == "green", repr(_rvm))
 
+    # ---- TOOL-dSafePassage-6 AC1 to AC7. THE FORWARDERS, THROUGH THE GENERATOR'S OWN FIXTURE. Every
+    # ---- language under every mode forwards exit 3, the arguments `a` and `b c` and the stdin `in`,
+    # ---- prints or stays silent as its mode says and journals one argument-free line; every window
+    # ---- pair of AC6 holds or allows a closed row; an unlanded row is held; and `--check` reds a
+    # ---- forwarder edited by hand. Each case asserts its exit AND its summary line. Run four at a
+    # ---- time: each plant is its own scratch repository, and serially they cost ~3 minutes.
+    import concurrent.futures as _cf
+    _shim_cases = [(f"[dSafePassage-6] AC3-AC5 plant {_l} --mode {_m} forwards intact and {_m} reports as it should",
+                    ["--plant", _l, "--mode", _m], 0, "observation(s) matched")
+                   for _l in ("sh", "js", "py", "module") for _m in ("warn", "journal", "unset", "bogus")]
+    _shim_cases += [(f"[dSafePassage-6] AC6 window {_w} with {_n} release(s) {'allows' if _rc == 0 else 'holds'} a closed row",
+                     ["--plant", "window", "--window", str(_w), "--releases", str(_n)], _rc,
+                     "allowed to close" if _rc == 0 else "the closed row is held")
+                    for _w, _n, _rc in ((0, 0, 1), (0, 1, 0), (1, 0, 1), (1, 1, 0), (2, 0, 1), (2, 1, 1),
+                                        (2, 2, 0), (4, 0, 1), (4, 3, 1), (4, 4, 0))]
+    _shim_cases += [("[dSafePassage-6] AC6 an unlanded row is held whatever its releases",
+                     ["--plant", "window", "--window", "0", "--releases", "2", "--unlanded"], 1,
+                     "the closed row is held"),
+                    ("[dSafePassage-6] AC1 --check reds a forwarder edited by hand",
+                     ["--plant", "parity-edit"], 0, "3 of 3 observation(s) matched")]
+
+    def _run_shim_case(case):
+        return case, subprocess.run([sys.executable, str(HERE / "shims.py"), "--fixture", *case[1]],
+                                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+
+    with _cf.ThreadPoolExecutor(max_workers=4) as _pool:
+        for (_label, _argv, _rc, _line), _p in _pool.map(_run_shim_case, _shim_cases):
+            _last = (_p.stdout.strip().splitlines() or [""])[-1]
+            check(_label, _p.returncode == _rc and _line in _last and "MISS" not in _p.stdout,
+                  f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")

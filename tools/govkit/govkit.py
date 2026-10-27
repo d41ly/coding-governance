@@ -260,6 +260,32 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+def read_policy_value(key: str, root: pathlib.Path | str, rev: str | None = None) -> tuple:
+    """-> (value, source, reason) for policy key `key` in the repository at `root`, as the policy
+    kit's `policy.py get` answers it: the committed policy at the landed revision, or at `rev` when
+    one is given, an unset key reading the catalogue default (TOOL-dSafePassage-6, -9, -13).
+
+    govkit reaches the policy kit as a subprocess and never imports it, finding it through the
+    inlined `resolve_kit_dir` from this directory; no kit found raises its LookupError, and a reader
+    refusal or any other failed read is a Refusal carrying the reader's own line.
+    """
+    kit = resolve_kit_dir("policy", "policy.py", GOVKIT_DIR)
+    argv = [sys.executable, str(kit / "policy.py"), "get", key, "--json", *(["--rev", rev] if rev else [])]
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    try:
+        p = subprocess.run(argv, cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", stdin=subprocess.DEVNULL, env=env)
+    except OSError as exc:
+        raise Refusal(f"govkit: policy.py get {key} did not run: {exc}") from None
+    try:
+        hit = json.loads(p.stdout) if p.returncode == 0 else None
+    except ValueError:
+        hit = None
+    if not isinstance(hit, dict) or "value" not in hit:
+        raise Refusal((p.stderr or "").strip() or f"govkit: policy.py get {key} exited {p.returncode}")
+    return hit["value"], hit.get("source"), hit.get("reason")
+
+
 def resolve_tool_path(root: pathlib.Path | str, *parts: str) -> pathlib.Path:
     """`root` joined to its derived tool root and then to `parts` — a name spelled kit-relatively."""
     tr = derive_tool_root(root)
@@ -3814,6 +3840,32 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
                f"`{_akey[_nm]}` instead")
     r.note(f"adopter names: {len(_anames)} from {len(_adopters)} adopters.toml row(s) over "
            f"{len(_shipped)} shipped file(s) · {sum(_measured.values())} site(s)")
+
+    # ---- 11: TOOL-dSafePassage-6. EVERY FORWARDER IS ITS RENDER, AND NONE CLOSES BEFORE ITS WINDOW.
+    #          `shims.py`'s parity over `shims.toml` (each open row's forwarder equals its render,
+    #          each closed row's file is gone) and its window (a `closed = true` row is refused until
+    #          `install.deprecation-window` releases are cut since its landing, and while no release
+    #          exists). The count prints on every run, a zero included, since gov ships no shim yet.
+    #          DOES NOT CHECK: that a forwarder's target exists — the step gate sees a vanished member.
+    #          A govkit copied without `shims.py` beside it (a self-test's scratch gov) declares no
+    #          shim to grade, and the arm says it stood down rather than printing a graded zero.
+    _sh_src = GOVKIT_DIR / "shims.py"
+    if not _sh_src.is_file():
+        r.note(f"shims: arm 11 stood down, graded nothing: no {_sh_src.name} beside {GOVKIT_DIR.as_posix()}")
+        return r.emit()
+    _sh_spec = importlib.util.spec_from_file_location("shims", _sh_src)
+    shims = importlib.util.module_from_spec(_sh_spec)
+    _sh_spec.loader.exec_module(shims)
+    try:
+        _sh_rows = shims.read_shim_rows(root)
+        _sh_n, _sh_parity = shims.check_shim_parity(root)
+        _sh_held = shims.check_shim_windows(root)
+    except Refusal as exc:
+        _sh_rows, _sh_n, _sh_parity, _sh_held = [], 0, [str(exc)], []
+    for _f in (*_sh_parity, *_sh_held):
+        r.fail(_f)
+    _sh_closed = sum(bool(row["closed"]) for row in _sh_rows)
+    r.note(f"shims: {_sh_n} row(s) graded · {_sh_n - _sh_closed} open · {_sh_closed} closed")
     return r.emit()
 
 

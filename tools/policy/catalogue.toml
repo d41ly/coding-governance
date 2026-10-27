@@ -1636,12 +1636,16 @@ owner = "dSafePassage"
 name = "install.deprecation-window"
 allowed = [0, 1, 2, 4]
 default = 2
+summary = "How many releases gov cuts after a moved surface's forwarder lands before it may take the forwarder away; no forwarder closes before the first release."
+usage = 'install.deprecation-window = 4'
 owner = "dSafePassage"
 
 [[key]]
 name = "install.on-shim-call"
 allowed = ["warn", "journal"]
 default = "warn"
+summary = "What a forwarder left at a moved command, hook or module path does when called: print a line naming the new path and journal the call, or journal it silently."
+usage = 'install.on-shim-call = "journal"'
 owner = "dSafePassage"
 
 [[key]]

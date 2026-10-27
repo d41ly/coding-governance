@@ -1419,6 +1419,7 @@
       "{prefix}/govkit/govkit.py",
       "selfcheck"
     ],
+    "reads": {"history": "its arm 11 finds the commit that landed each closed shim row with `git log --first-parent -S` and counts the releases descending from it (TOOL-dSafePassage-6)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 310

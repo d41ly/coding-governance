@@ -1,0 +1,16 @@
+# shims.toml - one [[shim]] row per surface gov has moved: a command, a hook path or a module
+# import (TOOL-dSafePassage-6). `python <this kit>/shims.py --write` renders each open row's
+# forwarder at its `from` path, and `--check` holds every forwarder equal to its render and every
+# closed row's file absent. A forwarder is never written by hand. What an adopter sees:
+# help/shims.md.
+#
+# Keys, every one required:
+#   id     = "<entry>/<slug>"                 # unique, as a step id
+#   kind   = "command" | "hook" | "module"   # a module row's paths end in .py
+#   from   = "{prefix}/<kit>/<old path>"      # the forwarder is written here; .sh, .js or .py
+#   to     = "{prefix}/<kit>/<new path>"      # what it forwards to, in the same language
+#   closed = false                            # true only once install.deprecation-window allows it
+#
+# A row lands with closed = false. `govkit selfcheck` refuses closed = true until at least one
+# release has been cut and at least the window's count of releases have been cut since the commit
+# that landed the row on the default branch. Gov has moved no surface yet, so this file holds no row.

@@ -72,10 +72,8 @@ help.atlas
 help.enforce
 help.explanation
 hooks.bypass
-install.deprecation-window
 install.from
 install.guards
-install.on-shim-call
 install.retired-edits
 install.steps
 instructions.checks

@@ -9,4 +9,5 @@ One task-oriented page per user-facing feature: what it is, how to use it, a sho
 - [Upgrade steps and retired kits](upgrade-steps.md) — what an `[[upgrade]]` step and a `[[retired]]` kit are, what `update` does with a kit that has a successor, and where `.agent-cap.conf`'s value now lives.
 - [The step gate](step-gate.md) — the `step-gate` leg: what it reds when a landing makes an adopter-visible member vanish, how a landing answers it with an `[[upgrade]]` or `[[retired]]` row, and how a later class joins.
 - [The size caps](size-caps.md) — one switch, `budgets.enforce`, over every size cap a gate enforces; the pins that keep a cap refusing; which caps sit outside the switch; and where each cap's value is declared.
+- [Forwarders for a moved path](shims.md) — what a call to a moved command, hook or module path does, the two `install.on-shim-call` modes, where the journal is, and how long `install.deprecation-window` holds a forwarder.
 - [The Python floor](python-floor.md) — the interpreter floor every gate and hook runs at, what the resolver's refusal says, how to install the floor, and what `platforms.provision`'s three values do.
