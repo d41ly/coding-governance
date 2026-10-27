@@ -313,8 +313,7 @@ observed RED then GREEN at the close as M8 owes, and its suite's clean reading i
   late-answer cause. Options: (a) `route-back` on the answered item, a re-entry being a backward
   transition, as TOOL-dPlacedRequest-14 S4 draws `route-back` on `item.entry.place` for a re-placement;
   (b) a new `amendment` cause. (b) widens a sibling unit's closed set for a draw (a) already names.
-  RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the brief's D9 reading. widens: none ·
-  relaxes: none
+  RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the brief's D9 reading. widens: none · relaxes: none
 - **F4 — Who reads whether a fork was decided?** Options: (a) the driver, whose `plan_state` already
   holds the mark grammar, through `--fork-state`; (b) a Python reader in the loop kit. (b) is a third
   spelling of a grammar a contract suite keeps at two. RESOLVED (agent, 2026-10-26, delegated): (a),

@@ -307,8 +307,7 @@ kit's suites: they are waived for this build's landing (the README's build-level
   widens: none · relaxes: none
 - **F6 — The `ask` value parks for the owner: with which question kind?** Options: (a) TOOL-dBoundRoles-11's
   existing kind `refusal`, as TOOL-dBoundRoles-26 asks it; (b) a new kind `contradiction`. (b) widens a
-  sibling build's closed set. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  sibling build's closed set. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes: none
 - **F7 — The severity of a repair ask.** Options: (a) `LOW`, the gap register's rating of
   `gap-roles-17`; (b) `MED`; (c) `HIGH`, as the driver's other auto-filers write. RESOLVED (agent,
   2026-10-26, delegated): (a), rung 1, the gap register's line 169 rates a missing repair route LOW,
