@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-61 — the ninth spec audit's 27 minors: a reach and a landing rule read over the population and range they claim, one frozen parse compared, a guard fixture graded through the trip rule's own object, a registry-less root named, an empty prefix documented as `tools`, and every deploy key and row field refused at one check
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 8f5d36ad · streams tooling · order 33 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node d · Tier-2 · base 8f5d36ad · streams tooling · order 33 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

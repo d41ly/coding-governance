@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-45 — the fourth spec audit's 8 upgrade-step minors: a copied kit.toml matched on its own `home`, a top level compared as a file, every git child stripped of the leaking variables, live fixtures, one tool-root search and a deploy descriptor refused by name
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

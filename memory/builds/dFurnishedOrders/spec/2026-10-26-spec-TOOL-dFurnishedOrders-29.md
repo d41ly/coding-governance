@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-29 — the round-1 audit's 35 roles, hooks and runlog minors: one reader per value, bounded slot readers, the verifier hooks' failure paths and registries, and fixtures that read only what they plant
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-5 — each role's trust profile and context temperature declared and rendered
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 2 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 2 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0196@f158a89c whole
 **Carries:** node:policy-key.roles.trust

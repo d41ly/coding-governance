@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-28 — an unreadable presence inside a run's window reads away, so no owner question of an unattended run is held for an owner nobody can show is there
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

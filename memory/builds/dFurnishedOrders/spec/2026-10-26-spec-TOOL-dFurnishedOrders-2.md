@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-2 — prompt-writer calls batched by `prompts.batch`: one call frames a step's tasks of one role, split per task at render
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 19 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 19 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0193@a564937b whole
 

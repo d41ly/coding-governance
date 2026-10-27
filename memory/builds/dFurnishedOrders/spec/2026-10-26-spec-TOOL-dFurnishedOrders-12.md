@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-12 — the work order's `map` slot for the roles `memory.project-map` names, with each item's unfolds
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 15 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 15 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0203@325cbb22 whole
 **Carries:** node:policy-key.memory.project-map

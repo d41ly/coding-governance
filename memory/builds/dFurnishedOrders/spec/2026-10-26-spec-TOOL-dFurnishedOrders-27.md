@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-27 — every owner question the driver raises carries the run's window: `--dispatch` and `--phase` ask the door through one helper that hands it the run's session and lease start
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 21 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

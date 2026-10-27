@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-59 — unit 53's one-way case planted: the guard fixture holds a `kit.toml` row below the home it drops, asserts the old rule would read that home covered, and shows the arm graded the planted row
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base dee9e867 · streams tooling · order 31 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base dee9e867 · streams tooling · order 31 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-4 — the work order's optional slots in three states, and bug classes as a core field the spec names
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 4 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 4 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0195@d3ad9dda whole
 

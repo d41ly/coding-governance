@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-53 — the guard arm's covered rule is one-way for a required directory: each required path meets the trip rule without its trailing slash, so a home's own `kit.toml` row never covers the home
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

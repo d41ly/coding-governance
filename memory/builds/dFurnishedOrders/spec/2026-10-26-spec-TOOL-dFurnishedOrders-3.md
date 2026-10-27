@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-3 — a return's harness notices persisted with it, as runlog `notice` events and on the agent ledger's returned line, by `notices.record`
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 7 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 7 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0194@48cbc488 whole
 **Carries:** node:policy-key.notices.record

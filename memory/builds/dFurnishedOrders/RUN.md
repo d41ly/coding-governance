@@ -128,3 +128,123 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-27T06:01:39Z rescope · item add TOOL-dFurnishedOrders-61 · reason spec-audit round1 of the round-8 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 1 9 27 2 3 10 13 12 19 11 22 18 29 (items M1-M9) and LOW ids 28 4 5 14 6 7 31 15 16 17 20 24 25 30 (items L1-L12)
 
 2026-10-27T06:22:12Z review · item dFurnishedOrders-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 27 · disposition promote
+
+2026-10-27T06:49:02Z rescope · item defer TOOL-dFurnishedOrders-1 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:03Z rescope · item defer TOOL-dFurnishedOrders-2 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:03Z rescope · item defer TOOL-dFurnishedOrders-3 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:04Z rescope · item defer TOOL-dFurnishedOrders-4 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:05Z rescope · item defer TOOL-dFurnishedOrders-5 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:05Z rescope · item defer TOOL-dFurnishedOrders-6 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:06Z rescope · item defer TOOL-dFurnishedOrders-7 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:07Z rescope · item defer TOOL-dFurnishedOrders-8 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:07Z rescope · item defer TOOL-dFurnishedOrders-9 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:08Z rescope · item defer TOOL-dFurnishedOrders-10 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:09Z rescope · item defer TOOL-dFurnishedOrders-11 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:09Z rescope · item defer TOOL-dFurnishedOrders-12 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:10Z rescope · item defer TOOL-dFurnishedOrders-13 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:11Z rescope · item defer TOOL-dFurnishedOrders-14 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:11Z rescope · item defer TOOL-dFurnishedOrders-15 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:12Z rescope · item defer TOOL-dFurnishedOrders-16 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:13Z rescope · item defer TOOL-dFurnishedOrders-17 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:13Z rescope · item defer TOOL-dFurnishedOrders-18 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:14Z rescope · item defer TOOL-dFurnishedOrders-19 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:15Z rescope · item defer TOOL-dFurnishedOrders-20 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:15Z rescope · item defer TOOL-dFurnishedOrders-22 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:16Z rescope · item defer TOOL-dFurnishedOrders-23 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:17Z rescope · item defer TOOL-dFurnishedOrders-24 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:17Z rescope · item defer TOOL-dFurnishedOrders-25 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:18Z rescope · item defer TOOL-dFurnishedOrders-26 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:19Z rescope · item defer TOOL-dFurnishedOrders-27 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:19Z rescope · item defer TOOL-dFurnishedOrders-28 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:20Z rescope · item defer TOOL-dFurnishedOrders-29 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:21Z rescope · item defer TOOL-dFurnishedOrders-30 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:21Z rescope · item defer TOOL-dFurnishedOrders-31 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:22Z rescope · item defer TOOL-dFurnishedOrders-32 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:23Z rescope · item defer TOOL-dFurnishedOrders-33 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:23Z rescope · item defer TOOL-dFurnishedOrders-34 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:24Z rescope · item defer TOOL-dFurnishedOrders-35 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:25Z rescope · item defer TOOL-dFurnishedOrders-36 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:25Z rescope · item defer TOOL-dFurnishedOrders-37 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:26Z rescope · item defer TOOL-dFurnishedOrders-38 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:27Z rescope · item defer TOOL-dFurnishedOrders-39 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:27Z rescope · item defer TOOL-dFurnishedOrders-40 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:28Z rescope · item defer TOOL-dFurnishedOrders-41 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:29Z rescope · item defer TOOL-dFurnishedOrders-42 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:29Z rescope · item defer TOOL-dFurnishedOrders-43 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:30Z rescope · item defer TOOL-dFurnishedOrders-44 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:31Z rescope · item defer TOOL-dFurnishedOrders-45 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:31Z rescope · item defer TOOL-dFurnishedOrders-46 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:32Z rescope · item defer TOOL-dFurnishedOrders-47 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:33Z rescope · item defer TOOL-dFurnishedOrders-48 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:33Z rescope · item defer TOOL-dFurnishedOrders-49 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:34Z rescope · item defer TOOL-dFurnishedOrders-50 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:35Z rescope · item defer TOOL-dFurnishedOrders-51 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:35Z rescope · item defer TOOL-dFurnishedOrders-52 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:36Z rescope · item defer TOOL-dFurnishedOrders-53 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:37Z rescope · item defer TOOL-dFurnishedOrders-54 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:37Z rescope · item defer TOOL-dFurnishedOrders-55 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:38Z rescope · item defer TOOL-dFurnishedOrders-56 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:39Z rescope · item defer TOOL-dFurnishedOrders-57 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:39Z rescope · item defer TOOL-dFurnishedOrders-58 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:40Z rescope · item defer TOOL-dFurnishedOrders-59 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:41Z rescope · item defer TOOL-dFurnishedOrders-60 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T06:49:42Z rescope · item defer TOOL-dFurnishedOrders-61 · reason spec run (README rule 1): specced here, its spec-audit chain stopped by the owner's rule at round 9; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-9 — the role-by-step matrix derived from the item declarations, joined both ways, and rendered to each role as its own row
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0200@89a5045e whole
 

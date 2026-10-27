@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-51 — unit 49's interrupt probe reads the pid its kill path targets: a Python stub writing `os.getpid()`, that pid read live before the interrupt in the kill's own namespace, and a no-op tree kill that reds the arm
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 28 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 28 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-56 — the guard arm returns the row that covered each required path, so a criterion over a scratch manifest proves the copy's own spelling was graded and reds when another manifest was read
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

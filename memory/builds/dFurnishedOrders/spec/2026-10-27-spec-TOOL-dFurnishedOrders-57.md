@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-57 — unit 50's reach read from the spec-token checker itself: the `govkit selftest <- ` tokens its `[guards]` rows print over the whole resolved guard, and every waiver row keyed to one of them
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 29 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 29 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

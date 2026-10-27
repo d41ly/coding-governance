@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-7 — a false handed fact repaired in the return and filed as an ask against its producer's record, routed by `roles.on-contradiction` through the refusal outcome table
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0198@9197dfef whole
 **Carries:** node:policy-key.roles.on-contradiction

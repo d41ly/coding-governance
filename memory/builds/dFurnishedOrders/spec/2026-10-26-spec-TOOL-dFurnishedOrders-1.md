@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-1 — the orientation scout composing the card in a sidechain at session start, its recall re-verified once at entry and a moved-source record handed as stale
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 5 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 5 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0192@e52307f5 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-24 — each work order's return schema rendered as one branch per outcome, the template's and each arm's, so a valid refused or probe return passes and a malformed one fails on its own fields
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

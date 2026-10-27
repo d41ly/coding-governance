@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-16 — owner questions asked live while the build is attended, never decided at raise, and a late answer placed as an amendment that re-enters its item
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 2193e25d · streams tooling · order 20 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 2193e25d · streams tooling · order 20 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0207@770af750 whole
 

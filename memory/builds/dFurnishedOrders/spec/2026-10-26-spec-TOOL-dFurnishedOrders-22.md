@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-22 — a verifier's subject declared as the input slots it reads, `subject-reads`, checked against `reads` and `verifies` and written into the role index
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

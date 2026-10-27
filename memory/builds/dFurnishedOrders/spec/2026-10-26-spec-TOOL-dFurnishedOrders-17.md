@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-17 — the `code` slot rendered per item from its declared seed, as ranges under `memory.code-budget`
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 16 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 16 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0208@b6c1dedb whole
 **Carries:** node:policy-key.memory.code-budget

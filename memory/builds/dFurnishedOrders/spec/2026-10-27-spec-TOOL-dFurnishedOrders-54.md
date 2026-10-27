@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-54 — the guard arm's trip answer is computed over the `legs` it is handed: the spec-token checker's own per-path join, loaded by path and run in process, so a scratch manifest is the manifest graded
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

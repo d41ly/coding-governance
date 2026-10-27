@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-44 — the step's receipt homes held to the receipt `apply` writes: one govkit selftest arm applies every shipped kit to a scratch target with a per-kit override and compares both ways
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

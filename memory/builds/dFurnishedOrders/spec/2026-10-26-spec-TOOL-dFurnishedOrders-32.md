@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-32 — a reviewer's subject read from the roster present at the pass: the merged reviewer's subject is the first slot of a `subject-reads` group its work order hands, so its criterion stays non-exempt
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 13 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 13 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-34 — the posture read's failures named and bounded: a `breakpoints.py list` that fails, hangs or prints no `attendance —` line, and a policy read that fails, each an unreadable posture with its cause
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

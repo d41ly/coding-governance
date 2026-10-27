@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-31 — a field table is no outcome arm: `derive_return_arms` yields only tables carrying `outcome`, so every branch of the per-order schema names an outcome from the step unit 24 builds at
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 10 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 10 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

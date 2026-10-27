@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-49 — the fifth spec audit's 6 roles-suite, budget and write-set minors: a disjointness read from what units 45 and 46 wrote, a budget re-pinned from every worktree's readings by an expression, and an interrupt probe that waits for its child
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

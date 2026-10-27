@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-47 — unit 44's parity arm grades the receipt `apply` finishes: an adopter or render problem outside home parity is named and tolerated, and a refusal before the final receipt still fails the arm
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

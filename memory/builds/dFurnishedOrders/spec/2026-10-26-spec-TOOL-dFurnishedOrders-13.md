@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-13 — the orientation scout composing the card's project-map cell, placed and shape-checked at the append, not installed until the map renderer lands
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0204@34f664ed whole
 

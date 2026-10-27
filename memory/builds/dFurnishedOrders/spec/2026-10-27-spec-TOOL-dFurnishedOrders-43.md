@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-43 — a receipt target's kit homes are the directories `apply` lands each kit's home at, derived through the entry's own destination rules, never a formula beside them
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

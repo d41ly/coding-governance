@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-55 — the guard arm's glob rows read from the `legs` it is handed: each `govkit selftest` row carrying the checker's `GLOB_MAGIC` printed as unevaluated, never as covering, missing or dropped
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-6 — the answered-call hook: a role agent's call its work order already answers refused, warned or recorded by `roles.answered-calls`, a verifier's read of its subject exempt, and each hook failure recorded
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 11 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 11 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0197@ced122c4 whole
 **Carries:** node:policy-key.roles.answered-calls

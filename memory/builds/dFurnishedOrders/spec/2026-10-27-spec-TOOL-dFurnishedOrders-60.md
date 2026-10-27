@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-60 — the eighth spec audit's 24 minors: a guard arm that grades the population it claims and names every checker failure, a reach read on the checker's own separators, waiver rows that name what they waive, one pass predicate, an interrupt cleanup on the held child, every deploy key refused by shape, and criteria that read the line they claim
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base dee9e867 · streams tooling · order 32 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base dee9e867 · streams tooling · order 32 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

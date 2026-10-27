@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-20 — the problems whose subject meets an item's seed, read from the register when the order is cut and handed as rows
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 17 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 17 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0211@6b17e1fe whole
 

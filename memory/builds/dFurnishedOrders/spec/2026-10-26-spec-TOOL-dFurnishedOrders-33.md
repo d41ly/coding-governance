@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-33 — an unreadable posture inside a run's window reads away unless an owner turn after the run's start shows the owner there, so the stall an unread posture holds is closed
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node d · Tier-2 · base 8c395e3c · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 8c395e3c · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

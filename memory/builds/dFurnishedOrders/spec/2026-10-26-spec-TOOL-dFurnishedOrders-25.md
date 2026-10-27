@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-25 — the retired-argument upgrade steps scan an adopter's executable call sites only, never its records or its markdown, so `up` and `witness` pass on a tree whose history quotes the retired command
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 5 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 5 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

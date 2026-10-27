@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-36 — the kits' own suites out of the call-site scan on every target: a `project-owned` file or a `*.test.sh` under a kit home spells the retired keys on purpose and is never an adopter's call site
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-35 — the call-site scan's kit files defined on every target kind: gov's own kit source, a receipt, or the directories a `kit.toml` homes, so gov's own update walk passes
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 6 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

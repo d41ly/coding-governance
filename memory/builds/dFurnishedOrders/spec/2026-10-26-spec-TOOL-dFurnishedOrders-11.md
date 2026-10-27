@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-11 — the work order's memory, code-notes, legacy and house-index slots, each under its own budget and its own answer
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 14 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 14 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0202@504bb58f whole
 **Carries:** node:policy-key.retrofit.slot-bytes

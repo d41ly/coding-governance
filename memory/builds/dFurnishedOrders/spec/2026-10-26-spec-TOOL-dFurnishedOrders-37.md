@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-37 — the second spec audit's 37 minors: readers that tell a missing input from an empty one, one bounded runner, the retired-key scan's shapes and conf, the card's map cell bounded and never re-derived, and criteria that read what they claim
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 23 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 23 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

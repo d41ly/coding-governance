@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-30 — the round-1 audit's 16 workflows, unattended, kickoff and memory-tree minors: retired keys refused and observed, every cold carrier named, the card's map cell given a failure state, and the harness's rows checked in-script
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

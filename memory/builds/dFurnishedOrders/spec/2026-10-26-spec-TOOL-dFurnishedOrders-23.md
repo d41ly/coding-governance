@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-23 — the answered-call hook's verifier exemption keyed on `subject-reads`, and certified on every verifier the shipped role index holds, never on a planted block name
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5ff43572 · streams tooling · order 12 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 

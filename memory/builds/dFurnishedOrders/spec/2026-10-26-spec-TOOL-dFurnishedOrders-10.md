@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-10 — role metrics per role and item, classed by runlog's extractor and kept in this build's metrics file
 
-**Status:** OPEN · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 13 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 13 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0201@53144abb whole
 
