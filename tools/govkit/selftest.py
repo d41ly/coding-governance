@@ -18336,6 +18336,8 @@ user_skills = "/tmp/gk-fake-skills"
     # line-ending-only rewrite read unedited; `oid-only` stages AC1's red.
     _rte_cases += [(f"[dSafePassage-63] plant {_pl} matches its case", [_pl], 0)
                    for _pl in ("render-edited-no-oid", "render-eol-no-oid")]
+    # TOOL-dSafePassage-64 AC1: a `retired-edited` row takes back `engine` once gov ships it again.
+    _rte_cases += [("[dSafePassage-64] plant edited-reshipped matches its case", ["edited-reshipped"], 0)]
     _rte_cases += [(f"[dSafePassage-9] plant {_pl} --stub {_st} stages its red", [_pl, "--stub", _st], 1)
                    for _pl, _st in (("edited-row", "forked"), ("keep", "report-omits"),
                                     ("render-edited", "today"), ("seed-retired-edited", "seed-override"),

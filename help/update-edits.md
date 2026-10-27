@@ -7,8 +7,9 @@ used to pass silently; each now keeps your bytes and says what it did.
 
 Gov retires a file, and your copy carries an edit of yours. `update` reports the row as
 **`retired-edited`**, never `patched` and never `forked`, and never writes or deletes your copy,
-`--write-withdrawals` included. The receipt records the row's role as `retired-edited`, so every
-later run treats it the same way. What happens next is `install.retired-edits` in your <!-- usage: policy:install.retired-edits b88bd05f -->
+`--write-withdrawals` included. The receipt records the row's role as `retired-edited`, and the row
+keeps that role until gov ships the file again, when it returns to the role gov's kit gives it and is
+graded as any file of that role. What happens next is `install.retired-edits` in your <!-- usage: policy:install.retired-edits b88bd05f -->
 `.governance/policy.toml`:
 
 | Value | What `update` does |

@@ -31,7 +31,7 @@ import govkit  # noqa: E402 — the deployer itself, for its tool root, its slug
 PFX = govkit.derive_tool_root(govkit.repo_root())
 PLANTS = ("fragment-withdrawn", "fragment-rollback", "edited-gone", "edited-row", "keep",
           "seed-retired-edited", "seed-retired-clean", "render-edited", "render-clean",
-          "render-edited-no-oid", "render-eol-no-oid", "dispatch-gap")
+          "render-edited-no-oid", "render-eol-no-oid", "dispatch-gap", "edited-reshipped")
 # Each stub is one statement over the scratch module `m`, run after it loads and before its `main`.
 STUBS = {
     "forked": 'm.UPDATE_ROLE["retired-edited"] = m.UPDATE_ROLE["forked"]',
@@ -243,7 +243,7 @@ def run_plant(tmp: pathlib.Path, plant: str, stub: str, write_withdrawals: bool,
                     ("fragment file", "present" if read_bytes(t, frag) else "gone",
                      "gone" if write_withdrawals else "present")]
         return obs
-    if plant in ("edited-gone", "edited-row", "keep"):
+    if plant in ("edited-gone", "edited-row", "keep", "edited-reshipped"):
         edited = b"gov's line\nthe target's edit\n"
         (t / gone).write_bytes(edited)
         write_commit(t, "the target edits a gov file")
@@ -261,6 +261,16 @@ def run_plant(tmp: pathlib.Path, plant: str, stub: str, write_withdrawals: bool,
                     '[install]\nretired-edits = "keep"\n', encoding="utf-8", newline="\n")
             write_commit(t, "the first order cleared" + (", retired edits kept" if plant == "keep" else ""))
             obs.append(("role before the second run", read_role(t, gone), "retired-edited"))
+            if plant == "edited-reshipped":
+                # TOOL-dSafePassage-64: gov ships the file again with the bytes it held at `A`.
+                write_gov_files(g, {"gone.txt": FILES["gone.txt"]})
+                write_commit(g, "C")
+                out = run_update(g, t, stub=stub)
+                return obs + [("verdict " + gone, read_verdict(out, gone), "patched"),
+                              ("receipt role", read_role(t, gone), "engine"),
+                              ("retired-edited orders", str(len(read_orders(t, "retired-edited"))), "0"),
+                              ("the edited bytes", "kept" if read_bytes(t, gone) == edited else "lost",
+                               "kept")]
             out = run_update(g, t, stub=stub)
         obs.append(("verdict " + gone, read_verdict(out, gone), "retired-edited"))
         if plant == "keep":

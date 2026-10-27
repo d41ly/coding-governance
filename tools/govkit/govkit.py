@@ -10149,6 +10149,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             w = res["writes"].get(row["path"])
             now = w["role"] if w else next(
                 (u["role"] for u in res["unlanded"] if u["dest"] == row["path"]), None)
+            # TOOL-dSafePassage-64 S1. `retired-edited` IS NO DESCRIPTOR'S ROLE: the write loop sets
+            # it because gov held no blob at the row's source, so once gov ships the path again the
+            # state's one premise is false and the row takes back the role gov now declares, in this
+            # run and with no flag. Its `commit`, `source` and `gov_oid` stay, so the verdict grid
+            # grades it from the vintage it landed at (`patched` keeps the edit, a moved gov side
+            # reaches the three-way). Never into a kit-writing disposition, whose regenerate would
+            # write over the edit with no conflict (DEPL-cMendedVintage-27 S1).
+            if (role == "retired-edited" and now
+                    and UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS):
+                row["role"] = role = now
+                how = UPDATE_ROLE.get(now)
             if now and now != role:
                 # S3. TWO BRANCHES, NEVER ONE WIDENED. A schema-1 receipt's ROLE is untrusted for a
                 # different reason: unit 1 measured that such a receipt stamps `engine` on a file
