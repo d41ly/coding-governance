@@ -310,8 +310,7 @@ New arm: tools/lib/resolve-python.test.sh · covers none · the launcher's `PARI
   `grep -a -o 'u({hookEventName:A("[A-Za-z]*")[^}]*})'` over the `claude` on PATH (`claude --version`
   2.1.292, 2026-10-26). Observation: the `PostToolUse` schema carries `additionalContext`. Liveness: the
   same probe reads `CwdChanged` and `PermissionDenied` without it. RESOLVED (agent, 2026-10-26,
-  delegated): PostToolUse `hookSpecificOutput.additionalContext`, the channel S3 emits. widens: none ·
-  relaxes: none
+  delegated): PostToolUse `hookSpecificOutput.additionalContext`, the channel S3 emits. widens: none · relaxes: none
 
 ## 9. Revision log
 

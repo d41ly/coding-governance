@@ -377,8 +377,7 @@ New arm: tools/memory-tree/adopt_program.py · covers AC1 AC2 AC3 AC4 AC7 AC8 ·
 - **F4 — How does 94 AC5 tell the locator from 81's key rule?** Options: (a) state that a key needs a
   colon outside quotes and `${{ }}`; (b) relax AC5 to any reason other than AC1's to AC3's; (c) plant
   AC3's scalar without `${{`. (b) and (c) leave 94 S3's disjointness claim false; (a) satisfies every
-  criterion and leaves none open. RESOLVED (agent, 2026-10-27, delegated): (a), S8. widens: none ·
-  relaxes: none
+  criterion and leaves none open. RESOLVED (agent, 2026-10-27, delegated): (a), S8. widens: none · relaxes: none
 
 ## 9. Revision log
 

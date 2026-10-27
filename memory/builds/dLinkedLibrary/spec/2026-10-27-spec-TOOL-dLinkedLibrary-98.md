@@ -137,8 +137,7 @@ probe by `python -I -c` and writes S4's line, and `TOOL-dLinkedLibrary-101`'s pa
 - **F2 — How does the blob keep its CRs?** Options: (a) `git config core.autocrlf false` in the scratch
   repository before `git add`; (b) `git hash-object -w --no-filters` with `update-index --cacheinfo`.
   Both are the report's. (a) leaves an attributes file able to fold; (b) satisfies every criterion
-  either does and leaves no follow-up. RESOLVED (agent, 2026-10-27, delegated): (b), S1. widens: none ·
-  relaxes: none
+  either does and leaves no follow-up. RESOLVED (agent, 2026-10-27, delegated): (b), S1. widens: none · relaxes: none
 
 ## 9. Revision log
 

@@ -285,8 +285,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-
   deviation and spans derive from definitions alone, `gov:end` building no half; (b) the pass parks
   the unit. The chain's fork rule parks nothing (the execution plan, lines 900-946), and the research
   names definitions alone as the survivor when the share is that high. RESOLVED (agent, 2026-10-26,
-  delegated): (a), rung 1, the research's loss rule as v2's `[owed]` line states it. widens: none ·
-  relaxes: none
+  delegated): (a), rung 1, the research's loss rule as v2's `[owed]` line states it. widens: none · relaxes: none
 
 ## 9. Revision log
 

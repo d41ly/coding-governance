@@ -263,8 +263,7 @@ New arm: tools/memory-tree/code_enrich.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · `
   sanctioned directory `memory/code/`, a change to hygiene check 3's set. (a) loses an agent's work
   at the node boundary, since the index is a cache under the git common directory; (c) changes a
   governance carrier for one file. RESOLVED (agent, 2026-10-26, delegated): (b), rung 3, the
-  registry form TOOL-dTotalRecall-68 already takes for `census-kept-paths.txt`. widens: none ·
-  relaxes: none
+  registry form TOOL-dTotalRecall-68 already takes for `census-kept-paths.txt`. widens: none · relaxes: none
 - **F2 — What does `in-code-notes` read, and does the agent's pass run under it?** NP-11's option
   reads "in-code `gov:note` only". Options: (a) notes only, docstrings ignored; (b) docstrings and
   headers first, then a note, with no agent pass; (c) the agent's pass writes notes into code. (a)

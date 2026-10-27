@@ -130,8 +130,7 @@ adopted. It repairs `TOOL-dLinkedLibrary-3` and builds one step after it (order 
 - **F2 — Which file does `MAP_CLI` name?** Options: (a) `house_index.py`; (b) `gov_code.py`; (c) keep
   `gov_map.py` and gate on the verdict. (c) leaves the skip on `lose` (veto 1 against unit 3's S4); (b)
   declares the map adopted wherever the core is (veto 1 against S3's "the declaration that the map is
-  adopted"). RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the one survivor. widens: none ·
-  relaxes: none
+  adopted"). RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the one survivor. widens: none · relaxes: none
 
 ## 9. Revision log
 

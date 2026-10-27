@@ -398,8 +398,7 @@ New arm: tools/memory-tree/adopt_program.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC
   (retrofit.md:455). Options: (a) dossiers for the paths no dossier claims, where the codebase map is
   installed; (b) every record kind a unit pass writes; (c) code purposes. (b) names kinds whose
   first-touch writers are dScopedBuild's and unbuilt; (c) are not records and are
-  TOOL-dLinkedLibrary-15's. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  TOOL-dLinkedLibrary-15's. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 

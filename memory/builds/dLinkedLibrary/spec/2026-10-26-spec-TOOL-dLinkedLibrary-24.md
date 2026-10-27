@@ -289,8 +289,7 @@ New arm: tools/memory-tree/gotchas.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 
   dLinkedLibrary's `shape:` field and `derive_gate_status` (TOOL-dLinkedLibrary-24 S1, S2) say which."
   Accept line: "accept `review_dispose.py classes` earns no gate for a class whose status is `gated` and,
   under `second-occurrence`, none for a `shape: judgement` class, seen on one planted record of each."
-  The main loop files it. RESOLVED (agent, 2026-10-26, delegated): filed as stated, rung 3. widens: none ·
-  relaxes: none
+  The main loop files it. RESOLVED (agent, 2026-10-26, delegated): filed as stated, rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 

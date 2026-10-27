@@ -243,8 +243,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 AC4 AC5 · the playb
   The literal pair is not a second spelling of the selector set: it names the narrower set whose
   members exist only to select, which `role` does not say, so no factory is owed. RESOLVED (agent,
   2026-10-26, delegated): (a), rung 3, the only option satisfying AC4; the brief's count was wrong, as
-  `feature` is the sixth later selector, not the third, and the return says so. widens: none ·
-  relaxes: none
+  `feature` is the sixth later selector, not the third, and the return says so. widens: none · relaxes: none
 
 ## 9. Revision log
 

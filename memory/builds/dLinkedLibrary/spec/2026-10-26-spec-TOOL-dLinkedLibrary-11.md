@@ -278,8 +278,7 @@ New arm: tools/drift-audit/selftest.py · covers AC7 · its report-only pin arm 
   for a repeat; (b) the enclosing definition's qualified name; (c) the block's line number. (c) is
   refused by the factory, and (b) leaves a top-level block and two blocks in one definition without a
   key. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the only option keying every block, and
-  the tie-break's reuse of `derive_pin_hash`, the normaliser the chain's pins share. widens: none ·
-  relaxes: none
+  the tie-break's reuse of `derive_pin_hash`, the normaliser the chain's pins share. widens: none · relaxes: none
 
 ## 9. Revision log
 

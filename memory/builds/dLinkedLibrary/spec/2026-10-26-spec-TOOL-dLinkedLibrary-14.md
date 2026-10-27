@@ -259,8 +259,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC7 · the `grep_words_py` `
   feature-rich survivor: the clause's level-1 view exists under either verdict, and `gov map code`
   prints it wherever `gov map` exists; I17 is refined to name `gov_code.py map` as the render and
   `gov_map.py code` as its map-side form. On a `lose`, the pass records the `gov map code` spelling
-  carried by `gov_code.py map` alone as a deviation from cl-dClosedLoop-0251. widens: none ·
-  relaxes: none
+  carried by `gov_code.py map` alone as a deviation from cl-dClosedLoop-0251. widens: none · relaxes: none
 - **F2 — `grep_words`: extract a primitive, or call `git grep` inline again?** Options: (a) inline in
   `gov_code.py`, a second copy of drift's batched call; (b) extract the canonical block at this, its
   second instance, carried inline by both kits under a parity row; (c) import drift's function across
