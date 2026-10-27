@@ -818,9 +818,10 @@ def set_step_state(receipt: dict, step_id, introduced, state, failure=None, via=
     """Record `step_id` at `state` in the receipt's `steps`: the field's one writer (S3).
 
     The row moves to the end, so the last `applied` row is the last completed step; a known
-    `introduced` survives a call passing None. `via` is written only when given, and only
-    "witness" on an `applied` row is legal (TOOL-dSafePassage-33), so a rewrite that passes none
-    drops the mark. It refuses a receipt `test_steps_recordable` rejects and any row
+    `introduced` survives a call passing None. `via` is written when given, and only "witness" on
+    an `applied` row is legal (TOOL-dSafePassage-33); a call passing none keeps the row's mark
+    while the row stays `applied` and drops it on a state change (TOOL-dSafePassage-39), so no
+    caller passes the mark back by hand. It refuses a receipt `test_steps_recordable` rejects and any row
     `read_step_states` would refuse, mutates `receipt` and persists nothing: the caller writes it.
 
     The bootstrap: before schema 4 no step row is persisted, so a step's failure or interruption
@@ -845,6 +846,8 @@ def set_step_state(receipt: dict, step_id, introduced, state, failure=None, via=
     old = next((r for r in rows if r["id"] == step_id), None)
     if introduced is None and old is not None:
         row["introduced"] = old["introduced"]
+    if via is None and state == "applied" and old is not None and old["state"] == "applied" and "via" in old:
+        row["via"] = old["via"]  # TOOL-dSafePassage-39 S1: the carry, keyed on the state alone
     read_step_states({"schema": schema, "steps": [row]})  # the writer refuses what the reader would
     receipt["steps"] = [r for r in rows if r["id"] != step_id] + [row]
     return row
@@ -1473,7 +1476,8 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
     spawn through `run_step_reread`. Per step: (1) one recorded `rolled-back` or nowhere runs its
     witness first and is skipped where it does not hold, nothing of it applied; (2) a row needing
     target code stops the walk with `write_attended_order`'s order naming its down; (3) its state
-    kept, `failure` `down interrupted: ...` is persisted BEFORE the spawn; (4) its down, a non-zero
+    kept, `failure` `down interrupted: ...` is persisted BEFORE the spawn, a row recorded nowhere
+    with no before-image marked `"via": "witness"` (TOOL-dSafePassage-39); (4) its down, a non-zero
     exit stopping with `down exit <rc>: <last stderr line>`; (5) `derive_down_verdict`'s judge
     (TOOL-dSafePassage-17): the down's own exit under `reverted = "down-exit"`, or with no
     before-image at the spawn on a row recorded nowhere or `applied` via its witness
@@ -1518,8 +1522,11 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
             out["order"] = write_attended_order(target, gov_root, row, "down", to).relative_to(target).as_posix()
             return stop(row, f"{ATTENDED_STOP} — {out['order']} names its down")
         paths = read_image_paths(target, row.id)
+        # TOOL-dSafePassage-39 S3: a row recorded nowhere with no image had no up on record, so it
+        # is marked as the forward walk's witness skip is; a recorded row's mark the writer carries.
         write_step_record(receipt_path, receipt, row, state, f"{DOWN_STOP_PREFIXES[0]} started "
-                          f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded")
+                          f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded",
+                          "witness" if record is None and not paths else None)
         got = run_step_reread(row, "down", target, gov_root, receipt_path, receipt, to)
         recordable = test_steps_recordable(receipt)  # TOOL-dSafePassage-18 S1: below 4, no row
         if got["verdict"] != "ok":
@@ -2403,7 +2410,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
 # reads its plants there: `<slug>.fail` exits 1 before any write, `<slug>.block` writes the image,
 # then the pid and `<slug>.blocking`, and waits to be killed; `<slug>.block-after` does the same
 # after its first file (TOOL-dSafePassage-4). Its down writes `<slug>.down-saw`, each target file's
-# path and sha256 as the down found them, then restores from the image, `<slug>.down-fails` exiting
+# path and sha256 as the down found them (`<slug>.down-block` blocking first, TOOL-dSafePassage-39),
+# then restores from the image, `<slug>.down-fails` exiting
 # 1 first and `<slug>.down-keeps` exiting 0 with nothing restored; `<slug>.down-lowers` then sets the
 # receipt to schema 3 and takes `steps` out, as the schema step's down does (TOOL-dSafePassage-18).
 # `<slug>.witness-absent` makes its witness "the file is absent", and `<slug>.witness-always` one
@@ -2427,6 +2435,8 @@ def block():
         time.sleep(0.5)
 if verb == "down":
     import hashlib
+    if (reports / f"{slug}.down-block").exists():
+        block()
     (reports / f"{slug}.down-saw").write_text("".join(
         f"{p.relative_to(target).as_posix()} {hashlib.sha256(p.read_bytes()).hexdigest()}\n"
         for p in sorted(target.rglob("*")) if p.is_file() and ".git" not in p.relative_to(target).parts),
@@ -2541,8 +2551,9 @@ UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-e
                  "needs-target-source")
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
 NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePassage-17: s2 is the floor row's shape
+DOWN_KILLED_PLANTS = ("witness-only-down-killed", "unrecorded-witness-down-killed")  # TOOL-dSafePassage-39
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
-                   "callers", "witness-only", "image-lost") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS
+                   "callers", "witness-only", "image-lost") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
 ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp")  # TOOL-dSafePassage-19
 ROLLBACK_UPDATE_PLANTS = (("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
                           + ("schema-up-kill",))  # TOOL-dSafePassage-62
@@ -3378,7 +3389,9 @@ def run_rollback_fixture(plant: str | None) -> int:
     `node-witness-refuses`', `schema-step-early`'s and `image-lost`'s 1 by design. `witness-only` and the
     `node-witness` plants (TOOL-dSafePassage-17) make s2's witness hold before any up, so the walk
     records it `applied` via its witness alone and writes it no before-image; `image-lost`
-    (TOOL-dSafePassage-33) deletes the image s4's up wrote, so its down stops naming the image."""
+    (TOOL-dSafePassage-33) deletes the image s4's up wrote, so its down stops naming the image. The
+    DOWN_KILLED_PLANTS (TOOL-dSafePassage-39) kill the first reverse walk in `witness-only`'s s2's
+    down, the second after taking s2's row out of the receipt, and the re-run must down s2 by its exit."""
     if plant == "callers":
         texts = {p.name: p.read_text(encoding="utf-8") for p in (pathlib.Path(__file__).resolve(), HERE / "govkit.py")}
         rc = run_callers_probe(texts)
@@ -3434,13 +3447,13 @@ def run_rollback_fixture(plant: str | None) -> int:
         else:
             if plant == "after-fail":
                 (fx / "s3.fail").touch()
-            elif plant == "witness-only":
+            elif plant in ("witness-only",) + DOWN_KILLED_PLANTS:
                 (fx / "s2.witness-absent").touch()
             elif plant in NODE_WITNESS_PLANTS:
                 (fx / "s2.witness-always").touch()
             rc_w, _out = run_fixture_child(FIXTURE_WALK_CHILD, gov, t, sha["C"], env)
             expect(rc_w == (1 if plant == "after-fail" else 0), f"the walk exited {rc_w}")
-            if plant in ("witness-only",) + NODE_WITNESS_PLANTS:
+            if plant in ("witness-only",) + NODE_WITNESS_PLANTS + DOWN_KILLED_PLANTS:
                 bare = (rows().get("fx/s2", ("",))[0] == "applied" and not (fx / "s2.up").exists()
                         and not derive_image_path(t, "fx/s2").exists())
                 print("rollback: fx/s2 " + ("applied by witness alone, no before-image" if bare
@@ -3491,6 +3504,25 @@ def run_rollback_fixture(plant: str | None) -> int:
             print(f"rollback: after the kill · the receipt reads schema {rec.get('schema')}"
                   + (" whole" if whole else ", NOT WHOLE"))
             expect(whole, "the kill left neither schema 4 with the schema step's `down interrupted:` nor schema 3 without `steps`")
+        elif plant in DOWN_KILLED_PLANTS:
+            # TOOL-dSafePassage-39 AC1, AC3: killed in s2's down, after move 3 and before its verdict;
+            # the reverse() below is the re-run, which must still judge s2 by its down's exit.
+            if plant == "unrecorded-witness-down-killed":
+                receipt = json.loads(rp.read_text(encoding="utf-8"))
+                receipt["steps"] = [r for r in receipt["steps"] if r["id"] != "fx/s2"]
+                rp.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+                expect(not derive_image_path(t, "fx/s2").exists(), "s2 has a before-image for the unrecorded plant")
+            (fx / "s2.down-block").touch()
+            why = run_killed([sys.executable, "-c", FIXTURE_REVERSE_CHILD, str(HERE / "upgrade_steps.py"),
+                              str(gov), str(t), sha["A"]], fx, "s2", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            (fx / "s2.down-block").unlink()
+            s2 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s2"), {})
+            held = (s2.get("state") == "applied" and s2.get("via") == "witness"
+                    and str(s2.get("failure", "")).startswith(DOWN_STOP_PREFIXES[0]))
+            print(f"rollback: after the kill · fx/s2 {s2.get('state')} · via {s2.get('via')} · "
+                  f"{'down interrupted' if held else 'NOT down interrupted via its witness'}")
+            expect(held, "the kill did not leave s2 applied `via` `witness` with its `down interrupted:` failure")
         rc, got, out = reverse()
         state = rows()
         if plant in (None, "unrecorded", "after-kill", "after-fail", "witness-only", "node-witness"):
@@ -3504,6 +3536,14 @@ def run_rollback_fixture(plant: str | None) -> int:
             expect(same and rc == 0, f"the bytes differ from before the walk, or the reverse walk exited {rc}")
             if plant == "unrecorded":
                 expect("s2.down" in downs(), "the unrecorded s2's down did not run")
+        elif plant in DOWN_KILLED_PLANTS:
+            same = tracked() == before
+            print(f"rollback: the re-run · fx/s2 {state.get('fx/s2', ('',))[0]} · bytes "
+                  f"{'equal' if same else 'DIFFER from'} their bytes before the walk")
+            expect(got == rolled("s2", "s1"), f"the re-run's lines are not {rolled('s2', 's1')}")
+            expect(all(state.get(f"fx/{s}", ("",))[0] == "rolled-back" for s in ("s1", "s2", "s3", "s4")),
+                   "s1 to s4 do not each read rolled-back")
+            expect(same and rc == 0, f"the bytes differ from before the walk, or the re-run exited {rc}")
         elif plant == "image-lost":
             text = f"{DOWN_STOP_PREFIXES[2]}; before-image .governance/steps/fx/s4.before.json absent"
             kept = (t / "s4.txt").is_file()

@@ -3820,7 +3820,9 @@ def check_step_rollback() -> None:
     still downed by its exit; AC4 is the `schema-step-kill-before-stamp` row, and the in-process
     verdict table below covers the no-record branch that row's re-run reaches. TOOL-dSafePassage-62's
     AC1 and AC2 are the `schema-up-kill` row: an update killed in the schema step's up left rows naming
-    the bytes its file pass moved, and the rollback from there returns them."""
+    the bytes its file pass moved, and the rollback from there returns them. TOOL-dSafePassage-39's AC1
+    and AC3 are the two `-down-killed` rows, a rollback killed in s2's down keeping its `via` mark for
+    the re-run, and AC2 the writer's carry below."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -3848,6 +3850,14 @@ def check_step_rollback() -> None:
             ("rollback", "node-witness-refuses", 1, ("step fx/s3 · rolled-back\nstep fx/s2 · STOPPED · down exit 1: "
                                                      "fx: s2 down fails by its plant\nrollback: 3 reached",
                                                      "stop text opens with an entry of DOWN_STOP_PREFIXES: yes")),
+            ("rollback", "witness-only-down-killed", 0, (
+                "rollback: after the kill · fx/s2 applied · via witness · down interrupted",
+                "step fx/s2 · rolled-back\nstep fx/s1 · rolled-back\nrollback: 2 reached · stopped at none",
+                "rollback: the re-run · fx/s2 rolled-back · bytes equal")),
+            ("rollback", "unrecorded-witness-down-killed", 0, (
+                "rollback: after the kill · fx/s2 applied · via witness · down interrupted",
+                "step fx/s2 · rolled-back\nstep fx/s1 · rolled-back\nrollback: 2 reached · stopped at none",
+                "rollback: the re-run · fx/s2 rolled-back · bytes equal")),
             ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
                                         "in planted_caller\n")),
             ("rollback", "schema-step", 0, ("step fx/s1 · rolled-back\nstep govkit/receipt-schema-4 · rolled-back",
@@ -3890,6 +3900,7 @@ def check_step_rollback() -> None:
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
         tag = ("dSP-62" if plant == "schema-up-kill"
+               else "dSP-39" if plant in ("witness-only-down-killed", "unrecorded-witness-down-killed")
                else "dSP-33" if plant == "image-lost"
                else "dSP-17" if plant in ("witness-only", "node-witness", "node-witness-refuses")
                else "dSP-4" if not (plant or "").startswith("schema-step")
@@ -3914,6 +3925,14 @@ def check_step_rollback() -> None:
         check(f"[dSP-33 AC1] the writer {'admits' if admit33 else 'refuses'} `via` {via33!r} on a {state33} row",
               (not got33 and r33["steps"][0].get("via") == via33) if admit33
               else ("'a/one'" in got33 and r33["steps"] == []), got33 or str(r33))
+    # TOOL-dSafePassage-39 AC2: a call passing no `via` carries the mark while the row stays applied
+    # and drops it on a state change.
+    for state39, fail39, keeps39 in (("applied", None, True), ("applied", "down interrupted: x", True),
+                                     ("failed", "exit 1: x", False), ("rolled-back", None, False)):
+        r39 = {"schema": 4, "steps": [{"id": "a/one", "introduced": None, "state": "applied", "via": "witness"}]}
+        got39 = us.set_step_state(r39, "a/one", None, state39, fail39).get("via")
+        check(f"[dSP-39 AC2] the writer {'keeps' if keeps39 else 'drops'} the mark on a rewrite to {state39}"
+              + (f" with {fail39!r}" if fail39 else ""), got39 == ("witness" if keeps39 else None), str(r39))
     row33 = us.StepRow("fx/x", ["u"], ["d"], ["w"], None, [], False, "fx", 1, None)
     for image33, record33, want33 in (
             (False, None, (True, "down")),
