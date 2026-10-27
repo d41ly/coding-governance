@@ -962,6 +962,8 @@ owner = "dDeclaredLoop"
 name = "help.enforce"
 allowed = ["refuse", "warn", "off"]
 default = "refuse"
+summary = "What the docs leg does when a help page is stale, a page command names an undeclared verb or flag, a link is broken or a member is undocumented: refuse the landing, print each finding as a warning, or grade nothing."
+usage = 'help.enforce = "warn"'
 owner = "dSafePassage"
 
 [[key]]

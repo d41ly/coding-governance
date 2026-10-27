@@ -1863,6 +1863,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "build_docs_fixture",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "build_docs_repo",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
@@ -4258,6 +4263,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "check_docs",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "check_down_floor",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
@@ -4783,6 +4793,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "check_legacy_low_water",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "check_lin_control",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -5006,6 +5021,16 @@
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_page_command",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
+      "id": "check_page_links",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "check_pair",
@@ -7568,6 +7593,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_heading_slugs",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "derive_health_log",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -8786,6 +8816,11 @@
       "id": "derive_unsummarised",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_usage_fingerprint",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "derive_vanished_members",
@@ -10856,6 +10891,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/govkit/check_runbook_parity.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "main",
@@ -14238,6 +14278,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_docs_state",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "read_docs_tip",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -14658,6 +14703,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_hook_usage",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "read_hook_verdict",
       "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
@@ -14918,6 +14968,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_leg_usage",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "read_legacy_fanout",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -14926,6 +14981,11 @@
       "id": "read_legacy_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_legacy_rows",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "read_legs",
@@ -15243,6 +15303,21 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "read_page_anchors",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
+      "id": "read_page_commands",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
+      "id": "read_page_lines",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "read_parity",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -15416,6 +15491,11 @@
       "id": "read_policy_text",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_policy_usage",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "read_policy_value",
@@ -16413,6 +16493,16 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_usage_classes",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
+      "id": "read_usage_rows",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
+    },
+    {
       "id": "read_user_name",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -16426,6 +16516,11 @@
       "id": "read_verb_members",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_verb_usage",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "read_verdict",
@@ -20831,6 +20926,11 @@
       "id": "run_docs_bar",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "run_docs_fixture",
+      "kind": "function",
+      "file": "tools/govkit/docs_leg.py"
     },
     {
       "id": "run_docs_push",

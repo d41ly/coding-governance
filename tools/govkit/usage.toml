@@ -1,0 +1,253 @@
+# usage.toml — each user-facing member's declared usage, read by `<prefix>/govkit/docs_leg.py` beside
+# this file and by nothing else (TOOL-dSafePassage-13).
+#
+# One `[[class]]` row per class of `surface-classes.toml`: `class`, its id there; `usage`, the
+# shape of its members' usage (`verb`, `key`, `hook`, `leg`, `page` or `none`); `rows`, where the
+# members' rows come from, a reader `<path under the tool root>:<function>` over the registry that
+# already states them, or `usage.toml`, the `[[usage]]` rows below; and a `why`. A `page` or
+# `none` class carries no `rows`.
+#
+# A `[[usage]]` row is `id`, `shape` and the shape's fields: a `verb` row's `entry`, `verb` and
+# `flags` (a trailing `=` takes a value), a `key` row's `values` and `default`. It is written only
+# for a member whose own registry states no usage, or for a `script:<path>[#<verb>]` a page under
+# `help/` shows that no class holds. A row a class's reader already returns is a finding.
+#
+# A CLASS JOINS BY ADDING ITS ROW: a registered class with no row here is a finding, and so is a
+# shaped class with no `rows`.
+
+[[class]]
+class = "file"
+usage = "none"
+why = "an installed file's user-facing usage is the command or hook that runs it, graded in its own class"
+
+[[class]]
+class = "installable"
+usage = "none"
+why = "the same: a destination is graded through the command, hook or key that reaches it"
+
+[[class]]
+class = "hook"
+usage = "hook"
+rows = "govkit/docs_leg.py:read_hook_usage"
+why = "a hook is its event and its matcher, which its fragment states"
+
+[[class]]
+class = "command"
+usage = "verb"
+rows = "usage.toml"
+why = "a Skill is its name and its arguments, which no registry states"
+
+[[class]]
+class = "agent"
+usage = "page"
+why = "a role agent is graded for presence on a page"
+
+[[class]]
+class = "conf"
+usage = "key"
+rows = "usage.toml"
+why = "a conf key is its values and its default, which no registry states in one place"
+
+[[class]]
+class = "policy"
+usage = "key"
+rows = "govkit/docs_leg.py:read_policy_usage"
+why = "a policy key is its allowed values and its default, which its catalogue row states"
+
+[[class]]
+class = "verb"
+usage = "verb"
+rows = "govkit/docs_leg.py:read_verb_usage"
+why = "a CLI verb is a verb and its flags, which its declared usage text states"
+
+[[class]]
+class = "entry"
+usage = "page"
+why = "a registry entry is graded for presence on a page"
+
+[[usage]]
+id = "command:build"
+shape = "verb"
+verb = "/build"
+flags = []
+
+[[usage]]
+id = "script:tools/roles/handoff.py#render"
+shape = "verb"
+entry = "tools/roles/handoff.py"
+verb = "render"
+flags = ["--role=", "--build=", "--unit=", "--card=", "--input=", "--out=", "--stdout", "--stand-in", "--part="]
+
+[[usage]]
+id = "script:tools/roles/handoff.py#roster"
+shape = "verb"
+entry = "tools/roles/handoff.py"
+verb = "roster"
+flags = []
+
+[[usage]]
+id = "script:tools/roles/render_agents.py"
+shape = "verb"
+entry = "tools/roles/render_agents.py"
+flags = ["--write", "--check", "--selftest"]
+
+[[usage]]
+id = "script:tools/playbook/adopt-playbook.sh"
+shape = "verb"
+entry = "tools/playbook/adopt-playbook.sh"
+flags = ["--target=", "--check", "--selftest"]
+
+[[usage]]
+id = "script:tools/run-gates/measure_legs.py"
+shape = "verb"
+entry = "tools/run-gates/measure_legs.py"
+flags = ["--serial", "--concurrent", "--selftest", "--legs=", "--out=", "--census-every=", "--stall-window=", "--stall-cpu="]
+
+[[usage]]
+id = "script:tools/run-gates/derive-ceilings.py"
+shape = "verb"
+entry = "tools/run-gates/derive-ceilings.py"
+flags = ["--report", "--write", "--check", "--reset=", "--observed=", "--how="]
+
+[[usage]]
+id = "script:tools/policy/policy.py#get"
+shape = "verb"
+entry = "tools/policy/policy.py"
+verb = "get"
+flags = ["--rev=", "--explain", "--json"]
+
+[[usage]]
+id = "script:tools/policy/policy.py#check"
+shape = "verb"
+entry = "tools/policy/policy.py"
+verb = "check"
+flags = ["--rev="]
+
+[[usage]]
+id = "script:tools/policy/policy.py#lists"
+shape = "verb"
+entry = "tools/policy/policy.py"
+verb = "lists"
+flags = ["--write", "--check"]
+
+[[usage]]
+id = "script:tools/policy/policy.py#mirror"
+shape = "verb"
+entry = "tools/policy/policy.py"
+verb = "mirror"
+flags = ["--write", "--check", "--print"]
+
+[[usage]]
+id = "script:tools/policy/policy.py#settings"
+shape = "verb"
+entry = "tools/policy/policy.py"
+verb = "settings"
+flags = ["--write", "--check"]
+
+[[usage]]
+id = "script:tools/policy/check_policy.py"
+shape = "verb"
+entry = "tools/policy/check_policy.py"
+flags = ["--repo=", "--fixture", "--strict-from=", "--live"]
+
+[[usage]]
+id = "script:tools/policy/adopt-policy.sh"
+shape = "verb"
+entry = "tools/policy/adopt-policy.sh"
+flags = ["--scaffold", "--check", "--target="]
+
+[[usage]]
+id = "script:tools/policy/budgets.py#resolve"
+shape = "verb"
+entry = "tools/policy/budgets.py"
+verb = "resolve"
+flags = ["--explain"]
+
+[[usage]]
+id = "script:tools/lib/python_floor.py#check"
+shape = "verb"
+entry = "tools/lib/python_floor.py"
+verb = "check"
+flags = ["--rev="]
+
+[[usage]]
+id = "script:tools/lib/python-floor.sh#preflight"
+shape = "verb"
+entry = "tools/lib/python-floor.sh"
+verb = "preflight"
+flags = []
+
+[[usage]]
+id = "script:tools/govkit/step_gate.py"
+shape = "verb"
+entry = "tools/govkit/step_gate.py"
+flags = ["--base=", "--list", "--print-base", "--fixture", "--plant=", "--with-row"]
+
+[[usage]]
+id = "script:tools/govkit/upgrade_steps.py#list"
+shape = "verb"
+entry = "tools/govkit/upgrade_steps.py"
+verb = "list"
+flags = ["--window"]
+
+[[usage]]
+id = "script:tools/govkit/upgrade_steps.py#frozen"
+shape = "verb"
+entry = "tools/govkit/upgrade_steps.py"
+verb = "frozen"
+flags = ["--base="]
+
+[[usage]]
+id = "script:tools/govkit/upgrade_steps.py#fixture"
+shape = "verb"
+entry = "tools/govkit/upgrade_steps.py"
+verb = "fixture"
+flags = ["--plant="]
+
+[[usage]]
+id = "script:tools/govkit/steps/receipt_schema_4.py#up"
+shape = "verb"
+entry = "tools/govkit/steps/receipt_schema_4.py"
+verb = "up"
+flags = []
+
+[[usage]]
+id = "script:tools/govkit/steps/receipt_schema_4.py#witness"
+shape = "verb"
+entry = "tools/govkit/steps/receipt_schema_4.py"
+verb = "witness"
+flags = []
+
+[[usage]]
+id = "script:tools/govkit/steps/receipt_schema_4.py#down"
+shape = "verb"
+entry = "tools/govkit/steps/receipt_schema_4.py"
+verb = "down"
+flags = []
+
+[[usage]]
+id = "script:tools/govkit/steps/fanout_cap.py#up"
+shape = "verb"
+entry = "tools/govkit/steps/fanout_cap.py"
+verb = "up"
+flags = []
+
+[[usage]]
+id = "script:tools/govkit/steps/fanout_cap.py#witness"
+shape = "verb"
+entry = "tools/govkit/steps/fanout_cap.py"
+verb = "witness"
+flags = []
+
+[[usage]]
+id = "script:tools/govkit/steps/fanout_cap.py#down"
+shape = "verb"
+entry = "tools/govkit/steps/fanout_cap.py"
+verb = "down"
+flags = []
+
+[[usage]]
+id = "script:tools/govkit/docs_leg.py"
+shape = "verb"
+entry = "tools/govkit/docs_leg.py"
+flags = ["--list", "--undocumented", "--fixture", "--plant=", "--enforce="]

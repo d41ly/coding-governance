@@ -17,7 +17,7 @@ the row, and a row the default branch has not landed reads `unlanded`. A kit tha
   python tools/govkit/upgrade_steps.py list
   ```
 
-  One line per row: its position, its id, its introducing commit (or `unlanded`) and the file that
+  One line per row: its position, its id, its introducing commit (or `unlanded`) and the file that <!-- usage: script:tools/govkit/upgrade_steps.py#list 0be9734d -->
   declares it, then one line per `[[retired]]` row. Rows that landed in the same commit run with
   `steps.toml` first, then each kit in registry order. A malformed row exits 2 naming its file, row
   and key.
@@ -25,7 +25,7 @@ the row, and a row the default branch has not landed reads `unlanded`. A kit tha
   --window` prints each home a step's `surfaces` names, `open` until that step lands, then `closed by
   <step id>`.
 - **Correct a landed step:** add a new step under a new id. A landed row is frozen: the
-  `step-rows-frozen` leg, `python tools/govkit/upgrade_steps.py frozen`, fails when a branch edits a
+  `step-rows-frozen` leg, `python tools/govkit/upgrade_steps.py frozen`, fails when a branch edits a <!-- usage: script:tools/govkit/upgrade_steps.py#frozen ae4d6ce6 -->
   landed row's `up`, `down`, `witness`, `resume`, `reverted` or `surfaces`, edits a byte of a
   program a landed row runs, or removes a landed row with no `[[retired]]` row naming it. It does
   not check what a step program imports.
@@ -82,7 +82,7 @@ gov runs it beside planted hooks and modules in a scratch copy and reads one ver
 - `breach` — it ran your code anyway, named in the line; fix the step;
 - `attended` — it already declares `needs-target = true`, and nothing ran.
 
-To see the contract hold on this machine:
+To see the contract hold on this machine: <!-- usage: script:tools/govkit/upgrade_steps.py#fixture 8e855cf3 -->
 
 ```sh
 python tools/govkit/upgrade_steps.py fixture isolation                  # exit 0
@@ -114,7 +114,7 @@ Before schema 4 no step row is written: a step's failure or interruption on such
 only in `update`'s output and findings. The `govkit/receipt-schema-4` row itself is written once
 that step's re-read of the receipt shows schema 4, like any other row. A row is recorded only on a
 receipt whose `schema` is a number of 4 or more and whose `steps` is a list; anything else is
-refused. Until the deployer runs steps itself, run the step by hand:
+refused. Until the deployer runs steps itself, run the step by hand: <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#up 051ba178 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#witness f462d008 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#down a555ef91 -->
 
 ```sh
 python tools/govkit/steps/receipt_schema_4.py up <repo>       # schema 3 -> 4
@@ -171,7 +171,7 @@ python tools/govkit/upgrade_steps.py fixture update --plant kill-walk   # update
 ## Rolling back
 
 `update` refuses a `--to` older than the commit the receipt records: a downgrade is not an update.
-When you do mean to go back, ask for it by name:
+When you do mean to go back, ask for it by name: <!-- usage: verb:govkit.py:update c276c2e7 -->
 
 ```sh
 python tools/govkit/govkit.py update --target <repo> --rollback --to <rev>          # preview
@@ -249,7 +249,7 @@ The step `agent-cap/fanout-cap-to-agents-in-flight` retires the file: its up wri
 when the line lowers it (and leaves the policy file alone when it does not), then removes the file,
 so the limit reads the same before and after. Its down puts both files back byte-for-byte.
 `update --write` runs it as one of its steps; to run it by hand, from this checkout, against a
-repository whose `.agent-cap.conf` and policy file are committed:
+repository whose `.agent-cap.conf` and policy file are committed: <!-- usage: script:tools/govkit/steps/fanout_cap.py#up 4f94983b --> <!-- usage: script:tools/govkit/steps/fanout_cap.py#witness 052d667f --> <!-- usage: script:tools/govkit/steps/fanout_cap.py#down 3f5f9500 -->
 
 ```sh
 python tools/govkit/steps/fanout_cap.py up <repo>       # exit 1, writing nothing, on a bad value

@@ -24,7 +24,7 @@ of that root, so one spelling names the member at every install prefix:
 
 ## How to use it
 
-- **Run it:** `python tools/govkit/step_gate.py` grades from `GATE_PUSH_BASE`, else the merge-base
+- **Run it:** `python tools/govkit/step_gate.py` grades from `GATE_PUSH_BASE`, else the merge-base <!-- usage: script:tools/govkit/step_gate.py 90245caf -->
   with the default branch — the same base `kit epoch` reads; `--base <rev>` grades from another
   commit, and `--print-base` prints the base it would use. A red line reads:
 

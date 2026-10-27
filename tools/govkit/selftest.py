@@ -18231,6 +18231,41 @@ user_skills = "/tmp/gk-fake-skills"
                   and (_rc == 1) == ("MISS" in _p.stdout),
                   f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
 
+    # ---- TOOL-dSafePassage-13 AC1, AC3-AC8. THE DOCS LEG, through its own fixture: every plant exits
+    # ---- as section 4's table says and prints the line its criterion names, and `stale-page` under
+    # ---- `warn` exits 0 with a WARN line and under `off` prints one line naming the key.
+    _docs_cases = [(["none"], 0, r"^docs: \d+ classes · .* 0 stale · commands 2 tested, 1 skipped, 0 unrowed"),
+                   (["stale-page"], 1, r"^docs: STALE help/guide\.md:\d+ fx-verb:tool: the page holds [0-9a-f]{8}, the row is now [0-9a-f]{8}$"),
+                   (["bad-flag"], 1, r"^docs: COMMAND help/guide\.md:\d+ .*flag '--section'"),
+                   (["bad-verb"], 1, r"^docs: COMMAND help/guide\.md:\d+ .*verb 'rendr'"),
+                   (["unrowed"], 1, r"^docs: UNROWED help/guide\.md:\d+ tools/fx/other\.py"),
+                   (["broken-link"], 1, r"^docs: LINK help/guide\.md:\d+ gone\.md"),
+                   (["broken-fragment"], 1, r"^docs: FRAGMENT help/guide\.md:\d+ .*#no-such-heading"),
+                   (["external-link"], 0, r"^docs: .* links 2 checked, 1 external"),
+                   (["undocumented"], 1, r"^docs: UNDOCUMENTED fx-page:guide"),
+                   (["drained-row"], 1, r"^docs: DRAINED .* row fx-page:guide"),
+                   (["grown-list"], 1, r"^docs: GROWN .*: 2 rows, above its low-water 1"),
+                   (["orphan-anchor"], 1, r"^docs: ORPHAN help/more\.md:\d+ usage anchor fx-key:NOPE"),
+                   (["restated-row"], 1, r"^docs: RESTATED fx-hook:fx-hook"),
+                   (["reader-rows"], 1, r"^docs: STALE help/more\.md:\d+ fx-mod:thing"),
+                   (["none-rows"], 1, r"^docs: CLASS fx-none: usage none carries `rows`"),
+                   (["leg-row"], 1, r"^docs: STALE help/more\.md:\d+ fx-leg:fx-leg"),
+                   (["unclassed"], 1, r"^docs: CLASS fx-extra: a registered class with no \[\[class\]\] row"),
+                   (["empty-class"], 2, r"^docs: REFUSED · class fx-key has usage key and no member"),
+                   (["untested"], 2, r"^docs: REFUSED · .*no page command was tested"),
+                   (["stale-page", "--enforce", "warn"], 0, r"^docs: WARN STALE help/guide\.md:\d+ fx-verb:tool"),
+                   (["stale-page", "--enforce", "off"], 0, r"\Adocs: help\.enforce = off · --enforce\n\Z")]
+
+    def _run_docs_case(case):
+        return case, subprocess.run([sys.executable, str(HERE / "docs_leg.py"), "--fixture", "--plant", *case[0]],
+                                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+
+    with _cf.ThreadPoolExecutor(max_workers=4) as _pool:
+        for (_argv, _rc, _needle), _p in _pool.map(_run_docs_case, _docs_cases):
+            check(f"[dSafePassage-13] docs fixture {' '.join(_argv)} exits {_rc} and names {_needle}",
+                  _p.returncode == _rc and bool(_re.search(_needle, _p.stdout, _re.M)),
+                  f"exit {_p.returncode}: {_p.stdout[-1500:]}{_p.stderr[-400:]}")
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")

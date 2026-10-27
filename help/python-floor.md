@@ -4,7 +4,7 @@
 refuses any interpreter below a floor. The floor is declared once, in `tools/lib/python-floor.txt`:
 one `<major>.<minor>` line, `3.15` today. The resolver block every script carries holds a copy of
 that line, `_rp_floor="3.15"`, because a kit copied into another repository has no `tools/lib/` to
-read; `python tools/lib/python_floor.py check` fails when a copy differs from the declaration, and
+read; `python tools/lib/python_floor.py check` fails when a copy differs from the declaration, and <!-- usage: script:tools/lib/python_floor.py#check 7176958e -->
 when any tracked file outside `memory/` states a floor of its own instead of pointing here.
 
 ## What the refusal says
@@ -27,7 +27,7 @@ resolve_python: install the floor with: uv python install 3.15
 resolve_python: or, on Windows: py install 3.15
 ```
 
-`bash tools/lib/python-floor.sh preflight` refuses the same way, byte for byte. At the floor it
+`bash tools/lib/python-floor.sh preflight` refuses the same way, byte for byte. At the floor it <!-- usage: script:tools/lib/python-floor.sh#preflight 239262cc -->
 prints the interpreter and its version and exits 0.
 
 ## How to install the floor
@@ -40,7 +40,7 @@ prints the interpreter and its version and exits 0.
 
 ## `platforms.provision` — what the refusal does about installing
 
-Set it in `.governance/policy.toml` (see [the policy file](policy.md)). The resolver reads it with
+Set it in `.governance/policy.toml` (see [the policy file](policy.md)). The resolver reads it with <!-- usage: policy:platforms.provision 0eef7dd7 -->
 `policy.py get platforms.provision` at the landed revision, so a branch or an uncommitted edit does
 not change it.
 

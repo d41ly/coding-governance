@@ -1,6 +1,6 @@
 # Role agents and `/build`
 
-**What it is.** Every piece of LLM work in a governed repository runs as a declared workflow:
+**What it is.** Every piece of LLM work in a governed repository runs as a declared workflow: <!-- usage: command:build 03924a5c -->
 orientation, research, reuse, spec writing, spec review, building, the closing review, the gate bar,
 handoffs and bookkeeping. Spec writing, spec review, building and the closing review run only inside
 role agents. The main session orients, hands work off and keeps the records. Hooks refuse the
@@ -36,7 +36,7 @@ reference; this page is the short version.
   python tools/roles/handoff.py render --role gov-builder --build <slug> --unit <unit-id> --part task
   ```
 
-  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is
+  Pass that output, unchanged, as the prompt of an `Agent` call whose `subagent_type` is <!-- usage: script:tools/roles/handoff.py#render 57cac9a7 -->
   `gov-builder`. An edited prompt is refused. Pass the name it prints on stderr after
   `handoff: description — ` as the call's `description`; any other name is refused.
 - **Change how a role behaves:** edit `<prefix>/roles/house/<role>.md`, never the file under
@@ -45,9 +45,9 @@ reference; this page is the short version.
   Its `[effort]` tables set levels per role and per harness stage; its `[gates]` table lists the
   only gate legs a role agent may run.
 - **Render in this order.** After changing a role file, re-render the charter first with
-  `bash tools/playbook/adopt-playbook.sh --target .`, because its Agent roles section is generated
+  `bash tools/playbook/adopt-playbook.sh --target .`, because its Agent roles section is generated <!-- usage: script:tools/playbook/adopt-playbook.sh 814e2edf -->
   from the role files. After changing a role, an overlay, the policy or a charter rule, run
-  `python tools/roles/render_agents.py --write`. Then start a new session: a running session cannot
+  `python tools/roles/render_agents.py --write`. Then start a new session: a running session cannot <!-- usage: script:tools/roles/render_agents.py ee6e2d2c -->
   spawn an agent type written after it started.
 
 ## How agents are named
@@ -148,4 +148,4 @@ needs the kickoff and memory-tree kits.
 - The `[roles]` rule and the Agent roles section ship with template v4.4. A template seeded earlier
   keeps rendering without them: merge the `[roles]` rule, the shortened Tools bullet and the Agent
   roles section from gov's template into yours, then re-render. Without the playbook renderer,
-  fill `{{ROLE_ROSTER}}` from `python <prefix>/roles/handoff.py roster`.
+  fill `{{ROLE_ROSTER}}` from `python <prefix>/roles/handoff.py roster`. <!-- usage: script:tools/roles/handoff.py#roster 739c5825 -->

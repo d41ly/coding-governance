@@ -8,7 +8,7 @@ you where the surface went. Gov has moved no surface yet, so no forwarder ships 
 ## What you see when you call a moved path
 
 The call runs exactly as before: the forwarder passes every argument, your stdin and the target's
-exit status through unchanged. What it adds depends on `install.on-shim-call` in your
+exit status through unchanged. What it adds depends on `install.on-shim-call` in your <!-- usage: policy:install.on-shim-call 28513ea3 -->
 `.governance/policy.toml`:
 
 | Value | What a call does |
@@ -43,7 +43,7 @@ says so on stderr.
 
 ## How long a forwarder is held
 
-Gov keeps a forwarder until `install.deprecation-window` releases (0, 1, 2 or 4; default 2) have been
+Gov keeps a forwarder until `install.deprecation-window` releases (0, 1, 2 or 4; default 2) have been <!-- usage: policy:install.deprecation-window 7a4e6868 -->
 cut since the commit that landed it, and holds every forwarder while no release has been cut at all.
 No release has been cut yet, so every forwarder is held. Gov's `govkit selfcheck` refuses a forwarder
 marked closed before its window allows it. Move your calls to the new path before then: once the

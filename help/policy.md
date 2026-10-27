@@ -5,7 +5,7 @@ cap's breach warns or refuses. The policy kit's catalogue, `tools/policy/catalog
 repository, is the file's schema. It has one row per key, giving the values the key admits, its
 default, and the build that owns it. A key the file does not set takes its default.
 
-One reader reads the file: `python tools/policy/policy.py get <key>`, below. Two families of keys
+One reader reads the file: `python tools/policy/policy.py get <key>`, below. Two families of keys <!-- usage: script:tools/policy/policy.py#get af650e87 -->
 have consumers so far: `runtime.agents-in-flight`, the agent limit, which `policy.py settings
 --write` renders into the harness's settings and the agent-cap hook holds them to ([the agent
 limit](agent-limit.md)); and `budgets.enforce`, `budgets.pinned` and `budgets.<cap>`, which every
@@ -58,7 +58,7 @@ allowed values and every check.
   A value you set in the file always wins over the default.
 - **When the file is invalid:** a file that is not TOML, sets a value outside its key's allowed
   values, or sets a key no catalogue row names is invalid, and an invalid file NEVER reads the
-  catalogue defaults, because a default may be looser than what you chose. `policy-file.on-invalid`
+  catalogue defaults, because a default may be looser than what you chose. `policy-file.on-invalid` <!-- usage: policy:policy-file.on-invalid 89965eb1 -->
   decides what it reads instead, and it is itself read from the last valid revision of the file,
   never from the invalid one, so an out-of-set value of it is one more problem:
   - `last-valid` (the default): every key reads the newest earlier commit whose file was present and
@@ -72,13 +72,13 @@ allowed values and every check.
   computes it yet, so `get` refuses it, naming the row, until the file sets the key. A file saved in
   another encoding than UTF-8, as a PowerShell redirect writes it, is invalid, and a clone too
   shallow to reach a valid commit refuses saying `history is shallow`; fetch more history.
-- **Check the committed file:** `python tools/policy/policy.py check` checks the file as committed at
+- **Check the committed file:** `python tools/policy/policy.py check` checks the file as committed at <!-- usage: script:tools/policy/policy.py#check a787d169 -->
   `HEAD`, the commit a push lands; `--rev <rev>` checks another commit. It exits 0 with one
   `policy: check · ...` line when the file is valid, missing, or invalid with a valid commit to fall
   back to under `last-valid`, the line saying which, and exits 2 with the refusal otherwise. The
   `policy check` gate runs the same check on every push and landing, so an invalid file with nothing
   to fall back to blocks the push.
-- **Check the file:** `python tools/policy/check_policy.py`. It refuses a value outside its key's
+- **Check the file:** `python tools/policy/check_policy.py`. It refuses a value outside its key's <!-- usage: script:tools/policy/check_policy.py 49bb87e8 -->
   allowed values, an empty set for a key that is never empty, and a key no catalogue row names. Each
   check prints one line with the number it read; a check that read nothing is red too, unless reading
   nothing is a legal state, no policy file yet, no tracked code, no owner build landed, or no landed
@@ -86,7 +86,7 @@ allowed values and every check.
 - **Start a file in another repository:** see [Install](#install), below.
 - **See which keys are documented:** a catalogue row with no `summary` or no `usage` is named on
   `tools/policy/unsummarised-keys.txt`. That list may only shrink. To document a key, give its row a
-  `summary` and a `usage`, then run `python tools/policy/policy.py lists --write` to drain it from the
+  `summary` and a `usage`, then run `python tools/policy/policy.py lists --write` to drain it from the <!-- usage: script:tools/policy/policy.py#lists 54ff8bae -->
   list. `python tools/policy/policy.py lists --check` reds a list that grew past the one the default
   branch carries.
 - **Know which keys are loop bounds or deadlines:** raising one loosens the policy, so its catalogue
@@ -97,7 +97,7 @@ allowed values and every check.
 
 ## Install
 
-`bash tools/policy/adopt-policy.sh --scaffold --target <repo>` starts the policy file in another
+`bash tools/policy/adopt-policy.sh --scaffold --target <repo>` starts the policy file in another <!-- usage: script:tools/policy/adopt-policy.sh f6cd6f1b -->
 repository. It writes the starter file only where none exists, then renders the harness settings
 from the agent limit and the policy mirror wherever the repository has a commit, so the first agent
 spawn passes and the merge bar finds the mirror fresh. `--check --target <repo>` checks that
@@ -179,7 +179,7 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
   `policy-guard: admitted · budgets."AGENTS.md" 20480 -> 24576 · its change record attached`.
 - **An agent may also commit the mirror it regenerated, in a commit of its own.** A change to the
   policy file or to `tools/policy/catalogue.toml` leaves the mirror stale, so it takes two commits:
-  first the policy or catalogue change, then `python tools/policy/policy.py mirror --write` and a
+  first the policy or catalogue change, then `python tools/policy/policy.py mirror --write` and a <!-- usage: script:tools/policy/policy.py#mirror f4887510 -->
   commit of `.governance/policy.json` with neither of those two files staged beside it. The hook
   renders the mirror at `HEAD` itself and admits the staged one only when its bytes are that render,
   printing `policy-guard: admitted · .governance/policy.json · equals its render at HEAD`.

@@ -46,6 +46,7 @@ codebase-map kit selftest	27.5	1	a	2026-09-24	runner
 corpus-ids selftest	165.1	2	a	2026-09-24	runner
 dead-path carriers (deleted files still named)	14.5	1	a	2026-09-06	runner
 dead-path carriers self-test	131.5	2	a	2026-09-24	runner
+docs	2.7	1	d	2026-10-27	docs_leg.py on the worktree at 1b64e20a with the pass staged, timed by bash time, 2.7s wall, build pass of TOOL-dSafePassage-13
 drift-audit records	35.5	2	a	2026-09-24	runner
 drift-audit selftest	292.5	1	a	2026-09-24	runner
 drift-audit wiring	9.8	1	a	2026-09-06	runner

@@ -1460,6 +1460,18 @@
     "ceiling": 60
   },
   {
+    "name": "docs",
+    "argv": [
+      "python",
+      "{prefix}/govkit/docs_leg.py"
+    ],
+    "reads": {"history": "it reads help.enforce at the landed revision through govkit's read_policy_value, and walks the first-parent history of memory/project/docs-undocumented.txt through drift-audit's derive_low_waters for the list's low-water (TOOL-dSafePassage-13)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 60,
+    "doc_reads": ["help/", "memory/project/docs-undocumented.txt"]
+  },
+  {
     "name": "govkit selftest",
     "argv": [
       "python",

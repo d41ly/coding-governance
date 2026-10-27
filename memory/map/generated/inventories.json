@@ -26,6 +26,7 @@
       "corpus-ids selftest",
       "dead-path carriers (deleted files still named)",
       "dead-path carriers self-test",
+      "docs",
       "drift-audit records",
       "drift-audit selftest",
       "drift-audit wiring",

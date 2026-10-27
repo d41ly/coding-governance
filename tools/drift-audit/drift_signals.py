@@ -135,6 +135,7 @@ SHRINK_ONLY: dict[str, str] = {
     # value standing next to it (TOOL-aScouredKit-8).
     "memory/project/unarmed-branches.txt": "fail branches with no arm; drains as each is armed",
     "memory/project/trace-waiver.txt": "CLOSED specs no TRACE_GLOBS subject can name — signal 6's exemption",
+    "memory/project/docs-undocumented.txt": "user-facing members no help page anchors yet; drains as each is documented",
 }
 
 # --------------------------------------------------------------------------------------------
