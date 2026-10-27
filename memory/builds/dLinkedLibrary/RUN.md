@@ -9,6 +9,9 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dLinkedLibrary-26=DEFERRED TOOL-dLinkedLibrary-27=DEFERRED TOOL-dLinkedLibrary-28=DEFERRED TOOL-dLinkedLibrary-29=DEFERRED TOOL-dLinkedLibrary-30=DEFERRED TOOL-dLinkedLibrary-31=DEFERRED TOOL-dLinkedLibrary-32=DEFERRED TOOL-dLinkedLibrary-33=DEFERRED TOOL-dLinkedLibrary-34=DEFERRED TOOL-dLinkedLibrary-35=DEFERRED TOOL-dLinkedLibrary-36=DEFERRED
+units-at-landing: TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-45 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-48 TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-65 TOOL-dLinkedLibrary-66 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-38 TOOL-dLinkedLibrary-50 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-39 TOOL-dLinkedLibrary-44 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-41 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-71 TOOL-dLinkedLibrary-72 TOOL-dLinkedLibrary-73 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-42 TOOL-dLinkedLibrary-83 TOOL-dLinkedLibrary-84 TOOL-dLinkedLibrary-85 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-89 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-70 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-68 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-81 TOOL-dLinkedLibrary-82 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-87 TOOL-dLinkedLibrary-88 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-93 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-95 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-102
+gates-run: unattended-179309939154127331645-619 cb559d01
 parked-surfaced: yes, 92 surfaced
 keepalive-reaped: yes
 hold-run: 
@@ -22,7 +25,7 @@ held-from: REVIEWING
 refreshed-at: 2bd5e10d4e861245d1a5adea5d53b45f90826489 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 4ea15e8da030fba7784101cccaeb469d7269ace5
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -377,3 +380,7 @@ base: 5fede642ad2ff1418f12b5d7117129edc8287d7e
 2026-10-27T09:01:29Z rescope · item defer TOOL-dLinkedLibrary-101 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dLinkedLibrary/prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-1-owner-stop-chain.md), carried forward to the build run
 
 2026-10-27T09:01:30Z rescope · item defer TOOL-dLinkedLibrary-102 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dLinkedLibrary/prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T11:23:58Z override · item specs-audited · reason the owner's ruling of 2026-10-27 (memory/builds/dLinkedLibrary/prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-1-owner-stop-chain.md) ends the spec-audit chain at round 8; its promotions TOOL-dLinkedLibrary-97 to -102 close unaudited, as the owner ruled for dKeptSession
+
+2026-10-27T11:23:58Z override · item closing-review-recorded · reason a spec run writes no code, so its diff is specs and records only; the owner's ruling of 2026-10-27 (memory/builds/dLinkedLibrary/prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-1-owner-stop-chain.md) takes the eight-round spec-audit chain as the review of this spec-only diff, as for dKeptSession; the build run's closing diff review is unaffected
