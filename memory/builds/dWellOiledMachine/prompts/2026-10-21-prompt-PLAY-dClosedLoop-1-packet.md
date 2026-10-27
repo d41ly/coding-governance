@@ -113,7 +113,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `4bc4aaf90556c4574e6c84c747bc4dea615cbec8`
+- rendered at: `d6b4ab22a724978436e963fa165c17ad1c22d167`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -427,12 +427,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dWellOiledMachine`:
 
-Coverage of dWellOiledMachine's 61 clauses and 69 owned nodes, over 61 specs:
+Coverage of dWellOiledMachine's 61 clauses and 69 owned nodes, over 78 specs:
 - carried whole: 61; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: none; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-63.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-64.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-65.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-66.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-67.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-68.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-69.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-70.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-71.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-72.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-73.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-74.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-75.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-76.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-77.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-78.md (PLAY-dClosedLoop-2), memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-79.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0283, cl-dClosedLoop-0285, cl-dClosedLoop-0286, cl-dClosedLoop-0290, cl-dClosedLoop-0291, cl-dClosedLoop-0292, cl-dClosedLoop-0296, cl-dClosedLoop-0299, cl-dClosedLoop-0300, cl-dClosedLoop-0302, cl-dClosedLoop-0308, cl-dClosedLoop-0309, cl-dClosedLoop-0330, cl-dClosedLoop-0335, cl-dClosedLoop-0337, cl-dClosedLoop-0338
 
 ### Reading order

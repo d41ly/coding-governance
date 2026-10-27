@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-62
+ids: TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-62 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79
 spec-audit: 2026-10-21
 parents: dBoundRoles dTotalRecall dKeptSession
 may: PLAY-dClosedLoop-3
@@ -127,97 +127,116 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 61 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 78 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11
 ids TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22
 ids TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33
 ids TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44
 ids TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55
-ids TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-62
+ids TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-62 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66
+ids TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77
+ids TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dWellOiledMachine-1 — the platform spike, the runtime kit it founds, and the one act launcher](spec/2026-10-26-spec-TOOL-dWellOiledMachine-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-16 — the journal grammar moved into the core, its runtime producer, and its retention by `runtime.journal`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-16.md) | 2 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-1 — the platform spike, the runtime kit it founds, and the one act launcher](spec/2026-10-26-spec-TOOL-dWellOiledMachine-1.md) | 1 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-16 — the journal grammar moved into the core, its runtime producer, and its retention by `runtime.journal`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-16.md) | 2 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-61 — the node profile at the node's home: read whole, schema-checked both ways, written only by the owner's guarded command](spec/2026-10-26-spec-TOOL-dWellOiledMachine-61.md) | 3 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-20 — the `hook` and `point` tag namespaces, and the point registry they read](spec/2026-10-26-spec-TOOL-dWellOiledMachine-20.md) | 4 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-72 — runlog verify reports a record whose journal lines retention pruned as `pruned`, never as tampering](spec/2026-10-27-spec-TOOL-dWellOiledMachine-72.md) | 3 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-20 — the `hook` and `point` tag namespaces, and the point registry they read](spec/2026-10-26-spec-TOOL-dWellOiledMachine-20.md) | 4 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-22 — hook and point purposes: a field on every member, and every existing member reviewed](spec/2026-10-26-spec-TOOL-dWellOiledMachine-22.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-17 — the grant enforced on every adapter row, and the secret value scan at every publishing boundary with its shape report beside it](spec/2026-10-26-spec-TOOL-dWellOiledMachine-17.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-14 — harness adapters with capability tables, measured and never claimed, and their install targets](spec/2026-10-26-spec-TOOL-dWellOiledMachine-14.md) | 7 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-13 — the scheduler's host adapters, the OS scheduler first, and per-period cadence witnesses](spec/2026-10-26-spec-TOOL-dWellOiledMachine-13.md) | 8 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-17 — the grant enforced on every adapter row, and the secret value scan at every publishing boundary with its shape report beside it](spec/2026-10-26-spec-TOOL-dWellOiledMachine-17.md) | 6 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-14 — harness adapters with capability tables, measured and never claimed, and their install targets](spec/2026-10-26-spec-TOOL-dWellOiledMachine-14.md) | 7 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-13 — the scheduler's host adapters, the OS scheduler first, and per-period cadence witnesses](spec/2026-10-26-spec-TOOL-dWellOiledMachine-13.md) | 8 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-68 — the runlog and unattended Skills read their destination through `{skill_home}`, completing the install-target re-pointing](spec/2026-10-27-spec-TOOL-dWellOiledMachine-68.md) | 8 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-15 — the node registry's runtime facts, the clock offset measured at each beat and correcting a holder's stamp where a lease's expiry is judged](spec/2026-10-26-spec-TOOL-dWellOiledMachine-15.md) | 9 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-36 — the harness conformance fixture: each binary's rows measured into the capability table and the node registry, read by `runtime.binary`, `runtime.owner-harness` and `runtime.act-harness`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-36.md) | 10 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-10 — the one enforcement surface: the kits' fragments as packs behind one dispatcher entry per event, failing closed](spec/2026-10-26-spec-TOOL-dWellOiledMachine-10.md) | 11 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-31 — a hook pack's refusal text: its rule, remedy and actor declared in the pack contract and checked at registration](spec/2026-10-26-spec-TOOL-dWellOiledMachine-31.md) | 12 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-21 — the hook-message and harness-prompt templates: hook text and Workflow prompts as slot-line templates over registered units](spec/2026-10-26-spec-TOOL-dWellOiledMachine-21.md) | 13 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-2 — the `next` verb over the position function, the `next —` micro-format, and every declared command ending with one](spec/2026-10-26-spec-TOOL-dWellOiledMachine-2.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-32 — the act as the key: minted at launch with the harness session id, its record, its cost and duration, and the identity committed records may carry](spec/2026-10-26-spec-TOOL-dWellOiledMachine-32.md) | 15 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-39 — every act's minimal binding record pushed to `refs/gov/bindings`, and one reader over `<current default>..HEAD` that never passes a binding it cannot find](spec/2026-10-26-spec-TOOL-dWellOiledMachine-39.md) | 16 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-12 — sessions bound on every source, a card never silently undelivered, and each compaction flushed, journaled and re-oriented](spec/2026-10-26-spec-TOOL-dWellOiledMachine-12.md) | 17 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-38 — the per-session orientation card retired into the session binding, with the write gate's card and route reads re-pointed in the same unit](spec/2026-10-26-spec-TOOL-dWellOiledMachine-38.md) | 18 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-23 — the session-start hook loading the set `memory.default-load` names, ending with `next`'s line, held under the hook channel's measured cap](spec/2026-10-26-spec-TOOL-dWellOiledMachine-23.md) | 19 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-11 — workspaces by `build.worktree`: the allocator, the commit queue, integration before release, and a sweep that reaps only what it allocated](spec/2026-10-26-spec-TOOL-dWellOiledMachine-11.md) | 20 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-33 — the `Gov-*` trailers written from the binding at every commit site, and the commit-key check at the push and in `commit-msg`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-33.md) | 21 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-35 — the session node derived from bindings: `runs-in` and `after`, acts and sessions as native-id classes, the live inbox and the card's session list](spec/2026-10-26-spec-TOOL-dWellOiledMachine-35.md) | 22 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-40 — the commit queue pushes the build's branch as `build.push` says, taking no lander lock and running no bar but a declared branch bar](spec/2026-10-26-spec-TOOL-dWellOiledMachine-40.md) | 23 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-55 — the transport points in Runtime's `[extend]`: a lease store with git refs its only adapter and its conformance probes, a doorbell, and an offer source](spec/2026-10-26-spec-TOOL-dWellOiledMachine-55.md) | 24 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-60 — the landing, its lease beat and its `landed` notice in one atomic push, and the commit queue's push through the same fence](spec/2026-10-26-spec-TOOL-dWellOiledMachine-60.md) | 25 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-58 — the record door: every coordination write bound to its writer's session binding, and the two closing items it admits](spec/2026-10-26-spec-TOOL-dWellOiledMachine-58.md) | 26 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-57 — the secret scan over coordination payloads and adapter boundaries, the door's token-shape refusal, and the request record bound to its intake](spec/2026-10-26-spec-TOOL-dWellOiledMachine-57.md) | 27 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-6 — the supervisor: `resume-tick.sh` grown into the executor's seam, one act session per role act, relaunch by policy, and a reconcile before the first beat](spec/2026-10-26-spec-TOOL-dWellOiledMachine-6.md) | 28 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-37 — the launch preflight: no hook- or permission-skipping launch, trusted hooks by hash, an allowlisted environment, the credential order, and relative worktree pointers](spec/2026-10-26-spec-TOOL-dWellOiledMachine-37.md) | 29 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-56 — the act's harness and credential resolved per role through Roles' resolver, a harness row for how it reads the credential, and the launch pinned out of bare mode](spec/2026-10-26-spec-TOOL-dWellOiledMachine-56.md) | 30 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-8 — the persisted-return store, keyed per spawn site, and the shared deferral block](spec/2026-10-26-spec-TOOL-dWellOiledMachine-8.md) | 31 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-7 — act binding and the epoch check at the Workflow, Agent and shell call, decided in the dispatcher's PermissionRequest entry, with in-script spawns declared and reconciled](spec/2026-10-26-spec-TOOL-dWellOiledMachine-7.md) | 32 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-36 — the harness conformance fixture: each binary's rows measured into the capability table and the node registry, read by `runtime.binary`, `runtime.owner-harness` and `runtime.act-harness`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-36.md) | 10 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-10 — the one enforcement surface: the kits' fragments as packs behind one dispatcher entry per event, failing closed](spec/2026-10-26-spec-TOOL-dWellOiledMachine-10.md) | 11 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-31 — a hook pack's refusal text: its rule, remedy and actor declared in the pack contract and checked at registration](spec/2026-10-26-spec-TOOL-dWellOiledMachine-31.md) | 12 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-69 — the trusted hooks copy written at the config scope that wins in each worktree](spec/2026-10-27-spec-TOOL-dWellOiledMachine-69.md) | 12 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-71 — a one-fragment settings-merge upserts its packs into the pack table and re-renders every entry from the whole table](spec/2026-10-27-spec-TOOL-dWellOiledMachine-71.md) | 12 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-21 — the hook-message and harness-prompt templates: hook text and Workflow prompts as slot-line templates over registered units](spec/2026-10-26-spec-TOOL-dWellOiledMachine-21.md) | 13 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-2 — the `next` verb over the position function, the `next —` micro-format, and every declared command ending with one](spec/2026-10-26-spec-TOOL-dWellOiledMachine-2.md) | 14 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-32 — the act as the key: minted at launch with the harness session id, its record, its cost and duration, and the identity committed records may carry](spec/2026-10-26-spec-TOOL-dWellOiledMachine-32.md) | 15 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-39 — every act's minimal binding record pushed to `refs/gov/bindings`, and one reader over `<current default>..HEAD` that never passes a binding it cannot find](spec/2026-10-26-spec-TOOL-dWellOiledMachine-39.md) | 16 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-67 — launch_act branches on the measured values of `preset-session-id`, and `start-event` becomes a measured row](spec/2026-10-27-spec-TOOL-dWellOiledMachine-67.md) | 16 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-12 — sessions bound on every source, a card never silently undelivered, and each compaction flushed, journaled and re-oriented](spec/2026-10-26-spec-TOOL-dWellOiledMachine-12.md) | 17 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-38 — the per-session orientation card retired into the session binding, with the write gate's card and route reads re-pointed in the same unit](spec/2026-10-26-spec-TOOL-dWellOiledMachine-38.md) | 18 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-77 — a session is bound as the owner only when no machine launcher started it](spec/2026-10-27-spec-TOOL-dWellOiledMachine-77.md) | 18 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-23 — the session-start hook loading the set `memory.default-load` names, ending with `next`'s line, held under the hook channel's measured cap](spec/2026-10-26-spec-TOOL-dWellOiledMachine-23.md) | 19 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-73 — the orientation card stored through the runtime kit where it resolves, and at its legacy home where it does not](spec/2026-10-27-spec-TOOL-dWellOiledMachine-73.md) | 19 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-11 — workspaces by `build.worktree`: the allocator, the commit queue, integration before release, and a sweep that reaps only what it allocated](spec/2026-10-26-spec-TOOL-dWellOiledMachine-11.md) | 20 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-33 — the `Gov-*` trailers written from the binding at every commit site, and the commit-key check at the push and in `commit-msg`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-33.md) | 21 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-35 — the session node derived from bindings: `runs-in` and `after`, acts and sessions as native-id classes, the live inbox and the card's session list](spec/2026-10-26-spec-TOOL-dWellOiledMachine-35.md) | 22 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-40 — the commit queue pushes the build's branch as `build.push` says, taking no lander lock and running no bar but a declared branch bar](spec/2026-10-26-spec-TOOL-dWellOiledMachine-40.md) | 23 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-55 — the transport points in Runtime's `[extend]`: a lease store with git refs its only adapter and its conformance probes, a doorbell, and an offer source](spec/2026-10-26-spec-TOOL-dWellOiledMachine-55.md) | 24 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-60 — the landing, its lease beat and its `landed` notice in one atomic push, and the commit queue's push through the same fence](spec/2026-10-26-spec-TOOL-dWellOiledMachine-60.md) | 25 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-58 — the record door: every coordination write bound to its writer's session binding, and the two closing items it admits](spec/2026-10-26-spec-TOOL-dWellOiledMachine-58.md) | 26 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-57 — the secret scan over coordination payloads and adapter boundaries, the door's token-shape refusal, and the request record bound to its intake](spec/2026-10-26-spec-TOOL-dWellOiledMachine-57.md) | 27 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-63 — the record door's node writer: a sessionless coordination write admitted for this node's own records](spec/2026-10-27-spec-TOOL-dWellOiledMachine-63.md) | 27 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-6 — the supervisor: `resume-tick.sh` grown into the executor's seam, one act session per role act, relaunch by policy, and a reconcile before the first beat](spec/2026-10-26-spec-TOOL-dWellOiledMachine-6.md) | 28 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-37 — the launch preflight: no hook- or permission-skipping launch, trusted hooks by hash, an allowlisted environment, the credential order, and relative worktree pointers](spec/2026-10-26-spec-TOOL-dWellOiledMachine-37.md) | 29 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-78 — one supervisor per build: the tick's liveness read with the recorded image and stamp, `unknown` held as live, and the start claimed exclusively](spec/2026-10-27-spec-TOOL-dWellOiledMachine-78.md) | 29 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-56 — the act's harness and credential resolved per role through Roles' resolver, a harness row for how it reads the credential, and the launch pinned out of bare mode](spec/2026-10-26-spec-TOOL-dWellOiledMachine-56.md) | 30 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-8 — the persisted-return store, keyed per spawn site, and the shared deferral block](spec/2026-10-26-spec-TOOL-dWellOiledMachine-8.md) | 31 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-7 — act binding and the epoch check at the Workflow, Agent and shell call, decided in the dispatcher's PermissionRequest entry, with in-script spawns declared and reconciled](spec/2026-10-26-spec-TOOL-dWellOiledMachine-7.md) | 32 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-74 — a kept return reused only for the same spawn input: the input print joins the spawn site's label](spec/2026-10-27-spec-TOOL-dWellOiledMachine-74.md) | 32 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-19 — act binding against the resolved shape's digest, `roles.shape-enforce`, the journal reconciled against the shape, and each non-review act's shape-run row](spec/2026-10-26-spec-TOOL-dWellOiledMachine-19.md) | 33 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-30 — act binding and shape-run rows for an experiment's acts, read at the experiment kind's harness](spec/2026-10-26-spec-TOOL-dWellOiledMachine-30.md) | 34 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-9 — agent slots reserved under `runtime.agents-in-flight`: the slot ledger and the supervisor's reservations](spec/2026-10-26-spec-TOOL-dWellOiledMachine-9.md) | 35 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-43 — the in-flight ledger: a slot per agent at SubagentStart and SubagentStop, Workflow reservations converted by run, a sweep keyed to the session's liveness, and its split fallback](spec/2026-10-26-spec-TOOL-dWellOiledMachine-43.md) | 36 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-45 — the admission queue: every spawn and Workflow call waits its turn under `runtime.agents-in-flight`, clamped to the share it can hold, and handed to the executor past the hook's hold](spec/2026-10-26-spec-TOOL-dWellOiledMachine-45.md) | 37 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-9 — agent slots reserved under `runtime.agents-in-flight`: the slot ledger and the supervisor's reservations](spec/2026-10-26-spec-TOOL-dWellOiledMachine-9.md) | 35 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-43 — the in-flight ledger: a slot per agent at SubagentStart and SubagentStop, Workflow reservations converted by run, a sweep keyed to the session's liveness, and its split fallback](spec/2026-10-26-spec-TOOL-dWellOiledMachine-43.md) | 36 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-70 — the slot reap and the stale-lock break by rename into a graveyard, with the residual window named](spec/2026-10-27-spec-TOOL-dWellOiledMachine-70.md) | 36 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-45 — the admission queue: every spawn and Workflow call waits its turn under `runtime.agents-in-flight`, clamped to the share it can hold, and handed to the executor past the hook's hold](spec/2026-10-26-spec-TOOL-dWellOiledMachine-45.md) | 37 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-66 — refusal rows and rule lines for the act-binding and in-flight admission packs](spec/2026-10-27-spec-TOOL-dWellOiledMachine-66.md) | 37 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-53 — admission under `runtime.admission-scope`: the node's plan and hardware ledgers, charged by every project and weighed by the profile's shares](spec/2026-10-26-spec-TOOL-dWellOiledMachine-53.md) | 38 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-52 — the node beat: the supervisor's beat carrying the node's capacity, free slots, load, holds and plan allowance, and nothing of another project](spec/2026-10-26-spec-TOOL-dWellOiledMachine-52.md) | 39 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-4 — the prompt-submit pack: each owner prompt written verbatim to the intake record, its secrets redacted and its size capped](spec/2026-10-26-spec-TOOL-dWellOiledMachine-4.md) | 40 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-27 — intake for a prompt that reaches no owner session: the mailbox and cadence origins, only owner origin ratifying, and the interim roots drained](spec/2026-10-26-spec-TOOL-dWellOiledMachine-27.md) | 41 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-4 — the prompt-submit pack: each owner prompt written verbatim to the intake record, its secrets redacted and its size capped](spec/2026-10-26-spec-TOOL-dWellOiledMachine-4.md) | 40 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-27 — intake for a prompt that reaches no owner session: the mailbox and cadence origins, only owner origin ratifying, and the interim roots drained](spec/2026-10-26-spec-TOOL-dWellOiledMachine-27.md) | 41 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-75 — an intake that cannot be written fails its pack, so the dispatcher refuses the prompt](spec/2026-10-27-spec-TOOL-dWellOiledMachine-75.md) | 41 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-5 — Plan's ratification and the placement dispositions re-pointed to the intake record, RC-9's fallback drained per harness, and fallback witnesses kept readable](spec/2026-10-26-spec-TOOL-dWellOiledMachine-5.md) | 42 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-76 — a mailbox intake ratifies only on the proof of its own request, never a borrowed one](spec/2026-10-27-spec-TOOL-dWellOiledMachine-76.md) | 42 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-48 — owner items: a deadline on every question left to the owner, the silence rule past it, and the push to an absent owner](spec/2026-10-26-spec-TOOL-dWellOiledMachine-48.md) | 43 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-18 — event waits woken by their record, and one sweep raising each wait past its declared deadline once](spec/2026-10-26-spec-TOOL-dWellOiledMachine-18.md) | 44 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-3 — the owner's lifecycle requests: pause, resume, withdraw, supersede, attend and unattend through one guarded command](spec/2026-10-26-spec-TOOL-dWellOiledMachine-3.md) | 45 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-47 — every wait the supervisor holds given its deadline and outcome: the hold ceiling's hand-over, the act ceiling, nested spawns, restarts and `invalid-input`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-47.md) | 46 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-47 — every wait the supervisor holds given its deadline and outcome: the hold ceiling's hand-over, the act ceiling, nested spawns, restarts and `invalid-input`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-47.md) | 46 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-50 — the wait graph across builds: built at half a wait's deadline, one owner item per cycle, and a parent ending incomplete releasing its dependents](spec/2026-10-26-spec-TOOL-dWellOiledMachine-50.md) | 47 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-46 — the progress ledger per item instance: no-progress and repeat counted on witnesses, a lifetime relaunch cap, and a lease renewed only on progress](spec/2026-10-26-spec-TOOL-dWellOiledMachine-46.md) | 48 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-49 — the refusal breaker: every refusal journaled with its rule, one rule's repeats ending the act, and a remedy another guard refuses refused at registration](spec/2026-10-26-spec-TOOL-dWellOiledMachine-49.md) | 49 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-41 — a unit of a leased build offered at placement to another session or node as `build.unit-holders` says, its holder driving only that unit's passes on its own branch](spec/2026-10-26-spec-TOOL-dWellOiledMachine-41.md) | 50 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-49 — the refusal breaker: every refusal journaled with its rule, one rule's repeats ending the act, and a remedy another guard refuses refused at registration](spec/2026-10-26-spec-TOOL-dWellOiledMachine-49.md) | 49 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-41 — a unit of a leased build offered at placement to another session or node as `build.unit-holders` says, its holder driving only that unit's passes on its own branch](spec/2026-10-26-spec-TOOL-dWellOiledMachine-41.md) | 50 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-54 — discovery and the pick: one read of a project's claimable ready set, a pure replaceable pick filtered by the node profile, and the preset check refusing a harness with no model](spec/2026-10-26-spec-TOOL-dWellOiledMachine-54.md) | 51 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-42 — `gov-session` retired with an upgrade step: a hand-off becomes an `intake` message or a unit offered at placement, every reader re-pointed in the same unit](spec/2026-10-26-spec-TOOL-dWellOiledMachine-42.md) | 52 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-34 — `gov trace <key>` and `gov why <key>` over the one index, one timeline engine bounded by `trace.rows`, and the health and stall logs folded into the journal grammar](spec/2026-10-26-spec-TOOL-dWellOiledMachine-34.md) | 53 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-34 — `gov trace <key>` and `gov why <key>` over the one index, one timeline engine bounded by `trace.rows`, and the health and stall logs folded into the journal grammar](spec/2026-10-26-spec-TOOL-dWellOiledMachine-34.md) | 53 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-51 — each build's spend derived from its `trace.cost` rows and trended, `build.spend-cap` measured by default and set from that evidence, and a build reaching a set cap ending as `flow.on-exhausted` says](spec/2026-10-26-spec-TOOL-dWellOiledMachine-51.md) | 54 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-24 — the journal's count of map reads outside a slice: a record pack on every shell call that runs `gov map`, judged against the role's slice](spec/2026-10-26-spec-TOOL-dWellOiledMachine-24.md) | 55 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-65 — the stall journal line carries the limit's reset, and the limit hold reads it there](spec/2026-10-27-spec-TOOL-dWellOiledMachine-65.md) | 54 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-24 — the journal's count of map reads outside a slice: a record pack on every shell call that runs `gov map`, judged against the role's slice](spec/2026-10-26-spec-TOOL-dWellOiledMachine-24.md) | 55 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-59 — a cadence run's own rework budget on its period lease, the cadence-items point, and the tick that runs them](spec/2026-10-26-spec-TOOL-dWellOiledMachine-59.md) | 56 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-44 — the memory-mirror point: a stand-in adapter fed from the change feed, four reads that consult it, and every verdict computed locally](spec/2026-10-26-spec-TOOL-dWellOiledMachine-44.md) | 57 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-44 — the memory-mirror point: a stand-in adapter fed from the change feed, four reads that consult it, and every verdict computed locally](spec/2026-10-26-spec-TOOL-dWellOiledMachine-44.md) | 57 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-29 — the measured `browser` row and the `visual.capture` command adapter: a pinned tree served, the cache busted, the viewports taken, screenshots kept by hash after the scan](spec/2026-10-26-spec-TOOL-dWellOiledMachine-29.md) | 58 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-26 — the `step —` announcement before each act while attended, and once when attendance begins, rendered from `next` and the item's declaration](spec/2026-10-26-spec-TOOL-dWellOiledMachine-26.md) | 59 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dWellOiledMachine-25 — the supervisor the only driver in every mode: `run` hands a build to it, the owner's session its client, the hosted fallback act-bound, and `/build` a client of `run`](spec/2026-10-26-spec-TOOL-dWellOiledMachine-25.md) | 60 | 2 | OPEN | rev-1 | 2026-10-26 |
-| [TOOL-dWellOiledMachine-28 — the unattended kit dissolved: its hooks and its tick taken into the runtime kit, `RESUME_SCHEDULE_*` retired, `/unattended` a client of `run`, with the upgrade steps that carry adopters across](spec/2026-10-26-spec-TOOL-dWellOiledMachine-28.md) | 61 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dWellOiledMachine-28 — the unattended kit dissolved: its hooks and its tick taken into the runtime kit, `RESUME_SCHEDULE_*` retired, `/unattended` a client of `run`, with the upgrade steps that carry adopters across](spec/2026-10-26-spec-TOOL-dWellOiledMachine-28.md) | 61 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-64 — the moved hooks' message renderer and table moved with them into the runtime kit](spec/2026-10-27-spec-TOOL-dWellOiledMachine-64.md) | 62 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dWellOiledMachine-79 — the spec audit's 49 medium and low findings, batched: capability rows, pack shapes, launch environment, registries, renders and the records that miscount](spec/2026-10-27-spec-TOOL-dWellOiledMachine-79.md) | 63 | 2 | OPEN | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 3 record folder(s).
+Records: 30 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17
-TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27
-TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37
-TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47
-TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57
-TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9.
+Ids no `spec-audit` record has ever named: TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71
+TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79.
 
-Ids whose spec moved past its audited revision: none — 0 of 61 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: TOOL-dWellOiledMachine-1@rev-1 TOOL-dWellOiledMachine-10@rev-1 TOOL-dWellOiledMachine-11@rev-1 TOOL-dWellOiledMachine-12@rev-1 TOOL-dWellOiledMachine-13@rev-1 TOOL-dWellOiledMachine-14@rev-1 TOOL-dWellOiledMachine-16@rev-1
+TOOL-dWellOiledMachine-17@rev-1 TOOL-dWellOiledMachine-2@rev-1 TOOL-dWellOiledMachine-20@rev-1 TOOL-dWellOiledMachine-21@rev-1 TOOL-dWellOiledMachine-23@rev-1 TOOL-dWellOiledMachine-24@rev-1 TOOL-dWellOiledMachine-27@rev-1 TOOL-dWellOiledMachine-28@rev-1 TOOL-dWellOiledMachine-31@rev-1
+TOOL-dWellOiledMachine-32@rev-1 TOOL-dWellOiledMachine-33@rev-1 TOOL-dWellOiledMachine-34@rev-1 TOOL-dWellOiledMachine-35@rev-1 TOOL-dWellOiledMachine-36@rev-1 TOOL-dWellOiledMachine-37@rev-1 TOOL-dWellOiledMachine-38@rev-1 TOOL-dWellOiledMachine-39@rev-1 TOOL-dWellOiledMachine-4@rev-1
+TOOL-dWellOiledMachine-40@rev-1 TOOL-dWellOiledMachine-41@rev-1 TOOL-dWellOiledMachine-43@rev-1 TOOL-dWellOiledMachine-44@rev-1 TOOL-dWellOiledMachine-45@rev-1 TOOL-dWellOiledMachine-47@rev-1 TOOL-dWellOiledMachine-49@rev-1 TOOL-dWellOiledMachine-55@rev-1 TOOL-dWellOiledMachine-56@rev-1
+TOOL-dWellOiledMachine-57@rev-1 TOOL-dWellOiledMachine-58@rev-1 TOOL-dWellOiledMachine-6@rev-1 TOOL-dWellOiledMachine-60@rev-1 TOOL-dWellOiledMachine-7@rev-1 TOOL-dWellOiledMachine-8@rev-1 TOOL-dWellOiledMachine-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 61 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 78 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 61
 - carried in parts: 0 (none)
@@ -226,7 +245,11 @@ Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 61 spec(
 - stale: 0 (none)
 - ambiguous: 0 (none)
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: `spec/2026-10-27-spec-TOOL-dWellOiledMachine-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-65.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dWellOiledMachine-66.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-69.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dWellOiledMachine-70.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-73.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dWellOiledMachine-74.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-77.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dWellOiledMachine-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dWellOiledMachine-79.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0283, cl-dClosedLoop-0285, cl-dClosedLoop-0286, cl-dClosedLoop-0290, cl-dClosedLoop-0291, cl-dClosedLoop-0292, cl-dClosedLoop-0296, cl-dClosedLoop-0299, cl-dClosedLoop-0300, cl-dClosedLoop-0302, cl-dClosedLoop-0308, cl-dClosedLoop-0309,
   cl-dClosedLoop-0330, cl-dClosedLoop-0335, cl-dClosedLoop-0337, cl-dClosedLoop-0338
 <!-- /gen:build-coverage -->
@@ -237,23 +260,23 @@ Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 61 spec(
 |---|---|---|
 | 1 | `TOOL-dWellOiledMachine-1` | no |
 | 2 | `TOOL-dWellOiledMachine-16` | no |
-| 3 | `TOOL-dWellOiledMachine-61` | no |
+| 3 | `TOOL-dWellOiledMachine-61`, `TOOL-dWellOiledMachine-72` | yes |
 | 4 | `TOOL-dWellOiledMachine-20` | no |
 | 5 | `TOOL-dWellOiledMachine-22` | no |
 | 6 | `TOOL-dWellOiledMachine-17` | no |
 | 7 | `TOOL-dWellOiledMachine-14` | no |
-| 8 | `TOOL-dWellOiledMachine-13` | no |
+| 8 | `TOOL-dWellOiledMachine-13`, `TOOL-dWellOiledMachine-68` | yes |
 | 9 | `TOOL-dWellOiledMachine-15` | no |
 | 10 | `TOOL-dWellOiledMachine-36` | no |
 | 11 | `TOOL-dWellOiledMachine-10` | no |
-| 12 | `TOOL-dWellOiledMachine-31` | no |
+| 12 | `TOOL-dWellOiledMachine-31`, `TOOL-dWellOiledMachine-69`, `TOOL-dWellOiledMachine-71` | no |
 | 13 | `TOOL-dWellOiledMachine-21` | no |
 | 14 | `TOOL-dWellOiledMachine-2` | no |
 | 15 | `TOOL-dWellOiledMachine-32` | no |
-| 16 | `TOOL-dWellOiledMachine-39` | no |
+| 16 | `TOOL-dWellOiledMachine-39`, `TOOL-dWellOiledMachine-67` | yes |
 | 17 | `TOOL-dWellOiledMachine-12` | no |
-| 18 | `TOOL-dWellOiledMachine-38` | no |
-| 19 | `TOOL-dWellOiledMachine-23` | no |
+| 18 | `TOOL-dWellOiledMachine-38`, `TOOL-dWellOiledMachine-77` | no |
+| 19 | `TOOL-dWellOiledMachine-23`, `TOOL-dWellOiledMachine-73` | no |
 | 20 | `TOOL-dWellOiledMachine-11` | no |
 | 21 | `TOOL-dWellOiledMachine-33` | no |
 | 22 | `TOOL-dWellOiledMachine-35` | no |
@@ -261,22 +284,22 @@ Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 61 spec(
 | 24 | `TOOL-dWellOiledMachine-55` | no |
 | 25 | `TOOL-dWellOiledMachine-60` | no |
 | 26 | `TOOL-dWellOiledMachine-58` | no |
-| 27 | `TOOL-dWellOiledMachine-57` | no |
+| 27 | `TOOL-dWellOiledMachine-57`, `TOOL-dWellOiledMachine-63` | no |
 | 28 | `TOOL-dWellOiledMachine-6` | no |
-| 29 | `TOOL-dWellOiledMachine-37` | no |
+| 29 | `TOOL-dWellOiledMachine-37`, `TOOL-dWellOiledMachine-78` | yes |
 | 30 | `TOOL-dWellOiledMachine-56` | no |
 | 31 | `TOOL-dWellOiledMachine-8` | no |
-| 32 | `TOOL-dWellOiledMachine-7` | no |
+| 32 | `TOOL-dWellOiledMachine-7`, `TOOL-dWellOiledMachine-74` | yes |
 | 33 | `TOOL-dWellOiledMachine-19` | no |
 | 34 | `TOOL-dWellOiledMachine-30` | no |
 | 35 | `TOOL-dWellOiledMachine-9` | no |
-| 36 | `TOOL-dWellOiledMachine-43` | no |
-| 37 | `TOOL-dWellOiledMachine-45` | no |
+| 36 | `TOOL-dWellOiledMachine-43`, `TOOL-dWellOiledMachine-70` | no |
+| 37 | `TOOL-dWellOiledMachine-45`, `TOOL-dWellOiledMachine-66` | no |
 | 38 | `TOOL-dWellOiledMachine-53` | no |
 | 39 | `TOOL-dWellOiledMachine-52` | no |
 | 40 | `TOOL-dWellOiledMachine-4` | no |
-| 41 | `TOOL-dWellOiledMachine-27` | no |
-| 42 | `TOOL-dWellOiledMachine-5` | no |
+| 41 | `TOOL-dWellOiledMachine-27`, `TOOL-dWellOiledMachine-75` | no |
+| 42 | `TOOL-dWellOiledMachine-5`, `TOOL-dWellOiledMachine-76` | no |
 | 43 | `TOOL-dWellOiledMachine-48` | no |
 | 44 | `TOOL-dWellOiledMachine-18` | no |
 | 45 | `TOOL-dWellOiledMachine-3` | no |
@@ -288,7 +311,7 @@ Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 61 spec(
 | 51 | `TOOL-dWellOiledMachine-54` | no |
 | 52 | `TOOL-dWellOiledMachine-42` | no |
 | 53 | `TOOL-dWellOiledMachine-34` | no |
-| 54 | `TOOL-dWellOiledMachine-51` | no |
+| 54 | `TOOL-dWellOiledMachine-51`, `TOOL-dWellOiledMachine-65` | yes |
 | 55 | `TOOL-dWellOiledMachine-24` | no |
 | 56 | `TOOL-dWellOiledMachine-59` | no |
 | 57 | `TOOL-dWellOiledMachine-44` | no |
@@ -296,6 +319,8 @@ Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 61 spec(
 | 59 | `TOOL-dWellOiledMachine-26` | no |
 | 60 | `TOOL-dWellOiledMachine-25` | no |
 | 61 | `TOOL-dWellOiledMachine-28` | no |
+| 62 | `TOOL-dWellOiledMachine-64` | no |
+| 63 | `TOOL-dWellOiledMachine-79` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
