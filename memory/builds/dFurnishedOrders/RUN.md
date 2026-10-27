@@ -78,3 +78,13 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-26T22:40:18Z rescope · item add TOOL-dFurnishedOrders-42 · reason spec-audit round1 of the round-2 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) minors batched, the roles runlog unattended and kickoff half, a write set disjoint from TOOL-dFurnishedOrders-41 by M6: MEDIUM ids 1 2 23 3 22 4 5 6 25 7 11 12 13 21 26 30 35 (items M1-M7 M9-M11 M16-M18 M22) and LOW ids 16 20 (items L2 L3)
 
 2026-10-26T22:58:20Z review · item dFurnishedOrders-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 31 · disposition promote
+
+2026-10-27T00:03:40Z rescope · item add TOOL-dFurnishedOrders-43 · reason spec-audit round1 of the round-3 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) finding id 1 at HIGH, report item H1, shared with id 14: unit 40 derives a receipt kit's home by a formula, never from where apply lands the kit
+
+2026-10-27T00:03:41Z rescope · item add TOOL-dFurnishedOrders-44 · reason spec-audit round1 of the round-3 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) finding id 14 at HIGH, report item H1, shared with id 1: no criterion holds the step's receipt homes to where apply lands each shipped kit, so a parallel formula passes AC1
+
+2026-10-27T00:03:42Z rescope · item add TOOL-dFurnishedOrders-45 · reason spec-audit round1 of the round-3 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) minors batched, the govkit upgrade-step half: MEDIUM ids 25 9 31 32 (items M1 M5 M12) and LOW ids 5 13 18 27 (items L2 L5 L7 L10)
+
+2026-10-27T00:03:43Z rescope · item add TOOL-dFurnishedOrders-46 · reason spec-audit round1 of the round-3 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) minors batched, the roles run-gates unattended kickoff and gate-manifest half, a write set disjoint from TOOL-dFurnishedOrders-45 by M6: MEDIUM ids 2 3 8 10 15 16 20 22 29 (items M2 M3 M4 M6 M7 M8 M9 M10 M11) and LOW ids 4 11 12 17 19 24 28 30 33 (items L1 L3 L4 L6 L8 L9 L11 L12 L13)
+
+2026-10-27T00:27:15Z review · item dFurnishedOrders-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 26 · disposition promote

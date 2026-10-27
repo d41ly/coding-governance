@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-38 — the per-pass line's absence arms graded on their content: a named `miss` helper, and a probe whose red pattern reads each arm's text, never git grep's prefixed line
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 24 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 24 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md) | research | TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md) | research | TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,7 @@ repairs `TOOL-dFurnishedOrders-37` and builds one step after it (order 24).
 - **consumes-from** `TOOL-dFurnishedOrders-30` — S4's conversion of the three arms on the per-pass line to absence assertions, which S2 writes through `miss` (id 29)
 - **consumes-from** `TOOL-dFurnishedOrders-37` — AC3's adopt-unattended arm and S4's amended answer for unit 30, which S3 grades on content (id 29)
 - **hands-off** `TOOL-dFurnishedOrders-42` — the `miss` helper and the three arms written with it, whose floor unit 42 counts (id 1)
+- **hands-off** `TOOL-dFurnishedOrders-46` — the `miss` helper, its failure text, its three arms and the offender key it mints, which unit 46 S7, S14 and S16 settle (ids 20, 19, 28 of the fourth audit)
 
 ## 4. Design
 
@@ -167,6 +169,7 @@ New arm: tools/unattended/adopt-unattended.test.sh · covers AC1 · the three ar
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-2 promotions, id 29
   (HIGH, item H1, related to id 1 at MEDIUM).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-46, promoted from the spec audit of the round-3 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

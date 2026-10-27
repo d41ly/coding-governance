@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-42 — the third spec audit's 19 roles, runlog, hooks, unattended and kickoff minors: criteria that read what they claim, one output for an empty transcript, imports gated as a class, the posture read decoded and bounded, and a runner bound a suite can lower
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 25 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 25 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 |
 
 <!-- /gen:spec-records -->
 
@@ -154,6 +155,7 @@ scope item each.
 - **consumes-from** `TOOL-dFurnishedOrders-37` — AC2, AC3, AC7, AC8, AC9, AC11, AC12, AC14 and AC17, S1, S10, S17, S22 and S25, which S1 to S8, S11 and S15 to S18 settle (ids 1, 2, 23, 16, 3, 22, 4, 5, 7, 13, 21, 26, 30)
 - **consumes-from** `TOOL-dFurnishedOrders-38` — the `miss` helper and the arms written with it, whose floor S1 counts (id 1)
 - **consumes-from** `TOOL-dFurnishedOrders-39` — the file-backed `run_slot_reader`, which S16 observes on the posture read, S17 bounds lower and S19 counts as the one runner (ids 21, 26, 20)
+- **hands-off** `TOOL-dFurnishedOrders-46` — S2, S3, S7, S14, S17, S19, AC2, AC4 and AC13 and its staged breaks, which unit 46 S1, S2, S4 to S6, S10, S12 and S18 settle (ids 2, 3, 10, 15, 16, 4, 12, 33 of the fourth audit)
 
 ## 4. Design
 
@@ -345,6 +347,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC12 · a wrapped sibling
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-2 promotions' roles, runlog, hooks,
   unattended and kickoff minors batched: 17 MEDIUM and 2 LOW.
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-46, promoted from the spec audit of the round-3 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

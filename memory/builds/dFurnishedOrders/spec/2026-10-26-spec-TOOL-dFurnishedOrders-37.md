@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-37 — the second spec audit's 37 minors: readers that tell a missing input from an empty one, one bounded runner, the retired-key scan's shapes and conf, the card's map cell bounded and never re-derived, and criteria that read what they claim
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 23 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-3 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 23 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -248,6 +248,7 @@ own scope item here.
 - **hands-off** `TOOL-dFurnishedOrders-39` — S12's one runner and AC8's stub readers, which unit 39 S3 bounds against a descendant holding stdout (id 27 of the third audit)
 - **hands-off** `TOOL-dFurnishedOrders-41` — S23's population read and its unreadable count, which unit 41 S12 gives a link rule and a read cap (id 31 of the third audit)
 - **hands-off** `TOOL-dFurnishedOrders-42` — AC2, AC3, AC7, AC8, AC9, AC11, AC12, AC14 and AC17, S1, S10, S17, S22 and S25, which unit 42 S1 to S8, S11 and S15 to S18 settle (ids 1, 2, 23, 16, 3, 22, 4, 5, 7, 13, 21, 26, 30 of the third audit)
+- **hands-off** `TOOL-dFurnishedOrders-46` — AC8's first arm and S17's re-stamp, which unit 46 S2 and S1 settle (ids 3, 2 of the fourth audit)
 
 ## 4. Design
 
@@ -510,6 +511,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC18 · a cold render wi
 - rev-1 · 2026-10-26 · initial draft, the spec audit of the round-1 promotions' 27 MEDIUM and 10 LOW
   findings batched.
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-38, TOOL-dFurnishedOrders-39, TOOL-dFurnishedOrders-41, TOOL-dFurnishedOrders-42, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-46, promoted from the spec audit of the round-3 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

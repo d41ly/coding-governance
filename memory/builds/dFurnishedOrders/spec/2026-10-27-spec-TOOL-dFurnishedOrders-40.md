@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-40 — a receipt target's kit home is the kit's declared home under the target's prefix, never the directory of a receipt row, so a merged or seed row at the repo root widens nothing
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 7 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 7 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
 
 <!-- /gen:spec-records -->
 
@@ -73,6 +74,9 @@ landed. It repairs `TOOL-dFurnishedOrders-36` and builds one step after it (orde
 - **consumes-from** `TOOL-dFurnishedOrders-36` — S1's kit home on a receipt target, which S1 to S3 define from the kit's declaration (id 28)
 - **consumes-from** `TOOL-dFurnishedOrders-35` — the step's by-path `gov_govkit` load, through which S1 reads gov's descriptors (id 28)
 - **hands-off** `TOOL-dFurnishedOrders-41` — the declared-home derivation and its target-root guard, which unit 41 extends to flat entries at the prefix root, maps `project-owned` rows through, and gives an outcome for a kit gov has no descriptor for (ids 15, 17, 24, 33, 8)
+- **hands-off** `TOOL-dFurnishedOrders-43` — S1's receipt-home branch and AC1's fixture, which unit 43 S1 to S3 derive from `apply`'s own rules (id 1 of the fourth audit)
+- **hands-off** `TOOL-dFurnishedOrders-45` — S1's home sketch, S4's prefix read, §5 and AC2 and AC3's fixtures, which unit 45 S1, S5, S6 and S8 settle (ids 25, 5, 13, 27 of the fourth audit)
+- **hands-off** `TOOL-dFurnishedOrders-46` — the govkit selftest arm whose sibling reads unit 46 S8 guards (id 22 of the fourth audit)
 
 ## 4. Design
 
@@ -189,6 +193,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · receipts carrying roo
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-2 promotions, id 28
   (HIGH, item H3, related to id 15 at MEDIUM).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-43, TOOL-dFurnishedOrders-45, TOOL-dFurnishedOrders-46, promoted from the spec audit of the round-3 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

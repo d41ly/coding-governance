@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-39 — the roles kit's one bounded runner writes its child's output to files, never a pipe, so a descendant holding stdout cannot outlive the bound, from one canonical block the run-gates kit already proves
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 24 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 24 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 |
 
 <!-- /gen:spec-records -->
 
@@ -78,6 +79,7 @@ bound through a pipe. This unit makes that shape one canonical block both kits c
 - **consumes-from** `TOOL-dFurnishedOrders-29` — `run_slot_reader` and its rendered answers, whose body S3 runs through the canonical block (id 27)
 - **consumes-from** `TOOL-dFurnishedOrders-37` — S12's one runner and AC8's stub readers, which S3 bounds against a descendant holding stdout (id 27)
 - **hands-off** `TOOL-dFurnishedOrders-42` — the file-backed `run_slot_reader`, whose bound a test lowers and whose posture read unit 42 observes under a descendant holding stdout (ids 26, 21)
+- **hands-off** `TOOL-dFurnishedOrders-46` — the `run_bounded_py` block, `run_slot_reader` and the run-gates version move, which unit 46 S1 to S3, S9 to S13, S15 and S17 settle (ids 2, 3, 8, 29, 4, 11, 12, 17, 24, 30 of the fourth audit)
 
 ## 4. Design
 
@@ -208,6 +210,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC3 · the `run_bounded_py` 
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-2 promotions, id 27
   (HIGH, item H2, related to id 21 at MEDIUM).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-46, promoted from the spec audit of the round-3 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

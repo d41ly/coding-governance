@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-41 — the third spec audit's 12 upgrade-step minors: the walk run on the repository root, kit source narrowed to kit homes, kit homes matched to gov's descriptors, `project-owned` suites derived and mapped, and a scan that skips links and caps a read
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 25 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 25 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-42 |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-42 |
+| [2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-42 |
 
 <!-- /gen:spec-records -->
 
@@ -115,6 +116,9 @@ into one item still take one scope item each.
 - **consumes-from** `TOOL-dFurnishedOrders-36` — S1's suite subtraction, its descriptor read and AC2, which S3 and S7 to S11 settle (ids 10, 15, 17, 24, 33, 8)
 - **consumes-from** `TOOL-dFurnishedOrders-37` — S23's population read and its unreadable count, which S12 gives a link rule and a read cap (id 31)
 - **consumes-from** `TOOL-dFurnishedOrders-40` — the declared-home derivation and its target-root guard, which S7, S8 and S10 extend (ids 15, 17, 33)
+- **consumes-from** `TOOL-dFurnishedOrders-43` — the homes `derive_receipt_homes` answers, which S7's prefix guard, S8's `project-owned` mapping and S10's no-descriptor branch read (id 1 of the fourth audit)
+- **hands-off** `TOOL-dFurnishedOrders-45` — S2's top-level refusal, S5's tool-root search, S6's `kit.toml` compare and AC3 and AC5's fixtures, which unit 45 S1 to S5 and S7 settle (ids 25, 9, 31, 32, 5, 18 of the fourth audit)
+- **hands-off** `TOOL-dFurnishedOrders-46` — the govkit selftest arm whose sibling reads unit 46 S8 guards (id 22 of the fourth audit)
 
 ## 4. Design
 
@@ -291,6 +295,7 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC5 AC6 AC7 · subdirect
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-2 promotions' govkit upgrade-step
   minors batched: 11 MEDIUM and 1 LOW.
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **consumes-from** bullet mirroring TOOL-dFurnishedOrders-43 and the **hands-off** bullets mirroring TOOL-dFurnishedOrders-45, TOOL-dFurnishedOrders-46, promoted from the spec audit of the round-3 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

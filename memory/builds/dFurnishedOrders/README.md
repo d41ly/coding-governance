@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-21 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42
+ids: TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-21 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46
 spec-audit: 2026-10-21
 parents: dBoundRoles
 may: PLAY-dClosedLoop-3
@@ -82,11 +82,12 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 41 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 45 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12
 ids TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-21 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23
 ids TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34
-ids TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42
+ids TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45
+ids TOOL-dFurnishedOrders-46
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -101,8 +102,10 @@ ids TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 T
 | [TOOL-dFurnishedOrders-35 — the call-site scan's kit files defined on every target kind: gov's own kit source, a receipt, or the directories a `kit.toml` homes, so gov's own update walk passes](spec/2026-10-26-spec-TOOL-dFurnishedOrders-35.md) | 6 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dFurnishedOrders-36 — the kits' own suites out of the call-site scan on every target: a `project-owned` file or a `*.test.sh` under a kit home spells the retired keys on purpose and is never an adopter's call site](spec/2026-10-26-spec-TOOL-dFurnishedOrders-36.md) | 6 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dFurnishedOrders-3 — a return's harness notices persisted with it, as runlog `notice` events and on the agent ledger's returned line, by `notices.record`](spec/2026-10-26-spec-TOOL-dFurnishedOrders-3.md) | 7 | 2 | OPEN | rev-2 | 2026-10-26 |
-| [TOOL-dFurnishedOrders-40 — a receipt target's kit home is the kit's declared home under the target's prefix, never the directory of a receipt row, so a merged or seed row at the repo root widens nothing](spec/2026-10-27-spec-TOOL-dFurnishedOrders-40.md) | 7 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-40 — a receipt target's kit home is the kit's declared home under the target's prefix, never the directory of a receipt row, so a merged or seed row at the repo root widens nothing](spec/2026-10-27-spec-TOOL-dFurnishedOrders-40.md) | 7 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dFurnishedOrders-19 — every role return declaring the rows it establishes, and each work order's return schema rendered from its own rows, so a dropped, invented or doubled row fails the return and is retried](spec/2026-10-26-spec-TOOL-dFurnishedOrders-19.md) | 8 | 2 | OPEN | rev-2 | 2026-10-26 |
+| [TOOL-dFurnishedOrders-43 — a receipt target's kit homes are the directories `apply` lands each kit's home at, derived through the entry's own destination rules, never a formula beside them](spec/2026-10-27-spec-TOOL-dFurnishedOrders-43.md) | 8 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-44 — the step's receipt homes held to the receipt `apply` writes: one govkit selftest arm applies every shipped kit to a scratch target with a per-kit override and compares both ways](spec/2026-10-27-spec-TOOL-dFurnishedOrders-44.md) | 8 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dFurnishedOrders-24 — each work order's return schema rendered as one branch per outcome, the template's and each arm's, so a valid refused or probe return passes and a malformed one fails on its own fields](spec/2026-10-26-spec-TOOL-dFurnishedOrders-24.md) | 9 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [TOOL-dFurnishedOrders-7 — a false handed fact repaired in the return and filed as an ask against its producer's record, routed by `roles.on-contradiction` through the refusal outcome table](spec/2026-10-26-spec-TOOL-dFurnishedOrders-7.md) | 9 | 2 | OPEN | rev-2 | 2026-10-26 |
 | [TOOL-dFurnishedOrders-14 — the answered-call hook's range matching, the excerpt keys it matches and a repair's carry, designed as RC-7 asks](spec/2026-10-26-spec-TOOL-dFurnishedOrders-14.md) | 10 | 2 | OPEN | rev-2 | 2026-10-26 |
@@ -127,28 +130,31 @@ ids TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 T
 | [TOOL-dFurnishedOrders-30 — the round-1 audit's 16 workflows, unattended, kickoff and memory-tree minors: retired keys refused and observed, every cold carrier named, the card's map cell given a failure state, and the harness's rows checked in-script](spec/2026-10-26-spec-TOOL-dFurnishedOrders-30.md) | 22 | 2 | OPEN | rev-3 | 2026-10-27 |
 | [TOOL-dFurnishedOrders-33 — an unreadable posture inside a run's window reads away unless an owner turn after the run's start shows the owner there, so the stall an unread posture holds is closed](spec/2026-10-26-spec-TOOL-dFurnishedOrders-33.md) | 22 | 2 | OPEN | rev-1 | 2026-10-26 |
 | [TOOL-dFurnishedOrders-34 — the posture read's failures named and bounded: a `breakpoints.py list` that fails, hangs or prints no `attendance —` line, and a policy read that fails, each an unreadable posture with its cause](spec/2026-10-26-spec-TOOL-dFurnishedOrders-34.md) | 22 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dFurnishedOrders-37 — the second spec audit's 37 minors: readers that tell a missing input from an empty one, one bounded runner, the retired-key scan's shapes and conf, the card's map cell bounded and never re-derived, and criteria that read what they claim](spec/2026-10-26-spec-TOOL-dFurnishedOrders-37.md) | 23 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dFurnishedOrders-38 — the per-pass line's absence arms graded on their content: a named `miss` helper, and a probe whose red pattern reads each arm's text, never git grep's prefixed line](spec/2026-10-27-spec-TOOL-dFurnishedOrders-38.md) | 24 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dFurnishedOrders-39 — the roles kit's one bounded runner writes its child's output to files, never a pipe, so a descendant holding stdout cannot outlive the bound, from one canonical block the run-gates kit already proves](spec/2026-10-27-spec-TOOL-dFurnishedOrders-39.md) | 24 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dFurnishedOrders-41 — the third spec audit's 12 upgrade-step minors: the walk run on the repository root, kit source narrowed to kit homes, kit homes matched to gov's descriptors, `project-owned` suites derived and mapped, and a scan that skips links and caps a read](spec/2026-10-27-spec-TOOL-dFurnishedOrders-41.md) | 25 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dFurnishedOrders-42 — the third spec audit's 19 roles, runlog, hooks, unattended and kickoff minors: criteria that read what they claim, one output for an empty transcript, imports gated as a class, the posture read decoded and bounded, and a runner bound a suite can lower](spec/2026-10-27-spec-TOOL-dFurnishedOrders-42.md) | 25 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-37 — the second spec audit's 37 minors: readers that tell a missing input from an empty one, one bounded runner, the retired-key scan's shapes and conf, the card's map cell bounded and never re-derived, and criteria that read what they claim](spec/2026-10-26-spec-TOOL-dFurnishedOrders-37.md) | 23 | 2 | OPEN | rev-3 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-38 — the per-pass line's absence arms graded on their content: a named `miss` helper, and a probe whose red pattern reads each arm's text, never git grep's prefixed line](spec/2026-10-27-spec-TOOL-dFurnishedOrders-38.md) | 24 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-39 — the roles kit's one bounded runner writes its child's output to files, never a pipe, so a descendant holding stdout cannot outlive the bound, from one canonical block the run-gates kit already proves](spec/2026-10-27-spec-TOOL-dFurnishedOrders-39.md) | 24 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-41 — the third spec audit's 12 upgrade-step minors: the walk run on the repository root, kit source narrowed to kit homes, kit homes matched to gov's descriptors, `project-owned` suites derived and mapped, and a scan that skips links and caps a read](spec/2026-10-27-spec-TOOL-dFurnishedOrders-41.md) | 25 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-42 — the third spec audit's 19 roles, runlog, hooks, unattended and kickoff minors: criteria that read what they claim, one output for an empty transcript, imports gated as a class, the posture read decoded and bounded, and a runner bound a suite can lower](spec/2026-10-27-spec-TOOL-dFurnishedOrders-42.md) | 25 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-45 — the fourth spec audit's 8 upgrade-step minors: a copied kit.toml matched on its own `home`, a top level compared as a file, every git child stripped of the leaking variables, live fixtures, one tool-root search and a deploy descriptor refused by name](spec/2026-10-27-spec-TOOL-dFurnishedOrders-45.md) | 26 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dFurnishedOrders-46 — the fourth spec audit's 18 roles, run-gates, process-monitor, unattended and kickoff minors: one re-stamp last, one bounded runner that carries its imports and kills on any exception, criteria that read the real gate, and the guards and pins the new arms move](spec/2026-10-27-spec-TOOL-dFurnishedOrders-46.md) | 26 | 2 | OPEN | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 23 bound to this build, across 4 record folder(s).
+Records: 24 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46.
 
-Ids no `spec-audit` record has ever named: TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42.
+Ids no `spec-audit` record has ever named: TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46.
 
 Ids whose spec moved past its audited revision: TOOL-dFurnishedOrders-1@rev-1 TOOL-dFurnishedOrders-10@rev-1 TOOL-dFurnishedOrders-11@rev-1 TOOL-dFurnishedOrders-12@rev-1 TOOL-dFurnishedOrders-13@rev-1 TOOL-dFurnishedOrders-14@rev-1 TOOL-dFurnishedOrders-15@rev-1 TOOL-dFurnishedOrders-16@rev-1
 TOOL-dFurnishedOrders-17@rev-1 TOOL-dFurnishedOrders-18@rev-1 TOOL-dFurnishedOrders-19@rev-1 TOOL-dFurnishedOrders-2@rev-1 TOOL-dFurnishedOrders-20@rev-1 TOOL-dFurnishedOrders-22@rev-1 TOOL-dFurnishedOrders-23@rev-1 TOOL-dFurnishedOrders-24@rev-1 TOOL-dFurnishedOrders-25@rev-1
 TOOL-dFurnishedOrders-26@rev-1 TOOL-dFurnishedOrders-27@rev-1 TOOL-dFurnishedOrders-28@rev-1 TOOL-dFurnishedOrders-29@rev-1 TOOL-dFurnishedOrders-3@rev-1 TOOL-dFurnishedOrders-30@rev-1 TOOL-dFurnishedOrders-31@rev-1 TOOL-dFurnishedOrders-32@rev-1 TOOL-dFurnishedOrders-34@rev-1
-TOOL-dFurnishedOrders-35@rev-1 TOOL-dFurnishedOrders-36@rev-1 TOOL-dFurnishedOrders-37@rev-1 TOOL-dFurnishedOrders-4@rev-1 TOOL-dFurnishedOrders-5@rev-1 TOOL-dFurnishedOrders-6@rev-1 TOOL-dFurnishedOrders-7@rev-1 TOOL-dFurnishedOrders-8@rev-1 TOOL-dFurnishedOrders-9@rev-1.
+TOOL-dFurnishedOrders-35@rev-1 TOOL-dFurnishedOrders-36@rev-1 TOOL-dFurnishedOrders-37@rev-1 TOOL-dFurnishedOrders-4@rev-1 TOOL-dFurnishedOrders-5@rev-1 TOOL-dFurnishedOrders-6@rev-1 TOOL-dFurnishedOrders-7@rev-1 TOOL-dFurnishedOrders-8@rev-1 TOOL-dFurnishedOrders-9@rev-1
+TOOL-dFurnishedOrders-38@rev-1 TOOL-dFurnishedOrders-39@rev-1 TOOL-dFurnishedOrders-40@rev-1 TOOL-dFurnishedOrders-41@rev-1 TOOL-dFurnishedOrders-42@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dFurnishedOrders's 20 clause(s) and 14 owned node(s), over 41 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dFurnishedOrders's 20 clause(s) and 14 owned node(s), over 45 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 20
 - carried in parts: 0 (none)
@@ -162,7 +168,8 @@ Coverage of dFurnishedOrders's 20 clause(s) and 14 owned node(s), over 41 spec(s
   `spec/2026-10-26-spec-TOOL-dFurnishedOrders-29.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dFurnishedOrders-30.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dFurnishedOrders-31.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dFurnishedOrders-32.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-TOOL-dFurnishedOrders-33.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dFurnishedOrders-34.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dFurnishedOrders-35.md` (PLAY-dClosedLoop-2), `spec/2026-10-26-spec-TOOL-dFurnishedOrders-36.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-26-spec-TOOL-dFurnishedOrders-37.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dFurnishedOrders-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dFurnishedOrders-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dFurnishedOrders-40.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-27-spec-TOOL-dFurnishedOrders-41.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dFurnishedOrders-42.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-27-spec-TOOL-dFurnishedOrders-41.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dFurnishedOrders-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dFurnishedOrders-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dFurnishedOrders-44.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dFurnishedOrders-45.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dFurnishedOrders-46.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0192, cl-dClosedLoop-0195, cl-dClosedLoop-0200, cl-dClosedLoop-0204, cl-dClosedLoop-0205, cl-dClosedLoop-0211
 <!-- /gen:build-coverage -->
 
@@ -177,7 +184,7 @@ Coverage of dFurnishedOrders's 20 clause(s) and 14 owned node(s), over 41 spec(s
 | 5 | `TOOL-dFurnishedOrders-1`, `TOOL-dFurnishedOrders-25` | yes |
 | 6 | `TOOL-dFurnishedOrders-13`, `TOOL-dFurnishedOrders-35`, `TOOL-dFurnishedOrders-36` | no |
 | 7 | `TOOL-dFurnishedOrders-3`, `TOOL-dFurnishedOrders-40` | yes |
-| 8 | `TOOL-dFurnishedOrders-19` | no |
+| 8 | `TOOL-dFurnishedOrders-19`, `TOOL-dFurnishedOrders-43`, `TOOL-dFurnishedOrders-44` | no |
 | 9 | `TOOL-dFurnishedOrders-24`, `TOOL-dFurnishedOrders-7` | no |
 | 10 | `TOOL-dFurnishedOrders-14`, `TOOL-dFurnishedOrders-31` | no |
 | 11 | `TOOL-dFurnishedOrders-6` | no |
@@ -195,6 +202,7 @@ Coverage of dFurnishedOrders's 20 clause(s) and 14 owned node(s), over 41 spec(s
 | 23 | `TOOL-dFurnishedOrders-37` | no |
 | 24 | `TOOL-dFurnishedOrders-38`, `TOOL-dFurnishedOrders-39` | yes |
 | 25 | `TOOL-dFurnishedOrders-41`, `TOOL-dFurnishedOrders-42` | yes |
+| 26 | `TOOL-dFurnishedOrders-45`, `TOOL-dFurnishedOrders-46` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
