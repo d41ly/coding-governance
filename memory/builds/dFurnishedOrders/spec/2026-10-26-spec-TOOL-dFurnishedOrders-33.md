@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-27-build-TOOL-dFurnishedOrders-33-deviation-331.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-33-deviation-331.md) | deviation | — |
 | [2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 |
 
 <!-- /gen:spec-records -->

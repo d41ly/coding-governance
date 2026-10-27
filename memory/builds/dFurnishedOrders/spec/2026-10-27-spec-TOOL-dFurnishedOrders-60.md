@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-59-round8-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-59-round8-fix-return.md) | research | TOOL-dFurnishedOrders-59 |
+| [2026-10-27-build-TOOL-dFurnishedOrders-60-deviation-601.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-60-deviation-601.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-59-round8-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-59-round8-fix-brief.md) | research | TOOL-dFurnishedOrders-59 |
 | [2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-59 |
 

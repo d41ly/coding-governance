@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-27-build-TOOL-dFurnishedOrders-61-deviation-611.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-61-deviation-611.md) | deviation | — |
 | [2026-10-27-build-TOOL-dFurnishedOrders-61-round9-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-61-round9-fix-return.md) | research | — |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-61-round9-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-61-round9-fix-brief.md) | research | — |
 
