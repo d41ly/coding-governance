@@ -195,7 +195,7 @@ ids TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-d
 | [TOOL-dLinkedLibrary-102 — the spec audit of units 92 to 96: its medium and low findings, batched](spec/2026-10-27-spec-TOOL-dLinkedLibrary-102.md) | 39 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 102 bound to this build, across 4 record folder(s).
+Records: 126 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
