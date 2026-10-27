@@ -3771,7 +3771,9 @@ def check_step_rollback() -> None:
     AC2 and AC3 are the `image-lost` and `witness-only` rows, the scoped no-image rule: a row its up
     applied whose image went missing stops naming the image, and one applied `via` its witness is
     still downed by its exit; AC4 is the `schema-step-kill-before-stamp` row, and the in-process
-    verdict table below covers the no-record branch that row's re-run reaches."""
+    verdict table below covers the no-record branch that row's re-run reaches. TOOL-dSafePassage-62's
+    AC1 and AC2 are the `schema-up-kill` row: an update killed in the schema step's up left rows naming
+    the bytes its file pass moved, and the rollback from there returns them."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -3833,11 +3835,15 @@ def check_step_rollback() -> None:
                 "rollback-update: the re-run exits 0 · its receipt's bytes equal the twin's · the target's bytes equal "
                 "the twin's · the record has the twin's finished shape",
                 "rollback-update: re-run record · down fx/s1: skipped (nothing applied)\n"
-                "rollback-update: re-run record · down govkit/receipt-schema-4: skipped (nothing applied)"))):
+                "rollback-update: re-run record · down govkit/receipt-schema-4: skipped (nothing applied)")),
+            ("rollback-update", "schema-up-kill", 0, (
+                "rollback-update: after the kill · gov_commit A · tools/demo/one.txt row at B",
+                "rollback-update: the rollback exits 0 · tools/demo/one.txt b'v1\\n' · schema 3 · no steps · gov_commit A"))):
         p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
-        tag = ("dSP-33" if plant == "image-lost"
+        tag = ("dSP-62" if plant == "schema-up-kill"
+               else "dSP-33" if plant == "image-lost"
                else "dSP-17" if plant in ("witness-only", "node-witness", "node-witness-refuses")
                else "dSP-4" if not (plant or "").startswith("schema-step")
                else "dSP-19" if family == "rollback-update" else "dSP-18")

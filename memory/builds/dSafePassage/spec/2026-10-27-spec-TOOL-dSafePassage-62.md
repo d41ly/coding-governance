@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-62 — `update` writes the receipt its file pass moved before the first step, so a walk killed below schema 4 leaves rows a rollback can return
 
-**Status:** DEFERRED · rev-1 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 part 2/2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-26-build-TOOL-dSafePassage-62-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-62-ledger.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-62-build-brief.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-62-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

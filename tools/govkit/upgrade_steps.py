@@ -2224,7 +2224,8 @@ NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePass
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
                    "callers", "witness-only", "image-lost") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS
 ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp")  # TOOL-dSafePassage-19
-ROLLBACK_UPDATE_PLANTS = ("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
+ROLLBACK_UPDATE_PLANTS = (("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
+                          + ("schema-up-kill",))  # TOOL-dSafePassage-62
 
 
 def build_fixture_env(**extra: str) -> dict[str, str]:
@@ -3198,7 +3199,8 @@ def run_rollback_update_fixture(plant: str | None) -> int:
         fails: list[str] = []
         schema = plant in ROLLBACK_UPDATE_SCHEMA_PLANTS
         gov, targets, sha_a, sha_b, env = build_update_gov(
-            tmp, ("t", "t2") if plant == "schema-step-kill-before-stamp" else ("t",), ("s1",), fails, schema3=schema)
+            tmp, ("t", "t2") if plant == "schema-step-kill-before-stamp" else ("t",), ("s1",), fails,
+            schema3=schema or plant == "schema-up-kill")
         t = targets["t"]
         reports, rp = t.with_name("t.fx"), t / ".governance" / "install.json"
 
@@ -3224,7 +3226,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
             rec = tt / ".governance" / "outbox" / f"update-reverted-{sha_b[:8]}-{sha_a[:8]}.md"
             return rec.read_text(encoding="utf-8").splitlines() if rec.is_file() else []
 
-        for tt in targets.values() if not fails and plant != "descendant" else ():
+        for tt in targets.values() if not fails and plant not in ("descendant", "schema-up-kill") else ():
             rc0, out0 = run_fixture_govkit(gov, env, "update", "--target", str(tt), "--to", sha_b, "--write")
             got0 = {r["id"]: r["state"] for r in receipt_of(tt).get("steps") or []}
             expect(rc0 == 0 and receipt_of(tt).get("gov_commit") == sha_b and got0.get("fx/s1") == "applied"
@@ -3239,6 +3241,31 @@ def run_rollback_update_fixture(plant: str | None) -> int:
         rc = 0
         if fails:
             pass
+        elif plant == "schema-up-kill":
+            # TOOL-dSafePassage-62 AC1, AC2: `update --to B --write` over the schema-3 target at A,
+            # killed once the schema step's up has renamed schema 4 into place, so the walk persisted
+            # no step record; the receipt written before the walk must name B's bytes for every row
+            # the write loop moved, and the rollback to A from that state must return them.
+            reports.mkdir(exist_ok=True)
+            (reports / "schema.block-after").touch()
+            why = run_killed([sys.executable, str(gov / "tools" / HERE.name / "govkit.py"), "update", "--target",
+                              str(t), "--to", sha_b, "--write"], reports, "schema", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            (reports / "schema.block-after").unlink(missing_ok=True)
+            rec = receipt()
+            row = next((f for f in rec.get("files") or [] if f.get("path") == "tools/demo/one.txt"), {})
+            names = {sha_a: "A", sha_b: "B"}
+            print(f"rollback-update: after the kill · gov_commit {names.get(rec.get('gov_commit'), rec.get('gov_commit'))} · "
+                  f"tools/demo/one.txt row at {names.get(row.get('commit'), row.get('commit'))}")
+            expect(rec.get("gov_commit") == sha_a and row.get("commit") == sha_b,
+                   "the killed receipt does not name gov_commit A with the one.txt row at B's vintage")
+            rc, out = govkit("--rollback", "--to", sha_a, "--write")
+            rec, one = receipt(), (t / "tools" / "demo" / "one.txt").read_bytes()
+            print(f"rollback-update: the rollback exits {rc} · tools/demo/one.txt {one!r} · schema {rec.get('schema')} · "
+                  f"{'WITH' if 'steps' in rec else 'no'} steps · gov_commit {names.get(rec.get('gov_commit'), rec.get('gov_commit'))}")
+            expect(rc == 0 and one == b"v1\n" and rec.get("schema") == 3 and "steps" not in rec
+                   and rec.get("gov_commit") == sha_a,
+                   "the rollback did not exit 0 with one.txt at v1, schema 3, no `steps` and gov_commit A")
         elif schema:
             # TOOL-dSafePassage-19 AC1: a rollback past the schema step, over a target updated from a
             # schema-3 receipt through it, stamps schema 3 with no `steps` and finishes its record.

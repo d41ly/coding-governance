@@ -169,7 +169,10 @@ that run has ended. Before each index write a run appends the path and the blob 
 `.governance/outbox/.update.lock.staged`; the run that reclaims the lock reads that journal, so the
 paths the killed run staged are not refused as dirty, while a different blob you staged at one of
 them still is. The step the kill interrupted reads `failed` with its `interrupted:` text, and the
-next walk runs it again, or runs the row's `resume` command where it declares one.
+next walk runs it again, or runs the row's `resume` command where it declares one. A writing `update`
+records the files its file pass moved in the receipt before its first step, with `gov_commit` left
+unmoved, so `update --rollback --to <that gov_commit> --write` from a killed run's state returns
+those files to the bytes they had.
 
 To see it on this machine:
 

@@ -4283,10 +4283,12 @@ def scan_entry_argv(descs: dict[str, tuple[dict, str]], selection: list[str], ta
 # three and `adopt`'s one — now routes through `write_atomic`, and the assertion reds on any left.
 #
 # `"install.sums"` IS THE THIRD (TOOL-dRedressedBar-19 S40): `.governance/install.sums`, the flat
-# sidecar of the receipt that `check` compares with it both ways. It is written beside the receipt at
-# `apply`'s RECEIPT step, `update`'s three and `adopt`'s one, each through `write_atomic` and each
-# BEFORE its receipt, so an interrupt between the two leaves a new sidecar beside the old receipt,
-# which `check` reports until the next apply rewrites both, and never a truncated sidecar.
+# sidecar of the receipt that `check` compares with it both ways. It is written beside the receipt by
+# ONE writer, `write_install_receipt` (TOOL-dSafePassage-62 S2), which `apply`'s RECEIPT step,
+# `update`'s write before its step walk and its three after it, and `adopt`'s one all call: each file
+# through `write_atomic` and the sidecar BEFORE its receipt, so an interrupt between the two leaves a
+# new sidecar beside the old receipt, which `check` reports until the next apply rewrites both, and
+# never a truncated sidecar.
 ADOPTER_BAR_PATHS = ('gr["file"]', 'receipt_path', '"install.sums"')
 
 
@@ -4327,6 +4329,15 @@ def write_atomic(dest: pathlib.Path, text: str) -> None:
             tmp.unlink()
         except OSError:
             pass
+
+
+def write_install_receipt(target: pathlib.Path, receipt_path: pathlib.Path, doc: dict) -> None:
+    """Write `.governance/install.sums` from every `doc["files"]` row carrying `sha256`, then the
+    receipt `doc` at `receipt_path`, each through `write_atomic` and in that order
+    (TOOL-dRedressedBar-19 S40). The one writer of the pair (TOOL-dSafePassage-62 S2)."""
+    write_atomic(target / ".governance" / "install.sums",
+                 "".join(f"{f['sha256']}  {f['path']}\n" for f in doc["files"] if "sha256" in f))
+    write_atomic(receipt_path, json.dumps(doc, indent=2) + "\n")
 
 
 def derive_receipt_schema(prior) -> dict:
@@ -8611,9 +8622,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         "gate_runner": {"kind": gr.get("kind", "absent"), "file": gr.get("file"),
                         "emitted": emitted, "legs_withheld": _legs_withheld}})
     # TOOL-dRedressedBar-19 S40: the sidecar first, the receipt last, each through `write_atomic`.
-    write_atomic(target / ".governance" / "install.sums",
-                 "".join(f"{w['sha256']}  {w['path']}\n" for w in _rcpt_doc["files"] if "sha256" in w))
-    write_atomic(receipt_path, json.dumps(_rcpt_doc, indent=2) + "\n")
+    write_install_receipt(target, receipt_path, _rcpt_doc)
     if _carried_kits:
         print(f"govkit apply — receipt KEEPS {len(_carried_kits)} kit(s) this selection did not "
               f"name, with their {len(_carried_rows)} row(s) verbatim: {', '.join(_carried_kits)}")
@@ -11759,6 +11768,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                  "earlier one" if kits else f"this run already has {len(r.problems)} finding(s)")
               + f" · {len(_sw_pending)} pending")
     else:
+        # TOOL-dSafePassage-62 S1. THE ROWS THE WRITE LOOP STAMPED REACH THE DISK BEFORE THE FIRST
+        # STEP, `gov_commit` unmoved. Below schema 4 the walk persists nothing (TOOL-dSafePassage-15
+        # S1), so a step killed here left a receipt naming the old bytes for every file the loop moved,
+        # and a rollback read each one as an adopter's edit and kept it. Above schema 4 the walk's
+        # first record writes the same receipt; this closes the window before it.
+        write_install_receipt(target, receipt_path, receipt)
         _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _sw_pending,
                                                to_commit)
         print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
@@ -12977,9 +12992,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # skips that guard entirely and overwrites the project-owned file the first run refused to touch.
     # A partial update leaves the receipt describing what it did, at the commit it came from.
     if r.problems:
-        write_atomic(target / ".governance" / "install.sums",
-                     "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
-        write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
+        write_install_receipt(target, receipt_path, receipt)
         print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
               f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
@@ -13022,16 +13035,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"and this run graded none of them, so advancing gov_commit would move the base they "
               f"must be attributed from. Clear them with "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write`")
-        write_atomic(target / ".governance" / "install.sums",
-                     "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
-        write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
+        write_install_receipt(target, receipt_path, receipt)
         _rb_finish(f"not moved, {ungraded} row(s) carry evidence unattributed")
         return r.emit()
 
     receipt["gov_commit"] = to_commit
-    write_atomic(target / ".governance" / "install.sums",
-                 "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f))
-    write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
+    write_install_receipt(target, receipt_path, receipt)
     # DEPL-cMendedVintage-4 S3. dGaugedVintage-8 S2's "what it overrode" clause went with the
     # override: reaching here now proves `ungraded` is 0, so the clause could only ever render empty.
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
@@ -13665,9 +13674,7 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # TOOL-dSafePassage-3 S5: `schema` in place and, where it is given, `steps` as the last key —
     # carried verbatim from the receipt `--re-adopt` replaces, for D2's reason, or a first install's.
     envelope.update(derive_receipt_schema(_prior))
-    write_atomic(target / ".governance" / "install.sums",
-                 "".join(f"{w['sha256']}  {w['path']}\n" for w in rows if "sha256" in w))
-    write_atomic(receipt_path, json.dumps(envelope, indent=2) + "\n")
+    write_install_receipt(target, receipt_path, envelope)
     print(f"govkit adopt — receipt written: {len(rows)} row(s), {len(selection)} kit(s), "
           f"schema {envelope['schema']}, gov_commit {commit[:8]}")
     if staged:

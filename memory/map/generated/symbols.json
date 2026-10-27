@@ -26798,6 +26798,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_install_receipt",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "write_installable_plant",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
