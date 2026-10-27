@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** DEFERRED · rev-9 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-10 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -169,9 +169,8 @@ TOOL-dSafePassage-N, each item naming the unit it amends; cites are at base `370
   and observes unit 9's plant.
   **Readers:** by name: `_cmd_update` in `tools/govkit/govkit.py`, the tuple's one reader · by value:
   NO VALUE READERS — no verdict is withdrawn. Observed by AC27.
-- S39. id 67. A `retired-edited` row whose path gov ships again, as a descriptor role or a
-  `[[retired]]` successor's, returns to that role, graded as a three-way conflict candidate with an
-  order (plant `edited-reshipped`). Observed by AC38.
+- S39. id 67. Moved to TOOL-dSafePassage-64, its S1, on 2026-10-27: unit 5's build-run walk needs
+  it before order 6. NOT OBSERVED here — TOOL-dSafePassage-64's AC1 observes it.
 
 ### Records and step programs (D-32 to D-35)
 
@@ -318,7 +317,7 @@ Minted: `resolve_landing_base` in `tools/govkit/upgrade_steps.py`; `build_scratc
 `tools/govkit/fixture_target.py`; `resolve_lander_kit` in `tools/push-main.sh`; the verb `floor` on
 `tools/lib/python-floor.sh`; the placeholder `{to}`; the lock keys `platform` and `boot_id`; the join
 `ac-order`; the plants `window-prefix-id`, `window-comment-id`,
-`edited-reshipped`, `reader-raises`, `base-without-source`, `console-prompt`,
+`reader-raises`, `base-without-source`, `console-prompt`,
 `continued-flag`, `unbalanced-quote`, `comment-apostrophe`, `truncated-image`, `autocrlf`,
 `lock-foreign-namespace`, `needs-target-source` and `missing-target`. Each Python function passes
 `py.function` and `resolve_lander_kit` `sh.function`, by `python tools/lexicon/lexicon.py --suggest
@@ -398,7 +397,8 @@ The resolver block's inline copies (unit 23 S4) are re-synced in the same commit
 ## 6. Acceptance criteria
 
 The criteria AC7, AC20, AC21 and AC22 moved to TOOL-dSafePassage-61 on 2026-10-26, as its AC6,
-then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
+then AC8 to AC10, with S8, S21, S22 and S23, and AC38 moved to TOOL-dSafePassage-64 on 2026-10-27,
+as its first criterion, with S39; the labels are not reused here.
 
 - AC1. When `git grep -n -e "def resolve_landing_base" -e "def derive_push_base" -- tools/govkit`
   runs, it prints one line, the definition in `tools/govkit/upgrade_steps.py`.
@@ -513,9 +513,6 @@ then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
   naming the class, the side and the error; `--plant base-without-source` exits 0, that class counted
   as joining.
   Red when: a raising reader tracebacks with exit 1, or an absent source errors.
-- AC38. When `python "tools/govkit/fixtures/retired_edits.py" --plant edited-reshipped` runs, it
-  exits 0, the row gov re-ships reading as a conflict candidate with an order.
-  Red when: the row stays `retired-edited` while gov ships the path.
 - AC39. When `bash -c '. "$1"; read_consumes_from "$2"' _ tools/unattended/lib-unattended.sh <spec>`
   runs over the specs of units 3, 8, 12, 11 and 19, each prints its same-order producer named in S40.
   Red when: a same-order pair has no edge `--dispatch` waits on.
@@ -570,7 +567,7 @@ then AC8 to AC10, with S8, S21, S22 and S23; the labels are not reused here.
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `python resolver (behaviour + inline parity + idiom ban)` · `template size gate selftest` · `dead-path carriers (deleted files still named)` · `dead-path carriers self-test` · `unattended skill wiring` · `row-grammar selftest` · `push-main self-test` · `spec-tokens self-test` · `unattended-build self-test` · `lexicon selftest` · `codebase-map kit selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `verifier fan-out self-test` · `review-join self-test` · `tier2-review self-test` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC9 AC12 AC14 AC30 AC31 AC32 AC37 AC38 · its new plants and the widened one-writer arms, each failing case staged by its plant or a direct write · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
+New arm: tools/govkit/selftest.py · covers AC9 AC12 AC14 AC30 AC31 AC32 AC37 · its new plants and the widened one-writer arms, each failing case staged by its plant or a direct write · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
 New arm: tools/lib/resolve-python.test.sh · covers AC19 AC46 · stubs exiting 9009 and a fake that fails only under `-I` · none
 New arm: tools/check-spec-tokens.test.sh · covers AC43 · a scratch live spec whose criteria run out of order · none
 New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run lines compared before and after the extraction · none
@@ -622,6 +619,10 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
   `build_scratch_gov`, which disagreed with TOOL-dSafePassage-5 S2 and its §8 F1, whose release-0
   is written by the pinned clone's own `apply`; S19 now binds synthetic govs alone and names that
   clone, by `2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md`; no other section moved.
+- rev-10 · 2026-10-27 · S39 · AC38 · §4 Inventory · §7 · S39 and AC38 moved to the new
+  TOOL-dSafePassage-64 at order 5, since TOOL-dSafePassage-5's walk measured the sticky
+  `retired-edited` role after a rollback and unit 5 builds before this unit, by
+  `2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 

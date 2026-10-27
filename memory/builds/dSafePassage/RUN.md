@@ -219,3 +219,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-27T07:44:52Z dispatch · item ff6b1fdf TOOL-dSafePassage-62 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-62.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-62-ledger.md memory/map/generated/symbols.json
 
 2026-10-27T07:44:54Z brief · item TOOL-dSafePassage-62 · reason 83b6052a666e memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-62-build-brief.md
+
+2026-10-27T09:10:40Z rescope · item add TOOL-dSafePassage-63 · reason TOOL-dSafePassage-5's third build pass measured an adopter's edit to a rendered file lost on the first update: the pinned apply writes rendered rows with output_sha256 and no oid, and check_render_edited cannot prove an edit without oid; the check falls back to output_sha256, ordered before unit 5
+
+2026-10-27T09:30:14Z rescope · item add TOOL-dSafePassage-64 · reason TOOL-dSafePassage-5's third build pass measured a withdraw-one rollback leaving a receipt row at retired-edited where release-0 recorded engine; no record declares role re-derived, and round-1 finding D-42 (TOOL-dSafePassage-26 S39/AC38) owned the fix at order 6, after unit 5; S39 and AC38 move to this unit at order 5

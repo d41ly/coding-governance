@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** DEFERRED · rev-8 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-9 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 part 1/2
 
@@ -23,6 +23,8 @@
 | [2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-5-3-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-3-spec-writer.md) | research | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-5-4-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-4-spec-writer.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-5-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-5-spec-writer.md) | research | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 |
 
 <!-- /gen:spec-records -->
@@ -83,6 +85,8 @@ research's losing test for its candidate E (`research-supersession.md`, section 
   S4 derives the sidecar from those rows; and each index entry of an `engine` row with its mode read
   through `resolve_landed_mode` against gov's mode at the pin, on both sides, since
   DEPL-aLevelledCopy-1 S1 and S3 level that mode up from gov's tree on every run and never down. The
+  index entries of the receipt and its sidecar are compared by mode and stage only: their blob ids
+  hash the very contents compared above, so a blob compare would read those records' fields raw. The
   rendered files' own bytes, and every other key, line and entry, are compared as they are.
   Observed by AC3, AC4 and AC7.
 - **S5** — The walk, in a child process. `run_child_walk` runs the clone's `govkit.py update` as
@@ -161,6 +165,8 @@ order, which the `edited-retired` plant expects.
 - **consumes-from** `TOOL-dSafePassage-17` — the reverted rule and the no-image down; without them the rollback stops at the floor step and the two legacy-home steps
 - **consumes-from** `TOOL-dSafePassage-18` — the reverse walk past the schema step writing no row; without it the rollback to release-0 refuses after its last down
 - **consumes-from** `TOOL-dSafePassage-19` — the stamp and the record after the schema step's down, and the re-run after a kill; without them the rollback cases end unspecified
+- **consumes-from** `TOOL-dSafePassage-63` — `check_render_edited` proving an edit from `output_sha256` where a row has no `oid`; without it the first `update` renders over the `edited-render` plant with no order, and `down`, `reup` and `kill` differ at that file
+- **consumes-from** `TOOL-dSafePassage-64` — a `retired-edited` row taking back the role gov's descriptor gives its path; without it the rollback to the pin leaves the `withdraw-one` row `tools/hooks/README.md` at `retired-edited` where release-0 recorded `engine`
 - **consumes-from** `TOOL-dSafePassage-62` — the receipt `update` writes before its first step, rows and sidecar through `write_install_receipt`; without it the `kill` case's rollback from the schema step's killed state reads every file the killed run moved as an adopter's edit, writes none, and never reaches release-0's digest
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 - **hands-off** `TOOL-dSafePassage-61` — the `size-limits` `[[condition]]` row of `tools/govkit/fixtures/release-0/plants.toml`, added with the step it names, which joins the population when that unit lands
@@ -189,8 +195,11 @@ clone's kit and reads the policy file and `.agent-cap.conf` only as committed at
 (TOOL-dGroundRules-2 S2 and S6, TOOL-dGroundRules-15 S1), so the release-0 target needs no reader of
 its own. The observation holds when stdout is `value` and no `absent` path is in that commit. A
 `get` exit of 2 is a red that carries the reader's `policy: refused` line. `ordered` holds when an order under
-`.governance/outbox/` names the path. A `[[gov_plant]]` row: `id`, `what` and the edit, committed on
-the clone's tip. A `[[condition]]` row: `step`, and either `plant` (a `[[plant]]`-shaped edit) or
+`.governance/outbox/` names the path. A `[[gov_plant]]` row: `id`, `what` and one edit, a `[[plant]]`
+edit or `remove`, the file deleted, committed on the clone's tip. `remove` exists because the grid
+reads `retired-edited` only where gov holds no blob at the row's `source` (`classify_row` and
+`VERDICT_GRID`, `tools/govkit/govkit.py:9131-9133`, `:8650`), so dropping the rule alone reads
+`patched`. A `[[condition]]` row: `step`, and either `plant` (a `[[plant]]`-shaped edit) or
 `fakes` (launcher names and the version each prints, put first on the child's `PATH`).
 
 The rows at this pass, each path re-read against the pin's tree when the row is written and drawn
@@ -205,7 +214,7 @@ from a kit the `kits` line keeps:
 | `old-shape-record` | plant | a spec under `memory/builds/` dated before `SPEC10_CUTOFF`, nine sections | carried, `unchanged` |
 | `edited-render` | plant | one line edited in a `rendered` row's file | ordered |
 | `edited-retired` | plant | one line appended to the file `withdraw-one` withdraws | ordered |
-| `withdraw-one` | gov plant | one installed file dropped from its descriptor's `[[files]]` at the tip | — |
+| `withdraw-one` | gov plant | the hooks README's rule dropped from its descriptor's `[[files]]` at the tip, and its source deleted by the row `withdraw-one-source`, edit `remove` | — |
 | `floor-below` | condition | `lib/python-floor-3.15`, fakes `python3`, `python` and `py` printing `3.14` | — |
 
 ### The cases
@@ -233,11 +242,17 @@ partial write. A step a later build adds whose witness holds over release-0 take
 | `shims` | no | the clone holds no tag; `read_releases` over it returns none; `check_shim_windows` holds every row `read_shim_rows` reads; each forwarder whose `from` the receipt installs is in the walked target; zero rows prints `shims: 0 declared`, counted as measured-nothing |
 | `isolation` | yes | `check_needs_target` over a scratch copy of release-0 returns `isolated` or `attended`; `breach` or `needs-target` is a red naming the step |
 
-The first write. `derive_first_write(before, shadow)` lists the paths the shadow run changed and
-orders them by modification time, a path the run unlinked timed by its parent directory's; the
-earliest is applied to the target as its bytes, or as its absence. A step whose shadow run changes
-nothing is killed at its end. The order is an approximation of the step's own write order, and
-§5 says what it cannot see.
+The first write. `derive_first_write(before, shadow, image)` lists the paths the shadow run changed.
+Where `image`, the step's before-image (`derive_image_path`, `tools/govkit/upgrade_steps.py:585-590`),
+is among them, it is the first write: the contract writes it first (`:44-47`), and
+`write_before_image` (`:601-633`) writes it before returning the after-state the up then writes, as
+the fan-out step's `cmd_up` does, the policy file next and `.agent-cap.conf` unlinked last
+(`tools/govkit/steps/fanout_cap.py`). Else a single changed path is it. Else the paths order by
+modification time, and a tie between the two earliest, or a removed path among them, is a red naming
+the step, `first write undetermined`: at `29665dd17` the fan-out step's two writes shared one
+`mtime_ns` and its unlinked conf, timed by its directory, sorted first. The first write is applied to
+the target as its bytes, or as its absence. A step whose shadow run changes nothing is killed at its
+end.
 
 ### The arms
 
@@ -341,7 +356,7 @@ fixture's seed is written there too, against the pin's `apply` (§8 F3).
 - perf / scale: PINNED at `3708a705` on node `d`, 2026-10-23, one run each into a bare target with gov's 22-kit selection: `apply` 15.3 s, a read-only `update` 15.2 s, `check` 17.3 s. A run is about 5 walks per step plus 3 and the arms, so DERIVED it is tens of minutes; the `ceiling` is set from the measured time at the pass and recorded in `tools/run-gates/ceiling-evidence.txt`.
 - error / empty / loading states: a failed pin, a release-0 that does not apply clean, an absent plant path and an empty step population each exit 2 with the reason; zero shims and attended steps are counted on the summary, never read as green.
 - observability: one line per case and step, each red naming the step, the case and the differing paths or rows.
-- risks: the first-write order is read from modification times, so two writes inside one timestamp tick order by path, and a write inside one file is not split; the measured bare-target `apply` at `3708a705` refused 24 problems, and at the pin `60d90cb7` 19 lines, each disposed by §8 F3 through the seed, a take-out or its reading as a note, so a refusal a later re-measure finds takes the same route and is never dropped silently. The floor step's down over the committed release-0 target was measured printing no finding, exit 0 (2026-10-27), so the two lines that refuse that down on gov's own tree reach no case of this leg. PINNED at `41062397`, 2026-10-27, measured twice over a fresh release-0 with no plants: `up` then `down` differed from release-0 at the receipt (202 rows by `carry` alone, five `rendered` SKILL.md rows gaining `sha256`, `oid`, `gov_oid` and `commit`), its sidecar (five lines), and the index (the receipt and sidecar unstaged, three `engine` entries at `100755` where release-0's `apply` staged `100644`), each read by S4 under its owning record; killed at the floor step, the rollback added `.governance/policy.json`, which S2's re-run of the policy adopter now puts in release-0; killed at the schema step, it left 38 paths at the tip, which TOOL-dSafePassage-62 closes. TOOL-dSafePassage-40 (order 6) records a step whose earlier record is `failed` as `applied` with no `via` on the re-run, so after it lands the `kill` case's re-run over a forced step carries no `via` where `up` carries `witness`; that unit's pass owns the case's expectation then.
+- risks: a step writing several paths and no before-image is ordered by modification time, a tie being a red and never an order (§4), and a write inside one file is not split; the measured bare-target `apply` at `3708a705` refused 24 problems, and at the pin `60d90cb7` 19 lines, each disposed by §8 F3 through the seed, a take-out or its reading as a note, so a refusal a later re-measure finds takes the same route and is never dropped silently. The floor step's down over the committed release-0 target was measured printing no finding, exit 0 (2026-10-27), so the two lines that refuse that down on gov's own tree reach no case of this leg. PINNED at `41062397`, 2026-10-27, measured twice over a fresh release-0 with no plants: `up` then `down` differed from release-0 at the receipt (202 rows by `carry` alone, five `rendered` SKILL.md rows gaining `sha256`, `oid`, `gov_oid` and `commit`), its sidecar (five lines), and the index (the receipt and sidecar unstaged, three `engine` entries at `100755` where release-0's `apply` staged `100644`), each read by S4 under its owning record; killed at the floor step, the rollback added `.governance/policy.json`, which S2's re-run of the policy adopter now puts in release-0; killed at the schema step, it left 38 paths at the tip, which TOOL-dSafePassage-62 closes. TOOL-dSafePassage-40 (order 6) records a step whose earlier record is `failed` as `applied` with no `via` on the re-run, so after it lands the `kill` case's re-run over a forced step carries no `via` where `up` carries `witness`; that unit's pass owns the case's expectation then.
 - testing: the arms of §4, run by the leg after its real cases, and the cheap `--list` and `--pin` observations in the selftest arm (§7).
 - migration: additive; §4 "### Migration".
 - user docs: the `help/upgrade-steps.md` section (S13), graded by the docs leg.
@@ -369,8 +384,7 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
   as S4 states, equals release-0's and it exits 0; with `--inject lossy-down` it exits 1 naming the
   path the down left.
   Red when: the digest reads `.git/` or the outbox, a byte a down leaves goes unnamed, or a receipt
-  key, sidecar line or index entry outside S4's three record-owned readings differs and the case
-  still passes.
+  key, sidecar line or index entry outside S4's readings differs and the case still passes.
 - **AC4** — When `python "tools/govkit/upgrade_walk.py" --case reup` runs, the digest after a second
   walk from the rolled-back tree equals the first walk's, and it exits 0.
   Red when: a step's second up writes differently from its first.
@@ -392,7 +406,8 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
   and separately with `--inject not-rerunnable`, it exits 1 naming the arm.
   Red when: the kill lands before the step's first write or after the walk returns, so no partial
   state is ever re-run; or a step whose witness holds over release-0 is passed by that witness, so
-  its up is never killed.
+  its up is never killed; or a step's first write is read from modification times where its
+  before-image or a single changed path names it, so the killed state is one its up cannot reach.
   cost: the longest case, tens of minutes over every step.
 - **AC8** — When `python "tools/govkit/upgrade_walk.py" --case fail` runs, for each step k the receipt
   names step k-1 as its last `applied` row and k `failed` with `exit 1`, no later step is
@@ -456,6 +471,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   faster than its poll, so the case is unobservable for it; (c) kills no process, so no dead
   holder's lock is left. RESOLVED (agent, 2026-10-23, delegated): (d), rung 3, the one option that
   leaves a real dead walk over a real partial state for every step. widens: none · relaxes: none
+  Amended at rev-9 (2026-10-27): the first write is the before-image where the step wrote one, then
+  a lone path, then modification time with a tie a red (§4), since the third pass measured a tie;
+  killing the real up after its first write would need (b)'s watcher.
 - **F3 — Which kits release-0 installs.** Options: gov's own selection, the `kits` of
   `.governance/deploy.toml`; the registry's default selection (`tools/govkit/registry.toml`,
   `[selection]`); `apply --all`, every non-conditional entry. Each of the first two leaves out kits
@@ -519,6 +537,10 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   DEPL-dRemeasuredRender-1 S1 and S4, and DEPL-aLevelledCopy-1 S1 and S3 declare them (S4); the
   policy mirror is completed in release-0 by its adopter's own remedy (S2); and the files a walk
   killed at the schema step left at the tip are TOOL-dSafePassage-62's defect, not a reading.
+  Amended at rev-9 (2026-10-27) by the third pass: the lost render edit is TOOL-dSafePassage-63's
+  defect and the `retired-edited` role a rollback left is TOOL-dSafePassage-64's, since no record
+  declares a row's role output or re-derived per run (TOOL-dSafePassage-9 §4 has a rollback leave
+  it); the receipt's and sidecar's index entries read by mode and stage follow from S4's readings.
 - **F6 — How the walk is made to skip, fail or die at one step.** Options: a test flag on `update`;
   step rows edited on the clone; a child process rebinding the runner and the reader. A flag is a
   public surface no clause names; an edited landed row is frozen. RESOLVED (agent, 2026-10-23,
@@ -573,6 +595,11 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   and 2/2; the clone's landed ref is gov's own; `kill` and `fail` force a holding first witness; and
   AC8's schema clause reads the receipt the findings path writes, by
   `2026-10-27-prompt-TOOL-dSafePassage-5-4-spec-writer.md`.
+- rev-9 · 2026-10-27 · S4 · §3 Edges · §4 fixture files, plants and cases · §5 risks · AC3 · AC7 ·
+  §8 F2 · F5 · the third pass's five reds disposed: the lost render edit and the sticky role to the
+  new TOOL-dSafePassage-63 and -64, consumed here; the first write named by the before-image; the
+  gov plant edit `remove`; the receipt's and sidecar's index entries by mode and stage, by
+  `2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md`.
 
 ## 10. Reuse audit
 
