@@ -56,3 +56,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## Carried from TOOL-dSafePassage-6 (0e392296e)
+
+- `tools/govkit/shims.py`'s `run_fixture` inherits `GOV_REMOTE` and `GOV_DEFAULT_BRANCH` from the calling shell (class fixture-inherits-ambient-machine-state): a policy read in its remote-less scratch repository refuses when either is set. Pop both at the top of `run_fixture` and pass `-c commit.gpgsign=false` to its commits, where your pass touches `shims.py`; if it does not, name the gap in your summary.
