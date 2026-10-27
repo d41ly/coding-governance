@@ -9,10 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 2bd5e10d4e861245d1a5adea5d53b45f90826489 · park · 0 touching
+asks-at-landing: TOOL-dRankedPlan-17=SPECCED TOOL-dRankedPlan-18=OPEN
+units-at-landing: TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-27 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-24 TOOL-dRankedPlan-2 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-34 TOOL-dRankedPlan-14 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-35 TOOL-dRankedPlan-43 TOOL-dRankedPlan-13 TOOL-dRankedPlan-20 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-11 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-12 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-19 TOOL-dRankedPlan-3 TOOL-dRankedPlan-59 TOOL-dRankedPlan-28 TOOL-dRankedPlan-33 TOOL-dRankedPlan-4 TOOL-dRankedPlan-44 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-23 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-62 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-67 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77
+hold-run: 
+hold-streak: 1 · at e501a1f1
+resume-owed: none · owner
+held-at: 2026-10-27T08:58:40Z
+hold-reason: the spec-audit promotion chain does not converge: seven rounds promoted 61 units (TOOL-dRankedPlan-19 to -77) with highs 9, 7, 7, 6, 9, 4, 9 at precision 0.86-1.00, nearly all refining one unbounded mechanism, TOOL-dRankedPlan-22's static caller check of read_plan_ratification; M4 ends a chain only below the precision floor, so whether to cap it, re-scope the caller check to a runtime guard, or keep promoting is the owner's — both options are parked in RUN.md. TOOL-dRankedPlan-68 to -77 are specced and committed but unaudited; no unit is deferred and the spec run is not closed
+hold-until: owner
+hold-code: owner-decision
+held-from: RUNNING
+refreshed-at: 558b755a1e7e9fed1107cec2a5af7e33e4e363da · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
-phase: RUNNING
+witness: e501a1f1d65a544e980acb6c45b34adc8a051581
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -167,3 +177,7 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T07:42:48Z rescope · item add TOOL-dRankedPlan-77 · reason spec-audit of TOOL-dRankedPlan-63 to -67 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-63-spec-audit.md) the 16 MEDIUM and LOW findings batched into one unit: ids 2 3 4 5 6 7 9 12 14 15 17 20 21 24 26 27 (items M1 to M9 and L1 to L3)
 
 2026-10-27T08:02:23Z review · item dRankedPlan-spec-set-r7 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 16 · disposition promote
+
+2026-10-27T08:58:46Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dRankedPlan && bash tools/push-main.sh --land --slug dRankedPlan && bash tools/unattended/unattended.sh --settle dRankedPlan
+
+2026-10-27T08:58:46Z hold · item owner-decision · reason until owner · reaped 08db21e2 · resume none(owner)
