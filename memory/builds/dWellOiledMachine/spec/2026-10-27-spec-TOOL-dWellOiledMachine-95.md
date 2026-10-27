@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-95 — unit 90 never widens the shared spec token read: its S1 is handed whole to unit 93's caller-side join before unit 90 builds
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 66 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 66 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-95-deviation-951.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-95-deviation-951.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-95-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-95-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 |
 
 <!-- /gen:spec-records -->
 
@@ -67,6 +68,11 @@ unit 90 builds no part of it, and deletes 93's revert clause, both before unit 9
 - **consumes-from** `TOOL-dWellOiledMachine-90` — S1, AC1, Files touched and the sentences naming S1 as built here, which this unit rewrites before unit 90 builds, so unit 90 edits no `design_lib` spec reader
 - **consumes-from** `TOOL-dWellOiledMachine-93` — S3's caller-side join, which carries 90's S1 whole, and S3's revert clause and S5's rev bump of spec 90, which this unit deletes
 - **hands-off** `TOOL-dWellOiledMachine-97` — 90's rewritten S1 paragraph, which the batch's item for finding 9 observes beside 94 S26's Files touched pointer
+- **hands-off** `TOOL-dWellOiledMachine-98` — the §6 preamble, which gains the one ordering probe this build loads, before this unit's pass runs AC2 (round-4 promotions audit, finding 1)
+- **hands-off** `TOOL-dWellOiledMachine-99` — S3 and §5's observability and risks lines, which state the commit pair the ordering claim compares (round-4 promotions audit, finding 11)
+- **hands-off** `TOOL-dWellOiledMachine-100` — AC2's first half, rewritten to check each rev bump by ancestry against unit 90's build commit (round-4 promotions audit, finding 19)
+- **hands-off** `TOOL-dWellOiledMachine-101` — §4, §5's testing line and §6, which gain the fixture and AC6 that observe the ordering check red (round-4 promotions audit, finding 29)
+- **hands-off** `TOOL-dWellOiledMachine-108` — S1's text for spec 90, S2, AC3 and §4 Evidence, amended before this unit builds (round-4 promotions audit, findings 4, 10, 16 and 18)
 
 ## 4. Design
 
@@ -169,6 +175,8 @@ observation of the caller-side join.
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-3 promotions, finding
   1 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-4
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-98, TOOL-dWellOiledMachine-99, TOOL-dWellOiledMachine-100, TOOL-dWellOiledMachine-101, TOOL-dWellOiledMachine-108.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-96 — an arm line's suite path is its first path-shaped token, so an annotated arm still joins the build-order write set
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-96-deviation-961.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-96-deviation-961.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-95-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-95-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-97 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,10 @@ it is path-shaped, read through one field split the covers join shares.
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-93` — `read_spec_arm_lines` and S3's caller-side join, whose suite-path parse this unit specifies and amends into spec 93 before unit 93 builds
+- **hands-off** `TOOL-dWellOiledMachine-102` — S4, which states the commit pair the ordering claim compares (round-4 promotions audit, finding 12)
+- **hands-off** `TOOL-dWellOiledMachine-103` — AC5 and the §6 preamble, rewritten to load and call the ordering probe for spec 93 (round-4 promotions audit, finding 20)
+- **hands-off** `TOOL-dWellOiledMachine-104` — §4, §5's testing line and §6, which gain the fixture and AC8 that observe the ordering check red (round-4 promotions audit, finding 30)
+- **hands-off** `TOOL-dWellOiledMachine-108` — §1, S2, S3, §3, §4, AC1 and AC3, amended before this unit builds (round-4 promotions audit, findings 2, 3, 6, 9, 14, 17, 22, 23 and 28)
 
 ## 4. Design
 
@@ -207,6 +212,8 @@ No arm is added at this unit's pass: the selftest case S3 declares lands on spec
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-3 promotions, finding
   25 (H2).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-4
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-102, TOOL-dWellOiledMachine-103, TOOL-dWellOiledMachine-104, TOOL-dWellOiledMachine-108.
 
 ## 10. Reuse audit
 

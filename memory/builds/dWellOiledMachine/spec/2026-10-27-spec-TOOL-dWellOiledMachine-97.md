@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-97 — the round-3 promotions audit's 23 medium and low findings, batched: pathspecs, the fixture session, probe environments, the ask row, renders and criteria green before their build
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-97-deviation-971.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-97-deviation-971.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-95-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-95-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 |
 
 <!-- /gen:spec-records -->
 
@@ -155,6 +156,10 @@ the corrected text. Paths are those at each amended unit's order.
 - **consumes-from** `TOOL-dWellOiledMachine-93` — S1's and S2's Gates slice and AC3 (S15, S17)
 - **consumes-from** `TOOL-dWellOiledMachine-94` — S14, S25, AC2, AC8, AC15, AC17, AC18, AC19, AC29, §4 Evidence and the §7 leg line (S1 to S3, S7, S8, S10 to S13, S16, S18, S19)
 - **consumes-from** `TOOL-dWellOiledMachine-95` — 90's rewritten S1 paragraph and the deletion of 93 S5's rev bump, which S19's criterion reads (S19)
+- **hands-off** `TOOL-dWellOiledMachine-105` — S24 and §5's risks line, which state the commit pair per amended unit (round-4 promotions audit, finding 13)
+- **hands-off** `TOOL-dWellOiledMachine-106` — AC15 and the §6 preamble, rewritten to call the ordering probe once per amended unit (round-4 promotions audit, finding 21)
+- **hands-off** `TOOL-dWellOiledMachine-107` — §4, §5's testing line and §6, which gain the fixture and AC16 that observe the ordering check red (round-4 promotions audit, finding 31)
+- **hands-off** `TOOL-dWellOiledMachine-108` — S1, S2, S15, S19, S20, §3 Edges, §4 Evidence, AC1, AC8 and AC12, amended before this unit builds (round-4 promotions audit, findings 5, 7, 8, 10, 15, 18, 25, 26, 27, 32 and 33)
 
 ## 4. Design
 
@@ -317,6 +322,8 @@ the amended units declare stay on their own §7 lines.
 
 - rev-1 · 2026-10-27 · initial draft, the round-3 promotions audit's 23 medium and low findings
   batched.
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-4
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-105, TOOL-dWellOiledMachine-106, TOOL-dWellOiledMachine-107, TOOL-dWellOiledMachine-108.
 
 ## 10. Reuse audit
 
