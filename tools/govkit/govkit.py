@@ -471,6 +471,11 @@ UNLANDED_REASON = {
     # so selfcheck arm 3b refuses a descriptor that spells it. Here so arm 7g demands its dispatch row.
     "adopter-owned": "the target declares it owns these bytes in its deploy.toml [[own]] — gov grades "
                      "the contract other kits call, never the bytes",
+    # TOOL-dSafePassage-9 S3. Like `adopter-owned`, reached only through `update` and so not in
+    # `ROLE_KINDS`: the row's verdict cell (`differs`, `absent`) records it, and every later run
+    # dispatches the row by this role. Here so arm 7g demands its dispatch row.
+    "retired-edited": "the target edited a file gov no longer ships, so gov keeps the target's bytes "
+                      "and orders it",
 }
 
 
@@ -2797,16 +2802,8 @@ def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int
     #          structurally cannot see a missing GRID cell — which is how the grid shipped with no
     #          answer for a file deleted on both sides, and the verdict routed to a restore of a blob
     #          that does not exist. A refusal counts as a row; silence does not.
-    known_roles = set(UNLANDED_REASON) | set(LANDABLE_ROLES) | {"attributes", "gate-leg", "ci"}
-    for role in sorted(known_roles):
-        if role not in UPDATE_ROLE:
-            r.fail(f"role '{role}' has no row in `update`'s dispatch — a role a later unit adds and "
-                   f"leaves out of the table is one `update` will meet and cannot classify")
-    for o in OURS_STATES:
-        for t in THEIRS_STATES:
-            if (o, t) not in VERDICT_GRID:
-                r.fail(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
-                       f"name a verdict, including the one where both sides are gone")
+    for _gap in derive_dispatch_gaps(UPDATE_ROLE, UNLANDED_REASON, LANDABLE_ROLES, VERDICT_GRID):
+        r.fail(_gap)
     # DEPL-cMendedVintage-24 S6. AND THE DECLARED WRITING SET IS A SUBSET OF WHAT THAT TABLE MAPS TO.
     # Two preconditions and `update`'s closing tally all take their population from this set; a
     # member misspelled here matches no row, empties all three populations at once, and every one of
@@ -6307,20 +6304,33 @@ def run_fragment_merges(target: pathlib.Path, rows: list[dict], landed: set[str]
     return added
 
 
-def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[str], verb: str) -> None:
+def remove_wired_fragments(target: pathlib.Path, rows: list[dict], frags: list[str], verb: str,
+                           cause: str = "rollback") -> list[str]:
     """TOOL-aRepatriatedFork-11 S4: a rolled-back kit takes back out exactly the settings entries
     `run_fragment_merges` added for it, through `settings-merge.py --unwire`, so no entry is left
     pointing at a hook file the rollback removed. Called BEFORE the kit's files are restored,
-    because a landed fragment is deleted by that restore and `--unwire` reads the fragment."""
+    because a landed fragment is deleted by that restore and `--unwire` reads the fragment.
+
+    TOOL-dSafePassage-9 S1: `cause="withdrawn"` is `update`'s withdrawn arm taking out the entry of
+    a fragment gov no longer ships, before any deletion. Returns the fragments it unwired."""
     sm = next((str(f["path"]) for f in rows if f.get("kit") == "settings-merge"
                and str(f.get("path", "")).endswith("settings-merge.py")), None)
     settings = os.environ.get("GOV_SETTINGS_JSON") or ".claude/settings.json"
+    done = ("unwired, gov no longer ships it" if cause == "withdrawn" else "unwired by the rollback")
+    unwired: list[str] = []
     for p in frags:
         out = subprocess.run([sys.executable, str(sm), settings, "--unwire", "--fragment", p],
                              cwd=str(target), capture_output=True, text=True, encoding="utf-8") if sm else None
-        print(f"govkit {verb} — hooks: {p} "
-              + ("unwired by the rollback" if out is not None and out.returncode == 0 else
-                 "could NOT be unwired by the rollback; remove its entry from " + settings + " by hand"))
+        if out is not None and out.returncode == 0:
+            unwired.append(p)
+            print(f"govkit {verb} — hooks: {p} {done}")
+        elif cause == "withdrawn":
+            print(f"govkit {verb} — hooks: {p} could NOT be unwired, so its entry stays wired in "
+                  f"{settings} and the fragment is kept; remove the entry by hand")
+        else:
+            print(f"govkit {verb} — hooks: {p} could NOT be unwired by the rollback; remove its "
+                  f"entry from {settings} by hand")
+    return unwired
 
 
 def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
@@ -8626,7 +8636,9 @@ VERDICT_GRID = {
     ("equal", "absent"): "withdrawn",
     ("differs", "equal"): "patched",
     ("differs", "differs"): "diverged",
-    ("differs", "absent"): "patched",
+    # TOOL-dSafePassage-9 S2. Gov retired a file the target edited: kept, ordered as
+    # `install.retired-edits` says, and never graded `patched` with no order nor `forked`.
+    ("differs", "absent"): "retired-edited",
     ("absent", "equal"): "missing",
     ("absent", "differs"): "missing",
     ("absent", "absent"): "converged",
@@ -8658,6 +8670,16 @@ RAW_WRITE_VERDICTS = ("stale", "missing")
 # not have been taken from.
 TOUCHING_VERDICTS = tuple(RAW_WRITE_VERDICTS) + ("diverged", "renamed")
 
+# TOOL-dSafePassage-9 §4. The verdicts the write loop's ordered arm takes, ahead of its `how` guard,
+# so a first-time engine row, a retired seed row and a row already carrying the role all reach it.
+# Neither moves a byte: each keeps the target's copy and writes one outbox order.
+ORDERED_VERDICTS = ("retired-edited", "render-edited")
+
+# TOOL-dSafePassage-9 S2. The verdicts the seed override passes through. `retired-edited` and
+# `withdrawn` are the two the grid gives only where gov holds no blob at the row's `source`, so a
+# seed row gov still ships keeps the override and a retired one keeps its own verdict.
+SEED_KEPT_VERDICTS = ("missing", "renamed", "retired-edited", "withdrawn")
+
 # DEPL-dCarriedReceipt-14 S3. The six fields `-11` S4 rewrites AS A SET, snapshotted together and
 # restored together. `path` and `source` are in it because a rolled-back rename that kept its
 # post-rename spelling beside pre-rename identities is exactly the split `-7` S9 refuses the whole
@@ -8675,6 +8697,24 @@ def raw_write_cells(grid: dict) -> list[tuple[str, str, str]]:
     """
     return sorted((o, t, v) for (o, t), v in grid.items()
                   if o == "differs" and v in RAW_WRITE_VERDICTS)
+
+
+def derive_dispatch_gaps(update_role: dict, unlanded_reason: dict, landable_roles, grid: dict) -> list[str]:
+    """Selfcheck arm 7g's two completeness loops (TOOL-dSafePassage-9 S3): every known role has a
+    dispatch row, and every (ours, theirs) pair has a grid cell. A function so a fixture can drive it
+    over a copy of the tables and watch it speak; selfcheck calls it with the module's own."""
+    gaps: list[str] = []
+    known_roles = set(unlanded_reason) | set(landable_roles) | {"attributes", "gate-leg", "ci"}
+    for role in sorted(known_roles):
+        if role not in update_role:
+            gaps.append(f"role '{role}' has no row in `update`'s dispatch — a role a later unit adds and "
+                        f"leaves out of the table is one `update` will meet and cannot classify")
+    for o in OURS_STATES:
+        for t in THEIRS_STATES:
+            if (o, t) not in grid:
+                gaps.append(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
+                            f"name a verdict, including the one where both sides are gone")
+    return gaps
 
 
 # What `update` does per ROLE. A role whose row is a refusal is still a ROW: silence is what lets a
@@ -8704,6 +8744,9 @@ UPDATE_ROLE = {
     # target declared it owns these bytes, so `update` counts the row and reports the contract parity
     # other kits call it by. Never `r.fail`, so the row never withholds the re-stamp.
     "adopter-owned": "contract",
+    # TOOL-dSafePassage-9 S3. Classified every run, and its `retired-edited` verdict takes the write
+    # loop's ordered arm: the target's bytes are kept and one order is written, never a write.
+    "retired-edited": "order",
 }
 
 # DEPL-cMendedVintage-24 S1. THE DISPOSITIONS A WRITING VERB CAN PUT BYTES AT, declared once, beside
@@ -9325,6 +9368,59 @@ def measure_rendered_rows(root: pathlib.Path, target: pathlib.Path, rows: list[d
             row["version"] = resolve_version(row)
         out.append((row, None))
     return out
+
+
+def check_render_edited(target: pathlib.Path, row: dict) -> bool:
+    """TOOL-dSafePassage-9 S5: is a `rendered` row's working file no longer the blob its receipt
+    recorded at its last render? The working file is cleaned by the target's own filters, as
+    `measure_rendered_rows` stamped `oid`; the index is not read, because a regenerate may leave its
+    output unstaged. A row with no recorded `oid`, or no file, cannot prove an edit: False."""
+    path, rec = str(row.get("path")), row.get("oid")
+    dp = target / path
+    if not rec or not dp.is_file():
+        return False
+    cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}", "--", str(dp)],
+                        capture_output=True, text=True, encoding="utf-8", check=False)
+    return cl.returncode == 0 and bool(cl.stdout.strip()) and cl.stdout.strip() != rec
+
+
+def read_retired_edits_mode(target: pathlib.Path) -> str:
+    """TOOL-dSafePassage-9 S6: the target's `install.retired-edits`, `order` or `keep`, as gov's
+    policy reader answers it at the target's landed revision; an unset key reads the catalogue
+    default. A value outside the two, a reader refusal or no policy kit is a Refusal naming the key."""
+    try:
+        value, source, reason = read_policy_value("install.retired-edits", target)
+    except (LookupError, Refusal) as exc:
+        raise Refusal(f"install.retired-edits could not be read: {exc}") from None
+    if value not in ("order", "keep"):
+        raise Refusal(f"install.retired-edits = {value!r} is neither `order` nor `keep` "
+                      f"({source}: {reason})")
+    return value
+
+
+def write_row_order(outbox: pathlib.Path, kind: str, row: dict, to_commit: str, body: str) -> pathlib.Path:
+    """The one writer of an outbox order for a row's verdict (TOOL-dSafePassage-9 S4): the
+    `withdrawn` arm's, extracted at its second caller. Writes `update-<kind>-<slug>.md` and returns
+    its path; `body` is the text below the row's source, commit and vintage lines."""
+    order = outbox / f"update-{kind}-{render_order_slug(row['path'])}.md"
+    title = (f"{row['path']} was edited since its last render" if kind == "render-edited"
+             else f"gov no longer ships {row['path']}")
+    order.write_text(f"# {title}\n\n"
+                     f"source {row.get('source')}\n"
+                     f"last gov commit {row.get('commit')}\n"
+                     f"vintage asked for {to_commit}\n\n"
+                     f"{body}",
+                     encoding="utf-8", newline="\n")
+    return order
+
+
+def render_retired_edited_line(row: dict, mode: str, order_path: str | None) -> str:
+    """The report line of a row the ordered arm kept (TOOL-dSafePassage-9 S4): the order's path
+    under `order`, the mode that kept it under `keep`, so neither value leaves the row silent."""
+    if mode == "keep":
+        return (f"  kept, no order  [{row.get('role')}] {row['path']} · kept, no order "
+                f"(install.retired-edits = keep)")
+    return f"  ordered          [{row.get('role')}] {row['path']} · order {order_path}"
 
 
 def render_hole_verdict(eid: str, hid: str, verdict: str, detail: str, why: str,
@@ -10311,7 +10407,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if how == "seed" or how == "report-reseed":
             if c["t_state"] == "differs":
                 v = "reseed-available"
-            elif v not in ("missing", "renamed"):
+            elif v not in SEED_KEPT_VERDICTS:
                 # DEPL-dCarriedReceipt-11 S0c. `renamed` IS EXEMPT FROM THIS OVERRIDE, beside
                 # `missing`, and the exemption is the sharpest thing in that unit. This line rewrites
                 # any surviving verdict on a seed row to `current`/`patched` — which for a row whose
@@ -10321,6 +10417,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # `current` while the file behind it had moved. That is a silent-green of exactly
                 # the kind the comment at the reported-only branch below records an incident for.
                 v = "current" if c["o_state"] == "equal" else "patched"
+        # TOOL-dSafePassage-9 S5. AN EDITED RENDER IS HELD, never capped at `re-rendered`: the kit's
+        # regenerate would run over the edit, so the whole kit is held back and the row ordered.
+        if how == "adopter" and check_render_edited(target, row):
+            v = "render-edited"
+            _add_held(row.get("kit"), row["path"])
         if how == "adopter" and v in ("diverged", "stale"):
             v = "re-rendered"          # CAP at report; the adopter owns these bytes
         if v == "patched" and c["carry"] in ("eol", "relocate"):
@@ -10612,6 +10713,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
+    # The target-code switch, read once ABOVE the write loop (TOOL-dSafePassage-9 S1), so the
+    # withdrawn arm's unwire and the re-render and wiring steps below read the one value.
+    _rerender_on = os.environ.get("GOVKIT_RERENDER") != "0"
+    # TOOL-dSafePassage-9 S1. Per kit, the withdrawn fragments this run unwired, which a rollback of
+    # that kit wires again once its files are restored. And the mode, read once per run.
+    _unwired_withdrawn: dict[str, list[str]] = {}
+    _retired_mode: str | None = None
     changed, deleted, conflicts = [], [], 0
     # DEPL-dCarriedReceipt-11 S6. BOTH SPELLINGS of every performed rename, in the shape `changed`
     # and `deleted` already take. `git mv` stages both ends, so this is not a second `git add` and
@@ -10878,6 +10986,38 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                    f"may write, whatever the verdict says")
             continue
 
+        # TOOL-dSafePassage-9 §4, THE ORDERED ARM, ahead of the `how` guard so an engine row, a
+        # retired seed row and a row already carrying the role all reach it. No byte moves: the
+        # target's copy is kept, `--write-withdrawals` included, and one order is written unless
+        # `install.retired-edits = keep`. An edited render is always ordered, whatever the mode.
+        if v in ORDERED_VERDICTS:
+            if v == "retired-edited" and _retired_mode is None:
+                try:
+                    _retired_mode = read_retired_edits_mode(target)
+                except Refusal as _rm_err:
+                    r.fail(f"'{row['path']}' is retired-edited and its order mode is unknown — {_rm_err}")
+                    continue
+            _mode = _retired_mode if v == "retired-edited" else "order"
+            _ord_rel = None
+            if _mode == "order":
+                _ord = write_row_order(
+                    outbox, v, row, to_commit,
+                    (f"gov no longer ships this file, and the copy here carries the target's edit. "
+                     f"Nothing was deleted. Once the edit has moved where it belongs, delete the "
+                     f"file and the next `update` closes the row.\n"
+                     if v == "retired-edited" else
+                     f"The target edited this rendered file since its last render, so its kit "
+                     f"'{row.get('kit')}' was HELD BACK and its regenerate did not run over the "
+                     f"edit. Move the edit into the kit's template or conf, restore the rendered "
+                     f"file, and re-run `update`.\n"))
+                _ord_rel = _ord.relative_to(target).as_posix()
+            _rl = render_retired_edited_line(row, _mode, _ord_rel)
+            if _rl:
+                print(_rl)
+            if v == "retired-edited" and row.get("role") != "retired-edited":
+                row["role"] = "retired-edited"
+            continue
+
         # THE ROLE DECIDES, not the verdict. `how` is what the role dispatch computed; branching on
         # the verdict alone writes gov's RAW bytes for a role declared never-written — measured, a
         # `rendered` row on a `missing` verdict landed an unrendered template, placeholders and all,
@@ -11122,23 +11262,36 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # `--force`: it enables a narrower class of action and overrides no refusal. The order is
             # written either way, because a deletion that happened and a deletion that was withheld
             # are both things the operator has to be able to read afterwards.
-            _why = ("It WAS deleted: this run carried --write-withdrawals."
+            # TOOL-dSafePassage-9 S1. A WITHDRAWN HOOK FRAGMENT IS UNWIRED FIRST, before any
+            # deletion, because `--unwire` reads the fragment. Declined by the target-code switch or
+            # failed, the entry stays wired, one line says so, and the fragment is not deleted.
+            _frag_kept = False
+            if str(row["path"]).endswith(".fragment.json"):
+                if not _rerender_on:
+                    _frag_kept = True
+                    print(f"govkit update — hooks: {row['path']} left WIRED — GOVKIT_RERENDER=0 is "
+                          f"exported, and unwiring runs the target's own settings-merge.py; the "
+                          f"fragment is kept")
+                elif remove_wired_fragments(target, receipt.get("files") or [], [row["path"]],
+                                            "update", cause="withdrawn"):
+                    _unwired_withdrawn.setdefault(str(row.get("kit")), []).append(row["path"])
+                else:
+                    _frag_kept = True
+            _why = ("NOTHING was deleted: its hook entry could not be taken out of the settings "
+                    "file first, and the line naming it says why."
+                    if write_withdrawals and _frag_kept else
+                    "It WAS deleted: this run carried --write-withdrawals."
                     if write_withdrawals else
                     "NOTHING was deleted. `update` no longer removes a tracked file from a "
                     "repository gov does not own on the strength of a verdict alone. Re-run with "
                     "--write-withdrawals if this file really should go.")
             # RE-KEYED WITH THE OTHER TWO, and NOT collected into `_orders_written`: this writer had
             # the identical basename collision, and the reap below can never reach its output.
-            (outbox / f"update-withdrawn-{render_order_slug(row['path'])}.md").write_text(
-                f"# gov no longer ships {row['path']}\n\n"
-                f"source {row.get('source')}\n"
-                f"last gov commit {row.get('commit')}\n"
-                f"vintage asked for {to_commit}\n\n"
-                f"gov's tree holds no blob for that source at the requested vintage, and no rename "
-                f"pair at >= {RENAME_SIMILARITY_PERCENT}% similarity names a replacement for it.\n\n"
-                f"{_why}\n",
-                encoding="utf-8", newline="\n")
-            if not write_withdrawals:
+            write_row_order(outbox, "withdrawn", row, to_commit,
+                            f"gov's tree holds no blob for that source at the requested vintage, and "
+                            f"no rename pair at >= {RENAME_SIMILARITY_PERCENT}% similarity names a "
+                            f"replacement for it.\n\n{_why}\n")
+            if not write_withdrawals or _frag_kept:
                 withheld += 1
                 continue
             if dp.is_file():
@@ -11626,7 +11779,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # under the operator's uid, so a check running under the run's own uid can be defeated by whoever
     # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
     # trusted.
-    _rerender_on = os.environ.get("GOVKIT_RERENDER") != "0"
     _rr_ran: list[str] = []
     _rr_declined: list[tuple[str, str]] = []
     # DEPL-cMendedVintage-1 S1. A STRICT SUBSET OF `_rr_declined`, and the subset is the point: it
@@ -12284,6 +12436,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         s["row"][k] = s["fields"][k]
                     else:
                         s["row"].pop(k, None)
+
+            # TOOL-dSafePassage-9 S1. WHAT THIS RUN UNWIRED COMES BACK WITH THE BYTES: the withdrawn
+            # fragments of this kit are wired again now that its files are restored.
+            if _unwired_withdrawn.get(eid):
+                run_fragment_merges(target, receipt.get("files") or [], set(_unwired_withdrawn[eid]),
+                                    set(), "update")
 
             # DEPL-aRepatriatedFork-17 S1. THE RE-RENDER'S OUTPUTS COME BACK TOO, through the same
             # two plumbing calls the loop above makes, plus the snapshot's own worktree bytes: the

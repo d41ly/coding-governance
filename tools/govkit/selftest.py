@@ -18206,6 +18206,31 @@ user_skills = "/tmp/gk-fake-skills"
             check(_label, _p.returncode == _rc and _line in _last and "MISS" not in _p.stdout,
                   f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
 
+    # ---- TOOL-dSafePassage-9 AC1-AC6, AC8, AC9, AC12. WITHDRAWN FRAGMENTS, RETIRED EDITS AND EDITED
+    # ---- RENDERS, through the unit's own fixture: every plant matches its case (exit 0, no MISS), and
+    # ---- each stub stages the red its criterion names (exit 1). Four at a time, as above.
+    _rte_cases = [(f"[dSafePassage-9] plant {' '.join(_a)} matches its case", list(_a), 0)
+                  for _a in (("fragment-withdrawn",), ("fragment-withdrawn", "--write-withdrawals"),
+                             ("fragment-withdrawn", "--rerender-off"), ("fragment-rollback",),
+                             ("edited-gone",), ("edited-row",), ("keep",), ("seed-retired-edited",),
+                             ("seed-retired-clean",), ("render-edited",), ("render-clean",),
+                             ("dispatch-gap",))]
+    _rte_cases += [(f"[dSafePassage-9] plant {_pl} --stub {_st} stages its red", [_pl, "--stub", _st], 1)
+                   for _pl, _st in (("edited-row", "forked"), ("keep", "report-omits"),
+                                    ("render-edited", "today"), ("seed-retired-edited", "seed-override"))]
+
+    def _run_rte_case(case):
+        return case, subprocess.run([sys.executable, str(HERE / "fixtures" / "retired_edits.py"),
+                                     "--plant", *case[1]], capture_output=True, text=True,
+                                    encoding="utf-8", errors="replace")
+
+    with _cf.ThreadPoolExecutor(max_workers=4) as _pool:
+        for (_label, _argv, _rc), _p in _pool.map(_run_rte_case, _rte_cases):
+            _last = (_p.stdout.strip().splitlines() or [""])[-1]
+            check(_label, _p.returncode == _rc and "observation(s) matched" in _last
+                  and (_rc == 1) == ("MISS" in _p.stdout),
+                  f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")

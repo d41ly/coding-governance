@@ -1652,6 +1652,8 @@ owner = "dSafePassage"
 name = "install.retired-edits"
 allowed = ["order", "keep"]
 default = "order"
+summary = "What update does with a file you edited that gov no longer ships: keep your copy and write an outbox order for it, or keep it and name it in the report with no order."
+usage = 'install.retired-edits = "keep"'
 owner = "dSafePassage"
 
 [[key]]

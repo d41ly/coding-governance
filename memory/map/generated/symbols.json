@@ -2635,6 +2635,11 @@
     {
       "id": "build_repo",
       "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "build_repo",
+      "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
     {
@@ -2801,6 +2806,11 @@
       "id": "build_scratch_clone",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_scratch_gov",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "build_scratch_repo",
@@ -3006,6 +3016,11 @@
       "id": "build_table",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_target",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "build_target",
@@ -5318,6 +5333,11 @@
       "file": "tools/runlog/adopt-runlog.sh"
     },
     {
+      "id": "check_render_edited",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "check_rendered",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
@@ -7341,6 +7361,11 @@
       "id": "derive_dir_segments",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "derive_dispatch_gaps",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_dispatch_order",
@@ -10840,6 +10865,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
     {
@@ -13818,6 +13848,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_bytes",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
       "id": "read_bytes_as_text",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -13926,6 +13961,11 @@
       "id": "read_clause_values",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "read_clean_env",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "read_cli_help",
@@ -15178,6 +15218,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "read_orders",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
       "id": "read_origin_scope",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -15593,6 +15638,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "read_retired_edits_mode",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_retired_ids",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -15621,6 +15671,11 @@
       "id": "read_revision",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_role",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "read_root_dir",
@@ -16380,6 +16435,11 @@
     {
       "id": "read_verdict",
       "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "read_verdict",
+      "kind": "function",
       "file": "tools/govkit/matrix.py"
     },
     {
@@ -16416,6 +16476,11 @@
       "id": "read_waivers",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_wired",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "read_with_one_refusal",
@@ -17808,6 +17873,11 @@
       "file": "tools/process-monitor/classify.py"
     },
     {
+      "id": "render_retired_edited_line",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "render_role",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -19111,6 +19181,11 @@
       "id": "resolve_kit_homes",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
+    },
+    {
+      "id": "resolve_kit_path",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "resolve_landed_log",
@@ -20728,6 +20803,11 @@
       "file": "tools/unattended/resume-tick.sh"
     },
     {
+      "id": "run_dispatch_gap",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
       "id": "run_dispose",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -20796,6 +20876,11 @@
       "id": "run_f4_filer",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "run_fixture",
@@ -20920,6 +21005,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/govkit/shims.py"
     },
     {
@@ -20996,6 +21086,11 @@
       "id": "run_gov_git",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "run_govkit",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "run_govkit",
@@ -21411,6 +21506,11 @@
       "id": "run_plan_in",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_plant",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "run_plant_arms",
@@ -21946,6 +22046,11 @@
       "id": "run_unchecked",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "run_update",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "run_update_fixture",
@@ -26338,6 +26443,11 @@
       "file": "tools/govkit/step_gate.py"
     },
     {
+      "id": "write_commit",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
       "id": "write_conf",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"
@@ -26526,6 +26636,11 @@
       "id": "write_gates_staged",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "write_gov_files",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "write_gw_seal",
@@ -26976,6 +27091,11 @@
       "id": "write_routed_keys",
       "kind": "function",
       "file": "tools/memory-tree/adopt-memory-tree.sh"
+    },
+    {
+      "id": "write_row_order",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "write_rows_spec",
