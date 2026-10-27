@@ -175,7 +175,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-66 — `update` puts a held kit's writes back before the first upgrade step, so a walk killed inside a step leaves that kit at its pre-run bytes](spec/2026-10-27-spec-TOOL-dSafePassage-66.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | CLOSED | rev-11 | 2026-10-27 |
 | [TOOL-dSafePassage-39 — the step row's `via` mark survives every rewrite that keeps the row `applied`, so the reverse walk's own records cannot erase it](spec/2026-10-23-spec-TOOL-dSafePassage-39.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-27 |
-| [TOOL-dSafePassage-40 — the forward walk marks a row `via: witness` only when nothing records that its up ever ran](spec/2026-10-23-spec-TOOL-dSafePassage-40.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-26 |
+| [TOOL-dSafePassage-40 — the forward walk marks a row `via: witness` only when nothing records that its up ever ran](spec/2026-10-23-spec-TOOL-dSafePassage-40.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-27 |
 | [TOOL-dSafePassage-67 — the fixture factory pins commit signing and hooks in every repository it builds, and refuses a git command that fails](spec/2026-10-27-spec-TOOL-dSafePassage-67.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-31 — the write lock records its holder's pid namespace, and a holder from another namespace reads unknown](spec/2026-10-23-spec-TOOL-dSafePassage-31.md) | 7 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-34 — the `ac-order` join ships under a dated cutoff, over a population measured at HEAD with every current hit disposed](spec/2026-10-23-spec-TOOL-dSafePassage-34.md) | 7 | 2 | DEFERRED | rev-3 | 2026-10-23 |
@@ -202,7 +202,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 310 bound to this build, across 4 record folder(s).
+Records: 311 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

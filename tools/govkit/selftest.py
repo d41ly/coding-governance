@@ -3693,7 +3693,8 @@ def check_step_walk() -> None:
     holder, and the walk inside `update` with its staging journal across a kill. The `schema-3` plants
     are TOOL-dSafePassage-15's AC1 to AC4: a schema-3 receipt walks through the schema step, recording
     nothing until its up lands schema 4. `lock-live-slow-census` is TOOL-dSafePassage-22's AC1: a live
-    holder behind a census three seconds slow still reads live. Each plant's failing case is staged by the plant; the fixture
+    holder behind a census three seconds slow still reads live. `kill-after-up` is TOOL-dSafePassage-40's
+    AC1 and AC3: a row a record or an image says an up wrote is never marked `via` `witness`. Each plant's failing case is staged by the plant; the fixture
     prints `<family>: FAILED` on any unmet expectation."""
     us_py = HERE / "upgrade_steps.py"
     for family, plant, want, needles in (
@@ -3723,6 +3724,13 @@ def check_step_walk() -> None:
             ("walk", "truncated-image", 1, ("walk: unchanged · fx/s3 applied · image rewritten",
                                             "exit 1: upgrade_steps.Refusal: .governance/steps/fx/s3.before.json",
                                             "walk: changed · fx/s3 failed · rc 1")),
+            # TOOL-dSafePassage-40 AC1, AC3: a row whose up ran, by its record or its image, is
+            # passed by its witness with no `via`.
+            ("walk", "kill-after-up", 0, ("last applied ['fx/s2'] · fx/s3 failed · interrupted: started ",
+                                          "walk: after the kill · s3.txt and its image present",
+                                          "walk: the re-run · fx/s3 applied · via None",
+                                          "walk: failed record, no image · fx/s2 applied · via None",
+                                          "walk: no record, image present · fx/s2 applied · via None")),
             ("walk", "schema-3-kill", 0, (" whole · the up's temporary file present",
                                           "walk: the re-run's target and receipt equal an uninterrupted walk's")),
             ("lock", "lock-dead", 0, ("govkit update — reclaimed ", "lock: taken")),
@@ -3766,6 +3774,7 @@ def check_step_walk() -> None:
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
         tag = ("dSP-15" if (plant or "").startswith("schema-3")
+               else "dSP-40" if plant == "kill-after-up"
                else "dSP-33" if family == "walk" and plant in ("witness-holds", "fail-k")
                else "dSP-22" if plant == "lock-live-slow-census"
                else "dSP-26" if plant in ("truncated-image", "lock-foreign-namespace", "needs-target-source")
@@ -3822,7 +3831,8 @@ def check_step_rollback() -> None:
     AC1 and AC2 are the `schema-up-kill` row: an update killed in the schema step's up left rows naming
     the bytes its file pass moved, and the rollback from there returns them. TOOL-dSafePassage-39's AC1
     and AC3 are the two `-down-killed` rows, a rollback killed in s2's down keeping its `via` mark for
-    the re-run, and AC2 the writer's carry below."""
+    the re-run, and AC2 the writer's carry below. TOOL-dSafePassage-40's AC2 is the
+    `kill-after-up-image-lost` row: a row whose up ran before a kill, its image lost, stops."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -3846,6 +3856,10 @@ def check_step_rollback() -> None:
                                            "step fx/s4 · STOPPED · witness still holds after down; before-image "
                                            ".governance/steps/fx/s4.before.json absent\nrollback: 1 reached",
                                            "· s4.txt in place")),
+            ("rollback", "kill-after-up-image-lost", 1, (
+                "rollback: the re-run · fx/s3 applied · via None · image present before the plant deletes it",
+                "step fx/s4 · rolled-back\nstep fx/s3 · STOPPED · witness still holds after down; before-image "
+                ".governance/steps/fx/s3.before.json absent\nrollback: 2 reached", "· s3.txt in place")),
             ("rollback", "node-witness", 0, ("rollback: fx/s2 applied by witness alone, no before-image", rolled, same)),
             ("rollback", "node-witness-refuses", 1, ("step fx/s3 · rolled-back\nstep fx/s2 · STOPPED · down exit 1: "
                                                      "fx: s2 down fails by its plant\nrollback: 3 reached",
@@ -3902,6 +3916,7 @@ def check_step_rollback() -> None:
         tag = ("dSP-62" if plant == "schema-up-kill"
                else "dSP-39" if plant in ("witness-only-down-killed", "unrecorded-witness-down-killed")
                else "dSP-33" if plant == "image-lost"
+               else "dSP-40" if plant == "kill-after-up-image-lost"
                else "dSP-17" if plant in ("witness-only", "node-witness", "node-witness-refuses")
                else "dSP-4" if not (plant or "").startswith("schema-step")
                else "dSP-19" if family == "rollback-update" else "dSP-18")

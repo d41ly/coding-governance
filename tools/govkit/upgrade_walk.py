@@ -694,22 +694,26 @@ def run_walk_case(ctx: dict, case: str, steps: list | None = None, inject: tuple
                 tw = build_case_tree(f"kill-{pos}-w", t)
                 held = us.run_step_isolated(r, "witness", tw, ctx["clone"])["verdict"] == "ok"
                 remove_tree(tw)
+                # TOOL-dSafePassage-40 S1: the re-run marks the row only where the killed state holds
+                # no record of it and no before-image
+                marked = held and kst is None and not us.derive_image_path(t, r.id).exists()
                 rc2, out2 = run_child_walk(ctx, t, walk, inject=inj_rows)
                 got = check_walk_exit(rc2, out2, ctx["ordered"])
                 if got:
                     bad.append("the re-run did not return: " + " | ".join(got))
                 write_commit(t, "re-run")
                 # AC7: k's row read without `via` on both sides, which TOOL-dSafePassage-33 S1 marks
-                # exactly when the killed state's witness holds
+                # exactly when `marked` holds
                 diff = derive_digest_diff(derive_tree_digest(t, ctx["pin_modes"], r.id),
                                           derive_tree_digest(up_t, ctx["pin_modes"], r.id))
                 if diff:
                     bad.append(f"the re-run's digest differs from up's at {', '.join(diff[:12])}")
                 rrow = next((x for x in json.loads((t / RECEIPT).read_text(encoding="utf-8")).get("steps") or []
                              if isinstance(x, dict) and x.get("id") == r.id), {})
-                if (rrow.get("via") == "witness") != held:
+                if (rrow.get("via") == "witness") != marked:
                     bad.append(f"the re-run's row carries via {rrow.get('via')!r} where the killed state's "
-                               f"witness {'holds' if held else 'does not hold'}")
+                               f"witness {'holds' if held else 'does not hold'}"
+                               + ("" if marked or not held else ", over a record or a before-image of its up"))
                 rc3, out3 = run_child_walk(ctx, tr, back, inject=inj_rows)
                 got = check_walk_exit(rc3, out3, ctx["ordered"])
                 if got:
@@ -723,7 +727,7 @@ def run_walk_case(ctx: dict, case: str, steps: list | None = None, inject: tuple
                 else:
                     print_line(f"kill · {tag} · lock holder dead, " + ("no row for it (schema-3 receipt)" if kst is None
                         else "it failed interrupted:") + ", the re-run equals up"
-                        + (", via witness as its witness holds" if held else ", no via") + ", the rollback equals release-0")
+                        + (", via witness as its witness holds" if marked else ", no via") + ", the rollback equals release-0")
                 remove_tree(tr)
             remove_tree(t)
     return reds

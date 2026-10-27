@@ -54,7 +54,8 @@ THE RECEIPT'S `steps` (TOOL-dSafePassage-3). A schema-4 receipt records each ste
 `{"id", "introduced", "state"}` rows, `state` applied, failed (adding `failure`) or rolled-back; an
 applied row a down stopped on adds a `failure` that opens with an entry of `DOWN_STOP_PREFIXES`
 (TOOL-dSafePassage-43), and a rolled-back row carries none. An applied row the walk passed by its
-witness alone, its up never spawned, adds `"via": "witness"` (TOOL-dSafePassage-33).
+witness alone, its up never spawned, adds `"via": "witness"` (TOOL-dSafePassage-33): only where
+the walk-start receipt held no record of it and no before-image exists (TOOL-dSafePassage-40).
 `set_step_state` is the only code that mutates the field and `read_step_states` the only code that
 parses it; the writer persists nothing.
 
@@ -1340,8 +1341,9 @@ def write_step_staged(target, step_id: str, paths: list[str], then: str) -> None
 def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[StepRow],
                   to_commit: str) -> dict:
     """Walk `rows`, the pending steps in order, over `target` (TOOL-dSafePassage-2 S2), every spawn
-    through `run_step_isolated`. Per step: (1) its witness; exit 0 records `applied` with `"via":
-    "witness"` (TOOL-dSafePassage-33), its up never spawned; (2) a row needing target code records `failed` (`attended: ...`), writes the attended
+    through `run_step_isolated`. Per step: (1) its witness; exit 0 records `applied`, with `"via":
+    "witness"` (TOOL-dSafePassage-33) only where the receipt held no record of the step when this
+    walk began and no before-image exists (TOOL-dSafePassage-40), its up never spawned; (2) a row needing target code records `failed` (`attended: ...`), writes the attended
     order and stops; (3) records `failed` (`interrupted: started <utc>, no exit recorded`) BEFORE
     the spawn, so a walk killed with its step leaves that failure; (4) runs the row's `resume` argv
     where the receipt held a `failed` row for it when this walk began and `resume` is an argv, else
@@ -1357,7 +1359,8 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
     step may rewrite them. Returns `{"pending", "applied", "skipped", "stopped", "failure",
     "order"}`, `applied` counting the ups run and `skipped` the steps passed by their witness."""
     target, receipt_path = pathlib.Path(target).resolve(), pathlib.Path(receipt_path)
-    began_failed = {r["id"] for r in read_step_states(receipt) if r["state"] == "failed"}
+    began = {r["id"]: r["state"] for r in read_step_states(receipt)}  # the walk-start receipt
+    began_failed = {sid for sid, state in began.items() if state == "failed"}
     out = {"pending": len(rows), "applied": 0, "skipped": 0, "stopped": None, "failure": None,
            "order": None}
 
@@ -1386,8 +1389,10 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
         seen = row._replace(needs_target=False)
         if spawn(seen, "witness")["verdict"] == "ok":
             # TOOL-dSafePassage-33 S2: the mark that lets the reverse walk read a missing image as
-            # "never ran"; move 5 below, after an up, passes none.
-            unrecorded = persist(row, "applied", via="witness")
+            # "never ran"; move 5 below, after an up, passes none. TOOL-dSafePassage-40 S1: only
+            # where nothing says an up spawned, no walk-start record and no before-image.
+            fresh = row.id not in began and not derive_image_path(target, row.id).exists()
+            unrecorded = persist(row, "applied", via="witness" if fresh else None)
             print(f"step {row.id} · skipped (witness holds){unrecorded}")
             out["skipped"] += 1
             continue
@@ -2415,24 +2420,28 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
 # 1 first and `<slug>.down-keeps` exiting 0 with nothing restored; `<slug>.down-lowers` then sets the
 # receipt to schema 3 and takes `steps` out, as the schema step's down does (TOOL-dSafePassage-18).
 # `<slug>.witness-absent` makes its witness "the file is absent", and `<slug>.witness-always` one
-# that exits 0 whatever the target holds, as a witness reading node state does (TOOL-dSafePassage-17).
+# that exits 0 whatever the target holds, as a witness reading node state does (TOOL-dSafePassage-17);
+# `<slug>.witness-block` blocks a witness that holds, so a walk dies after the up returned and before
+# move 5 records it (TOOL-dSafePassage-40).
 FIXTURE_WALK_STEP = r'''import importlib.util, os, pathlib, sys, time
 verb, target, slug = sys.argv[1], pathlib.Path(sys.argv[2]), sys.argv[3]
 reports = target.with_name(target.name + ".fx")
 reports.mkdir(exist_ok=True)
 with open(reports / f"{slug}.{verb}", "a", encoding="utf-8") as f:
     f.write(f"{os.getpid()}\n")
-if verb == "witness":
-    held = (target / f"{slug}.txt").is_file() != (reports / f"{slug}.witness-absent").exists()
-    sys.exit(0 if held or (reports / f"{slug}.witness-always").exists() else 1)
-spec = importlib.util.spec_from_file_location("upgrade_steps", pathlib.Path(__file__).resolve().parents[1] / "upgrade_steps.py")
-steps = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(steps)
 def block():
     (reports / f"{slug}.pid").write_text(str(os.getpid()), encoding="utf-8")
     (reports / f"{slug}.blocking").touch()
     for _ in range(600):
         time.sleep(0.5)
+if verb == "witness":
+    held = (target / f"{slug}.txt").is_file() != (reports / f"{slug}.witness-absent").exists()
+    if held and (reports / f"{slug}.witness-block").exists():
+        block()
+    sys.exit(0 if held or (reports / f"{slug}.witness-always").exists() else 1)
+spec = importlib.util.spec_from_file_location("upgrade_steps", pathlib.Path(__file__).resolve().parents[1] / "upgrade_steps.py")
+steps = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(steps)
 if verb == "down":
     import hashlib
     if (reports / f"{slug}.down-block").exists():
@@ -2544,7 +2553,7 @@ while sys.argv[4] != "-" and not pathlib.Path(sys.argv[4]).exists() and time.tim
 '''
 WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSafePassage-15
 WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending",
-               "truncated-image") + WALK_SCHEMA_PLANTS
+               "truncated-image", "kill-after-up") + WALK_SCHEMA_PLANTS
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-foreign-namespace", "lock-unreadable",
                "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot")
 UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update",
@@ -2553,7 +2562,7 @@ ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early"
 NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePassage-17: s2 is the floor row's shape
 DOWN_KILLED_PLANTS = ("witness-only-down-killed", "unrecorded-witness-down-killed")  # TOOL-dSafePassage-39
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
-                   "callers", "witness-only", "image-lost") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
+                   "callers", "witness-only", "image-lost", "kill-after-up-image-lost") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
 ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp")  # TOOL-dSafePassage-19
 ROLLBACK_UPDATE_PLANTS = (("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
                           + ("schema-up-kill",))  # TOOL-dSafePassage-62
@@ -2847,6 +2856,35 @@ def run_walk_fixture(plant: str | None) -> int:
             else:
                 expect(len(ups) == 2 and not resumed, "the re-run did not spawn s3's up again")
             expect(rc == 0 and rc2 == 0, f"the re-run exited {rc}, the uninterrupted walk {rc2}")
+        elif plant == "kill-after-up":
+            # TOOL-dSafePassage-40 AC1: killed in move 5's witness, after s3's up wrote its image and
+            # file; the re-run passes s3 by its witness and must not mark it. AC3: each evidence alone.
+            t = build_case_target("t")
+            fx = t.with_name("t.fx")
+            fx.mkdir()
+            (fx / "s3.witness-block").touch()
+            killed_walk(t)
+            (fx / "s3.witness-block").unlink()
+            wrote = (t / "s3.txt").is_file() and derive_image_path(t, "fx/s3").is_file()
+            print(f"walk: after the kill · s3.txt and its image {'present' if wrote else 'NOT both present'}")
+            expect(wrote, "the kill did not land after s3's up wrote its file and image")
+            rc, out = walk(t)
+            s3 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s3"), {})
+            print(f"walk: the re-run · fx/s3 {s3.get('state')} · via {s3.get('via')}")
+            expect("step fx/s3 · skipped (witness holds)" in lines_of(out), "the re-run did not pass s3 by its witness")
+            expect(s3.get("state") == "applied" and "via" not in s3 and rc == 0,
+                   "s3, whose up ran before the kill, is marked applied via its witness")
+            image2 = derive_image_path(pathlib.Path("."), "fx/s2").as_posix()
+            for name, what, pre, files in (
+                    ("t2", "failed record, no image",
+                     [{"id": "fx/s2", "introduced": sha["B"], "state": "failed", "failure": "exit 1: fx"}], {}),
+                    ("t3", "no record, image present", None, {image2: "{}\n"})):
+                tt = build_case_target(name, pre, {"s2.txt": "s2\n", **files})
+                rc_t, _out = walk(tt)
+                s2 = next((r for r in read_receipt_steps(tt) if r["id"] == "fx/s2"), {})
+                print(f"walk: {what} · fx/s2 {s2.get('state')} · via {s2.get('via')}")
+                expect(s2.get("state") == "applied" and "via" not in s2 and rc_t == 0,
+                       f"s2 ({what}) is marked applied via its witness")
         elif plant == "attended":
             t = build_case_target("t")
             rc, out = walk(t)
@@ -3386,7 +3424,9 @@ def run_rollback_fixture(plant: str | None) -> int:
     receipt and the staging journal. The `schema-step` plants (TOOL-dSafePassage-18) put the copied
     schema step first, over a schema-3 target. An unmet expectation prints `rollback: FAILED`;
     otherwise the exit is the reverse walk's first, `down-fails`', `witness-stays`',
-    `node-witness-refuses`', `schema-step-early`'s and `image-lost`'s 1 by design. `witness-only` and the
+    `node-witness-refuses`', `schema-step-early`'s, `image-lost`'s and `kill-after-up-image-lost`'s 1
+    by design; the last (TOOL-dSafePassage-40) kills the walk after s3's up, re-runs it and deletes
+    s3's image, so s3's down stops naming it. `witness-only` and the
     `node-witness` plants (TOOL-dSafePassage-17) make s2's witness hold before any up, so the walk
     records it `applied` via its witness alone and writes it no before-image; `image-lost`
     (TOOL-dSafePassage-33) deletes the image s4's up wrote, so its down stops naming the image. The
@@ -3444,6 +3484,22 @@ def run_rollback_fixture(plant: str | None) -> int:
             s3 = rows().get("fx/s3", (None, None))
             print(f"rollback: after the kill · fx/s3 {s3[0]} · s3.txt {'present' if (t / 's3.txt').is_file() else 'absent'}")
             expect(s3[0] == "failed" and (t / "s3.txt").is_file(), "the kill did not leave s3 failed with its first file written")
+        elif plant == "kill-after-up-image-lost":
+            # TOOL-dSafePassage-40 AC2: the walk family's `kill-after-up`, its re-run, then s3's
+            # unstaged image lost.
+            (fx / "s3.witness-block").touch()
+            why = run_killed([sys.executable, "-c", FIXTURE_WALK_CHILD, str(HERE / "upgrade_steps.py"), str(gov),
+                              str(t), sha["C"]], fx, "s3", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            (fx / "s3.witness-block").unlink()
+            rc_w, _out = run_fixture_child(FIXTURE_WALK_CHILD, gov, t, sha["C"], env)
+            s3 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s3"), {})
+            image = derive_image_path(t, "fx/s3")
+            print(f"rollback: the re-run · fx/s3 {s3.get('state')} · via {s3.get('via')} · image "
+                  f"{'present' if image.is_file() else 'absent'} before the plant deletes it")
+            expect(rc_w == 0 and s3.get("state") == "applied" and "via" not in s3 and image.is_file(),
+                   "the re-run did not record s3 applied with no `via`, its image on disk")
+            image.unlink(missing_ok=True)
         else:
             if plant == "after-fail":
                 (fx / "s3.fail").touch()
@@ -3544,13 +3600,16 @@ def run_rollback_fixture(plant: str | None) -> int:
             expect(all(state.get(f"fx/{s}", ("",))[0] == "rolled-back" for s in ("s1", "s2", "s3", "s4")),
                    "s1 to s4 do not each read rolled-back")
             expect(same and rc == 0, f"the bytes differ from before the walk, or the re-run exited {rc}")
-        elif plant == "image-lost":
-            text = f"{DOWN_STOP_PREFIXES[2]}; before-image .governance/steps/fx/s4.before.json absent"
-            kept = (t / "s4.txt").is_file()
-            print(f"rollback: fx/s4 {state.get('fx/s4')} · s4.txt {'in place' if kept else 'GONE'}")
-            expect(got == [f"step fx/s4 · STOPPED · {text}"], f"the reverse walk did not stop at fx/s4 naming `{text}`")
-            expect(state.get("fx/s4") == ("applied", text) and kept, "s4 is not kept applied with the stop, its file in place")
-            expect("s3.down" not in downs() and rc == 1 and "Traceback" not in out,
+        elif plant in ("image-lost", "kill-after-up-image-lost"):
+            n = 4 if plant == "image-lost" else 3
+            text = f"{DOWN_STOP_PREFIXES[2]}; before-image .governance/steps/fx/s{n}.before.json absent"
+            kept = (t / f"s{n}.txt").is_file()
+            print(f"rollback: fx/s{n} {state.get(f'fx/s{n}')} · s{n}.txt {'in place' if kept else 'GONE'}")
+            expect(got == rolled(*(["s4"] if n == 3 else [])) + [f"step fx/s{n} · STOPPED · {text}"],
+                   f"the reverse walk did not stop at fx/s{n} naming `{text}`")
+            expect(state.get(f"fx/s{n}") == ("applied", text) and kept,
+                   f"s{n} is not kept applied with the stop, its file in place")
+            expect(f"s{n - 1}.down" not in downs() and rc == 1 and "Traceback" not in out,
                    f"the reverse walk went on past the stop, or exited {rc}, or printed a traceback")
         elif plant == "partial-to":
             print(f"rollback: s1.txt and s2.txt {'present' if (t / 's1.txt').is_file() and (t / 's2.txt').is_file() else 'GONE'}")
