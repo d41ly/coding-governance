@@ -1296,10 +1296,12 @@ PY
       git commit -q --no-verify -m "TOOL-tFix-36: the failing regeneration reverted"
       bash "$lander" --prepare --slug tRegenAfterWalkRetry >/dev/null 2>&1; echo "retry-rc=$?"
       git rev-parse -q --verify 'HEAD^2' >/dev/null && echo merge=1
+      # the walk makes a file the refusal had to clean, or fail-clean=1 proves nothing
+      [ -n "$(git ls-tree --name-only HEAD -- .governance/install.json)" ] && echo walk-receipt=1
       printf 'steps-outbox=[%s]\n' "$(git ls-tree -r --name-only HEAD -- .governance/steps .governance/outbox | tr '\n' ' ')"
     )
     case "$out36" in
-      *"could NOT be regenerated"*"fail-rc=1"*"unmoved=1"*"fail-clean=1"*"retry-rc=0"*"merge=1"*)
+      *"could NOT be regenerated"*"fail-rc=1"*"unmoved=1"*"fail-clean=1"*"retry-rc=0"*"merge=1"*"walk-receipt=1"*)
         ok "36 a regeneration refused after a passing gov-first walk leaves no file of the walk behind, and the retry prepares a clean merge" ;;
       *) bad "36 a refused regeneration after a passing walk left the walk's files untracked, or the retry folded or refused on them: $out36" ;;
     esac
