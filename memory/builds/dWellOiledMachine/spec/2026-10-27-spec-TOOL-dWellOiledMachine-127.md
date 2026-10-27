@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-127 — the spec tokens and routed commits ceilings cover this build's close and its landing push, each sized through `derive-ceilings.py --observed` from readings of the leg alone
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-1 · base 0075cd1c · streams tooling
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-1 · base 0075cd1c · streams tooling
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -29,13 +29,13 @@ ordered it at the hand-off
 ## 2. Scope (IN)
 
 - **S1** — The ceiling of `spec tokens (a spec's own names resolve)` in `tools/gate-legs.json`
-  (`:1700`, 390 today) becomes C1, the value §4 "The value" derives from the builder's reading R1.
+  (`:1700`, 390 today) becomes C1, the value §4 "The value" derives from the main loop's reading R1.
   Its row in `tools/run-gates/ceiling-evidence.txt` (`:132`, 195.0 from `TOOL-dGroundRules-87`'s
   out-of-band reading today) rises to R1. `derive-ceilings.py --write --observed` writes the row
   with the `--how` text §4 gives, so the row's source column says how R1 was taken. Observed by AC1,
   AC2 and AC5.
 - **S2** — The ceiling of `routed commits name a specced unit` in `tools/gate-legs.json` (`:1104`,
-  300 today) becomes C2, derived the same way from R2. R2 is the larger of the builder's two
+  300 today) becomes C2, derived the same way from R2. R2 is the larger of the main loop's two
   readings of the leg: R2a under the close's environment and R2b under the landing push's. The leg
   has no row in
   `tools/run-gates/ceiling-evidence.txt` today, so the same write route adds one, with its own
@@ -134,39 +134,47 @@ pushed HEAD, and then WHOLE beside it. A push whose tree already carries a green
 push is decided again (`unattended.sh:11209-11210`) and may run the bar.
 
 At 0075cd1c both `git rev-parse origin/main` and `git ls-remote origin refs/heads/main` read
-`1a61f21a`. The builder reads the leg under each bar's environment, and the larger reading sizes C2.
+`1a61f21a`. The leg is read under each bar's environment, and the larger reading sizes C2.
 
 ### The readings
 
-The builder takes R1, then R2a, then R2b, one after another and never side by side. All three are
-taken at the build commit's parent, with this spec INPROGRESS and the chain run still live, and
-before any write:
+**The main loop takes them, and the builder receives them as inputs.** The builder cannot take
+them. The role-gate arm of `tools/hooks/scratch-guard.js` refuses a role agent any simple command
+that runs a leg's argv word for word from its script on (G1, `:105-112`, the arm at `:1203`). The
+arm came from `TOOL-aOrientedCast-11` at `06194e750`. The builder refused the pass at `ce91bfc21`
+and probed the hook with payloads: all three reading commands were refused with rc 2, and
+`derive-ceilings.py --report` was allowed.
 
-1. **A free host, sampled before each reading.** `ps -ef` lists no `run-gates.sh`, no
-   `run-selftests.sh` and no other gate checker or suite, this worktree's or another's. One
-   exception is allowed, as `64c85a989` allowed it: an idle orphan with parent 1, no child in
-   `ps -ef`, and fields 14 and 15 of its `/proc/<pid>/stat` unmoved across two samples a minute
-   apart. The builder lists such an orphan in the commit message and leaves it alone.
-2. **R1, spec tokens alone.** From the repository root, run `time python tools/check-spec-tokens.py`,
-   the leg's own argv (`tools/gate-legs.json:1693-1696`). It exits 0, and its
-   `spec-tokens: packet join ·` line reports 1 or more live chain runs. R1 is the `real` time in
-   seconds, to one decimal, the precision the evidence file writes (`derive-ceilings.py:627`). If
-   the line reports 0 live chain runs, the reading argues nothing; the builder reports it and stops.
-3. **R2a, routed commits alone as the close runs it.** Run
-   `time env -u GATE_PUSH_BASE python3 tools/memory-tree/routed_commits.py`, the leg's own argv
-   (`tools/gate-legs.json:1096-1099`) with the close's environment. It exits 0. Its first line opens
-   `routed-commits: WHOLE (GATE_PUSH_BASE is unset)`, and a `routed-commits: deviation: WHOLE ·`
-   line shows the join armed. R2a is the `real` time to one decimal.
-4. **R2b, routed commits alone as the landing push runs it.** First the builder reads the base the
-   push will export, the remote's main tip, with `timeout 60 git ls-remote origin refs/heads/main`
-   (`1a61f21a` at 0075cd1c). It confirms the clone holds that commit with `git cat-file -e`, and
-   fetches it if not. An unresolvable base silently widens to WHOLE (`routed_commits.py:221-223`),
-   which would measure nothing extra. Then it runs
-   `time env GATE_PUSH_BASE=<base> python3 tools/memory-tree/routed_commits.py`. It exits 0. Its
-   first line opens `routed-commits: RANGE <base8>..`, a second summary line opens
-   `routed-commits: WHOLE beside RANGE`, and the join prints a `routed-commits: deviation: RANGE`
-   line and a `routed-commits: deviation: WHOLE ·` line. R2b is the `real` time to one decimal.
-5. **R2 is the larger of R2a and R2b**, and the builder records which one governed.
+The main loop took the three readings one after another and never side by side, at `ce91bfc21` on
+node a, with the chain run live. It applied this free-host rule at each start. `ps -ef` lists no
+`run-gates.sh`, no `run-selftests.sh` and no other gate checker or suite, this worktree's or
+another's. One exception is allowed, as `64c85a989` allowed it: an idle orphan with parent 1, no
+child in `ps -ef`, and fields 14 and 15 of its `/proc/<pid>/stat` unmoved across two samples a
+minute apart. Each reading is the `real` time to one decimal, the precision the evidence file writes
+(`derive-ceilings.py:627`).
+
+1. **R1 = 465.2 s, spec tokens alone.** The command was `python tools/check-spec-tokens.py`, the leg's
+   own argv (`tools/gate-legs.json:1693-1696`). It exited 0, and its packet join line read
+   `spec-tokens: packet join · 1 live chain run(s) · 1 packet(s) checked`. At its start the host was
+   free but for the idle orphan `run-gates.sh` pid 10907 from Oct 23. A foreign spec-tokens run from
+   dSafePassage's `--dispatch` started at 23:56:10, about 20 s before R1 ended.
+2. **R2a = 378.7 s, routed commits alone as the close runs it.** The command was
+   `env -u GATE_PUSH_BASE python3 tools/memory-tree/routed_commits.py`, the leg's own argv
+   (`tools/gate-legs.json:1096-1099`) with the close's environment. It exited 0, and its first line
+   read `routed-commits: WHOLE (GATE_PUSH_BASE is unset)`. The host was free at its 00:12:41 start.
+   A foreign spec-tokens run from dSafePassage's `--dispatch` and a
+   `check-memory-hygiene.sh --staged` overlapped its last two minutes or so, from 00:16:54.
+3. **R2b = 322.1 s, routed commits alone as the landing push runs it.** The base came from
+   `git ls-remote origin refs/heads/main`: `1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3`, a commit the
+   clone holds. A base the clone did not hold would silently widen to WHOLE
+   (`routed_commits.py:221-223`). The command was
+   `env GATE_PUSH_BASE=1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 python3 tools/memory-tree/routed_commits.py`.
+   It exited 0. Its first line read `routed-commits: RANGE 1a61f21a..ce91bfc2`, and a
+   `routed-commits: WHOLE beside RANGE` line followed. No foreign gate work ran at its start or end.
+4. **R2 = max(R2a, R2b) = R2a = 378.7 s.** The unset reading governs.
+
+An idle python one-off, pid 406066 and 406067 from Oct 26, sat through all three readings. It is not
+gate work. The overlaps under R1 and R2a can only lengthen those readings, never shorten them.
 
 ### The value
 
@@ -178,14 +186,21 @@ each C is the least multiple of 10 at or above R + max(120, R). For R of 120 s o
 10 × ⌈R / 5⌉.
 
 The out-of-band row falls to the headroom branch, never the REACHED one, which grades runner rows
-alone (`:679`). At the side-by-side figures, C1 would be 1030 and C2 720; the solo readings size the
-real values.
+alone (`:679`).
+
+From the inputs:
+- **C1 = 940.** R1 + max(120, R1) = 465.2 + 465.2 = 930.4, and 10 × ⌈465.2 / 5⌉ = 10 × 94 = 940.
+- **C2 = 760.** R2 + max(120, R2) = 378.7 + 378.7 = 757.4, and 10 × ⌈378.7 / 5⌉ = 10 × 76 = 760.
+
+The builder re-derives both values from R1 and R2 by this rule before editing, and stops if either
+differs from the figure here.
 
 **The stop rule.** Each raise must move its ceiling up. C1 exceeds 390 exactly when R1 exceeds
 195.0, which is also the condition under which the monotone refusal at `derive-ceilings.py:581-586`
-does not fire. C2 exceeds 300 exactly when R2, the larger of R2a and R2b, exceeds 150.0. If R1 or
-R2 falls at or under its bound, the kill at the close was contention rather than the leg's own work,
-and no raise is derived from it. The builder writes nothing, reports every reading, and stops.
+does not fire. C2 exceeds 300 exactly when R2, the larger of R2a and R2b, exceeds 150.0. Had R1 or
+R2 fallen at or under its bound, the kill at the close would have been contention rather than the
+leg's own work, and no raise could be derived from it. The inputs clear both bounds: 465.2 exceeds
+195.0, and 378.7 exceeds 150.0.
 
 ### The writes
 
@@ -195,21 +210,22 @@ any other count, the builder writes from a scratch clone of the build commit's p
 only `tools/run-gates/ceiling-evidence.txt`, as `9c756ce7d` did.
 
 `--observed` takes one leg per call (`derive-ceilings.py:736`), so there are two writes, R1's first.
-`<node>` is the node the readings were taken on, which the tool refuses to default (`:570-574`):
+The node is `a`, where the main loop took the readings; the tool refuses to default it
+(`:570-574`). `derive-ceilings.py` does not read `GATE_PUSH_BASE`, so its value does not matter to
+these calls. The role-gate arm does not refuse them, because neither is a leg's argv.
 
 ```
-GOV_NODE=<node> python tools/run-gates/derive-ceilings.py --write --observed "spec tokens (a spec's own names resolve)=<R1>" --how "<how1>"
-GOV_NODE=<node> python tools/run-gates/derive-ceilings.py --write --observed "routed commits name a specced unit=<R2>" --how "<how2>"
+GOV_NODE=a python tools/run-gates/derive-ceilings.py --write --observed "spec tokens (a spec's own names resolve)=465.2" --how "<how1>"
+GOV_NODE=a python tools/run-gates/derive-ceilings.py --write --observed "routed commits name a specced unit=378.7" --how "<how2>"
 ```
 
 Each `--how` text is one line with no tab (`:422-424`), in the shape of the row `TOOL-dGroundRules-87`
-wrote. `<sha8>` is the build commit's parent, `<n>` the live count R1's packet join line printed,
-`<base8>` the base R2b read, and `<governed>` either `the unset reading` or `the landing-push
-reading`, whichever is R2:
+wrote. Each carries its readings' commit, node and rc, and the overlaps as the main loop recorded
+them. `<how1>`, then `<how2>`:
 
 ```
-the leg alone in the worktree at <sha8> on a host running no other gate suite, its packet join over <n> live chain run(s), real <R1>s; killed at its 390 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 512 s beside routed commits at ec8ad036
-the leg alone in the worktree at <sha8> on a host running no other gate suite, its deviation join armed, read twice one after the other: GATE_PUSH_BASE unset so it graded WHOLE as the close's bar does, real <R2a>s, then GATE_PUSH_BASE=<base8> so it graded RANGE and WHOLE beside it as the landing push's bar does, real <R2b>s; <governed> governs; killed at its 300 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 358 s beside spec tokens at ec8ad036
+taken by the main loop, the leg alone at ce91bfc2 on node a, rc 0, its packet join over 1 live chain run, real 465.2s; host free at its start but for an idle run-gates.sh orphan from Oct 23 and an idle python one-off from Oct 26, and a foreign spec-tokens of dSafePassage's dispatch overlapped its last ~20 s; killed at its 390 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 512 s beside routed commits at ec8ad036
+taken by the main loop, the leg alone at ce91bfc2 on node a, its deviation join armed, read twice one after the other: GATE_PUSH_BASE unset so it graded WHOLE as the close's bar does, rc 0, real 378.7s, host free at its start but for an idle run-gates.sh orphan from Oct 23 and an idle python one-off from Oct 26, and a foreign spec-tokens of dSafePassage's dispatch and a staged memory-hygiene check overlapped its last ~2 min; then GATE_PUSH_BASE=1a61f21a from ls-remote so it graded RANGE and WHOLE beside it as the landing push's bar does, rc 0, real 322.1s, no foreign gate work at its start or end; the unset reading governs; killed at its 300 s ceiling under the close's bar at 10ab2148 in the pool, the pool's tail and its serial retry, and 358 s beside spec tokens at ec8ad036
 ```
 
 **What `--observed` writes for a leg with no row.** `rows.get` finds nothing, so the monotone
@@ -250,9 +266,11 @@ the margin's value for that reading.
   instead.
 - **The load R was taken under.** An `--observed` row is admitted uncensused, and its `--how` text is
   the only record of the host (`derive-ceilings.py:49-52`). On Windows, `ps -ef` sees only processes
-  an MSYS shell spawned.
+  an MSYS shell spawned. Foreign gate work overlapped the tail of R1 and of R2a. That can only
+  lengthen them, so C1 and C2 are at worst loose, never short. R2b ran clean at both ends.
 - **Whether R was taken as `--how` says.** `--check` reads the two tracked files alone
-  (`derive-ceilings.py:643-647`).
+  (`derive-ceilings.py:643-647`). The builder did not take the readings, so the main loop's record
+  and the `--how` text are the only account of them.
 
 ### Rollout
 
@@ -261,12 +279,24 @@ commit lands before the build commit. Routed commits grades the build commit, wh
 `tools/`, against a spec at its first parent (`routed_commits.py:299`), and the close's bar runs
 that leg.
 
-The builder sets this spec's status from DEFERRED to INPROGRESS before its first write, because
-`tools/` is under `ROUTED_PATHS`. S3's stamp is `last-audit: <date -Iseconds> @ <git rev-parse HEAD>`,
-both taken when the builder stages. The commit message carries a manifest delta line in the shape of
-`64c85a989`'s: none to §B, `last-audit` re-stamped for the watched `tools/gate-legs.json`, whose only
-change is two legs' ceilings. The message also states R1, R2a, R2b with its base, which of the two
-governed R2, C1, C2, the node, and any orphan the free-host check listed. The main loop re-renders the build README and runs the bar at the close.
+The main loop takes the readings; the builder runs no leg's argv. The builder's steps, in order:
+
+1. Set this spec's status from DEFERRED to INPROGRESS before its first write, because `tools/` is
+   under `ROUTED_PATHS`.
+2. Confirm `derive-ceilings.py --report` prints `# 0 leg(s) with a reading`, or write from a clone
+   as "The writes" says.
+3. Write the two `--observed` rows, R1's first, with `GOV_NODE=a`. `GATE_PUSH_BASE` does not matter
+   to these calls.
+4. Re-derive C1 and C2, and edit the two `"ceiling":` values to 940 and 760.
+5. Re-stamp the manifest per S3, as `last-audit: <date -Iseconds> @ <git rev-parse HEAD>`, both taken
+   when it stages.
+6. Commit with the trailer `Pass: TOOL-dWellOiledMachine-127`.
+
+The commit message carries a manifest delta line in the shape of `64c85a989`'s: none to §B,
+`last-audit` re-stamped for the watched `tools/gate-legs.json`, whose only change is two legs'
+ceilings. It cites R1, R2a and R2b as the main loop's inputs at `ce91bfc21` on node a, with R2b's
+base, the overlaps, and that R2a governed R2. It also states C1 and C2. The main loop re-renders the
+build README and runs the bar at the close.
 
 ### Files touched (estimate)
 
@@ -277,19 +307,23 @@ governed R2, C1, C2, the node, and any orphan the free-host check listed. The ma
 ## 5. Acceptance criteria
 
 All commands run from the repository root of the pass's worktree, in Git Bash, with S1 to S3 applied
-and staged and before the unit's commit. R1, R2a, R2b and R2 are the builder's readings, and C1 and
-C2 the values §4 derives from them.
+and staged and before the unit's commit. R1, R2a, R2b and R2 are the main loop's readings (§4 "The
+readings"), and C1 and C2 the values §4 derives from them. The main loop observes AC2 and AC3,
+and the builder neither runs nor claims them. The builder's own criteria need no leg run: they are
+the first, fourth and fifth.
 
-- **AC1** — When `python tools/run-gates/derive-ceilings.py --check` runs, it exits 0 and prints a `ceiling-evidence:` line. Its stderr names both `spec tokens (a spec's own names resolve)` and `routed commits name a specced unit` among the ceilings backed by a reading taken outside the runner, each with its R, the node and its `--how` text.
-  Red when: both evidence rows are written and both ceilings are left at 390 and 300. Then it prints `CEILING-EVIDENCE FAILED — routed commits name a specced unit: ceiling 300s does not clear its evidenced maximum` and `CEILING-EVIDENCE FAILED — spec tokens (a spec's own names resolve): ceiling 390s does not clear its evidenced maximum`, and exits 1. The builder observes this red between the writes and the ceiling edits.
-  figure: DERIVED. Each shortfall is R + max(120, R) − the old ceiling, re-derived from the rows at check time.
-  permission: `64c85a989` records that a hook refused `TOOL-dGroundRules-87`'s builder this leg's command. Where that recurs, the builder probes the same arithmetic over the two tracked files and the main loop observes AC1 at the close.
-- **AC2** — When `time python tools/check-spec-tokens.py` runs, it exits 0, its `spec-tokens: packet join ·` line reports 1 or more live chain runs, and its `real` seconds sit under C1 by at least the margin's 120 s floor.
-  Red when: the same command runs in a scratch clone at origin/main `1a61f21a`, where no chain build's run is live. Then the line reads `spec-tokens: packet join · 0 live chain run(s) · 0 packet(s) checked`, a reading without the join that sizes no ceiling here.
-  figure: DERIVED. The pass's own reading varies from R1; the side-by-side reading was 512 s. The floor is `tools/run-gates/ceiling-margin.txt:26`.
-- **AC3** — When `time env -u GATE_PUSH_BASE python3 tools/memory-tree/routed_commits.py` runs, it exits 0, its first line opens `routed-commits: WHOLE (GATE_PUSH_BASE is unset)`, and it prints a `routed-commits: deviation: WHOLE ·` line. Then, one after the other and never side by side, `time env GATE_PUSH_BASE=1a61f21a python3 tools/memory-tree/routed_commits.py` runs: it exits 0, its first line opens `routed-commits: RANGE 1a61f21a..`, and a later summary line opens `routed-commits: WHOLE beside RANGE`. Each run's `real` seconds sit under C2 by at least the margin's 120 s floor.
-  Red when: the second command runs with a base the clone does not hold, `GATE_PUSH_BASE=0123456789abcdef0123456789abcdef01234567`. Then its first line reads `routed-commits: WHOLE (GATE_PUSH_BASE 0123456789ab names no commit in this clone)` and no `routed-commits: WHOLE beside RANGE` line is printed. It is a WHOLE reading posing as the landing push's, and it sizes nothing the close's reading did not.
-  figure: PINNED and DERIVED. `1a61f21a` is the remote's main tip at 0075cd1c; where `git ls-remote origin refs/heads/main` reads another tip, the pass substitutes it. The seconds are the pass's own readings, which vary from R2a and R2b; the side-by-side reading was 358 s, unset.
+- **AC1** — When `python tools/run-gates/derive-ceilings.py --check` runs, it exits 0 and prints a `ceiling-evidence:` line. Its stderr names both `spec tokens (a spec's own names resolve)` and `routed commits name a specced unit` among the ceilings backed by a reading taken outside the runner, each with its R, node `a` and its `--how` text.
+  Red when: both evidence rows are written and both ceilings are left at 390 and 300. Then it prints `CEILING-EVIDENCE FAILED — routed commits name a specced unit: ceiling 300s does not clear its evidenced maximum 378.7s` ending `(short by 457s)`, and `CEILING-EVIDENCE FAILED — spec tokens (a spec's own names resolve): ceiling 390s does not clear its evidenced maximum 465.2s` ending `(short by 540s)`, and exits 1. This red is observed between the writes and the ceiling edits.
+  figure: DERIVED. Each shortfall is R + max(120, R) − the old ceiling, re-derived from the rows at check time: 757.4 − 300 and 930.4 − 390, printed to the second.
+  permission: this command is the argv of `leg ceilings clear their evidenced maximum` (`tools/gate-legs.json:1846`), so the role-gate arm of `tools/hooks/scratch-guard.js` refuses it to the builder, as a hook refused `TOOL-dGroundRules-87`'s builder (`64c85a989`). The builder then observes the green and the red through a `python -c` probe of the same arithmetic over `tools/gate-legs.json`, `tools/run-gates/ceiling-evidence.txt` and `tools/run-gates/ceiling-margin.txt`. The main loop runs the command itself at the close.
+- **AC2** — When the main loop runs `time python tools/check-spec-tokens.py`, it exits 0, its `spec-tokens: packet join ·` line reports 1 or more live chain runs, and its `real` seconds sit under C1 by at least the margin's 120 s floor. Observed green at `ce91bfc21`: rc 0, `spec-tokens: packet join · 1 live chain run(s) · 1 packet(s) checked`, real 465.2 s against C1 = 940.
+  Red when: the main loop runs the same command in a scratch clone at origin/main `1a61f21a`, where no chain build's run is live. Then the line reads `spec-tokens: packet join · 0 live chain run(s) · 0 packet(s) checked`, a reading without the join that sizes no ceiling here.
+  permission: the main loop's alone. The role-gate arm refuses the builder this leg's argv. The builder's acceptance ledger cites this observation and claims no run of its own.
+  figure: DERIVED. The green reading is R1. The floor is `tools/run-gates/ceiling-margin.txt:26`.
+- **AC3** — When the main loop runs `time env -u GATE_PUSH_BASE python3 tools/memory-tree/routed_commits.py`, it exits 0 and its first line opens `routed-commits: WHOLE (GATE_PUSH_BASE is unset)`. Then, one after the other and never side by side, it runs `time env GATE_PUSH_BASE=1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 python3 tools/memory-tree/routed_commits.py`: that exits 0, its first line opens `routed-commits: RANGE 1a61f21a..`, and a later summary line opens `routed-commits: WHOLE beside RANGE`. Each run's `real` seconds sit under C2 by at least the margin's 120 s floor. Observed green at `ce91bfc21`: rc 0 and real 378.7 s unset, and rc 0 and real 322.1 s at the base with first line `routed-commits: RANGE 1a61f21a..ce91bfc2`, both against C2 = 760.
+  Red when: the main loop runs the second command with a base the clone does not hold, `GATE_PUSH_BASE=0123456789abcdef0123456789abcdef01234567`. Then its first line reads `routed-commits: WHOLE (GATE_PUSH_BASE 0123456789ab names no commit in this clone)` and no `routed-commits: WHOLE beside RANGE` line is printed. It is a WHOLE reading posing as the landing push's, and it sizes nothing the close's reading did not.
+  permission: the main loop's alone. The role-gate arm refuses the builder this leg's argv. The builder's acceptance ledger cites this observation and claims no run of its own.
+  figure: PINNED and DERIVED. The base is the remote's main tip as `git ls-remote origin refs/heads/main` read it for R2b. The green readings are R2a and R2b.
 - **AC4** — When `bash skills/session-kickoff/manifest-check.sh --staged` runs, it prints no `MANIFEST check 5 FAILED` line and exits 0.
   Red when: S1 and S2 are staged without S3. Then it prints `MANIFEST check 5 FAILED — staged changes touch watched files:` with the indented path `tools/gate-legs.json`, and exits 1.
 - **AC5** — When `git diff --cached --numstat -- tools/gate-legs.json tools/run-gates/ceiling-evidence.txt` runs, it prints 2 added and 2 deleted for `tools/gate-legs.json`, and 2 added and 1 deleted for `tools/run-gates/ceiling-evidence.txt`. Then `git diff --cached -U0 -- tools/gate-legs.json` shows two hunks, at `tools/gate-legs.json:1104` and `tools/gate-legs.json:1700`, each adding a `"ceiling":` key, with C2 and C1. And `git diff --cached -U0 -- tools/run-gates/ceiling-evidence.txt` shows one deleted line, the 195.0 row at `tools/run-gates/ceiling-evidence.txt:132`, and two added lines, opening `routed commits name a specced unit` with R2 and `spec tokens (a spec's own names resolve)` with R1.
@@ -381,6 +415,31 @@ memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine
 
   The H1, §1, §2 S2, §4 "The base each reading grades", "The readings", "The value", "The writes", "What this
   does not check" and "Rollout", and §5's preamble and AC3 changed. Nothing else moved.
+- rev-3 · 2026-10-28 · the coordinator's amendment after the builder refused the pass at
+  `ce91bfc21`. The role-gate arm of `tools/hooks/scratch-guard.js` (`TOOL-aOrientedCast-11`,
+  `06194e750`) refuses a role agent any leg's own argv (G1, `:105-112`). The builder's payload probe
+  had all three reading commands refused with rc 2, and `derive-ceilings.py --report` allowed. So the
+  main loop took the readings at `ce91bfc21` on node a, and the spec records them as the builder's
+  inputs: R1 = 465.2 s, R2a = 378.7 s, R2b = 322.1 s at base `1a61f21a`, and R2 = R2a.
+
+  Changes:
+  - C1 = 940 and C2 = 760 are re-derived here by the margin rule, not copied.
+  - The `--how` texts carry each reading's commit, node, rc and overlaps.
+  - AC2 and AC3 are the main loop's observations, its red cases included. The builder neither runs
+    nor claims them.
+  - AC1's refusal handling now names the arm that refuses `--check`, and quotes the derived
+    shortfalls.
+  - The Rollout lists the builder's steps: `GOV_NODE=a` writes, the two ceiling edits, the re-stamp,
+    and a `Pass: TOOL-dWellOiledMachine-127` commit citing the readings as main-loop inputs.
+
+  The mark reads none on both halves. No surface is added. Every criterion keeps its assertion and
+  its red case, and only who observes AC2 and AC3 moves. The overlaps under R1 and R2a can only
+  lengthen the readings, so no bound is loosened below what the leg's own work measured.
+  widens: none · relaxes: none
+
+  The H1 is unchanged. Changed: the header, §2 S1 and S2, §4 "The base each reading grades" (its last
+  sentence), "The readings", "The value", "The writes", "What this does not check" and "Rollout", and
+  §5's preamble, AC1, AC2 and AC3.
 
 ## 9. Reuse audit
 

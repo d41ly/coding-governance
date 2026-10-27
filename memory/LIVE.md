@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-27, the newest record date in this tree (dFurnishedOrders).
+Dormant: no record dated within 21 days of 2026-10-28, the newest record date in this tree (dWellOiledMachine).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -32,7 +32,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dShippedRelease](builds/dShippedRelease/README.md) | OPEN | d | 2026-10-21 | deployer | 32 | 2026-10-21 | active | 0 |
 | [dTendedCadence](builds/dTendedCadence/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-10-21 | active | 0 |
 | [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 106 | 2026-10-26 | active | 0 |
-| [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 129 | 2026-10-27 | active | 0 |
+| [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 129 | 2026-10-28 | active | 0 |
 | [dWitnessedBar](builds/dWitnessedBar/README.md) | DEFERRED | d | 2026-10-21 | tooling | 98 | 2026-10-26 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 | 2026-08-18 | dormant | 0 |
