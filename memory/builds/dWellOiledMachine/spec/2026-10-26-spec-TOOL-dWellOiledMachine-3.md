@@ -286,8 +286,7 @@ New arm: tools/runtime/lifecycle_fixture.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC
   line: "`--card --follow --terminal` writes no second `card` record when the newest one already names
   the same terminal state"; (b) S6 skipped and the transition's follow taken as the snapshot, which
   puts it after the leases are closed, against flow-steps' order. Rung 3, the parent left unedited and
-  the ask filed once by the main loop. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none ·
-  relaxes: none
+  the ask filed once by the main loop. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 

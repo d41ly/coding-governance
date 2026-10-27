@@ -253,8 +253,7 @@ New arm: tools/runtime/secret_scan.py · covers AC3 AC5 · a planted token per p
   RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F3 — May a request with no text commit be claimed?** (a) No: it is `unproven: no text`; (b) yes,
   as before this unit. (b) lets an unbound content key place work on another node, the gap this clause
-  closes. Rung 3, deny by default. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none ·
-  relaxes: none
+  closes. Rung 3, deny by default. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 

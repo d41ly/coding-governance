@@ -315,8 +315,7 @@ the amended units declare stay on their own §7 lines.
   first code pass, the route TOOL-dWellOiledMachine-95 §8 F1 takes; (c) a rev bump per amended unit
   placed one step after each. (a) leaves unit 94's AC8 and AC15 red at its pass and lets its AC29 probe
   write the live `health.log`. (c) is one unit per minor, which M4 forbids. (b) has each amended unit
-  build and observe the corrected text. RESOLVED (agent, 2026-10-27, delegated): (b). widens: none ·
-  relaxes: none
+  build and observe the corrected text. RESOLVED (agent, 2026-10-27, delegated): (b). widens: none · relaxes: none
 
 ## 9. Revision log
 

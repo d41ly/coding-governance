@@ -188,8 +188,7 @@ New arm: tools/memory-tree/door_fixture.py · covers AC1 AC2 AC3 AC4 AC5 · each
   (c) only `absent`. (b) lets a sessionless writer tombstone another session's lease on this node,
   against 58 S4; (c) refuses the supervisor's `--beat`, which renews a lease carrying the run's
   session (`write_claim`, `:2405-2409`), so AC1 fails. Rung 3, the most capable surviving option,
-  reusing the `mine` row's keying. RESOLVED (agent, 2026-10-27, delegated): (a). widens: none ·
-  relaxes: none
+  reusing the `mine` row's keying. RESOLVED (agent, 2026-10-27, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 

@@ -250,8 +250,7 @@ New arm: tools/runtime/limits_fixture.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 A
 - **F1 — Who judges the hold ceiling?** (a) TOOL-dWellOiledMachine-18's sweep over a declared wait,
   its outcome holder-only; (b) the supervisor in process. (b) loses the count at a restart and is
   invisible to other nodes, and the layer calls the hold "a declared wait inside its deadline"
-  (layer-runtime.md:401-404). Rung 1. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none ·
-  relaxes: none
+  (layer-runtime.md:401-404). Rung 1. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F2 — How does the wake stop when a harness schedule cannot be reaped from the shell?** (a)
   `verb_resume` made inert for a build this node handed over; (b) a session-side reap of the schedule
   by name. (b) needs a session to run, which is what a stopped wake no longer has. Rung 3. RESOLVED

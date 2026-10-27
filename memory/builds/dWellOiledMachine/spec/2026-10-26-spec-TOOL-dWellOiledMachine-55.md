@@ -274,8 +274,7 @@ New arm: tools/policy/check_policy.py · covers AC6 · a planted doorbell name, 
   the file as data imports no runtime code, so the kit cycle unit 20 names does not arise. Rung 1,
   layer-runtime `[extend]`: names are "validated against the registry, never against a literal
   enumeration". RESOLVED (agent, 2026-10-26, delegated): (a); the arm admits names for any `enum` row
-  whose `registry` is a point tag, so a later row joins it by naming its point. widens: none ·
-  relaxes: none
+  whose `registry` is a point tag, so a later row joins it by naming its point. widens: none · relaxes: none
 
 ## 9. Revision log
 

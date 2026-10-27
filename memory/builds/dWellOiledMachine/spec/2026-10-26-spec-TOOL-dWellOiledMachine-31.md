@@ -222,8 +222,7 @@ New arm: tools/check-wiring.test.sh · covers AC1 AC3 · five malformed declarat
 - **F1 — One refusal per pack, or one per rule?** (a) A list, one object per rule; (b) one object per
   pack, as I11's proposed spelling reads. (b) cannot carry scratch-guard's eight rules or agent-cap's
   six, so a pack would name one remedy for refusals with different remedies. Rung 3, the most capable
-  option; I11's owner refines the spelling. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none ·
-  relaxes: none
+  option; I11's owner refines the spelling. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F2 — How does a pack name the rule it refused under?** (a) A last reason line `rule — <rule>`,
   stripped by the dispatcher; (b) a JSON field in the pack's output. (b) changes the output shape of
   every exit-2 pack and of none of the JSON ones. Rung 3. RESOLVED (agent, 2026-10-26, delegated):

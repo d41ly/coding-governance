@@ -182,8 +182,7 @@ New arm: tools/check-spec-tokens.test.sh · covers AC3 · a fixture spec whose a
   `gen_build_index.py` importing the spec-token checker. (b) is a second copy of one parse, which the
   charter's reuse rule forbids at the second instance; (c) makes a kit module import a repo-root tool
   an adopter may not carry. (a) spells the parse once, reaches both callers, and stays in the kit
-  that already holds the one token read. RESOLVED (agent, 2026-10-27, delegated): (a). widens: none ·
-  relaxes: none
+  that already holds the one token read. RESOLVED (agent, 2026-10-27, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 

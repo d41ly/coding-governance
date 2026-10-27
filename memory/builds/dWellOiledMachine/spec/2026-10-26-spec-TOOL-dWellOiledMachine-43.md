@@ -247,8 +247,7 @@ New arm: tools/policy/check_policy.py · covers AC7 · the split plant staged ag
   spawn guard's settings rule reading the mode; (b) admission alone, the settings left at `L`. (b)
   lets one run hold `L` agents beside `ceil(L/2)` direct ones, failing the clause's split. Rung 3, the
   only option meeting AC3 and AC7; the cross-kit read is the optional sibling read the policy kit
-  already makes for the spike's launcher. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none ·
-  relaxes: none
+  already makes for the spike's launcher. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F2 — What happens to a call that outlives the hook's hold before TOOL-dWellOiledMachine-45 lands?**
   (a) A deny carrying I24's notice and the hold it outlived, the spot 45's queue replaces; (b) hold
   past the measured bound, where the spike records what the harness does to a timed-out hold. (b) is

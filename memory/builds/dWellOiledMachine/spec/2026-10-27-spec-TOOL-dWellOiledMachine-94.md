@@ -445,8 +445,7 @@ New arm: tools/runtime/stall-recorder.test.sh · covers AC22 · the payload case
   only under `--fixture`; (b) a `file-fixture` value of `runtime.secret-home`; (c) the OS keychain
   under a scratch service name. (b) adds a secret home any policy could select, a wider surface than
   the unit priced; (c) writes the real keychain, which 85 §5 and 90 S4 forbid. (a) makes every write
-  criterion runnable and adds no surface. RESOLVED (agent, 2026-10-27, delegated): (a). widens: none ·
-  relaxes: none
+  criterion runnable and adds no surface. RESOLVED (agent, 2026-10-27, delegated): (a). widens: none · relaxes: none
 - **F2 — Which file carries the start claim's liveness record?** (a) `pid`, `image` and `stamp` written
   by the tick after `write_node_lock` returns 0, `owner` a release token only; (b) `owner` holding
   `<pid> <image> <stamp>`, parsed by the stale test. (b) joins the release compare and the liveness

@@ -204,8 +204,7 @@ New arm: tools/runtime/launch.py · covers AC4 AC5 · an unmeasured credential r
   2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F2 — How does a role get its own subscription?** (a) Its own setup token, stored under
   `act_setup_token_<slot>`; (b) its own harness login under a per-role config home. (b) rests on a
-  capability no row records. Rung 3. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none ·
-  relaxes: none
+  capability no row records. Rung 3. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 

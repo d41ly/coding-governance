@@ -200,8 +200,7 @@ New arm: tools/runtime/graph_fixture.py · covers AC1 AC2 AC3 AC4 AC5 · each pl
 - **F1 — Which cycle walk does the graph use?** (a) `_scan_cycles` extracted into a `tools/lib`
   block carried inline; (b) a copy in `wait_graph.py`; (c) `scan_consumes_cycles`. (b) is the copy the
   reuse rule forbids at a second instance, and (c) is awk over spec files and stops at the first cycle.
-  Rung 3, reusing the seam M5 found. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none ·
-  relaxes: none
+  Rung 3, reusing the seam M5 found. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F2 — What does the cycle's item recommend?** (a) Replanning the newest member, the build whose
   wait was declared last; (b) no recommendation, an owner-only kind. (b) parks a build at every
   silent cycle, where replanning the newest undoes the least work. Rung 3. RESOLVED (agent,
