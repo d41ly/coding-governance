@@ -130,6 +130,13 @@ COUNTED on the report line, which prints its bullet, token and silent counts whe
 or off. Like its three dated siblings the key is a RELATION and not a constant, re-derived at the
 build commit and again at landing, so it grades zero tracked specs on its landing day.
 
+**The criterion-order key (TOOL-dSafePassage-34).** `SPEC_AC_ORDER_CUTOFF` (`.memory-tree.conf`,
+blank = off), read as `AC_ORDER_KEY` through `read_cutoff_key`, arms the join that has a live spec
+dated at or after it list its section 6 labels in ascending order. Unlike the relation keys above it
+is a CONSTANT, 2026-10-23, the earliest date that grades dSafePassage's own specs: an older live spec
+keeps an out-of-order list and is graded by nobody, which the conf comment states. A value that is
+not an ISO date refuses the run like every other cutoff.
+
 **Terminal specs are outside the population by construction.** This repo cites a landed decision
 verbatim and never rewrites one, so grading a CLOSED spec would demand editing a frozen record to
 clear a hit. The population is the specs a build can still change.

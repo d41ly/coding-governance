@@ -287,3 +287,11 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-27T21:12:57Z dispatch · item 30ba3902 TOOL-dSafePassage-31 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-31.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-31-ledger.md memory/map/generated/symbols.json
 
 2026-10-27T21:13:00Z brief · item TOOL-dSafePassage-31 · reason 18885b6ff945 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-build-brief.md
+
+2026-10-27T22:02:19Z dispatch · item c8043dcd TOOL-dSafePassage-34 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md tools/drift-audit/drift_signals.py
+
+2026-10-27T22:02:25Z brief · item TOOL-dSafePassage-34 · reason 59a165f1a169 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-34-build-brief.md
+
+2026-10-27T22:12:22Z dispatch · item c8043dcd TOOL-dSafePassage-34 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md tools/drift-audit/drift_signals.py memory/guides/SESSION-KICKOFF.md
+
+2026-10-27T22:23:21Z dispatch · item c8043dcd TOOL-dSafePassage-34 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md tools/drift-audit/drift_signals.py memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-34-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-34.md

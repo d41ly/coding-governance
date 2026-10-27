@@ -367,6 +367,10 @@ AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # `**AC1** `): the label regex of the hygiene gate's acceptance-witness check, ported, so the covers
 # join and that check agree on which criteria a spec defines (TOOL-aMendedFleet-75).
 AC_LABEL = re.compile(r"^(?:[ \t]*[-*][ \t]*)?(?:\*\*)?(AC[0-9]+[a-z]?)(?:\*\*)?(?:[^A-Za-z0-9]|$)", re.M)
+# TOOL-dSafePassage-34: the criterion-order join's key — a LIVE spec dated at or after it has its
+# section 6 labels ascend. Blank or absent is OFF; a set value that is not an ISO date refuses the run.
+# Declared, read and validated here with nothing yet graded by it: TOOL-dSafePassage-41 builds the join.
+AC_ORDER_KEY = "SPEC_AC_ORDER_CUTOFF"
 # A merge-bar or suite INVOCATION: the runner or a suite at command position — the token's start
 # or a chain separator, past optional VAR=value prefixes, `timeout` with its options and duration,
 # and a bash/sh/python/py launcher with one option — a short one, `py`'s version selector
@@ -1481,7 +1485,9 @@ def main(argv):
     direct_cut = read_cutoff_key(root, DIRECT_KEY)
     handoff_cut = read_cutoff_key(root, HANDOFF_KEY)
     guards_cut = read_cutoff_key(root, GUARDS_KEY)
-    if legline_cut is None or direct_cut is None or handoff_cut is None or guards_cut is None:
+    ac_order_cut = read_cutoff_key(root, AC_ORDER_KEY)
+    if (legline_cut is None or direct_cut is None or handoff_cut is None or guards_cut is None
+            or ac_order_cut is None):
         return 1
     relation = check_cutoff_relation(root, DIRECT_KEY, direct_cut) if direct_cut else ""
     grelation = check_cutoff_relation(root, GUARDS_KEY, guards_cut) if guards_cut else ""

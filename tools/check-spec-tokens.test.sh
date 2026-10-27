@@ -49,7 +49,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # bare code span, each top-level. Counted by reading; OWED: observed at the close.
 # RAISED 197 -> 199 by TOOL-dGroundRules-63: its two packet-join arms, the live run's hit and the
 # landed run's silence, each top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=199
+# RAISED 199 -> 200 by TOOL-dSafePassage-34: its non-ISO SPEC_AC_ORDER_CUTOFF refusal arm, top-level.
+# Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=200
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -917,6 +919,12 @@ git -C "$d" reset -q --hard "$clean"
 printf 'SPEC_GUARD_LEGS_CUTOFF="2026-9-8"\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 arm "a non-ISO SPEC_GUARD_LEGS_CUTOFF is REFUSED like the other cutoff keys" 1 "$d" "REFUSING — SPEC_GUARD_LEGS_CUTOFF 2026-9-8 is not an ISO date"
+git -C "$d" reset -q --hard "$clean"
+
+# TOOL-dSafePassage-34 AC2 — the criterion-order key is read through the same refusal, never as off.
+printf 'SPEC_AC_ORDER_CUTOFF="2026-9-8"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a non-ISO SPEC_AC_ORDER_CUTOFF is REFUSED like the other cutoff keys" 1 "$d" "REFUSING — SPEC_AC_ORDER_CUTOFF 2026-9-8 is not an ISO date"
 git -C "$d" reset -q --hard "$clean"
 
 # AC17's relation, for the new key — a COMMITTED value not strictly past its own commit day is
