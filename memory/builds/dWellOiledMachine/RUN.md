@@ -24,20 +24,20 @@ parked-surfaced: yes, 126 surfaced
 keepalive-reaped: yes
 refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: b5eca851ada77d11d3a87bc8c60f05a69c9ab197
-phase: HELD
+witness: 0075cd1c4cd9dec8738742f687f103d5d36ae660
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dwelloiledmachine-b9baed
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-26T18:31:14Z
+lease-utc: 2026-10-27T20:32:25Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 21956
 session: bed09852-88a1-4a95-9e8b-a44c50a3de6a
-keepalive: a9b3bb6f
+keepalive: bc5d9ebf
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 anchor-ref: refs/heads/main
@@ -446,3 +446,9 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T16:32:39Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dWellOiledMachine && bash tools/push-main.sh --land --slug dWellOiledMachine && bash tools/unattended/unattended.sh --settle dWellOiledMachine
 
 2026-10-27T16:32:39Z hold · item owner-decision · reason until owner · reaped a9b3bb6f · resume none(owner)
+
+2026-10-27T20:32:33Z resume · item dWellOiledMachine · reason held · keepalive bc5d9ebf · manual
+
+2026-10-27T20:33:01Z rescope · item add TOOL-dWellOiledMachine-127 · reason owner-ordered at the hand-off (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-raise-ceilings.md): the close's bar timed out spec tokens (512s alone vs its 390s ceiling) and routed commits (358s alone vs 300s); this unit raises both ceilings from readings of each leg alone through derive-ceilings.py --observed, the route TOOL-dGroundRules-87 took, and is the one unit this spec run builds
+
+2026-10-27T21:13:39Z brief · item TOOL-dWellOiledMachine-127 · reason e90d284841e7 memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-127-spec-brief.md
