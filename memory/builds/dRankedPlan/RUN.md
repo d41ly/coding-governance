@@ -24,20 +24,20 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: be042d1e29a70aa5e09e05e0391fa4cc53cb683b
-phase: HELD
+witness: ef0ac519801e86ef87071973e4f698da57217c97
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-drankedplan-1fc3d7
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-27T12:00:37Z
+lease-utc: 2026-10-27T20:33:07Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 26296
 session: 43fa2011-5bb6-422a-bd52-776c30d97bd4
-keepalive: 6cdb61ed
+keepalive: b425cd37
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 anchor-ref: refs/heads/main
@@ -360,3 +360,7 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T18:50:59Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dRankedPlan && bash tools/push-main.sh --land --slug dRankedPlan && bash tools/unattended/unattended.sh --settle dRankedPlan
 
 2026-10-27T18:50:59Z hold · item owner-decision · reason until owner · reaped 6cdb61ed · resume none(owner)
+
+2026-10-27T20:33:15Z resume · item dRankedPlan · reason held · keepalive b425cd37 · manual
+
+2026-10-27T20:33:32Z rescope · item add TOOL-dRankedPlan-82 · reason owner-authorized at the hand-off of 2026-10-27 ("Raise the spec-tokens leg's ceiling in tools/gate-legs.json enough for the live chain's packet join, then resume dRankedPlan, re-run the close and land it"): the spec tokens leg's 390s ceiling cannot hold the packet join over this run's live chain (killed twice in the close's bar); sized through derive-ceilings.py --observed as TOOL-dGroundRules-87 was, built in this run

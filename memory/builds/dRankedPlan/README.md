@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81
+ids: TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82
 spec-audit: 2026-10-21
 parents: dDeclaredLoop dTotalRecall dBoundRoles
 may: PLAY-dClosedLoop-3
@@ -76,13 +76,13 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 79 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 80 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15
 ids TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29
 ids TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43
 ids TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57
 ids TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71
-ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81
+ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -166,13 +166,14 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-80 — a JavaScript declarator that opens with a destructuring pattern ends at its value, so the declarator after it is bound](spec/2026-10-27-spec-TOOL-dRankedPlan-80.md) | 25 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 | [TOOL-dRankedPlan-77 — the spec audit of units 63 to 67: its 16 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-77.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-81 — the spec audit of units 68 to 77: its 20 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-81.md) | 27 | 2 | DEFERRED | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-82 — the spec tokens leg's ceiling covers the packet join over this run's live chain, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-27-spec-TOOL-dRankedPlan-82.md) | 28 | 1 | DEFERRED | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 133 bound to this build, across 4 record folder(s).
+Records: 135 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81.
+Ids no `spec-audit` record has ever named: TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82.
 
 Ids whose spec moved past its audited revision: TOOL-dRankedPlan-1@rev-1 TOOL-dRankedPlan-10@rev-1 TOOL-dRankedPlan-11@rev-1 TOOL-dRankedPlan-12@rev-1 TOOL-dRankedPlan-13@rev-1 TOOL-dRankedPlan-14@rev-1 TOOL-dRankedPlan-15@rev-1 TOOL-dRankedPlan-16@rev-1 TOOL-dRankedPlan-19@rev-1
 TOOL-dRankedPlan-2@rev-1 TOOL-dRankedPlan-20@rev-1 TOOL-dRankedPlan-21@rev-1 TOOL-dRankedPlan-22@rev-1 TOOL-dRankedPlan-23@rev-1 TOOL-dRankedPlan-24@rev-1 TOOL-dRankedPlan-25@rev-1 TOOL-dRankedPlan-26@rev-1 TOOL-dRankedPlan-27@rev-1 TOOL-dRankedPlan-28@rev-1 TOOL-dRankedPlan-29@rev-1
@@ -185,7 +186,7 @@ TOOL-dRankedPlan-69@rev-1 TOOL-dRankedPlan-70@rev-1 TOOL-dRankedPlan-71@rev-1 TO
 
 <!-- gen:build-coverage -->
 
-Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 79 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 80 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 16
 - carried in parts: 0 (none)
@@ -209,7 +210,8 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 79 spec(s) at 
   `spec/2026-10-27-spec-TOOL-dRankedPlan-66.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-69.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-27-spec-TOOL-dRankedPlan-70.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-73.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-27-spec-TOOL-dRankedPlan-74.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-77.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-27-spec-TOOL-dRankedPlan-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-81.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-27-spec-TOOL-dRankedPlan-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-81.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dRankedPlan-82.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0372, cl-dClosedLoop-0382, cl-dClosedLoop-0497, cl-dClosedLoop-0498
 <!-- /gen:build-coverage -->
 
@@ -244,6 +246,7 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 79 spec(s) at 
 | 25 | `TOOL-dRankedPlan-67`, `TOOL-dRankedPlan-73`, `TOOL-dRankedPlan-74`, `TOOL-dRankedPlan-75`, `TOOL-dRankedPlan-76`, `TOOL-dRankedPlan-78`, `TOOL-dRankedPlan-79`, `TOOL-dRankedPlan-80` | no |
 | 26 | `TOOL-dRankedPlan-77` | no |
 | 27 | `TOOL-dRankedPlan-81` | no |
+| 28 | `TOOL-dRankedPlan-82` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

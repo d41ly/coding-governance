@@ -32,3 +32,12 @@ ends the chain whatever it confirms.
   marked landed.
 - The second park's alternative, re-scoping `TOOL-dRankedPlan-22`'s static caller check, is not taken: the owner
   chose the cap.
+
+## The hand-off answer
+
+> Raise the spec-tokens leg's ceiling in tools/gate-legs.json enough for the live chain's packet join, then resume
+> dRankedPlan, re-run the close and land it.
+
+— owner, 2026-10-27, answering the run's hand-off `owner-decision` at `be042d1e2`, which parked the close's red
+spec tokens leg. The run adds `TOOL-dRankedPlan-82`, a Tier-1 micro-unit built in this run as `TOOL-dGroundRules-87`
+was, sizes the ceiling through `derive-ceilings.py --observed`, and then re-closes and lands.
