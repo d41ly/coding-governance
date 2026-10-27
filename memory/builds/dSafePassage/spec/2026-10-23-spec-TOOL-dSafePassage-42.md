@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,7 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md) | research | TOOL-dSafePassage-38 TOOL-dSafePassage-39 |
 | [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-42-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-42-build-brief.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-28-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-28-1-spec-writer.md) | research | TOOL-dSafePassage-28 |
 | [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-38 |
 
 <!-- /gen:spec-records -->
@@ -64,17 +65,13 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 
 ### The prepared landing's refusals and their arm (D-7, D-8, D-19, D-14, D-28, D-27)
 
-- **S1** — id 1. TOOL-dSafePassage-28 S3 and AC2 are read per row: the compare-and-swap row asserts
-  the branch at the sha the plant moved it to, checked out, `git status --porcelain` empty and no
-  `.governance/steps` or `.governance/outbox` path left; every other row keeps "at its old sha".
-  Observed by AC1.
-- **S2** — id 10. The `expect` column of `PREPARE_REFUSALS` (TOOL-dSafePassage-28 §4) names each row's
-  expected branch value, `old` or `moved`, and the arm asserts against it. The value is read after
-  `tools/push-main.sh:938`'s refused `git update-ref "refs/heads/$branch" "$t" "$oldb"` and its
-  `git checkout "$branch"` at `:939`, which leave the branch where the plant moved it. Observed by AC1.
-- **S3** — id 31. The compare-and-swap row keeps its clean-tree observation under the moved-branch
-  expectation, so the one row that exercises that refusal still observes what it leaves behind, and
-  the arm reads green on the shipped lander. Observed by AC1.
+- **S1** — id 1. Moved to TOOL-dSafePassage-28, its S3, on 2026-10-27: that unit builds at order 5,
+  before this one, and its arm reads green on the shipped lander only with this item in place. NOT
+  OBSERVED here — TOOL-dSafePassage-28's AC2 observes it.
+- **S2** — id 10. Moved to TOOL-dSafePassage-28, its S3 and its §4 table, on 2026-10-27, for S1's
+  reason. NOT OBSERVED here — TOOL-dSafePassage-28's AC2 observes it.
+- **S3** — id 31. Moved to TOOL-dSafePassage-28, its S3, on 2026-10-27, for S1's reason; nothing of it
+  stands here once S1 has moved. NOT OBSERVED here — TOOL-dSafePassage-28's AC2 observes it.
 - **S4** — id 2. TOOL-dSafePassage-27 §1 is read as: the refused run's leftovers make the next
   `--prepare` refuse at its dirty-tree precondition (`tools/push-main.sh:860-865`,
   `git status --porcelain --ignore-submodules=untracked`, which lists untracked files), before the
@@ -203,7 +200,7 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-27` — the one snapshot, its Goal and AC2, which S4, S5 and S6 read, and its added landings, which S27 prices
-- **consumes-from** `TOOL-dSafePassage-28` — `PREPARE_REFUSALS`, its derived count and its fixture landings, which S1, S2, S3, S12, S13 and S27 amend and price
+- **consumes-from** `TOOL-dSafePassage-28` — `PREPARE_REFUSALS`, its derived count and its fixture landings, which S12, S13 and S27 amend and price
 - **consumes-from** `TOOL-dSafePassage-29` — `STEP_REFUSED_KEYS` and the help section's rewrite, which S7 extends and S21 keeps whole
 - **consumes-from** `TOOL-dSafePassage-30` — `read_target_repositories` and `reached_by`, which S8 reorders and S22 spells
 - **consumes-from** `TOOL-dSafePassage-31` — the lock record and its WSL probe, which S10 and S25 read
@@ -217,16 +214,6 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 
 ## 4. Design
 
-### The compare-and-swap row
-
-```
-PREPARE_REFUSALS (stage, plant, expect):
-  ...
-  compare-and-swap   regen.py commits on the branch, then exits 0   moved
-assert per row: rc 1; branch == (oldb if expect == old else the plant's commit); branch checked out
-                `git status --porcelain` empty; no .governance/steps or outbox path
-```
-
 ### The derived count
 
 ```
@@ -237,8 +224,8 @@ count = rows of body, not heredoc and not continued, whose code holds \breturn 1
 
 ### Inventory
 
-Minted: the plants `submodule-fsmonitor` and `submodule-name-differs`; the `expect` values `old` and
-`moved`; the `reached_by` marker `by name`. No function, conf key, gate leg or policy key; S9 raises
+Minted: the plants `submodule-fsmonitor` and `submodule-name-differs`; the `reached_by` marker
+`by name`. No function, conf key, gate leg or policy key; S9 raises
 one drift pin and S27 re-prices one budget row. No new `raise Refusal` site: S7's rows and S8's order
 use TOOL-dSafePassage-24's one site, so `tools/govkit/refusal_join.py`'s `BRANCH_PIN` does not move.
 
@@ -291,13 +278,9 @@ disjoint write sets, and the pass is one unit.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the compare-and-swap row's fixture landing `bash tools/push-main.sh --prepare --slug fx`
-  runs with the planted `regen.py` that moves the branch, it exits 1, `git rev-parse refs/heads/<branch>`
-  prints the plant's commit, `git symbolic-ref HEAD` names the branch and `git status --porcelain`
-  prints nothing; `git grep -n "PREPARE_REFUSALS" -- tools/push-main.test.sh` shows `moved` for that row
-  and `old` for every other.
-  Red when: the row asserts the old sha and reds on a correct lander, or drops its clean-tree check.
-  fixture: TOOL-dSafePassage-28's scratch clones under `%TEMP%`.
+The criterion AC1 moved to TOOL-dSafePassage-28 on 2026-10-27, as its AC2, with S1, S2 and S3; the
+label is not reused here.
+
 - **AC2** — When TOOL-dSafePassage-27's fixture retry `bash tools/push-main.sh --prepare --slug fx`
   runs after the refused run, it exits 0 and its stderr holds no "working tree has uncommitted changes
   or untracked files" line; on a lander copy whose regeneration refusal cleans against a snapshot taken
@@ -379,7 +362,7 @@ disjoint write sets, and the pass is one unit.
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `drift-audit selftest` · `drift-audit records` · `push-main self-test` · `measure-legs selftest` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC4 AC5 AC13 · the self-test runs the two plants this unit adds and the widened class arm, its failing cases staged by a walk copy that reads the index first and by a table copy missing the `imap.tunnel` row · none
-New arm: tools/push-main.test.sh · covers AC1 AC9 · the compare-and-swap row under its `moved` expectation and the blanked derived count, their failing cases staged by a row expecting `old` and by a lander copy carrying a commented `return 1` · none
+New arm: tools/push-main.test.sh · covers AC9 · the blanked derived count, its failing case staged by a lander copy carrying a commented `return 1` · none
 
 ## 8. Open questions
 
@@ -402,11 +385,18 @@ New arm: tools/push-main.test.sh · covers AC1 AC9 · the compare-and-swap row u
   repair handoff
   `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
   criterion's meaning moved.
+- rev-4 · 2026-10-27 · S1 · S2 · S3 · §3 · §4 · AC1 · §7 · §10 · S1, S2 and S3, the per-row `expect`
+  reading of `PREPARE_REFUSALS`, moved with their criterion AC1 to TOOL-dSafePassage-28, which builds
+  at order 5 and whose arm read red on the shipped lander without them; S1 to S3 stay as pointer
+  stubs; the Edges' `TOOL-dSafePassage-28` bullet, §4's compare-and-swap design and its two minted
+  values, §7's push-main arm line and §10's `:938-942` seam follow; §4 Files touched is unchanged,
+  because S12 and S18 still write `tools/push-main.test.sh` and `tools/push-main.sh`; by
+  `memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-28-1-spec-writer.md`.
 
 ## 10. Reuse audit
 
 The seams extended are named per item: `scan_shell_lines` (`tools/memory-tree/check-arms.py:305`), the
-lander's refusals (`tools/push-main.sh:860-865`, `:938-942`) and `remove_new_untracked` (`:784-793`),
+lander's dirty-tree refusal (`tools/push-main.sh:860-865`) and `remove_new_untracked` (`:784-793`),
 the parity arm's population (`tools/lib/resolve-python.test.sh:169`, `:218`), `take_write_lock`
 (`tools/govkit/govkit.py:7430`), the drift pin (`tools/drift-audit/drift_signals.py:351`), the budget
 row (`tools/run-gates/selftest-budgets.txt:88`), `SPEC_DATE` (`tools/check-spec-tokens.py:896`), and the
