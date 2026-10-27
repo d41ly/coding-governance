@@ -127,7 +127,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 126 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 126 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11
 ids TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22
 ids TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33
@@ -269,7 +269,7 @@ ids TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine
 | [TOOL-dWellOiledMachine-124 — spec 121's AC4 is observed both ways: its walk count reads red over spec 115 before the cross-read and green after, and §4 records both readings](spec/2026-10-27-spec-TOOL-dWellOiledMachine-124.md) | 75 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-125 — 97 AC1 runs 90 AC20's walk over the two files at their repository paths, as spec 121 has 108 S10 spell it](spec/2026-10-27-spec-TOOL-dWellOiledMachine-125.md) | 75 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 | [TOOL-dWellOiledMachine-126 — the round-7 promotions audit's 11 medium and low findings, batched: 97 S1's unquoted pathspec, criteria that observe 108 S8 and S10 and the edges, the token checker's own predicate, a positive count that can fail, a pinned held_halves read and observers that read 115](spec/2026-10-27-spec-TOOL-dWellOiledMachine-126.md) | 76 | 2 | DEFERRED | rev-1 | 2026-10-27 |
-| [TOOL-dWellOiledMachine-127 — the spec tokens and routed commits ceilings cover this build's close and its landing push, each sized through `derive-ceilings.py --observed` from readings of the leg alone](spec/2026-10-27-spec-TOOL-dWellOiledMachine-127.md) | — | 1 | INPROGRESS | rev-3 | 2026-10-28 |
+| [TOOL-dWellOiledMachine-127 — the spec tokens and routed commits ceilings cover this build's close and its landing push, each sized through `derive-ceilings.py --observed` from readings of the leg alone](spec/2026-10-27-spec-TOOL-dWellOiledMachine-127.md) | — | 1 | CLOSED | rev-3 | 2026-10-28 |
 <!-- /gen:build-units -->
 
 Records: 153 bound to this build, across 4 record folder(s).

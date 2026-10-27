@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-127 — the spec tokens and routed commits ceilings cover this build's close and its landing push, each sized through `derive-ceilings.py --observed` from readings of the leg alone
 
-**Status:** INPROGRESS · rev-3 · 2026-10-28 · node a · Tier-1 · base 0075cd1c · streams tooling
+**Status:** CLOSED · rev-3 · 2026-10-28 · node a · Tier-1 · base 0075cd1c · streams tooling
 
 **Derived:** PLAY-dClosedLoop-2
 
