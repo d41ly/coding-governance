@@ -32,7 +32,7 @@ PFX = govkit.derive_tool_root(govkit.repo_root())
 PLANTS = ("fragment-withdrawn", "fragment-rollback", "edited-gone", "edited-row", "keep",
           "seed-retired-edited", "seed-retired-clean", "render-edited", "render-clean",
           "render-edited-no-oid", "render-eol-no-oid", "dispatch-gap", "edited-reshipped",
-          "edited-rolled-back")
+          "edited-rolled-back", "render-edited-kill")
 # Each stub is one statement over the scratch module `m`, run after it loads and before its `main`.
 STUBS = {
     "forked": 'm.UPDATE_ROLE["retired-edited"] = m.UPDATE_ROLE["forked"]',
@@ -346,21 +346,52 @@ def run_plant(tmp: pathlib.Path, plant: str, stub: str, write_withdrawals: bool,
     obs.append(("the render's recorded oid", "present" if any(
         f.get("path") == out_md and f.get("oid") for f in rec.get("files", [])) else "absent", "present"))
     edited = b"tpl v2\nthe target's edit\n"
-    if plant == "render-edited":
+    if plant in ("render-edited", "render-edited-kill"):
         (t / out_md).write_bytes(edited)
         write_commit(t, "the target edits the render")
     write_gov_files(g, {"tpl.md": "tpl v3\n", "eng.txt": "v3\n"})
+    us = govkit.upgrade_steps
+    if plant == "render-edited-kill":
+        # TOOL-dSafePassage-66: C also ships step `fx/s1`, which blocks after its first write; the
+        # update is killed there, so only what ran before the walk is on disk.
+        gk = g / resolve_kit_path(govkit.GOVKIT_DIR.name)
+        (gk / "steps").mkdir(exist_ok=True)
+        (gk / "steps" / "fx.py").write_text(us.FIXTURE_WALK_STEP, encoding="utf-8", newline="\n")
+        (gk / us.STEPS_FILE).write_text(us.render_fixture_row("s1"), encoding="utf-8", newline="\n")
     write_commit(g, "C")
+    if plant == "render-edited-kill":
+        reports = t.with_name(t.name + ".fx")
+        reports.mkdir()
+        (reports / "s1.block-after").touch()
+        path = (g / resolve_kit_path(govkit.GOVKIT_DIR.name, "govkit.py")).as_posix()
+        why = us.run_killed([sys.executable, "-c", LOADER, path, stub, "update", "--target", str(t),
+                             "--write"], reports, "s1", read_clean_env())
+        if why:
+            raise OSError(f"the kill was not staged: {why}")
+        rec = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+        row = next((f for f in rec.get("files", []) if f.get("path") == eng), {})
+        step = next((s for s in rec.get("steps") or [] if s.get("id") == "fx/s1"), {})
+        sha_b = run_git(g, "rev-parse", "HEAD~1").stdout.strip()
+        return obs + [("the demo kit's eng.txt", (read_bytes(t, eng) or b"").decode(), "v2\n"),
+                      ("its receipt row's commit",
+                       "B" if row.get("commit") == sha_b else str(row.get("commit")), "B"),
+                      ("fx/s1", f"{step.get('state')} · {str(step.get('failure', '')).split(' ', 1)[0]}",
+                       "failed · interrupted:")]
     out = run_update(g, t, stub=stub)
     if plant == "render-clean":
         return obs + [("verdict " + out_md, read_verdict(out, out_md), "re-rendered"),
                       ("render-edited orders", str(len(read_orders(t, "render-edited"))), "0"),
                       ("the render", (read_bytes(t, out_md) or b"").decode(), "tpl v3\n")]
+    rb = t / ".governance" / "outbox" / f"update-rollback-{DEMO}.md"
+    rb_lines = rb.read_text(encoding="utf-8").splitlines() if rb.is_file() else []
     return obs + [("verdict " + out_md, read_verdict(out, out_md), "render-edited"),
                   ("the HELD BACK line", str(f"HELD BACK {DEMO}:" in out), "True"),
                   ("render-edited orders", str(len(read_orders(t, "render-edited", out_md))), "1"),
                   ("the edited bytes", "kept" if read_bytes(t, out_md) == edited else "overwritten",
-                   "kept")]
+                   "kept"),
+                  # TOOL-dSafePassage-66 S2: put back before the walk, and still named by the order.
+                  ("the demo kit's eng.txt", (read_bytes(t, eng) or b"").decode(), "v2\n"),
+                  ("the order's restored line", str(f"restored  {eng}" in rb_lines), "True")]
 
 
 def run_dispatch_gap() -> list[tuple[str, str, str]]:

@@ -172,7 +172,8 @@ them still is. The step the kill interrupted reads `failed` with its `interrupte
 next walk runs it again, or runs the row's `resume` command where it declares one. A writing `update`
 records the files its file pass moved in the receipt before its first step, with `gov_commit` left
 unmoved, so `update --rollback --to <that gov_commit> --write` from a killed run's state returns
-those files to the bytes they had.
+those files to the bytes they had. A kit the run held back, because it refused a row of it, is
+put back before the first step, so a kill leaves that kit at the bytes it had before the run.
 
 To see it on this machine:
 

@@ -26828,6 +26828,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "write_kit_restore",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "write_kits",
       "kind": "function",
       "file": ".githooks/straggler-guard.test.sh"

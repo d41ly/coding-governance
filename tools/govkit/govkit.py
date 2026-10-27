@@ -8703,6 +8703,234 @@ SEED_KEPT_VERDICTS = ("missing", "renamed", "retired-edited", "withdrawn")
 ROLLBACK_FIELDS = ("path", "source", "sha256", "commit", "gov_oid", "oid")
 
 
+def write_kit_restore(target: pathlib.Path, eid: str, receipt: dict, snap_rows: list[dict],
+                      written_paths: set[str], landed_new: list[str], withdrawn_rows: list[dict],
+                      wired: list[str], unwired_withdrawn: list[str], r
+                      ) -> tuple[list[str], list[str], list[tuple[str, str]], list[str], set[str]]:
+    """Put one kit's writes from this `update` run back to their pre-run index entries.
+
+    TOOL-dSafePassage-66 S1. The verify pass's per-kit restore (DEPL-aHalvedInstall-4,
+    DEPL-cMendedVintage-2), lifted out at its second call site: `update` runs it for each HELD kit
+    before the first upgrade step, so a walk killed inside a step leaves that kit at its pre-run
+    bytes, and the verify pass runs it for a kit whose own check reds. It undoes the kit's wiring,
+    puts each `snap_rows` path back, and puts the receipt row's `ROLLBACK_FIELDS` back with it.
+
+    Returns the lists the verify pass prints and writes in its order: `restored`, `removed`
+    (landed paths deleted), `unrestored` as (path, what refused), `untouched`, and the withdrawn
+    paths whose row was kept, which picks the `NOT restored` sentence. It mutates `landed_new`,
+    `withdrawn_rows` and `receipt["files"]` in place, as the inline restore did.
+    """
+    # TOOL-aRepatriatedFork-11 S4. FIRST, while the landed fragments are still on disk.
+    remove_wired_fragments(target, receipt.get("files") or [], wired, "update")
+    # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
+    # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
+    # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
+    # replace, an index `git rm --cached` will not touch — and this suite manufactures none
+    # of those modes; `land_through_index`'s post-`git mv` failure is in exactly the same
+    # position and says so where it stands. What each of them leaves is a PART-restored
+    # target, and each says that in its own message, because a silent partial restore is
+    # worse than the write it was undoing.
+    restored: list[str] = []
+    # DEPL-dSealedTally-1 S7. A REMOVED LANDING PRINTS UNDER ITS OWN VERB. A landed
+    # path had no index entry to restore, so reporting it as `restored` describes
+    # something that did not happen -- and the order's "was restored to the index
+    # entry it had" sentence is false of it.
+    removed_landed: list[str] = []
+    untouched: list[str] = []
+    # DEPL-cMendedVintage-2 S1. EVERY FAILURE ABOVE NAMES ITSELF HERE, paired with the git
+    # operation that refused. A failed path used to appear in NONE of the three lists below,
+    # which reads as a path nothing touched -- while the tail reverted its receipt row
+    # anyway. The list is (path, why) rather than a bare path because the order prints the
+    # refusing operation, and a second lookup to recover it is a second place to get wrong.
+    unrestored: list[tuple[str, str]] = []
+    # DEPL-cMendedVintage-18 S3. THE WITHDRAWN PATHS WHOSE ROW WAS KEPT ANYWAY, so the order
+    # can say what is true of them. The `unrestored` sentence below is written for a path
+    # this run REWROTE; a path this run DELETED and could not put back is a different fact
+    # and gets a different sentence, read off the same predicate that decided the row.
+    kept_withdrawn: set[str] = set()
+    # DEPL-cMendedVintage-10 S2. THE ATTRIBUTES ENTRY JOINS EVERY KIT'S ROLLBACK, because it
+    # belongs to no kit: the block gov wrote is the UNION over every claimed kit, so there is
+    # no one kit whose rollback owns it. A second restore is idempotent — the same pre-run
+    # index entry, put back a second time — and each rolled-back kit's order then names the
+    # file, which is what an operator reading one order needs to see.
+    for s in [x for x in snap_rows
+              if x["kit"] == eid or x["origin"] == "attributes"]:
+        for p in s["paths"]:
+            # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
+            # built from `acted` BEFORE the write loop's own containment check, and this
+            # loop `unlink()`s and `checkout-index`es each path — so a receipt row spelling
+            # `../../x` that the write loop refused could still be reached here, on the
+            # rollback path, where the operation is a DELETE. Narrow (it needs a kit whose
+            # check goes red after the run) and not reproduced, which is stated rather than
+            # dressed up: it is guarded because the class is the same and the cost is one
+            # condition, not because a fixture demonstrated it.
+            try:
+                demand_contained_dest(p, f"rollback of kit '{eid}'")
+            except Refusal as _esc:
+                r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
+                unrestored.append((p, "refused as outside the target"))
+                continue
+            if p not in written_paths:
+                untouched.append(p)
+                continue
+            entry = s["index"].get(p)
+            if entry is None:
+                # `absent` before the write. The bytes at this path are ones this run put
+                # there — a rename destination, or a `missing` restore — so unstaging and
+                # unlinking returns the target to what it had, which was nothing.
+                upgrade_steps.write_staging_line(target, p, None)
+                rmv = subprocess.run(
+                    ["git", "-C", str(target), "rm", "-q", "--cached", "--ignore-unmatch",
+                     "--", p], capture_output=True, text=True, check=False)
+                if rmv.returncode != 0:
+                    r.fail(f"rolling back kit '{eid}': '{p}' was absent from the index "
+                           f"before this run and `git rm --cached` would not unstage it: "
+                           f"{rmv.stderr.strip()}. The target is now PART restored — say so "
+                           f"rather than reporting a rollback that did not happen")
+                    unrestored.append((p, "`git rm --cached` would not unstage it"))
+                    continue
+                if (target / p).is_file():
+                    (target / p).unlink()
+                restored.append(p)
+                continue
+            mode, oid = entry
+            upgrade_steps.write_staging_line(target, p, oid)
+            upx = subprocess.run(
+                ["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
+                 f"{mode},{oid},{p}"], capture_output=True, text=True, check=False)
+            if upx.returncode != 0:
+                r.fail(f"rolling back kit '{eid}': `git update-index` would not restore "
+                       f"{mode},{oid[:12]},{p}: {upx.stderr.strip()}. The target is now "
+                       f"PART restored")
+                unrestored.append((p, "`git update-index` would not take its pre-run entry"))
+                continue
+            (target / p).parent.mkdir(parents=True, exist_ok=True)
+            cox = subprocess.run(
+                ["git", "-C", str(target), "checkout-index", "-f", "--", p],
+                capture_output=True, text=True, check=False)
+            if cox.returncode != 0:
+                r.fail(f"rolling back kit '{eid}': the index now names {oid[:12]} at '{p}' "
+                       f"and `git checkout-index` could not write the worktree file: "
+                       f"{cox.stderr.strip()}. The target is now PART restored — a silent "
+                       f"partial restore is worse than the write it was undoing")
+                # S4. THE ONLY HALF-DONE ONE, and the sentence is measured rather than
+                # reasoned: `update-index` above already took the pre-run blob, and
+                # `checkout-index -f` unlinks the existing file BEFORE it writes the
+                # replacement -- so when it refuses, the worktree file is GONE rather than
+                # holding this run's bytes. Index and worktree disagree; which bytes sit on
+                # disk is git's business at that point and this line does not promise any.
+                unrestored.append(
+                    (p, "`git checkout-index` could not write the worktree file, and the "
+                        "index was ALREADY reverted to the pre-run blob, so the index and "
+                        "the worktree now disagree at this path"))
+                continue
+            restored.append(p)
+
+        # DEPL-dSealedTally-1 S3. A LANDED ENTRY IS REMOVED, NOT RESTORED, and the two
+        # halves the table branch below performs are both WRONG for it: restoring
+        # `ROLLBACK_FIELDS` would write receipt fields onto a row that should cease to
+        # exist, and the `withdrawn_rows` removal is about rows this run withdrew,
+        # which has nothing to say about a row this run MINTED.
+        if s.get("origin") == "landed":
+            # F3. THE ROW GOES ONLY IF THE FILE WENT. This branch ran once per ENTRY, after
+            # the per-path loop, and dropped the receipt row whatever that loop decided --
+            # so a path whose removal was REFUSED by containment, or whose `git rm --cached`
+            # failed, left a gov-written file staged in a repository gov does not own,
+            # named in no line of the rollback order and withdrawable by nothing, because
+            # the row that would have named it was gone.
+            _left_landed = [p for p in s["paths"] if p not in restored]
+            for _lp in [p for p in s["paths"] if p in restored]:
+                while _lp in landed_new:
+                    landed_new.remove(_lp)
+                restored.remove(_lp)
+                removed_landed.append(_lp)
+            if _left_landed:
+                r.fail(f"rolling back kit '{eid}': the landed path(s) "
+                       f"{', '.join(sorted(_left_landed))} could not be removed, so their "
+                       f"receipt row is KEPT. The target is PART restored and those bytes "
+                       f"are still staged; the row is what a later `update` needs in order "
+                       f"to see them at all")
+            else:
+                try:
+                    receipt["files"].remove(s["row"])
+                except ValueError:
+                    pass
+            continue
+
+        # DEPL-cMendedVintage-2 S2. THE ROW GOES BACK ONLY IF THE FILE DID. This is
+        # `_left_landed` thirty lines up, one level out: the landed branch already refuses
+        # to drop a row whose path it could not remove, and the block below reverted a row
+        # whatever the path loop decided. A failed restore therefore left the file holding
+        # this run's bytes while its row claimed the pre-run `sha256`, and the run persisted
+        # that -- the exact disagreement `-7` and `-8` were built to prevent, arriving
+        # through the failure path instead of the success one.
+        #
+        # `p in written_paths` IS LOAD-BEARING. An entry's path this run never wrote is
+        # collected into `untouched`, and reverting the row is correct for it; without the
+        # filter a single untouched path in a renamed entry would pin that row forward and
+        # invert the fix. The row that stays forward describes the bytes actually on disk,
+        # which costs the operator a re-offer they will not get -- stated in the order,
+        # because a receipt that agrees with the tree beats one that re-offers work over an
+        # unrepaired path.
+        # DEPL-cMendedVintage-18 S1. THE REMOVAL IS NOT THE REVERT, and `-2` gated the two
+        # together on the assumption that no snapshot entry is also a withdrawn row.
+        # `_touching` admits `withdrawn` whenever `--write-withdrawals` is passed, so on
+        # those runs the assumption is false. `withdrawn_rows` is the DELETE list — the
+        # filter far below STRIPS every row still in it from the receipt — so taking the row
+        # OUT of it is what SAVES the row, and the gate that is right for the revert is
+        # exactly wrong for this. MEASURED on a `--write-withdrawals` run whose rollback
+        # `checkout-index` a required smudge filter refused: the row vanished from the
+        # receipt while `update-index` had just re-staged the pre-run blob at that path, so
+        # the target carried gov's bytes and its receipt admitted to none of them. It now
+        # runs for every entry that reached this tail, whatever the path loop decided.
+        _was_withdrawn = s["row"] in withdrawn_rows
+        if _was_withdrawn:
+            withdrawn_rows.remove(s["row"])
+
+        _left = [p for p in s["paths"] if p in written_paths and p not in restored]
+        if _left:
+            if _was_withdrawn:
+                kept_withdrawn.update(_left)
+            continue
+
+        # DEPL-cMendedVintage-10 S2. THE SYNTHESIZED ROW GOES BACK WHOLE. The three fields
+        # the pin write refreshes are `mode`, `block_sha256` and `patterns`, and none of
+        # them is in ROLLBACK_FIELDS — so the field-by-field revert below would put the
+        # bytes back and leave the row describing the block that was just removed. Cleared
+        # and re-filled in place rather than replaced, because `receipt["files"]` holds this
+        # dict by identity and rebinding the name would leave the receipt at this run's
+        # values.
+        if s["origin"] == "attributes":
+            # DEPL-cMendedVintage-17 S3. AND IT COMES BACK OUT OF THE WITHDRAWAL SET FIRST.
+            # The withdrawal path drops this row by appending it here, and the filter that
+            # consumes the list runs long after this loop — so restoring the dict's contents
+            # without also un-dropping it would put the block back on disk and still delete
+            # the row that says gov owns it. DEPL-cMendedVintage-18 hoisted that un-drop
+            # above the `_left` gate, where one statement now serves this branch and the
+            # table one alike; this branch carried its own copy of it until then.
+            s["row"].clear()
+            s["row"].update(s["fields"])
+            continue
+
+        # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
+        # row stamped forward re-creates `-8` exactly — the next run reads the row as
+        # `equal` against bytes that were reverted — and restoring only some of the six is
+        # the split `-7` S9 refuses the whole next run on.
+        for k in ROLLBACK_FIELDS:
+            if k in s["fields"]:
+                s["row"][k] = s["fields"][k]
+            else:
+                s["row"].pop(k, None)
+
+    # TOOL-dSafePassage-9 S1. WHAT THIS RUN UNWIRED COMES BACK WITH THE BYTES: the withdrawn
+    # fragments of this kit are wired again now that its files are restored.
+    if unwired_withdrawn:
+        run_fragment_merges(target, receipt.get("files") or [], set(unwired_withdrawn),
+                            set(), "update")
+
+    return restored, removed_landed, unrestored, untouched, kept_withdrawn
+
+
 def raw_write_cells(grid: dict) -> list[tuple[str, str, str]]:
     """Every cell of a verdict grid that would hand a DELTA row to the raw-write arm.
 
@@ -11785,6 +12013,41 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"govkit update — HELD BACK {_eid_h}: {len(_paths_h)} row(s) refused "
               f"({', '.join(_paths_h)}), so none of this kit's writes from this run will stand")
 
+    # WHAT THE WRITE LOOP ACTUALLY DID, frozen before any rollback edits these lists. The snapshot's
+    # population is what the loop was GOING to act on; this is what it reached. A row refused at its
+    # own arm — a conflicting three-way, a rename destination the target already holds — is in the
+    # first and not the second, and rolling one of those back is not merely wasted: the occupied
+    # rename destination is an UNTRACKED operator file whose snapshot entry is `absent`, so the
+    # `absent` arm below would unlink bytes this run never wrote and the refusal exists to protect.
+    # DEPL-dSealedTally-1 S4. THE LANDED DESTINATIONS COUNT AS WRITTEN. Without this a landed
+    # path is classified untouched by the closing tally, which reports it as a file this run
+    # never wrote -- while it sits staged in the adopter's index.
+    # DEPL-cMendedVintage-10 S2. AND THE PIN BLOCK, when this run wrote it. The rollback loop skips
+    # any snapshot path that is not in this set — correctly, because a path this run never touched
+    # has nothing to undo — so leaving `.gitattributes` out would make its snapshot entry decorative:
+    # recorded, carried through the whole verb, and stepped over at the one moment it is for.
+    # DEPL-cMendedVintage-17 S3. AND WHEN THE WITHDRAWAL REMOVED IT, for the same reason: a path
+    # missing from this set is stepped over by the rollback loop, and a removal the rollback steps
+    # over is a block gov deleted from a repository whose kit then rolled back.
+    written_paths = (set(changed) | set(renamed) | set(deleted) | set(_landed_new)
+                     | ({_pins_snap["paths"][0]}
+                        if (_ga_written or _ga_removed) and _pins_snap else set()))
+
+    # TOOL-dSafePassage-66 S1. A HELD KIT GOES BACK HERE, BEFORE THE FIRST STEP, not in the verify
+    # pass after the walk. The hold set is final at the HELD BACK lines above, and every input of the
+    # restore is bound by now. Restored there, a walk killed inside a step ended the run first and
+    # left the kit at the tip, where the next run's restore found the tip as its pre-run state and
+    # the kit never came back (`verdict-printed-before-the-step-that-reverts-it`). The receipt below
+    # is written after this, so it records the kit's rows at their pre-run values. Its fragments are
+    # never wired and its regenerate never runs, so the restore meets only the write loop's writes.
+    # Scoped to `touched_kits`, the verify pass's population: a held kit outside it owns no
+    # snapshot row and would only restore the shared attributes row with no order naming it.
+    _held_restore: dict[str, tuple] = {}
+    for _eid_h in [e for e in touched_kits if e in _held_kits]:
+        _held_restore[_eid_h] = write_kit_restore(
+            target, _eid_h, receipt, snap_rows, written_paths, _landed_new, withdrawn_rows, [],
+            _unwired_withdrawn.get(_eid_h, []), r)
+
     # ======================= TOOL-dSafePassage-2 S4 — THE UPGRADE-STEP WALK =======================
     # HERE, after the write loop and before the re-render, so a step meets the new vintage's files
     # and the renders, hook wiring and per-kit verify below meet the migrated tree. Oldest first,
@@ -12141,26 +12404,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # IT RUNS UNCONDITIONALLY UNDER `--write`. There is no flag, in any spelling, because an opt-in
     # verifier verifies the runs that were already careful.
 
-    # WHAT THE WRITE LOOP ACTUALLY DID, frozen before any rollback edits these lists. The snapshot's
-    # population is what the loop was GOING to act on; this is what it reached. A row refused at its
-    # own arm — a conflicting three-way, a rename destination the target already holds — is in the
-    # first and not the second, and rolling one of those back is not merely wasted: the occupied
-    # rename destination is an UNTRACKED operator file whose snapshot entry is `absent`, so the
-    # `absent` arm below would unlink bytes this run never wrote and the refusal exists to protect.
-    # DEPL-dSealedTally-1 S4. THE LANDED DESTINATIONS COUNT AS WRITTEN. Without this a landed
-    # path is classified untouched by the closing tally, which reports it as a file this run
-    # never wrote -- while it sits staged in the adopter's index.
-    # DEPL-cMendedVintage-10 S2. AND THE PIN BLOCK, when this run wrote it. The rollback loop skips
-    # any snapshot path that is not in this set — correctly, because a path this run never touched
-    # has nothing to undo — so leaving `.gitattributes` out would make its snapshot entry decorative:
-    # recorded, carried through the whole verb, and stepped over at the one moment it is for.
-    # DEPL-cMendedVintage-17 S3. AND WHEN THE WITHDRAWAL REMOVED IT, for the same reason: a path
-    # missing from this set is stepped over by the rollback loop, and a removal the rollback steps
-    # over is a block gov deleted from a repository whose kit then rolled back.
-    written_paths = (set(changed) | set(renamed) | set(deleted) | set(_landed_new)
-                     | ({_pins_snap["paths"][0]}
-                        if (_ga_written or _ga_removed) and _pins_snap else set()))
-
     # DEPL-cMendedVintage-24 S5. THE CLASS LEFT-SHIFT, and the reason this unit is not just one more
     # name in a list. The defect it closes was a hand-maintained membership test that had to be
     # re-derived every time a verb learned to write a role it previously only read, with no signal at
@@ -12299,213 +12542,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 continue
             n_rolled += 1
             _rolled_kits.add(eid)
-            # TOOL-aRepatriatedFork-11 S4. FIRST, while the landed fragments are still on disk.
-            remove_wired_fragments(target, receipt.get("files") or [], _wired_new.get(eid, []), "update")
-            # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
-            # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
-            # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
-            # replace, an index `git rm --cached` will not touch — and this suite manufactures none
-            # of those modes; `land_through_index`'s post-`git mv` failure is in exactly the same
-            # position and says so where it stands. What each of them leaves is a PART-restored
-            # target, and each says that in its own message, because a silent partial restore is
-            # worse than the write it was undoing.
-            restored: list[str] = []
-            # DEPL-dSealedTally-1 S7. A REMOVED LANDING PRINTS UNDER ITS OWN VERB. A landed
-            # path had no index entry to restore, so reporting it as `restored` describes
-            # something that did not happen -- and the order's "was restored to the index
-            # entry it had" sentence is false of it.
-            removed_landed: list[str] = []
-            untouched: list[str] = []
-            # DEPL-cMendedVintage-2 S1. EVERY FAILURE ABOVE NAMES ITSELF HERE, paired with the git
-            # operation that refused. A failed path used to appear in NONE of the three lists below,
-            # which reads as a path nothing touched -- while the tail reverted its receipt row
-            # anyway. The list is (path, why) rather than a bare path because the order prints the
-            # refusing operation, and a second lookup to recover it is a second place to get wrong.
-            unrestored: list[tuple[str, str]] = []
-            # DEPL-cMendedVintage-18 S3. THE WITHDRAWN PATHS WHOSE ROW WAS KEPT ANYWAY, so the order
-            # can say what is true of them. The `unrestored` sentence below is written for a path
-            # this run REWROTE; a path this run DELETED and could not put back is a different fact
-            # and gets a different sentence, read off the same predicate that decided the row.
-            kept_withdrawn: set[str] = set()
-            # DEPL-cMendedVintage-10 S2. THE ATTRIBUTES ENTRY JOINS EVERY KIT'S ROLLBACK, because it
-            # belongs to no kit: the block gov wrote is the UNION over every claimed kit, so there is
-            # no one kit whose rollback owns it. A second restore is idempotent — the same pre-run
-            # index entry, put back a second time — and each rolled-back kit's order then names the
-            # file, which is what an operator reading one order needs to see.
-            for s in [x for x in snap_rows
-                      if x["kit"] == eid or x["origin"] == "attributes"]:
-                for p in s["paths"]:
-                    # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
-                    # built from `acted` BEFORE the write loop's own containment check, and this
-                    # loop `unlink()`s and `checkout-index`es each path — so a receipt row spelling
-                    # `../../x` that the write loop refused could still be reached here, on the
-                    # rollback path, where the operation is a DELETE. Narrow (it needs a kit whose
-                    # check goes red after the run) and not reproduced, which is stated rather than
-                    # dressed up: it is guarded because the class is the same and the cost is one
-                    # condition, not because a fixture demonstrated it.
-                    try:
-                        demand_contained_dest(p, f"rollback of kit '{eid}'")
-                    except Refusal as _esc:
-                        r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
-                        unrestored.append((p, "refused as outside the target"))
-                        continue
-                    if p not in written_paths:
-                        untouched.append(p)
-                        continue
-                    entry = s["index"].get(p)
-                    if entry is None:
-                        # `absent` before the write. The bytes at this path are ones this run put
-                        # there — a rename destination, or a `missing` restore — so unstaging and
-                        # unlinking returns the target to what it had, which was nothing.
-                        upgrade_steps.write_staging_line(target, p, None)
-                        rmv = subprocess.run(
-                            ["git", "-C", str(target), "rm", "-q", "--cached", "--ignore-unmatch",
-                             "--", p], capture_output=True, text=True, check=False)
-                        if rmv.returncode != 0:
-                            r.fail(f"rolling back kit '{eid}': '{p}' was absent from the index "
-                                   f"before this run and `git rm --cached` would not unstage it: "
-                                   f"{rmv.stderr.strip()}. The target is now PART restored — say so "
-                                   f"rather than reporting a rollback that did not happen")
-                            unrestored.append((p, "`git rm --cached` would not unstage it"))
-                            continue
-                        if (target / p).is_file():
-                            (target / p).unlink()
-                        restored.append(p)
-                        continue
-                    mode, oid = entry
-                    upgrade_steps.write_staging_line(target, p, oid)
-                    upx = subprocess.run(
-                        ["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
-                         f"{mode},{oid},{p}"], capture_output=True, text=True, check=False)
-                    if upx.returncode != 0:
-                        r.fail(f"rolling back kit '{eid}': `git update-index` would not restore "
-                               f"{mode},{oid[:12]},{p}: {upx.stderr.strip()}. The target is now "
-                               f"PART restored")
-                        unrestored.append((p, "`git update-index` would not take its pre-run entry"))
-                        continue
-                    (target / p).parent.mkdir(parents=True, exist_ok=True)
-                    cox = subprocess.run(
-                        ["git", "-C", str(target), "checkout-index", "-f", "--", p],
-                        capture_output=True, text=True, check=False)
-                    if cox.returncode != 0:
-                        r.fail(f"rolling back kit '{eid}': the index now names {oid[:12]} at '{p}' "
-                               f"and `git checkout-index` could not write the worktree file: "
-                               f"{cox.stderr.strip()}. The target is now PART restored — a silent "
-                               f"partial restore is worse than the write it was undoing")
-                        # S4. THE ONLY HALF-DONE ONE, and the sentence is measured rather than
-                        # reasoned: `update-index` above already took the pre-run blob, and
-                        # `checkout-index -f` unlinks the existing file BEFORE it writes the
-                        # replacement -- so when it refuses, the worktree file is GONE rather than
-                        # holding this run's bytes. Index and worktree disagree; which bytes sit on
-                        # disk is git's business at that point and this line does not promise any.
-                        unrestored.append(
-                            (p, "`git checkout-index` could not write the worktree file, and the "
-                                "index was ALREADY reverted to the pre-run blob, so the index and "
-                                "the worktree now disagree at this path"))
-                        continue
-                    restored.append(p)
-
-                # DEPL-dSealedTally-1 S3. A LANDED ENTRY IS REMOVED, NOT RESTORED, and the two
-                # halves the table branch below performs are both WRONG for it: restoring
-                # `ROLLBACK_FIELDS` would write receipt fields onto a row that should cease to
-                # exist, and the `withdrawn_rows` removal is about rows this run withdrew,
-                # which has nothing to say about a row this run MINTED.
-                if s.get("origin") == "landed":
-                    # F3. THE ROW GOES ONLY IF THE FILE WENT. This branch ran once per ENTRY, after
-                    # the per-path loop, and dropped the receipt row whatever that loop decided --
-                    # so a path whose removal was REFUSED by containment, or whose `git rm --cached`
-                    # failed, left a gov-written file staged in a repository gov does not own,
-                    # named in no line of the rollback order and withdrawable by nothing, because
-                    # the row that would have named it was gone.
-                    _left_landed = [p for p in s["paths"] if p not in restored]
-                    for _lp in [p for p in s["paths"] if p in restored]:
-                        while _lp in _landed_new:
-                            _landed_new.remove(_lp)
-                        restored.remove(_lp)
-                        removed_landed.append(_lp)
-                    if _left_landed:
-                        r.fail(f"rolling back kit '{eid}': the landed path(s) "
-                               f"{', '.join(sorted(_left_landed))} could not be removed, so their "
-                               f"receipt row is KEPT. The target is PART restored and those bytes "
-                               f"are still staged; the row is what a later `update` needs in order "
-                               f"to see them at all")
-                    else:
-                        try:
-                            receipt["files"].remove(s["row"])
-                        except ValueError:
-                            pass
-                    continue
-
-                # DEPL-cMendedVintage-2 S2. THE ROW GOES BACK ONLY IF THE FILE DID. This is
-                # `_left_landed` thirty lines up, one level out: the landed branch already refuses
-                # to drop a row whose path it could not remove, and the block below reverted a row
-                # whatever the path loop decided. A failed restore therefore left the file holding
-                # this run's bytes while its row claimed the pre-run `sha256`, and the run persisted
-                # that -- the exact disagreement `-7` and `-8` were built to prevent, arriving
-                # through the failure path instead of the success one.
-                #
-                # `p in written_paths` IS LOAD-BEARING. An entry's path this run never wrote is
-                # collected into `untouched`, and reverting the row is correct for it; without the
-                # filter a single untouched path in a renamed entry would pin that row forward and
-                # invert the fix. The row that stays forward describes the bytes actually on disk,
-                # which costs the operator a re-offer they will not get -- stated in the order,
-                # because a receipt that agrees with the tree beats one that re-offers work over an
-                # unrepaired path.
-                # DEPL-cMendedVintage-18 S1. THE REMOVAL IS NOT THE REVERT, and `-2` gated the two
-                # together on the assumption that no snapshot entry is also a withdrawn row.
-                # `_touching` admits `withdrawn` whenever `--write-withdrawals` is passed, so on
-                # those runs the assumption is false. `withdrawn_rows` is the DELETE list — the
-                # filter far below STRIPS every row still in it from the receipt — so taking the row
-                # OUT of it is what SAVES the row, and the gate that is right for the revert is
-                # exactly wrong for this. MEASURED on a `--write-withdrawals` run whose rollback
-                # `checkout-index` a required smudge filter refused: the row vanished from the
-                # receipt while `update-index` had just re-staged the pre-run blob at that path, so
-                # the target carried gov's bytes and its receipt admitted to none of them. It now
-                # runs for every entry that reached this tail, whatever the path loop decided.
-                _was_withdrawn = s["row"] in withdrawn_rows
-                if _was_withdrawn:
-                    withdrawn_rows.remove(s["row"])
-
-                _left = [p for p in s["paths"] if p in written_paths and p not in restored]
-                if _left:
-                    if _was_withdrawn:
-                        kept_withdrawn.update(_left)
-                    continue
-
-                # DEPL-cMendedVintage-10 S2. THE SYNTHESIZED ROW GOES BACK WHOLE. The three fields
-                # the pin write refreshes are `mode`, `block_sha256` and `patterns`, and none of
-                # them is in ROLLBACK_FIELDS — so the field-by-field revert below would put the
-                # bytes back and leave the row describing the block that was just removed. Cleared
-                # and re-filled in place rather than replaced, because `receipt["files"]` holds this
-                # dict by identity and rebinding the name would leave the receipt at this run's
-                # values.
-                if s["origin"] == "attributes":
-                    # DEPL-cMendedVintage-17 S3. AND IT COMES BACK OUT OF THE WITHDRAWAL SET FIRST.
-                    # The withdrawal path drops this row by appending it here, and the filter that
-                    # consumes the list runs long after this loop — so restoring the dict's contents
-                    # without also un-dropping it would put the block back on disk and still delete
-                    # the row that says gov owns it. DEPL-cMendedVintage-18 hoisted that un-drop
-                    # above the `_left` gate, where one statement now serves this branch and the
-                    # table one alike; this branch carried its own copy of it until then.
-                    s["row"].clear()
-                    s["row"].update(s["fields"])
-                    continue
-
-                # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
-                # row stamped forward re-creates `-8` exactly — the next run reads the row as
-                # `equal` against bytes that were reverted — and restoring only some of the six is
-                # the split `-7` S9 refuses the whole next run on.
-                for k in ROLLBACK_FIELDS:
-                    if k in s["fields"]:
-                        s["row"][k] = s["fields"][k]
-                    else:
-                        s["row"].pop(k, None)
-
-            # TOOL-dSafePassage-9 S1. WHAT THIS RUN UNWIRED COMES BACK WITH THE BYTES: the withdrawn
-            # fragments of this kit are wired again now that its files are restored.
-            if _unwired_withdrawn.get(eid):
-                run_fragment_merges(target, receipt.get("files") or [], set(_unwired_withdrawn[eid]),
-                                    set(), "update")
+            if _held_v:
+                # TOOL-dSafePassage-66 S2. RESTORED ALREADY, before the first upgrade step: this
+                # prints and orders what that restore did, and puts nothing back a second time.
+                restored, removed_landed, unrestored, untouched, kept_withdrawn = _held_restore[eid]
+            else:
+                restored, removed_landed, unrestored, untouched, kept_withdrawn = write_kit_restore(
+                    target, eid, receipt, snap_rows, written_paths, _landed_new, withdrawn_rows,
+                    _wired_new.get(eid, []), _unwired_withdrawn.get(eid, []), r)
 
             # DEPL-aRepatriatedFork-17 S1. THE RE-RENDER'S OUTPUTS COME BACK TOO, through the same
             # two plumbing calls the loop above makes, plus the snapshot's own worktree bytes: the

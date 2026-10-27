@@ -18340,6 +18340,10 @@ user_skills = "/tmp/gk-fake-skills"
     _rte_cases += [("[dSafePassage-64] plant edited-reshipped matches its case", ["edited-reshipped"], 0)]
     # TOOL-dSafePassage-65 AC1: a rollback resolves the row's role from the descriptor at `--to`.
     _rte_cases += [("[dSafePassage-65] plant edited-rolled-back matches its case", ["edited-rolled-back"], 0)]
+    # TOOL-dSafePassage-66 AC1 AC2: a held kit is put back before the first step, so a walk killed
+    # inside `fx/s1` leaves it at its pre-run bytes and row; `render-edited` above carries AC2's
+    # `eng.txt` and the order's `restored` line.
+    _rte_cases += [("[dSafePassage-66] plant render-edited-kill matches its case", ["render-edited-kill"], 0)]
     _rte_cases += [(f"[dSafePassage-9] plant {_pl} --stub {_st} stages its red", [_pl, "--stub", _st], 1)
                    for _pl, _st in (("edited-row", "forked"), ("keep", "report-omits"),
                                     ("render-edited", "today"), ("seed-retired-edited", "seed-override"),

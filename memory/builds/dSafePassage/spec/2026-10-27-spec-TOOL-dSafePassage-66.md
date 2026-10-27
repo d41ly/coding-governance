@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-66 — `update` puts a held kit's writes back before the first upgrade step, so a walk killed inside a step leaves that kit at its pre-run bytes
 
-**Status:** DEFERRED · rev-1 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-10-27 · node d · Tier-2 · base 60d90cb7 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-5
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-26-build-TOOL-dSafePassage-66-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-66-ledger.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-66-build-brief.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-66-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
