@@ -9383,11 +9383,20 @@ def check_render_edited(target: pathlib.Path, row: dict) -> bool:
     """TOOL-dSafePassage-9 S5: is a `rendered` row's working file no longer the blob its receipt
     recorded at its last render? The working file is cleaned by the target's own filters, as
     `measure_rendered_rows` stamped `oid`; the index is not read, because a regenerate may leave its
-    output unstaged. A row with no recorded `oid`, or no file, cannot prove an edit: False."""
+    output unstaged. A row with no `oid` but the `output_sha256` `apply` recorded (TOOL-dSafePassage-63
+    S1) is edited when that hash names none of the file's raw bytes, those bytes with CRLF folded to
+    LF, or the folded bytes written as CRLF: a line-ending-only difference reads unedited, as it does
+    through a clean filter. A row with neither field, or no file, cannot prove an edit: False."""
     path, rec = str(row.get("path")), row.get("oid")
     dp = target / path
-    if not rec or not dp.is_file():
+    if not dp.is_file():
         return False
+    if not rec:
+        out = row.get("output_sha256")
+        if not out:
+            return False
+        lf = (raw := dp.read_bytes()).replace(b"\r\n", b"\n")
+        return out not in {_sha(raw), _sha(lf), _sha(lf.replace(b"\n", b"\r\n"))}
     cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}", "--", str(dp)],
                         capture_output=True, text=True, encoding="utf-8", check=False)
     return cl.returncode == 0 and bool(cl.stdout.strip()) and cl.stdout.strip() != rec

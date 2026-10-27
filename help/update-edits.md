@@ -38,9 +38,10 @@ A kit's rendered file (one its regenerate argv writes) that no longer matches th
 its last render reads **`render-edited`**. `update` holds the whole kit back, so its regenerate does
 not run over your edit (you see its `HELD BACK` line), keeps your bytes, and always writes an order,
 `.governance/outbox/update-render-edited-<slug>.md`, whatever `install.retired-edits` says. Move the
-edit into the kit's template or conf, restore the rendered file, and re-run `update`. A receipt that
-recorded no render blob for the row cannot show an edit, so that row is graded as before until a
-render records one.
+edit into the kit's template or conf, restore the rendered file, and re-run `update`. A row whose
+receipt recorded only the bytes its install left (no `update` has re-rendered it yet) is compared
+with those bytes, line endings aside: an edit made before your first `update` is held and ordered
+the same way, and a file whose only change is CRLF or LF line endings reads unedited.
 
 ## A hook gov withdrew
 

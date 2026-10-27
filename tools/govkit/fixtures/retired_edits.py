@@ -30,13 +30,17 @@ import govkit  # noqa: E402 — the deployer itself, for its tool root, its slug
 
 PFX = govkit.derive_tool_root(govkit.repo_root())
 PLANTS = ("fragment-withdrawn", "fragment-rollback", "edited-gone", "edited-row", "keep",
-          "seed-retired-edited", "seed-retired-clean", "render-edited", "render-clean", "dispatch-gap")
+          "seed-retired-edited", "seed-retired-clean", "render-edited", "render-clean",
+          "render-edited-no-oid", "render-eol-no-oid", "dispatch-gap")
 # Each stub is one statement over the scratch module `m`, run after it loads and before its `main`.
 STUBS = {
     "forked": 'm.UPDATE_ROLE["retired-edited"] = m.UPDATE_ROLE["forked"]',
     "report-omits": 'm.render_retired_edited_line = lambda *a, **k: ""',
     "today": "m.check_render_edited = lambda *a, **k: False",
     "seed-override": 'm.SEED_KEPT_VERDICTS = ("missing", "renamed")',
+    # TOOL-dSafePassage-63: a row with no `oid` graded False, as the check did before its fallback.
+    "oid-only": ("m.check_render_edited = lambda t, r, f=m.check_render_edited: "
+                 "bool(r.get('oid')) and f(t, r)"),
 }
 LOADER = ("import importlib.util, sys\n"
           "path, stub, argv = sys.argv[1], sys.argv[2], sys.argv[3:]\n"
@@ -294,6 +298,27 @@ def run_plant(tmp: pathlib.Path, plant: str, stub: str, write_withdrawals: bool,
             obs.append(("receipt role", read_role(t, seed), "retired-edited"))
         obs.append(("the seeded copy", "kept" if read_bytes(t, seed) == copy else "changed", "kept"))
         return obs
+    if plant in ("render-edited-no-oid", "render-eol-no-oid"):
+        # TOOL-dSafePassage-63: the render `apply` left, with no update between, so its row carries
+        # `output_sha256` and no `oid`; then gov moves the template.
+        rec = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+        obs.append(("the render's recorded oid", "present" if any(
+            f.get("path") == out_md and f.get("oid") for f in rec.get("files", [])) else "absent", "absent"))
+        eol = plant == "render-eol-no-oid"
+        edited = (read_bytes(t, out_md) or b"").replace(b"\n", b"\r\n") if eol else b"tpl v1\nthe target's edit\n"
+        (t / out_md).write_bytes(edited)
+        write_commit(t, "the target rewrites the render's line endings" if eol else "the target edits the render")
+        write_gov_files(g, {"tpl.md": "tpl v2\n"})
+        write_commit(g, "B")
+        out = run_update(g, t, stub=stub)
+        if eol:
+            return obs + [("verdict " + out_md, read_verdict(out, out_md), "re-rendered"),
+                          ("render-edited orders", str(len(read_orders(t, "render-edited"))), "0")]
+        return obs + [("verdict " + out_md, read_verdict(out, out_md), "render-edited"),
+                      ("the HELD BACK line", str(f"HELD BACK {DEMO}:" in out), "True"),
+                      ("render-edited orders", str(len(read_orders(t, "render-edited", out_md))), "1"),
+                      ("the edited bytes", "kept" if read_bytes(t, out_md) == edited else "overwritten",
+                       "kept")]
     # render-edited, render-clean: a first update renders and stamps the row's `oid`, then gov moves
     # the template and the engine again over an edited or an untouched render.
     write_gov_files(g, {"tpl.md": "tpl v2\n", "eng.txt": "v2\n"})

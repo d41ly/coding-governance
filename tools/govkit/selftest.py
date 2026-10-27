@@ -18332,9 +18332,14 @@ user_skills = "/tmp/gk-fake-skills"
                              ("edited-gone",), ("edited-row",), ("keep",), ("seed-retired-edited",),
                              ("seed-retired-clean",), ("render-edited",), ("render-clean",),
                              ("dispatch-gap",))]
+    # TOOL-dSafePassage-63 AC1 AC2: an edited render with no `oid` proven from `output_sha256`, and a
+    # line-ending-only rewrite read unedited; `oid-only` stages AC1's red.
+    _rte_cases += [(f"[dSafePassage-63] plant {_pl} matches its case", [_pl], 0)
+                   for _pl in ("render-edited-no-oid", "render-eol-no-oid")]
     _rte_cases += [(f"[dSafePassage-9] plant {_pl} --stub {_st} stages its red", [_pl, "--stub", _st], 1)
                    for _pl, _st in (("edited-row", "forked"), ("keep", "report-omits"),
-                                    ("render-edited", "today"), ("seed-retired-edited", "seed-override"))]
+                                    ("render-edited", "today"), ("seed-retired-edited", "seed-override"),
+                                    ("render-edited-no-oid", "oid-only"))]
 
     def _run_rte_case(case):
         return case, subprocess.run([sys.executable, str(HERE / "fixtures" / "retired_edits.py"),
