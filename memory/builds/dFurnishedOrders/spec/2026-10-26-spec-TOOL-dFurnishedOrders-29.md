@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-29 — the round-1 audit's 35 roles, hooks and runlog minors: one reader per value, bounded slot readers, the verifier hooks' failure paths and registries, and fixtures that read only what they plant
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5ff43572 · streams tooling · order 22 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,12 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-22-round1-fix-return.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-22-round1-fix-return.md) | research | TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-30 |
 | [2026-10-27-build-TOOL-dFurnishedOrders-29-deviation-291.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-29-deviation-291.md) | deviation | — |
 | [2026-10-27-build-TOOL-dFurnishedOrders-29-deviation-292.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-29-deviation-292.md) | deviation | — |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-29-deviation-293.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-29-deviation-293.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-22-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-22-round1-fix-brief.md) | research | TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-30 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-29-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-29-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-22-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-30 |
 
 <!-- /gen:spec-records -->
@@ -78,12 +83,15 @@ named once below and closed by its scope item; `TOOL-dFurnishedOrders-30` takes 
 - **S5** — id 58. A cut pattern list. When the guard's list has no terminating `.` inside the lead
   `_read_result_text` returns (`extract.py:619-627`, 200 characters), `derive_notices` leaves out the partial
   last name and adds the label `truncated`. Observed by AC4.
-- **S6** — ids 14, 38, 27. One by-file loader. `load_kit_module(kit, file, name)` in
-  `tools/roles/roles_lib.py` resolves the file by `resolve_kit_dir` and loads it with
-  `importlib.util.spec_from_file_location` under the private name `name`, cached in `sys.modules`. Unit
-  3 S4 and unit 10 S2 load runlog's `extract.py` as `gov_runlog_extract`, and unit 11's ledger module is
-  loaded the same way; no file under `tools/roles/` imports a sibling kit's module by its bare name.
-  Observed by AC5.
+- **S6** — ids 14, 38, 27. No sibling module in process. A by-file load is an in-process import, which
+  a kit may not make of a sibling kit (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7 §4), so the
+  roles kit reaches runlog only through runlog's own verbs, run as subprocesses found by
+  `resolve_kit_dir("runlog", "runlog.py", KIT_DIR)`: unit 3 S4's `notices` and unit 10 S2's
+  `orientation`, each minted by its unit, as unit 16 S2 mints `turns`. Unit 11's ledger is read by
+  `legacy_ledger.py registrations --json` (unit 11 §8 F5). No file under `tools/roles/` loads a
+  sibling kit's module by file or imports one by its bare name, so memory-recall's `extract.py` can
+  shadow nothing, and neither unit 3 nor unit 10 is the origin of a load the other reuses. Observed
+  by AC5.
 - **S7** — id 15. `help/roles.md` and `tools/roles/README.md` each carry the string `outcome: probe`.
   Observed by AC6.
 - **S8** — id 26. Each policy fixture of units 3, 11, 12 and 17 makes its scratch repository with
@@ -91,14 +99,20 @@ named once below and closed by its scope item; `TOOL-dFurnishedOrders-30` takes 
   (`tools/policy/policy.py:752-756`); unit 3's note says the value was read, not refused. Observed by AC6.
 - **S9** — id 29. Units 11, 12 and 7 read `retrofit.slot-bytes`, `roles.orientation.house-index`,
   `memory.project-map`, `memory.map-unfold` and `roles.on-contradiction` through
-  `read_policy_setting(key, root)` (TOOL-dBoundRoles-21 S1), a None reading the catalogue default; no
-  `resolve_kit_dir("policy", "policy.py", ...)` import is left in `tools/roles/`. Observed by AC7.
+  `read_policy_setting(key, root, with_default=True)` (TOOL-dBoundRoles-21 S1), the form
+  TOOL-dBoundRoles-43 S21 gives a read with a catalogue default, so the catalogue answers each key's
+  default and a None means only that no policy kit was found. No file under `tools/roles/` runs
+  `policy.py get` outside `read_policy_setting` or imports the policy kit; that function's own
+  `resolve_kit_dir("policy", "policy.py", here)` locator stays. Observed by AC7.
 - **S10** — ids 30, 16. One seed read. `read_item_seed(root, slug, unit, item, question)` lives in
   `tools/roles/handoff.py` once, runs `loop_lib.py seed` once per render, and the legacy, code and
   problems slots of units 11, 17 and 20 read its one answer. Observed by AC8.
-- **S11** — id 31. Unit 12's `all` unfold reads the namespaces through `read_namespaces` of the playbook
-  kit's `gov_tag.py` (PLAY-dOrderedCharter-19 S2), loaded by S6 as `gov_tag_reader`; no file under `tools/roles/` parses
-  `namespaces.toml`. With no playbook kit the list stays `unarmed`. Observed by AC8.
+- **S11** — id 31. Unit 12's `all` unfold reads the namespaces that `read_namespaces` of the playbook
+  kit's `gov_tag.py` returns (PLAY-dOrderedCharter-19 S2), through the `gov_tag.py namespaces --json`
+  verb §8 F6 asks for, run by `run_slot_reader` (S24) and found by `resolve_kit_dir`. No file under
+  `tools/roles/` parses `namespaces.toml` or loads `gov_tag.py`. With no playbook kit the list stays
+  `unarmed`; any other failure, the verb not yet landed among them, takes S24's `not-installed:`
+  state. Observed by AC8.
 - **S12** — id 32. One rule, one checker. `validate_return` evaluates with `check_return_schema` only
   the per-order properties the parent cannot see, `upstream` and S13's `tasks`; template fields stay
   TOOL-dBoundRoles-5 S1's, establishes rows unit 19 S2's. The whole schema is rendered for the order's
@@ -115,8 +129,10 @@ named once below and closed by its scope item; `TOOL-dFurnishedOrders-30` takes 
   --json` (PLAY-dOrderedCharter-19 S6) and cuts nothing itself; `parse_sections` stays only where
   `parse_charter` needs it. Where the index's extent is not fence-aware, the pass names that in its
   return for an ask on PLAY-dOrderedCharter-19. Observed by AC11.
-- **S16** — id 36. Unit 2's `prompts.batch` reads `per-batch` on a None from any cause; the note
-  `read_policy_setting` writes names a missing kit. Observed by AC12.
+- **S16** — id 36. Unit 2's `prompts.batch` is read with `with_default=True` (unit 2 S5), so the
+  catalogue answers `per-batch` where the key is unset, and a None means only that no policy kit was
+  found. That None reads `per-task`, with the note `read_policy_setting` writes naming the missing kit
+  (unit 2 §8 F3). The caller never probes the kit itself. Observed by AC12.
 - **S17** — id 39. `memory/project/method-carriers.txt` keeps a `.claude/agents/` row only for an agent
   file that mentions `BUILD-METHOD.md` after unit 8, and words each kept row as carrying handed slices.
   Observed by AC13.
@@ -124,9 +140,11 @@ named once below and closed by its scope item; `TOOL-dFurnishedOrders-30` takes 
   `answered-calls self-test` and its `harness-hooks` row the key
   `PreToolUse tools/roles/answered-calls.js`; `answered-calls.test.sh` pins a non-zero
   `SELFTEST_FLOOR` and prints the agreed count line. Observed by AC14.
-- **S19** — id 44. The `answered-calls self-test` row of `tools/gate-legs.json` carries the guard
-  `{prefix}/roles/`, `{prefix}/hooks/scratch-guard.js`, `{prefix}/policy/policy-mirror.js`,
-  `{prefix}/lib/`. Observed by AC14.
+- **S19** — id 44. The `answered-calls self-test` declaration, unit 6 S9's `[[exempt_leg]]` row of
+  `tools/govkit/registry.toml`, carries the guard `{prefix}/roles/`, `{prefix}/hooks/scratch-guard.js`,
+  `{prefix}/policy/policy-mirror.js` and `{prefix}/lib/`. `tools/gate-legs.json` is re-rendered by
+  `leg_factory.py --write` and never edited (TOOL-dWitnessedBar-11 S1, S2). Where `leg_factory.py` is
+  not built at the pass, the pass records that a hand edit stood in for it. Observed by AC14.
 - **S20** — id 45. `answered-calls.js` finds `scratch-guard.js` as `agent-cap.js` finds its policy
   helper (`tools/hooks/agent-cap.js:465-467`), a sibling-kit path checked with `existsSync`; with none,
   it judges nothing, exits 0 and writes one stderr line naming the missing kit. `tools/roles/kit.toml`
@@ -176,14 +194,14 @@ named once below and closed by its scope item; `TOOL-dFurnishedOrders-30` takes 
 
 - **consumes-from** `TOOL-dFurnishedOrders-1` — the fact-line recall run, whose resolution and failure form S23 add (id 56)
 - **consumes-from** `TOOL-dFurnishedOrders-2` — the batch render, whose join, key read, bounds and loop-kit branch S13, S16, S24 and S27 settle (ids 33, 36, 57, 12)
-- **consumes-from** `TOOL-dFurnishedOrders-3` — `derive_notices` and the runlog load, which S4 to S6 and S8 extend (ids 25, 58, 14, 38, 26)
+- **consumes-from** `TOOL-dFurnishedOrders-3` — `derive_notices` and the `notices` verb the roles kit reaches it by, which S4 to S6 and S8 extend (ids 25, 58, 14, 38, 26)
 - **consumes-from** `TOOL-dFurnishedOrders-4` — `render_slot`, `ORDER_SLOTS` and the bug-class lookup, whose reader S24 bounds and whose slot list S26 holds (ids 57, 10)
 - **consumes-from** `TOOL-dFurnishedOrders-6` — `answered-calls.js`, its suite and its leg, whose failure path, version read, registries and sibling reach S1, S2 and S18 to S20 settle (ids 2, 23, 43, 44, 45)
 - **consumes-from** `TOOL-dFurnishedOrders-7` — the contradiction key and the producer, read and checked by S9 and S28 (ids 29, 61)
 - **consumes-from** `TOOL-dFurnishedOrders-8` — `resolve_slices` and the Protocols carry, which S15, S17, S21 and S22 settle (ids 35, 39, 37, 47)
 - **consumes-from** `TOOL-dFurnishedOrders-9` — the matrix verb, whose subprocess S24 bounds (id 57)
-- **consumes-from** `TOOL-dFurnishedOrders-10` — `write_role_metrics` and the runlog load, which S6 and S14 re-point (ids 14, 27, 34)
-- **consumes-from** `TOOL-dFurnishedOrders-11` — the legacy slot's seed, key reads and ledger load, which S6, S8, S9, S10 and S24 settle (ids 27, 26, 29, 30, 57)
+- **consumes-from** `TOOL-dFurnishedOrders-10` — `write_role_metrics` and the `orientation` verb, which S14 re-points and S6 holds to a subprocess (ids 14, 27, 34)
+- **consumes-from** `TOOL-dFurnishedOrders-11` — the legacy slot's seed, key reads and ledger read, which S6, S8, S9, S10 and S24 settle (ids 27, 26, 29, 30, 57)
 - **consumes-from** `TOOL-dFurnishedOrders-12` — `derive_role_set`, the map slot's keys and unfolds, which S8, S9, S11, S24 and S25 settle (ids 26, 29, 31, 57, 59)
 - **consumes-from** `TOOL-dFurnishedOrders-14` — `read_excerpt` and the repair carry, whose anchor and fixture S21 and S31 settle (ids 37, 7)
 - **consumes-from** `TOOL-dFurnishedOrders-15` — the tester's Write and Edit and its docs, which S3 confines and S7 tightens (ids 24, 51, 15)
@@ -194,9 +212,9 @@ named once below and closed by its scope item; `TOOL-dFurnishedOrders-30` takes 
 - **consumes-from** `TOOL-dFurnishedOrders-20` — the problems slot's seed, which S10 reads from one call (ids 30, 16)
 - **consumes-from** `TOOL-dFurnishedOrders-24` — the outcome branches, which S12 keeps out of `validate_return`'s own evaluation (id 32)
 - **consumes-from** `TOOL-dFurnishedOrders-31` — S30 whole, the outcome filter of `derive_return_arms` and `establishes:list` on the template line, landed by unit 31 at order 10, which this pass finds present and records as closed (id 1 of the second audit)
-- **hands-off** `TOOL-dFurnishedOrders-37` — AC5's import grep, `run_slot_reader`'s bound and class, the answered-call guard, the broken-index branch and the `FACT_RE` widening, which unit 37 S2, S3, S12, S24 to S26 and S32 settle, and the kickoff manifest re-stamp S17 makes after this unit's `tools/gate-legs.json` edit (ids 5, 14, 20, 38, 39, 37, 15, 26 of the second audit)
+- **hands-off** `TOOL-dFurnishedOrders-37` — AC5's import grep, `run_slot_reader`'s bound and class, the answered-call guard, the broken-index branch and the `FACT_RE` widening, which unit 37 S2, S3, S12, S24 to S26 and S32 settle, and the kickoff manifest re-stamp S17 makes after this unit's `tools/gate-legs.json` render (ids 5, 14, 20, 38, 39, 37, 15, 26 of the second audit)
 - **hands-off** `TOOL-dFurnishedOrders-39` — `run_slot_reader`'s body, which unit 39 S3 runs through the canonical file-backed block (id 27 of the third audit)
-- **hands-off** `TOOL-dFurnishedOrders-42` — `load_kit_module` and `run_slot_reader`, through which unit 42 S7 loads `budgets.py` and S17 lowers the bound (ids 4, 26 of the third audit)
+- **hands-off** `TOOL-dFurnishedOrders-42` — `run_slot_reader`, whose bound unit 42 S17 lowers, and `read_cap_answer`'s in-process `budgets` import, which unit 42 S7 replaces with the policy kit's `budgets.py resolve` verb (ids 4, 26 of the third audit)
 
 ## 4. Design
 
@@ -215,10 +233,10 @@ landed unit already left it so.
 
 ### Inventory
 
-Minted: `load_kit_module`, `read_item_seed` (moved, its name unit 20's), `resolve_build_record` and
+Minted: `read_item_seed` (moved, its name unit 20's), `resolve_build_record` and
 `run_slot_reader`, each answered OK by `python tools/lexicon/lexicon.py --suggest <name> --as
-py.function`; the attribute value `stale=unchecked`; the label `truncated`; the private module names
-`gov_runlog_extract` and `gov_tag_reader`.
+py.function`; the attribute value `stale=unchecked`; the label `truncated`. No loader and no private
+module name: S6 loads no sibling module.
 
 ### Migration
 
@@ -245,7 +263,8 @@ runlog kit's versions move for the kit epoch leg.
 - `tools/hooks/agent-cap.js`
 - `tools/runlog/extract.py`
 - `tools/runlog/selftest.py`
-- `tools/gate-legs.json`
+- `tools/govkit/registry.toml` (the `answered-calls self-test` declaration's guard, S19)
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`, never edited)
 - `memory/map/features/roles.md`
 - `memory/project/method-carriers.txt`
 - `help/roles.md`
@@ -290,11 +309,12 @@ runlog kit's versions move for the kit epoch leg.
   holds one `notice` of class `security`, labels `a,b`, `src` `verify:ids-1`; a list past the 200-character
   lead yields whole names and `truncated`.
   Red when: a harness-route notice is dropped, or a cut name is recorded as a label.
-- **AC5** — When `python -c` imports memory-recall's `extract.py` first and then calls
-  `roles_lib.load_kit_module("runlog", "extract.py", "gov_runlog_extract")` twice, both return one module
-  holding `derive_notices`; and `git grep -n -E "^\s*import extract|sys.path.insert" -- tools/roles/`
-  prints only `read_cap_answer`'s lines.
-  Red when: a by-name import picks the wrong `extract`.
+- **AC5** — When `git grep -n -E "^\s*(import|from) (extract|gov_tag|legacy_ledger|backlog)\b|spec_from_file_location|load_kit_module|import_module" -- 'tools/roles/*.py'`
+  runs it prints nothing, and over a scratch copy whose `handoff.py` gains
+  `importlib.util.spec_from_file_location("x", p)` it prints that line; and
+  `git grep -n "sys.path.insert" -- tools/roles/` piped to `grep -v -e "str(KIT_DIR)" -e "sys.argv\[1\]"`
+  prints only `read_cap_answer`'s line, which unit 42 S7 removes.
+  Red when: a sibling module is loaded in process, so a by-name import can pick the wrong `extract`.
 - **AC6** — When `grep -n "outcome: probe"` runs over `help/roles.md` and `tools/roles/README.md` each
   prints a line; when a scratch repository made by S8's recipe, `git init -b main` and a commit of
   `.governance/policy.toml` holding `bypass = "never"` under `[core]`, is read by `python -c` calling
@@ -303,14 +323,17 @@ runlog kit's versions move for the kit epoch leg.
   `grep -n "init -b main" tools/runlog/selftest.py tools/roles/adopt-roles.test.sh` prints a line per
   policy fixture S8 names.
   Red when: a docs grep passes at base, or a fixture's read passes by refusal.
-- **AC7** — When `git grep -n -E "import policy|[^.]\bresolve\(" -- tools/roles/` runs, every code line
-  it prints sits inside `read_policy_setting`; at base it prints only a comment of `roles_lib.py:110`.
-  figure: the base line is PINNED 2026-10-26.
-  Red when: a second policy reader is left.
+- **AC7** — When `git grep -n -E "policy\.py.*get|from policy import|import policy" -- 'tools/roles/*.py'`
+  runs (TOOL-dBoundRoles-43 AC21's predicate), it prints only lines inside `read_policy_setting`,
+  none an import; over a scratch copy whose `handoff.py` gains a `policy.py` `get` subprocess line
+  outside it, it prints that line too; and each of S9's five calls passes `with_default=True`.
+  figure: at `1a61f21a2` it prints nothing, PINNED 2026-10-28.
+  Red when: a second policy reader is left, or the roles kit imports the policy kit.
 - **AC8** — When `python handoff.py render --role gov-builder --item <tag>` runs in a fixture whose stub
-  `loop_lib.py` appends one line per call to a counter file, the counter gains one line per render; and
-  with `memory.map-unfold = all` and a stub `gov_tag.py` listing two namespaces, the map slot's unfolds
-  name both.
+  `loop_lib.py` answers `declaration --item <tag> --json` with a declaration whose actor is
+  `role:gov-builder`, answers `seed` with the seed's line, and appends its verb to a counter file on
+  every call, the counter gains one `seed` line per render; and with `memory.map-unfold = all` and a
+  stub `gov_tag.py` whose `namespaces --json` prints two namespaces, the map slot's unfolds name both.
   Red when: one render cuts slots from different seeds, or the registry is parsed twice.
 - **AC9** — When `validate_return` reads a return with one wrong-typed template field and one malformed
   `establishes` row, it reports exactly two defects, neither a schema keyword; and a batch return
@@ -326,17 +349,19 @@ runlog kit's versions move for the kit epoch leg.
   symbol anchor is refused naming `not-installed`.
   Red when: two cutters disagree on one section's extent.
 - **AC12** — When unit 2's batch render, `handoff.py render --role <dest> --unit <a> --unit <b>`, runs
-  with the policy kit removed, it renders per batch and its notes carry the reader's missing-kit note.
-  Red when: the caller probes the kit privately.
+  with the policy kit removed, it refuses the second `--unit` as `per-task` does and its notes carry
+  the reader's missing-kit note; with the policy kit present and the key unset, it renders per batch.
+  Red when: the caller probes the kit privately, or the absent kit reads as `per-batch`.
 - **AC13** — When `grep -c "BUILD-METHOD.md"` runs over each `.claude/agents/` file
   `memory/project/method-carriers.txt` names, each prints at least 1, and every agent file that prints at
   least 1 has a row.
   Red when: the registry declares a carrier that no longer points at the method.
-- **AC14** — When `python -c` reads `tools/gate-legs.json`, the `answered-calls self-test` row's guard
-  is S19's four paths; `grep -n "answered-calls self-test" memory/map/features/roles.md` prints the
+- **AC14** — When `python -c` reads the rendered `tools/gate-legs.json`, the `answered-calls self-test`
+  row's guard is S19's four paths, and `python tools/run-gates/leg_factory.py --check` exits 0; `grep -n "answered-calls self-test" memory/map/features/roles.md` prints the
   claims line; `grep -c "Protocols and Facts" memory/map/features/roles.md` prints 0; and the suite holds a
   `SELFTEST_FLOOR=` above 0.
-  Red when: the new leg reds the map and testsuite-count legs, or skips on a sibling change.
+  Red when: the new leg reds the map and testsuite-count legs, skips on a sibling change, or is edited
+  into the manifest beside its declaration.
 - **AC15** — When `node answered-calls.js` runs in a fixture holding the roles kit and no hooks kit, it
   exits 0 with one stderr line naming the hooks kit; and `tools/roles/kit.toml` holds a `requires_if`
   row naming `hooks`.
@@ -368,7 +393,7 @@ runlog kit's versions move for the kit epoch leg.
 
 ## 7. Gates
 
-`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `method carriers (every pointer declared)` · `method-carriers self-test` · `codebase-map coverage + freshness` · `testsuite counts (every bar self-test prints one)` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `policy fixtures` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `method carriers (every pointer declared)` · `method-carriers self-test` · `codebase-map coverage + freshness` · `testsuite counts (every bar self-test prints one)` · `measure-legs selftest` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `policy fixtures` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/roles/adopt-roles.test.sh · covers AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 AC16 AC17 AC18 AC19 AC20 AC21 · stub readers, a batch, a fenced section, a planted repair ask and the policy fixtures of units 11, 12 and 17, staged by restoring the second seed call and a fixture's uncommitted policy file · none
 New arm: tools/hooks/scratch-guard.test.sh · covers AC3 · a `gov-tester` write inside and outside the repository, staged by dropping the new step · none
@@ -391,6 +416,19 @@ New arm: tools/runlog/selftest.py · covers AC4 AC6 · a labelled log line, a li
 - **F5 — The units this one lands on are unbuilt.** Units 1 to 20 and 24 are specced and unbuilt at
   `5ff43572`. RESOLVED (agent, 2026-10-26, delegated): the build run re-grounds on each at the pass and
   records any item a landed unit already closed, rung 1, the brief's rule. widens: none · relaxes: none
+- **F6 — How does unit 12's `all` unfold read the namespace registry without loading the playbook
+  kit (S11)?** A kit imports no sibling kit (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7 §4), and
+  `gov_tag.py`'s verbs are `show`, `where`, `refs` and `check` (PLAY-dOrderedCharter-19 §4), none of
+  which prints `read_namespaces`' rows. Options: (a) an ask of dOrderedCharter: `gov_tag.py namespaces
+  --json` prints one JSON object per row `read_namespaces` returns, and S11 runs it by subprocess; (b)
+  a declared `requires_if` row on `tools/roles/kit.toml` naming `playbook`, admitting an in-process
+  `read_namespaces` call; (c) the roles kit parses `namespaces.toml` itself. (c) is the second parser
+  id 31 closes. (b) needs no parent change, but it is the in-process sibling edge the rule names, and
+  no reason the rule admits holds for one registry read. (a) is one verb over a reader that already
+  exists. Its cost is a wait, since AC8's second arm passes only against the landed verb, and the unfold
+  renders `not-installed:` until then. Recommendation (a). Open for the owner: the ask the build run
+  files is "PLAY-dOrderedCharter-19: `gov_tag.py` gains `namespaces --json`, printing one JSON object
+  per row `read_namespaces` returns".
 
 ## 9. Revision log
 
@@ -398,11 +436,15 @@ New arm: tools/runlog/selftest.py · covers AC4 AC6 · a labelled log line, a li
 - rev-2 · 2026-10-26 · §3 · a consumes-from edge to unit 31, which lands S30 at order 10, and a
   hands-off edge to unit 37 (ids 1, 5, 14, 20, 38, 39, 37, 15 and 26 of the second audit).
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-39, TOOL-dFurnishedOrders-42, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
+- rev-4 · 2026-10-28 · §2 S6, S9, S11, S16, S19; §3 Edges; §4 Inventory, Files touched; §6 AC5, AC7, AC8,
+  AC12, AC14; §7; §8 F6 (new, open); §10 · re-grounded on the parents at `1a61f21a2` by the cross-check
+  record `memory/builds/dFurnishedOrders/build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`,
+  rows 98, 99, 104, 105 and 107; S16 and AC12 follow unit 2's rev-3 S5, and S6 follows unit 11's §8 F5.
 
 ## 10. Reuse audit
 
-The seams extended: `resolve_kit_dir` (`tools/roles/roles_lib.py:97`) under S6's loader;
-`read_policy_setting` (TOOL-dBoundRoles-21 S1) for S9 and S16; `write_agent_ledger`'s locator
+The seams extended: `resolve_kit_dir` (`tools/roles/roles_lib.py:97`) for S6's and S11's subprocess
+reaches; `read_policy_setting` (TOOL-dBoundRoles-21 S1) and its `with_default` form for S9 and S16; `write_agent_ledger`'s locator
 (`tools/roles/handoff.py:755-792`), extracted at its second caller by S14; `loadRoleIndex` and the
 write gate's step order (`tools/hooks/scratch-guard.js:952`, `:1090-1112`) for S1 and S3; the sibling
 path of `tools/hooks/agent-cap.js:465-467` for S20. `python tools/codebase-map/reuse_lookup.py "locate

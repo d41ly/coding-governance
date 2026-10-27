@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-7 — a false handed fact repaired in the return and filed as an ask against its producer's record, routed by `roles.on-contradiction` through the refusal outcome table
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 9 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0198@9197dfef whole
 **Carries:** node:policy-key.roles.on-contradiction
@@ -13,8 +13,12 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-fix-return.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-27-build-TOOL-dFurnishedOrders-7-deviation-71.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-7-deviation-71.md) | deviation | — |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-7-deviation-72.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-7-deviation-72.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -50,17 +54,20 @@ route rides TOOL-dBoundRoles-26's refusal outcome table, never a second one.
   "Records"). Observed by AC3.
 - **S4** — The route, `derive_repair_route(repair, value, producer)` in `roles_lib.py`: it maps the
   policy value to an actor of TOOL-dBoundRoles-26 S3's `REFUSAL_ROUTES` and answers through that
-  unit's `route_refusal`, per §4 "The route". `roles.on-contradiction` is read through `resolve`
-  (`tools/policy/policy.py:752`) located by `roles_lib.resolve_kit_dir`, never with `tomllib` (J1).
-  Observed by AC4.
+  unit's `route_refusal`, per §4 "The route". `roles.on-contradiction` is read through
+  `read_policy_setting("roles.on-contradiction", root, with_default=True)` (TOOL-dBoundRoles-21 S1),
+  the roles kit's one runner of `policy.py get` (TOOL-dBoundRoles-43 S21), never with `tomllib` (J1),
+  so the catalogue answers its default; a None then means only that no policy kit was found, and
+  only then does the route read `repair-and-record`, with that read's note. Observed by AC4.
 - **S5** — The producer, `derive_repair_producer(key, memory_root, build)`: a `blob:` or `record:` key
   whose path lies under `<MEMORY_ROOT>/builds/<slug>/` names that build; any other key names the work
   order's own build, the marker's `build=`. Observed by AC4.
 - **S6** — The verb `python tools/roles/handoff.py route-repair --return <file> --build <slug>`, which
   prints one JSON line per repair, `{n, actor, route, producer, family, handed, read}`; with
   `--row <n> --id <ask id> --filed <date>` it prints instead the three rows S7 files for repair `n`,
-  rendered by `render_ask_row`, `render_sev_row` and `render_status_row` (`tools/memory-tree/backlog.py:1516-1540`),
-  reached through `resolve_kit_dir`. Observed by AC4.
+  rendered by `render_ask_row`, `render_sev_row` and `render_status_row` (`tools/memory-tree/backlog.py:1516-1540`)
+  through the memory-tree verb §8 F9 asks for, run as a subprocess of `backlog.py` found by
+  `resolve_kit_dir`; no file under `tools/roles/` imports `backlog.py`. Observed by AC4.
 - **S7** — The driver door, `bash tools/unattended/unattended.sh --repaired <slug> --return <file>`:
   for each `ask` route it mints the id in the producer's family (§8 F2), re-uses an open repair ask
   for the same `handed` key and the same `found` (§4 "Two repairs of one fact"), and files the rows
@@ -96,7 +103,7 @@ route rides TOOL-dBoundRoles-26's refusal outcome table, never a second one.
 - **consumes-from** `TOOL-dFurnishedOrders-19` — `render_return_schema` and the `repair` row kind, the rows a return declares its repairs in; without it a repair row is an invented row the schema refuses
 - **consumes-from** `TOOL-dFurnishedOrders-1` — `stale=`, the mark a handed fact carries when its source moved, copied into the ask's `data` clause
 - **hands-off** `TOOL-dFurnishedOrders-14` — `repair:`, the repair line S1 parses and the ask S7 files, which the carry reads to hand the repaired fact while the ask is open
-- **consumes-from** external — TOOL-dBoundRoles-26 S1 to S4, TOOL-dBoundRoles-5 S1, TOOL-dBoundRoles-2 S1, TOOL-dBoundRoles-11 S5, TOOL-dBoundRoles-13 S1, TOOL-dDeclaredLoop-14's `--refused` and TOOL-dTotalRecall-3 S1 and S3, each specced and unbuilt at base `2193e25d`
+- **consumes-from** external — TOOL-dBoundRoles-26 S1 to S4, TOOL-dBoundRoles-5 S1, TOOL-dBoundRoles-2 S1, TOOL-dBoundRoles-11 S5, TOOL-dBoundRoles-13 S1, TOOL-dDeclaredLoop-14's `--refused` and TOOL-dTotalRecall-3 S1 and S3, each specced and unbuilt at base `2193e25d`; the row-render verb of `tools/memory-tree/backlog.py`, an ask (§8 F9)
 - **hands-off** `TOOL-dFurnishedOrders-29` — the `roles.on-contradiction` read and `derive_repair_producer`, which unit 29 S9 re-points and S28 validates (ids 29, 61)
 
 ## 4. Design
@@ -319,12 +326,36 @@ kit's suites: they are waived for this build's landing (the README's build-level
   2026-10-26, delegated): this spec calls them as their specs name them; the build run re-grounds on
   each section it cites and stops the unit if one is still absent then, rung 1 (the brief's chain
   rule). widens: none · relaxes: none
+- **F9 — How does `route-repair --row` reach memory-tree's row renderers?** A kit imports no sibling
+  kit (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7 §4), and `backlog.py`'s only verb is
+  `--selftest` (`tools/memory-tree/backlog.py:2306-2312`); the roles kit `requires` memory-tree
+  (`tools/roles/kit.toml:12`) but declares no in-process edge to it. Options: (a) an ask of the
+  memory-tree kit: `backlog.py render --json` reads on stdin a list of `{shape, args}`, `shape` one of
+  `ask`, `sev` and `status`, and prints one row per entry through that shape's renderer, and S6 runs
+  it once per `--row` call; (b) a declared `requires_if` row on `tools/roles/kit.toml` naming
+  `memory-tree`, admitting the in-process import as a DECLARATION `govkit selfcheck` grades, the
+  shape `tools/memory-tree/kit.toml:8` uses, its why that the kit is already required; (c) the ask
+  door TOOL-dTotalRecall-7 S2 specs, `gov_record.py new ask`, which renders the ask row by
+  subprocess. (c) writes the producer's `BACKLOG.md` itself, the second writer beside
+  `write_ask_rows` §4 rejects, and renders no `SEV` or `KEEP` row; (b) needs no parent change but is
+  the in-process sibling edge the rule names; (a) is one verb over the three renderers that already
+  exist, and its cost is a wait, since AC5 and AC6 pass only against the landed verb.
+  Recommendation (a). Open for the owner: the ask the build run files, on the build that owns
+  `tools/memory-tree/backlog.py` at the pass (dTotalRecall today, whose units 7 and 41 extend its
+  ask door), is "`backlog.py` gains `render --json`, printing the row `render_ask_row`,
+  `render_sev_row` or `render_status_row` returns for each `{shape, args}` it reads on stdin".
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 7, the brief's J10 and D10, scout A's row
   for cl-0198, `layer-roles.md` `[trust]` item 7 and F3-4, and the source at `2193e25d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S4, S6 · §3 Edges · §8 F9 · re-grounded on dBoundRoles at `ac8ab8d5f` and
+  PLAY-dOrderedCharter-7, by the cross-check record
+  `2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck`, rows 32 and 33:
+  `roles.on-contradiction` is read through `read_policy_setting(..., with_default=True)`, the
+  default typed only for no policy kit; the rows are rendered through a memory-tree verb run by
+  subprocess, and F9, open for the owner, is the ask for it.
 
 ## 10. Reuse audit
 

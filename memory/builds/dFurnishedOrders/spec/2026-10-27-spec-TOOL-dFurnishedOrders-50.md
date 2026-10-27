@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-50 — unit 48's `govkit selftest` home rows priced in the guards join: a home only where `apply` runs or renders from it, no guard pushed into the broad set, and every live spec the rows reach carrying the leg or a waived, asked row
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 28 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 84ab3c6f · streams tooling · order 28 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,11 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-50-deviation-501.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-50-deviation-501.md) | deviation | — |
 | [2026-10-27-build-TOOL-dFurnishedOrders-50-round6-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-50-round6-fix-return.md) | research | TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-50-deviation-502.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-50-deviation-502.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-50-round6-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-50-round6-fix-brief.md) | research | TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-58 |
 | [2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 |
 
 <!-- /gen:spec-records -->
@@ -48,9 +52,13 @@ It disposes of the specs the rows reach under the standing ruling the earlier wi
   `via = "settings-merge"` (`tools/hooks/kit.toml:102`, `:116`), and `gate-lint` and
   `pytest-parallel-guardrails`, whose `argv` is empty with a `why_no_adopter`
   (`tools/gate-lint/kit.toml:32-35`, `tools/pytest-parallel-guardrails/kit.toml:42-45`). Their
-  descriptors stay required by unit 48 S14. The `govkit selftest` row in `tools/gate-legs.json`
-  ends holding exactly the home rows the narrowed term requires, whatever unit 48's pass landed.
-  Observed by AC1.
+  descriptors stay required by unit 48 S14. The `govkit selftest` leg's declaration, the
+  `[[exempt_leg]]` row at `tools/govkit/registry.toml:439`, ends holding exactly the home rows the
+  narrowed term requires, whatever unit 48's pass landed, and `python tools/run-gates/leg_factory.py
+  --write` renders it into `tools/gate-legs.json` (TOOL-dWitnessedBar-11 S1, S2). Where the factory
+  is not built at the pass (it is absent at `1a61f21a2`), the pass edits the manifest row by hand, a
+  row TOOL-dWitnessedBar-11 §4 "Migration" moves whole onto that declaration, and its ledger records
+  that the hand edit stood in for `--write`. Observed by AC1.
 - **S2** — No guard pushed into the broad set. Count the legs that carry each guard over
   `tools/gate-legs.json`, by the rule of `derive_guarded_legs`. The set of guards carried by more
   than 5 legs comes out the same with and without the `govkit selftest` row's `{prefix}/<home>/`
@@ -111,6 +119,7 @@ It disposes of the specs the rows reach under the standing ruling the earlier wi
 ### Edges
 
 - **consumes-from** `TOOL-dFurnishedOrders-48` — S17's home rows, S14's descriptor rows and S16's `check_selftest_guard_coverage`, whose required set S1 narrows and whose reach S2 to S5 dispose of (id 17)
+- **consumes-from** external — TOOL-dWitnessedBar-11's `leg_factory.py` and the `govkit selftest` `[[exempt_leg]]` declaration S1's home rows are rendered from, unbuilt at `1a61f21a2`
 - **hands-off** `TOOL-dFurnishedOrders-52` — the narrowed required set of `check_selftest_guard_coverage`, over which unit 52 S16 moves the covered rule onto `check_guard_trips` (ids 17 and 12)
 - **hands-off** `TOOL-dFurnishedOrders-57` — S3's reach, S5's waiver rows and asks and AC3, whose population unit 57 S1 reads from the checker and whose keys unit 57 S2 holds to its tokens (id 23 of the seventh audit)
 - **hands-off** `TOOL-dFurnishedOrders-58` — S1, S5, AC2 to AC4, the Inventory, the Rollout and the write set, which unit 58 S22 to S27 settle (ids 4, 28, 19, 22, 5, 26 of the seventh audit)
@@ -172,7 +181,7 @@ None: unit 48's arm and rows land one step earlier in the same build run.
 
 ### Rollout
 
-Live at landing, at order 28, after unit 48 and beside unit 51. Its `tools/gate-legs.json` edit is
+Live at landing, at order 28, after unit 48 and beside unit 51. Its render moves `tools/gate-legs.json`,
 a watched path (`memory/guides/SESSION-KICKOFF.md:6`), so the pass bundles its own re-stamp, as
 unit 48 S3 states. govkit's version moves for the kit epoch leg where its shipped bytes move. Between
 unit 48's pass and this one, the guards join reds on the reach. No bar runs between them, and the
@@ -181,7 +190,8 @@ close's bar reads this unit's rows.
 ### Files touched (estimate)
 
 - `tools/govkit/selftest.py`
-- `tools/gate-legs.json`
+- `tools/govkit/registry.toml`
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`, or hand-edited where it is not built)
 - `memory/guides/SESSION-KICKOFF.md`
 - `memory/project/spec-token-waivers.txt`
 - `memory/builds/dFurnishedOrders/BACKLOG.md`
@@ -224,8 +234,10 @@ close's bar reads this unit's rows.
   `tools/pytest-parallel-guardrails/` directory, and still holds `tools/hooks/kit.toml`. The
   `govkit selftest` row of `tools/gate-legs.json` carries no `{prefix}/hooks/` row. Over a parsed
   registry whose gate-lint descriptor copy declares `[adopt]` `argv = ["bash", "x.sh"]`, the set gains
-  `tools/gate-lint/`.
-  Red when: a home `apply` runs nothing from is required, or one it runs an adopter from is dropped.
+  `tools/gate-lint/`. Where `tools/run-gates/leg_factory.py` is built at the pass, `python
+  tools/run-gates/leg_factory.py --check` exits 0.
+  Red when: a home `apply` runs nothing from is required, or one it runs an adopter from is dropped,
+  or a home row is typed into the manifest that its declaration does not carry.
   fixture: a scratch descriptor copy, passed as the arm's argument.
 - **AC2** — When `python -c` counts, over `tools/gate-legs.json`, the legs carrying each guard (a
   guard listed twice in one row counts once), then lists the guards carried by more than 5 legs, it
@@ -283,6 +295,13 @@ The close's `spec tokens` leg is the whole-tree reading of AC3.
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-5 promotions, id 17
   (HIGH, item H1).
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-57, TOOL-dFurnishedOrders-58, promoted from the spec audit of the round-6 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S1 · §3 Edges · §4 Rollout, Files touched · §6 AC1 · re-grounded on
+  TOOL-dWitnessedBar-11, by the cross-check record
+  `build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`, row 126: the narrowing
+  edits the `govkit selftest` `[[exempt_leg]]` row at `tools/govkit/registry.toml:439` and renders
+  the manifest with `leg_factory.py --write`, a recorded hand edit standing in where it is not built,
+  and Files touched gains the registry; the re-stamp still follows the rendered manifest; nothing
+  else moved.
 
 ## 10. Reuse audit
 

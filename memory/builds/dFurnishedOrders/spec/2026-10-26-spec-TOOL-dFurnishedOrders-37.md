@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-37 — the second spec audit's 37 minors: readers that tell a missing input from an empty one, one bounded runner, the retired-key scan's shapes and conf, the card's map cell bounded and never re-derived, and criteria that read what they claim
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 8c395e3c · streams tooling · order 23 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 8c395e3c · streams tooling · order 23 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,10 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-37-deviation-371.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-37-deviation-371.md) | deviation | — |
 | [2026-10-27-build-TOOL-dFurnishedOrders-37-deviation-372.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-37-deviation-372.md) | deviation | — |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-37-deviation-373.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-37-deviation-373.md) | deviation | — |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 |
 
 <!-- /gen:spec-records -->
@@ -70,10 +74,14 @@ own scope item here.
   when the session's coverage reads `tree` `absent` (`tools/runlog/extract.py:756-757`); a transcript
   with no event still prints nothing and exits 0. `derive_attended` reads exit 3 as unit 28 S2's cause
   `no transcript for <sid>`. Observed by AC1.
-- **S2** — id 5. The sibling-kit import check scoped. Unit 29 AC5's grep becomes
-  `git grep -n -E "^\s*(import|from) (extract|gov_tag|loop_lib|runlog_lib)\b" -- tools/roles/`, which
-  prints nothing once unit 29 S6 is built; unit 29's ledger answers AC5 in the AMENDED form, naming
-  this item. Observed by AC2.
+- **S2** — id 5. The sibling-kit load check scoped. Unit 29 AC5's grep becomes
+  `git grep -n -E "^\s*(import|from) (extract|gov_tag|loop_lib|runlog_lib|legacy_ledger|backlog)\b|spec_from_file_location|load_kit_module|import_module" -- 'tools/roles/*.py'`.
+  It flags a bare import and a by-file load of another kit's module alike, since a by-file load is an
+  in-process import (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7 §4). A line it prints passes only
+  where a `requires_if` row of `tools/roles/kit.toml` names the kit the loaded file sits in. None does
+  at this unit's pass, so it prints nothing once unit 29 S6 is built. `read_cap_answer`'s `import
+  budgets` is unit 42 S7's. Unit 29's ledger answers AC5 in the AMENDED form, naming this item.
+  Observed by AC2.
 - **S3** — id 14. The self-kit path inserts left alone. The 13 `sys.path.insert` lines whose argument
   is `str(KIT_DIR)` or `sys.argv[1]` (`check_roles.py:83`, `handoff.py:91`, `render_agents.py:72`, three
   in `adopt-roles.sh`, seven in `adopt-roles.test.sh`, read at `8c395e3c`) load the roles kit's own
@@ -170,10 +178,13 @@ own scope item here.
   from the work tree, or one whose read raises, is counted `<u> unreadable` on unit 25 S5's line, never
   fatal. Observed by AC6.
 - **S24** — id 38. The answered-call leg's guard derived from what its hook reads. The `answered-calls
-  self-test` row of `tools/gate-legs.json` (unit 29 S19) gains `{prefix}/hooks/agent-cap.js`, which the
-  hook reads for `extractHandoffMarker` (`tools/hooks/agent-cap.js:1626`; the file has no
-  `module.exports`), and every file the hook `require`s falls under one of the row's guards; unit 29's
-  ledger answers AC14 in the AMENDED form, naming this item. Observed by AC13.
+  self-test` declaration, unit 6 S9's `[[exempt_leg]]` row of `tools/govkit/registry.toml` whose guard
+  unit 29 S19 sets, gains `{prefix}/hooks/agent-cap.js`, which the hook reads for
+  `extractHandoffMarker` (`tools/hooks/agent-cap.js:1626`; the file has no `module.exports`). Every
+  file the hook `require`s or spawns falls under one of the declaration's guards.
+  `tools/gate-legs.json` is re-rendered by `leg_factory.py --write`, never edited (TOOL-dWitnessedBar-11
+  S1, S2); where `leg_factory.py` is not built at the pass, the pass records that a hand edit stood in
+  for it. Unit 29's ledger answers AC14 in the AMENDED form, naming this item. Observed by AC13.
 - **S25** — id 39. The broken-index branch's population. Unit 29 S3's step denies on a broken
   `.claude/roles.json` only a payload carrying `agent_type`; a payload with none, the main loop, is
   admitted, and the deny text names the remedy `render_agents.py --write`. Observed by AC14.
@@ -241,7 +252,7 @@ own scope item here.
 - **consumes-from** `TOOL-dFurnishedOrders-26` — the window's time compare and its unparsed count, which S10 grounds on the `turns` verb's output (id 13)
 - **consumes-from** `TOOL-dFurnishedOrders-27` — `read_owner_door` and its no-bypass criterion, whose failure outcome and scan S20 and S22 settle (ids 32, 33)
 - **consumes-from** `TOOL-dFurnishedOrders-28` — the turn half's unread causes, its bound and its docs criterion, which S1, S12, S19 and S28 settle (ids 4, 20, 31, 7)
-- **consumes-from** `TOOL-dFurnishedOrders-29` — the import check, `run_slot_reader`, the answered-call guard and the broken-index step, which S2, S3, S12, S24 to S26 and S32 settle, and the watched `tools/gate-legs.json` S17 re-stamps after (ids 5, 14, 20, 38, 39, 37, 15, 26)
+- **consumes-from** `TOOL-dFurnishedOrders-29` — the load check, `run_slot_reader`, the answered-call guard and the broken-index step, which S2, S3, S12, S24 to S26 and S32 settle, and the watched `tools/gate-legs.json` render S17 re-stamps after (ids 5, 14, 20, 38, 39, 37, 15, 26)
 - **consumes-from** `TOOL-dFurnishedOrders-30` — the card's map cell, the cold carriers, the suite probes and the watched `manifest-check.sh`, which S4, S13 to S17, S21, S30, S31, S36 and S37 settle (ids 6, 21, 41, 22, 40, 26, 28, 9, 17, 29, 42)
 - **consumes-from** `TOOL-dFurnishedOrders-32` — the `subject-reads` group, whose members S27 checks for `?` (id 43)
 - **consumes-from** `TOOL-dFurnishedOrders-34` — the bounded posture read, which S12 re-points through `run_slot_reader` (id 20)
@@ -328,7 +339,8 @@ unattended and workflows kits' versions and `KIT_MANIFEST_VERSION` move for the 
 - `tools/hooks/scratch-guard.js`
 - `tools/hooks/scratch-guard.test.sh`
 - `tools/hooks/agent-cap.js`
-- `tools/gate-legs.json`
+- `tools/govkit/registry.toml` (the `answered-calls self-test` declaration's guard, S24)
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`, never edited)
 - `tools/govkit/steps/retired_dispatch_args.py`
 - `tools/govkit/selftest.py`
 - `tools/unattended/unattended.sh`
@@ -375,11 +387,13 @@ unattended and workflows kits' versions and `KIT_MANIFEST_VERSION` move for the 
   T1, `True` with a source ending `(1 unparsed)`.
   Red when: a missing transcript reads as an empty one, or one malformed line is answered two ways.
   fixture: scratch transcripts roots under `%TEMP%`, so no live session is read.
-- **AC2** — When `git grep -n -E "^\s*(import|from) (extract|gov_tag|loop_lib|runlog_lib)\b" -- tools/roles/`
-  runs it prints nothing; and `git grep -n "sys.path.insert" -- tools/roles/` piped to
+- **AC2** — When `git grep -n -E "^\s*(import|from) (extract|gov_tag|loop_lib|runlog_lib|legacy_ledger|backlog)\b|spec_from_file_location|load_kit_module|import_module" -- 'tools/roles/*.py'`
+  runs it prints nothing, and over a scratch copy whose `handoff.py` gains
+  `importlib.util.spec_from_file_location("gov_runlog_extract", p)` it prints that line; and `git grep -n "sys.path.insert" -- tools/roles/` piped to
   `grep -v -e "str(KIT_DIR)" -e "sys.argv\[1\]"` prints only `read_cap_answer`'s line in
   `tools/roles/roles_lib.py`.
-  Red when: a bare sibling import survives, or a faithful build must delete a self-kit insert to pass.
+  Red when: a bare sibling import or a by-file load survives, or a faithful build must delete a
+  self-kit insert to pass.
   figure: the 13 self-kit inserts are PINNED at `8c395e3c`.
 - **AC3** — When `git grep -n "for-diff HEAD~1" -- tools/unattended/adopt-unattended.test.sh` runs it
   prints at least 3 lines, none opening `hit `; and
@@ -443,10 +457,12 @@ unattended and workflows kits' versions and `KIT_MANIFEST_VERSION` move for the 
   print that line.
   Red when: the two paths answer a failed door two ways, or a sibling file bypasses the helper.
   fixture: unit 27 AC1's scratch clone under `%TEMP%`.
-- **AC13** — When `python -c` reads `tools/gate-legs.json` and the `require(` lines of
-  the roles kit's `answered-calls.js`, every required path and `tools/hooks/agent-cap.js` fall under a
-  guard of the `answered-calls self-test` row.
-  Red when: an edit to `extractHandoffMarker` skips the leg.
+- **AC13** — When `python -c` reads the rendered `tools/gate-legs.json` and the `require(` and spawn
+  lines of the roles kit's `answered-calls.js`, every required or spawned path and
+  `tools/hooks/agent-cap.js` fall under a guard of the `answered-calls self-test` row; and
+  `python tools/run-gates/leg_factory.py --check` exits 0.
+  Red when: an edit to `extractHandoffMarker` skips the leg, or the guard is edited into the manifest
+  beside its declaration.
 - **AC14** — When `node scratch-guard.js` reads a `Write` payload under `memory/` with `.claude/roles.json`
   invalid, it exits 2 naming the broken index and `render_agents.py --write` when the payload carries
   `agent_type` `gov-tester`, and exits 0 when it carries none; and `node -e` calling `loadRoleIndex` on
@@ -475,7 +491,7 @@ unattended and workflows kits' versions and `KIT_MANIFEST_VERSION` move for the 
 `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `hook destinations self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `measure-legs selftest` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `unattended kit gate` · `manifest-check self-test` · `kickoff-manifest ratchet` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `check-wiring self-test` · `policy fixtures` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The leg `answered-calls self-test` is `TOOL-dFurnishedOrders-6`'s, not in the manifest at base, so it
-is named here in prose; S24 edits its row.
+is named here in prose; S24 edits its declaration.
 
 New arm: tools/runlog/selftest.py · covers AC1 · a session with no transcript and one with an untimed owner record, staged by printing nothing and exiting 0 for both · none
 New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC7 AC8 AC15 AC17 · stub turns, map and tag readers, a refused return and a `?` subject entry, staged by restoring the unbounded checker run · none
@@ -514,6 +530,10 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC18 · a cold render wi
   findings batched.
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet(s) mirroring TOOL-dFurnishedOrders-38, TOOL-dFurnishedOrders-39, TOOL-dFurnishedOrders-41, TOOL-dFurnishedOrders-42, promoted from the spec audit of the round-2 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-31-spec-audit-round1.md`); nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-46, promoted from the spec audit of the round-3 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md`); nothing else moved.
+- rev-4 · 2026-10-28 · §2 S2, S24; §3 Edges; §4 Files touched; §6 AC2, AC13; §7 · re-grounded on the
+  parents at `1a61f21a2` by the cross-check record
+  `memory/builds/dFurnishedOrders/build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`,
+  rows 113 and 114.
 
 ## 10. Reuse audit
 

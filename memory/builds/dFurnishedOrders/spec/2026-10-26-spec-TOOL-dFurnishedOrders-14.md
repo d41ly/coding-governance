@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-14 — the answered-call hook's range matching, the excerpt keys it matches and a repair's carry, designed as RC-7 asks
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 10 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 10 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0205@5bbb1b2c whole
 
@@ -11,8 +11,12 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-a.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-13 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-fix-return.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-15 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-14-deviation-141.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-14-deviation-141.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-15 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -65,8 +69,13 @@ reader; nothing here refuses a call.
   are held to one case table. Observed by AC2 and AC4.
 - **S6** — The repair's carry. `read_open_repairs(root, memory_root)` in `roles_lib.py` reads every
   OPEN ask whose `data` clause opens `handed=` (TOOL-dFurnishedOrders-7's repair ask, the `repair:`
-  line in its parts) through `tools/memory-tree/backlog.py`'s `parse_file` and `derive_statuses`
-  (`:555`, `:912`), reached by `resolve_kit_dir`. `render_handoff` (`tools/roles/handoff.py:312`)
+  line in its parts) from memory-tree's ask verb, `python <memory-tree kit>/gen_build_index.py --asks
+  --json` (`tools/memory-tree/gen_build_index.py:3235`), run once per render as a subprocess found by
+  `resolve_kit_dir`, since a kit imports no sibling kit (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7
+  §4). It keeps the rows whose `status`, which that verb folds by `derive_statuses`, reads `OPEN`. A
+  row carries no `data` clause today (`:3346-3375`); the field is §8 F8's ask. Until it lands, or where
+  the verb exits non-zero, no repair is carried and the render prints one `roles: note — repairs
+  unread: <why>` line. `render_handoff` (`tools/roles/handoff.py:312`)
   checks each fact it cuts against them by §4 "The carry", and hands each open repair the fact covers,
   classed `claimed`, keyed by the repair's `read=` key and carrying TOOL-dFurnishedOrders-1's
   ` stale=<source path>@<blob12>` mark when that source moved. Observed by AC5.
@@ -92,7 +101,7 @@ reader; nothing here refuses a call.
 - **consumes-from** `TOOL-dFurnishedOrders-1` — `stale=`, the mark the carry writes on a repaired fact whose read source moved
 - **consumes-from** `TOOL-dFurnishedOrders-7` — `repair:`, the repair line and the ask that carries it, which the carry reads while the ask is open
 - **hands-off** `TOOL-dFurnishedOrders-6` — `match_answered_range`, spelled `check_answered_range` here and `checkAnsweredRange` in JavaScript (§8 F2), with `deriveCallRead` and `readHandedRanges`, which the hook calls at every read
-- **consumes-from** external — TOOL-dBoundRoles-13 S1 and S4 (`derive_fact_key`, `FACT_RE` and its JavaScript copy, the blob derivation at the spawn), TOOL-dBoundRoles-7 S1 (the write scan sharing the argv walk), TOOL-dBoundRoles-25 S4 (where a helper two packs read lives), each specced and unbuilt at base `2193e25d`
+- **consumes-from** external — TOOL-dBoundRoles-13 S1 and S4 (`derive_fact_key`, `FACT_RE` and its JavaScript copy, the blob derivation at the spawn), TOOL-dBoundRoles-7 S1 (the write scan sharing the argv walk), TOOL-dBoundRoles-25 S4 (where a helper two packs read lives), each specced and unbuilt at base `2193e25d`; and the `data` field of memory-tree's `--asks` rows, §8 F8's ask
 - **hands-off** `TOOL-dFurnishedOrders-29` — `read_excerpt`'s anchors and AC5's repair carry, which unit 29 S21 resolves through `resolve_slices` and S31 plants on both rows (ids 37, 7)
 
 ## 4. Design
@@ -210,11 +219,12 @@ Live at landing in the renderer. The matcher is inert until TOOL-dFurnishedOrder
 ## 5. Production-readiness checklist
 
 - security — no write path: the cut reads repository files the renderer already reads; the carry reads
-  `BACKLOG.md` files through the backlog kit's parser. `scanShellReads` runs no command.
+  open asks through memory-tree's `--asks` verb, which parses every `BACKLOG.md`. `scanShellReads`
+  runs no command.
 - perf / scale — one blob hash per read the hook sees, only when the work order holds a handed range
-  of that path; one backlog parse per render.
+  of that path; one `--asks` subprocess per render.
 - error / empty / loading states — a work order with no `blob:` fact yields no handed range and every
-  read runs; an unreadable `BACKLOG.md` is a parse finding the carry reports and skips.
+  read runs; a failed `--asks` run, or rows with no `data` field, carry no repair and print one note.
 - observability — a carried block names its ask id; the matcher returns the handed key the hook names.
 - risks — the Python and JavaScript copies drifting, held by AC4's one case table.
 - testing — AC1 to AC6 by probes and fixtures a pass runs; the arms of §7 at the close.
@@ -307,6 +317,21 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC2 · the compound `cat | 
   2026-10-26, delegated): this spec calls them as their specs name them; the build run re-grounds on
   each and stops the unit if a cited section is still absent then, rung 1 (the brief's chain rule).
   widens: none · relaxes: none
+- **F8 — How does the carry read an open ask's `data` clause without loading memory-tree's parser
+  (S6)?** A kit imports no sibling kit (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7 §4). The only
+  verb `backlog.py` has is `--selftest` (`tools/memory-tree/backlog.py:2306-2312`), and
+  `gen_build_index.py --asks --json` prints each ask's status but only a 160-byte `summary` of its
+  text (`:3346-3375`). The roles kit `requires` memory-tree (`tools/roles/kit.toml:12`) but declares no
+  in-process edge to it. Options: (a) an ask of the memory-tree kit: each `--asks` row gains `data`,
+  the ask's `data` clause, an addition every consumer reading by name passes, as TOOL-aMendedFleet-10
+  added `pointer` and `summary` (`:3353-3354`); (b) a declared `requires_if` row on
+  `tools/roles/kit.toml` naming `memory-tree`, admitting the in-process `parse_file` and
+  `derive_statuses` calls; (c) the roles kit parses `BACKLOG.md` itself. (c) is a second parser of the
+  row grammar. (b) needs no parent change, but it is the in-process sibling edge the rule names. (a)
+  is one field on a verb that already folds the statuses. Its cost is a wait, since AC5 passes only
+  against the landed field. Recommendation (a). Open for the owner: the ask the build run files, on
+  the build that owns `tools/memory-tree/gen_build_index.py`'s `--asks` contract at the pass, is
+  "`gen_build_index.py --asks --json` rows gain `data`, the ask's `data` clause as its row holds it".
 
 ## 9. Revision log
 
@@ -314,6 +339,10 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC2 · the compound `cat | 
   for cl-0205, v2:1965-1969, `layer-roles.md` `[trust]` items 3, 7 and 10, and the source at
   `2193e25d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S6; §3 Edges; §5; §8 F8 (new, open); §10 · re-grounded on the parents at
+  `1a61f21a2` by the cross-check record
+  `memory/builds/dFurnishedOrders/build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`,
+  row 55.
 
 ## 10. Reuse audit
 
@@ -321,8 +350,9 @@ The seams extended: `scanCommandHeads` (`tools/hooks/scratch-guard.js:1279`) and
 (`buildCommandView`, `:260`), already exported (`:1615`), which resolve launchers, prefixes and `-c`
 bodies, so the shell-reader table reads its argv rather than re-parsing; TOOL-dBoundRoles-13's
 `derive_fact_key`, `FACT_RE` and its JavaScript copy; `render_handoff`'s reads walk
-(`tools/roles/handoff.py:312`) for the carry; and the backlog kit's `parse_file` and `derive_statuses`
-(`tools/memory-tree/backlog.py:555`, `:912`) for which repair asks are open.
+(`tools/roles/handoff.py:312`) for the carry; and memory-tree's `gen_build_index.py --asks --json`
+(`:3235`, its row at `:3346-3375`), which folds `derive_statuses` (`tools/memory-tree/backlog.py:912`),
+for which repair asks are open, its `data` field §8 F8's ask.
 `python tools/codebase-map/reuse_lookup.py "decide whether a file read is answered by a handed line
 range at the same blob"` ranked name stems (`read`, `read_text`, `read_blobs_at` in
 `tools/memory-tree/tree_lib.py`, a blob reader at a commit that a kit may not import across kits); no

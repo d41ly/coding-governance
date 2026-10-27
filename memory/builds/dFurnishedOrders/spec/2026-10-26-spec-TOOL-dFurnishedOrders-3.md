@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-3 — a return's harness notices persisted with it, as runlog `notice` events and on the agent ledger's returned line, by `notices.record`
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 7 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 7 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0194@48cbc488 whole
 **Carries:** node:policy-key.notices.record
@@ -11,7 +11,11 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-a.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-3-deviation-31.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-3-deviation-31.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -40,10 +44,13 @@ notices of each agent's return written on its `returned` line in the agent ledge
   (`extract.py:63`) or is left out. Observed by AC1 and AC2.
 - **S2** — The key decides, inside the recognizer. Both functions return nothing under `none`, the
   `security` and `failure` pairs under `security-and-failures`, and every pair under `all`.
-  `read_notices_value(repo)` in `extract.py` reads `notices.record` through the policy kit's
-  `resolve` (`tools/policy/policy.py:752`), found by the inline `resolve_kit_dir` copy
-  (shared interface J1); no policy kit, or a refusal of the reader, answers the catalogue default
-  `none` with a note naming why. Observed by AC3.
+  `read_notices_value(repo)` in `extract.py` reads `notices.record` by running the policy kit's
+  `policy.py get notices.record --json` (TOOL-dGroundRules-2 S7) as a subprocess in `repo`, the file
+  found by the inline `resolve_kit_dir` copy: a kit imports no sibling kit, and `get` is the one seam a
+  sibling kit may reach (PLAY-dOrderedCharter-7 §4 "The policy reads"). It takes the printed `value`
+  whatever its `source`, so the catalogue answers its default `none` where the key is unset. No policy
+  kit, or an exit 2, answers `none` with a note naming why, the one place runlog types the default.
+  Observed by AC3.
 - **S3** — The session log. `KINDS` (`extract.py:46-47`) gains `notice`. `_scan_user` (`:678`) and
   `_scan_record` (`:718`) pass each notification block's `<result>`, each `Agent` tool result's lead
   and each `deferred_tools_delta` attachment to S1, and `_build_events` (`:762`) turns each pair into
@@ -51,16 +58,21 @@ notices of each agent's return written on its `returned` line in the agent ledge
   notice rode on, else `null`. `extract_session` (`:843`) takes `notices=<value>`, which
   `runlog.py extract` (`tools/runlog/runlog.py:271`) reads once by S2, so the stored session holds
   exactly what the key admits. A pair repeated within one source is kept once. Observed by AC4.
-- **S4** — Persisted with the return (shared interface J9). `print_agent_lines`
-  (`tools/roles/handoff.py:808`) loads runlog's `extract.py` by file through
-  `resolve_kit_dir("runlog", "extract.py", KIT_DIR)`, as TOOL-dFurnishedOrders-10 S2 loads it.
-  `load_session_calls` (`:576`) returns, beside its three values, the notices of each `Agent` call,
-  read from its notification's `<result>` and its tool result's lead; `load_agent_transcript`
-  (`:626`) gains the key `notices`, read from the agent's own `deferred_tools_delta` attachments.
+- **S4** — Persisted with the return (shared interface J9). A by-file load is an in-process import,
+  which a kit may not make of a sibling kit (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7 §4), so the
+  roles kit reaches S1 through runlog's verb `python <runlog kit>/runlog.py notices --transcript <path>
+  --json`, minted here as TOOL-dFurnishedOrders-16 S2 mints `turns`. Run in the repository, it reads
+  the key once by S2 and prints one JSON object per notice the transcript holds, `{"call", "class",
+  "labels"}`, `call` the tool-use id of the `Agent` call whose notification `<result>` or tool result
+  lead carried it, else `null`. `print_agent_lines` (`tools/roles/handoff.py:808`) has it run as a
+  subprocess found by `resolve_kit_dir("runlog", "runlog.py", KIT_DIR)`, under a 30-second bound:
+  `load_session_calls` (`:576`) runs it over the session file and returns, beside its three values,
+  the notices of each `Agent` call by that id; `load_agent_transcript` (`:626`) runs it over the
+  agent's own transcript and gains the key `notices`, its `deferred_tools_delta` attachments' pairs.
   Each agent's notices are held as `(class, labels)` pairs, and its `returned` line's `<outcome>`
   gains `render_notice_suffix`'s text, ` + notice <class> <label>,<label>` once per class present.
-  With no runlog kit resolved, no suffix is written and one `handoff: note — notices unread: <why>`
-  line says so. Observed by AC5 and AC6.
+  With no runlog kit resolved, or a verb exit other than 0, no suffix is written and one
+  `handoff: note — notices unread: <why>` line says so. Observed by AC5 and AC6.
 - **S5** — The docs. `tools/runlog/README.md`'s extractor section names the `notice` kind, its
   three classes and the key; `tools/roles/README.md`'s agents section and `help/roles.md`'s
   `returned` bullet (`help/roles.md:81-83`) name the suffix. NOT OBSERVED by a criterion: prose,
@@ -83,7 +95,7 @@ notices of each agent's return written on its `returned` line in the agent ledge
 ### Edges
 
 - **hands-off** `TOOL-dFurnishedOrders-10` — `notice`, the runlog event kind and the per-agent `(class, labels)` pairs its metrics count as `notice-security` and `notice-failure`
-- **hands-off** `TOOL-dFurnishedOrders-29` — `derive_notices` and the by-file load of runlog's `extract.py`, which unit 29 S4 to S6 and S8 extend (ids 25, 58, 14, 38, 26)
+- **hands-off** `TOOL-dFurnishedOrders-29` — `derive_notices` and the `notices` verb the roles kit reaches it by, which unit 29 S4 to S6 and S8 extend (ids 25, 58, 14, 38, 26)
 
 ## 4. Design
 
@@ -117,10 +129,11 @@ The `error` string is never read: the label is the server's name and its code.
 can add no field. `write_agent_ledger` keys a line by its head and its last field (`:791-792`), so a
 line written before its notices were known is not written twice.
 
-### The value, read once per run
+### The value, read by runlog alone
 
-`runlog.py extract` reads the key once and hands it to every session it extracts; `handoff.py
-agents` reads it once through the loaded module. Neither reads `.governance/policy.toml` itself.
+`runlog.py extract` reads the key once and hands it to every session it extracts; `runlog.py
+notices` reads it once per transcript `handoff.py agents` hands it, so the roles kit never reads the
+key. Neither reads `.governance/policy.toml` itself.
 
 ### Inventory
 
@@ -128,6 +141,7 @@ agents` reads it once through the loaded module. Neither reads `.governance/poli
 |---|---|---|
 | `derive_notices`, `derive_mcp_notices`, `read_notices_value` | functions, `extract.py` | `py.function`, OK |
 | `render_notice_suffix` | function, `handoff.py` | `py.function`, OK |
+| `notices` | verb, `runlog.py` | no verb cell is declared |
 | `notice` | member of `KINDS` | none |
 | `security`, `failure`, `other` | notice classes | none |
 | the key `notices` of `load_agent_transcript`'s return | dict key | none |
@@ -160,8 +174,8 @@ and `KIT_ROLES_VERSION` move for the kit epoch leg. The inline `resolve_kit_dir`
 
 ### Alternatives rejected
 
-- **A second recognizer in `handoff.py`.** The roles kit already loads runlog's extractor by file
-  for TOOL-dFurnishedOrders-10; two parsers of one harness string drift apart.
+- **A second recognizer in `handoff.py`.** The roles kit reaches runlog's extractor through S4's
+  verb; two parsers of one harness string drift apart.
 - **The return-check stop hook recording notices.** The injection guard's match is written into the
   parent's notification after the subagent stops, so the stop hook never sees it.
 
@@ -171,9 +185,10 @@ and `KIT_ROLES_VERSION` move for the kit epoch leg. The inline `resolve_kit_dir`
   the bracket when the guard did not match is recorded as a security notice: a false record, never a
   suppressed one. Labels are `LABEL_RE` tokens; no output text, error string or URL is kept.
 - perf / scale — one regex on a result's first 200 bytes, already read (`_read_result_text`,
-  `:619`), and one dict read per attachment.
-- error / empty / loading states — no policy kit answers `none` with a note; no runlog kit writes no
-  suffix with a note; a malformed attachment is skipped and counted in `coverage`.
+  `:619`), and one dict read per attachment; under `agents`, one bounded runlog subprocess per
+  transcript read.
+- error / empty / loading states — no policy kit answers `none` with a note; no runlog kit, or a
+  failed verb, writes no suffix with a note; a malformed attachment is skipped and counted in `coverage`.
 - observability — the `notice` events and the ledger suffix are the observation.
 - risks — a harness that respells its bracket stops being recognised as `security` and is recorded
   as `other` under `all`, and nothing under `security-and-failures`.
@@ -238,18 +253,25 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC5 AC6 · an agents run over
   2026-10-26, delegated): a third class `other`, recorded only under `all`, holding any other bracket
   and each server awaiting authorisation; J9's two classes are unchanged, so
   TOOL-dFurnishedOrders-10's counts read them as specced, rung 2. widens: none · relaxes: none
-- **F3 — Which kit holds the recognizer?** Options: (a) runlog's `extract.py`, loaded by file from
-  `handoff.py`; (b) `handoff.py`, called by runlog; (c) one copy in each. A kit reads no sibling kit
-  at import, and runlog's extractor is the session log's one parser of a transcript
-  (`tools/runlog/extract.py:1-23`); (c) writes the string twice. RESOLVED (agent, 2026-10-26,
-  delegated): (a), rung 3, the route TOOL-dFurnishedOrders-10 S2 already takes. widens: none ·
-  relaxes: none
+- **F3 — Which kit holds the recognizer?** Options: (a) runlog's `extract.py`, reached from
+  `handoff.py`; (b) `handoff.py`, called by runlog; (c) one copy in each. Runlog's extractor is the
+  session log's one parser of a transcript (`tools/runlog/extract.py:1-23`); (c) writes the string
+  twice. The 2026-10-26 pick, (a) loaded by file, is an in-process import of a sibling kit, which
+  PLAY-dOrderedCharter-7 §4 (`:202-205`) rules out. A declared `requires_if` row naming runlog would
+  admit it, but no reason the rule admits holds: this build writes the runlog kit and can add the verb.
+  RESOLVED (agent, 2026-10-28, delegated): (a), reached through S4's `runlog.py notices` verb run as a
+  subprocess, rung 1, PLAY-dOrderedCharter-7 §4, the shape TOOL-dFurnishedOrders-16 S2's `turns` gives
+  the same kit. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 3, the brief's J9, scout A's row for
   cl-0194, compaction-results.md's CX-2, and the source at `2193e25d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S2, S4; §3 Edges; §4 The value, Inventory, Alternatives rejected; §5; §8 F3
+  (re-resolved); §10 · re-grounded on the parents at `1a61f21a2` by the cross-check record
+  `memory/builds/dFurnishedOrders/build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`,
+  rows 11 and 12.
 
 ## 10. Reuse audit
 
@@ -257,7 +279,9 @@ The seams extended are runlog's transcript scanner, `_scan_user` and `_scan_reco
 (`tools/runlog/extract.py:678`, `:718`), with its closed `KINDS` list (`:46-47`) and its
 `_read_result_text` lead (`:619`); and the agent ledger's reader and writer, `load_session_calls`,
 `load_agent_transcript` and `print_agent_lines` (`tools/roles/handoff.py:576`, `:626`, `:808`),
-whose `NOTIFICATION_RE` (`:125`) already finds the notification block the notice rides in. `python
+whose `NOTIFICATION_RE` (`:125`) already finds the notification block the notice rides in; and
+runlog's verb table (`tools/runlog/runlog.py:497-564`), which takes S4's `notices` as it takes
+`turns`. `python
 tools/codebase-map/reuse_lookup.py "persist harness notices from an agent's return such as injection
 guard matches and MCP connection failures"` ranked `match_expr`, `renderAgentLabel` and the hook
 inventory; none reads a returned result's notice, and a grep for `instruction-shaped`, `injection`

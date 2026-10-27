@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-15 — the tester re-founded with its allowance, and the `probe` outcome on every role's return template
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 3 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 3 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0206@e18404dd whole
 
@@ -11,8 +11,12 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-c.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-c.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-16 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-fix-return.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-15-deviation-151.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-15-deviation-151.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -57,7 +61,9 @@ every-role arm.
   no repository class is granted; `reads` gains `input:question`; `verifies` is `verdict, claim`
   (TOOL-dFurnishedOrders-5's field), since it attributes each red and judges each claimed probe
   verdict; `slices` names the two sections its body cites; and its `return` template carries the
-  four items' outcomes. Its body states the four acts. Observed by AC4 and AC5.
+  four items' outcomes, keeping TOOL-dBoundRoles-2 §8 F4's `code-miss`, `spec-wrong` and `answered`
+  with its `answer` field and adding `designed` and `judged`. Its body states the four acts. Observed
+  by AC4 and AC5.
 - **S4** — The probe items the tester takes over. The two `[[stand-in]]` rows of `tools/loop/loop.toml`
   that TOOL-dPlacedRequest-7 S2 declares for `item.probe.design` and `item.probe.judge-claimed`
   (TOOL-dDeclaredLoop-13 S8's table) are deleted, and the four tester items' `actor` cells name one
@@ -93,7 +99,7 @@ every-role arm.
 - **hands-off** `TOOL-dFurnishedOrders-19` — `derive_return_arms`, the brief's `compose_return_arms` respelled for the lexicon, through which the established rows' arm is declared once
 - **hands-off** `TOOL-dFurnishedOrders-7` — `derive_return_arms`, J3's factory as the lexicon spells it (§8 F1), through which `[return.repair]` joins every role's template
 - **hands-off** `TOOL-dFurnishedOrders-9` — `gov-tester`, the role whose four items the matrix rows read
-- **consumes-from** external — TOOL-dWitnessedBar-23's `gov-tester`, TOOL-dBoundRoles-26's `[return.refusal]`, TOOL-dBoundRoles-43 S13's composition, TOOL-dBoundRoles-5's `validate_return`, and TOOL-dPlacedRequest-7's items and `probe.py`, each specced and unbuilt at base
+- **consumes-from** external — TOOL-dWitnessedBar-23's `gov-tester`, TOOL-dBoundRoles-2 §8 F4's tester `return`, TOOL-dBoundRoles-26's `[return.refusal]`, TOOL-dBoundRoles-43 S13's composition, TOOL-dBoundRoles-5's `validate_return`, and TOOL-dPlacedRequest-7's items and `probe.py`, each specced and unbuilt at base
 - **hands-off** `TOOL-dFurnishedOrders-22` — the re-founded `gov-tester` role file, its `reads` and its `verifies`, which unit 22 gives a `subject-reads` value (id 1)
 - **hands-off** `TOOL-dFurnishedOrders-24` — `derive_return_arms`, whose triples unit 24 renders as one schema branch per outcome (id 4)
 - **hands-off** `TOOL-dFurnishedOrders-29` — the tester's Write and Edit and AC7's docs, which unit 29 S3 confines and S7 tightens (ids 24, 51, 15)
@@ -126,14 +132,16 @@ reads: input:spec, input:diff?, input:question?
 writes: none
 verifies: verdict, claim
 slices: doc.build-method#m6-passes-commits-parallelism, doc.build-method#m12-research-test-choose-when-the-solution-is-not-given
-return: outcome:code-miss|spec-wrong|designed|judged, evidence:text, method:text?, losing:text?
+return: outcome:code-miss|spec-wrong|answered|designed|judged, evidence:text, answer:text?, method:text?, losing:text?
 ---
 ```
 
 The keys TOOL-dBoundRoles-1, -2 and -15 give every role (`layer`, `acts-as`, `never`, `budget`,
 `rules`, `mandatory`, `output`) keep the values those units set; the block shows the keys this unit
 moves. The body, under its `budget`, says: for each red you are handed, return `code-miss` or
-`spec-wrong` with the evidence (`test.attribute`) or the Test step's answer (`test.reason`); for a
+`spec-wrong` with the evidence (`test.attribute`); for the Test step's question, return `answered`
+with the answer in `answer` and its evidence (`test.reason`), TOOL-dBoundRoles-2 §8 F4's outcome for
+the act, the body stating what the template cannot, that `answer` is present exactly then; for a
 pinned probe, write its method and the outcome that would make it lose before anything runs, and
 return `designed` (`probe.design`); for a verdict held as claimed, judge it from its recorded outputs
 and return `judged` (`probe.judge-claimed`); an experiment's files go under the scratch path your task
@@ -150,7 +158,7 @@ outcome first.
 ```
 ## Return
 
-outcome:code-miss|spec-wrong|designed|judged, evidence:text, method:text?, losing:text?
+outcome:code-miss|spec-wrong|answered|designed|judged, evidence:text, answer:text?, method:text?, losing:text?
 - or outcome: refused — rule, remedy, actor (self|producer|driver|owner|build:<slug>)
 - or outcome: probe — subject, question, kind (verification|reproduction|experiment)
 ```
@@ -160,8 +168,9 @@ The arm lines are S13's form, whatever its final bytes; this unit adds the third
 ### Inventory
 
 Minted: `derive_return_arms`; the `[return.probe]` table and its `kinds`; the outcomes `designed` and
-`judged` on the tester's template. `python tools/lexicon/lexicon.py --suggest derive_return_arms --as
-py.function` answered OK; `compose_return_arms` was refused (§8 F1).
+`judged` on the tester's template, beside TOOL-dBoundRoles-2 §8 F4's `answered` and `answer`, kept.
+`python tools/lexicon/lexicon.py --suggest derive_return_arms --as py.function` answered OK;
+`compose_return_arms` was refused (§8 F1).
 
 ### Migration
 
@@ -231,9 +240,10 @@ TOOL-dBoundRoles-15 §4 "Pricing" (TOOL-dFurnishedOrders-5 §8 F3's precedent).
   `gates` list.
   Red when: the tester gains a repository write class or a gate leg.
 - **AC5** — When `grep -c` runs over the rendered `gov-tester.md` for `probe.design`,
-  `probe.judge-claimed`, `scratch path` and `browser tool`, each prints at least 1, and its `## Trust`
-  block holds `- Verifies: verdict, claim`.
-  Red when: the body omits an act or the browser stand-in.
+  `probe.judge-claimed`, `scratch path` and `browser tool`, each prints at least 1, its `## Trust`
+  block holds `- Verifies: verdict, claim`, and its `## Return` template line names `answered`,
+  `designed` and `judged`.
+  Red when: the body omits an act or the browser stand-in, or a `test.reason` return has no outcome.
 - **AC6** — When `grep -c 'item.probe.design\|item.probe.judge-claimed'` runs over the `[[stand-in]]`
   rows of `loop.toml` it prints 0, and the four tester items' `actor` cells print one spelling.
   Red when: a stand-in row survives, so a move through the item still answers `stand-in`.
@@ -281,6 +291,11 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 · a scratch schema w
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 15, the brief's J3 and D8, scout C's
   row 15, and the source at `1a3ce03d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-22, TOOL-dFurnishedOrders-24, TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S3 · §3 Edges · §4 "The role", "Rendered return", Inventory · §6 AC5 ·
+  re-grounded on dBoundRoles at `ac8ab8d5f`, by the cross-check record
+  `build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`, row 60: the tester's
+  template keeps TOOL-dBoundRoles-2 §8 F4's `answered` and `answer:text?` beside `designed` and
+  `judged`, and the body returns `answered` for `test.reason`; nothing else moved.
 
 ## 10. Reuse audit
 
