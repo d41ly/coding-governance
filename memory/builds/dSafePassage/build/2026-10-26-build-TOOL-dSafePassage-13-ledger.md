@@ -21,7 +21,7 @@ HOW EACH CRITERION WAS OBSERVED. No gate, suite or bar ran in this pass. Each AC
 node d (Windows, Python 3.15) by the leg's own CLI over its fixture or the tree, or a `git grep`.
 
 - AC1 — `--fixture --plant stale-page` exit 1: `docs: STALE help/guide.md:11 fx-verb:tool: the page holds ef26be5a, the row is now af2f8078`; `--plant none` exit 0. Red when, observed: the comparison patched to the page's own fingerprint (`now := fp`) made `stale-page` exit 0; restored from the index.
-- AC2 — `python tools/govkit/docs_leg.py` on the tree exit 0: `commands 54 tested, 6 skipped, 0 unrowed`, `0 stale`, `links 19 checked`; `help/roles.md` and `help/measure-legs.md` each carry tested commands (handoff.py render and roster, render_agents.py, adopt-playbook.sh; measure_legs.py and derive-ceilings.py). The scratch-clone respelling is recorded in the line below, after the pass commit.
+- AC2 — `python tools/govkit/docs_leg.py` on the tree exit 0: `commands 54 tested, 6 skipped, 0 unrowed`, `0 stale`, `links 19 checked`; `help/roles.md` and `help/measure-legs.md` each carry tested commands (handoff.py render and roster, render_agents.py, adopt-playbook.sh; measure_legs.py and derive-ceilings.py). After the pass commit 38d7f703, a clone under `%TEMP%/dl13` with `help/roles.md`'s `handoff.py render` command respelled `--part` to `--section` exited 1: `docs: COMMAND help/roles.md:36 python tools/roles/handoff.py render ... --section task: flag '--section' is not a declared flag of tools/roles/handoff.py render`; the clone was removed. Its summary there read `list 370 rows, low-water 370`, the committed history's.
 - AC3 — `--plant bad-flag` exit 1 naming `flag '--section'`; `--plant bad-verb` exit 1 naming `verb 'rendr'`; `--plant unrowed` exit 1 naming `tools/fx/other.py`; the base prints `commands 2 tested, 1 skipped`, the `sort` line skipped.
 - AC4 — `--plant broken-link` exit 1 `docs: LINK help/guide.md:13 gone.md`; `--plant broken-fragment` exit 1 naming `#no-such-heading`; `--plant external-link` exit 0 with `links 2 checked, 1 external`. Red when, observed: the fence skip of `check_page_links` patched away made the base exit 1 on the fenced `absent.md` link of `help/more.md`; restored.
 - AC5 — `--plant undocumented` exit 1 naming `fx-page:guide`; `--plant drained-row` exit 1 `DRAINED ... row fx-page:guide`; `--plant grown-list` exit 1 `2 rows, above its low-water 1`; `--plant orphan-anchor` exit 1 naming `fx-key:NOPE`. Red when, observed: the low-water comparison patched to `if False:` made `grown-list` exit 0; restored.
@@ -31,6 +31,12 @@ node d (Windows, Python 3.15) by the leg's own CLI over its fixture or the tree,
 - AC9 — `git grep -n -e "help.enforce" -e "docs_leg" -- help/` finds `help/docs-leg.md` and its `help/README.md` line; AC2's run grades that page green, its two anchors current.
 - AC10 — the `git grep` over the five files finds `docs` in each (`tools/gate-legs.json:1463`, `registry.toml:715`, `subject-pins.tsv:36`, `ceiling-evidence.txt:49`, `govkit.md:12`); `drift_signals.py:138` holds the `SHRINK_ONLY` row.
 - AC11 — `git grep -n -e "Departs from" -- memory/builds/dSafePassage/build/` lists deviation-51 and deviation-52 of this unit, each departing from `cl-dClosedLoop-0030@274077d4`.
+
+The bug-class checklist over the pass commit selected `fixture-inherits-ambient-machine-state`: the
+fixture's `git -C` calls inherited any `GIT_DIR` or `GIT_INDEX_FILE` a hook exports. A follow-up
+commit strips `GIT_*` from the fixture's environment; with both set to absent paths, the pass
+commit's module raised `KeyError: 'fx-hook:fx-hook'` (its hook row read through the foreign git),
+exit 1, and the fixed one ran `--plant grown-list` to its `GROWN` line.
 
 The fixture cases of the new selftest arm were run by a probe that executes that arm's own case
 list against the CLI: 21 of 21 held.

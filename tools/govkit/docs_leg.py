@@ -42,6 +42,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import os
 import pathlib
 import posixpath
 import re
@@ -644,7 +645,11 @@ def run_docs_fixture(plant: str, mode: str) -> int:
     """The leg over the fixture with `plant` staged, under `mode`; `off` builds nothing."""
     if mode == "off":
         return check_docs(None, [], set(), mode, "--enforce")
-    tmp = pathlib.Path(tempfile.mkdtemp(prefix="docs-"))
+    # The fixture's git must address its own repository: a GIT_DIR or GIT_INDEX_FILE a hook exported
+    # would point every `git -C <fixture>` at the caller's repository instead.
+    for k in [k for k in os.environ if k.startswith("GIT_")]:
+        del os.environ[k]
+    tmp =pathlib.Path(tempfile.mkdtemp(prefix="docs-"))
     try:
         root, class_ids, population = build_docs_fixture(tmp, plant)
         print(f"docs: fixture · plant {plant}")
