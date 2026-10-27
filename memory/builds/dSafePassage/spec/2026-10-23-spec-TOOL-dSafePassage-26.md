@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** DEFERRED · rev-10 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-11 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -123,7 +123,10 @@ TOOL-dSafePassage-N, each item naming the unit it amends; cites are at base `370
   through `build_scratch_gov` in `tools/govkit/fixture_target.py`, lifted from `build_gov17`
   (`tools/govkit/selftest.py:1728`). `upgrade_walk.py` builds no synthetic gov: its one gov is
   TOOL-dSafePassage-5 S2's `git clone --no-tags` of gov at the pin, whose own `apply` writes
-  release-0, so it stays a clone. Observed by AC18.
+  release-0, so it stays a clone. A local helper that comes to call the factory takes a name of its
+  own, `retired_edits.py`'s `build_target` (`:152`) and `upgrade_steps.py`'s (`:2419`) among them: a
+  local `build_target` calling it calls itself, as TOOL-dSafePassage-5's fourth pass measured.
+  Observed by AC18.
 
 ### The resolver's text (D-23)
 
@@ -623,6 +626,10 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
   TOOL-dSafePassage-64 at order 5, since TOOL-dSafePassage-5's walk measured the sticky
   `retired-edited` role after a rollback and unit 5 builds before this unit, by
   `2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md`; no other section moved.
+- rev-11 · 2026-10-27 · S19 · the local helpers named `build_target` take names of their own when
+  they call the factory, since TOOL-dSafePassage-5 rev-10 leaves them to S19 and its fourth pass
+  measured a local binding of that name recursing, by
+  `2026-10-27-prompt-TOOL-dSafePassage-5-8-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 
