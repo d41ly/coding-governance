@@ -22,7 +22,7 @@ hold-reason: the spec-audit promotion chain does not converge: seven rounds prom
 hold-until: owner
 hold-code: owner-decision
 held-from: RUNNING
-refreshed-at: 558b755a1e7e9fed1107cec2a5af7e33e4e363da · handoff · 0 touching
+refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: de997afe9a050c75185625e6b50b8160a2a948ff
 phase: VERIFYING
@@ -354,3 +354,5 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T14:54:16Z rescope · item defer TOOL-dRankedPlan-77 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
 
 2026-10-27T14:54:19Z rescope · item defer TOOL-dRankedPlan-81 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 8 by the owner's rulings of 2026-10-27 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md); the build run after this one builds it, advancing TOOL-dRankedPlan-17
+
+2026-10-27T18:50:10Z decision · item the close's bar cannot pass the spec-tokens leg while this chain run is live · reason the leg (ceiling 390 s in tools/gate-legs.json) timed out twice at the close: its packet join runs packet.py --check dRankedPlan, whose carries.py --report spawns git per chain spec revision over 954 chain specs, 344 s alone at idle and killed (exit 143) inside the leg; every other leg is green after b02b55c97. Options: (a) the owner raises the leg's ceiling; (b) the owner re-pins carries.py to a batched reader (packet.py --repin), the instrument pin being the owner's; (c) the owner lands the prepared merge by hand. Refused: the ceiling and the pin are owner-moved, and --override gates-green is refused for a red that is not INHERITED
