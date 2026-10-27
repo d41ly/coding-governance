@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-35 — the round-1 audit of units 15 to 26: its 39 minors, one filtered population, one plan source, pinned plants and the texts that cite them
 
-**Status:** DEFERRED · rev-6 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-7 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,8 @@
 | [2026-10-26-prompt-TOOL-dSafePassage-35-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-35-build-brief.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md) | research | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-35-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-35-2-spec-writer.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-35-3-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-35-3-spec-writer.md) | research | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-35-4-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-35-4-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-34 |
 
 <!-- /gen:spec-records -->
@@ -50,7 +52,7 @@ reading, because a built spec is not rewritten, and a criterion here observes it
 | D-23 | MEDIUM | 24 | S13 |
 | D-24 | MEDIUM | 39 | S8 |
 | D-25 | MEDIUM | 41 | S17 |
-| D-26 | MEDIUM | 42 | S19 |
+| D-26 | MEDIUM | 42 | S19, moved to TOOL-dSafePassage-70 |
 | D-27 | LOW | 3 | S14 |
 | D-28 | LOW | 5, 21 | S15, S16 |
 | D-29 | LOW | 10 | S18 |
@@ -74,6 +76,8 @@ cites was read there on 2026-10-28, unless the item pins it at `3708a705`. Where
 an item, or a different rule for it, the item says so and keeps only its residual. S15, S16, S18,
 S29, S34 and S35 are built and read as written. S5 keeps its boot-clock half, S27 keeps its plant,
 and S25 and S28 are struck (§8 F3, F4).
+Rev-7 moves id 42's item S19 and its criterion to TOOL-dSafePassage-70, which builds the reverse
+walk's rule for a receipt already below schema 4 that the item needs.
 
 ## 2. Scope (IN)
 
@@ -97,7 +101,17 @@ and S25 and S28 are struck (§8 F3, F4).
   its receipt branch, with that branch's not-JSON `Refusal`, leaves the function with this item. A
   branch carrying the last landing's receipt whose commits stop shipping a file then shows that
   file's `file:` vanish on the branch. TOOL-dSafePassage-26 S24's prepared-merge observation is read as the plan source on
-  that tree. Observed by AC3.
+  that tree. The class's plant follows its source. At HEAD `write_file_plant` (`step_gate.py:399-418`)
+  takes a row out of the clone's receipt, which no reader reads after this item, so it would move no
+  member. It stages `git rm` of the first `.md` destination `read_plan_destinations` returns on the
+  clone whose `source` is that same path, as `write_installable_plant` moves a kit README
+  (`:421-429`), writes no receipt, and returns that `file:` member. The three texts that name the
+  receipt source say "each destination gov's own plan derives": the docstring of
+  `read_file_members` (`:270-271`), the `file` row's `summary` in `tools/govkit/surface-classes.toml`
+  (`:18`) and the `file` row of `help/step-gate.md` (`:15`). The self-test's TOOL-dSafePassage-21
+  AC3 check (`tools/govkit/selftest.py:4347-4358`) reads the class twice, and both reads become the
+  plan, so it cannot fail; it compares the receipt's `files` paths, in member spelling, with
+  `read_file_members` instead. Observed by AC3.
 
 ### The lock's plants and its margin (D-10, D-11, D-12, D-31)
 
@@ -197,18 +211,16 @@ and S25 and S28 are struck (§8 F3, F4).
 - **S18** — id 10. TOOL-dSafePassage-18's Inventory is read with `schema-step-early` among its minted
   `rollback` plants, beside `schema-step` and `schema-step-kill`. Built: `ROLLBACK_SCHEMA_PLANTS`
   holds all three (`tools/govkit/upgrade_steps.py:2593`). Observed by AC16.
-- **S19** — id 42. The `rollback-update` family gains `schema-step-kill-shipped-rows`: the reverse set
-  uses the shipped row shapes, a `reverted = "down-exit"` row shaped as the floor row and a row whose
-  witness is "the file is absent", applied by witness alone. The fixture kills the run after the
-  schema step's down and before the stamp; the re-run downs both rows a second time, each down
-  writing nothing, and the receipt and record bytes, times aside, equal an uninterrupted run's.
-  Observed by AC17.
+- **S19** — id 42. Moved to TOOL-dSafePassage-70, its S2, on 2026-10-28, with the reverse walk's rule
+  for a receipt already below schema 4, without which the re-run refuses at its first row. NOT
+  OBSERVED here: TOOL-dSafePassage-70's AC1 observes it.
 - **S20** — id 11. TOOL-dSafePassage-19's S4 and AC2 read as one, by S4's own design text: the re-run
   downs again, idempotently, a row whose witness still holds after its down, as a `down-exit` row and
   a row with no record and no image (`TOOL-dSafePassage-33`'s branch) do. AC2's red clause "downs a
   row a second time" is read as "a second down changes a byte". TOOL-dSafePassage-5's kill case kills
   during an up only and observes no killed rollback, and TOOL-dSafePassage-19 §5's "covers" sentence is
-  read as `TOOL-dSafePassage-33`'s branch. Observed by AC17.
+  read as `TOOL-dSafePassage-33`'s branch. NOT OBSERVED here: TOOL-dSafePassage-70's AC1 observes
+  the second downs this reading admits.
 
 ### Cites by phrase (D-32)
 
@@ -226,7 +238,10 @@ and S25 and S28 are struck (§8 F3, F4).
   five-element call form, their plant committed at `HEAD`, and the plant's absence they name read as
   a commit that takes it out. TOOL-dSafePassage-26
   S10's six-element argv is what the floor row ships, and TOOL-dSafePassage-17's §4 floor-row block is
-  read with that argv and its own `reverted = "down-exit"` line (§8 F1). Observed by AC19.
+  read with that argv and its own `reverted = "down-exit"` line (§8 F1). The upgrade-step paragraph of
+  `help/python-floor.md` (`:74`), which spells the down `python-floor.sh down 3.12 <target> <to>`,
+  spells it `python-floor.sh down 3.12 <target> [<to>]` and says `<to>` defaults to the target's
+  `HEAD`. Observed by AC19.
 - **S23** — id 15. TOOL-dSafePassage-26's AC47 is read as `tools/lexicon/selftest.py:109`, the line
   holding "no declared Python floor" at `3708a705`. Observed by AC20.
 - **S24** — id 30. The step module's argv resolution owns its closure, which is the `ast` closure of
@@ -237,14 +252,22 @@ and S25 and S28 are struck (§8 F3, F4).
   constants move with them: `_BASH` (`:1205`), `TOKEN_RX` (`:1202`), `OPT_IN_ALL` (`:577`),
   `PER_KIT_PATH_TOKENS` (`:1464`), `SEEDED_TOKENS` (`:1461`), `ANSWER_VALUE_RE` (`:1467`),
   `DRIVE_PREFIX_RE` (`:1365`) and `TOKEN_VALUE_RE` (`:1344`). `Refusal` is already the step module's
-  (`upgrade_steps.py:254`, bound back at `govkit.py:143`). govkit binds each moved name back from the
-  step module, as it binds `blob_at` (`govkit.py:6832`), so its own readers keep their spelling.
+  (`upgrade_steps.py:254`, bound back at `govkit.py:143`). govkit binds back from the step module
+  each moved name a reader still spells off govkit, as it binds `blob_at` (`govkit.py:6832`): the
+  five functions (`resolve_bash` is read off govkit at `tools/govkit/shims.py:448` and
+  `tools/govkit/upgrade_walk.py:199`), `OPT_IN_ALL`, `SEEDED_TOKENS` and `TOKEN_RX`, each read by
+  govkit outside the moved functions (an `ast` count at HEAD `717bf240a` on 2026-10-28). The other
+  five constants are bound back nowhere. `ANSWER_VALUE_RE`, `DRIVE_PREFIX_RE`,
+  `PER_KIT_PATH_TOKENS` and `TOKEN_VALUE_RE` have no reader outside the moved functions. `_BASH` is
+  `resolve_bash`'s cache, reassigned inside it (`govkit.py:1231-1259`), so a bound-back copy would
+  be a stale alias that no reset reaches; it belongs to the step module alone.
   `resolve_kit_dir` enters the step module as an inline copy under its `# >>> resolve_kit_dir` block
   (`govkit.py:223-261`), which the parity arm grades in Python files
   (`tools/lib/resolve-python.test.sh:343`, its population `:397`), and `check_holder_dead`
   (`upgrade_steps.py:1683`) and `build_update_gov` (`:3236`) call that copy. The arm at
-  `tools/govkit/selftest.py:17329-17338` clears and restores the step module's `_BASH`, the cache
-  the moved `resolve_bash` reads. The ten other names the step module borrows through `load_govkit`
+  `tools/govkit/selftest.py:17329-17338` reads, clears and restores the step module's `_BASH`, the
+  cache the moved `resolve_bash` reads, where it spells `govkit._BASH` at HEAD (`:17329`, `:17330`,
+  `:17338`). The ten other names the step module borrows through `load_govkit`
   stay borrowed, by §4 "What the step module still borrows". The `load_govkit` docstring
   (`upgrade_steps.py:1929-1932`), which names four of its borrowings and the kit-dir resolver among
   them, is rewritten to name those ten. Observed by AC21.
@@ -324,7 +347,8 @@ and S25 and S28 are struck (§8 F3, F4).
   S18's `write_row_order` (`tools/govkit/govkit.py:9613-9622`, its spelling at `:9619`) and
   `write_conflict_candidate` (`:9514-9528`, its spelling at `:9522`) both call it, the latter for
   its candidate directory, so the order and its directory share one key.
-  That unit's AC17 is read as AC28 of this unit. Observed by AC28.
+  That unit's criterion grepping the `outbox / f"update-` spelling is read as AC28 of this unit.
+  Observed by AC28.
 
 ## 3. Non-goals (OUT)
 
@@ -333,6 +357,8 @@ and S25 and S28 are struck (§8 F3, F4).
   item edits another spec.
 - Moving the ten names the step module still borrows through `load_govkit` (§4): finding 30 names
   none of them, and no criterion needs them moved.
+- The re-run of a rollback killed past the schema step, its plant and its criterion: they need the
+  reverse walk's rule for a receipt already below schema 4, which TOOL-dSafePassage-70 builds.
 - The report's left-shift lints beyond the arms named in §7: a spec lint for `<path>:<line>` cites, an
   already-green-at-HEAD check, and the checklist entries the report proposes per item.
 
@@ -341,7 +367,7 @@ and S25 and S28 are struck (§8 F3, F4).
 - **consumes-from** `TOOL-dSafePassage-16` — the predicate and its criteria, which S14, S15 and S16 read
 - **consumes-from** `TOOL-dSafePassage-17` — the no-image downs and the floor-row block, which S17 and S22 read
 - **consumes-from** `TOOL-dSafePassage-18` — the schema-step plants, which S18 reads
-- **consumes-from** `TOOL-dSafePassage-19` — the kill-before-stamp re-run and its AC2, which S19 and S20 extend and read
+- **consumes-from** `TOOL-dSafePassage-19` — the kill-before-stamp re-run and its AC2, which S20 reads
 - **consumes-from** `TOOL-dSafePassage-20` — the Goal's cites and the Inventory's refusal-join sentence, which S9 and S21 read
 - **consumes-from** `TOOL-dSafePassage-21` — `read_plan_destinations` and the file class's sources, which S1, S2 and S3 amend
 - **consumes-from** `TOOL-dSafePassage-22` — the lock plants and `REUSE_MARGIN_S`, which S4, S5 and S7 amend, and the leg its arm runs in, which S6 guards
@@ -353,10 +379,11 @@ and S25 and S28 are struck (§8 F3, F4).
 - **consumes-from** `TOOL-dSafePassage-29` — `STEP_REFUSED_KEYS`, which S8 extends with the credential values
 - **consumes-from** `TOOL-dSafePassage-31` — the `pid_ns` row, before which S26 places the boot rows
 - **consumes-from** `TOOL-dSafePassage-32` — the boot frame of the reuse estimate, which S5 and S7 state per backend
-- **consumes-from** `TOOL-dSafePassage-33` — the no-record branch of the down's verdict, which S19 and S20 rest on
+- **consumes-from** `TOOL-dSafePassage-33` — the no-record branch of the down's verdict, which S20 rests on
 - **hands-off** `TOOL-dSafePassage-38` — S8's credential rows restated as one predicate over keys and values, and every refusal line's keys redacted, the repair of finding 30 of the spec audit of units 27 to 35
 - **hands-off** `TOOL-dSafePassage-42` — findings 25, 3, 13 and 19 of the spec audit of units 27 to 35, AC9 counting code lines and `remove_new_untracked` calling `write_untracked_snapshot`; finding 11, AC12's population as the parity arm's own; finding 12, S24's moved set as its ast closure, `demand_safe_token` and eight constants included; findings 4 and 15, AC18 read as a regression guard; and finding 16, the `BRANCH_PIN` and filter cites
 - **hands-off** `TOOL-dSafePassage-61` — S17 (id 41) and its criterion, the size-limits step's down with no image, built there with that step
+- **hands-off** `TOOL-dSafePassage-70` — S19 (id 42) and its criterion AC17, the shipped-shape plant of the kill-before-stamp re-run, built there with the reverse walk's rule for a receipt already below schema 4
 - **hands-off** `TOOL-dSafePassage-44` — S8's `remote.<x>.url` and `remote.<x>.pushurl` rows, which that unit's pass removes in favour of `test_credential_bearing` and its ssh exemption, finding 3 of the spec audit of units 43 to 46
 
 ## 4. Design
@@ -422,9 +449,9 @@ Minted: `write_untracked_snapshot` in `tools/push-main.sh` (cell `sh.function`, 
 `python tools/lexicon/lexicon.py --suggest write_untracked_snapshot --as sh.function` on 2026-10-23);
 `render_row_order_key` in `tools/govkit/govkit.py` (cell `py.function`, verb `render`, OK by the same
 command with `--as py.function`); the plants `stale-receipt`, `local-url-userinfo`,
-`schema-step-kill-shipped-rows`, `lock-other-boot`, `lock-no-namespace` and `autocrlf-local`; the
-`FIXTURE_LOCK_CHILD` argument `bootid`. Moved, not minted, into `tools/govkit/upgrade_steps.py`: the
-five functions and eight constants of S24. Copied, not minted: `resolve_kit_dir`, under its parity
+`lock-other-boot`, `lock-no-namespace` and `autocrlf-local`; the `FIXTURE_LOCK_CHILD` argument
+`bootid`. Moved, not minted, into `tools/govkit/upgrade_steps.py`: the five functions and eight
+constants of S24, govkit binding back the eight names S24 lists and no other. Copied, not minted: `resolve_kit_dir`, under its parity
 block. No conf key, gate leg or policy key; S6 edits one leg's guard. No item adds a `raise Refusal`
 site: S24's moves keep the branch count, the `resolve_kit_dir` copy raises `LookupError`, which the
 matcher does not count (`tools/govkit/refusal_join.py:259-269`), and S3 takes one branch out of
@@ -441,7 +468,8 @@ step row exists, so no item changes a recorded value.
 Live at landing. It builds at order 8, after every unit of the build, units 27 to 34 included. Its
 items share `tools/govkit/govkit.py`, `tools/govkit/upgrade_steps.py` and `tools/govkit/selftest.py`
 with each other, and the lander items' fixtures run govkit's walk, so the pass is one unit: the minors
-do not split into two disjoint write sets by M6.
+do not split into two disjoint write sets by M6. TOOL-dSafePassage-70 shares order 8 and three of
+these files, so it builds after this unit.
 
 ### Files touched (estimate)
 
@@ -454,7 +482,10 @@ do not split into two disjoint write sets by M6.
 - `tools/push-main.test.sh`
 - `tools/lib/python-floor.sh`
 - `tools/lib/python_floor.py`
+- `tools/govkit/surface-classes.toml`
 - `help/upgrade-steps.md`
+- `help/step-gate.md`
+- `help/python-floor.md`
 
 ### Alternatives rejected
 
@@ -480,16 +511,21 @@ do not split into two disjoint write sets by M6.
 - observability: every new refusal names its file, key or stage.
 - risks: S26 reads a differing `boot_id` as dead on one hostname, so two kernels that share a hostname
   and a tree would be judged one host, which the help page states; S24 moves five functions and
-  eight constants, govkit binds each name back, and the one suite write to a moved name,
-  `govkit._BASH` (`tools/govkit/selftest.py:17330`, `:17338`), moves to the step module's.
+  eight constants, govkit binds back the eight a reader spells off it, and the one suite write to a
+  moved name, `govkit._BASH` (`tools/govkit/selftest.py:17330`, `:17338`), moves to the step
+  module's, since govkit keeps no `_BASH`; S3's plant now takes a shipped file out of the clone, so
+  the `installable` class moves with it on that fixture.
 - testing: the probes and fixtures of §6 and the arms of §7.
 - migration: §4 "Migration".
-- user docs: `help/upgrade-steps.md` (S8, S14, S26).
+- user docs: `help/upgrade-steps.md` (S8, S14, S26), `help/step-gate.md` (S3) and
+  `help/python-floor.md` (S22).
 
 ## 6. Acceptance criteria
 
 The criterion AC15 moved to TOOL-dSafePassage-61 on 2026-10-26, as its AC7, with S17; the label is
 not reused here. AC22 and AC25 were struck on 2026-10-28 with S25 and S28; neither label is reused.
+The criterion AC17 moved to TOOL-dSafePassage-70 on 2026-10-28, as its AC1, with S19; the label is
+not reused here.
 The criteria AC14, AC16, AC20, AC26 and AC27 observe code that is built at HEAD, and each is a
 regression guard that this pass must keep green.
 
@@ -504,8 +540,11 @@ regression guard that this pass must keep green.
   fixture: a scratch clone under `%TEMP%`.
 - **AC3** — When `python "tools/govkit/step_gate.py" --fixture --plant stale-receipt` runs, a branch
   carrying the last landing's source receipt that deletes a shipped file exits 1 naming the `file:`
-  member.
-  Red when: the class reads the stale receipt and the branch is green.
+  member. `python "tools/govkit/step_gate.py" --fixture --plant file` exits 1 naming the `file:`
+  member its plant's `git rm` took out, and
+  `git grep -n "install.json" -- tools/govkit/surface-classes.toml help/step-gate.md` prints nothing.
+  Red when: the class reads the stale receipt and the branch is green, or the `file` plant edits a
+  receipt no reader reads and its fixture exits 0.
 - **AC4** — When `python3 "tools/govkit/upgrade_steps.py" fixture lock --plant lock-live-slow-census`
   runs, the take refuses naming the live holder and exits 1, the census delayed 6 s, and the same
   plant run against a judge copy that reads the clock after the census reclaims.
@@ -559,19 +598,15 @@ regression guard that this pass must keep green.
 - **AC16** — When `git grep -n -F "schema-step-early" -- tools/govkit/upgrade_steps.py` runs, it prints
   the plant's definition in the `rollback` family.
   Red when: the criterion's plant is not built.
-- **AC17** — When `python3 "tools/govkit/upgrade_steps.py" fixture rollback-update --plant schema-step-kill-shipped-rows`
-  runs, the re-run exits 0, both shipped-shape rows are downed a second time with their targets'
-  bytes unchanged by that down, and the receipt and record bytes, times aside, equal an uninterrupted
-  run's.
-  Red when: the re-run stops on a row whose witness no down can falsify, or a second down changes a
-  byte.
 - **AC18** — When `git grep -c -F "<phrase>" -- <cited spec>` runs for each row of §4 "The cites, by
   phrase", each prints `<cited spec>:1`.
   Red when: a phrase is quoted that its spec does not carry, or carries twice.
 - **AC19** — When `bash tools/lib/python-floor.sh down 3.11 <clone>` runs from a scratch clone whose
   plant `v = f"{"X" if c else "y"}"` is committed at `HEAD`, it exits 1 naming the plant, and
   `bash tools/lib/python-floor.sh down 3.11 <clone> <to>` with `<to>` before the plant exits 0.
-  Red when: the call without `<to>` grades the working tree, or either call form refuses the other.
+  `git grep -n -F "down 3.12 <target> [<to>]" -- help/python-floor.md` prints the upgrade-step line.
+  Red when: the call without `<to>` grades the working tree, either call form refuses the other, or
+  the page still spells `<to>` as required.
   fixture: a scratch clone under `%TEMP%`, in `static` mode on node d, as TOOL-dSafePassage-11's AC6
   runs.
 - **AC20** — When `python tools/lib/python_floor.py check --rev 3708a705` runs, it prints seven
@@ -584,9 +619,13 @@ regression guard that this pass must keep green.
   `import` or `from` naming `govkit`, and the attributes it reads off a `load_govkit()` result, bound
   to a name or read inline, are exactly the nine `ast`-visible names of §4 "What the step module still
   borrows"; `git grep -c "^# >>> resolve_kit_dir" -- tools/govkit/upgrade_steps.py` prints
-  `tools/govkit/upgrade_steps.py:1`.
-  Red when: a name of S24's closure is still read off `load_govkit()`, or a borrowed name joins the
-  module unlisted.
+  `tools/govkit/upgrade_steps.py:1`. The same probe over `tools/govkit/govkit.py` finds the eight
+  names S24 binds back each bound once off the step module, and no binding of `_BASH`,
+  `ANSWER_VALUE_RE`, `DRIVE_PREFIX_RE`, `PER_KIT_PATH_TOKENS` or `TOKEN_VALUE_RE`; and
+  `git grep -n "govkit\._BASH" -- tools/govkit/selftest.py` prints nothing.
+  Red when: a name of S24's closure is still read off `load_govkit()`, a borrowed name joins the
+  module unlisted, or govkit keeps a copy of the step module's `_BASH` that the self-test's reset
+  does not reach.
   figure: the nine are PINNED at HEAD `56aef62aa` on 2026-10-28, where the same probe printed
   thirteen: those nine and `resolve_shell_argv`, `resolve_tokens`, `target_context` and
   `resolve_kit_dir`.
@@ -619,7 +658,7 @@ regression guard that this pass must keep green.
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC8 AC17 AC23 AC24 · the self-test runs each plant this unit adds or pins, its failing cases staged by the staged judge copy, the stubs and committed direct writes · none
+New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC8 AC23 AC24 · the self-test runs each plant this unit adds or pins, its failing cases staged by the staged judge copy, the stubs and committed direct writes · none
 New arm: tools/push-main.test.sh · covers AC10 AC11 · the unwritable-snapshot landing and the attended landing with a failing witness, each failing case staged by a lander copy whose snapshot site keeps its inline line · none
 
 AC5's boot half needs a Linux judge, which the self-test on node d and remote CI's `windows-latest`
@@ -684,6 +723,15 @@ TOOL-dSafePassage-26, so no arm is added for it.
   `started_boot` half (§8 F4); S4 keeps the 6 s delay; S14 keeps the help sentence; S26's table
   shows HEAD's verdicts; AC7 reads the comment above the constant and AC18's first phrase fits one
   line; every cite moves to HEAD's lines.
+- rev-7 · 2026-10-28 · §1 · S3 · S20 · S22 · S24 · S39 · §3 · §4 · §5 · AC3 · AC19 · AC21 · §7 ·
+  S19 and AC17 move to TOOL-dSafePassage-70 with the reverse walk's rule they need, after this
+  unit's second build pass measured the re-run exiting 2; S20, §3 and its Edges point there, and S39
+  names TOOL-dSafePassage-26's criterion by what it greps. Three file-list findings of that pass fold
+  in: S3's `file` plant takes a shipped file out by `git rm`, and the class's summary and help row
+  name the plan alone; S22's help line spells `<to>` optional; S24 binds back only the eight moved
+  names a reader spells off govkit, never `_BASH`. §4 Files touched gains
+  `tools/govkit/surface-classes.toml`, `help/step-gate.md` and `help/python-floor.md`; by the brief
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-35-4-spec-writer.md`.
 
 ## 10. Reuse audit
 
@@ -695,7 +743,9 @@ the resolver's parity arm (`tools/lib/resolve-python.test.sh:330-412`), `write_c
 (`tools/gate-legs.json`), and the specced seams of units 16 to 33. S24 extends the import-back seam
 TOOL-dSafePassage-26 built, `blob_at = upgrade_steps.blob_at` (`tools/govkit/govkit.py:6832`) and
 `write_atomic` (`:4303`), and leaves `load_govkit` (`tools/govkit/upgrade_steps.py:1928-1942`) as
-the seam for every name it does not move. S28's rule is TOOL-dSafePassage-26 S31's, kept
+the seam for every name it does not move. S3's plant extends `write_installable_plant`'s staged
+move of a kit README through `run_git_staged` (`tools/govkit/step_gate.py:392-396`, `:421-429`).
+S28's rule is TOOL-dSafePassage-26 S31's, kept
 (`tools/govkit/upgrade_steps.py:656-706`), and its sibling rule is `write_atomic`'s
 (`:1888-1925`).
 `python tools/codebase-map/reuse_lookup.py "move a function into the step module and import it back into govkit"`

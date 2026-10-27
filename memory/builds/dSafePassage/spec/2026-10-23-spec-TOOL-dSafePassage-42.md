@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them
 
-**Status:** DEFERRED · rev-6 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-7 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -148,7 +148,8 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
   `resolve_tokens` (`:1233`), `target_context` (`:1436`) and `demand_safe_token` (`:1406`), which
   `target_context` calls, move; the constants `_BASH`, `TOKEN_RX`, `OPT_IN_ALL`, `PER_KIT_PATH_TOKENS`,
   `SEEDED_TOKENS`, `ANSWER_VALUE_RE`, `DRIVE_PREFIX_RE` and `TOKEN_VALUE_RE`, and the class `Refusal`,
-  are each moved or copied, govkit re-importing what moves; `resolve_kit_dir` (`:197`) stays the inline
+  are each moved or copied, govkit re-importing only the moved names a reader spells off it, never
+  `_BASH`, by TOOL-dSafePassage-35 rev-7 S24; `resolve_kit_dir` (`:197`) stays the inline
   copy S24 names. Its §5 risk line is read as five functions and eight constants. TOOL-dSafePassage-35
   rev-6 S24 states this set itself, re-derived at HEAD `56aef62aa` on 2026-10-28 with the same
   members, and names the ten other names its module borrows through `load_govkit` as kept; this item
@@ -412,6 +413,11 @@ New arm: tools/push-main.test.sh · covers AC9 · the blanked derived count, its
   cites and S24's comparison cite move to the lines that unit cites at HEAD `56aef62aa`, and S24
   drops the stale pin value; no criterion's meaning moved; by
   `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md`.
+- rev-7 · 2026-10-28 · S14 · the cross-read of TOOL-dSafePassage-35 rev-7: S14's "govkit
+  re-importing what moves" disagreed with that unit's S24, which now binds back only the moved names
+  a reader spells off govkit and never `_BASH`, the cache a bound-back copy would leave stale; AC10,
+  "defined there or imported by govkit from there", holds as written; by
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-35-4-spec-writer.md`.
 
 ## 10. Reuse audit
 

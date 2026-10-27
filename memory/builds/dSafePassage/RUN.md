@@ -295,3 +295,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-27T22:12:22Z dispatch · item c8043dcd TOOL-dSafePassage-34 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md tools/drift-audit/drift_signals.py memory/guides/SESSION-KICKOFF.md
 
 2026-10-27T22:23:21Z dispatch · item c8043dcd TOOL-dSafePassage-34 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md tools/drift-audit/drift_signals.py memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-34-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-34.md
+
+2026-10-27T23:27:24Z rescope · item add TOOL-dSafePassage-70 · reason TOOL-dSafePassage-35's second build pass measured a rollback killed between the schema step's down and the stamp as unresumable: the re-run exits 2, 'a receipt at schema 3 has no steps to record fx/s2 in', because move 3 of run_reverse_walk persists on a receipt the schema down already lowered; 35's S19 and AC17 move here with the walk change that makes them buildable, at order 8
