@@ -166,7 +166,9 @@ def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants:
     if not landed:
         raise Stop("gov names no landed ref, so no step's introducing commit can be derived")
     clone = root / "gov"
-    run_git(root, "clone", "-q", "--no-tags", gov_root.as_posix(), clone.as_posix())
+    # PINNED, not inherited: a Windows git install sets core.autocrlf=true system-wide, and the clone
+    # would check out its engine bytes by the machine running the leg (fixture-inherits-ambient-machine-state)
+    run_git(root, "clone", "-q", "--no-tags", "-c", "core.autocrlf=false", gov_root.as_posix(), clone.as_posix())
     run_git(clone, "-c", "advice.detachedHead=false", "checkout", "-q", "--detach", pin)
     full = run_git(gov_root, "rev-parse", "--symbolic-full-name", landed) or landed
     run_git(clone, "fetch", "-q", "--no-tags", gov_root.as_posix(), f"+{full}:refs/heads/main")

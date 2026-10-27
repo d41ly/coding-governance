@@ -18,7 +18,10 @@ over a copy of the killed state, answers `ok`.
 HOW EACH CRITERION WAS OBSERVED. No gate, suite or bar ran in this pass. Each case was run on node d
 (Windows) as the leg's own CLI, one `--case` per run; the logs of the cases this pass did not
 change are the fifth dispatch's (`TOOL-5-wip5/logs-pass5/` in the run's scratchpad), over the same
-code but the `kill` compare.
+code but the `kill` compare. A follow-up commit pins `core.autocrlf=false` on the scratch clone,
+which the bug-class checklist selected (`fixture-inherits-ambient-machine-state`); after it,
+`--case down` exited 0 (570 s) and `--case kill --step govkit/receipt-schema-4` exited 0 (714 s),
+the cases the clone's bytes reach first, and the other cases' runs above predate the pin.
 
 **Evidences:** TOOL-dSafePassage-5
 - AC1 — `upgrade_walk.py --list` exit 0 at this pass: `pin 60d90cb71db51e651aa1c5efe3f6d48ba21a997d · landed ref 1a61f21a… · 3 step(s)`, step 1 `govkit/receipt-schema-4`, step 2 `lib/python-floor-3.15`, step 3 `agent-cap/fanout-cap-to-agents-in-flight`, then 7 plant, 2 gov_plant, 1 condition and 9 arm rows. The selftest row over it is owed at the close.
