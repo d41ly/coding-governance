@@ -9448,6 +9448,28 @@ def test_source_target(root: pathlib.Path, target: pathlib.Path) -> bool:
     return pathlib.Path(root).resolve() == pathlib.Path(target).resolve()
 
 
+def read_plan_destinations(root: pathlib.Path) -> dict[str, dict]:
+    """TOOL-dSafePassage-21 S1. Each destination `planned_writes` derives for gov's own deploy file
+    and selection over gov's own tree `root`, keyed in plan order to the source receipt's `files` row
+    for it, the first row per destination. The ONE derivation source mode's receipt writer and the
+    step gate's `file` class both read. WRITES NOTHING; a plan with problems is a Refusal naming them."""
+    root = pathlib.Path(root)
+    r = Report()
+    reg = load_registry(root)
+    descs = read_descriptors(root, reg, r)
+    deploy = load_deploy(root)
+    plan = [] if r.problems else planned_writes(
+        root, root, deploy, descs, resolve_selection(reg, descs, "default", [], deploy), r)
+    if r.problems:
+        raise Refusal("gov's plan over its own tree refuses: " + "; ".join(r.problems))
+    out: dict[str, dict] = {}
+    for pw in plan:
+        if not pw["missing"]:
+            out.setdefault(pw["dest"], {"path": pw["dest"], "kit": pw["kit"], "role": pw["role"],
+                                        "source": pw["src"]})
+    return out
+
+
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
                write_withdrawals: bool = False,
                kits: list[str] | None = None, accept_role_moves: bool = False,
@@ -9511,15 +9533,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # dirty-path test, which guards a row write, has no population here.
         demand_writable_target(target, "update", None)
         deploy = load_deploy(target)
-        selection = resolve_selection(reg, descs, "default", [], deploy)
-        _plan = planned_writes(root, target, deploy, descs, selection, r)
-        if r.problems:
-            return r.emit()
-        _files: dict[str, dict] = {}
-        for _pw in _plan:
-            if not _pw["missing"]:
-                _files.setdefault(_pw["dest"], {"path": _pw["dest"], "kit": _pw["kit"],
-                                                "role": _pw["role"], "source": _pw["src"]})
+        _files = read_plan_destinations(root)
         receipt = {"schema": RECEIPT_SCHEMA, "mode": "source", "gov_source": ".",
                    "prefix": str(deploy.get("prefix") or "tools"), "kits": list(deploy.get("kits") or []),
                    "files": list(_files.values()), **derive_receipt_schema(prior)}

@@ -15423,6 +15423,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "read_plan_destinations",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_plant_bytes",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"

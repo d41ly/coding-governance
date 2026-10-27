@@ -4137,6 +4137,18 @@ def check_source_mode(tmp: pathlib.Path) -> None:
     check("[dSP-8] AC9 check-wiring and check-install-prefix read the source receipt as no receipt",
           seen[0] == seen[1], f"{[s[0] for s in seen[0]]} vs {[s[0] for s in seen[1]]}")
 
+    # TOOL-dSafePassage-21 AC3 — the step gate's `file` class reads one member set from the source
+    # receipt `update --write` just wrote and, with it removed, from gov's plan on the same tree.
+    sys.path.insert(0, str(HERE))
+    import step_gate  # noqa: E402, PLC0415
+    from_receipt = step_gate.read_file_members(clone)
+    rp.replace(tmp / "gf-receipt.json")
+    from_plan = step_gate.read_file_members(clone)
+    (tmp / "gf-receipt.json").replace(rp)
+    check("[dSP-21] AC3 the file class reads the same members from the source receipt and from the plan",
+          bool(from_receipt) and from_receipt == from_plan,
+          f"receipt only {sorted(from_receipt - from_plan)[:5]}, plan only {sorted(from_plan - from_receipt)[:5]}")
+
     # AC4, first half — a planted row whose up exits 0 and whose witness never holds stops the walk.
     with open(kit / "steps.toml", "a", encoding="utf-8", newline="\n") as fh:
         fh.write('\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\n'

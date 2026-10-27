@@ -12,7 +12,7 @@ of that root, so one spelling names the member at every install prefix:
 
 | Class | A member is |
 |---|---|
-| `file` | each `files` row's path in gov's source-mode receipt, `.governance/install.json` |
+| `file` | each `files` row's path in gov's source-mode receipt, `.governance/install.json`, else each destination gov's own plan derives |
 | `installable` | each destination a shipped kit file lands at, e.g. `installable:{prefix}/roles/README.md` |
 | `hook` | each tracked hook fragment's `name`, e.g. `hook:scratch-guard` |
 | `command` | each Skill shipped to `.claude/skills/<name>/SKILL.md`, by `<name>` |
