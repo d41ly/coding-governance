@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-82 — the spec tokens leg's ceiling covers the packet join over this run's live chain, sized through `derive-ceilings.py --observed` from a reading of the leg alone
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-1 · base ef0ac519 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-10-28 · node a · Tier-1 · base ef0ac519 · streams tooling
 
 **Derived:** PLAY-dClosedLoop-2
 

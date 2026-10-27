@@ -129,7 +129,7 @@ selftest harness self-test	26.8	2	a	2026-09-24	runner
 settings-merge selftest	6.8	2	a	2026-09-24	runner
 shell hygiene (a loop fed by a command substitution)	1.1	1	a	2026-09-24	runner
 shell-hygiene selftest	0.9	2	a	2026-09-24	runner
-spec tokens (a spec's own names resolve)	195.0	1	a	2026-10-26	the leg alone in the worktree at 0d9b531f on a host running no other gate suite, its packet join over 1 live chain run, real 195.0s; killed at its 180 s ceiling twice under the close's bar at 263d31d5, in the pool and on its serial retry
+spec tokens (a spec's own names resolve)	411.0	1	a	2026-10-28	the leg alone in the worktree at cc8880ae on node a, its packet join over 1 live chain run, real 411.0s; the census held no gate suite but the idle orphan run-gates.sh of unattended-dgroundrules-0e6f4a, and another worktree's check-spec-tokens.py overlapped the reading's last 61s; killed at its 390 s ceiling twice under dRankedPlan's close bar, in the pool and on its serial retry
 spec-tokens self-test	156.8	1	a	2026-09-24	runner
 template size <=48KiB	5.1	1	a	2026-09-06	runner
 template size gate selftest	74.8	2	a	2026-09-24	runner

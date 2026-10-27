@@ -76,7 +76,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 80 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 80 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15
 ids TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29
 ids TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43
@@ -166,7 +166,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-80 — a JavaScript declarator that opens with a destructuring pattern ends at its value, so the declarator after it is bound](spec/2026-10-27-spec-TOOL-dRankedPlan-80.md) | 25 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 | [TOOL-dRankedPlan-77 — the spec audit of units 63 to 67: its 16 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-77.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-81 — the spec audit of units 68 to 77: its 20 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-81.md) | 27 | 2 | DEFERRED | rev-1 | 2026-10-27 |
-| [TOOL-dRankedPlan-82 — the spec tokens leg's ceiling covers the packet join over this run's live chain, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-27-spec-TOOL-dRankedPlan-82.md) | — | 1 | DEFERRED | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-82 — the spec tokens leg's ceiling covers the packet join over this run's live chain, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-27-spec-TOOL-dRankedPlan-82.md) | — | 1 | INPROGRESS | rev-2 | 2026-10-28 |
 <!-- /gen:build-units -->
 
 Records: 140 bound to this build, across 4 record folder(s).
