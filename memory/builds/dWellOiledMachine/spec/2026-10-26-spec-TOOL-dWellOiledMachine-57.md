@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-57 — the secret scan over coordination payloads and adapter boundaries, the door's token-shape refusal, and the request record bound to its intake
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 27 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 27 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0335@523e4c44 whole
 
@@ -106,6 +106,7 @@ owner binding's proof, which a claiming node checks before it acquires the reque
 - **hands-off** `TOOL-dWellOiledMachine-27` — `check_request_proof`, the owner binding's proof a mailbox intake must carry to ratify
 - **hands-off** `TOOL-dWellOiledMachine-76` — `check_request_proof`, which that unit's ratification still requires (finding 62)
 - **hands-off** `TOOL-dWellOiledMachine-79` — the door's token-shape scan (findings 43, 67), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — `PAYLOAD_POPULATIONS`, which gains `life`, `attendance`, `binding` and `decision`, and the scan's exit 2, read by the door as a refusal (finding 66)
 ## 4. Design
 
 ### Evidence
@@ -260,6 +261,8 @@ New arm: tools/runtime/secret_scan.py · covers AC3 AC5 · a planted token per p
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-76, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

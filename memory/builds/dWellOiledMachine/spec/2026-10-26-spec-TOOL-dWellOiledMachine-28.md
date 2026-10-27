@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-28 — the unattended kit dissolved: its hooks and its tick taken into the runtime kit, `RESUME_SCHEDULE_*` retired, `/unattended` a client of `run`, with the upgrade steps that carry adopters across
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 61 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 61 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0306@a3aa83b5 whole
 
@@ -226,6 +226,7 @@ upgrade step (night pass `[p1-unattended]` point 1, P38; layer-runtime `[supervi
 - **hands-off** external — dConvergedCharter retires `/unattended`, the kit's remaining files and the forwarder's last reader with it
 - **hands-off** `TOOL-dWellOiledMachine-64` — the four moved hook modules, whose renderer, message table and instruction units that unit moves after them (finding 2)
 - **hands-off** `TOOL-dWellOiledMachine-79` — the moved hooks, tick and suites (findings 48, 51, 52, 53), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — the moved-file list, the moved suites and the path-keyed registry rows re-keyed to `tools/runtime/` (findings 11, 25, 26)
 
 ## 4. Design
 
@@ -450,6 +451,8 @@ requires the condition to survive elsewhere.
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-64, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

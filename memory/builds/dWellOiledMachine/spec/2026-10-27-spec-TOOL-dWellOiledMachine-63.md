@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-63 — the record door's node writer: a sessionless coordination write admitted for this node's own records
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 27 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 27 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-63-deviation-631.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-63-deviation-631.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-79 |
 
 <!-- /gen:spec-records -->
 
@@ -76,6 +77,8 @@ the reach `check_claim_writable`'s `mine` row grants the tick today, and no more
 - **consumes-from** `TOOL-dWellOiledMachine-58` — `check_writer_binding`, its verdict table and `door_fixture.py`, which this unit gives the node writer; without them there is no door to admit through
 - **hands-off** `TOOL-dWellOiledMachine-6` — the node writer, through which the supervisor's `--beat`, its lease reads and its wakes reach the remote with no session
 - **consumes-from** external — TOOL-dPlacedRequest-1 S11's `resolve_fleet_tag` and S2's lease record keys `session` and `fleet-tag`; TOOL-dPlacedRequest-12's `derive_ref_segment`
+- **hands-off** `TOOL-dWellOiledMachine-87` — `read_node_writer` and the node writer's rules, whose sessions gain `prior-session` and whose admission gains the keepalive check (finding 50)
+- **hands-off** `TOOL-dWellOiledMachine-90` — the node writer's docstring, its AC6 page, the Python host rule and the fixture's bash resolver (findings 14, 17, 24, 36, 49)
 
 ## 4. Design
 
@@ -191,6 +194,8 @@ New arm: tools/memory-tree/door_fixture.py · covers AC1 AC2 AC3 AC4 AC5 · each
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 1 (B1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-87, TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

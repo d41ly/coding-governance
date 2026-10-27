@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-36 — the harness conformance fixture: each binary's rows measured into the capability table and the node registry, read by `runtime.binary`, `runtime.owner-harness` and `runtime.act-harness`
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0314@12a43ed3 whole
 **Carries:** node:policy-key.runtime.binary
@@ -114,6 +114,7 @@ TOOL-dWellOiledMachine-15's node facts, and reads them for `runtime.binary` and
 - **hands-off** `TOOL-dWellOiledMachine-29` — `derive_conformance_rows`, which gains the `browser` case live and offline
 - **hands-off** `TOOL-dWellOiledMachine-67` — `derive_conformance_rows`, which that unit extends with the `start-event` row (finding 6)
 - **hands-off** `TOOL-dWellOiledMachine-79` — `derive_conformance_rows` (findings 4, 41), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — the claude-code conformance record, which gains a synthetic prompt-submit log (finding 7)
 ## 4. Design
 
 ### Evidence
@@ -275,6 +276,8 @@ New arm: tools/runtime/selftest.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC9 AC11 ·
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-67, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

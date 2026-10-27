@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-23 — the session-start hook loading the set `memory.default-load` names, ending with `next`'s line, held under the hook channel's measured cap
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 19 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 19 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0301@29109ea6 whole
 **Carries:** node:policy-key.memory.default-load
@@ -85,6 +85,7 @@ letting the harness cut it silently (night pass, point 5).
 - **consumes-from** `TOOL-dWellOiledMachine-1` — `launch_act`, the one launcher the live measurement starts its headless session through
 - **consumes-from** external — `gov_map.py` and its cache (TOOL-dTotalRecall-14 S2, S7)
 - **hands-off** `TOOL-dWellOiledMachine-79` — the session-start fallback and `measure_hook_cap.py` (findings 23, 41, 57), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — the map extra keyed on `owner`, which treats `machine` as `yes` (finding 38)
 
 ## 4. Design
 
@@ -217,6 +218,8 @@ New arm: tools/runtime/measure_hook_cap.py · covers AC4 · the cut and attachme
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

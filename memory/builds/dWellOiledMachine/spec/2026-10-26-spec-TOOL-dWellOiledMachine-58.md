@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-58 — the record door: every coordination write bound to its writer's session binding, and the two closing items it admits
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 26 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 26 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0505@d65ddfae whole
 **Carries:** node:item.life.unlease
@@ -150,6 +150,8 @@ git boundary is the floor (the owner's FK-5-3, the whole-design audit's A2-F10).
 - **hands-off** external — dShippedRelease's `deploy.unlease` and dTendedCadence's Maintain's prune, each joining `DOOR_CLOSING_VERBS`
 - **hands-off** `TOOL-dWellOiledMachine-63` — `check_writer_binding` and its verdict table, which that unit gives a node writer for the sessionless tick and supervisor (finding 1)
 - **hands-off** `TOOL-dWellOiledMachine-79` — the door's namespaces and rules (finding 67), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-84` — `write_gov_ref`'s namespace list and `check_writer_binding`, which gain the exact-entry kind for `refs/gov/attendance` (finding 39)
+- **hands-off** `TOOL-dWellOiledMachine-90` — `door_fixture.py`'s binding and token cases, its resolver for bash, and the door's reading of a scan exit 2 (findings 6, 24, 66)
 
 ## 4. Design
 
@@ -328,6 +330,8 @@ New arm: tools/memory-tree/door_fixture.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-63, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-84, TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

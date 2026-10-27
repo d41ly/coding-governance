@@ -66,3 +66,27 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-26T23:24:04Z rescope · item add TOOL-dWellOiledMachine-78 · reason promoted from the spec audit round 1 (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md), finding 64 at HIGH, item H15, repairing TOOL-dWellOiledMachine-6
 
 2026-10-26T23:24:12Z rescope · item add TOOL-dWellOiledMachine-79 · reason promoted from the spec audit round 1 (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md), its 49 minor findings batched into one unit, 37 MEDIUM (findings 4 7 8 9 10 11 12 13 14 16 17 18 19 20 21 30 31 32 33 39 41 42 45 48 51 52 53 54 55 56 57 61 65 66 67 69 70) and 12 LOW (findings 22 23 24 25 26 27 36 37 40 43 44 58), repairing no one unit
+
+2026-10-27T01:31:46Z rescope · item add TOOL-dWellOiledMachine-80 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 1 at HIGH, item H1, repairing TOOL-dWellOiledMachine-78
+
+2026-10-27T01:31:55Z rescope · item add TOOL-dWellOiledMachine-81 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 16 at HIGH, item H2, repairing TOOL-dWellOiledMachine-65
+
+2026-10-27T01:31:57Z rescope · item add TOOL-dWellOiledMachine-82 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 18 at HIGH, item H3, repairing TOOL-dWellOiledMachine-71
+
+2026-10-27T01:31:59Z rescope · item add TOOL-dWellOiledMachine-83 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 30 at HIGH, item H4, repairing TOOL-dWellOiledMachine-78
+
+2026-10-27T01:32:01Z rescope · item add TOOL-dWellOiledMachine-84 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 39 at HIGH, item H5, repairing TOOL-dWellOiledMachine-79
+
+2026-10-27T01:32:02Z rescope · item add TOOL-dWellOiledMachine-85 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 40 at HIGH, item H6, repairing TOOL-dWellOiledMachine-79
+
+2026-10-27T01:32:04Z rescope · item add TOOL-dWellOiledMachine-86 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 41 at HIGH, item H7 (shared with finding 61), repairing TOOL-dWellOiledMachine-72
+
+2026-10-27T01:32:06Z rescope · item add TOOL-dWellOiledMachine-87 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 50 at HIGH, item H8, repairing TOOL-dWellOiledMachine-63
+
+2026-10-27T01:32:08Z rescope · item add TOOL-dWellOiledMachine-88 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 61 at HIGH, item H7 (shared with finding 41), repairing TOOL-dWellOiledMachine-72
+
+2026-10-27T01:32:09Z rescope · item add TOOL-dWellOiledMachine-89 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), finding 63 at HIGH, item H9, repairing TOOL-dWellOiledMachine-78
+
+2026-10-27T01:32:11Z rescope · item add TOOL-dWellOiledMachine-90 · reason promoted from the spec audit of the round-1 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md), its 55 minor findings batched into one unit, 46 MEDIUM (findings 2 3 4 5 6 7 8 9 10 11 15 19 20 21 22 23 24 25 26 27 31 32 33 35 38 42 43 44 45 46 52 53 54 55 56 57 58 59 60 62 64 65 66 67 68 69) and 9 LOW (findings 12 14 17 29 36 37 47 48 49), repairing no one unit
+
+2026-10-27T02:14:00Z review · item dWellOiledMachine-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 10 · minors 55 · disposition promote

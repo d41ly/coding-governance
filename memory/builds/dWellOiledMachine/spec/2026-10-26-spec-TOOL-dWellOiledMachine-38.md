@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-38 — the per-session orientation card retired into the session binding, with the write gate's card and route reads re-pointed in the same unit
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0316@8f48a4b0 whole
 
@@ -90,6 +90,7 @@ The old path is still read for `install.deprecation-window` releases as an upgra
 - **consumes-from** `TOOL-dWellOiledMachine-12` — `session-bindings`: the record, its home `<git-common-dir>/gov/session-bindings/<sid>.md`, its `owner` field and its writer `session_binding.py`; without it the card has no home to move into
 - **consumes-from** external — the `[[upgrade]]` row grammar (TOOL-dSafePassage-1 S1) and the window rule over `install.deprecation-window` (TOOL-dSafePassage-6 S5)
 - **hands-off** `TOOL-dWellOiledMachine-73` — S2's card store through `put-card`, to which that unit adds the legacy home where the runtime kit is absent (finding 50)
+- **hands-off** `TOOL-dWellOiledMachine-90` — the orientation exemption keyed on `owner`, which does not exempt `machine` (finding 38)
 
 ## 4. Design
 
@@ -248,6 +249,8 @@ New arm: tools/check-wiring.test.sh · covers AC7 · its card fixtures planted a
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-73.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

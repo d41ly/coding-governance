@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-65 — the stall journal line carries the limit's reset, and the limit hold reads it there
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 54 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 54 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-65-deviation-651.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-65-deviation-651.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-79 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,8 @@ line and points every reader of the retired sidecar at the journal.
 - **consumes-from** `TOOL-dWellOiledMachine-34` — S7's journal write from `stall-recorder.js` and the `journal.py read` verb this unit's hold reads; without them there is no line to carry the reset
 - **consumes-from** `TOOL-dWellOiledMachine-6` — `supervise.py`'s limit hold and its sidecar parser, which this unit re-points and moves
 - **consumes-from** `TOOL-dWellOiledMachine-47` — `limits_fixture.py`, whose stub this unit re-points
+- **hands-off** `TOOL-dWellOiledMachine-81` — `extractResetUtc` and the stall line's `reset`, which that unit reads from the transcript's measured limit record (finding 16)
+- **hands-off** `TOOL-dWellOiledMachine-90` — the stall line's format, the hold's line filter and `reset=none` rule, and the retired-sidecar grep (findings 8, 12, 33, 53, 54, 55)
 
 ## 4. Design
 
@@ -133,6 +136,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 3 (H2).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-81, TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

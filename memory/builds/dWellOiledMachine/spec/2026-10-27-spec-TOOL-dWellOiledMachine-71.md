@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-71 — a one-fragment settings-merge upserts its packs into the pack table and re-renders every entry from the whole table
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-71-deviation-711.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-71-deviation-711.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-79 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,8 @@ table by a stable key, and proves that rendering B after A still lists A.
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-10` — S3's pack table and dispatcher-entry render, which this unit makes incremental
+- **hands-off** `TOOL-dWellOiledMachine-82` — S3's scratch copy of the pack table, which govkit's stale probe compares (finding 18)
+- **hands-off** `TOOL-dWellOiledMachine-90` — the pack table's location rule and the normalised `fragment` key (finding 60)
 
 ## 4. Design
 
@@ -124,6 +127,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 46 (H8).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-82, TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

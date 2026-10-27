@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-74 — a kept return reused only for the same spawn input: the input print joins the spawn site's label
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 32 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 32 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-74-deviation-741.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-74-deviation-741.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-79 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,7 @@ only to a spawn whose input is the one that produced it.
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-8` — the `gov_returns_js` block, `readKeptReturn`, its carriers and the stub runner of its AC5, which this unit re-keys
+- **hands-off** `TOOL-dWellOiledMachine-90` — the kept-return label, re-rendered with the print before the stage, `readKeptReturn` and its readers (findings 3, 21, 32, 43)
 
 ## 4. Design
 
@@ -134,6 +136,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 59 (H11).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

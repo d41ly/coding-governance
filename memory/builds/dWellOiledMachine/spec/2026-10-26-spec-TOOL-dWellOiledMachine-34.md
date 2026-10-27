@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-34 — `gov trace <key>` and `gov why <key>` over the one index, one timeline engine bounded by `trace.rows`, and the health and stall logs folded into the journal grammar
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 53 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 53 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0312@60d68fcb whole
 **Carries:** node:policy-key.trace.rows
@@ -120,6 +120,7 @@ grammar, keyed (P35).
 - **consumes-from** external — TOOL-dTotalRecall-9's `record find` and `record show`; TOOL-dDeclaredLoop-23's `read_commits`; PLAY-dOrderedCharter-28's edge types
 - **hands-off** `TOOL-dWellOiledMachine-65` — S7's stall journal line and `journal.py read`, which that unit gives a `reset` key and points the limit hold at (finding 3)
 - **hands-off** `TOOL-dWellOiledMachine-79` — `journal.py read` (finding 48), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — `journal.py read --producer health`, through which the four suites read the health events (findings 25, 44, 67)
 
 ## 4. Design
 
@@ -265,6 +266,8 @@ New arm: tools/lib/resolve-python.test.sh · covers AC4 AC5 · one byte changed 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-65, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

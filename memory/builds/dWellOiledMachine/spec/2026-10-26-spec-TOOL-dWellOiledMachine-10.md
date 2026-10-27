@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-10 — the one enforcement surface: the kits' fragments as packs behind one dispatcher entry per event, failing closed
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0288@c845fe18 whole
 **Carries:** node:point.hook-packs
@@ -166,6 +166,7 @@ hardens the git hooks and the lander (layer-runtime `[enforce]`, :592-717; RT-2,
 - **hands-off** `TOOL-dWellOiledMachine-75` — S6's failed-pack rule and the dispatcher fixture, which that unit's intake case and record-pack case extend (finding 60)
 - **hands-off** `TOOL-dWellOiledMachine-77` — S7's `GOV_SESSION_KIND=act` marker, which that unit's bind rule reads (finding 63)
 - **hands-off** `TOOL-dWellOiledMachine-79` — `dispatch.js`, the session arm and the decision table (findings 8, 36, 42, 45, 66), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — the pack table's one location, `.claude/hook-packs.json` under the target root, which `dispatch.js` reads (finding 60)
 ## 4. Design
 
 ### Evidence
@@ -423,6 +424,8 @@ New arm: tools/push-main.test.sh · covers AC14 · a drifted `core.hooksPath`, s
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-69, TOOL-dWellOiledMachine-71, TOOL-dWellOiledMachine-75, TOOL-dWellOiledMachine-77, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

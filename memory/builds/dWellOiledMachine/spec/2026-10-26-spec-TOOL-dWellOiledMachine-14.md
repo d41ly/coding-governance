@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-14 — harness adapters with capability tables, measured and never claimed, and their install targets
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0292@7eaaf1a6 whole
 **Carries:** node:point.harness-adapters
@@ -127,6 +127,7 @@ declaring them (gap-rt-19, gap-register:284). This unit registers each harness a
 - **hands-off** `TOOL-dWellOiledMachine-67` — `CAPABILITY_NAMES` and `read_capability`, which `start-event` joins (finding 6)
 - **hands-off** `TOOL-dWellOiledMachine-68` — the `{skill_home}` token, `GOV_SKILL_HOME` and `--check-targets`, which that unit applies to the runlog and unattended Skills (finding 28)
 - **hands-off** `TOOL-dWellOiledMachine-79` — `harness.py`, `CAPABILITY_NAMES` and the govkit fixture (findings 7, 8, 21, 44), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — `harness.py capability`, which check-wiring's session arm calls, and the adapter's skill home check 31 resolves (findings 31, 57)
 ## 4. Design
 
 ### Evidence
@@ -282,6 +283,8 @@ New arm: tools/govkit/selftest.py · covers AC4 AC5 · a fixture target under th
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-67, TOOL-dWellOiledMachine-68, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

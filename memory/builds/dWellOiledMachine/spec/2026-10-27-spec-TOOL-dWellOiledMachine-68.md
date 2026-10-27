@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-68 — the runlog and unattended Skills read their destination through `{skill_home}`, completing the install-target re-pointing
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-68-deviation-681.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-68-deviation-681.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-79 |
 
 <!-- /gen:spec-records -->
 
@@ -49,6 +50,7 @@ the check's population comes from the tree and reads clean.
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-14` — the `{skill_home}` token seeded by `target_context`, `GOV_SKILL_HOME` and `harness.py --check-targets`, which this unit's rows and adopters use and which grades them
+- **hands-off** `TOOL-dWellOiledMachine-90` — the Skills' `{skill_home}` destination, whose hard-coded readers and check 31 resolve through it (findings 27, 57)
 
 ## 4. Design
 
@@ -116,6 +118,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 28 (H5).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

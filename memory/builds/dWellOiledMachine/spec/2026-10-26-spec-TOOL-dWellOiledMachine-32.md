@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-32 — the act as the key: minted at launch with the harness session id, its record, its cost and duration, and the identity committed records may carry
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 15 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 15 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0310@6e643d4a whole
 **Carries:** node:record-kind.act
@@ -116,6 +116,7 @@ say, and makes the run log's closed-schema leg read the same key.
 - **hands-off** `TOOL-dWellOiledMachine-34` — `act`, the act records whose `node`, `cause` and `transcript=` the trace and the why chain read
 - **hands-off** `TOOL-dWellOiledMachine-67` — `launch_act`'s session-id branch and `act.py`'s fixture, which that unit re-spells in the measured values (finding 6)
 - **hands-off** `TOOL-dWellOiledMachine-79` — the act record and its record-kind row (findings 10, 24), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — S5's start-event timeout, tree kill, `state: failed` and exit 3, carried onto the `returned` branch (finding 56)
 ## 4. Design
 
 ### Evidence
@@ -268,6 +269,8 @@ New arm: tools/runlog/selftest.py · covers AC7 · a session id in an `Acts` row
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-67, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-35 — the session node derived from bindings: `runs-in` and `after`, acts and sessions as native-id classes, the live inbox and the card's session list
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0313@ab83255b whole
 
@@ -97,6 +97,7 @@ adapter (P33, P36; memory-plan `[sessions]`).
 
 - **hands-off** `TOOL-dWellOiledMachine-27` — `[[native]]`, the `act` and `session` classes a drained root's `Caused-by` may name
 - **hands-off** `TOOL-dWellOiledMachine-79` — `session_node.py` (finding 11), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — the session node keyed on `owner`, which treats `machine` as `yes` (finding 38)
 ## 4. Design
 
 ### Evidence
@@ -258,6 +259,8 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC6 · the `ses
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

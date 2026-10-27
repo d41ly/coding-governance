@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-12 — sessions bound on every source, a card never silently undelivered, and each compaction flushed, journaled and re-oriented
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 17 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 17 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0290@b1905801 whole
 **Carries:** node:record-kind.session-binding
@@ -135,6 +135,7 @@ summary drops; and the card is held under the harness's re-attachment cap (night
 - **hands-off** `TOOL-dWellOiledMachine-73` — `session_binding.py`, the anchor that unit resolves the runtime kit by (finding 50)
 - **hands-off** `TOOL-dWellOiledMachine-77` — `bind` and the binding's `owner` field, whose rule that unit narrows to sessions no machine launcher started (finding 63)
 - **hands-off** `TOOL-dWellOiledMachine-79` — `session_binding.py` and its pack (findings 7, 42, 57), which the spec audit's minors batch repairs
+- **hands-off** `TOOL-dWellOiledMachine-90` — card replay keyed on `owner`, which treats `machine` as `yes`, and `hold_lock`, under which the node salt is first created (findings 38, 69)
 ## 4. Design
 
 ### Evidence
@@ -321,6 +322,8 @@ New arm: tools/check-wiring.test.sh · covers AC2 · the merged settings carry a
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-64, TOOL-dWellOiledMachine-70, TOOL-dWellOiledMachine-73, TOOL-dWellOiledMachine-77, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

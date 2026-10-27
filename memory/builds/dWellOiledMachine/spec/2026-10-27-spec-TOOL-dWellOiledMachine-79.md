@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-79 — the spec audit's 49 medium and low findings, batched: capability rows, pack shapes, launch environment, registries, renders and the records that miscount
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 63 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 63 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-79-deviation-791.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-79-deviation-791.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-64 |
 
 <!-- /gen:spec-records -->
 
@@ -279,6 +280,9 @@ is amended at this unit's pass, its §9 line naming this unit and the finding.
 - **consumes-from** `TOOL-dWellOiledMachine-57` — the token-shape scan at the door (S47)
 - **consumes-from** `TOOL-dWellOiledMachine-58` — the door's namespaces and rules (S47)
 - **consumes-from** `TOOL-dWellOiledMachine-60` — `run_build_push`'s fence (S10)
+- **hands-off** `TOOL-dWellOiledMachine-84` — S47's attendance entry, re-spelled as the exact ref `refs/gov/attendance` (finding 39)
+- **hands-off** `TOOL-dWellOiledMachine-85` — S7's `read_node_salt`, which reads the old store names as a fallback and copies them across (finding 40)
+- **hands-off** `TOOL-dWellOiledMachine-90` — S1's replay, S3's verb, S7's salt, S13's leg, S22's normaliser, S28's tickets, S31's population, S35's re-point, S36's rows, S47's scan and §7's legs (findings 4, 5, 6, 7, 11, 25, 26, 29, 31, 35, 37, 44, 47, 48, 65, 66, 67, 68, 69)
 
 ## 4. Design
 
@@ -502,6 +506,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit round 1's 49 medium and low findings batched.
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-84, TOOL-dWellOiledMachine-85, TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

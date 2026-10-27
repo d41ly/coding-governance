@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-64 — the moved hooks' message renderer and table moved with them into the runtime kit
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 62 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 62 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-64-deviation-641.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-64-deviation-641.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-79 |
 
 <!-- /gen:spec-records -->
 
@@ -63,6 +64,7 @@ still names its rule.
 - **consumes-from** `TOOL-dWellOiledMachine-28` — the four moved hook modules in `tools/runtime/`, whose sibling renderer this unit supplies; without the move there is nothing to repair
 - **consumes-from** `TOOL-dWellOiledMachine-21` — `render-message.js`, `messages.json`, the instruction units and the `messages` `[[target]]` row this unit moves
 - **consumes-from** `TOOL-dWellOiledMachine-12` — `tools/runtime/instructions.toml`, the runtime kit's instruction file the units join
+- **hands-off** `TOOL-dWellOiledMachine-90` — the moved hooks' load probe made static, the lazy-require evidence, the Files touched token and the refusal cases (findings 10, 15, 46, 52)
 
 ## 4. Design
 
@@ -137,6 +139,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 2 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

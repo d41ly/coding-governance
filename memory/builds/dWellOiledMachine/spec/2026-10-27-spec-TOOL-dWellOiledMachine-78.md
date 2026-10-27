@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-78 — one supervisor per build: the tick's liveness read with the recorded image and stamp, `unknown` held as live, and the start claimed exclusively
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 29 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 29 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-78-deviation-781.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-78-deviation-781.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-79 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,10 @@ exact, treats `unknown` as live, and lets exactly one tick start a supervisor.
 ### Edges
 
 - **consumes-from** `TOOL-dWellOiledMachine-6` — `run_supervisors`, the supervisor pid file and its recorded image and stamp, which this unit reads exactly and claims exclusively
+- **hands-off** `TOOL-dWellOiledMachine-80` — S4's stale test, named `check_supervisor_claim_stale`, which gains the incomplete-claim arm (finding 1)
+- **hands-off** `TOOL-dWellOiledMachine-83` — S3's claim and S4's rename break, which that unit puts behind the lifted guarded lock (finding 30)
+- **hands-off** `TOOL-dWellOiledMachine-89` — S3's claim, whose parent that unit makes and whose failure it classifies (finding 63)
+- **hands-off** `TOOL-dWellOiledMachine-90` — the claim's recorded pid read as the Windows pid, its `unknown` reading, and the fixture's bash resolver (findings 23, 24, 64)
 
 ## 4. Design
 
@@ -128,6 +133,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 64 (H15).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-80, TOOL-dWellOiledMachine-83, TOOL-dWellOiledMachine-89, TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 

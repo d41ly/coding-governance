@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-67 — launch_act branches on the measured values of `preset-session-id`, and `start-event` becomes a measured row
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-67-deviation-671.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-67-deviation-671.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-79 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,7 @@ measured row, and proves the launch through the shipped table.
 - **consumes-from** `TOOL-dWellOiledMachine-32` — `launch_act`'s session-id branch and `act.py`'s fixture, which this unit re-spells
 - **consumes-from** `TOOL-dWellOiledMachine-36` — `derive_conformance_rows` and its value set for `preset-session-id`, which this unit's branch reads and which gains the `start-event` row
 - **consumes-from** `TOOL-dWellOiledMachine-14` — `CAPABILITY_NAMES`, `read_capability` and the seeded tables `start-event` joins
+- **hands-off** `TOOL-dWellOiledMachine-90` — the `returned` branch, which takes 32 S5's start-event timeout, and the replay argument spelled as a path (findings 7, 56)
 
 ## 4. Design
 
@@ -143,6 +145,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit round 1, finding 6 (H4).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
 
 ## 10. Reuse audit
 
