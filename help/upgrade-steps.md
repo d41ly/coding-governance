@@ -50,9 +50,12 @@ starts it:
   gov reads it, `include.path` files included, and refuses the step, spawning nothing, when it
   declares a key git runs as a program or sends as a credential. The check reads the config of
   every repository git can enter from yours, each submodule's included: a `git status` in your
-  repository runs a submodule's own filters, so every directory under `.git/modules/`, checked out
-  or not, and every checked-out submodule, nested ones too, is read the same way, and a refusal
-  names the submodule's path beside the key. The refused keys are that whole class as git itself
+  repository runs a submodule's own filters, so every directory under `modules/` in your
+  worktree's own git directory, checked out or not, and every checked-out submodule, nested ones
+  too, is read the same way, and a refusal names the submodule's path beside the key. The check
+  reads the submodules of the target's own worktree: in a linked worktree (`git worktree add`)
+  that is `.git/worktrees/<name>/modules/`, never the main worktree's `.git/modules/`, which a step
+  run in the linked worktree never enters. The refused keys are that whole class as git itself
   documents it: every key `git help --config` lists whose name says it runs something (a
   `program`, `command`, `cmd`, `editor`, `path`, `driver`, `helper`, `pager` and the like), and
   gov's self-test re-reads that list on every run, so a key a later git adds fails the test until

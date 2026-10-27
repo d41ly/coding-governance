@@ -3426,7 +3426,8 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     TOOL-dSafePassage-24 AC1 to AC4 ride the same fixture: the four `local-*` plants refused, their
     `-stub` twins red naming the executor's canary; TOOL-dSafePassage-29 AC1, AC2 and AC4 add
     `local-gpg`, `local-hook` and the class arm over `git help --config`; TOOL-dSafePassage-30 AC1
-    to AC3 add the three `submodule-*` plants and their `-stub` twins."""
+    to AC3 add the three `submodule-*` plants and their `-stub` twins; TOOL-dSafePassage-36 AC1 and
+    AC2 add the two linked-worktree plants and a walk copy rooted at the common dir."""
     us_py = HERE / "upgrade_steps.py"
 
     def fixture(py: pathlib.Path, *plant: str) -> tuple[int, str]:
@@ -3512,6 +3513,36 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               + f"and names {', '.join(needles)}",
               rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
               and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+
+    # TOOL-dSafePassage-36 AC1 and AC2: a linked-worktree target's walk is rooted at its own git dir,
+    # so its own de-initialised submodule's filter refuses the step and the main worktree's does not;
+    # the `-stub` twin's filter runs, and a copy whose walk is rooted at the common dir reds both.
+    head = "isolation: fixture/update · refused · fixture/update up: the target's own git config declares what git runs"
+    wt_on = ("filter.canary.clean in ", "/.git/worktrees/wt/modules/sub/config (submodule sub), so nothing")
+    for plant, want, on_refusal, needles in (
+            ("submodule-unpopulated-worktree", 1, wt_on, ("unpopulated-worktree canary: absent",)),
+            ("submodule-unpopulated-worktree-stub", 1, (), ("fixture/update · up · ok",
+                                                            "unpopulated-worktree canary: present · filter-clean")),
+            ("submodule-main-only", 0, (), ("fixture/update · up · ok", "main-only canary: absent"))):
+        rc, out = fixture(us_py, plant)
+        line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
+        check(f"[dSP-36] fixture isolation {plant} exits {want}, "
+              + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
+              + f"and names {', '.join(needles)}",
+              rc == want and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
+    rooted = tmp / "common-rooted"
+    rooted.mkdir(parents=True)
+    shutil.copy(HERE / "govkit.py", rooted / "govkit.py")
+    walk = '                mods = d / "modules"'
+    src = us_py.read_text(encoding="utf-8")
+    (rooted / "upgrade_steps.py").write_text(src.replace(walk, '                mods = (pathlib.Path(git(target, '
+                                             '"rev-parse", "--path-format=absolute", "--git-common-dir").strip()) '
+                                             'if not via else d) / "modules"'), encoding="utf-8", newline="\n")
+    for plant in ("submodule-unpopulated-worktree", "submodule-main-only"):
+        rc, out = fixture(rooted / "upgrade_steps.py", plant)
+        check(f"[dSP-36] a walk copy rooted at the common dir reds fixture isolation {plant}",
+              src.count(walk) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
     # TOOL-dSafePassage-29 S3 and AC4, the class arm: every executor-shaped key `git help --config`
     # lists matches a `STEP_REFUSED_KEYS` or a `STEP_UNREFUSED_KEYS` row, the counts re-derived on

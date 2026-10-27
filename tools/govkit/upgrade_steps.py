@@ -182,7 +182,8 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "local-include", "local-include-stub", "local-gpg", "local-gpg-stub",
                   "local-hook", "local-hook-stub", "submodule-filter", "submodule-filter-stub",
                   "submodule-nested", "submodule-nested-stub", "submodule-unpopulated",
-                  "submodule-unpopulated-stub")
+                  "submodule-unpopulated-stub", "submodule-unpopulated-worktree",
+                  "submodule-unpopulated-worktree-stub", "submodule-main-only")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -883,8 +884,9 @@ def read_target_repositories(target) -> list[dict[str, str]] | str:
     """Every repository a git command run in `target` can enter (TOOL-dSafePassage-30 S1), as
     `{"git_dir", "reached_by"}` rows, the target's own first with `reached_by` empty: each gitlink
     of a repository's index whose working directory holds a `.git` entry, walked again over that
-    repository's index, and every directory under `<common dir>/modules/` (a submodule's own git
-    directory for one) holding a `config`, populated or not. Each is listed once by its resolved
+    repository's index, and every directory under `<git dir>/modules/` (a submodule's own git
+    directory for one) holding a `config`, populated or not, the target's `<git dir>` its own
+    worktree's (TOOL-dSafePassage-36 S1), never the common one. Each is listed once by its resolved
     path. Every git call runs under `build_step_env`'s environment; one that fails returns the call
     and git's exit as a string, never an empty population."""
     with tempfile.TemporaryDirectory(prefix="gk-repos-", ignore_cleanup_errors=True) as td:
@@ -912,7 +914,6 @@ def read_target_repositories(target) -> list[dict[str, str]] | str:
         try:
             target = pathlib.Path(target)
             add(git(target, "rev-parse", "--absolute-git-dir").strip(), "", target)
-            common = pathlib.Path(git(target, "rev-parse", "--path-format=absolute", "--git-common-dir").strip())
             while queue:
                 d, via, work = queue.pop(0)
                 if work is not None:
@@ -922,7 +923,7 @@ def read_target_repositories(target) -> list[dict[str, str]] | str:
                         if meta.startswith("160000 ") and (work / path / ".git").exists():
                             add(git(work / path, "rev-parse", "--absolute-git-dir").strip(),
                                 f"{via}/{path}".lstrip("/"), work / path)
-                mods = (common if not via else d) / "modules"  # the target's common dir, else its own
+                mods = d / "modules"  # a linked worktree's submodules sit under its own git dir
                 for root, dirs, files in os.walk(mods):
                     if "config" in files:
                         # ponytail: inside a submodule's git dir only its own `modules/` holds more
@@ -1719,6 +1720,12 @@ FIXTURE_STEPS = {
         "import subprocess, sys\n"
         "p = subprocess.run(['git', '-C', sys.argv[1], 'status', '--porcelain'], capture_output=True, timeout=60)\n"
         "open(sys.argv[2], 'w', encoding='utf-8').write(str(p.returncode))\n"),
+    "update.py": (
+        "import subprocess, sys\n"
+        "u = subprocess.run(['git', '-c', 'protocol.file.allow=always', '-C', sys.argv[1], 'submodule', 'update',\n"
+        "                    '-q', '--init'], capture_output=True, timeout=60)\n"
+        "p = subprocess.run(['git', '-C', sys.argv[1], 'status', '--porcelain'], capture_output=True, timeout=60)\n"
+        "open(sys.argv[2], 'w', encoding='utf-8').write(f'{u.returncode} {p.returncode}')\n"),
     "reaches.py": "import sys\nopen(sys.argv[1], 'w').close()\nimport adopter_only\n",
     "opens.py": "import sys\nsys.path.insert(0, sys.argv[1])\nimport adopter_only\n",
 }
@@ -1955,8 +1962,11 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
     elif plant.startswith("submodule-"):
         # TOOL-dSafePassage-30 S4: the filter in a submodule's own config, which the superproject's
         # `git status` runs; `nested` sets it one submodule deeper, `unpopulated` in a submodule the
-        # target does not check out.
+        # target does not check out. TOOL-dSafePassage-36 S3: `unpopulated-worktree` sets it in a
+        # linked-worktree target's own de-initialised submodule, whose step updates it and runs
+        # `git status`, and `main-only` in the main worktree's, which that target never enters.
         kind = plant.removeprefix("submodule-").removesuffix("-stub")
+        linked = kind in ("unpopulated-worktree", "main-only")
         fx = ["git", "-c", "protocol.file.allow=always", "-c", "user.name=gk-fx", "-c", "user.email=gk-fx@invalid"]
 
         def fx_git(cwd: pathlib.Path, *args: str) -> None:
@@ -1978,10 +1988,16 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         fx_git(target, "submodule", "add", "-q", sub.as_posix(), "sub")
         if kind == "nested":
             fx_git(target, "submodule", "update", "-q", "--init", "--recursive")
-        deep = target / "sub" / "inner" if kind == "nested" else target / "sub"
+        stepped = target
+        if linked:
+            fx_git(target, "commit", "-q", "-m", "fx")
+            stepped = tmp / "wt"
+            fx_git(target, "worktree", "add", "-q", stepped.as_posix())
+            fx_git(stepped, "-c", "protocol.file.allow=always", "submodule", "update", "-q", "--init")
+        deep = {"nested": target / "sub" / "inner", "unpopulated-worktree": stepped / "sub"}.get(kind, target / "sub")
         fx_git(deep, "config", "filter.canary.clean", f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
-        if kind == "unpopulated":
-            fx_git(target, "submodule", "deinit", "-q", "-f", "sub")
+        if kind == "unpopulated" or linked:
+            fx_git(stepped, "submodule", "deinit", "-q", "-f", "sub")
         else:
             # same size, new mtime: git cannot tell it changed without the clean filter
             (deep / "a.txt").write_text("b\n", encoding="utf-8", newline="\n")
@@ -1990,13 +2006,16 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         canaries.mkdir()
         where = {"filter": ".git/modules/sub/config (submodule sub)",
                  "nested": ".git/modules/sub/modules/inner/config (submodule sub/inner)",
-                 "unpopulated": ".git/modules/sub/config (submodule sub)"}[kind]
+                 "unpopulated": ".git/modules/sub/config (submodule sub)",
+                 "unpopulated-worktree": (target / ".git" / "worktrees" / "wt" / "modules" / "sub").resolve().as_posix()
+                 + "/config (submodule sub)"}.get(kind, "")
         done = reports / "status.rc"
-        status = row("status", ["python", "{gov}/steps/status.py", "{target}", done.as_posix()])
+        status = (row("update", ["python", "{gov}/steps/update.py", "{target}", done.as_posix()]) if linked
+                  else row("status", ["python", "{gov}/steps/status.py", "{target}", done.as_posix()]))
         if plant.endswith("-stub"):
             g["check_target_local_config"] = lambda t: []
         try:
-            r = run_step_isolated(status, "up", target, gov)
+            r = run_step_isolated(status, "up", stepped, gov)
             print(f"isolation: {status.id} · up · {r['verdict']}")
             refused = ""
         except Refusal as e:
@@ -2004,14 +2023,17 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             print(f"isolation: {status.id} · refused · {e}")
         hit = read_plant_canaries(canaries)
         print(f"isolation: {kind} canary: {'present · ' + ', '.join(hit) if hit else 'absent'}")
-        if plant.endswith("-stub"):
+        if kind == "main-only":
+            expect(not refused and done.exists() and not hit,
+                   "the main worktree's submodule config refused the linked worktree's step, or its filter ran")
+        elif plant.endswith("-stub"):
             expect(not refused and done.exists(), "the stubbed check still refused, so nothing spawned")
             if kind != "unpopulated":
                 expect(hit == ["filter-clean"], "the submodule's filter did not run under the stubbed check")
         else:
             expect(f"filter.canary.clean in {where}" in refused, f"the step was not refused naming filter.canary.clean in {where}")
             expect(not done.exists() and not hit, "the refused step spawned, or its filter ran")
-        rc = 1
+        rc = 0 if kind == "main-only" else 1
     for f in fails:
         print(f"isolation: FAILED · {f}")
     return 1 if fails else rc

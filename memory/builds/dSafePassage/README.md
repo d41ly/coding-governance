@@ -159,7 +159,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-27 — the prepared landing's one untracked snapshot, taken before the walk, serves the regeneration's refusal too](spec/2026-10-23-spec-TOOL-dSafePassage-27.md) | 5 | 2 | CLOSED | rev-2 | 2026-10-27 |
 | [TOOL-dSafePassage-28 — every refusal of the prepared landing after the walk leaves a clean tree, gated as a class](spec/2026-10-23-spec-TOOL-dSafePassage-28.md) | 5 | 2 | CLOSED | rev-3 | 2026-10-27 |
 | [TOOL-dSafePassage-33 — a missing before-image means "never ran" only for a row the forward walk applied by witness alone, recorded as such](spec/2026-10-23-spec-TOOL-dSafePassage-33.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-27 |
-| [TOOL-dSafePassage-36 — the config check walks the target worktree's own git directory for submodules, so a linked worktree's submodules are graded](spec/2026-10-23-spec-TOOL-dSafePassage-36.md) | 5 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dSafePassage-36 — the config check walks the target worktree's own git directory for submodules, so a linked worktree's submodules are graded](spec/2026-10-23-spec-TOOL-dSafePassage-36.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-27 |
 | [TOOL-dSafePassage-37 — the refused-key predicate keeps every key named as a hook, and the step environment closes the `ext::` transport by one command-scope pair](spec/2026-10-23-spec-TOOL-dSafePassage-37.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | DEFERRED | rev-6 | 2026-10-26 |
 | [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | DEFERRED | rev-8 | 2026-10-26 |
@@ -190,7 +190,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 278 bound to this build, across 4 record folder(s).
+Records: 279 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
