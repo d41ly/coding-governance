@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-54 — the guard arm's trip answer is computed over the `legs` it is handed: the spec-token checker's own per-path join, loaded by path and run in process, so a scratch manifest is the manifest graded
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 |
 
 <!-- /gen:spec-records -->
 
@@ -65,6 +67,7 @@ one step after it (order 30).
 - **hands-off** `TOOL-dFurnishedOrders-55` — the checker module S1 loads, whose `GLOB_MAGIC` unit 55 reads over the same `legs` rows (ids 3 and 18)
 - **hands-off** `TOOL-dFurnishedOrders-56` — S1's per-path answer from `derive_tripped_legs`, whose tripping guard unit 56 records per required path (ids 3 and 25)
 - **hands-off** `TOOL-dFurnishedOrders-58` — the in-process checker route, which unit 58 S16 records in unit 52's ledger and whose loaded module unit 58 S17 puts under the `govkit selftest` guard (ids 3, 12 and 24)
+- **hands-off** `TOOL-dFurnishedOrders-60` — S3, AC2 and AC3, the checker load and its failure messages, which unit 60 S1 to S3 settle (ids 7, 10 and 26 of the eighth audit)
 
 ## 4. Design
 
@@ -188,6 +191,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the guard arm over a 
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-6 promotions, id 3
   (HIGH, item H1, shared with ids 18 and 25).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-60, promoted from the spec audit of the round-7 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

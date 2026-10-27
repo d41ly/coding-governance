@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-58 — the seventh spec audit's 27 minors: an interrupt probe whose every branch has a fixture and whose kill spares a reused pid, budget and roles readings that count only what ran, criteria that read the ledgers they claim, guard rows that land with their reach, every deploy table refused by shape, and one receipt needle
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 31 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 31 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 |
 
 <!-- /gen:spec-records -->
 
@@ -201,6 +203,7 @@ it AMENDED, naming the item.
 - **consumes-from** `TOOL-dFurnishedOrders-52` — S9, S13, S15 to S26, AC1, AC4 to AC6, AC8, AC9, AC11 to AC13, AC15 and §7, which S5 to S21 settle (ids 33, 9, 8, 32, 6, 13, 7, 15, 34, 27, 20, 12, 24, 31, 10, 21, 17)
 - **consumes-from** `TOOL-dFurnishedOrders-54` — the in-process checker route, which S16 records and whose module S17 guards (ids 12, 24)
 - **consumes-from** `TOOL-dFurnishedOrders-57` — S1's population, the checker's printed `govkit selftest <- ` tokens, which S17 and S24 read (ids 24, 19)
+- **hands-off** `TOOL-dFurnishedOrders-60` — S1, S3, S8, S14, S15, S17, S18, S20, §5 and AC10 to AC20, which unit 60 S9 to S24 settle (ids 23, 1, 4, 5, 16, 24, 27, 2, 3, 6, 9, 14, 15, 18, 21 and 28 of the eighth audit)
 
 ## 4. Design
 
@@ -406,6 +409,7 @@ New arm: tools/govkit/selftest.py · covers AC14 AC15 AC16 · four wrong-typed d
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-6 promotions' minors batched: 17
   MEDIUM and 10 LOW.
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-60, promoted from the spec audit of the round-7 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

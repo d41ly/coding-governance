@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-53 — the guard arm's covered rule is one-way for a required directory: each required path meets the trip rule without its trailing slash, so a home's own `kit.toml` row never covers the home
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +59,7 @@ This unit makes the covered rule one-way. It repairs unit 52 and builds one step
 ### Edges
 
 - **consumes-from** `TOOL-dFurnishedOrders-52` — S16's covered rule over `check_selftest_guard_coverage`'s required set, which S1 makes one-way for a required directory (id 11)
+- **hands-off** `TOOL-dFurnishedOrders-59` — AC1's scratch manifest and the §7 arm's staged break, whose fixture unit 59 S1 plants a row below the dropped home and unit 59 S2 proves distinguishing (id 19 of the eighth audit)
 
 ## 4. Design
 
@@ -173,6 +176,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · the guard arm over a mani
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-6 promotions, id 11
   (BLOCKER, item B1).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-59, promoted from the spec audit of the round-7 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

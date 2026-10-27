@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-56 — the guard arm returns the row that covered each required path, so a criterion over a scratch manifest proves the copy's own spelling was graded and reds when another manifest was read
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 5647189e · streams tooling · order 30 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-58 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +56,8 @@ This unit makes the arm's answer carry its source. It repairs unit 52 and builds
 
 - **consumes-from** `TOOL-dFurnishedOrders-52` — AC6's slashless case, whose verdict alone S1 and S3 replace with the covering row the arm returns (id 25)
 - **consumes-from** `TOOL-dFurnishedOrders-54` — S1's per-path answer from `derive_tripped_legs`, whose `guard` field S1 returns (ids 3 and 25)
+- **hands-off** `TOOL-dFurnishedOrders-59` — S1's returned dict, which unit 59 S3 reads to show the planted `tools/roles/kit.toml` row was graded (id 19 of the eighth audit)
+- **hands-off** `TOOL-dFurnishedOrders-60` — S1's returned dict, which unit 60 S1 reads for the `scratch-kit` path (id 7 of the eighth audit)
 
 ## 4. Design
 
@@ -163,6 +167,7 @@ New arm: tools/govkit/selftest.py · covers AC1 · the guard arm's returned cove
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-6 promotions, id 25
   (HIGH, item H1, shared with ids 3 and 18).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-59, TOOL-dFurnishedOrders-60, promoted from the spec audit of the round-7 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

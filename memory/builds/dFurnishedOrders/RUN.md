@@ -118,3 +118,9 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-27T03:34:50Z rescope · item add TOOL-dFurnishedOrders-57 · reason spec-audit round1 of the round-6 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) finding id 23 at HIGH, report item H2: unit 50 computes its reach over home rows only, so its waiver table keys tokens the spec-token checker never prints
 
 2026-10-27T03:34:54Z rescope · item add TOOL-dFurnishedOrders-58 · reason spec-audit round1 of the round-6 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 1 30 2 4 28 6 13 7 8 9 12 19 22 24 27 29 31 (items M1-M14) and LOW ids 5 26 10 21 15 34 17 20 32 33 (items L1-L7)
+
+2026-10-27T04:36:27Z rescope · item add TOOL-dFurnishedOrders-59 · reason spec-audit round1 of the round-7 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md) finding id 19 at HIGH, report item H1: unit 53 AC1's fixture plants no row below tools/roles/, so it cannot exercise the one-way directory rule it certifies
+
+2026-10-27T04:36:32Z rescope · item add TOOL-dFurnishedOrders-60 · reason spec-audit round1 of the round-7 promotions (memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-53-spec-audit-round1.md) minors batched in one unit: MEDIUM ids 1 5 16 4 7 8 10 26 23 24 27 (items M1-M10) and LOW ids 2 3 6 9 11 17 12 13 14 15 18 21 28 (items L1-L12)
+
+2026-10-27T04:56:19Z review · item dFurnishedOrders-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 24 · disposition promote
