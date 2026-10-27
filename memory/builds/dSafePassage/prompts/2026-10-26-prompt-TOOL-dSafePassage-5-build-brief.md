@@ -71,3 +71,9 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 - The first builder handed release-0 back: the pin's adopters refused it. Spec rev-7 takes four kits out by F3 and answers the rest; it adds `ci_file` and `lexicon_conf` answers from reading the pinned renderer, not from a measurement. Confirm on your first probe; if `apply` still does not exit 0, that is a DIVERGENCE hand-back naming the kit and its refusal (F3).
 - TOOL-dSafePassage-62 builds before you (spec rev-8 consumes it): `update` writes its receipt and sidecar, `gov_commit` unmoved, before the first step, so a kill below schema 4 leaves the rows on disk.
+
+## From the third dispatch (2026-10-27)
+
+- The third builder (`wf_0d024041-1eb`) wrote the whole unit and handed it back on five measurements; spec rev-9 disposes each. Its work is kept at `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dsafepassage-567339/c5f50d22-89c6-41d7-84e5-2382dcd49faa/scratchpad/TOOL-5-wip/`: `upgrade_walk.py`, `fixture_target.py`, the `release-0` fixtures and `selftest-build_target.patch`. Start from it; it already has the `remove` gov-plant edit, but not rev-9's first-write rule or the index compare by mode and stage.
+- TOOL-dSafePassage-63 (459f12158) and TOOL-dSafePassage-64 (14f36c6dc) are built: `check_render_edited` falls back to `output_sha256` when a row has no `oid`, and a `retired-edited` row takes back gov's role once gov ships its path again. The `edited-render` plant and the `withdraw-one` rollback read against those.
+- The case logs `uw5-*.log` and `uw5b-*.log` in the scratchpad show what each case printed at 29665dd17.
