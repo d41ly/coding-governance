@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-12 — the orientation scout's placement return through the typed channel, recorded and checked by the driver
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 20 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0177@4a09db23 whole
 
@@ -12,7 +12,10 @@
 | [2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-12-deviation-121.md](../build/2026-10-26-build-TOOL-dBoundRoles-12-deviation-121.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-12-deviation-122.md](../build/2026-10-26-build-TOOL-dBoundRoles-12-deviation-122.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -36,15 +39,17 @@ return, then run `placement.check`.
   them (I20), beside the card body the role already returns. The grammar is that unit's; this unit
   writes no key of its own. Observed by AC4.
 - **S2** — The typed channel at the record. `place --return <file>` in `tools/loop/placement.py`
-  (TOOL-dPlacedRequest-4 S1) calls `validate_return("gov-orienter", text)` (I16, TOOL-dBoundRoles-5)
-  before it reads a key, the function located through `resolve_kit_dir("roles", "roles_lib.py",
-  here)`. A refusal prints each of `validate_return`'s lines under `placement: refused — return —`,
-  exits 1 and appends no block. Observed by AC1.
+  (TOOL-dPlacedRequest-4 S1) runs `handoff.py check-return-file --role gov-orienter --file <file>` as a
+  subprocess before it reads a key, `handoff.py` found through the inline `resolve_kit_dir("roles",
+  "handoff.py", here)` (§8 F4). The verb, minted here in `tools/roles/handoff.py`, prints each line of
+  `validate_return(role, text)` (I16, TOOL-dBoundRoles-5) and of S3's check and exits 1, or exits 0
+  printing nothing. A refusal prints each line under `placement: refused — return —`, exits 1 and
+  appends no block. Observed by AC1.
 - **S3** — The return answers an orientation work order. The work order the return answers, as
-  `validate_return` reads its `answers` value (I14), carries a marker whose `role` is `gov-orienter`,
-  read through `MARKER_RE` (I5). A return answering any other role's work order, or one whose answered
-  file carries no marker, is refused naming the role it found, so no other role and no driver-typed
-  text becomes an `agent` placement. Observed by AC2.
+  `validate_return` reads its `answers` value (I14), carries a marker whose `role` is the verb's
+  `--role`, read by the verb through `MARKER_RE` (I5). A return answering any other role's work
+  order, or one whose answered file carries no marker, is refused naming the role it found, so no
+  other role and no driver-typed text becomes an `agent` placement. Observed by AC2.
 - **S4** — The driver's step. The `/build` Skill's "Stage 1 — orient" (`tools/roles/SKILL.template.md:34-36`,
   rendered at `.claude/skills/build/SKILL.md`) states it: when the orientation scout returned a
   placement, the driver writes the return to the request's file, runs `placement.py place --request
@@ -64,7 +69,8 @@ return, then run `placement.check`.
   checks there through the same `place`, so S2 covers it.
 - The retry of a refused direct-spawn return under `roles.retries`: TOOL-dBoundRoles-5's SubagentStop
   check. The driver re-spawns the scout; this unit retries nothing.
-- `validate_return`, `answers` and the marker grammar: TOOL-dBoundRoles-5's, -17's and -17's.
+- `validate_return`, `answers` and the marker grammar: TOOL-dBoundRoles-5's, -17's and -17's; this unit
+  adds only the verb that runs them.
 - The orienter's rename and its definition file's other fields: TOOL-dBoundRoles-1's and -2's (D6 keeps
   the stem `gov-orienter`).
 
@@ -87,19 +93,22 @@ the item body and the prompt path unbound.
 ```
 place --request <key> --return <file>
   1. text = read <file>
-  2. lines = roles_lib.validate_return("gov-orienter", text)       # I16, unit 5
-     lines non-empty            -> "placement: refused — return — <line>" each; exit 1
-  3. answered = the work order `answers` names                     # I14, read as validate_return reads it
-     MARKER_RE over answered    -> role != gov-orienter, or no marker
-                                -> "placement: refused — return — answers a <role> work order"; exit 1
-  4. TOOL-dPlacedRequest-4 S1: read the block, resolve the disposition, append, as specced
+  2. run <roles kit>/handoff.py check-return-file --role gov-orienter --file <file>   # a subprocess
+       validate_return("gov-orienter", text)                       # I16, unit 5: one line per defect
+       answered = the work order `answers` names                   # I14, read as validate_return reads it
+       MARKER_RE over answered -> role != gov-orienter, or no marker
+                               -> "answers a <role> work order"
+     exit 1                     -> "placement: refused — return — <line>" each; exit 1
+     any exit but 0 or 1        -> refused, naming the exit and the verb's first stderr line
+  3. TOOL-dPlacedRequest-4 S1: read the block, resolve the disposition, append, as specced
 ```
 
-The loop kit locates the roles library the way every kit locates a sibling,
-`resolve_kit_dir` (`tools/roles/roles_lib.py:96-133`, carried inline in each kit by the
-`resolve_kit_dir` parity row), and imports nothing by a typed path. Where the roles kit is not
-installed, `place --return` refuses naming the three places it looked: an untyped placement is the
-gap this unit closes, so it never falls back to reading the block unchecked.
+The loop kit finds the roles kit the way every kit finds a sibling, `resolve_kit_dir`
+(`tools/roles/roles_lib.py:96-133`, carried inline in each kit by the `resolve_kit_dir` parity row),
+and runs its verb as a subprocess, since a kit imports no sibling kit (PLAY-dOrderedCharter-7 §4 "The
+policy reads"; TOOL-dDeclaredLoop-12 S4), the way TOOL-dWitnessedBar-3's `judge` reaches its siblings.
+Where the roles kit is not installed, `place --return` refuses naming the three places it looked: an
+untyped placement is the gap this unit closes, so it never falls back to reading the block unchecked.
 
 ### Why the answered work order's role, and not the return's own claim
 
@@ -120,8 +129,11 @@ Skill is rendered by the roles adopter, so the rendered copy is the template's.
 
 ### Inventory
 
-Minted: the two refusal line shapes of §4 under `placement: refused — return —`, and the plants of §7's
-arm, `return-untyped` and `return-wrong-role`. No function, key or file is minted.
+Minted: the verb `check-return-file` of `tools/roles/handoff.py`; the two refusal line shapes of §4
+under `placement: refused — return —`; and the plants of §7's arm, `return-untyped` and
+`return-wrong-role`. No key or file is minted. The verb leads with the declared verb `check`: `python
+tools/lexicon/lexicon.py --suggest check_return_file --as py.function` answered OK on 2026-10-26, and
+refuses `validate`, so the name is unit 5's `check-return` read from a file.
 
 ### Migration
 
@@ -136,6 +148,7 @@ Live at landing on every `place --return`.
 ### Files touched (estimate)
 
 - `tools/loop/placement.py` (the binding in `place`, the two plants)
+- `tools/roles/handoff.py` (the verb `check-return-file`)
 - `tools/roles/agents/gov-orienter.agent.md` (its `return` field's four keys)
 - `.claude/agents/gov-orienter.md` (its render, by `tools/roles/render_agents.py`)
 - `.claude/roles.json` (re-rendered beside it)
@@ -146,7 +159,8 @@ Live at landing on every `place --return`.
 ### Alternatives rejected
 
 - **A wrapper verb in the roles kit**, `handoff.py` chaining validate, place and check. The loop's item
-  body and the unattended prompt path call `place` directly and would stay unbound.
+  body and the unattended prompt path call `place` directly and would stay unbound; `check-return-file`
+  only checks, and `place` runs it.
 - **The step in kickoff's engine.** It has 122 bytes of headroom under its leg and does not spawn the
   scout today.
 - **Trusting a `role:` line in the return.** It is a claim the return makes about itself.
@@ -155,7 +169,7 @@ Live at landing on every `place --return`.
 
 - security — narrows a write path: `place` writes a placement block only from a typed return that
   answers an orientation work order, so a driver or another role cannot type an `agent` placement.
-- perf / scale — one function call and one marker read per placement.
+- perf / scale — one subprocess and one marker read per placement.
 - error / empty / loading states — an absent roles kit, an unreadable answered file and an empty
   return each refuse naming the cause; nothing is recorded on any refusal.
 - observability — every refusal prints under `placement: refused — return —`, the prefix
@@ -173,7 +187,7 @@ Live at landing on every `place --return`.
   lacking `reason`, the plant's `place` exits 1 printing `placement: refused — return —` with the line
   `validate_return` gives for `reason`, and the request's `.placement` file holds no block; with
   `reason` restored the same plant appends one block and exits 0.
-  Red when: `place` reads the block without calling `validate_return`, so the block is appended.
+  Red when: `place` reads the block without running `check-return-file`, so the block is appended.
 - **AC2** — When `python placement.py --fixture --plant return-wrong-role` runs, its return valid and
   answering a work order whose marker names `role=gov-researcher`, `place` exits 1 naming
   `gov-researcher`; re-pointed at a `role=gov-orienter` work order it is accepted.
@@ -197,7 +211,7 @@ and this unit's two join it.
 
 `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/placement.py · covers AC1 AC2 · the `return-untyped` and `return-wrong-role` plants, the failing case staged by removing the `validate_return` call from `place` · none
+New arm: tools/loop/placement.py · covers AC1 AC2 · the `return-untyped` and `return-wrong-role` plants, the failing case staged by removing the `check-return-file` run from `place` · none
 
 ## 8. Open questions
 
@@ -217,12 +231,28 @@ New arm: tools/loop/placement.py · covers AC1 AC2 · the `return-untyped` and `
   2026-10-25, delegated): (a), rung 1, the brief's rule; the build run re-grounds on each and stops this
   unit if one is still absent then. options: (a) > (b) · pick: (a) · admitted-by: principle.p18 ·
   widens: none · relaxes: none
+- **F4 — How does `place`, a loop-kit verb, reach the roles kit's `validate_return`?** A kit imports
+  no sibling kit (PLAY-dOrderedCharter-7 §4; TOOL-dDeclaredLoop-12 S4), and TOOL-dBoundRoles-5 mints
+  only `check-return`, which reads a `SubagentStop` payload, not a file. Options: (a) a roles-kit verb
+  `handoff.py check-return-file --role <slot> --file <file>`, minted by this unit, run as a subprocess;
+  (b) a declared `requires_if` row on `tools/loop/kit.toml` naming `roles`, keeping an in-process
+  import, the shape of `tools/memory-tree/kit.toml:8`; (c) unit 5 widened to mint the verb. (b) makes
+  the loop kit the one in-process consumer of a kit its siblings reach by subprocess, the shape
+  TOOL-dDeclaredLoop-12 F5 and -26 F5 recommend against; (c) moves a caller's adapter into the
+  checker's unit. Rev-2 imported `roles_lib` through `resolve_kit_dir`, which the rule rules out.
+  RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, PLAY-dOrderedCharter-7 §4 and
+  TOOL-dDeclaredLoop-12 S4. options: (a) > (c) > (b) · pick: (a) · admitted-by: principle.p18 ·
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 12, the brief's I14, I16 and I20, scout B's
   row for cl-0177, and TOOL-dPlacedRequest-3 and -4 at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-10-26 · S2 · S3 · §3 · §4 Where the binding lives · §4 Inventory · §4 Files
+  touched · §5 · AC1 · §7 · §8 F4 · re-grounded on the cross-check record
+  `2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck`, row 25: `place` runs the roles kit's new
+  `handoff.py check-return-file` as a subprocess and imports no roles module.
 
 ## 10. Reuse audit
 

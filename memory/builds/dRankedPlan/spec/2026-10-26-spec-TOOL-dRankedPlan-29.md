@@ -174,7 +174,7 @@ write sets under M6's clauses.
   check needs no roles kit. Observed by AC17.
 - **S23** — Id 26, item L8. `TOOL-dRankedPlan-8` §8 F6 and its §5 risk are superseded by
   `TOOL-dRankedPlan-7` S7: the `READER_SHAPES` row (`tools/policy/check_policy.py:423`) counts
-  `read_card_policy <key>`, `kickoff.runs` included; TOOL-dPlacedRequest-68 is satisfied by that row
+  `read_card_policy <key>`, `kickoff.runs` included; TOOL-dPlacedRequest-73 is satisfied by that row
   where dPlacedRequest has not landed its own. Observed by AC18.
 - **S24** — Id 29, item M11. `tools/memory-tree/kit.toml` gains a `[[generated]]` row, `path =
   "{memory_root}/PLAN.md"`, `generator = "gen_build_index.py"`, with the `LIVE.md` row's `write`,

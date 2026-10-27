@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-43 — the round-1 spec audit's 59 minors, batched
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 27 · advances TOOL-dTotalRecall-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 |
 | [2026-10-26-build-TOOL-dTotalRecall-43-deviation-431.md](../build/2026-10-26-build-TOOL-dTotalRecall-43-deviation-431.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-43-deviation-432.md](../build/2026-10-26-build-TOOL-dTotalRecall-43-deviation-432.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-43-deviation-433.md](../build/2026-10-26-build-TOOL-dTotalRecall-43-deviation-433.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 |
 | [2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-37-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-36 TOOL-dTotalRecall-39 |
 
@@ -20,12 +23,11 @@
 ## 1. Goal
 
 The round-1 spec audit (`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md`)
-exited CONVERGED with 66 confirmed findings over units 1 to 26; its seven highs, ids 1, 16, 17, 23, 36,
-49 and 51, are units 36 to 42. This unit is M4's batch of every MEDIUM and LOW by report id, plus
+exited CONVERGED with 66 confirmed findings over units 1 to 26; its seven highs are units 36 to 42. This unit is M4's batch of every MEDIUM and LOW by report id, plus
 gap-mem-16 (id 2), at order 27, after unit 12's 26.
 
-Items keep the report's order but for ids 11, 32 and 33 (S10 to S12) and 67 (S17, by its twin 19);
-the review holds their text. Ids 9 and 36 are one defect (unit 40 closes unit 4's half, S8 unit
+Items keep the report's order but for ids 11, 32 and 33 (S10 to S12) and 67 (S17, by its twin 19).
+Ids 9 and 36 are one defect (unit 40 closes unit 4's half, S8 unit
 2's), ids 19 and 67 one match, ids 12 and 51 one rule. Refuted ids 14 and 61 are out.
 
 ## 2. Scope (IN)
@@ -47,8 +49,9 @@ is re-observed here.
   `readers-none = "<reason>"`; `home` a glob (`memory/builds/*/BACKLOG.md`, `memory/builds/*/README.md`,
   `refs/gov/claims/*`, and unit 42's shape-run glob); and a `purpose` table. Observed by AC3.
 - **S4** — id 5. `deviation` has one registry entry, the factory-kinds row, whose `source` is the
-  factory's per-kind field table and whose `writer` reads `gov_record.py new <kind>`; the door's writer
-  refusal (`TOOL-dTotalRecall-2` S2) admits `build_records.py new <kind>` as its alias. Observed by AC4.
+  factory's per-kind field table and whose `writer` names the factory and its per-kind flags, not a
+  `new <kind>` verb; the door's writer refusal (`TOOL-dTotalRecall-2` S2) admits it as its own. The
+  build run re-grounds the call on the landed factory. Observed by AC4.
   **Readers:** by name: READER NOT IN TREE — `record-kinds.toml`, minted by `TOOL-dTotalRecall-1`, is
   absent at base · by value: `check_record_kinds` and the door's kind lookup read the row's `writer`
   and `source` cells, the factory row after this item.
@@ -64,8 +67,7 @@ is re-observed here.
   (`TOOL-dTotalRecall-2` S9) names the row `log`, reading each row's kind through `canonical_kind`, so
   the `log` row's `writer` reads `gov_record.py new log`. Unit 40's alias census reds any raw comparison
   left in `gov_record.py`. Observed by AC8.
-- **S9** — id 10. `stream-plan` joins the record-kind vocabulary: `RECORD_KIND_TOKENS` in
-  `tree_lib.py` carries it, so a record opening `**Serves:** stream-plan <ids>`
+- **S9** — id 10. `stream-plan` is a typed kind (`TOOL-dTotalRecall-25` S6), so a `-stream-plan-<n>.md` record opening `**Serves:** stream-plan <ids>`
   classifies under `read_bindings`, that line being the kind's binding, stated in the row's
   `purpose`. Observed by AC9.
 - **S10** — id 11. The memory-tree kit declares its reach into the playbook kit's index once: a
@@ -148,9 +150,10 @@ is re-observed here.
   files are those `git grep -lE '^(node|roster|streams): ' -- tools` lists at the pass.
   Observed by AC28.
 - **S29** — id 40. Every leg units 1, 8, 11, 19, 22 and 26 added carries its meta-gate rows: a kit
-  `[[gate_leg]]` or registry `[[exempt_leg]]` row, its `tools/govkit/subject-pins.tsv` row written by
-  `govkit.py selfcheck --write`, its `tools/run-gates/ceiling-evidence.txt` line, and a
-  `gate-legs` claim in a dossier with room under `DOSSIER_CAP_BYTES`. Observed by AC29.
+  `[[gate_leg]]` or registry `[[exempt_leg]]` row holding a non-empty `enforces`, its
+  `tools/govkit/subject-pins.tsv` row written by `govkit.py selfcheck --write`, its
+  `tools/run-gates/ceiling-evidence.txt` line, and a `gate-legs` claim in a dossier with room under
+  `DOSSIER_CAP_BYTES`. Observed by AC29.
 - **S30** — id 41. `memory/map/generated/` is regenerated by `python tools/codebase-map/gen_map.py
   --write` at this pass, after every unit that minted or renamed a symbol. Observed by AC30.
 - **S31** — id 42. Every name the units' Inventory lines mint is asked of the lexicon at this pass;
@@ -318,24 +321,23 @@ Minted: arm `homeless records`; `scan_cycles` (S18), `check_line_break` (S37); l
 - `tools/run-gates/ceiling-evidence.txt`, `tools/codebase-map/scen-adversarial.json`
 - `tools/unattended/unattended.test.sh`, `tools/workflows/unattended-build.test.sh`
 - `WIRE-INTO-PROJECT.md`, `memory/guides/SESSION-KICKOFF.md`
-- `memory/map/features/` (the dossiers S29 claims legs in)
-- `memory/map/generated/` (regenerated by `python tools/codebase-map/gen_map.py --write`)
+- `memory/map/features/` (S29's dossiers), `memory/map/generated/` (S30)
 
-Each further fixture S28's grep lists is added here as a rev bump before its edit.
+S28's further fixtures join this list by a rev bump before their edit.
 
 ### Alternatives rejected
 
 - **Fold each minor into its unit's spec.** M4 refuses it at the exit.
-- **For S27, a `build_index` alias in `bench.py` keeping `union.py` byte-identical.** S2's grep
-  finds `B.build_index(` in `union.py`, the name `TOOL-dTotalRecall-33` retires kept live.
+- **For S27, a `build_index` alias in `bench.py` keeping `union.py` byte-identical.** It keeps
+  live the name `TOOL-dTotalRecall-33` retires.
 
 ## 5. Production-readiness checklist
 
-- security — S37 and S57 refuse at the write boundary; S47 narrows a write surface.
+- security — S37 and S57 refuse at the write boundary; S47 narrows a write.
 - perf / scale — S39 bounds the index; S56 parses an empty blob once; S59 adds a spawn per mint.
 - error / empty / loading states — S38 names a busy index; S45 refuses a missing kit; S42 re-renders.
-- observability — S39's freed rows; S1's homeless paths; each refusal names its argument.
-- risks — a row S19's merge of two shrink-only homes loses reds a legacy record; AC19 counts both.
+- observability — S39's freed rows; S1's homeless paths; each refusal's argument.
+- risks — a row S19's merge loses reds a legacy record; AC19 counts both homes.
 - testing — AC1 to AC59 by the pass, S32 and S33 excepted; §7's arms at the close.
 - migration — S19's ledger merge and S28's fixture edits, inside the tree.
 - user docs — S26's runbook and S35's kickoff lines; no `help/` page covers these internals.
@@ -357,9 +359,11 @@ Criteria are numbered by the item they observe; S32 and S33 carry none.
   closed-set `lifecycle` on each.
   Red when: a row keeps `layer = "memory"`, a prose lifecycle or a directory home.
 - **AC4** — When a `tomllib` probe counts the registry entries covering `deviation`, it counts one, and
-  `python gov_record.py new deviation --build <slug> --unit <id> --caused-by <id>`
-  in a scratch clone under `%TEMP%` exits 0.
-  Red when: two rows cover the kind, or the door refuses its own factory kind.
+  its `writer` names `build_records.py` and no `new` verb, and `python gov_record.py new deviation
+  --build <slug> --unit <id> --caused-by <id>` in a scratch clone under `%TEMP%` exits 0, its
+  factory call re-grounded on the landed factory.
+  Red when: two rows cover the kind, the writer claims a `new <kind>` verb, or the door refuses its
+  own factory kind.
 - **AC5** — When `python record_kinds.py --check` runs at the tip, it prints each
   `fields` kind's graded and legacy counts, and the `deviation` legacy count is above zero.
   Red when: a `fields` row grades no record for want of a home.
@@ -376,7 +380,7 @@ Criteria are numbered by the item they observe; S32 and S33 carry none.
   census.
   Red when: the door's rewrite looks for a row named `journal` and leaves `log`'s writer `hand`.
 - **AC9** — When a `python -c` probe runs `read_bindings` from `tools/memory-tree/tree_lib.py` over a
-  planted record opening `**Serves:** stream-plan X-a-1`, it classifies the kind `stream-plan` and marks
+  planted `-stream-plan-1.md` record opening `**Serves:** stream-plan X-a-1`, it classifies the kind `stream-plan` and marks
   nothing malformed.
   Red when: the token is unregistered and the record reads as malformed.
 - **AC10** — When `python gov_map.py` runs in a scratch copy with `tools/playbook`
@@ -451,8 +455,8 @@ Criteria are numbered by the item they observe; S32 and S33 carry none.
   Red when: a fixture README outside those plants still types a derived key.
 - **AC29** — When a probe reads, for each leg those units added, `tools/govkit/subject-pins.tsv`,
   `tools/run-gates/ceiling-evidence.txt`, the kit and registry rows and the dossiers, each leg is named
-  in every one.
-  Red when: a leg lacks a meta-gate row.
+  in every one, its declaration's `enforces` non-empty.
+  Red when: a leg lacks a meta-gate row or an `enforces`.
 - **AC30** — When `python tools/codebase-map/gen_map.py --write` runs at the tip, `git status --porcelain
   memory/map/generated` prints nothing.
   Red when: the committed symbol tier is stale.
@@ -577,6 +581,8 @@ New arm: tools/memory-recall/selftest.py · covers AC38 AC39 · the held write t
   (items M1 to M44) and 13 LOW (items L1 to L13).
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-52, TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted; non-criterion prose cut to the size cap.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-60, each the other end of an edge a unit the round-1 spec audit of units 44 to 53 promoted wrote; non-criterion prose cut to the size cap.
+- rev-4 · 2026-10-26 · §2 S4, S9, S29 · §4 Files touched · §6 AC4, AC9, AC29 · rows 49 and 50 of
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`; prose cut to the size cap.
 
 ## 10. Reuse audit
 

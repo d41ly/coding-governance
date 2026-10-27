@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-25 — the stream-plan kind, registered so the planner that writes it and the pick that reads it descend from one row
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 6 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0236@4e9bd61a whole
 **Carries:** node:record-kind.stream-plan
@@ -12,6 +12,9 @@
 | [2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-a.md](../build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-a.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-7 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-26 |
+| [2026-10-26-build-TOOL-dTotalRecall-25-deviation-251.md](../build/2026-10-26-build-TOOL-dTotalRecall-25-deviation-251.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
@@ -47,6 +50,13 @@ owner's CL-3).
 - **S5** — The empty population: while no stream-plan record exists, `--check` prints
   `stream-plan: unarmed — no record yet; its writer is dIndexedDesign's planner` and grades the kind
   through its fixture plants only. Observed by AC5.
+- **S6** — The typed name joined (§8 F3): `stream-plan` joins `TYPED_RECORD_KINDS` in
+  `tools/memory-tree/tree_lib.py`, the per-kind table of the factory `tools/memory-tree/build_records.py`
+  and the closed `<kind>` list of `tools/memory-tree/HYGIENE.template.md` with its render, in this
+  pass (PLAY-dOrderedCharter-42 S1, S2, S5). The factory's table holds each kind's required fields and
+  closed sets (PLAY-dOrderedCharter-7 S7); a fence is neither, so the kind's entry declares none and
+  S3 alone grades the fence. Under PLAY-dOrderedCharter-42 S3 a `-stream-plan-<n>.md` file served as
+  another kind, and a `stream-plan` record not so named, read malformed. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -59,6 +69,7 @@ owner's CL-3).
 ### Edges
 
 - **consumes-from** `TOOL-dTotalRecall-1` — `record-kinds.toml`, `record_kinds.py new` and `check_record_kinds`, where this kind lands its row and its validator
+- **consumes-from** external — PLAY-dOrderedCharter-42 S1, S2, S3 and S5 (`TYPED_RECORD_KINDS`, the factory's kind list, the name join, the HYGIENE kind list) and PLAY-dOrderedCharter-7 S7's factory; DEFERRED at base, re-grounded by the build run
 - **hands-off** external — dIndexedDesign's planner `design.streams` writes the kind and dWellOiledMachine's pick reads it, each against this row
 - **hands-off** `TOOL-dTotalRecall-42` — `check_stream_plan`'s unarmed line, which that unit prints from the row's `unarmed` key (the round-1 audit's id 51)
 - **hands-off** `TOOL-dTotalRecall-43` — `check_stream_plan` and the `stream-plan` kind token, which that unit changes for the round-1 audit's ids 10 and 66
@@ -107,7 +118,9 @@ under `--as py.function` at the pass.
 
 - `tools/memory-tree/record-kinds.toml`
 - `tools/memory-tree/record_kinds.py`
-- `tools/memory-tree/HYGIENE.template.md` (the view's new row)
+- `tools/memory-tree/tree_lib.py` (`TYPED_RECORD_KINDS`)
+- `tools/memory-tree/build_records.py` (the per-kind table's entry)
+- `tools/memory-tree/HYGIENE.template.md` (the view's new row and the closed `<kind>` list)
 - `memory/HYGIENE.md` (the render, never the edit)
 
 ### Alternatives rejected
@@ -148,6 +161,13 @@ under `--as py.function` at the pass.
 - **AC5** — When `--check` runs at the pass tip, where no stream-plan record exists, it prints the
   `unarmed` line naming dIndexedDesign's planner and exits 0.
   Red when: the empty population prints nothing, so it reads as graded.
+- **AC6** — When a probe at this repo's root imports `tree_lib` and `build_records` from
+  `tools/memory-tree/`, `stream-plan` is a member of `TYPED_RECORD_KINDS` and of the factory's kind
+  table, the bullet of `tools/memory-tree/HYGIENE.template.md` opening the closed `<kind>` list names
+  `stream-plan` backticked, and `read_bindings` over a scratch repository reads a
+  `-stream-plan-1.md` record served `research` as `malformed`, naming `stream-plan`.
+  Red when: the typed name sits outside the tuple, so a mis-served plan binds.
+  fixture: the factory's table name is re-grounded on the landed PLAY-dOrderedCharter-7 code.
 
 ## 7. Gates
 
@@ -167,6 +187,17 @@ New arm: tools/memory-tree/record_kinds.py · covers AC2 AC3 AC4 · the `record-
   TOOL-dTotalRecall-1's writer column for one row. RESOLVED (agent, 2026-10-26, delegated): (a), rung
   3, and TOOL-dTotalRecall-2's door replaces `hand` when the planner registers. widens: none · relaxes:
   none
+- **F3 — How does the typed name `<date>-build-<unit id>-stream-plan-<n>.md` meet
+  PLAY-dOrderedCharter-42's join?** Under its S1 a kind whose records take that name is a member of
+  `TYPED_RECORD_KINDS`, and its S3 joins name and Serves kind only for members, so a plan outside the
+  tuple serving `research` binds. Options: (a) join the tuple, the factory's table with no required
+  field, and the HYGIENE list, the fence graded by S3; (b) drop the typed name for an untyped one;
+  (c) keep the name outside the tuple, `check_stream_plan` applying the name join itself. (b) breaks
+  the shape TOOL-dTotalRecall-42 copies for `shape-run` (its S1); (c) is a second copy of the
+  reader's rule. RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, PLAY-dOrderedCharter-42 S1, S2
+  and S5. Whether the landed factory admits a kind with no required field is unknown until
+  PLAY-dOrderedCharter-7 builds; if it does not, the build run takes (c) and records it as a rev.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -174,6 +205,9 @@ New arm: tools/memory-tree/record_kinds.py · covers AC2 AC3 AC4 · the `record-
   cl-0236 and the sources read at base `462d20f3`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-42, TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · §2 S6 added · §3 the external edge · §4 Files touched · §6 AC6 added · §8 F3 added · the parents'
+  re-ground, row 45 of `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`: `stream-plan`
+  joins `TYPED_RECORD_KINDS`, the factory's table and the HYGIENE list, so its typed name is joined.
 
 ## 10. Reuse audit
 

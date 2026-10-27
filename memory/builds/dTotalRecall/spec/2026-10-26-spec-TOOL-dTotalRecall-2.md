@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 12 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0213@bfd195a1 whole
 
@@ -14,7 +14,10 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-2-deviation-21.md](../build/2026-10-26-build-TOOL-dTotalRecall-2-deviation-21.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-2-deviation-22.md](../build/2026-10-26-build-TOOL-dTotalRecall-2-deviation-22.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-2-deviation-23.md](../build/2026-10-26-build-TOOL-dTotalRecall-2-deviation-23.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-36-round1-fix-return.md) | research | TOOL-dTotalRecall-36 TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-round1-fix-brief.md) | research | TOOL-dTotalRecall-8 TOOL-dTotalRecall-23 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 |
@@ -42,7 +45,9 @@ P30). Today three scaffolds write records (`gen_build_index.py --new-build` and 
 - **S2** — The kind's row: the door reads `<kind>`'s `[[record-kind]]` row from
   `tools/memory-tree/record-kinds.toml` (I1) and refuses, exit 2, a kind with no row and a kind whose
   `writer` names another door, naming that door, since each kind has one door and the registry names
-  it. Observed by AC1.
+  it. A factory kind whose `writer` names the factory with its flags (TOOL-dTotalRecall-1 §4,
+  `deviation` among them) is the door's own, the door being the factory's adapter (S1). Observed by
+  AC1 and AC9.
 - **S3** — Rendering: the record's text is TOOL-dTotalRecall-1's generated template for the row,
   `render_template` (the `record_kinds.py --template <kind>` skeleton: the `**Serves:** <kind> <ids>`
   line and one `- **<Key>:** ` line per field in the row's order), each field line filled with the
@@ -70,7 +75,7 @@ P30). Today three scaffolds write records (`gen_build_index.py --new-build` and 
   `build-readme` and `spec` rows become `gov_record.py new build-readme` and `gov_record.py new spec`.
   Forwarding `--new-build` and `--new-spec` to the door is TOOL-dTotalRecall-20's. Observed by AC7.
 - **S9** — Each registry row whose `writer` is `hand` and whose `schema.form` is `fields` (unit 1's
-  `journal`, `research`, `deviation` and `design-record` rows, and any other the pass finds) takes
+  `journal`, `research` and `design-record` rows, and any other the pass finds) takes
   `writer = "gov_record.py new <kind>"`, since the door now writes it; a `hand` row of another form
   keeps `hand`, and the pass commit's `Decided:` trailer names the unit or kit owning its door
   (`backlog-row`: TOOL-dTotalRecall-7's ask door; `dossier`: the codebase-map kit). Observed by AC9.
@@ -119,7 +124,7 @@ P30). Today three scaffolds write records (`gen_build_index.py --new-build` and 
   adapter the door reads `leases.offline` through
 - **consumes-from** external — PLAY-dOrderedCharter-7 S7/S8's `tools/memory-tree/build_records.py`,
   its renderer, `read_record` and `new` verb; TOOL-dPlacedRequest-1's build lease
-  `refs/gov/leases/<slug>/build` and its `--claims` reader
+  `refs/gov/leases/<slug>/build`, read from the remote by `read_claims`, and the holder verb §8 F6 asks for
 - **hands-off** `TOOL-dTotalRecall-43` — `gov_record.py`, its writer refusal, its hand-row rewrite, its value refusal and its mint, which that unit changes for the round-1 audit's ids 5, 8, 9, 50 and 60
 - **hands-off** `TOOL-dTotalRecall-79` — `gov_record.py new deviation`, the door that unit writes its deviation records through (the round-1 audit of units 71 to 76, id 1)
 - **hands-off** `TOOL-dTotalRecall-80` — `gov_record.py new deviation`, the door that unit writes its deviation records through (the round-1 audit of units 71 to 76, id 16)
@@ -180,9 +185,13 @@ mints each placeholder it holds; a grammar holding none names a given id.
 | `<unit id>` | the caller's `--unit`, an id the tree defines | none |
 | none (a given id, such as a spec's) | the caller's id, minted by its session | the build's lease or claim |
 
-The build's authority, in order: the lease `refs/gov/leases/<slug>/build` held by this session, read
-through `unattended.sh --claims` (TOOL-dPlacedRequest-1); else the slug claim `refs/gov/claims/<slug>`
-whose `claimant:` is this session's; a lease or claim held by another refuses, naming the holder. A
+The build's authority, in order: the lease `refs/gov/leases/<slug>/build` held by this session
+(TOOL-dPlacedRequest-1), its holder read through the verb §8 F6 asks dPlacedRequest for; else the
+slug claim `refs/gov/claims/<slug>` whose `claimant:` is this session's; a lease or claim held by
+another refuses, naming the holder. `unattended.sh --claims` cannot serve: it prints fields 1 to 5,
+no session among them (TOOL-dPlacedRequest-1:206-208, :396-397), while a lease is `mine` only when
+its `fleet-tag` and `session` match (:90-92). `read_claims` fetches `refs/gov/leases/*` from the
+remote in one bounded fetch (:76-77), so the lease read is the remote's, never a local-only ref. A
 build with neither, every build opened before TOOL-dTotalRecall-3, mints under the charter's
 per-session rule and prints `minted under the session rule: no claim or lease for <slug>`. The
 offline value passed to `gov-claim.sh` is `read_policy_value("leases.offline", root)` (I8), through
@@ -265,11 +274,12 @@ door writes at this pass are read from the registry and named in the pass commit
   `<n>` is one higher; and when `gov_record.py new spec TOOL-dTotalRecall-2` runs at the pass tip, it
   exits 2 naming the existing spec.
   Red when: a different value overwrites a record, or an existing id is re-written.
-- **AC5** — When a fixture clone holds a local lease ref `refs/gov/leases/xA/build` held by another
-  session, `gov_record.py new deviation --build xA …` exits 2 naming the holder; with the claim ref
-  `refs/gov/claims/xA` carrying this session's claimant it writes; with neither it writes and prints
-  `minted under the session rule`.
-  Red when: the door mints without reading the build's authority.
+- **AC5** — When the fixture's bare remote holds the lease `refs/gov/leases/xA/build` held by another
+  session, `gov_record.py new deviation --build xA …` run in a clone of it exits 2 naming the holder;
+  with no lease and the claim ref `refs/gov/claims/xA` carrying this session's claimant it writes; with
+  neither it writes and prints `minted under the session rule`.
+  Red when: the door mints without reading the build's authority, or a lease the remote holds is
+  missed because only the clone's refs are read.
 - **AC6** — When a fixture registry row `planted-ask` whose `id-rule` is `<FAMILY>-<slug>-<seq>` is written
   twice with equal fields through `gov_record.py new` against a bare fixture remote under
   `%TEMP%/<short>`, both calls print the same id and the counter ref's tip moves once.
@@ -283,9 +293,11 @@ door writes at this pass are read from the registry and named in the pass commit
   no finding and the record's first binding line is `**Serves:** deviation TOOL-dTotalRecall-2`.
   Red when: the template the door renders fails its own kind's check.
 - **AC9** — When a probe reads `record-kinds.toml` with `tomllib` at the pass tip, no row whose
-  `schema.form` is `fields` has `writer = "hand"`, and the `deviation` row's writer is
-  `gov_record.py new deviation`.
-  Red when: a kind the door can write is still registered as hand-written.
+  `schema.form` is `fields` has `writer = "hand"`, and the `research` row's writer is
+  `gov_record.py new research`; the `deviation` row's writer names the factory, and AC3's
+  `gov_record.py new deviation` writes under it.
+  Red when: a kind the door can write is still registered as hand-written, or the door refuses its
+  own factory's kind.
 
 ## 7. Gates
 
@@ -320,6 +332,17 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC7 · its `--selftest` 
   reader are DEFERRED at `462d20f3`. RESOLVED (agent, 2026-10-26, delegated): this spec calls them as
   their specs name them, and the build run re-grounds on the landed code, rung 1 (the brief's chain
   rule). widens: none · relaxes: none
+- **F6 — Through which surface does the door read whether this session holds the build lease?**
+  `--claims` prints five fields and no session (TOOL-dPlacedRequest-1:206-208, :396-397), and no
+  read-only verb of that unit prints a lease's `session`. Options: (a) an ask to dPlacedRequest for a
+  holder verb over `read_claims`, printing a lease's `fleet-tag`, `session` and its `lease`-mode class
+  (`mine` or foreign), the five-field `--claims` shape kept; (b) an ask for a `session` column on
+  `--claims`, which breaks that unit's AC10 and the shape TOOL-dDeclaredLoop-8 S7 extends; (c) the
+  door parses the lease commit's `session:` key itself, a second parser of the record its S2 keeps in
+  `read_claims`; (d) `--claims`' node column alone, so two sessions of one node both mint under one
+  lease. Recommendation: (a). The ask the build run would file in dPlacedRequest's `BACKLOG.md`: "a
+  read-only verb printing a lease's `fleet-tag`, `session` and `lease`-mode class through
+  `read_claims`". Open for the owner; the pass builds no lease rung before the pick.
 
 ## 9. Revision log
 
@@ -333,6 +356,10 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC7 · its `--selftest` 
   unit the round-1 spec audit of units 77 to 88 promoted wrote; nothing else moved.
 - rev-5 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-93, TOOL-dTotalRecall-94, TOOL-dTotalRecall-95, TOOL-dTotalRecall-96, TOOL-dTotalRecall-98, TOOL-dTotalRecall-99, TOOL-dTotalRecall-100, each the other end of an edge a
   unit the round-1 spec audit of units 89 to 92 promoted wrote; nothing else moved.
+- rev-6 · 2026-10-26 · §2 S2, S9 · §3 the external edge · §4 "Minting" · §6 AC5, AC9 · §8 F6 added ·
+  the parents' re-ground, rows 8 and 9 of `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`:
+  the lease holder is read through the verb F6 asks for, never `--claims`, and AC5 plants the lease on
+  the bare remote; S2, S9 and AC9 follow unit 1 rev-4, whose `deviation` row names the factory.
 
 ## 10. Reuse audit
 

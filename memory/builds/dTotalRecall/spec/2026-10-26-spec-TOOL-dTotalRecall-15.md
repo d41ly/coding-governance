@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-15 — the map's three-way completeness check and the map leg pack
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 24 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 24 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0226@0bd15de1 whole
 
@@ -11,6 +11,9 @@
 | [2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-c.md](../build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-c.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-17 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
+| [2026-10-26-build-TOOL-dTotalRecall-15-deviation-151.md](../build/2026-10-26-build-TOOL-dTotalRecall-15-deviation-151.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
@@ -28,8 +31,10 @@ bar.
 
 The disk join is `compute_coverage` with its `Coverage` class, moved by PLAY-dOrderedCharter-19 S9 to
 `tools/lib/coverage_join.py` and shipped inline in `tools/memory-tree/coverage_join.py`. The leg key
-`pack` is PLAY-dOrderedCharter-19 S12's. The index and its registry are that spec's S2 and S4. All
-are DEFERRED at base `462d20f3`. The map is unit 14's `gov_map.py`.
+`pack` is PLAY-dOrderedCharter-19 S12's. The index and its registry are that spec's S2 and S4. A leg's
+one declaration and `tools/run-gates/leg_factory.py` are TOOL-dWitnessedBar-11 S1 to S3; the key
+`enforces`, its meta-check and `core.bypass` are PLAY-dOrderedCharter-7 S2, S3 and S10. All are
+DEFERRED at base `462d20f3`. The map is unit 14's `gov_map.py`.
 
 - **S1** — The checker, `tools/memory-tree/map_checks.py`. `python map_checks.py` runs every check
   of S2 to S10 over the tree and prints one `map: <check> <finding>` line per finding, then a summary
@@ -65,13 +70,18 @@ are DEFERRED at base `462d20f3`. The map is unit 14's `gov_map.py`.
   `tree_lib.STATUS_TOKENS`. Observed by AC9.
 - **S10** — `populated`: a registered namespace with no node in the index is named in the summary's
   `unarmed` field and is never counted green. Observed by AC10.
-- **S11** — The pack. Two legs in `tools/gate-legs.json` carry `"pack": "map"`:
-  `map (the project map's checks)`, argv `python3 {prefix}/memory-tree/map_checks.py`, and
-  `map selftest`, argv `python3 {prefix}/memory-tree/map_checks.py --selftest`, which runs every
-  plant of S12 and `gov_map.py --selftest`. Each has its `[[gate_leg]]` row in
-  `tools/memory-tree/kit.toml`, a guard naming both modules and `tools/playbook/namespaces.toml`, a
-  ceiling from a measured run in `tools/run-gates/ceiling-evidence.txt`, and its name covered by a
-  dossier. Observed by AC11.
+- **S11** — The pack. Two legs carry `"pack": "map"`: `map (the project map's checks)`, argv
+  `python3 {prefix}/memory-tree/map_checks.py`, and `map selftest`, argv `python3
+  {prefix}/memory-tree/map_checks.py --selftest`, which runs every plant of S12 and `gov_map.py
+  --selftest`. Each is declared once, a `[[gate_leg]]` row in `tools/memory-tree/kit.toml` written by
+  `python tools/run-gates/leg_factory.py new` and rendered into `tools/gate-legs.json` by its `--write`,
+  holding a guard naming both modules and `tools/playbook/namespaces.toml` and a non-empty `enforces`:
+  `["practice.derive"]` for `map (the project map's checks)`, the practice whose line states the rule
+  its red reports broken, an index and its map checked both ways (TOOL-dWitnessedBar-11 §4 "The
+  enforces rule", step 2, since cl-0226 sits in no v2 `[enforcement]` row), and `["practice.verify"]`
+  for `map selftest`, the tag TOOL-dWitnessedBar-51 S12 gives a self-test leg. PLAY-dOrderedCharter-7
+  S3 reds a leg with no `enforces`. Each has a ceiling from a measured run in
+  `tools/run-gates/ceiling-evidence.txt`, and its name covered by a dossier. Observed by AC11.
 - **S12** — The plants, `map_checks.py --fixture --plant <case>`, each a scratch repository with a
   built index and a rendered map: `newkit`, `unlisted-node`, `ghost-line`, `ghost-rel`, `count-off`,
   `ownerless`, `two-owners`, `no-extractor`, `default-owner`, `refuse-over`, `degrade-unnamed`,
@@ -126,8 +136,8 @@ fixed in the same pass, since a leg seen only red at its landing cannot land.
 ### Files touched (estimate)
 
 - `tools/memory-tree/map_checks.py` (new)
-- `tools/gate-legs.json`: the two legs
-- `tools/memory-tree/kit.toml`: two `[[gate_leg]]` rows and a `[[files]]` rule
+- `tools/gate-legs.json`: the two legs, rendered by `leg_factory.py --write`
+- `tools/memory-tree/kit.toml`: two `[[gate_leg]]` rows, the legs' declarations, and a `[[files]]` rule
 - `tools/run-gates/ceiling-evidence.txt`: the two legs' measured maxima
 - `tools/govkit/subject-pins.tsv`: regenerated by `python tools/govkit/govkit.py selfcheck --write`
 - `memory/map/features/project-map.md`: unit 14's dossier, extended to cover the checker and the two
@@ -153,7 +163,10 @@ fixed in the same pass, since a leg seen only red at its landing cannot land.
   reads as green.
 - observability — one line per finding and the summary's derived counts.
 - risks — a census route that drifts from its namespace's real population reds as `stale_claims`,
-  which is the check working.
+  which is the check working. Both legs carry a guard and a non-empty `enforces`, so under
+  `core.bypass = never` PLAY-dOrderedCharter-7 S10's meta-check reds them until TOOL-dWitnessedBar-11
+  §8 F5 settles which legs are core. Under the default, `with-hooks-report`, the meta-check reds no
+  guarded leg.
 - testing — AC1 to AC11 by a pass; the arms of §7 at the close.
 - migration — none.
 - user docs — `help/project-map.md` (unit 14's) gains a paragraph naming the `map` pack and its
@@ -194,10 +207,12 @@ fixed in the same pass, since a leg seen only red at its landing cannot land.
 - **AC10** — When `--plant unpopulated` runs, one registered namespace with no node, it exits 0 and
   the summary's `unarmed` field names it.
   Red when: an empty namespace is counted as a passing check.
-- **AC11** — When `python -c "import json,sys; print([l['name'] for l in json.load(open(sys.argv[1])) if l.get('pack') == 'map'])" tools/gate-legs.json`
-  runs at the pass tip, it prints the two leg names; and when each leg's argv is run by hand, the
-  first exits 0 on gov's tree and the second prints every plant's name with its exit.
-  Red when: a leg lacks the key, or the selftest leg runs no plant.
+- **AC11** — When `python -c "import json,sys; print([(l['name'], l.get('enforces')) for l in json.load(open(sys.argv[1])) if l.get('pack') == 'map'])" tools/gate-legs.json`
+  runs at the pass tip, it prints the two leg names, `map (the project map's checks)` with
+  `['practice.derive']` and `map selftest` with `['practice.verify']`; and when each leg's argv is run
+  by hand, the first exits 0 on gov's tree and the second prints every plant's name with its exit.
+  Red when: a leg lacks the key or carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check
+  reds, or the selftest leg runs no plant.
 
 ## 7. Gates
 
@@ -230,6 +245,11 @@ New arm: tools/memory-tree/map_checks.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 A
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 15, the brief's I11, I12 and I19,
   scout C's row for cl-0226, and the project map's `[checks]` and `[owners]`.
+- rev-2 · 2026-10-26 · §2 preconditions, S11 · §4 Files touched · §5 risks · §6 AC11 · re-grounded on
+  dWitnessedBar at `443775a2f` and PLAY-dOrderedCharter-7, by the cross-check record
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck`, row 32: both `map` legs are declared once
+  with `enforces`, read by AC11, and §5 names their red under `core.bypass = never` while
+  TOOL-dWitnessedBar-11 §8 F5 is open.
 
 ## 10. Reuse audit
 

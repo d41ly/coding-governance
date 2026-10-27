@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-22 — each edge type's cardinality declared per source and per target, mirrored in the kind registry, and checked over the merged tree after every merge
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 10 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 10 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0233@50683b2a whole
 
@@ -13,6 +13,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-22-deviation-221.md](../build/2026-10-26-build-TOOL-dTotalRecall-22-deviation-221.md) | deviation | — |
 | [2026-10-26-build-TOOL-dTotalRecall-22-deviation-222.md](../build/2026-10-26-build-TOOL-dTotalRecall-22-deviation-222.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-22-deviation-223.md](../build/2026-10-26-build-TOOL-dTotalRecall-22-deviation-223.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-26 TOOL-dTotalRecall-12 |
 
@@ -51,10 +54,17 @@ edge gates count per source only ("a second edge line of one type", `memory-plan
   (TOOL-dTotalRecall-6) for the README site, targets normalised by PLAY-dOrderedCharter-19's resolver
   so two address forms of one node count once, counted by `count_edge_cardinality`; exit 1 with one
   line per violation, exit 0 with a line naming the edge and type counts read. Observed by AC5 and AC6.
-- **S6** — The leg `edge cardinality (per source and per target, over the merged tree)` in
-  `tools/gate-legs.json`, argv `python {prefix}/playbook/edge_grammar.py --cardinality`, `"pack":
-  "tags"`, so the bar runs it before a push and `tools/run-gates/post-merge.sh` runs it on every landed
-  sha, which `tools/push-main.sh:445-455` starts after every landing. Observed by AC7.
+- **S6** — The leg `edge cardinality (per source and per target, over the merged tree)`, argv `python
+  {prefix}/playbook/edge_grammar.py --cardinality`, `"pack": "tags"`, `enforces =
+  ["practice.one-fact"]`, declared in this unit's own pass by `python tools/run-gates/leg_factory.py new
+  --kit playbook … --enforces practice.one-fact` as a `[[gate_leg]]` row of `tools/playbook/kit.toml`,
+  which `leg_factory.py --write` renders into `tools/gate-legs.json` (TOOL-dWitnessedBar-11 S1 to S3; its
+  factory refuses a manifest row no declaration produces). cl-0233 sits in no v2 `[enforcement]` row,
+  so the tag is step 2 of TOOL-dWitnessedBar-11 §4 "The enforces rule": a red here is one node given two
+  successors or one record two causes, one fact held twice. PLAY-dOrderedCharter-7 S3 reds a leg with
+  no `enforces`, and its pending list takes no row after its pass. The bar runs the leg before a push
+  and `tools/run-gates/post-merge.sh` runs it on every landed sha, which `tools/push-main.sh:445-455`
+  starts after every landing. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -75,7 +85,9 @@ edge gates count per source only ("a second edge line of one type", `memory-plan
   `--print-relations`, whose per-target counts the check takes
 - **consumes-from** external — PLAY-dOrderedCharter-24 S1's and -28 S1's `edges.toml` rows and S3/S5's
   parser and site adapters in `tools/playbook/edge_grammar.py`; PLAY-dOrderedCharter-19 S6's address
-  resolver; PLAY-dOrderedCharter-19 S12's `pack` key in `tools/gate-legs.json`
+  resolver; PLAY-dOrderedCharter-19 S12's `pack` key in `tools/gate-legs.json`; PLAY-dOrderedCharter-7
+  S2 and S3's `enforces` and meta-check; TOOL-dWitnessedBar-11 S1 to S3's leg declaration and
+  `leg_factory.py`
 - **hands-off** `TOOL-dTotalRecall-39` — `edge_grammar.py --cardinality`, which that unit's AC3 runs over a bulleted cause (the round-1 audit's id 23)
 - **hands-off** `TOOL-dTotalRecall-43` — `--cardinality` with memory-tree absent, the `design_lib` reach and the leg's meta-gate rows, which that unit changes for the round-1 audit's ids 20, 40 and 63
 - **hands-off** `TOOL-dTotalRecall-53` — `edge_grammar.py --cardinality`, which that unit makes collect a header refusal per record and runs at its tip (the round-1 audit of units 36 to 43, ids 45 and 11)
@@ -157,7 +169,8 @@ measured 2026-10-26 at `fb872a37e` by `git grep -c` over `memory/`; AC6 re-deriv
 - `tools/memory-tree/design_lib.py`
 - `tools/memory-tree/asbuilt_view.py`
 - `tools/memory-tree/record-kinds.toml`
-- `tools/gate-legs.json`
+- `tools/playbook/kit.toml` (the leg's `[[gate_leg]]` row)
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`)
 
 ### Alternatives rejected
 
@@ -211,9 +224,11 @@ measured 2026-10-26 at `fb872a37e` by `git grep -c` over `memory/`; AC6 re-deriv
   Red when: the population is empty and the zero is read as a pass, or today's tree reds.
   figure: the counts are DERIVED at each run.
 - **AC7** — When a probe reads `tools/gate-legs.json`, one row named `edge cardinality (per source and
-  per target, over the merged tree)` carries an argv ending in `edge_grammar.py --cardinality` and
-  `"pack": "tags"`.
-  Red when: the check is not in the bar, so the post-merge run never reaches it.
+  per target, over the merged tree)` carries an argv ending in `edge_grammar.py --cardinality`,
+  `"pack": "tags"` and `enforces` holding `practice.one-fact`, and `python
+  tools/run-gates/leg_factory.py --list` names its declaring file `tools/playbook/kit.toml`.
+  Red when: the check is not in the bar, so the post-merge run never reaches it, or its declaration
+  carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds.
 
 ## 7. Gates
 
@@ -259,6 +274,10 @@ New arm: tools/gate-legs.json · covers AC6 AC7 · the new leg itself, observed 
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-39, TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted.
+- rev-4 · 2026-10-26 · §2 S6 · §3 Edges · §4 Files touched · §6 AC7 · re-grounded on dWitnessedBar at
+  `443775a2f` and PLAY-dOrderedCharter-7, by the cross-check record
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck`, row 43: the leg is declared through the
+  leg factory in this unit's own pass with `enforces = ["practice.one-fact"]`, and AC7 reads it.
 
 ## 10. Reuse audit
 

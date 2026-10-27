@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-26 — the atlas under `help/atlas/`: generated Markdown and Mermaid pages from the one index's node table, refused when stale
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 25 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 25 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0237@0c51b12a whole
 **Carries:** node:policy-key.help.atlas
@@ -14,6 +14,9 @@
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 |
 | [2026-10-26-build-TOOL-dTotalRecall-26-deviation-261.md](../build/2026-10-26-build-TOOL-dTotalRecall-26-deviation-261.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-26-deviation-262.md](../build/2026-10-26-build-TOOL-dTotalRecall-26-deviation-262.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 |
 | [2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-1-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-1 TOOL-dTotalRecall-13 TOOL-dTotalRecall-8 TOOL-dTotalRecall-18 TOOL-dTotalRecall-16 TOOL-dTotalRecall-25 TOOL-dTotalRecall-5 TOOL-dTotalRecall-4 TOOL-dTotalRecall-6 TOOL-dTotalRecall-22 TOOL-dTotalRecall-3 TOOL-dTotalRecall-2 TOOL-dTotalRecall-7 TOOL-dTotalRecall-11 TOOL-dTotalRecall-10 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-9 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-20 TOOL-dTotalRecall-17 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-12 |
@@ -40,7 +43,9 @@ re-specced here: the one index `<git-common-dir>/gov/index.db`, `tools/playbook/
 `memory/project/chain.toml` (PLAY-dOrderedCharter-22 S3); `render_reference_pages` in
 `tools/playbook/render_playbook.py` (PLAY-dOrderedCharter-37 S2); `tools/govkit/docs_leg.py` and its
 link check `check_page_links` (TOOL-dSafePassage-13 S5, S9); the catalogue
-`tools/policy/catalogue.toml` and its `lists` verb (TOOL-dGroundRules-1 S3, S6). Built at base and
+`tools/policy/catalogue.toml` and its `lists` verb (TOOL-dGroundRules-1 S3, S6); a leg's one
+declaration and `tools/run-gates/leg_factory.py` (TOOL-dWitnessedBar-11 S1, S2), and `enforces` with its
+meta-check (PLAY-dOrderedCharter-7 S2, S3). Built at base and
 read as they stand: `tools/memory-tree/design_lib.py` and `tools/memory-tree/deviation_join.py`.
 
 - **S1** — The renderer, `tools/memory-tree/gen_atlas.py`, beside unit 14's `gov_map.py` in the
@@ -104,8 +109,13 @@ read as they stand: `tools/memory-tree/design_lib.py` and `tools/memory-tree/dev
 - **S10** — The docs and the leg. `help/atlas.md`, an authored page saying what the atlas shows, what
   `help.atlas` does and how to regenerate it, anchored as TOOL-dSafePassage-13 S3 requires, and its line
   in `help/README.md`. The leg `atlas selftest`, argv `python3 {prefix}/memory-tree/gen_atlas.py
-  --selftest`, as a `[[gate_leg]]` row in `tools/memory-tree/kit.toml` and a row in
-  `tools/gate-legs.json`, its ceiling written by `derive-ceilings.py --write`. Observed by AC14.
+  --selftest`, declared once as a `[[gate_leg]]` row in `tools/memory-tree/kit.toml` carrying `enforces
+  = ["principle.p42", "practice.verify"]` and rendered into `tools/gate-legs.json` by `python
+  tools/run-gates/leg_factory.py --write`, its ceiling written by `derive-ceilings.py --write`. P42's v2
+  `[enforcement]` row names cl-0237, the clause this unit carries (TOOL-dWitnessedBar-11 §4 "The
+  enforces rule", step 1), and `practice.verify` is the tag TOOL-dWitnessedBar-51 S12 gives a self-test
+  leg; PLAY-dOrderedCharter-7 S3 reds a leg with no `enforces`, its pending list taking no row after
+  its pass. Observed by AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -122,7 +132,7 @@ read as they stand: `tools/memory-tree/design_lib.py` and `tools/memory-tree/dev
 ### Edges
 
 - **consumes-from** `TOOL-dTotalRecall-14` — `gov_map.py`, the node table's derivation `derive_nodes` every namespace and plan page renders, and the `map` row field; without it the atlas has no node table to read
-- **consumes-from** external — PLAY-dOrderedCharter-19's index, `namespaces.toml`, `read_policy_value` and `common_git_dir`; PLAY-dOrderedCharter-22's chain registry; PLAY-dOrderedCharter-37's `render_reference_pages`; TOOL-dSafePassage-13's `docs_leg.py` and `check_page_links`; TOOL-dGroundRules-1's catalogue and `lists` verb, each built before this build's build run
+- **consumes-from** external — PLAY-dOrderedCharter-19's index, `namespaces.toml`, `read_policy_value` and `common_git_dir`; PLAY-dOrderedCharter-22's chain registry; PLAY-dOrderedCharter-37's `render_reference_pages`; TOOL-dSafePassage-13's `docs_leg.py` and `check_page_links`; TOOL-dGroundRules-1's catalogue and `lists` verb; TOOL-dWitnessedBar-11's leg declaration and `leg_factory.py`; PLAY-dOrderedCharter-7's `enforces` and meta-check, each built before this build's build run
 - **hands-off** `TOOL-dTotalRecall-43` — `gen_atlas.py`, its policy read, its escaping and its leg's meta-gate rows, which that unit changes for the round-1 audit's ids 32, 40 and 64
 
 ## 4. Design
@@ -198,7 +208,7 @@ the patched renderer, so only parity can see the missing node.
 | `help_pages.py`, `write_help_pages`, `render_atlas_back_link`, the `help_pages` parity row | `tools/lib/` | the inline-parity arm |
 | `check_node_links`, `node-link-missing`, `node-link-orphan` | `tools/govkit/docs_leg.py` | the lexicon's naming predicates |
 | the token `help_root` | `regen.py`, `lib-unattended.sh` | regen's token refusal |
-| the leg `atlas selftest` | `tools/gate-legs.json`, memory-tree `kit.toml` | the manifest's meta-gates |
+| the leg `atlas selftest` | memory-tree `kit.toml`, rendered into `tools/gate-legs.json` | the manifest's meta-gates |
 
 ### Migration
 
@@ -218,7 +228,7 @@ refusal prints. An adopter that wants no committed atlas sets `help.atlas` to `o
 - `tools/run-gates/regen.py`
 - `tools/unattended/lib-unattended.sh`
 - `tools/unattended/unattended.test.sh`
-- `tools/gate-legs.json`
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`)
 - `tools/run-gates/ceiling-evidence.txt`
 - `tools/policy/catalogue.toml` (the `help.atlas` row's `summary` and `usage`)
 - `tools/policy/unsummarised-keys.txt`
@@ -308,8 +318,10 @@ refusal prints. An adopter that wants no committed atlas sets `help.atlas` to `o
   Red when: a help page declaring a node lacks the back link and the link check passes.
 - **AC14** — When `git grep -n "atlas.md" -- help/README.md` runs, it finds the page's line; and
   `git grep -n "atlas selftest" -- tools/gate-legs.json tools/memory-tree/kit.toml` finds the leg's row
-  in each.
-  Red when: the atlas ships with no help page, or its self-test has no leg.
+  in each; and a `tomllib` probe of that `[[gate_leg]]` row reads `enforces` holding `principle.p42` and
+  `practice.verify`, the `tools/gate-legs.json` row carrying the same list.
+  Red when: the atlas ships with no help page, its self-test has no leg, or the leg carries no
+  `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds.
 
 ## 7. Gates
 
@@ -379,6 +391,11 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · a fixture descript
   `462d20f3`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-26 · §2 preconditions, S10 · §3 Edges · §4 Inventory, Files touched · §6 AC14 ·
+  re-grounded on dWitnessedBar at `443775a2f` and PLAY-dOrderedCharter-7, by the cross-check record
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck`, row 46: `atlas selftest`'s `[[gate_leg]]`
+  row carries `enforces = ["principle.p42", "practice.verify"]`, the manifest row is its render, and
+  AC14 checks it.
 
 ## 10. Reuse audit
 

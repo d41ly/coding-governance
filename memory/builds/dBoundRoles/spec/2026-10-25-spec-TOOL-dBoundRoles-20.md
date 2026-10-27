@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 23 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0185@ce70dc70 whole
 **Carries:** node:tag-namespace.workflow
@@ -14,8 +14,11 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-21 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-20-deviation-201.md](../build/2026-10-26-build-TOOL-dBoundRoles-20-deviation-201.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-20-deviation-202.md](../build/2026-10-26-build-TOOL-dBoundRoles-20-deviation-202.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -41,20 +44,28 @@ paths resolved in the install, and the two step-gate classes.
   (`tools/roles/workflows.toml`) and
   `workflow.adopter.<name>` for each overlay `[[workflow]]` row. Gov's entries are tagged in it by
   derivation from their `name`, never by a typed key. Observed by AC1.
-- **S2** — The two kinds registered (PLAY-dOrderedCharter-35 S10): `[[kind]]` rows `kind.role` and
-  `kind.workflow` in `tools/playbook/kinds.toml`, each with `schema` naming its kind file:
+- **S2** — The two kinds' schemas registered (PLAY-dOrderedCharter-35 S10). The `[[kind]]` rows
+  `kind.role` and `kind.workflow` of `tools/playbook/kinds.toml` are TOOL-dDeclaredLoop-6 S1's, each
+  naming `binds` (as PLAY-dOrderedCharter-7 S4 seeds it, `principle.p16` on `kind.role`), `population`
+  (`tools/roles/agents/*.agent.md`, `tools/roles/workflows.toml`), `factory` (TOOL-dDeclaredLoop-6 S7's
+  `new role` and S8's `new workflow`) and `gate`, the leg `roles catalogue`, whose `enforces` holds
+  every tag of both rows' `binds` (TOOL-dDeclaredLoop-6 S9; PLAY-dOrderedCharter-7 S5). This unit adds
+  no bind, so that `enforces` does not move, and adds to each row `schema` naming its kind file:
   `tools/roles/role-schema.toml` (TOOL-dBoundRoles-2's, gaining `owner-seat = "adopter"`) and a new
-  `tools/roles/workflow-schema.toml` (`[kind] name = "workflow"`, `owner-seat = "adopter"`), whose
-  field rows describe the `[[workflow]]` keys, the stage rows TOOL-dBoundRoles-22 adds included.
-  Observed by AC1 and AC2.
+  `tools/roles/workflow-schema.toml` (`[kind] name = "workflow"`, `owner-seat = "adopter"`), whose field
+  rows describe the `[[workflow]]` keys, the stage rows TOOL-dBoundRoles-22 adds included. Observed by
+  AC1 and AC2.
 - **S3** — The composition. `compose_roles(root, rev)` and `compose_workflows(root, rev)` in
   `tools/roles/roles_lib.py` return gov's rows and the overlay's `[[role]]` and `[[workflow]]` rows
-  composed through `read_overlay_rows` and `compose_rows` (PLAY-dOrderedCharter-35 S1, I22), at the
-  landed revision. `check_roles.py`, `render_agents.py` (the agent files and `.claude/roles.json`) and
-  `handoff.py` read the composition instead of `load_roles` and `load_workflows` alone, and each
-  render marks a repository row as the repository's. A repository role carries every structured field
-  gov's carry, its typed `return` and its `budget`, and declares the shape kinds it runs in under
-  `shapes`. Observed by AC2 and AC3.
+  composed by `compose_rows` (PLAY-dOrderedCharter-35 S1, I22), which runs PLAY-dOrderedCharter-36's
+  `check_rows` (its S7), at the landed revision. A kit imports no sibling kit, so the composers reach it
+  as TOOL-dDeclaredLoop-26 §8 F5 settles: the playbook kit's `compose` verb run as a subprocess, found
+  through the inline `resolve_kit_dir`, its JSON read back (§8 F6); with the playbook kit absent they
+  return gov's rows and print one note naming it. `check_roles.py`, `render_agents.py` (the agent files
+  and `.claude/roles.json`) and `handoff.py` read the composition instead of `load_roles` and
+  `load_workflows` alone, and each render marks a repository row as the repository's. A repository role
+  carries every structured field gov's carry, its typed `return` and its `budget`, and declares the
+  shape kinds it runs in under `shapes`. Observed by AC2 and AC3.
 - **S4** — No closed table in code. `WORKFLOW_NAMES` (`tools/roles/check_roles.py:90-91`) is deleted;
   R6 reads the workflow registry, the names of `compose_workflows`, and refuses a missing gov entry by
   reading gov's own `workflows.toml` names, never a typed tuple. `BODY_CEILINGS` is already a role
@@ -77,8 +88,11 @@ paths resolved in the install, and the two step-gate classes.
   item's `actor` (FA-4), admitted by `check_actor_patch(item, role)` in `tools/roles/roles_lib.py` only
   when the role's `return` holds the item's `returns` template, its ceiling (`writes` with the
   work-order allowance it grants) covers the item's `allowance`, and its `shapes` holds the shape kind
-  the item runs in. TOOL-dDeclaredLoop-24 S4's `check_item_composition` calls it for each item whose
-  composed actor is a repository role. Observed by AC6.
+  the item runs in. The roles-kit verb `check_roles.py --check-actor-patch <file>`, `<file>` the
+  composed item row as JSON, prints each refusal and exits 1, or exits 0. `check_item_composition`
+  (TOOL-dDeclaredLoop-24 S4) runs it as a subprocess for each item whose composed actor is a
+  repository role, the call this unit adds to `tools/loop/loop_items.py` and names to dDeclaredLoop as
+  an ask (§8 F3, F7). Observed by AC6.
 - **S7** — The exclusion refusals and the matrix arm over the composition: through PLAY-dOrderedCharter-36
   S4, an `instructions.exclude` of a role an active item names as its actor, and of a leg a role's
   `gates` grant names, are each refused naming the requirer; an exclusion leaving a role acting in no
@@ -120,7 +134,7 @@ paths resolved in the install, and the two step-gate classes.
 - **consumes-from** `TOOL-dBoundRoles-22` — `workflow.stages`, the ordered stage rows `workflow-schema.toml` describes and the composition carries
 - **consumes-from** `TOOL-dBoundRoles-16` — `shapes`, the role field the actor patch and the spawn-in-shape check read
 - **consumes-from** `TOOL-dBoundRoles-15` — `budget`, the role field a repository's role declares its ceiling in, so `BODY_CEILINGS` is a role field the composition carries and never a table closed in code
-- **consumes-from** external — PLAY-dOrderedCharter-19 S2, -35 S1 and S10, -36 S1 to S7, TOOL-dDeclaredLoop-24 S4 and TOOL-dSafePassage-10 S1, each specced and unbuilt at base `4ed9e567`
+- **consumes-from** external — PLAY-dOrderedCharter-19 S2, -35 S1 and S10, -36 S1 to S7, TOOL-dDeclaredLoop-6 S1 and S9's kind rows and leg, -24 S4, -26 §8 F5's `compose` verb and TOOL-dSafePassage-10 S1, each specced and unbuilt at base `4ed9e567`
 - **hands-off** `TOOL-dBoundRoles-25` — `harnesses`, the role index's held-harness list, which the spawn guard reads wherever it lives and the roles pack's guard matches a harness call against
 - **hands-off** external — the driver's role row, which whichever build registers it as a `cycle` role (dWellOiledMachine, Runtime) adds; the fixed-row derivation fixes it on arrival
 - **hands-off** `TOOL-dBoundRoles-43` — the composition and the repository role's tag, which unit 43 spells as one slot and declares through an extractor (ids 11, 38 and 63 of the round-1 spec audit)
@@ -188,9 +202,11 @@ check_actor_patch(item, role) -> [refusal]          # [] admits
   item's shape kind in role.shapes                  else "role <r> does not declare shape <k>"
 ```
 
-The item's shape kind is the `kind` of the workflow entry whose stage spawns the item's role
-(TOOL-dBoundRoles-16). "Holds the template" means every row of the item's `returns` template is a
-row of the role's `return`, the refusal arm of TOOL-dBoundRoles-26 included by composition.
+The loop kit runs it as `python <roles kit>/check_roles.py --check-actor-patch <item.json>`, so the
+rule lives in the roles kit and the verb reads no loop row but the one it is handed. The item's shape
+kind is the `kind` of the workflow entry whose stage spawns the item's role (TOOL-dBoundRoles-16).
+"Holds the template" means every row of the item's `returns` template is a row of the role's
+`return`, the refusal arm of TOOL-dBoundRoles-26 included by composition.
 
 ### Harness paths in the install
 
@@ -202,11 +218,12 @@ on-disk index with that render, so a planted index naming an absent path reds th
 
 ### Inventory
 
-Minted: the `workflow` namespace row; `extract_workflow`; `kind.role` and `kind.workflow`;
-`tools/roles/workflow-schema.toml`; `owner-seat`, `fixed-by`, `widens` and `ref` values on the role
-rows; `compose_roles`, `compose_workflows`, `check_core_fields`, `check_actor_patch`; the `role` and
-`workflow` surface classes with their readers and plants. Each function is asked of
-`python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
+Minted: the `workflow` namespace row; `extract_workflow`; the `schema` key on `kind.role` and
+`kind.workflow`; `tools/roles/workflow-schema.toml`; the `--check-actor-patch` mode of `check_roles.py`;
+`owner-seat`, `fixed-by`, `widens` and `ref` values on the role rows; `compose_roles`,
+`compose_workflows`, `check_core_fields`, `check_actor_patch`; the `role` and `workflow` surface classes
+with their readers and plants. Each function is asked of `python tools/lexicon/lexicon.py --suggest
+<name> --as py.function` at the pass.
 
 ### Migration
 
@@ -224,15 +241,15 @@ refusals, now armed for two more kinds.
 
 - `tools/playbook/namespaces.toml` (the `workflow` row)
 - `tools/playbook/tag_index.py` (`extract_workflow`)
-- `tools/playbook/kinds.toml` (`kind.role`, `kind.workflow`)
+- `tools/playbook/kinds.toml` (the `schema` key on TOOL-dDeclaredLoop-6's `kind.role` and `kind.workflow`)
 - `tools/roles/role-schema.toml` (the fixed and widening columns)
 - `tools/roles/workflow-schema.toml` (new)
 - `tools/roles/roles_lib.py` (the composers, `check_core_fields`, `check_actor_patch`)
-- `tools/roles/check_roles.py` (`WORKFLOW_NAMES` removed, the readers re-pointed)
+- `tools/roles/check_roles.py` (`WORKFLOW_NAMES` removed, the readers re-pointed, `--check-actor-patch`)
 - `tools/roles/render_agents.py` (the composition, held harnesses only)
 - `tools/roles/handoff.py` (the composition)
 - `tools/roles/adopt-roles.test.sh` (the arm of §7)
-- `tools/loop/loop_items.py` (the call of `check_actor_patch`)
+- `tools/loop/loop_items.py` (the subprocess run of `check_roles.py --check-actor-patch`, §8 F7)
 - `tools/govkit/surface-classes.toml` and `tools/govkit/step_gate.py` (the two classes)
 - `.claude/agents/` and `.claude/roles.json` (renders, by `tools/roles/render_agents.py`)
 - `tools/roles/README.md` (the catalogue section names the overlay)
@@ -252,7 +269,8 @@ refusals, now armed for two more kinds.
 - security — widens nothing by default: every repository row arrives through the guarded overlay with
   the owner's proof, a widening is listed by PLAY-dOrderedCharter-36 S6, and a core role's write class
   and return schema cannot be patched.
-- perf / scale — one composition per checker or render run, over a few dozen rows.
+- perf / scale — one composition per checker or render run, one `compose` subprocess per kind, over a
+  few dozen rows.
 - error / empty / loading states — an empty overlay composes to gov's rows; an absent overlay is an
   empty one (PLAY-dOrderedCharter-32 S1); an unheld harness is a note and an omission, never a guess.
 - observability — each refusal names the row, the field and the source or requirer; the index marks
@@ -288,8 +306,9 @@ refusals, now armed for two more kinds.
   `driver` refuses its `supersedes` the same way.
   Red when: a core role's write class or return schema is patched, or a cycle role is replaced.
 - **AC6** — When the fixture patches a gov item's `actor` to `role:adopter.triager` and the role's
-  `return` lacks the item's template, `check_item_composition` exits 1 naming the role and the template;
-  with the template added the patch is admitted.
+  `return` lacks the item's template, `python check_roles.py --check-actor-patch <item file>` exits 1
+  naming the role and the template, and `check_item_composition`, running it, refuses the patch; with
+  the template added both admit it.
   Red when: an actor patch is admitted for a role that cannot return the item's template.
 - **AC7** — When the fixture's `instructions.exclude` lists a role an active item names as its actor, and
   separately a leg a role's `gates` names, each composition is refused naming the requirer; an exclusion
@@ -336,8 +355,13 @@ New arm: tools/govkit/selftest.py · covers AC9 · the `role` and `workflow` cla
 - **F3 — Where does the actor-patch check live?** Options: (a) `check_actor_patch` in the roles library,
   called by the item kind's `check_item_composition`; (b) inside the loop kit; (c) in `check_roles.py`
   reading the loop's items. (b) puts a role rule in another kit; (c) makes the role checker parse loop
-  rows. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the rule lives with the role it judges.
-  options: (a) > (c) > (b) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none
+  rows. Rev-2 took (a) as an in-process call, which a kit's import of a sibling rules out
+  (PLAY-dOrderedCharter-7 §4 "The policy reads"; TOOL-dDeclaredLoop-12 S4). RESOLVED (agent,
+  2026-10-26, delegated): (a) behind the roles-kit verb `check_roles.py --check-actor-patch`, which
+  `check_item_composition` runs as a subprocess with the one composed item row, rung 1,
+  PLAY-dOrderedCharter-7 §4 and TOOL-dDeclaredLoop-12 S4; the rule still lives with the role it
+  judges. options: (a) > (c) > (b) · pick: (a) · admitted-by: principle.p18 · widens: none ·
+  relaxes: none
 - **F4 — One spec or parts?** The brief allows carrying this clause in parts if one spec cannot hold it
   under 49152 bytes. Options: (a) whole; (b) two parts. FACT-QUESTION settled by measuring this file
   with `wc -c` before return: it is under the cap. RESOLVED (agent, 2026-10-25, delegated): (a), rung 2;
@@ -347,6 +371,26 @@ New arm: tools/govkit/selftest.py · covers AC9 · the `role` and `workflow` cla
   against the specs and re-ground at the build run; (b) restate them. RESOLVED (agent, 2026-10-25,
   delegated): (a), rung 1, the brief's rule; the build run stops this unit if a section is still absent
   then. options: (a) > (b) · pick: (a) · admitted-by: principle.p18 · widens: none · relaxes: none
+- **F6 — How does the roles kit reach `compose_rows`, the playbook kit's function?** A kit imports no
+  sibling kit (PLAY-dOrderedCharter-7 §4), PLAY-dOrderedCharter-35 gives `compose_rows` no verb, and
+  TOOL-dDeclaredLoop-26 §8 F5 asks the same for the loop kit, open for the owner. Options: (a) the
+  `compose` verb that its (a) asks of dOrderedCharter, on `tools/playbook/overlay_rows.py`, printing
+  `compose_rows`' returns for a registered kind as JSON, run as a subprocess with `root` as its working
+  directory; (b) a declared `requires_if` row on `tools/roles/kit.toml` naming the playbook kit,
+  keeping the import, the shape of `tools/memory-tree/kit.toml:8`. (a) waits on the ask, and S3 and
+  every criterion whose fixture carries an overlay cannot pass until it lands; (b) needs no parent
+  change but binds the roles kit to the playbook module's names. Recommendation (a), so both kits
+  share one ask and this fork follows TOOL-dDeclaredLoop-26 F5's answer. Open for the owner: the ask the build run files is TOOL-dDeclaredLoop-26 F5's, a `compose`
+  verb on `tools/playbook/overlay_rows.py`, naming `kind.role` and `kind.workflow` among its callers.
+- **F7 — TOOL-dDeclaredLoop-24 S4 lists no actor-patch check; who adds the call?** Options: (a) an ask
+  to dDeclaredLoop that S4's list names the arm, the subprocess run of `check_roles.py
+  --check-actor-patch` for each item whose composed actor is a repository role, which this unit's build
+  adds to `tools/loop/loop_items.py` against the listed seam; (b) this unit adds the arm with no parent
+  change, as TOOL-dBoundRoles-1 S7 adds `check_item_roles`. (b) needs no wait but leaves S4's list short
+  of a check its function runs; (a) keeps that list the one place the checks are named. Recommendation
+  (a). Open for the owner: the ask the build run files is "TOOL-dDeclaredLoop-24 S4:
+  `check_item_composition` runs `check_roles.py --check-actor-patch` as a subprocess for each item whose
+  composed actor is a repository role, a refusal naming the item".
 
 ## 9. Revision log
 
@@ -354,6 +398,13 @@ New arm: tools/govkit/selftest.py · covers AC9 · the `role` and `workflow` cla
   I22, scout A's row for cl-0185, the flow roles adoption's items 1 to 19, and PLAY-dOrderedCharter-35 and
   -36 and TOOL-dDeclaredLoop-24 at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-10-26 · S2 · S3 · S6 · §3 · §4 The actor patch · §4 Inventory · §4 Files touched · §5 ·
+  AC6 · §8 F3 F6 F7 · re-grounded on the cross-check record
+  `2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck`, rows 33, 34 and 35: the kind rows are
+  TOOL-dDeclaredLoop-6 S1's, naming `binds`, `population`, `factory` and `gate`, and this unit adds
+  `schema`; the composition runs the playbook kit's `compose` verb by subprocess, F6 tracking
+  TOOL-dDeclaredLoop-26 §8 F5; the actor patch is a roles-kit verb `loop_items.py` runs by subprocess,
+  F7 the ask of TOOL-dDeclaredLoop-24 S4.
 
 ## 10. Reuse audit
 
