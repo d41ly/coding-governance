@@ -1336,4 +1336,101 @@ case "$out35" in
   *) bad "35 run_gov_first skipped a deployer it could not run, or refused an adopter's landing: $out35" ;;
 esac
 
+# 37 — TOOL-dSafePassage-28: EVERY refusal of cmd_prepare after the gov-first walk leaves a clean
+#      tree, gated as a class. PREPARE_REFUSALS holds one row per `return 1` line of cmd_prepare from
+#      its `run_gov_first` call to its end, in source order: stage | plant | expect. The arm derives
+#      that count from the lander beside this suite and reds when the table's row count differs, so a
+#      refusal added later joins the table or reds here. A refusal spelled other than `return 1` is
+#      not counted. A plantable row runs one fixture landing, the walk passing unless the row plants
+#      its refusal, and asserts exit 1, the branch where `expect` says (`old`: unmoved; `moved`: at the
+#      sha the planted regen.py moved it to and recorded under .git), the branch checked out, an empty
+#      `git status --porcelain` and no untracked path under .governance. An `unplantable:` row prints a
+#      skip line on every run and runs no case. Staged red by a lander copy carrying one extra refusal
+#      branch with no row, by one whose regeneration refusal cleans against a snapshot taken after the
+#      walk, and by the compare-and-swap row's expect set to `old`.
+PREPARE_REFUSALS=(
+  "gov-first|planted-witness-fails|old"
+  "regeneration|regen-exits-1|old"
+  "commit-tree|unplantable: no fixture fails git commit-tree or git update-ref without a lander switch|-"
+  "merge-loss|merge-loses-definition|old"
+  "compare-and-swap|regen-moves-branch|moved"
+  "final checkout|unplantable: no fixture fails the closing git checkout without a lander switch|-"
+)
+d37=$(awk '/^cmd_prepare\(\)/,/^}/' "$HERE/push-main.sh" | sed -n '/run_gov_first/,$p' | grep -c 'return 1')
+if [ "$d37" -gt 0 ] && [ "$d37" = "${#PREPARE_REFUSALS[@]}" ]; then
+  ok "37 cmd_prepare refuses $d37 way(s) after the gov-first walk, and PREPARE_REFUSALS carries a row for each"
+else
+  bad "37 cmd_prepare refuses $d37 way(s) after the gov-first walk (0 means the anchor matched nothing), PREPARE_REFUSALS carries ${#PREPARE_REFUSALS[@]} row(s)"
+fi
+_py37=$(resolve_python 2>/dev/null) || _py37=""
+n37=0
+for _row37 in "${PREPARE_REFUSALS[@]}"; do
+  n37=$((n37 + 1))
+  IFS='|' read -r st37 pl37 ex37 <<< "$_row37"
+  case "$pl37" in unplantable:*) echo "  skip — 37 $st37: ${pl37#unplantable: }, so this refusal is NOT covered"; continue ;; esac
+  if [ -z "$_mt_gk" ] || [ -z "$_rg_k" ] || [ -z "$_ml_lex" ] || [ -z "$_py37" ]; then
+    echo "  skip — 37 $st37: no govkit deployer, regen.py, lexicon kit or python launcher beside this lander, so this refusal is NOT covered"
+    continue
+  fi
+  out37=$(
+    build_regen_fixture "$tmp/remote37-$n37.git" "$tmp/work37-$n37" || exit 1
+    git checkout -q -b feat
+    case "$pl37" in
+      planted-witness-fails)
+        printf '\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\ndown = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\nsurfaces = []\nneeds-target = false\n' >> "${KIT_REL}$_mt_gk/steps.toml"
+        git commit -q --no-verify -am "TOOL-tFix-37: a planted step whose witness never holds"
+        want37="did not hold on gov first" ;;
+      regen-exits-1)
+        printf 'import pathlib, sys\npathlib.Path("regen-litter.txt").write_text("x", encoding="utf-8")\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
+        git commit -q --no-verify -am "TOOL-tFix-37: a failing regeneration"
+        want37="could NOT be regenerated" ;;
+      merge-loses-definition)
+        printf 'fa() { :; }\n' > fx37.sh; git add fx37.sh
+        git commit -q --no-verify -m "TOOL-tFix-37: fx37.sh"
+        git checkout -q -b side37
+        printf 'fa() { echo B; }\nfb() { :; }\n' > fx37.sh; git commit -q --no-verify -am "side B"
+        git checkout -q feat
+        printf 'fa() { echo A; }\n' > fx37.sh; git commit -q --no-verify -am "TOOL-tFix-37: side A"
+        git merge -q --no-ff --no-commit side37 >/dev/null 2>&1
+        printf 'fa() { echo A; }\n' > fx37.sh; git add fx37.sh
+        git commit -q --no-verify -m "merge side37, taking side A"
+        want37="would publish a merge that loses a definition" ;;
+      regen-moves-branch)
+        # A sibling moving the branch between the regeneration and the swap: the branch's own tree,
+        # committed onto it, HEAD and the working tree untouched, the sha recorded under .git.
+        cat > "${KIT_REL}$_rg_k/regen.py" <<'PY'
+import pathlib, subprocess
+def git(*a):
+    return subprocess.check_output(("git",) + a, text=True).strip()
+b = git("rev-parse", "refs/heads/feat")
+c = git("commit-tree", b + "^{tree}", "-p", b, "-m", "a sibling moved the branch")
+git("update-ref", "refs/heads/feat", c, b)
+pathlib.Path(git("rev-parse", "--git-dir"), "cas37-moved").write_text(c, encoding="utf-8")
+PY
+        git commit -q --no-verify -am "TOOL-tFix-37: a regeneration that moves the branch"
+        want37="moved while this merge was being made" ;;
+      *) echo "unknown-plant=$pl37"; exit 0 ;;
+    esac
+    oldb=$(git rev-parse refs/heads/feat)
+    unset GATE_PUSH_BASE; e37=$(bash "$lander" --prepare --slug fx 2>&1 >/dev/null); echo "rc=$?"
+    # the refusal is the row's own stage, or a case refused earlier would pass for it
+    case "$e37" in *"$want37"*) echo stage=refused ;; *) echo "stage-missing=[$e37]" ;; esac
+    nowb=$(git rev-parse refs/heads/feat)
+    if [ "$ex37" = moved ]; then
+      mv37=$(cat "$(git rev-parse --git-dir)/cas37-moved" 2>/dev/null)
+      [ -n "$mv37" ] && [ "$nowb" = "$mv37" ] && [ "$nowb" != "$oldb" ] && echo branch=expected || echo "branch=[$nowb] old=[$oldb] recorded=[$mv37]"
+    else
+      [ "$nowb" = "$oldb" ] && echo branch=expected || echo "branch=[$nowb] old=[$oldb]"
+    fi
+    printf 'head=%s\n' "$(git symbolic-ref --short HEAD 2>/dev/null)"
+    st37=$(git status --porcelain); [ -z "$st37" ] && echo clean=1 || echo "left=[$st37]"
+    gv37=$(git ls-files --others --exclude-standard -- .governance); [ -z "$gv37" ] && echo governance=clean || echo "governance=[$gv37]"
+  )
+  case "$out37" in
+    *rc=1*stage=refused*branch=expected*head=feat*clean=1*governance=clean*)
+      ok "37 $st37: its own refusal exits 1 with the branch $ex37 and checked out, and leaves a clean tree" ;;
+    *) bad "37 $st37: the refusal did not exit 1 with the branch $ex37, checked out, on a clean tree: $out37" ;;
+  esac
+done
+
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }
