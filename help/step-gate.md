@@ -52,6 +52,11 @@ a `summary`, and optionally a `witness` reading the class's own change record, w
 witnessed. Add the row and its functions, then run `--fixture --plant <id>` with and without
 `--with-row`. A row with no `plant` is refused, so a class cannot join without its own red.
 
+A reader returns no members where its source is absent from the tree it reads. A class whose source
+the base lacks therefore joins quietly, and the summary line counts it as `joining`. A reader that
+raises stops the gate (exit 2) with a line naming the class, the side it read (`base` or `tip`) and
+the error.
+
 ## What it does not check
 
 A change of meaning behind an unchanged name; whether a step actually carries the member it names

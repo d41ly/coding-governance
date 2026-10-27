@@ -38,7 +38,16 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 324    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 327    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 324 -> 327 at TOOL-dSafePassage-26, BY THE MEASURED DELTA: the matcher reads 447 over the
+# deployer's directory at that unit's base `31b078c3` and 450 on the tree it left, by this module's
+# own walk over each file at both ends. Four are new, each armed: `check_argv`'s refusal of `{to}`
+# outside a down (S10, the steps reader's planted rows), `read_steps`' refusal of a shallow clone
+# (S37, the moved-descriptor arm's shallow clone), `write_before_image`'s refusal of an image that
+# does not parse over a changed path (S31, `fixture walk --plant truncated-image`), and
+# `read_surface_population`'s refusal of a reader that raises (S38, the step gate's
+# `reader-raises` plant). One went: `fanout_cap.py`'s refusal of another assignment in the conf,
+# which the shared grammar admits (S30).
 # 320 -> 324 at TOOL-dSafePassage-8, BY THE MEASURED DELTA: the matcher's two shapes read 46 in
 # `_cmd_update` at that unit's base `208c2260` and 50 on the tree it left, by an AST probe of
 # `govkit.py`; `upgrade_steps.py` stays at 54, since `check_gov_first` returns its misses. Five are

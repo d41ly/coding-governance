@@ -45,7 +45,9 @@ starts it:
   `credential.helper` to nothing, and set `protocol.ext.allow` to `never`. A step's `git add` or
   `git mv` fires none of your hooks, and a step can never use the `ext::` transport, whose remote
   URL is a command: whatever your `protocol.allow`, `url.<base>.insteadOf` or `remote.<x>.url`
-  says, git itself refuses it inside the step with `transport 'ext' not allowed`.
+  says, git itself refuses it inside the step with `transport 'ext' not allowed`. Two settings
+  follow from gov's side, `core.autocrlf` and `core.eol`, where they are set where `update` runs:
+  so a step hashes and stages a file with the line endings `update` itself would.
 - **Python runs isolated (`-I`)**: it ignores `PYTHONPATH` and imports nothing from your tree or
   the working directory.
 - **Your repository's own config is read first, and can refuse the step.** Git has no switch that
@@ -83,7 +85,9 @@ starts it:
 
 A step that needs your repository's own code or hooks declares `needs-target = true`. The runner
 spawns nothing for such a step and reads it `attended`: a person runs it. The `update` walk still
-runs its witness, under this same contract, to see whether that person already has. To check a step's declaration,
+runs its witness, under this same contract, to see whether that person already has. On gov's own
+tree, where the target's code is gov's, the runner itself runs such a step's witness, so gov's own
+landing passes the step once its witness holds. To check a step's declaration,
 gov runs it beside planted hooks and modules in a scratch copy and reads one verdict:
 
 - `isolated` — it ran clean and touched none of your code;
@@ -145,7 +149,11 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
   `"via": "witness"` and its up never runs: `step <id> · skipped (witness holds)`.
 - **A step that runs** is recorded `failed`, `interrupted: started <utc>, no exit recorded`, before
   its up starts, and `applied` once the up exits 0 and the witness holds. Its writes and its
-  before-image under `.governance/steps/` are staged, never committed.
+  before-image under `.governance/steps/` are staged, never committed. The image is written
+  whole or not at all. An image cut short by an older writer counts as absent when none of the
+  paths it lists changed after it, and is written again. Where one did change, the up stops with
+  exit 1 and names the image: its before bytes are gone, so put those paths back by hand and
+  remove the image.
 - **A stopped walk.** An up that exits non-zero (`exit <rc>: <its last stderr line>`), or a witness
   that still fails after it (`witness does not hold after up`), stops the walk. The steps before it
   stay applied, no down runs, the run exits 1, and the receipt's `gov_commit` does not move.
@@ -165,7 +173,9 @@ the holder's pid and host. The next writing run on that host reclaims it by itse
 gone from the process table, or names a process started after the lock, and prints `reclaimed`. A
 lock from another host, one it cannot read, or one it cannot judge because the process census cannot
 run is not reclaimed: the refusal names the holder, and you delete the lock by hand once you know
-that run has ended. Before each index write a run appends the path and the blob it stages to
+that run has ended. The lock also records the platform it was taken on and, on Linux, the kernel's
+boot id; a lock from another platform or boot is not reclaimed either, so a WSL run and a Windows
+run on one tree, which share a host name, never take each other's live lock. Before each index write a run appends the path and the blob it stages to
 `.governance/outbox/.update.lock.staged`; the run that reclaims the lock reads that journal, so the
 paths the killed run staged are not refused as dirty, while a different blob you staged at one of
 them still is. The step the kill interrupted reads `failed` with its `interrupted:` text, and the
@@ -187,7 +197,9 @@ python tools/govkit/upgrade_steps.py fixture update --plant kill-walk   # update
 ## Rolling back
 
 `update` refuses a `--to` older than the commit the receipt records: a downgrade is not an update.
-When you do mean to go back, ask for it by name: <!-- usage: verb:govkit.py:update c276c2e7 -->
+When you do mean to go back, ask for it by name. A step's down may name that `--to` commit as
+`{to}`, which resolves in a rollback's down and nowhere else; a row spelling `{to}` in any other
+argv is refused when it is read: <!-- usage: verb:govkit.py:update c276c2e7 -->
 
 ```sh
 python tools/govkit/govkit.py update --target <repo> --rollback --to <rev>          # preview
@@ -269,15 +281,17 @@ problem for it.
 
 The agent limit is the policy key `runtime.agents-in-flight` in `.governance/policy.toml`
 ([the agent limit](agent-limit.md)). A `FANOUT_CAP=<n>` line in `.agent-cap.conf` only lowers it.
-The step `agent-cap/fanout-cap-to-agents-in-flight` retires the file: its up writes `<n>` into the key
-when the line lowers it (and leaves the policy file alone when it does not), then removes the file,
-so the limit reads the same before and after. Its down puts both files back byte-for-byte.
+The step `agent-cap/fanout-cap-to-agents-in-flight` moves the line out: its up writes `<n>` into the
+key when the line lowers it (and leaves the policy file alone when it does not), then takes every
+`FANOUT_CAP` line out of the file. Other lines are kept. Its up removes the file when only blank
+lines and comments are left. The limit reads the same before and after. Its down puts both files
+back byte-for-byte.
 `update --write` runs it as one of its steps; to run it by hand, from this checkout, against a
 repository whose `.agent-cap.conf` and policy file are committed: <!-- usage: script:tools/govkit/steps/fanout_cap.py#up 4f94983b --> <!-- usage: script:tools/govkit/steps/fanout_cap.py#witness 052d667f --> <!-- usage: script:tools/govkit/steps/fanout_cap.py#down 3f5f9500 -->
 
 ```sh
 python tools/govkit/steps/fanout_cap.py up <repo>       # exit 1, writing nothing, on a bad value
-python tools/govkit/steps/fanout_cap.py witness <repo>  # exit 0 once the file is gone
+python tools/govkit/steps/fanout_cap.py witness <repo>  # exit 0 once no FANOUT_CAP is left
 python tools/govkit/steps/fanout_cap.py down <repo>     # exit 1 if a file changed since the up
 ```
 

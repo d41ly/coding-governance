@@ -4,7 +4,9 @@
     python <this kit>/shims.py --write | --check
     python <this kit>/shims.py --fixture --plant <sh|js|py|module> [--mode warn|journal|unset|bogus]
     python <this kit>/shims.py --fixture --plant window --window <0|1|2|4> --releases <n> [--unlanded]
-    python <this kit>/shims.py --fixture --plant parity-edit
+                              --expect held|allowed
+    python <this kit>/shims.py --fixture --plant window-prefix-id | window-comment-id | parity-edit
+    python <this kit>/shims.py --fixture --plant missing-target --lang js
 
 `shims.toml` beside this file declares one `[[shim]]` row per moved surface. `--write` renders each
 open row's forwarder at its `from` path from one template per language, `--check` compares each with
@@ -18,6 +20,9 @@ and journals the call, `journal` journals it silently; neither ever blocks the f
 have been cut since the commit that landed it on the default branch, and holds every row while no
 release exists: `read_releases` is the stand-in that returns none until dShippedRelease defines its
 release tags. `govkit selfcheck` arm 11 runs both checks.
+
+Every plant prints its observations and exits by one contract (TOOL-dSafePassage-26 S9): 0 when
+each matched its case, the window plant's verdict included, which `--expect` names.
 
 Exit 0 clean · 1 a finding, or a fixture observation that missed its case · 2 cannot run or observe.
 """
@@ -145,8 +150,18 @@ if (lines[0] === "true" && lines[1]) {
     // a journal that cannot be written never blocks the forward
   }
 } else process.stderr.write(@NOGIT@ + "\n");
-const r = spawnSync(process.execPath, [path.join(__dirname, @TO_REL@), ...process.argv.slice(2)], { stdio: "inherit" });
-process.exit(r.status === null ? 1 : r.status);
+// The child's outcome, mapped in full (TOOL-dSafePassage-26 S34): a target that never started is 127
+// with its error printed, a missing target file among them; a signal is 128 plus its number.
+const target = path.join(__dirname, @TO_REL@);
+const r = fs.existsSync(target)
+  ? spawnSync(process.execPath, [target, ...process.argv.slice(2)], { stdio: "inherit" })
+  : { error: new Error(`ENOENT: no target at ${target}`) };
+if (r.error) {
+  process.stderr.write(@NOSTART@ + r.error.message + "\n");
+  process.exit(127);
+}
+if (r.signal) process.exit(128 + (require("os").constants.signals[r.signal] || 0));
+process.exit(r.status);
 """
 
 PY_PRELUDE = r"""# @MARKER@ — rendered by shims.py from shims.toml; edit the row, never this file.
@@ -204,6 +219,7 @@ _shim_runpy.run_path(_SHIM_TARGET, run_name="__main__")
 
 PY_MODULE_TAIL = r"""import importlib.util as _shim_iu
 
+_shim_sys.path.insert(0, _shim_os.path.dirname(_SHIM_TARGET))
 _shim_spec = _shim_iu.spec_from_file_location(__name__, _SHIM_TARGET)
 _shim_mod = _shim_iu.module_from_spec(_shim_spec)
 _shim_spec.loader.exec_module(_shim_mod)
@@ -234,7 +250,8 @@ def render_shim(row: dict) -> str:
         q = json.dumps
         subs = {"@WHY@": q(why), "@POLICY@": q(policy_rel), "@MOVED@": q(moved), "@JOURNAL@": q(JOURNAL),
                 "@NOGIT@": q(nogit), "@TO_REL@": q(to_rel), "@ID@": q(row["id"]),
-                "@FROM_Q@": q(row["from"]), "@TO_Q@": q(row["to"]), "@KEY@": q("install.on-shim-call")}
+                "@FROM_Q@": q(row["from"]), "@TO_Q@": q(row["to"]), "@KEY@": q("install.on-shim-call"),
+                "@NOSTART@": q(f"gov: shim {row['id']} could not start its target: ")}
         if row["lang"] == "js":
             text = JS_TEMPLATE
         else:
@@ -295,7 +312,11 @@ def run_git(root, *args: str) -> subprocess.CompletedProcess:
 def resolve_shim_landing(root, shim_id: str) -> str:
     """The oldest commit on the default branch's first-parent history whose `shims.toml` carries the
     row `shim_id`, or "" when no landed commit does. The default branch is the remote ladder's,
-    the remote's ref first and the local branch after it, `main` where the ladder names none."""
+    the remote's ref first and the local branch after it, `main` where the ladder names none.
+
+    The landing is the step rows' one derivation (TOOL-dSafePassage-26 S16): the first first-parent
+    blob holding a `[[shim]]` row with exactly that id, never a substring search, so an id another
+    id begins with, or one a comment spells first, lands at its own row."""
     remote, branch, _observed, refusal = govkit.resolve_remote(root)
     if refusal:
         return ""
@@ -305,9 +326,11 @@ def resolve_shim_landing(root, shim_id: str) -> str:
     for ref in ([f"refs/remotes/{remote}/{branch}"] if remote else []) + [f"refs/heads/{branch}"]:
         if run_git(root, "rev-parse", "--verify", "-q", f"{ref}^{{commit}}").returncode != 0:
             continue
-        p = run_git(root, "log", "--first-parent", "--reverse", "--format=%H", f"-S{json.dumps(shim_id)}",
-                    ref, "--", rel)
-        return (p.stdout.split() or [""])[0] if p.returncode == 0 else ""
+        try:
+            hit = govkit.upgrade_steps.derive_introduced(root, ref, [rel], "shim", [shim_id])
+        except govkit.Refusal:
+            return ""
+        return hit[shim_id][0] if shim_id in hit else ""
     return ""
 
 
@@ -353,12 +376,14 @@ TARGETS = {
     "js": 'const input = require("fs").readFileSync(0, "utf8");\n'
           'console.log("args:" + process.argv.slice(2).map((a) => ` [${a}]`).join(""));\n'
           'console.log(`stdin: [${input}]`);\nprocess.exit(3);\n',
-    "py": 'import sys\nprint("args:" + "".join(f" [{a}]" for a in sys.argv[1:]))\n'
-          'print(f"stdin: [{sys.stdin.read()}]")\nsys.exit(3)\n',
-    "module": 'import sys\nNAME = "newmod"\n\n\ndef main(argv):\n'
+    "py": 'import sys\nimport sib\nprint("args:" + "".join(f" [{a}]" for a in sys.argv[1:]))\n'
+          'print(f"stdin: [{sys.stdin.read()}]")\nsys.exit(sib.CODE)\n',
+    "module": 'import sys\nimport sib\nNAME = "newmod"\n\n\ndef main(argv):\n'
               '    print("args:" + "".join(f" [{a}]" for a in argv))\n'
-              '    print(f"stdin: [{sys.stdin.read()}]")\n    return 3\n',
+              '    print(f"stdin: [{sys.stdin.read()}]")\n    return sib.CODE\n',
 }
+# The py targets import this sibling by bare name, as a moved module's own imports do (S35).
+SIBLING = "CODE = 3\n"
 CALLER = ('import os\nimport sys\n\nimport oldmod\n\n'
           'print("names: " + oldmod.NAME + " " + os.path.basename(oldmod.__file__))\n'
           'sys.exit(oldmod.main(sys.argv[1:]))\n')
@@ -366,6 +391,7 @@ CALLER = ('import os\nimport sys\n\nimport oldmod\n\n'
 
 def build_scratch(t: pathlib.Path) -> None:
     run_git(t, "init", "-q", "-b", "main")
+    run_git(t, "config", "commit.gpgsign", "false")
     run_git(t, "config", "user.email", "shims@fixture.invalid")
     run_git(t, "config", "user.name", "shims fixture")
     run_git(t, "config", "core.autocrlf", "false")
@@ -393,7 +419,10 @@ def run_forward_plant(t: pathlib.Path, lang: str, mode: str) -> int:
     kit = pathlib.Path(govkit.resolve_kit_dir("policy", "policy.py", govkit.GOVKIT_DIR))
     shutil.copytree(kit, t / "tools" / "policy",
                     ignore=shutil.ignore_patterns("__pycache__", "*.test.sh", "legacy-homes.txt"))
-    for rel, text in ((row["to"], TARGETS[lang]), (row["from"], render_shim(row))):
+    files = [(row["to"], TARGETS[lang]), (row["from"], render_shim(row))]
+    if lang in ("py", "module"):
+        files.append((posixpath.join(posixpath.dirname(row["to"]), "sib.py"), SIBLING))
+    for rel, text in files:
         (t / rel).parent.mkdir(parents=True, exist_ok=True)
         (t / rel).write_bytes(text.encode("utf-8"))
     if lang == "module":
@@ -465,7 +494,7 @@ def print_observations(case: str, obs: list[tuple[str, str, str]]) -> int:
     return 1 if bad else 0
 
 
-def run_window_plant(t: pathlib.Path, window: int, n: int, unlanded: bool) -> int:
+def run_window_plant(t: pathlib.Path, window: int, n: int, unlanded: bool, expect: str) -> int:
     write_policy(t, f"[install]\ndeprecation-window = {window}\n")
     run_commit(t, f"window {window}")
     decl = t / "tools" / "govkit" / SHIMS_NAME
@@ -479,11 +508,52 @@ def run_window_plant(t: pathlib.Path, window: int, n: int, unlanded: bool) -> in
         releases.append(run_commit(t, f"release {i + 1}"))
     decl.write_text(row.replace("closed = false", "closed = true"), encoding="utf-8", newline="\n")
     found = check_shim_windows(t, releases)
-    print(f"shims fixture: plant window · window {window} · {n} release(s){' · unlanded' if unlanded else ''}")
     for line in found:
         print(f"  {line}")
-    print(f"shims fixture: the closed row is {'held' if found else 'allowed to close'}")
-    return 1 if found else 0
+    return print_observations(f"plant window · window {window} · {n} release(s)"
+                              f"{' · unlanded' if unlanded else ''}",
+                              [("the closed row", "held" if found else "allowed", expect)])
+
+
+def run_window_id_plant(t: pathlib.Path, plant: str) -> int:
+    """`window-prefix-id`: a row whose id begins another row's lands after it. `window-comment-id`:
+    the id is spelled in the file's header comment a commit before its row lands. Each id must
+    resolve to the commit that landed its own row (S17)."""
+    decl = t / "tools" / "govkit" / SHIMS_NAME
+    row = ('[[shim]]\nid = "{id}"\nkind = "command"\nfrom = "{{prefix}}/demo/{f}.sh"\n'
+           'to = "{{prefix}}/demo/new-{f}.sh"\nclosed = false\n')
+    if plant == "window-prefix-id":
+        decl.write_text(row.format(id="fixture/moved-on", f="a"), encoding="utf-8", newline="\n")
+        first = run_commit(t, "the longer id lands")
+        decl.write_text(row.format(id="fixture/moved-on", f="a") + "\n" + row.format(id="fixture/moved", f="b"),
+                        encoding="utf-8", newline="\n")
+        want = {"fixture/moved-on": first, "fixture/moved": run_commit(t, "the id it begins with lands")}
+    else:
+        head = '# "fixture/moved" lands in the next commit\n'
+        decl.write_text(head, encoding="utf-8", newline="\n")
+        run_commit(t, "a comment spells the id")
+        decl.write_text(head + row.format(id="fixture/moved", f="b"), encoding="utf-8", newline="\n")
+        want = {"fixture/moved": run_commit(t, "the row lands")}
+    return print_observations(f"plant {plant}", [(f"{i} lands at", resolve_shim_landing(t, i) or "none", c)
+                                                for i, c in want.items()])
+
+
+def run_missing_target_plant(t: pathlib.Path, lang: str) -> int:
+    """A `js` forwarder whose target was never written exits 127 printing the error (S34)."""
+    node = shutil.which("node")
+    if not node:
+        print("shims fixture: cannot observe: node not found on PATH")
+        return 2
+    row = {"id": f"fixture/moved-{lang}", "kind": "command", "from": f"tools/demo/old.{lang}",
+           "to": f"tools/moved/new.{lang}", "closed": False, "lang": lang, "policy": "tools/policy"}
+    (t / "tools" / "demo").mkdir(parents=True, exist_ok=True)
+    (t / row["from"]).write_bytes(render_shim(row).encode("utf-8"))
+    env = {k: v for k, v in os.environ.items() if k not in GIT_LOCATION_VARS}
+    p = subprocess.run([node, row["from"]], cwd=t, capture_output=True, text=True, encoding="utf-8",
+                       errors="replace", env=env, stdin=subprocess.DEVNULL)
+    said = any("could not start its target" in ln for ln in p.stderr.splitlines())
+    return print_observations(f"plant missing-target · lang {lang}", [
+        ("exit", str(p.returncode), "127"), ("the error printed", str(said), "True")])
 
 
 def run_parity_plant(t: pathlib.Path) -> int:
@@ -501,12 +571,21 @@ def run_parity_plant(t: pathlib.Path) -> int:
         ("its finding", (after or ["none"])[0].split(";")[0], "shims: fixture/moved's forwarder tools/demo/old.sh differs from its render")])
 
 
-def run_fixture(plant: str, mode: str, window: int, releases: int, unlanded: bool) -> int:
+def run_fixture(plant: str, mode: str, window: int, releases: int, unlanded: bool,
+                expect: str | None = None, lang: str = "js") -> int:
+    # The scratch repository has no remote: a policy read there refuses when the calling shell sets
+    # either of these (class fixture-inherits-ambient-machine-state), so the fixture drops both.
+    for k in ("GOV_REMOTE", "GOV_DEFAULT_BRANCH"):
+        os.environ.pop(k, None)
     t = pathlib.Path(tempfile.mkdtemp(prefix="shim-"))
     try:
         build_scratch(t)
         if plant == "window":
-            return run_window_plant(t, window, releases, unlanded)
+            return run_window_plant(t, window, releases, unlanded, expect)
+        if plant in ("window-prefix-id", "window-comment-id"):
+            return run_window_id_plant(t, plant)
+        if plant == "missing-target":
+            return run_missing_target_plant(t, lang)
         if plant == "parity-edit":
             return run_parity_plant(t)
         return run_forward_plant(t, plant, mode)
@@ -523,16 +602,22 @@ def main(argv: list[str]) -> int:
     verb.add_argument("--write", action="store_true")
     verb.add_argument("--check", action="store_true")
     verb.add_argument("--fixture", action="store_true")
-    ap.add_argument("--plant", choices=("sh", "js", "py", "module", "window", "parity-edit"))
+    ap.add_argument("--plant", choices=("sh", "js", "py", "module", "window", "window-prefix-id",
+                                        "window-comment-id", "missing-target", "parity-edit"))
     ap.add_argument("--mode", choices=("warn", "journal", "unset", "bogus"), default="warn")
     ap.add_argument("--window", type=int, choices=(0, 1, 2, 4), default=2)
     ap.add_argument("--releases", type=int, default=0)
     ap.add_argument("--unlanded", action="store_true")
+    ap.add_argument("--expect", choices=("held", "allowed"))
+    ap.add_argument("--lang", choices=("js",), default="js")
     args = ap.parse_args(argv)
     if args.fixture:
         if not args.plant:
             ap.error("--fixture needs --plant")
-        return run_fixture(args.plant, args.mode, args.window, args.releases, args.unlanded)
+        if (args.plant == "window") != bool(args.expect):
+            ap.error("--expect held|allowed goes with --plant window, and only with it")
+        return run_fixture(args.plant, args.mode, args.window, args.releases, args.unlanded,
+                           args.expect, args.lang)
     root = govkit.repo_root()
     try:
         if args.write:

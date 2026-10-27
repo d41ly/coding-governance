@@ -4298,43 +4298,9 @@ def scan_entry_argv(descs: dict[str, tuple[dict, str]], selection: list[str], ta
 ADOPTER_BAR_PATHS = ('gr["file"]', 'receipt_path', '"install.sums"')
 
 
-def write_atomic(dest: pathlib.Path, text: str) -> None:
-    """Persist `text` at `dest` through a sibling temp file and `os.replace`, so a run that dies
-    mid-write leaves the PREVIOUS file rather than a truncated one (DEPL-cMendedVintage-21 S1).
-
-    THE ONE WRITER for every destination `ADOPTER_BAR_PATHS` declares: the gate-leg manifest an
-    adopter's whole bar reads, the receipt, `.governance/install.json` (TOOL-dRedressedBar-17), and
-    its sidecar `.governance/install.sums`, written before the receipt (TOOL-dRedressedBar-19).
-    Two verbs write the manifest since DEPL-cMendedVintage-13, and an exception between opening it
-    and finishing it would hand the adopter a manifest that is not JSON — every leg of their bar,
-    gone, on a deployer step that was only adding one. A receipt cut short the same way is one the
-    next `apply`, `update` or `adopt` cannot parse.
-
-    WHAT THIS DOES NOT CLAIM. No fsync and no directory sync, so this is not crash consistency:
-    what it closes is a half-written file left by an EXCEPTION mid-write. Power loss is out of
-    scope and always was.
-
-    The temp file is a SIBLING, inside the destination's own directory. Two reasons, and both are
-    load-bearing: `os.replace` raises across a filesystem boundary, which a shared temp root makes
-    reachable and a sibling makes impossible; and a shared root is writable by principals the
-    destination's directory is not, so the file to be renamed into place could be swapped before
-    the rename. A stale sibling from a crashed run of an earlier vintage is overwritten here rather
-    than swept, because an unknown temp file of unknown vintage is not this engine's to delete.
-    """
-    tmp = dest.with_name(dest.name + ".govkit-new")
-    try:
-        tmp.write_text(text, encoding="utf-8", newline="\n")
-        os.replace(tmp, dest)
-    finally:
-        # THE CLEANUP RUNS ON THE SUCCESS PATH TOO, where `os.replace` has already consumed `tmp`
-        # and this raises FileNotFoundError — an OSError, swallowed. Swallowed rather than
-        # re-raised because this sits in a `finally`: an exception thrown from here REPLACES the
-        # one that brought us here, and the caller would be told the temp file could not be
-        # removed instead of why the write failed.
-        try:
-            tmp.unlink()
-        except OSError:
-            pass
+# The one atomic writer moved to `upgrade_steps.py` (TOOL-dSafePassage-26 S15), so the step
+# program and the walk write through the same function; govkit's callers read it here.
+write_atomic = upgrade_steps.write_atomic
 
 
 def write_install_receipt(target: pathlib.Path, receipt_path: pathlib.Path, doc: dict) -> None:
@@ -6861,16 +6827,9 @@ def scan_claimed_paths(desc: dict, wildcard_rule: dict, ctx: dict, home: str) ->
     return claimed
 
 
-def blob_at(root: pathlib.Path, commit: str, path: str) -> bytes | None:
-    """Bytes from the gov git INDEX at a recorded commit — never from the working tree.
-
-    This is the receipt's whole provenance claim. Reading the working tree would make the receipt
-    say "these bytes came from <commit>" about bytes that came from whatever the operator had
-    checked out and half-edited at the time.
-    """
-    out = subprocess.run(["git", "-C", str(root), "show", f"{commit}:{path}"],
-                         capture_output=True, check=False)
-    return out.stdout if out.returncode == 0 else None
+# The one revision-blob reader moved to `upgrade_steps.py` (TOOL-dSafePassage-26 S14); a
+# selftest patching `govkit.blob_at` still reaches every caller below, which reads this name.
+blob_at = upgrade_steps.blob_at
 
 
 # ---------------------------------------------------------------- the two identities (DEPL-dCarriedReceipt-7)
@@ -9651,20 +9610,28 @@ def read_retired_edits_mode(target: pathlib.Path) -> str:
     return value
 
 
-def write_row_order(outbox: pathlib.Path, kind: str, row: dict, to_commit: str, body: str) -> pathlib.Path:
-    """The one writer of an outbox order for a row's verdict (TOOL-dSafePassage-9 S4): the
-    `withdrawn` arm's, extracted at its second caller. Writes `update-<kind>-<slug>.md` and returns
-    its path; `body` is the text below the row's source, commit and vintage lines."""
-    order = outbox / f"update-{kind}-{render_order_slug(row['path'])}.md"
+def write_row_order(outbox: pathlib.Path, kind: str, key: str, text: str) -> pathlib.Path:
+    """THE ONE WRITER of a row-keyed outbox order (TOOL-dSafePassage-9 S4, TOOL-dSafePassage-26
+    S18): `update-<kind>-<slug>.md`, the slug `render_order_slug` of `key`, a row's path or a step's
+    id, holding `text`. The conflict, withdrawn, retired-edited and render-edited arms and the
+    attended step's order all write through it, so no two keys collide on a basename. Returns the
+    path."""
+    order = outbox / f"update-{kind}-{render_order_slug(key)}.md"
+    order.parent.mkdir(parents=True, exist_ok=True)
+    order.write_text(text, encoding="utf-8", newline="\n")
+    return order
+
+
+def render_row_order(kind: str, row: dict, to_commit: str, body: str) -> str:
+    """The text of a row verdict's order (TOOL-dSafePassage-9 S4): its title, the row's source,
+    commit and vintage lines, then `body`."""
     title = (f"{row['path']} was edited since its last render" if kind == "render-edited"
              else f"gov no longer ships {row['path']}")
-    order.write_text(f"# {title}\n\n"
-                     f"source {row.get('source')}\n"
-                     f"last gov commit {row.get('commit')}\n"
-                     f"vintage asked for {to_commit}\n\n"
-                     f"{body}",
-                     encoding="utf-8", newline="\n")
-    return order
+    return (f"# {title}\n\n"
+            f"source {row.get('source')}\n"
+            f"last gov commit {row.get('commit')}\n"
+            f"vintage asked for {to_commit}\n\n"
+            f"{body}")
 
 
 def render_retired_edited_line(row: dict, mode: str, order_path: str | None) -> str:
@@ -10974,7 +10941,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _rb_record = upgrade_steps.write_rollback_record(target, base_commit, to_commit, _rb_started)
         print(f"govkit update — rollback: {len(_rb_rows)} step(s) to roll back · record "
               f"{_rb_record.relative_to(target).as_posix()}")
-        _rb_walk = upgrade_steps.run_reverse_walk(root, target, receipt_path, receipt, _rb_rows)
+        _rb_walk = upgrade_steps.run_reverse_walk(root, target, receipt_path, receipt, _rb_rows, to_commit)
         if _rb_walk["stopped"]:
             r.fail(f"the rollback's reverse walk stopped at {_rb_walk['stopped']}: {_rb_walk['failure']}. "
                    f"No file row moved and gov_commit is unmoved; the next `update --rollback --to "
@@ -11286,8 +11253,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _mode = _retired_mode if v == "retired-edited" else "order"
             _ord_rel = None
             if _mode == "order":
-                _ord = write_row_order(
-                    outbox, v, row, to_commit,
+                _ord = write_row_order(outbox, v, row["path"], render_row_order(
+                    v, row, to_commit,
                     (f"gov no longer ships this file, and the copy here carries the target's edit. "
                      f"Nothing was deleted. Once the edit has moved where it belongs, delete the "
                      f"file and the next `update` closes the row.\n"
@@ -11295,7 +11262,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                      f"The target edited this rendered file since its last render, so its kit "
                      f"'{row.get('kit')}' was HELD BACK and its regenerate did not run over the "
                      f"edit. Move the edit into the kit's template or conf, restore the rendered "
-                     f"file, and re-run `update`.\n"))
+                     f"file, and re-run `update`.\n")))
                 _ord_rel = _ord.relative_to(target).as_posix()
             _rl = render_retired_edited_line(row, _mode, _ord_rel)
             if _rl:
@@ -11459,11 +11426,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 merged, _how = three_way(c["ours"], _b3, _t3)
                 if _how == "conflict":
                     conflicts += 1
-                    _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
-                    _orders_written.add(_order)
                     _cdir, _cline = write_conflict_candidate(outbox, row, _b3, c["ours"], _t3,
                                                              merged)
-                    _order.write_text(
+                    _orders_written.add(write_row_order(
+                        outbox, "conflict", row["path"],
                         f"# update conflict — {row['path']} (gov RENAMED this file)\n\n"
                         f"gov moved  {row.get('source')} -> {new_src}\n"
                         f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
@@ -11474,8 +11440,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         f"Resolve by hand, then re-run `update`.\n\n"
                         f"candidate {_cdir}/candidate\n"
                         f"files     {_cdir}/base {_cdir}/ours {_cdir}/theirs\n"
-                        f"reproduce {_cline}\n",
-                        encoding="utf-8", newline="\n")
+                        f"reproduce {_cline}\n"))
                     r.fail(f"'{row['path']}' was renamed by gov to '{new_src}' and the three-way "
                            f"conflicts — left untouched at its old path, order written")
                     continue
@@ -11573,10 +11538,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     "--write-withdrawals if this file really should go.")
             # RE-KEYED WITH THE OTHER TWO, and NOT collected into `_orders_written`: this writer had
             # the identical basename collision, and the reap below can never reach its output.
-            write_row_order(outbox, "withdrawn", row, to_commit,
-                            f"gov's tree holds no blob for that source at the requested vintage, and "
-                            f"no rename pair at >= {RENAME_SIMILARITY_PERCENT}% similarity names a "
-                            f"replacement for it.\n\n{_why}\n")
+            write_row_order(outbox, "withdrawn", row["path"], render_row_order(
+                "withdrawn", row, to_commit,
+                f"gov's tree holds no blob for that source at the requested vintage, and "
+                f"no rename pair at >= {RENAME_SIMILARITY_PERCENT}% similarity names a "
+                f"replacement for it.\n\n{_why}\n"))
             if not write_withdrawals or _frag_kept:
                 withheld += 1
                 continue
@@ -11613,12 +11579,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             merged, how = three_way(c["ours"], _b3, _t3)
             if how == "conflict":
                 conflicts += 1
-                _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
-                _orders_written.add(_order)
                 # S3. THE FOUR FILES ARE THE ONES THE MERGE WAS HANDED, carried rung included, so
                 # the printed line reproduces `candidate` byte for byte.
                 _cdir, _cline = write_conflict_candidate(outbox, row, _b3, c["ours"], _t3, merged)
-                _order.write_text(
+                _orders_written.add(write_row_order(
+                    outbox, "conflict", row["path"],
                     f"# update conflict — {row['path']}\n\n"
                     f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
                     f"base   {base_commit} sha {_sha(c['base'])}\n"
@@ -11627,8 +11592,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     f"The file was left BYTE-IDENTICAL. Resolve by hand, then re-run `update`.\n\n"
                     f"candidate {_cdir}/candidate\n"
                     f"files     {_cdir}/base {_cdir}/ours {_cdir}/theirs\n"
-                    f"reproduce {_cline}\n",
-                    encoding="utf-8", newline="\n")
+                    f"reproduce {_cline}\n"))
                 r.fail(f"'{row['path']}' diverged and the three-way conflicts — left untouched, "
                        f"order written")
             else:
@@ -14115,46 +14079,9 @@ def derive_epoch_state(root: pathlib.Path, eid: str, desc: dict, base: str, head
     return "moved", f"FAILED · last bump {bumps[0][:10]} precedes last move {w[:10]}", w, n
 
 
-def resolve_landing_base(root: pathlib.Path, base: str | None) -> tuple[str, bool, str]:
-    """`(sha, boundary, why)`: the commit a push-boundary leg grades from, and whether it is one.
-
-    `--base` when given, else `GATE_PUSH_BASE`, else the merge-base with the remote ladder's default
-    branch, the remote's first, then the local branch. `boundary` is True for the first two. On no
-    base `sha` is "" and `why` completes the line `no base to compare against`, because no base is a
-    FAILED exit 1 for every caller and never a zero-status skip: run-gates judges a leg by its exit
-    code, and a silent 0 reads as a pass forever. Extracted from `cmd_epoch` at its second caller,
-    `upgrade_steps.py frozen` (TOOL-dSafePassage-1), which calls it as `derive_push_base`; the step
-    gate is its third (TOOL-dSafePassage-10 S6), so the legs grading a landing read one base.
-    """
-    boundary = base is not None
-    # An ALL-ZERO value reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's old
-    # sha, forty zeros on a push that CREATES the default branch, and no commit carries that name.
-    if base is None and os.environ.get("GATE_PUSH_BASE", "").strip("0"):
-        base, boundary = os.environ["GATE_PUSH_BASE"], True
-    if base is None:
-        # The default base is `check-verdict-epoch.sh`'s. The remote and its branch are the
-        # ladder's (TOOL-dLadderedRemote-2); a refusal is the failed exit, naming it, and no remote
-        # at all leaves only the local branch.
-        remote, dflt, _observed, refusal = resolve_remote(root)
-        if refusal:
-            return "", boundary, f" · {refusal}"
-        dflt = dflt or "main"
-        for ref in ((f"{remote}/{dflt}", dflt) if remote else (dflt,)):
-            mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
-                                capture_output=True, text=True, encoding="utf-8")
-            if mb.returncode == 0 and mb.stdout.strip():
-                base = mb.stdout.strip()
-                break
-    rb = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
-                         f"{base}^{{commit}}"], capture_output=True, text=True, encoding="utf-8") if base else None
-    if rb is None or rb.returncode != 0:
-        return "", boundary, (f" ({base or 'no merge-base with the default branch'})"
-                              " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
-    return rb.stdout.strip(), boundary, ""
-
-
-# ponytail: one function, two names — `upgrade_steps.py frozen` spells TOOL-dSafePassage-1's.
-derive_push_base = resolve_landing_base
+# The landing's one base ladder lives in `upgrade_steps.py` (TOOL-dSafePassage-26 S1), which
+# `cmd_epoch`, `upgrade_steps.py frozen` and the step gate all call.
+resolve_landing_base = upgrade_steps.resolve_landing_base
 
 
 def cmd_epoch(root: pathlib.Path, base: str | None) -> int:

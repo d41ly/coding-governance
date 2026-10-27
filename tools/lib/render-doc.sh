@@ -181,6 +181,10 @@ for cite in cites:
     emit(cite, path.as_posix())
 try:
     receipt = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8"))
+    # A source-mode receipt records the plan of gov over its own tree and installs nothing, so it
+    # reads as absent: the source repo renders as it does with no receipt (TOOL-dSafePassage-26 S27).
+    if receipt.get("mode") == "source":
+        receipt = {}
     rows, pfx = list(receipt.get("files") or []), receipt.get("prefix")
 except (OSError, ValueError, AttributeError, TypeError):
     rows, pfx = [], None

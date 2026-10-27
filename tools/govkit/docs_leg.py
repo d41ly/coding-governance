@@ -76,7 +76,8 @@ COMMAND_LANGS = ("bash", "sh", "console")
 INTERPRETERS = ("python", "python3", "bash", "sh")
 PLANTS = ("none", "stale-page", "bad-flag", "bad-verb", "unrowed", "broken-link", "broken-fragment",
           "external-link", "undocumented", "drained-row", "grown-list", "orphan-anchor", "restated-row",
-          "reader-rows", "none-rows", "leg-row", "unclassed", "empty-class", "untested")
+          "reader-rows", "none-rows", "leg-row", "unclassed", "empty-class", "untested",
+          "console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe")
 
 
 def derive_usage_fingerprint(row: dict) -> str:
@@ -249,14 +250,19 @@ def read_page_anchors(page, rel: str) -> list[tuple]:
 def read_page_commands(page) -> list[tuple]:
     """(line, [token, ...]) for each segment of each command the page shows: a fenced `bash`, `sh` or
     `console` line, or an inline span opening `python`, `python3` or `bash`. Segments split on `|`,
-    `&&` and `;`; a leading `NAME=value` and a `...` token are set aside, a `#` word ends the line."""
+    `&&` and `;`; a leading `NAME=value` and a `...` token are set aside, a `#` word ends the line.
+
+    TOOL-dSafePassage-26 S36: in a `console` fence only a `$ ` or `> ` line is a command, its prompt
+    stripped, and a line a trailing backslash continues joins it unprompted; in a `bash` or `sh`
+    fence a comment goes through the shell grammar's own reading, `shlex`'s `#`, so an apostrophe in
+    it splits nothing. A line that grammar cannot split is (line, None), a finding the caller names."""
     out, pending = [], ""
     for n, ln, lang in read_page_lines(page.read_text(encoding="utf-8")):
         cmds = []
         if lang in COMMAND_LANGS:
             body = ln.strip()
-            if lang == "console":
-                body = body[2:] if body.startswith("$ ") else ""
+            if lang == "console" and not pending:
+                body = body[2:] if body.startswith(("$ ", "> ")) else ""
             if body.endswith("\\"):
                 pending += body[:-1] + " "
                 continue
@@ -267,11 +273,14 @@ def read_page_commands(page) -> list[tuple]:
             cmds = [s for s in INLINE_RE.findall(ln) if s.split(" ", 1)[0] in ("python", "python3", "bash")]
         for body in cmds:
             lex = shlex.shlex(body, posix=True, punctuation_chars=";&|")
-            lex.whitespace_split, lex.commenters = True, ""
+            lex.whitespace_split = True
+            if lang not in ("bash", "sh"):
+                lex.commenters = ""
             try:
                 toks = list(lex)
             except ValueError:
-                toks = body.split()
+                out.append((n, None))
+                continue
             seg: list = []
             for t in [*toks, ";"]:
                 comment = t.startswith("#")
@@ -432,6 +441,10 @@ def read_docs_state(root, class_ids: list[str], population: set[str]) -> dict:
     for p in pages:
         rel = p.relative_to(root).as_posix()
         for n, cmd in read_page_commands(p):
+            if cmd is None:
+                found.append(f"SPLIT {rel}:{n}: a command line the shell grammar cannot split, so no "
+                             f"verb or flag on it was tested")
+                continue
             verdict, what = check_page_command(cmd, by_entry, tracked)
             counts["tested" if verdict == "tested" else verdict if verdict != "red" else "tested"] += 1
             if verdict == "red":
@@ -627,6 +640,16 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         class_ids.append("fx-extra")
     elif plant == "empty-class":
         population.discard("fx-key:FX_ROOT")
+    elif plant in ("console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe"):
+        # TOOL-dSafePassage-26 S36: a `> ` prompt and a continued console line each carry a flag
+        # the row does not declare; an unbalanced quote cannot split; an apostrophe in a comment is
+        # no quote, the control that exits 0.
+        edit(guide, "```bash\npython tools/fx/run.py go --part task\n", {
+            "console-prompt": "```console\n> python tools/fx/run.py go --section task\n```\n\n```bash\n",
+            "continued-flag": "```console\n$ python tools/fx/run.py go \\\n    --section task\n```\n\n```bash\n",
+            "unbalanced-quote": "```bash\npython tools/fx/run.py go --part \"task\n",
+            "comment-apostrophe": "```bash\npython tools/fx/run.py go --part task  # don't\n",
+        }[plant])
     elif plant == "untested":
         text = (root / usage).read_text(encoding="utf-8")
         (root / usage).write_text(text[:text.index("[[usage]]\nid = \"fx-verb:tool\"")] +

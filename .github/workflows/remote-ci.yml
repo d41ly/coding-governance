@@ -7,8 +7,8 @@
 # `held-plan`, which derives one matrix entry per declared self-test from the runner's own resolved
 # population, and `held`, which runs each suite the way the sweep runs one and publishes its output.
 # Each job, once its tree is on disk and before anything runs Python, reads the interpreter floor
-# from its one declaration, tools/lib/python-floor.txt, refusing any value but <major>.<minor>, and
-# sets Python up at it with actions/setup-python (TOOL-dSafePassage-12). In `bar` the floor's
+# from its one declaration through its one shell reader, `bash tools/lib/python-floor.sh floor`,
+# which refuses any value but <major>.<minor> (TOOL-dSafePassage-26 S53), and sets Python up at it with actions/setup-python (TOOL-dSafePassage-12). In `bar` the floor's
 # preflight, `bash tools/lib/python-floor.sh preflight`, is the step before the merge bar.
 #
 # WHAT THIS DOES NOT DO, said here because a green run reads as more than it is:
@@ -77,11 +77,7 @@ jobs:
         id: floor
         working-directory: tree
         run: |
-          floor=$(tr -d '\r\n' < tools/lib/python-floor.txt) || floor=""
-          if ! [[ "$floor" =~ ^[0-9]+\.[0-9]+$ ]]; then
-            echo "floor: tools/lib/python-floor.txt holds '$floor', not <major>.<minor>" >&2
-            exit 1
-          fi
+          floor=$(bash tools/lib/python-floor.sh floor)
           echo "floor=$floor" >> "$GITHUB_OUTPUT"
       - name: Python at the floor
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
@@ -126,11 +122,7 @@ jobs:
         id: floor
         working-directory: ${{ env.PRIMARY_TREE }}
         run: |
-          floor=$(tr -d '\r\n' < tools/lib/python-floor.txt) || floor=""
-          if ! [[ "$floor" =~ ^[0-9]+\.[0-9]+$ ]]; then
-            echo "floor: tools/lib/python-floor.txt holds '$floor', not <major>.<minor>" >&2
-            exit 1
-          fi
+          floor=$(bash tools/lib/python-floor.sh floor)
           echo "floor=$floor" >> "$GITHUB_OUTPUT"
       - name: Python at the floor
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
@@ -187,11 +179,7 @@ jobs:
         id: floor
         working-directory: tree
         run: |
-          floor=$(tr -d '\r\n' < tools/lib/python-floor.txt) || floor=""
-          if ! [[ "$floor" =~ ^[0-9]+\.[0-9]+$ ]]; then
-            echo "floor: tools/lib/python-floor.txt holds '$floor', not <major>.<minor>" >&2
-            exit 1
-          fi
+          floor=$(bash tools/lib/python-floor.sh floor)
           echo "floor=$floor" >> "$GITHUB_OUTPUT"
       - name: Python at the floor
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
@@ -349,11 +337,7 @@ jobs:
         id: floor
         working-directory: ${{ env.PRIMARY_TREE }}
         run: |
-          floor=$(tr -d '\r\n' < tools/lib/python-floor.txt) || floor=""
-          if ! [[ "$floor" =~ ^[0-9]+\.[0-9]+$ ]]; then
-            echo "floor: tools/lib/python-floor.txt holds '$floor', not <major>.<minor>" >&2
-            exit 1
-          fi
+          floor=$(bash tools/lib/python-floor.sh floor)
           echo "floor=$floor" >> "$GITHUB_OUTPUT"
       - name: Python at the floor
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0

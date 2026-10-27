@@ -108,8 +108,10 @@ resolve_python() {
       if [ "$_rp_cv" -ge "$_rp_fv" ]; then
         # An override, the caller's or GOV_PYTHON, names the command a consumer spawns, a wrapper
         # or a venv launcher included, and is echoed as given. Only the three launcher names give
-        # way to the direct executable where the probe named a file, so a consumer never spawns
-        # the Windows App Execution Alias again; the launcher's own name otherwise.
+        # way to the direct executable where the probe named a file; the launcher's own name
+        # otherwise. The `[ -f ]` HOLDS on a Windows App Execution Alias, so a Store Python whose
+        # own sys.executable is an alias is echoed as printed: a gap the run-gates kit's
+        # check_app_alias closes for the legs it measures, and this block does not.
         _rp_exe=${_rp_out#* }
         if [ "$_rp_i" -gt 2 ] && [ "$_rp_exe" != "$_rp_out" ] && [ -f "$_rp_exe" ]; then printf '%s\n' "$_rp_exe"; else printf '%s\n' "$_rp_c"; fi
         return 0
@@ -127,7 +129,6 @@ resolve_python() {
     echo "resolve_python: no usable python launcher at the floor $_rp_floor (python-floor.txt in gov's lib dir)."
     echo "resolve_python: Each candidate was RUN with -I -c — being on PATH is not evidence (the Microsoft Store"
     echo "resolve_python: python3 stub answers \`command -v\` and exits 9009 without running anything)."
-    echo "resolve_python: tried:$_rp_tried"
     printf '%s' "$_rp_seen"
     if [ -n "${1:-}" ]; then
       echo "resolve_python: the caller's override '$1' was tried FIRST and $_rp_o1."
@@ -226,6 +227,9 @@ except LookupError as e:
         echo "resolve_python: install the floor with: uv python install $_rp_floor"
         case "${OSTYPE:-}" in msys*|cygwin*|win*) echo "resolve_python: or, on Windows: py install $_rp_floor" ;; esac ;;
     esac
+    # LAST, verbatim: the first line names the refusal and this one the candidates, and the lines
+    # between them carry the outcomes, the overrides and the install (TOOL-dSafePassage-26 S20).
+    echo "resolve_python: tried:$_rp_tried"
   } >&2
   return 1
 }

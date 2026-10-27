@@ -74,6 +74,17 @@ out=$(PATH="$C:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1); rc=$?
 [ "$rc" != 0 ] || bad "an all-broken PATH still returned 0"; ok
 grep -qF 'no usable python launcher' <<<"$out" || bad "the all-broken failure does not name itself"; ok
 grep -qF 'tried: python3 python py' <<<"$out" || bad "the failure does not list the candidates it tried"; ok
+# TOOL-dSafePassage-26 S20, AC19: the refusal opens with its name and closes with the candidates,
+# verbatim, every other line between them; the two RA7-4 arms of unattended-build.test.sh read both.
+out=$(env -u GOV_PYTHON PATH="$C:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1 >/dev/null)
+[[ $(head -n 1 <<<"$out") == "resolve_python: no usable python launcher"* ]] || bad "the refusal's first line is not its name: $(head -n 1 <<<"$out")"; ok
+[ "$(tail -n 1 <<<"$out" | tr -d '\r')" = "resolve_python: tried: python3 python py" ] || bad "a line prints after the tried: line: $(tail -n 1 <<<"$out")"; ok
+# TOOL-dSafePassage-26 S48, AC46: the probe runs each candidate under -I. A launcher that exits 1
+# under -I and runs without it is passed over as `did not run`; a probe without -I would pick it.
+mkdir -p "$TMP/noisolate"; printf '#!/usr/bin/env bash\nfor a in "$@"; do [ "$a" = -I ] && exit 1; done\nexec "%s" "$@"\n' "$REALPY_ABS" > "$TMP/noisolate/python3"
+chmod +x "$TMP/noisolate/python3"; mkfake "$TMP/noisolate" python 9009; mkfake "$TMP/noisolate" py 9009
+out=$(env -u GOV_PYTHON PATH="$TMP/noisolate:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1); rc=$?
+{ [ "$rc" != 0 ] && grep -qF 'resolve_python:   python3: did not run' <<<"$out"; } || bad "a launcher failing only under -I was not passed over as did not run: rc=$rc $out"; ok
 
 # (c) GOV_PYTHON, both states. An override that is set and unusable must be a NAMED failure — the
 # operator believes they chose, and a silent fall-through hides that they did not.
@@ -244,14 +255,14 @@ out=$(run_provision_refusal)
 
 # ---- 1d. THE FLOOR STATEMENTS AND THE COPIES (TOOL-dSafePassage-11) -------------------------------
 # On this tree the query finds no statement and every copy's literal equals the declaration; at the
-# raise's base it finds the six statements, settings-merge's among them (PINNED). Then a
-# fixture repository: a declaration that differs from a copy's literal, a planted statement (built
+# raise's base it finds the seven statements, settings-merge's and the lexicon selftest's among them
+# (PINNED; the lexicon one is TOOL-dSafePassage-26 S49's). Then a fixture repository: a declaration that differs from a copy's literal, a planted statement (built
 # here, so this file carries none), and an unmarked multi-line definition, each named.
 out=$(cd "$ROOT" && "$REALPY" -I "$HERE/python_floor.py" check 2>&1); rc=$?
 [ "$rc" = 0 ] && [ -z "$out" ] || bad "python_floor.py check on this tree is not clean: rc=$rc $out"; ok
 out=$(cd "$ROOT" && "$REALPY" -I "$HERE/python_floor.py" check --rev 3708a705 2>&1 | tr -d '\r')
-{ [ "$(printf '%s\n' "$out" | grep -c .)" = 6 ] && [[ $out == *"tools/settings-merge.py:3: "*"py>="*"3.10"* ]]; } \
-  || bad "python_floor.py check --rev 3708a705 did not print the six pinned statements: $out"; ok
+{ [ "$(printf '%s\n' "$out" | grep -c .)" = 7 ] && [[ $out == *"tools/settings-merge.py:3: "*"py>="*"3.10"* ]] && [[ $out == *"tools/lexicon/selftest.py:109: "* ]]; } \
+  || bad "python_floor.py check --rev 3708a705 did not print the seven pinned statements: $out"; ok
 FQ="$TMP/fq"; mkdir -p "$FQ/$KIT_REL"
 cp "$HERE/python_floor.py" "$FQ/$KIT_REL/"; printf '9.99\n' > "$FQ/$KIT_REL/python-floor.txt"
 sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$CANON" > "$FQ/copy.sh"
@@ -263,28 +274,44 @@ out=$(cd "$FQ" && "$REALPY" -I "$KIT_REL/python_floor.py" check 2>&1 | tr -d '\r
 [[ $out == *"note.md:1: needs Python"* ]] || bad "a planted floor statement in a tracked .md was not named: $out"; ok
 [[ $out == *"unmarked.sh:1: an unmarked multi-line definition"* ]] || bad "an unmarked multi-line resolve_python definition was not named: $out"; ok
 
-# ---- 1e. THE STEP'S DOWN (TOOL-dSafePassage-11) -----------------------------------------------------
-# A fixture repository carrying the declaration at gov's path and one copy: a planted PEP 701
-# f-string reds the down, names its file and line and writes nothing; with it removed the down
-# restores 3.11 in the declaration and the copy's literal; a planted TOML 1.1 inline table reds it
-# again. Red in either mode: `ast.parse(feature_version=(3, 11))` accepts the f-string, and the
-# running tomllib accepts the table. WHAT THIS DOES NOT CHECK: a real 3.11 compile on a node with
-# none, which is dWitnessedBar's, and any grammar change outside the static mode's eight shapes.
+# ---- 1e. THE STEP'S DOWN (TOOL-dSafePassage-11, TOOL-dSafePassage-26 S10 S11) ----------------------
+# A fixture gov carrying the declaration, the floor kit's three files and one copy, downed on its own
+# tree, its source mode: a planted PEP 701 f-string at <to> reds the down, names its file and line
+# and writes nothing; one planted at the tip but absent at <to> passes, since the down grades what the
+# rollback restores (AC9), and restores 3.11 in the declaration and the copy's literal; a planted TOML
+# 1.1 inline table at <to> reds it again. Then an adopter of that gov: its own PEP 701 file, which no
+# receipt row names, passes, and a TOML 1.1 table in its `.governance/policy.toml` reds (AC10). Red
+# in either mode: `ast.parse(feature_version=(3, 11))` accepts the f-string, and the running tomllib
+# accepts the table. WHAT THIS DOES NOT CHECK: a real 3.11 compile on a node with none, which is
+# dWitnessedBar's, and any grammar change outside the static mode's eight shapes.
 FD="$TMP/fd"; mkdir -p "$FD/$KIT_REL"
 printf '%s\n' "$FLOOR" > "$FD/$KIT_REL/python-floor.txt"; sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$CANON" > "$FD/copy.sh"
-printf 'c = 1\nv = f"{"X" if c else "y"}"\n' > "$FD/planted.py"
+cp "$HERE/python-floor.sh" "$HERE/python_floor.py" "$CANON" "$FD/$KIT_REL/"
+PF701='c = 1\nv = f"{"X" if c else "y"}"\n'
+printf "$PF701" > "$FD/planted.py"
 run_down_git() { git -C "$FD" -c user.email=t@e -c user.name=t "$@"; }
-run_down_git init -q && run_down_git add -A && run_down_git commit -qm raise
-out=$(bash "$HERE/python-floor.sh" down 3.11 "$FD" 2>&1); rc=$?; out=${out//$'\r'/}
+run_down() { out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$1" "$2" 2>&1); rc=$?; out=${out//$'\r'/}; }
+run_down_git init -q && run_down_git config core.autocrlf false && run_down_git add -A && run_down_git commit -qm raise
+run_down "$FD" "$(run_down_git rev-parse HEAD)"
 { [ "$rc" = 1 ] && [[ $out == "python-floor down: mode "* ]] && [[ $out == *"planted.py:2: "* ]]; } || bad "the down over a planted PEP 701 f-string did not exit 1 naming planted.py:2: rc=$rc $out"; ok
 [ "$(tr -d '\r\n' < "$FD/$KIT_REL/python-floor.txt")" = "$FLOOR" ] || bad "the down wrote the declaration before grading"; ok
 run_down_git rm -q planted.py && run_down_git commit -qm unplant
-out=$(bash "$HERE/python-floor.sh" down 3.11 "$FD" 2>&1); rc=$?; out=${out//$'\r'/}
+TO=$(run_down_git rev-parse HEAD)
+printf "$PF701" > "$FD/planted.py" && run_down_git add planted.py && run_down_git commit -qm "the tip plants again"
+run_down "$FD" "$TO"
 { [ "$rc" = 0 ] && [ "$(tr -d '\r\n' < "$FD/$KIT_REL/python-floor.txt")" = 3.11 ] && grep -q '^  _rp_floor="3.11"$' "$FD/copy.sh"; } \
-  || bad "the down with no finding did not restore 3.11 in the declaration and the copy: rc=$rc $out"; ok
+  || bad "the down over a file at the tip but absent at <to> did not pass and restore 3.11 in the declaration and the copy: rc=$rc $out"; ok
 run_down_git checkout -q -- . && printf '[a]\nt = { x = 1,\n      y = 2 }\n' > "$FD/planted.toml" && run_down_git add planted.toml && run_down_git commit -qm toml
-out=$(bash "$HERE/python-floor.sh" down 3.11 "$FD" 2>&1); rc=$?; out=${out//$'\r'/}
+run_down "$FD" "$(run_down_git rev-parse HEAD)"
 { [ "$rc" = 1 ] && [[ $out == *"planted.toml:"* ]]; } || bad "the down over a planted TOML 1.1 inline table did not exit 1 naming planted.toml: rc=$rc $out"; ok
+FT="$TMP/ft"; mkdir -p "$FT/.governance"
+printf '{"schema": 3, "files": [{"path": "kit/ok.py", "role": "engine", "source": "%s/python_floor.py"}]}\n' "$KIT_REL" > "$FT/.governance/install.json"
+printf "$PF701" > "$FT/own.py"
+run_down "$FT" "$(run_down_git rev-parse HEAD)"
+{ [ "$rc" = 0 ] && [[ $out != *"own.py"* ]]; } || bad "the down graded an adopter-owned file no receipt row names: rc=$rc $out"; ok
+printf '[a]\nt = { x = 1,\n      y = 2 }\n' > "$FT/.governance/policy.toml"
+run_down "$FT" "$(run_down_git rev-parse HEAD)"
+{ [ "$rc" = 1 ] && [[ $out == *".governance/policy.toml:"* ]]; } || bad "the down over a TOML 1.1 table in the adopter's policy file did not exit 1 naming it: rc=$rc $out"; ok
 
 # ---- 2. PARITY ----------------------------------------------------------------------------------
 # A TABLE of (marker, canonical source, exclude-prefix), not one hardcoded predicate. It held exactly

@@ -15,18 +15,22 @@ step's record; exits 1 on a field below schema 3; and otherwise sets `schema` to
 field out. A schema-4 receipt without the field, or a schema-3 one with it, is normalised to schema
 3 without it. THE WITNESS exits 0 at schema 4 or above with `steps` a list, else 1.
 
-Every write is `json.dumps(receipt, indent=2) + "\\n"`, govkit's own serialization, through a sibling
-temporary file renamed over the receipt — govkit's `write_atomic`, repeated because a step runs
-isolated and cannot import govkit — so a kill leaves one receipt or the other, never half of one, and
-the down's bytes equal the up's input for every receipt `apply`, `adopt` or `update` wrote.
+Every write is `json.dumps(receipt, indent=2) + "\\n"`, govkit's own serialization, through the one atomic
+writer, `write_atomic` in the step module beside govkit (TOOL-dSafePassage-26 S15, S46): UTF-8 with LF
+line ends through a sibling temporary file renamed over the receipt, so a kill leaves one receipt or
+the other, never half of one, and the down's bytes equal the up's input for every receipt `apply`,
+`adopt` or `update` wrote, on Windows too. The step module imports nothing from govkit, so a step
+running isolated imports it.
 
 Exit 0 done, 1 refused naming the receipt (nothing written), 2 a usage error.
 """
 
 import json
-import os
 import pathlib
 import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+from upgrade_steps import write_atomic  # noqa: E402 — the one atomic writer, beside govkit
 
 STEP_ID = "govkit/receipt-schema-4"
 RECEIPT = ".governance/install.json"
@@ -91,9 +95,7 @@ def main(argv: list[str]) -> int:
         return 1
     code, msg, out = verbs[argv[0]](receipt)
     if out is not None:
-        tmp = path.with_name(path.name + ".govkit-new")
-        tmp.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8", newline="\n")
-        os.replace(tmp, path)
+        write_atomic(path, json.dumps(out, indent=2) + "\n")
     (sys.stdout if code == 0 else sys.stderr).write(
         f"receipt-schema-4: {argv[0]} " + ("" if code == 0 else "refused ") + f"· {path.as_posix()} · {msg}\n")
     return code

@@ -47,8 +47,10 @@ resolve_python() {
       if [ "$_rp_cv" -ge "$_rp_fv" ]; then
         # An override, the caller's or GOV_PYTHON, names the command a consumer spawns, a wrapper
         # or a venv launcher included, and is echoed as given. Only the three launcher names give
-        # way to the direct executable where the probe named a file, so a consumer never spawns
-        # the Windows App Execution Alias again; the launcher's own name otherwise.
+        # way to the direct executable where the probe named a file; the launcher's own name
+        # otherwise. The `[ -f ]` HOLDS on a Windows App Execution Alias, so a Store Python whose
+        # own sys.executable is an alias is echoed as printed: a gap the run-gates kit's
+        # check_app_alias closes for the legs it measures, and this block does not.
         _rp_exe=${_rp_out#* }
         if [ "$_rp_i" -gt 2 ] && [ "$_rp_exe" != "$_rp_out" ] && [ -f "$_rp_exe" ]; then printf '%s\n' "$_rp_exe"; else printf '%s\n' "$_rp_c"; fi
         return 0
@@ -66,7 +68,6 @@ resolve_python() {
     echo "resolve_python: no usable python launcher at the floor $_rp_floor (python-floor.txt in gov's lib dir)."
     echo "resolve_python: Each candidate was RUN with -I -c — being on PATH is not evidence (the Microsoft Store"
     echo "resolve_python: python3 stub answers \`command -v\` and exits 9009 without running anything)."
-    echo "resolve_python: tried:$_rp_tried"
     printf '%s' "$_rp_seen"
     if [ -n "${1:-}" ]; then
       echo "resolve_python: the caller's override '$1' was tried FIRST and $_rp_o1."
@@ -165,6 +166,9 @@ except LookupError as e:
         echo "resolve_python: install the floor with: uv python install $_rp_floor"
         case "${OSTYPE:-}" in msys*|cygwin*|win*) echo "resolve_python: or, on Windows: py install $_rp_floor" ;; esac ;;
     esac
+    # LAST, verbatim: the first line names the refusal and this one the candidates, and the lines
+    # between them carry the outcomes, the overrides and the install (TOOL-dSafePassage-26 S20).
+    echo "resolve_python: tried:$_rp_tried"
   } >&2
   return 1
 }
@@ -1063,6 +1067,7 @@ fi
 # helper runs cut from the lander, its python and kit resolvers stubbed to a shell stub.
 out27=$(
   eval "$(sed -n '/^read_mint_unit() {/,/^}/p' "$lander")"
+  eval "$(sed -n '/^resolve_lander_kit() {/,/^}/p' "$lander")"  # TOOL-dSafePassage-26 S52: its one kit resolution
   resolve_python() { echo bash; }
   resolve_kit_dir() { echo k; }
   top="$tmp/mint27"; self_dir="$top"; mkdir -p "$top/k"
@@ -1318,6 +1323,7 @@ fi
 #      making the no-python branch return 0 whatever is beside the lander.
 out35=$(
   eval "$(sed -n '/^run_gov_first() {/,/^}/p' "$lander")"
+  eval "$(sed -n '/^resolve_lander_kit() {/,/^}/p' "$lander")"  # TOOL-dSafePassage-26 S52: its one kit resolution
   top="$tmp/gf35"; self_dir="$top/kits"; mkdir -p "$self_dir"
   resolve_python() { return 1; }
   printf 'nopy-absent=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
@@ -1432,5 +1438,56 @@ PY
     *) bad "37 $st37: the refusal did not exit 1 with the branch $ex37, checked out, on a clean tree: $out37" ;;
   esac
 done
+
+# 38 — TOOL-dSafePassage-26 AC50: every stage resolving a kit calls `resolve_lander_kit`, the one place
+#      `resolve_kit_dir "$py"` runs, and prints the lines it printed before the extraction. Each stage
+#      runs cut from the lander under three stubbed resolutions — no python, no kit, a kit whose file
+#      echoes its argv — and its lines are compared with the ones measured over the lander before the
+#      extraction, pinned below. Staged red by giving one stage its own resolve_kit_dir call back.
+out38=$(
+  for f in resolve_lander_kit check_merge_losses run_regen run_minter run_gov_first read_mint_unit; do
+    eval "$(sed -n "/^$f() {/,/^}/p" "$lander")"
+  done
+  top="$tmp/lk38"; self_dir="$top"; mkdir -p "$top/k"
+  for f in lexicon.py regen.py govkit.py routed_commits.py; do printf 'echo "ran %s $*"\n' "$f" > "$top/k/$f"; done
+  for c38 in nopy nokit kit; do
+    case $c38 in
+      nopy) resolve_python() { return 1; } ;;
+      nokit) resolve_python() { echo bash; }; resolve_kit_dir() { return 1; } ;;
+      kit) resolve_python() { echo bash; }; resolve_kit_dir() { echo k; } ;;
+    esac
+    echo "== $c38"
+    echo "merge-losses: $(check_merge_losses A B 2>&1; echo "rc=$?")"
+    echo "regen: $(run_regen 2>&1; echo "rc=$?")"
+    echo "minter: $(run_minter A 2>&1; echo "rc=$?")"
+    echo "gov-first: $(run_gov_first 2>&1; echo "rc=$?")"
+    echo "mint-unit: $(read_mint_unit A..B 2>&1; echo "rc=$?")"
+  done
+)
+nl38=$'\n'; top38="$tmp/lk38"
+want38="== nopy
+merge-losses: push-main: the merge-loss check did NOT run — no usable python launcher; the pre-push hook grades the landing again.${nl38}rc=0
+regen: push-main: generated outputs were NOT regenerated — no usable python launcher; the push bar's preflight grades them.${nl38}rc=0
+minter: push-main: kit versions were NOT minted — no usable python launcher; the push bar's epoch legs grade the landing.${nl38}rc=0
+gov-first: push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree.${nl38}rc=0
+mint-unit: rc=0
+== nokit
+merge-losses: push-main: the merge-loss check did NOT run — no lexicon kit beside this lander; the pre-push hook grades the landing again.${nl38}rc=0
+regen: push-main: generated outputs were NOT regenerated — no regen.py beside this lander; the push bar's preflight grades them.${nl38}rc=0
+minter: push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing.${nl38}rc=0
+gov-first: push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree.${nl38}rc=0
+mint-unit: rc=0
+== kit
+merge-losses: rc=0
+regen: ran regen.py --write${nl38}rc=0
+minter: ran govkit.py mint --base A${nl38}rc=0
+gov-first: ran govkit.py update --target $top38 --write${nl38}rc=0
+mint-unit: ran routed_commits.py --newest-unit A..B${nl38}rc=0"
+n38=$(grep -c 'resolve_kit_dir "$py"' "$lander")
+s38=$(for f in run_post_merge check_merge_losses run_regen run_minter run_gov_first read_mint_unit; do
+  sed -n "/^$f() {/,/^}/p" "$lander" | grep -q 'resolve_lander_kit ' || echo "$f"; done)
+{ [ "$out38" = "$want38" ] && [ "$n38" = 1 ] && [ -z "$s38" ]; } \
+  && ok "38 every lander stage resolves its kit through resolve_lander_kit and prints the lines it printed before" \
+  || bad "38 resolve_kit_dir \"\$py\" runs $n38 time(s), stages without resolve_lander_kit: [${s38//$'\n'/ }], or a stage's lines moved: $out38"
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

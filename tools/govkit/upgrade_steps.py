@@ -15,8 +15,8 @@ THE ROWS. A kit descriptor's `[[upgrade]]` rows, rows of the same grammar in
 succession rows. `read_steps` and `read_retired` parse, validate and order every one of them, at a
 revision or in the working tree; govkit calls them and parses no row itself. This reader is the rows'
 write boundary, so it DENIES BY DEFAULT and a refusal names the file, the row and the key: an
-unknown key; an authored `introduced` or `retired`; a placeholder other than `{gov}`, `{target}` and
-`{prefix}`; an interpreter other than python and bash; a `{gov}/` program git does not track at the
+unknown key; an authored `introduced` or `retired`; a placeholder other than `{gov}`, `{target}`,
+`{prefix}` and, in a `down` alone, `{to}` (TOOL-dSafePassage-26 S10); an interpreter other than python and bash; a `{gov}/` program git does not track at the
 revision read; a duplicate id; a descriptor row whose `<entry>` is not that descriptor's own id, or
 a steps-file row whose `<entry>` IS a registry entry; a `surfaces` item that is not
 `<class>:<name>`; a `reverted` that is neither `"down-exit"` nor an argv; and a succession row
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     sys.modules.setdefault("upgrade_steps", sys.modules[__name__])
 
 INTERPRETERS = ("python", "bash")
-PLACEHOLDER_RE = re.compile(r"\{(?:gov|target|prefix)\}")
+PLACEHOLDER_RE = re.compile(r"\{(?:gov|target|prefix|to)\}")
 STEP_KEYS = ("id", "up", "down", "witness", "resume", "reverted", "surfaces", "needs-target")
 RETIRED_KEYS = ("id", "successor", "surfaces")
 FROZEN_FIELDS = ("up", "down", "witness", "resume", "reverted", "surfaces")
@@ -185,7 +185,7 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-unpopulated-stub", "submodule-unpopulated-worktree",
                   "submodule-unpopulated-worktree-stub", "submodule-main-only",
                   "local-recent-objects-hook", "local-recent-objects-hook-stub", "local-ext-transport",
-                  "local-ext-transport-stub")
+                  "local-ext-transport-stub", "autocrlf")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -330,17 +330,23 @@ def read_registry_at(root, sha: str | None) -> tuple[str, str, list[dict], list[
     text = read_file_at(root, sha, rel)
     if text is None:
         raise Refusal(f"{rel}: no registry at {where}, and the rows are read from no other population")
-    entries = []
-    for e in parse_table_rows(text, rel, "entry", where):
-        if isinstance(e.get("id"), str) and isinstance(e.get("descriptor"), str):
-            entries.append((e["id"], gk.resolve_prefix_token(e["descriptor"], tr)))
-    return tr, rel, parse_table_rows(text, rel, "retired", where), entries
+    return tr, rel, parse_table_rows(text, rel, "retired", where), read_registry_entries(text, rel, tr, where)
 
 
-def check_argv(value, at: str, tr: str, where: str, read_tracked) -> list:
+def read_registry_entries(text: str, rel: str, tr: str, where: str) -> list[tuple[str, str]]:
+    """[(entry id, descriptor path)] of one registry text, each `{prefix}` resolved through govkit's
+    own resolver against the tool root `tr`."""
+    gk = load_govkit()
+    return [(e["id"], gk.resolve_prefix_token(e["descriptor"], tr))
+            for e in parse_table_rows(text, rel, "entry", where)
+            if isinstance(e.get("id"), str) and isinstance(e.get("descriptor"), str)]
+
+
+def check_argv(value, at: str, tr: str, where: str, read_tracked, down: bool = False) -> list:
     """`value` as a validated argv, else a refusal naming `at` (file, row and key): non-empty
-    strings, `argv[0]` an interpreter the runner resolves, only the three placeholders, and every
-    `{gov}/` program a file `read_tracked()` names, git's tracked set at the revision read."""
+    strings, `argv[0]` an interpreter the runner resolves, only the three placeholders, `{to}` too
+    where `down` (TOOL-dSafePassage-26 S10), and every `{gov}/` program a file `read_tracked()`
+    names, git's tracked set at the revision read."""
     if not isinstance(value, list) or not value or not all(isinstance(t, str) and t for t in value):
         raise Refusal(f"{at}: an argv is a non-empty list of non-empty strings")
     if value[0] not in INTERPRETERS:
@@ -351,6 +357,9 @@ def check_argv(value, at: str, tr: str, where: str, read_tracked) -> list:
         if "{" in rest or "}" in rest:
             raise Refusal(f"{at}: '{tok}' carries a placeholder other than {{gov}}, {{target}} and "
                           f"{{prefix}}")
+        if "{to}" in tok and not down:
+            raise Refusal(f"{at}: '{tok}' carries {{to}}, which resolves only in a step's down, to the "
+                          f"--to commit of `update --rollback`")
         if tok.startswith("{gov}/"):
             prog = (f"{tr}/" if tr else "") + tok[len("{gov}/"):]
             if prog not in read_tracked():
@@ -370,7 +379,10 @@ def read_steps(root, rev: str | None, landed_ref: str | None) -> list[StepRow]:
 
     The steps file beside this one first, then each registry entry's descriptor in entry order. With
     `landed_ref` each row's `introduced` is derived along that ref's first-parent line; without it,
-    None and the order is declaration order."""
+    None and the order is declaration order. The derivation reads each walked commit's declaring
+    files from that commit's own registry, so a descriptor that moved is read at its old path, and a
+    shallow repository, whose history is cut, is a refusal naming `git fetch --unshallow`
+    (TOOL-dSafePassage-26 S37)."""
     sha = resolve_rev(root, rev)
     where = sha[:8] if sha else "the working tree"
     tr, reg_rel, _retired, entries = read_registry_at(root, sha)
@@ -416,7 +428,7 @@ def read_steps(root, rev: str | None, landed_ref: str | None) -> list[StepRow]:
             for k in ("up", "down", "witness"):
                 if k not in d:
                     raise Refusal(f"{at} key {k}: required")
-                check_argv(d[k], f"{at} key {k}", tr, where, read_tracked)
+                check_argv(d[k], f"{at} key {k}", tr, where, read_tracked, down=k == "down")
             resume = d.get("resume")
             if resume is not None and resume != "atomic":
                 check_argv(resume, f"{at} key resume", tr, where, read_tracked)
@@ -434,7 +446,11 @@ def read_steps(root, rev: str | None, landed_ref: str | None) -> list[StepRow]:
                                 d["needs-target"], rel, n, None, reverted))
     if landed_ref is None:
         return rows
-    hit = derive_introduced(root, landed_ref, [rel for rel, _e in files], "upgrade", [r.id for r in rows])
+    if (run_git(root, "rev-parse", "--is-shallow-repository") or b"").strip() == b"true":
+        raise Refusal(f"{pathlib.Path(root).as_posix()} is a shallow clone, so the first-parent history "
+                      f"each row's introducing commit is derived along is cut; run `git fetch --unshallow`")
+    hit = derive_introduced(root, landed_ref, [files[0][0]], "upgrade", [r.id for r in rows],
+                            registry=(reg_rel, tr))
     rank_of = {rel: i for i, (rel, _e) in enumerate(files)}
     rows = [r._replace(introduced=hit[r.id][0] if r.id in hit else UNLANDED) for r in rows]
     return sorted(rows, key=lambda r: (r.id not in hit, hit.get(r.id, ("", 0))[1], rank_of[r.file], r.row))
@@ -484,35 +500,57 @@ def read_retired(root, rev: str | None, landed_ref: str | None) -> list[RetiredR
 
 
 def derive_introduced(root, landed_ref: str, files: list[str], table: str,
-                      ids: list[str]) -> dict[str, tuple[str, int]]:
+                      ids: list[str], registry: tuple[str, str] | None = None) -> dict[str, tuple[str, int]]:
     """{id: (commit, first-parent position)} for each of `ids` a `[[<table>]]` row of `files` holds on
     `landed_ref`'s first-parent line: the oldest commit whose change against its first parent left a
-    holding blob. One `git log` names the changed blobs oldest first, one `cat-file --batch` reads
-    them, a blob is parsed only where it spells a wanted id, and the walk stops at the last hit."""
+    holding blob. With `registry`, (its path, the tool root), the declaring files are `files` plus
+    the descriptors the registry names AT EACH WALKED COMMIT, read from that commit's own registry
+    blob (TOOL-dSafePassage-26 S37): every path any vintage named is walked, and a blob counts only
+    while its path is declared, so a moved descriptor is read at its old path. One `git log` names
+    the changed blobs oldest first, `blob_at` reads each through one `cat-file --batch` it is
+    handed, a blob is parsed only where it spells a wanted id, and the walk stops at the last hit."""
     want, found = set(ids), {}
     if not (landed_ref and want and files):
         return found
-    log = run_git(root, "log", "--first-parent", "--reverse", "--diff-merges=first-parent", "--raw",
-                  "--no-abbrev", "--no-renames", "--format=%x00%H", landed_ref, "--", *files)
-    if log is None:
-        raise Refusal(f"git log over {landed_ref} failed in {pathlib.Path(root).as_posix()}")
+    declared, walked = set(files), list(files)
     cat = subprocess.Popen(["git", "-C", str(root), "cat-file", "--batch"],
                            stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     try:
+        if registry:
+            reg_rel, tr = registry
+            for c in (run_git(root, "log", "--first-parent", "--format=%H", landed_ref, "--", reg_rel) or b"").split():
+                data = blob_at(root, c.decode("ascii"), reg_rel, cat)
+                try:
+                    walked += [d for _e, d in read_registry_entries((data or b"").decode("utf-8"), reg_rel, tr, "")]
+                except (Refusal, UnicodeDecodeError):
+                    continue  # an unreadable vintage declares nothing
+            walked = sorted(set(walked)) + [reg_rel]
+        log = run_git(root, "log", "--first-parent", "--reverse", "--diff-merges=first-parent", "--raw",
+                      "--no-abbrev", "--no-renames", "--format=%x00%H", landed_ref, "--", *walked)
+        if log is None:
+            raise Refusal(f"git log over {landed_ref} failed in {pathlib.Path(root).as_posix()}")
         for pos, chunk in enumerate(log.decode("utf-8", "replace").split("\0")[1:]):
             lines = chunk.strip("\n").split("\n")
-            for ln in lines[1:]:
+            # The registry's own change first, so a descriptor it adds in this commit is declared.
+            for ln in sorted(lines[1:], key=lambda x: not (registry and x.endswith("\t" + registry[0]))):
                 if not ln.startswith(":"):
                     continue
-                blob = ln.split("\t", 1)[0].split()[3]
-                if not blob.strip("0"):
+                meta, path = ln.split("\t", 1)
+                if not meta.split()[3].strip("0"):
                     continue  # a deletion leaves no blob to hold a row
-                cat.stdin.write(blob.encode("ascii") + b"\n")
-                cat.stdin.flush()
-                head = cat.stdout.readline().split()
-                if len(head) < 3:
+                data = blob_at(root, lines[0].strip(), path, cat)
+                if data is None:
                     continue
-                text = cat.stdout.read(int(head[2]) + 1)[:-1].decode("utf-8", "replace")
+                text = data.decode("utf-8", "replace")
+                if registry and path == registry[0]:
+                    try:  # this commit's registry: the declaring files from here on
+                        declared = set(files) | {d for _e, d in read_registry_entries(text, path, registry[1], "")}
+                    except Refusal:
+                        pass
+                    if path not in files:
+                        continue
+                if path not in declared:
+                    continue
                 hits = [i for i in want if f'"{i}"' in text]
                 if not hits:
                     continue
@@ -606,10 +644,26 @@ def write_before_image(target, step_id: str, derive_after) -> dict[str, bytes | 
     names every path it will write or remove; the image then records each path's working-tree bytes
     and the sha256 of what the up leaves. An image already there is never overwritten:
     `derive_after` is handed its before bytes instead, and its answer must hash to the image's
-    after-hashes, so a re-run over a killed up converges on the first image or refuses."""
+    after-hashes, so a re-run over a killed up converges on the first image or refuses.
+
+    The image is written through `write_atomic` (TOOL-dSafePassage-26 S31). One that does not parse,
+    an older writer's cut short, reads absent only when no path it lists changed after it was
+    written (`read_image_changes`), and is removed; otherwise the up refuses naming it, since its
+    before bytes are lost and a down could not restore them."""
     image = derive_image_path(target, step_id)
+    held = None
     if image.is_file():
-        held = json.loads(image.read_text(encoding="utf-8"))["paths"]
+        text = image.read_text(encoding="utf-8", errors="replace")
+        try:
+            held = json.loads(text)["paths"]
+        except (ValueError, KeyError, TypeError):
+            changed = read_image_changes(target, image, text)
+            if changed:
+                raise Refusal(f"{image.relative_to(target).as_posix()}: the before-image does not parse "
+                              f"and {', '.join(changed)} changed after it was written, so its before "
+                              f"bytes are lost; restore those paths by hand, then remove the image")
+            image.unlink()
+    if held is not None:
         before = {p: None if v["before"] is None else base64.b64decode(v["before"]) for p, v in held.items()}
         after = derive_after(before)
         if set(after) != set(held) or any(
@@ -628,9 +682,27 @@ def write_before_image(target, step_id: str, derive_after) -> dict[str, bytes | 
         paths[p] = {"before": None if was is None else base64.b64encode(was).decode("ascii"),
                     "after": None if data is None else hashlib.sha256(data).hexdigest()}
     image.parent.mkdir(parents=True, exist_ok=True)
-    image.write_text(json.dumps({"step": step_id, "paths": paths}, indent=2, sort_keys=True) + "\n",
-                     encoding="utf-8", newline="\n")
+    write_atomic(image, json.dumps({"step": step_id, "paths": paths}, indent=2, sort_keys=True) + "\n")
     return after
+
+
+IMAGE_ENTRY_RE = re.compile(r'^    ("(?:[^"\\]|\\.)*"): \{\s*"after": (?:null|"[0-9a-f]*"),\s*"before": (null|")?',
+                            re.M)
+
+
+def read_image_changes(target, image: pathlib.Path, text: str) -> list[str]:
+    """The paths a before-image that does not parse lists and that changed after it was written,
+    read from its legible entries (`write_before_image`'s layout): a path present and modified after
+    the image, or absent where the image recorded bytes or its entry is cut before saying. [] means
+    the image may be read as absent."""
+    since = image.stat().st_mtime_ns
+    changed = []
+    for m in IMAGE_ENTRY_RE.finditer(text):
+        rel = json.loads(m[1])
+        cur = check_contained(target, rel)
+        if cur.stat().st_mtime_ns > since if cur.is_file() else m[2] != "null":
+            changed.append(rel)
+    return changed
 
 
 def write_from_before_image(target, step_id: str) -> list[str]:
@@ -831,23 +903,48 @@ def render_policy_text(text: str | None, table: str, key: str, value) -> str:
     return out
 
 
-def build_step_env(scratch) -> dict[str, str]:
+LINE_ENDING_KEYS = ("core.autocrlf", "core.eol")
+
+
+def read_line_ending_config(cwd=None) -> list[tuple[str, str]]:
+    """The parent's effective `core.autocrlf` and `core.eol` (TOOL-dSafePassage-26 S13), each pair
+    only where some scope sets the key, by one `git config` read in `cwd`. The parent's environment
+    less git's location variables, so a calling hook's `GIT_DIR` cannot point the read elsewhere."""
+    env = {k: v for k, v in os.environ.items()
+           if k not in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR", "GIT_PREFIX")}
+    try:
+        p = subprocess.run(["git", *(["-C", str(cwd)] if cwd else []), "config", "--get-regexp",
+                            r"^core\.(autocrlf|eol)$"], capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", env=env, stdin=subprocess.DEVNULL)
+    except OSError:
+        return []
+    got = {}
+    for ln in p.stdout.splitlines():
+        k, _sep, v = ln.partition(" ")
+        got[k.lower()] = v  # the last scope printed wins, as git's own read does
+    return [(k, got[k]) for k in LINE_ENDING_KEYS if k in got]
+
+
+def build_step_env(scratch, target=None) -> dict[str, str]:
     """The environment a step runs under (TOOL-dSafePassage-7, S1): a NEW dict of the
     `STEP_ENV_KEEP` names present in the parent, plus the contract's own. Home and temp point into
     `scratch`; git reads no system or global config and prompts for nothing, and through
     `GIT_CONFIG_COUNT`, which outranks the target's own config, runs hooks from the empty
     `<scratch>/hooks`, holds the empty credential helper, and refuses the `ext::` transport
-    whatever a local `protocol.*`, `url.*` or `remote.*` key says (TOOL-dSafePassage-37 S3)."""
+    whatever a local `protocol.*`, `url.*` or `remote.*` key says (TOOL-dSafePassage-37 S3). The
+    parent's effective `core.autocrlf` and `core.eol` in `target` follow as further pairs, so a
+    step hashes and stages as the parent would (TOOL-dSafePassage-26 S13): the count is 3 plus them."""
     scratch = pathlib.Path(scratch)
     env = {k: os.environ[k] for k in STEP_ENV_KEEP if k in os.environ}
     env.update(dict.fromkeys(("HOME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "XDG_CONFIG_HOME"),
                              str(scratch / "home")))
     env.update(dict.fromkeys(("TMP", "TEMP", "TMPDIR"), str(scratch / "tmp")))
+    pairs = [("core.hooksPath", str(scratch / "hooks")), ("credential.helper", ""),
+             ("protocol.ext.allow", "never"), *read_line_ending_config(target)]
     env.update({"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_TERMINAL_PROMPT": "0",
-                "GCM_INTERACTIVE": "never", "GIT_CONFIG_COUNT": "3",
-                "GIT_CONFIG_KEY_0": "core.hooksPath", "GIT_CONFIG_VALUE_0": str(scratch / "hooks"),
-                "GIT_CONFIG_KEY_1": "credential.helper", "GIT_CONFIG_VALUE_1": "",
-                "GIT_CONFIG_KEY_2": "protocol.ext.allow", "GIT_CONFIG_VALUE_2": "never"})
+                "GCM_INTERACTIVE": "never", "GIT_CONFIG_COUNT": str(len(pairs))})
+    for i, (k, v) in enumerate(pairs):
+        env[f"GIT_CONFIG_KEY_{i}"], env[f"GIT_CONFIG_VALUE_{i}"] = k, v
     return env
 
 
@@ -868,16 +965,20 @@ def resolve_step_argv(argv, ctx: dict[str, str], step_id: str = "a step") -> lis
     return gk.resolve_shell_argv(out)
 
 
-def derive_step_context(row: StepRow, target, gov_root) -> dict[str, str]:
+def derive_step_context(row: StepRow, target, gov_root, to: str | None = None) -> dict[str, str]:
     """The placeholder answers a step argv resolves against: `{gov}` gov's tool root, `{target}`
-    the target, and `{prefix}` the target's install prefix where it has a `deploy.toml`. One
-    derivation for the spawn and for the attended order that names the argv a person runs."""
+    the target, `{prefix}` the target's install prefix where it has a `deploy.toml`, and `{to}` the
+    rollback's 40-hex `--to` where the caller passes it, which only a down of `update --rollback`
+    does (TOOL-dSafePassage-26 S10); anywhere else `{to}` is unanswered and refused by
+    `resolve_step_argv`. One derivation for the spawn and for the attended order."""
     gk = load_govkit()
     target, gov_root = pathlib.Path(target).resolve(), pathlib.Path(gov_root).resolve()
     tr = gk.derive_tool_root(gov_root)
     ctx = {"gov": (gov_root / tr if tr else gov_root).as_posix(), "target": target.as_posix()}
     if (target / ".governance" / "deploy.toml").is_file():
         ctx["prefix"] = gk.target_context(target, gk.load_deploy(target), row.id.split("/", 1)[0], {})["prefix"]
+    if to:
+        ctx["to"] = to
     return ctx
 
 
@@ -988,17 +1089,20 @@ def check_target_local_config(target) -> list[str]:
                    for pattern, rule, _runs in STEP_REFUSED_KEYS)]
 
 
-def run_step_isolated(row: StepRow, phase: str, target, gov_root) -> dict:
+def run_step_isolated(row: StepRow, phase: str, target, gov_root, to: str | None = None) -> dict:
     """Run `phase` of `row` under the contract: the step kind's ONE spawn of a step argv (S3), so the
     walk, the reverse walk, gov first and the leg inherit the contract by calling it.
 
     From gov's checkout root, with `build_step_env` over a scratch made for the call and cleared
     after it, and `resolve_step_argv`'s argv; output decoded as `run_target_argv` decodes it.
     Returns `{"verdict": "ok" | "failed" | "attended", "rc", "tail"}`, `tail` stderr's last 20
-    lines. A row that needs target code is `attended` and spawns nothing; a spawn error is
-    `failed` with `rc` None; a phase with no argv is a refusal, and so is a target whose own git
-    config `check_target_local_config` finds an executor or a credential in (TOOL-dSafePassage-24)."""
-    if derive_step_mode(row) == "attended":
+    lines. A row that needs target code is `attended` and spawns nothing, but for its witness on
+    gov's own tree, source mode, where the target's code is gov's (TOOL-dSafePassage-26 S32); a
+    spawn error is `failed` with `rc` None; a phase with no argv is a refusal, and so is a target whose own git
+    config `check_target_local_config` finds an executor or a credential in (TOOL-dSafePassage-24).
+    `to`, the rollback's `--to`, answers `{to}` in a `down` only (TOOL-dSafePassage-26 S10)."""
+    source = pathlib.Path(target).resolve() == pathlib.Path(gov_root).resolve()
+    if derive_step_mode(row) == "attended" and not (source and phase == "witness"):
         return {"verdict": "attended", "rc": None, "tail": ""}
     if phase not in STEP_PHASES or not isinstance(getattr(row, phase), list):
         raise Refusal(f"{row.id}: no `{phase}` argv to run; a step runs one of {', '.join(STEP_PHASES)}")
@@ -1008,13 +1112,13 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root) -> dict:
                       f"or sends as a credential, {', '.join(found)}, so nothing was spawned: remove it, "
                       f"or run the step attended")
     gov_root = pathlib.Path(gov_root).resolve()
-    ctx = derive_step_context(row, target, gov_root)
+    ctx = derive_step_context(row, target, gov_root, to if phase == "down" else None)
     with tempfile.TemporaryDirectory(prefix="gk-step-", ignore_cleanup_errors=True) as td:
         for d in ("home", "tmp", "hooks"):
             (pathlib.Path(td) / d).mkdir()
         try:
             p = subprocess.run(resolve_step_argv(getattr(row, phase), ctx, row.id), cwd=str(gov_root),
-                               env=build_step_env(td), stdin=subprocess.DEVNULL, capture_output=True,
+                               env=build_step_env(td, target), stdin=subprocess.DEVNULL, capture_output=True,
                                text=True, encoding="utf-8", errors="replace")
         except OSError as e:
             return {"verdict": "failed", "rc": None, "tail": f"{row.id} {phase}: could not spawn: {e}"}
@@ -1151,25 +1255,26 @@ def read_staging_journal(target) -> dict[str, str | None]:
     return out
 
 
-def write_attended_order(target, gov_root, row: StepRow, phase: str = "up") -> pathlib.Path:
+def write_attended_order(target, gov_root, row: StepRow, phase: str = "up",
+                         to: str | None = None) -> pathlib.Path:
     """Write the outbox order an `attended` stop leaves (S5),
     `.governance/outbox/update-attended-step-<slug>.md`, the slug `render_order_slug` of the step id:
     the step, its resolved `phase` argv, why it is attended, and what the next walk does. Returns
     its path."""
     gk = load_govkit()
-    argv = resolve_step_argv(getattr(row, phase), derive_step_context(row, target, gov_root), row.id)
-    order = (pathlib.Path(target) / ".governance" / "outbox"
-             / f"{gk.ATTENDED_ORDER_PREFIX}{gk.render_order_slug(row.id)}.md")
-    order.parent.mkdir(parents=True, exist_ok=True)
-    order.write_text(
+    argv = resolve_step_argv(getattr(row, phase), derive_step_context(
+        row, target, gov_root, to if phase == "down" else None), row.id)
+    # The order's kind is ATTENDED_ORDER_PREFIX's, so its readers glob what the one writer writes.
+    kind = gk.ATTENDED_ORDER_PREFIX.removeprefix("update-").removesuffix("-")
+    return gk.write_row_order(
+        pathlib.Path(target) / ".governance" / "outbox", kind, row.id,
         f"# An attended upgrade step: {row.id}\n\n"
         f"`govkit update --write` stopped before this step's `{phase}`. Its row declares "
         f"`needs-target = true`: its code needs the target's own code, which the isolation contract "
         f"keeps from every step govkit spawns, so govkit runs none of it.\n\n"
         f"Read it, then run it yourself:\n\n    {shlex.join(argv)}\n\n"
         f"The next `govkit update --write` runs the step's witness first, skips the step once that "
-        f"witness holds, and walks the steps after it.\n", encoding="utf-8", newline="\n")
-    return order
+        f"witness holds, and walks the steps after it.\n")
 
 
 def write_step_record(receipt_path, receipt: dict, row: StepRow, state: str,
@@ -1178,14 +1283,15 @@ def write_step_record(receipt_path, receipt: dict, row: StepRow, state: str,
     `receipt_path` in one atomic write (TOOL-dSafePassage-2 S3): the walk's and the reverse walk's
     one persist."""
     set_step_state(receipt, row.id, row.introduced, state, failure, via)
-    load_govkit().write_atomic(pathlib.Path(receipt_path), json.dumps(receipt, indent=2) + "\n")
+    write_atomic(receipt_path, json.dumps(receipt, indent=2) + "\n")
 
 
-def run_step_reread(row: StepRow, phase: str, target, gov_root, receipt_path, receipt: dict) -> dict:
+def run_step_reread(row: StepRow, phase: str, target, gov_root, receipt_path, receipt: dict,
+                    to: str | None = None) -> dict:
     """`run_step_isolated`, then the receipt hand-off (TOOL-dSafePassage-2 S3): `schema` and `steps`
     re-read from `receipt_path` into `receipt`, a key the step took away dropped here too, since a
     step may rewrite the receipt. A receipt that does not read back is a refusal naming the step."""
-    got = run_step_isolated(row, phase, target, gov_root)
+    got = run_step_isolated(row, phase, target, gov_root, to)
     receipt_path = pathlib.Path(receipt_path)
     try:
         disk = json.loads(receipt_path.read_text(encoding="utf-8"))
@@ -1323,7 +1429,7 @@ def check_gov_first(receipt: dict, declared: list[StepRow], target) -> list[str]
         if rec["state"] != "applied":
             problems.append(f"{sid}: listed {rec['state']} in gov's receipt, not applied")
             continue
-        if run_step_isolated(by_id[sid]._replace(needs_target=False), "witness", target, target)["verdict"] != "ok":
+        if run_step_isolated(by_id[sid], "witness", target, target)["verdict"] != "ok":
             problems.append(f"{sid}: listed applied, and its witness does not hold on gov's tree")
     return problems
 
@@ -1361,7 +1467,8 @@ def derive_down_verdict(row: StepRow, image_present: bool, down_rc,
     return None, "witness" if row.reverted is None else "reverted"
 
 
-def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[StepRow]) -> dict:
+def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[StepRow],
+                     to: str | None = None) -> dict:
     """Down `rows`, `derive_reverse_steps`' order, over `target` (TOOL-dSafePassage-4 S4), every
     spawn through `run_step_reread`. Per step: (1) one recorded `rolled-back` or nowhere runs its
     witness first and is skipped where it does not hold, nothing of it applied; (2) a row needing
@@ -1385,7 +1492,8 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
 
     Its one caller is `update --rollback`: a stopped walk, the verify rollback and `apply` run no
     down. Returns `{"downs": [(id, verdict)], "stopped", "failure", "order"}`, `downs` the verdict
-    list in the order the rows were reached, which `write_rollback_record` prints."""
+    list in the order the rows were reached, which `write_rollback_record` prints. `to`, the
+    rollback's `--to`, answers each down's `{to}` (TOOL-dSafePassage-26 S10)."""
     target, receipt_path = pathlib.Path(target).resolve(), pathlib.Path(receipt_path)
     out = {"downs": [], "stopped": None, "failure": None, "order": None}
 
@@ -1407,12 +1515,12 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
                 continue
             state = "applied"
         if derive_step_mode(row) == "attended":
-            out["order"] = write_attended_order(target, gov_root, row, "down").relative_to(target).as_posix()
+            out["order"] = write_attended_order(target, gov_root, row, "down", to).relative_to(target).as_posix()
             return stop(row, f"{ATTENDED_STOP} — {out['order']} names its down")
         paths = read_image_paths(target, row.id)
         write_step_record(receipt_path, receipt, row, state, f"{DOWN_STOP_PREFIXES[0]} started "
                           f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded")
-        got = run_step_reread(row, "down", target, gov_root, receipt_path, receipt)
+        got = run_step_reread(row, "down", target, gov_root, receipt_path, receipt, to)
         recordable = test_steps_recordable(receipt)  # TOOL-dSafePassage-18 S1: below 4, no row
         if got["verdict"] != "ok":
             failure = f"{DOWN_STOP_PREFIXES[1]}{got['rc']}: {(got['tail'].splitlines() or [''])[-1]}"
@@ -1490,10 +1598,21 @@ def read_boot_clock() -> float | None:
     return None if clock is None else time.clock_gettime(clock)
 
 
+def read_boot_id() -> str:
+    """The kernel's boot id under Linux, `/proc/sys/kernel/random/boot_id`, else "" (S33)."""
+    try:
+        return pathlib.Path("/proc/sys/kernel/random/boot_id").read_text(encoding="ascii").strip()
+    except OSError:
+        return ""
+
+
 def add_boot_start(record: dict) -> dict:
     """`record` with `started_boot`, the `read_boot_clock` reading, beside its `started`, the key
-    left out where the reading is None (TOOL-dSafePassage-32 S2)."""
+    left out where the reading is None (TOOL-dSafePassage-32 S2); and the pid namespace it was taken
+    in, `platform` (`sys.platform`) and `boot_id` (`read_boot_id`), so WSL and Windows runs on one
+    tree, one host name, never judge each other's pid (TOOL-dSafePassage-26 S33)."""
     boot = read_boot_clock()
+    record = {**record, "platform": sys.platform, "boot_id": read_boot_id()}
     return record if boot is None else {**record, "started_boot": boot}
 
 
@@ -1501,7 +1620,8 @@ def check_holder_dead(record: dict | None) -> tuple[str, str]:
     """(`dead`, `live` or `unknown`, why) for a lock or guard holder (S7). `dead`: its `host` is this
     host or absent, and the process-monitor census holds no row with its pid, or one created more
     than `REUSE_MARGIN_S` after its `started`, a reused pid; `live`: a row with that pid created no
-    later than that; `unknown`: an unreadable record, another host, or a census that cannot run. The
+    later than that; `unknown`: an unreadable record, another host, another `platform` or `boot_id`
+    where the record carries one (TOOL-dSafePassage-26 S33), or a census that cannot run. The
     clock is read once BEFORE the census is spawned and no later reading enters the estimate, so a
     slow census makes a holder look older, toward `live` (TOOL-dSafePassage-22 S1).
 
@@ -1514,6 +1634,10 @@ def check_holder_dead(record: dict | None) -> tuple[str, str]:
     host = record.get("host")
     if host is not None and host != THIS_HOST:
         return "unknown", f"it was taken on host {host!r}, and this host's process table cannot speak for that one"
+    for key, here in (("platform", sys.platform), ("boot_id", read_boot_id())):
+        if key in record and record[key] != here:
+            return "unknown", (f"it was taken under {key} {record[key]!r}, not this process's {here!r}, so "
+                               f"its pid names a process in another namespace this table cannot speak for")
     pid = record["pid"]
     try:
         pm_dir = load_govkit().resolve_kit_dir("process-monitor", "census.py", HERE)
@@ -1600,9 +1724,172 @@ def remove_shared_file(path) -> None:
     pathlib.Path(path).unlink(missing_ok=True)
 
 
+# The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
+# named on its marker line and gated by the resolve-python self-test (TOOL-dSafePassage-26 S4):
+# the base ladder below reads it here, so this module imports nothing from govkit for it.
+# >>> remote_ladder_py -- canonical copy: resolve_remote.py in the gov lib dir (byte-identical; gated)
+def resolve_remote(root):
+    """-> (remote, branch, observed, refusal) for the repository at <root>. Fetches nothing.
+
+    remote    GOV_REMOTE, else branch.<current>.remote unless it is ".", else the ONLY remote.
+              Several remotes and none chosen, or a chosen name that is not a remote here, is a
+              REFUSAL naming GOV_REMOTE. No remote at all is remote "" and NO refusal: the caller
+              keeps its own no-remote fallback.
+    observed  the branch refs/remotes/<remote>/HEAD names, or "". A caller whose GOV_DEFAULT_BRANCH
+              only CROSS-CHECKS the observation reads this one.
+    branch    GOV_DEFAULT_BRANCH, else observed, else "".
+    A refusal empties the other three, so no caller can pick a remote the ladder refused.
+    """
+    import os
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    names = read("remote").split()
+    listed = " ".join(names) or "none"
+    # FULL refs, never `--short`: a tag or branch sharing the name makes the short form ambiguous
+    # (`heads/x`, `remotes/r/x`), and the prefix is stripped exactly instead.
+    cur = read("symbolic-ref", "--quiet", "HEAD")
+    cur = cur[len("refs/heads/"):] if cur.startswith("refs/heads/") else ""
+    remote, how = os.environ.get("GOV_REMOTE") or "", "GOV_REMOTE"
+    if not remote and cur:
+        remote, how = read("config", "branch." + cur + ".remote"), "branch." + cur + ".remote"
+        if remote == ".":
+            remote = ""
+    if not remote and len(names) == 1:
+        remote = names[0]
+    if not remote and len(names) > 1:
+        where = "branch " + cur if cur else "a detached HEAD"
+        return "", "", "", ("cannot choose a remote: GOV_REMOTE is unset, %s has no configured remote, "
+                            "and this repository has %d remotes (%s). Name it: export GOV_REMOTE=<remote>."
+                            % (where, len(names), listed))
+    if remote and remote not in names:
+        return "", "", "", ("%s names %s, which is no remote of this repository (%s). Name one that is: "
+                            "export GOV_REMOTE=<remote>." % (how, remote, listed))
+    observed = ""
+    if remote:
+        pre = "refs/remotes/" + remote + "/"
+        head = read("symbolic-ref", "--quiet", pre + "HEAD")
+        if head.startswith(pre) and len(head) > len(pre):
+            observed = head[len(pre):]
+    return remote, os.environ.get("GOV_DEFAULT_BRANCH") or observed, observed, ""
+# <<< remote_ladder_py
+
+
+def resolve_landing_base(root, base: str | None) -> tuple[str, bool, str]:
+    """`(sha, boundary, why)`: the commit a push-boundary leg grades from, and whether it is one.
+
+    `--base` when given, else `GATE_PUSH_BASE`, else the merge-base with the remote ladder's default
+    branch, the remote's first, then the local branch. `boundary` is True for the first two. On no
+    base `sha` is "" and `why` completes the line `no base to compare against`, because no base is a
+    FAILED exit 1 for every caller and never a zero-status skip: run-gates judges a leg by its exit
+    code, and a silent 0 reads as a pass forever. Extracted from `cmd_epoch` at its second caller,
+    `upgrade_steps.py frozen` (TOOL-dSafePassage-1); the step gate is its third (TOOL-dSafePassage-10
+    S6), so the legs grading a landing read one base. It lives here, beside the inline remote
+    ladder, so this module imports nothing from govkit for it (TOOL-dSafePassage-26 S1, S4).
+    """
+    boundary = base is not None
+    # An ALL-ZERO value reads as UNSET (TOOL-aMendedFleet-111 S3): the hook exports the remote's old
+    # sha, forty zeros on a push that CREATES the default branch, and no commit carries that name.
+    if base is None and os.environ.get("GATE_PUSH_BASE", "").strip("0"):
+        base, boundary = os.environ["GATE_PUSH_BASE"], True
+    if base is None:
+        # The default base is `check-verdict-epoch.sh`'s. The remote and its branch are the
+        # ladder's (TOOL-dLadderedRemote-2); a refusal is the failed exit, naming it, and no remote
+        # at all leaves only the local branch.
+        remote, dflt, _observed, refusal = resolve_remote(root)
+        if refusal:
+            return "", boundary, f" · {refusal}"
+        dflt = dflt or "main"
+        for ref in ((f"{remote}/{dflt}", dflt) if remote else (dflt,)):
+            mb = subprocess.run(["git", "-C", str(root), "merge-base", ref, "HEAD"],
+                                capture_output=True, text=True, encoding="utf-8")
+            if mb.returncode == 0 and mb.stdout.strip():
+                base = mb.stdout.strip()
+                break
+    rb = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", "--quiet",
+                         f"{base}^{{commit}}"], capture_output=True, text=True, encoding="utf-8") if base else None
+    if rb is None or rb.returncode != 0:
+        return "", boundary, (f" ({base or 'no merge-base with the default branch'})"
+                              " · fetch full history, set GOV_DEFAULT_BRANCH, or pass --base <rev>")
+    return rb.stdout.strip(), boundary, ""
+
+
+def blob_at(root, commit: str, path: str, batch=None) -> bytes | None:
+    """Bytes of `path` in the commit `commit` names, from the object store — never from the working
+    tree; None where the commit holds no such blob.
+
+    This is the receipt's whole provenance claim. Reading the working tree would make the receipt
+    say "these bytes came from <commit>" about bytes that came from whatever the operator had
+    checked out and half-edited at the time.
+
+    THE ONE revision-blob reader (TOOL-dSafePassage-26 S14). `batch` is an open
+    `git cat-file --batch` process a caller reading many blobs passes, `derive_introduced` among
+    them, so a history walk asks one process rather than spawning one `git show` per blob.
+    """
+    if batch is None:
+        out = subprocess.run(["git", "-C", str(root), "show", f"{commit}:{path}"],
+                             capture_output=True, check=False)
+        return out.stdout if out.returncode == 0 else None
+    batch.stdin.write(f"{commit}:{path}\n".encode("utf-8"))
+    batch.stdin.flush()
+    head = batch.stdout.readline().split()
+    if len(head) < 3:
+        return None  # `<name> missing`: no such blob at that commit
+    return batch.stdout.read(int(head[2]) + 1)[:-1]
+
+
+def write_atomic(dest, text: str) -> None:
+    """Persist `text` at `dest` through a sibling temp file and `os.replace`, so a run that dies
+    mid-write leaves the PREVIOUS file rather than a truncated one (DEPL-cMendedVintage-21 S1).
+
+    THE ONE WRITER for every destination `ADOPTER_BAR_PATHS` declares: the gate-leg manifest an
+    adopter's whole bar reads, the receipt, `.governance/install.json` (TOOL-dRedressedBar-17), and
+    its sidecar `.governance/install.sums`, written before the receipt (TOOL-dRedressedBar-19).
+    Two verbs write the manifest since DEPL-cMendedVintage-13, and an exception between opening it
+    and finishing it would hand the adopter a manifest that is not JSON — every leg of their bar,
+    gone, on a deployer step that was only adding one. A receipt cut short the same way is one the
+    next `apply`, `update` or `adopt` cannot parse.
+
+    WHAT THIS DOES NOT CLAIM. No fsync and no directory sync, so this is not crash consistency:
+    what it closes is a half-written file left by an EXCEPTION mid-write. Power loss is out of
+    scope and always was.
+
+    The temp file is a SIBLING, inside the destination's own directory. Two reasons, and both are
+    load-bearing: `os.replace` raises across a filesystem boundary, which a shared temp root makes
+    reachable and a sibling makes impossible; and a shared root is writable by principals the
+    destination's directory is not, so the file to be renamed into place could be swapped before
+    the rename. A stale sibling from a crashed run of an earlier vintage is overwritten here rather
+    than swept, because an unknown temp file of unknown vintage is not this engine's to delete.
+    """
+    dest = pathlib.Path(dest)
+    tmp = dest.with_name(dest.name + ".govkit-new")
+    try:
+        tmp.write_text(text, encoding="utf-8", newline="\n")
+        os.replace(tmp, dest)
+    finally:
+        # THE CLEANUP RUNS ON THE SUCCESS PATH TOO, where `os.replace` has already consumed `tmp`
+        # and this raises FileNotFoundError — an OSError, swallowed. Swallowed rather than
+        # re-raised because this sits in a `finally`: an exception thrown from here REPLACES the
+        # one that brought us here, and the caller would be told the temp file could not be
+        # removed instead of why the write failed.
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+
+
 def load_govkit():
     """The deployer beside this file: the running module where it is the program, else imported by
-    its path. Only the CLI asks for it — the remote ladder and the push base are govkit's."""
+    its path, for the readers this module borrows: the tool root, the `{prefix}` token, the kit-dir
+    resolver and the staging journal's name. The remote ladder, the landing base, the revision-blob
+    reader and the atomic writer are this module's own (TOOL-dSafePassage-26 S1, S4, S14, S15)."""
     path = HERE / "govkit.py"
     for name in ("govkit", "__main__"):
         mod = sys.modules.get(name)
@@ -1619,7 +1906,7 @@ def resolve_landed_ref(root) -> str | None:
     """The default branch a row's introducing commit is derived along: the remote ladder's
     `<remote>/<branch>`, else the local `<branch>`, `main` where nothing names one; None when
     neither resolves, and then every row reads unlanded."""
-    remote, branch, _observed, refusal = load_govkit().resolve_remote(root)
+    remote, branch, _observed, refusal = resolve_remote(root)
     if refusal:
         raise Refusal(refusal)
     branch = branch or "main"
@@ -1657,7 +1944,7 @@ def cmd_list(root, window: bool) -> int:
 
 def cmd_frozen(root, base: str | None) -> int:
     """`frozen [--base <rev>]`: every landed row at the push base, frozen at HEAD (`check_frozen`)."""
-    sha, _boundary, why = load_govkit().derive_push_base(root, base)
+    sha, _boundary, why = resolve_landing_base(root, base)
     if not sha:
         print(f"step-rows-frozen: FAILED · no base to compare against{why}")
         return 1
@@ -1746,6 +2033,15 @@ FIXTURE_STEPS = {
         "sys.stderr.write(p.stderr.decode('utf-8', 'replace'))\n"
         "open(sys.argv[2], 'w', encoding='utf-8').write(str(p.returncode))\n"
         "sys.exit(p.returncode)\n"),
+    # TOOL-dSafePassage-26 S13: the oid git computes for a CRLF file in the target, under the
+    # step's environment, written for the parent to compare with its own.
+    "hash.py": (
+        "import subprocess, sys\n"
+        "target, out = sys.argv[1:3]\n"
+        "p = subprocess.run(['git', '-C', target, 'hash-object', '--path', 'crlf.txt', 'crlf.txt'],\n"
+        "                   capture_output=True, text=True)\n"
+        "open(out, 'w').write(p.stdout.strip())\n"
+    ),
     "reaches.py": "import sys\nopen(sys.argv[1], 'w').close()\nimport adopter_only\n",
     "opens.py": "import sys\nsys.path.insert(0, sys.argv[1])\nimport adopter_only\n",
 }
@@ -1796,10 +2092,10 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         (gov / "tools" / "steps" / name).write_text(text, encoding="utf-8", newline="\n")
     reports.mkdir()
     quiet = build_tree_git_env()
-    subprocess.run(["git", "init", "-q", str(target)], env=quiet, capture_output=True, check=True)
-    (target / ".governance").mkdir()
-    (target / ".governance" / "deploy.toml").write_text('prefix = "tools"\n', encoding="utf-8")
-    (target / "adopter_only.py").write_text(FIXTURE_ADOPTER_ONLY, encoding="utf-8", newline="\n")
+    # The scratch target through the factory (TOOL-dSafePassage-26 S19): its deploy file and the
+    # adopter-only module a breach plant imports, committed once.
+    load_fixture_target().build_target(tmp, 'prefix = "tools"\n', target.name,
+                                       {"adopter_only.py": FIXTURE_ADOPTER_ONLY})
     witness = ["python", "-c", "import os, sys; sys.exit(not os.path.isfile(sys.argv[1]))", "{target}/stepped.txt"]
 
     def row(slug: str, up: list, needs: bool = False) -> StepRow:
@@ -1835,12 +2131,15 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
     rc = 0
     if plant is None:
         rep = run_clean()
+        eol = read_line_ending_config(target)  # TOOL-dSafePassage-26 S13: 3 plus these pairs
         # The contract's own names are what the builder returns over an EMPTY parent: a builder
-        # that copies the parent adds nothing there, so the oracle is not the code under test.
+        # that copies the parent adds nothing there, so the oracle is not the code under test. The
+        # carried line-ending pairs are the parent's by design, so their names are named here.
         held = dict(os.environ)
         os.environ.clear()
         try:
-            allowed = set(STEP_ENV_KEEP) | set(contract_env(tmp))
+            allowed = set(STEP_ENV_KEEP) | set(contract_env(tmp)) | {
+                f"GIT_CONFIG_{kv}_{i}" for i in range(3, 3 + len(eol)) for kv in ("KEY", "VALUE")}
         finally:
             os.environ.update(held)
         extra = sorted(set(rep.get("env", [])) - allowed)
@@ -1849,8 +2148,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
               f"{rep.get('hooks')} · sys.flags.isolated {rep.get('isolated')} · cwd {rep.get('cwd')}")
         expect(bool(rep) and rep.get("add") == 0, "clean's report is missing, or its git add failed")
         expect(not extra, f"names outside the allowlist reached the step: {extra}")
-        expect(rep.get("count") == "3" and rep.get("key0") == "core.hooksPath" and rep.get("hooks") == [],
-               "GIT_CONFIG_COUNT is not 3 with core.hooksPath naming an empty directory")
+        expect(rep.get("count") == str(3 + len(eol)) and rep.get("key0") == "core.hooksPath" and rep.get("hooks") == [],
+               f"GIT_CONFIG_COUNT is not 3 plus the parent's {len(eol)} line-ending pair(s) with "
+               f"core.hooksPath naming an empty directory")
         expect(rep.get("isolated") == 1, "the leading python ran without -I")
         expect(bool(rep) and pathlib.Path(rep["cwd"]).resolve() == gov.resolve(), "the working directory is not gov's root")
         expect(rep.get("prefix") == "tools", "{prefix} did not resolve to the target's install prefix")
@@ -1861,7 +2161,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         expect(all(any(p.endswith(f".githooks/{h}") for p in planted) for h in ("post-index-change", "pre-commit")),
                "no post-index-change and pre-commit planted under the target's own core.hooksPath")
         if plant == "hook-stub":
-            g["build_step_env"] = lambda scratch: drop_pair(saved_build(scratch), "core.hooksPath")
+            g["build_step_env"] = lambda scratch, target=None: drop_pair(saved_build(scratch, target), "core.hooksPath")
         rep = run_clean()
         expect(rep.get("add") == 0, "clean's git add did not run")
         hit = [c for c in read_plant_canaries(canaries) if c.startswith("hook-")]
@@ -1872,7 +2172,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         os.environ["PYTHONPATH"] = str(target)
         if plant == "module-stub":
             saved_argv = g["resolve_step_argv"]
-            g["build_step_env"] = lambda scratch: dict(os.environ)
+            g["build_step_env"] = lambda scratch, target=None: dict(os.environ)
             g["resolve_step_argv"] = lambda argv, ctx, step_id="a step": [
                 a for a in saved_argv(argv, ctx, step_id) if a != "-I"]
         run_clean()
@@ -1886,7 +2186,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                        encoding="utf-8", newline="\n")
         os.environ.update({"GIT_CONFIG_GLOBAL": str(cfg), "GH_TOKEN": "gk-planted-token"})
         if plant == "credential-stub":
-            g["build_step_env"] = lambda scratch: {**drop_pair(saved_build(scratch), "credential.helper"),
+            g["build_step_env"] = lambda scratch, target=None: {**drop_pair(saved_build(scratch, target), "credential.helper"),
                                                    "GIT_CONFIG_GLOBAL": os.environ["GIT_CONFIG_GLOBAL"],
                                                    "GH_TOKEN": os.environ["GH_TOKEN"]}
         rep = run_clean()
@@ -1922,6 +2222,24 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             print(f"isolation: {tok.id} · refused · {e}")
         expect(not report.exists(), "the row holding {unknown} spawned")
         rc = 1
+    elif plant == "autocrlf":
+        # TOOL-dSafePassage-26 S13, AC12: the parent at core.autocrlf=true by command scope, the
+        # target holding a CRLF file and no text attribute; the step must hash as the parent does.
+        (target / "crlf.txt").write_bytes(b"one\r\ntwo\r\n")
+        os.environ.update({"GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "core.autocrlf",
+                           "GIT_CONFIG_VALUE_0": "true"})
+        out = reports / "hash.txt"
+        r = run_step_isolated(row("hash", ["python", "{gov}/steps/hash.py", "{target}", out.as_posix()]),
+                              "up", target, gov)
+        mine = subprocess.run(["git", "-C", str(target), "hash-object", "--path", "crlf.txt", "crlf.txt"],
+                              capture_output=True, text=True).stdout.strip()
+        raw = subprocess.run(["git", "-C", str(target), "-c", "core.autocrlf=false", "hash-object",
+                              "--path", "crlf.txt", "crlf.txt"], capture_output=True, text=True).stdout.strip()
+        got = out.read_text(encoding="utf-8").strip() if out.is_file() else ""
+        print(f"isolation: fixture/hash · up · {r['verdict']} · the step's oid {got or 'none'} · the parent's "
+              f"{mine} · {'equal' if got == mine else 'DIFFERENT'}")
+        expect(r["verdict"] == "ok" and bool(got) and got == mine, "the step hashed the CRLF file otherwise than the parent")
+        expect(mine != raw, "LIVENESS: core.autocrlf=true does not move this file's oid, so the plant grades nothing")
     elif plant.startswith("local-"):
         # TOOL-dSafePassage-24 S4 and TOOL-dSafePassage-29 S4: an executor in the target's own config,
         # each canary naming itself; clean.py commits what it stages, so a signing program and a
@@ -1960,7 +2278,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         if kind in ("filter", "process", "include"):
             (target / ".gitattributes").write_text("*.txt filter=canary\n", encoding="utf-8", newline="\n")
         if plant == "local-ext-transport-stub":
-            g["build_step_env"] = lambda scratch: drop_pair(saved_build(scratch), "protocol.ext.allow")
+            g["build_step_env"] = lambda scratch, target=None: drop_pair(saved_build(scratch, target), "protocol.ext.allow")
         elif plant.endswith("-stub"):
             g["check_target_local_config"] = lambda t: []
         key = {"filter": "filter.canary.clean", "process": "filter.canary.process",
@@ -2161,7 +2479,7 @@ spec.loader.exec_module(us)
 gov, target, to = pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3]), sys.argv[4]
 rp = target / ".governance" / "install.json"
 receipt = json.loads(rp.read_text(encoding="utf-8"))
-out = us.run_reverse_walk(gov, target, rp, receipt, us.derive_reverse_steps(gov, receipt, to))
+out = us.run_reverse_walk(gov, target, rp, receipt, us.derive_reverse_steps(gov, receipt, to), to)
 print(f"rollback: {len(out['downs'])} reached · stopped at {out['stopped'] or 'none'}")
 print(f"rollback: verdicts {out['downs']}")
 sys.exit(1 if out["stopped"] else 0)
@@ -2215,10 +2533,12 @@ while sys.argv[4] != "-" and not pathlib.Path(sys.argv[4]).exists() and time.tim
     time.sleep(0.05)
 '''
 WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSafePassage-15
-WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending") + WALK_SCHEMA_PLANTS
-LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-unreadable",
+WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending",
+               "truncated-image") + WALK_SCHEMA_PLANTS
+LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-foreign-namespace", "lock-unreadable",
                "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot")
-UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update")
+UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update",
+                 "needs-target-source")
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
 NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePassage-17: s2 is the floor row's shape
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
@@ -2233,6 +2553,16 @@ def build_fixture_env(**extra: str) -> dict[str, str]:
     or system config, so every fixture repository is the same on every node."""
     return {**build_tree_git_env(), "GIT_AUTHOR_NAME": "fx", "GIT_AUTHOR_EMAIL": "fx@e",
             "GIT_COMMITTER_NAME": "fx", "GIT_COMMITTER_EMAIL": "fx@e", **extra}
+
+
+def load_fixture_target():
+    """`fixture_target.py` beside this file, the scratch repositories' one factory
+    (TOOL-dSafePassage-26 S19). Loaded only by a fixture: a scratch gov holding a copy of this
+    module and not the factory still imports."""
+    if str(HERE) not in sys.path:
+        sys.path.insert(0, str(HERE))
+    import fixture_target
+    return fixture_target
 
 
 def run_fixture_git(cwd, *args: str, date: int | None = None) -> str:
@@ -2266,16 +2596,21 @@ FIXTURE_SCHEMA_STEP_PLANTS = (
      "        sys.stderr.write(\"fx: schema up fails by its plant\\n\")\n"
      "        return 1\n"
      "    code, msg, out = verbs[argv[0]](receipt)\n"),
-    ("        os.replace(tmp, path)\n",
-     "        if (fx / \"schema.block\").exists():\n"
-     "            (fx / \"schema.pid\").write_text(str(os.getpid()), encoding=\"utf-8\")\n"
-     "            (fx / \"schema.blocking\").touch()\n"
-     "            __import__(\"time\").sleep(300)\n"
-     "        os.replace(tmp, path)\n"
-     "        if (fx / \"schema.block-after\").exists():\n"
-     "            (fx / \"schema.pid\").write_text(str(os.getpid()), encoding=\"utf-8\")\n"
-     "            (fx / \"schema.blocking\").touch()\n"
-     "            __import__(\"time\").sleep(300)\n"),
+    # The step writes through `write_atomic` (TOOL-dSafePassage-26 S46), so the block wraps the
+    # rename that helper makes, in this step process only.
+    ("        write_atomic(path, json.dumps(out, indent=2) + \"\\n\")\n",
+     "        _os, _real = __import__(\"os\"), __import__(\"os\").replace\n"
+     "\n"
+     "        def _planted(a, b):\n"
+     "            for name, after in ((\"schema.block\", False), (\"schema.block-after\", True)):\n"
+     "                if after:\n"
+     "                    _real(a, b)\n"
+     "                if (fx / name).exists():\n"
+     "                    (fx / \"schema.pid\").write_text(str(_os.getpid()), encoding=\"utf-8\")\n"
+     "                    (fx / \"schema.blocking\").touch()\n"
+     "                    __import__(\"time\").sleep(300)\n"
+     "        _os.replace = _planted\n"
+     "        write_atomic(path, json.dumps(out, indent=2) + \"\\n\")\n"),
 )
 
 
@@ -2305,7 +2640,7 @@ def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, 
     gov = tmp / "gov"
     gkd = gov / "tools" / HERE.name
     (gkd / "steps").mkdir(parents=True)
-    run_fixture_git(gov.parent, "init", "-q", "-b", "main", gov.name)
+    load_fixture_target().build_scratch_gov(gov)
     (gkd / REGISTRY_FILE).write_text("", encoding="utf-8")
     shutil.copy2(HERE / "upgrade_steps.py", gkd / "upgrade_steps.py")
     (gkd / "steps" / "fx.py").write_text(FIXTURE_WALK_STEP, encoding="utf-8", newline="\n")
@@ -2344,20 +2679,12 @@ def build_walk_target(tmp: pathlib.Path, sha_a: str, name: str, steps: list | No
     """A scratch target repository `tmp/<name>` holding `files` and a schema-4 receipt at `sha_a`
     with `steps`, committed: what the `walk` and `rollback` families walk over. `schema3` forces the
     receipt to schema 3 with `steps` taken out (TOOL-dSafePassage-15)."""
-    t = tmp / name
-    (t / ".governance").mkdir(parents=True)
-    run_fixture_git(tmp, "init", "-q", "-b", "main", name)
-    for rel, body in (files or {}).items():
-        (t / rel).write_text(body, encoding="utf-8", newline="\n")
     receipt = {"schema": 4, "gov_commit": sha_a, "kits": [], "files": [], "steps": steps or []}
     if schema3:
         receipt["schema"] = 3
         del receipt["steps"]
-    (t / ".governance" / "install.json").write_text(json.dumps(receipt, indent=2) + "\n",
-                                                    encoding="utf-8", newline="\n")
-    run_fixture_git(t, "add", "-A")
-    run_fixture_git(t, "commit", "-qm", "base")
-    return t
+    return load_fixture_target().build_target(
+        tmp, None, name, {**(files or {}), ".governance/install.json": json.dumps(receipt, indent=2) + "\n"})
 
 
 def run_fixture_child(child: str, gov: pathlib.Path, t: pathlib.Path, to: str, env: dict) -> tuple[int, str]:
@@ -2416,7 +2743,7 @@ def run_walk_fixture(plant: str | None) -> int:
             if not ok:
                 fails.append(what)
 
-        def build_target(name: str, steps: list | None = None, files: dict | None = None) -> pathlib.Path:
+        def build_case_target(name: str, steps: list | None = None, files: dict | None = None) -> pathlib.Path:
             return build_walk_target(tmp, sha["A"], name, steps, files, schema3=plant in WALK_SCHEMA_PLANTS)
 
         def walk(t: pathlib.Path) -> tuple[int, str]:
@@ -2445,7 +2772,7 @@ def run_walk_fixture(plant: str | None) -> int:
         rc = 0
         if plant in (None, "not-pending"):
             pre = [{"id": "fx/s2", "introduced": sha["B"], "state": "applied"}] if plant else []
-            t = build_target("t", pre)
+            t = build_case_target("t", pre)
             rc, out = walk(t)
             want = ["fx/s1", "fx/s3", "fx/s4"] if plant else ["fx/s1", "fx/s2", "fx/s3", "fx/s4"]
             expect(lines_of(out) == [f"step {s} · applied" for s in want],
@@ -2461,7 +2788,7 @@ def run_walk_fixture(plant: str | None) -> int:
                 expect(not spawned, "a step outside the pending set spawned")
             expect(rc == 0, f"the walk exited {rc}")
         elif plant == "witness-holds":
-            t = build_target("t", files={"s2.txt": "s2\n"})
+            t = build_case_target("t", files={"s2.txt": "s2\n"})
             rc, out = walk(t)
             row = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s2"), {})
             print(f"walk: fx/s2 up canary {'present' if 's2.up' in canaries(t) else 'absent'} · row {row.get('state')}"
@@ -2471,7 +2798,7 @@ def run_walk_fixture(plant: str | None) -> int:
             expect(row.get("state") == "applied" and rc == 0, "s2 does not read applied, or the walk failed")
             expect(row.get("via") == "witness", "s2 is not marked applied via its witness (TOOL-dSafePassage-33)")
         elif plant == "fail-k":
-            t = build_target("t")
+            t = build_case_target("t")
             t.with_name("t.fx").mkdir()
             (t.with_name("t.fx") / "s3.fail").touch()
             rc, out = walk(t)
@@ -2489,7 +2816,7 @@ def run_walk_fixture(plant: str | None) -> int:
                    "the walk went on past the failure, or a down ran")
             expect(rc == 1, f"the walk exited {rc}, not 1")
         elif plant in ("kill-step", "resume"):
-            t, t2 = build_target("t"), build_target("t2")
+            t, t2 = build_case_target("t"), build_case_target("t2")
             t.with_name("t.fx").mkdir()
             (t.with_name("t.fx") / "s3.block").touch()
             killed_walk(t)
@@ -2510,7 +2837,7 @@ def run_walk_fixture(plant: str | None) -> int:
                 expect(len(ups) == 2 and not resumed, "the re-run did not spawn s3's up again")
             expect(rc == 0 and rc2 == 0, f"the re-run exited {rc}, the uninterrupted walk {rc2}")
         elif plant == "attended":
-            t = build_target("t")
+            t = build_case_target("t")
             rc, out = walk(t)
             s2 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s2"), {})
             orders = sorted((t / ".governance" / "outbox").glob("update-attended-step-*.md"))
@@ -2527,10 +2854,41 @@ def run_walk_fixture(plant: str | None) -> int:
             expect(lines_of(out2) == ["step fx/s2 · skipped (witness holds)", "step fx/s3 · applied",
                                       "step fx/s4 · applied"] and rc2 == 0,
                    "the re-run does not pass s2 by its witness and apply s3 and s4")
+        elif plant == "truncated-image":
+            # TOOL-dSafePassage-26 S31: s3's before-image cut short, as a writer before the atomic
+            # one could leave it. In `t` no path it lists changed since, so it reads absent and is
+            # rewritten; in `t2` a path it lists, `kept.txt`, was written after it, so the up refuses.
+            image = derive_image_path(pathlib.Path("."), "fx/s3")
+            s3row = {"after": hashlib.sha256(b"s3\n").hexdigest(), "before": None}
+            kept = {"after": None, "before": base64.b64encode(b"kept\n").decode("ascii")}
+            t, t2 = build_case_target("t"), build_case_target("t2")
+            for tt, paths in ((t, {"s3.txt": s3row}), (t2, {"kept.txt": kept, "s3.txt": s3row})):
+                full = json.dumps({"step": "fx/s3", "paths": paths}, indent=2, sort_keys=True)
+                (tt / image).parent.mkdir(parents=True)
+                (tt / image).write_text(full[:full.index('"step"')], encoding="utf-8", newline="\n")
+            (t2 / "kept.txt").write_text("edited\n", encoding="utf-8", newline="\n")
+            at = (t2 / image).stat().st_mtime + 10
+            os.utime(t2 / "kept.txt", (at, at))
+            rc, out = walk(t)
+            try:
+                rewritten = json.loads((t / image).read_text(encoding="utf-8"))["paths"]
+            except (OSError, ValueError, KeyError):
+                rewritten = None
+            s3 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s3"), {})
+            print(f"walk: unchanged · fx/s3 {s3.get('state')} · image "
+                  f"{'rewritten' if rewritten is not None else 'still unparsed'}")
+            expect(rc == 0 and s3.get("state") == "applied" and rewritten is not None,
+                   "a cut-short image over unchanged paths was not rewritten, or the step did not apply")
+            rc, out = walk(t2)
+            s3 = next((r for r in read_receipt_steps(t2) if r["id"] == "fx/s3"), {})
+            print(f"walk: changed · fx/s3 {s3.get('state')} · rc {rc}")
+            expect(rc == 1 and s3.get("state") == "failed" and "s3.before.json" in str(s3.get("failure"))
+                   and not (t2 / "s3.txt").exists(),
+                   "a cut-short image over a changed path did not stop the up naming it, or the path moved")
         elif plant in ("schema-3", "schema-3-kill"):
             # TOOL-dSafePassage-15 AC1, AC3: a schema-3 receipt walks to the schema step, whose
             # `applied` row lands after its up; a kill between its temporary file and its rename.
-            t = build_target("t")
+            t = build_case_target("t")
             if plant == "schema-3-kill":
                 fx = t.with_name("t.fx")
                 fx.mkdir()
@@ -2563,7 +2921,7 @@ def run_walk_fixture(plant: str | None) -> int:
                    "the schema step's first")
             expect(rc == 0, f"the walk exited {rc}")
             if plant == "schema-3-kill":
-                t2 = build_target("t2")
+                t2 = build_case_target("t2")
                 rc2, _out2 = walk(t2)
                 same = read_target_bytes(t) == read_target_bytes(t2)
                 print(f"walk: the re-run's target and receipt {'equal' if same else 'DIFFER from'} an uninterrupted walk's")
@@ -2571,7 +2929,7 @@ def run_walk_fixture(plant: str | None) -> int:
         elif plant == "schema-3-fail":
             # TOOL-dSafePassage-15 AC2: the schema step's up fails on a schema-3 receipt, which holds
             # no row, so the walk stops writing nothing and says why.
-            t = build_target("t")
+            t = build_case_target("t")
             t.with_name("t.fx").mkdir()
             (t.with_name("t.fx") / "schema.fail").touch()
             before = (t / ".governance" / "install.json").read_bytes()
@@ -2642,7 +3000,8 @@ def run_lock_fixture(plant: str) -> int:
 
         try:
             rc = 0
-            if plant in ("lock-dead", "lock-reused", "lock-live", "lock-foreign-host", "lock-unreadable",
+            if plant in ("lock-dead", "lock-reused", "lock-live", "lock-foreign-host", "lock-foreign-namespace",
+                         "lock-unreadable",
                          "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot"):
                 if plant == "lock-dead":
                     holder = dead_pid()
@@ -2670,6 +3029,13 @@ def run_lock_fixture(plant: str) -> int:
                 elif plant == "lock-foreign-host":
                     holder = dead_pid()
                     before = plant_lock(holder, time.time() - 30, "gk-elsewhere.invalid")
+                elif plant == "lock-foreign-namespace":
+                    # TOOL-dSafePassage-26 S33: this host, a dead pid, another platform's record.
+                    holder = dead_pid()
+                    rec = json.loads(plant_lock(holder, time.time() - 30))
+                    lock.write_text(json.dumps({**rec, "platform": "gk-elsewhere", "boot_id": ""}, indent=2) + "\n",
+                                    encoding="utf-8", newline="\n")
+                    before = lock.read_bytes()
                 else:
                     holder = None
                     lock.write_text("not a lock\n", encoding="utf-8", newline="\n")
@@ -2690,6 +3056,7 @@ def run_lock_fixture(plant: str) -> int:
                     expect({"lock-live": f"pid {holder} ", "lock-live-slow-census": f"pid {holder} ",
                             "lock-wall-step": f"pid {holder} ", "lock-wall-step-no-boot": f"pid {holder} ",
                             "lock-foreign-host": "gk-elsewhere.invalid",
+                            "lock-foreign-namespace": "unknown, it was taken under platform 'gk-elsewhere'",
                             "lock-unreadable": "no readable pid"}[plant] in out, "the refusal does not describe the holder")
                     if plant.startswith("lock-wall-step"):
                         verdict = "unknown" if plant.endswith("-no-boot") else "live"
@@ -2774,21 +3141,15 @@ def build_update_gov(tmp: pathlib.Path, names, slugs, fails: list[str],
     (demo / "kit.toml").write_text('id = "demo"\nhome = "demo"\n[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                                    '[adopt]\nargv = []\nmutates_index = false\n', encoding="utf-8", newline="\n")
     (demo / "one.txt").write_text("v1\n", encoding="utf-8", newline="\n")
-    run_fixture_git(tmp, "init", "-q", "-b", "main", "gov")
+    load_fixture_target().build_scratch_gov(gov)
     run_fixture_git(gov, "add", "-A")
     run_fixture_git(gov, "commit", "-qm", "A")
     sha_a = run_fixture_git(gov, "rev-parse", "HEAD")
     env = build_fixture_env(GOVKIT_NO_REMOTE_PROBE="1")
     targets = {}
     for name in names:
-        t = targets[name] = tmp / name
-        (t / ".governance").mkdir(parents=True)
-        run_fixture_git(tmp, "init", "-q", "-b", "main", name)
-        (t / "README.md").write_text("target\n", encoding="utf-8", newline="\n")
-        (t / ".governance" / "deploy.toml").write_text('gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n',
-                                                       encoding="utf-8", newline="\n")
-        run_fixture_git(t, "add", "-A")
-        run_fixture_git(t, "commit", "-qm", "base")
+        t = targets[name] = load_fixture_target().build_target(
+            tmp, 'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n', name)
         rc, out = run_fixture_govkit(gov, env, "apply", "--target", str(t))
         if rc != 0:
             fails.append(f"the scratch install of {name} failed ({rc}): {out[-600:]}")
@@ -2887,6 +3248,32 @@ def run_update_fixture(plant: str | None) -> int:
             expect(got == {"fx/s1": "applied", "fx/s2": "failed"}, "s1 is not applied and s2 failed")
             expect((t / "tools" / "demo" / "one.txt").read_bytes() == b"v2\n", "the file rows did not land")
             expect(not [c for c in canaries() if c.endswith(".down")], "a down ran")
+        elif plant == "needs-target-source":
+            # TOOL-dSafePassage-26 S32, AC31: `update` on gov's own tree, source mode, over a row
+            # declaring needs-target = true. Its witness runs there, gov's code being the target's:
+            # not holding, the walk stops attended at exit 1; holding, the row reads applied, exit 0.
+            (gkd / STEPS_FILE).write_text("".join(render_fixture_row(s, needs=s == "s2") for s in ("s1", "s2")),
+                                          encoding="utf-8", newline="\n")
+            (gov / ".governance").mkdir(exist_ok=True)
+            (gov / ".governance" / "deploy.toml").write_text('gov_source = "."\nprefix = "tools"\nkits = ["demo"]\n',
+                                                             encoding="utf-8", newline="\n")
+            run_fixture_git(gov, "add", "-A")
+            run_fixture_git(gov, "commit", "-qm", "a needs-target row")
+
+            def row_state(sid: str) -> str | None:
+                return next((r.get("state") for r in receipt_of(gov).get("steps") or [] if r.get("id") == sid), None)
+
+            rc1, out1 = govkit("update", "--target", str(gov), "--write")
+            print(out1, end="")
+            print(f"update: source mode, witness absent · exit {rc1} · fx/s2 {row_state('fx/s2')}")
+            expect(rc1 == 1 and f"step fx/s2 · failed · {ATTENDED_STOP}" in out1,
+                   "a needs-target row whose witness does not hold did not stop the source walk attended")
+            (gov / "s2.txt").write_text("s2\n", encoding="utf-8", newline="\n")
+            rc, out = govkit("update", "--target", str(gov), "--write")
+            print(out, end="")
+            print(f"update: source mode, witness holds · exit {rc} · fx/s2 {row_state('fx/s2')}")
+            expect(rc == 0 and row_state("fx/s2") == "applied",
+                   "a needs-target row whose witness holds did not read applied on gov's tree")
         elif plant == "schema-3-update":
             # TOOL-dSafePassage-15 AC4: `update` from a schema-3 receipt `apply` wrote, then again on
             # a second target with the schema step killed during its up, and that target re-run.

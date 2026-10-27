@@ -1345,7 +1345,7 @@
     {
       "id": "blob_at",
       "kind": "function",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "blob_oid",
@@ -2650,11 +2650,6 @@
     {
       "id": "build_repo",
       "kind": "function",
-      "file": "tools/govkit/fixtures/retired_edits.py"
-    },
-    {
-      "id": "build_repo",
-      "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
     {
@@ -2681,6 +2676,16 @@
       "id": "build_rerun",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_retired_gov",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
+    },
+    {
+      "id": "build_retired_target",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "build_role_pair",
@@ -2825,7 +2830,7 @@
     {
       "id": "build_scratch_gov",
       "kind": "function",
-      "file": "tools/govkit/fixtures/retired_edits.py"
+      "file": "tools/govkit/fixture_target.py"
     },
     {
       "id": "build_scratch_repo",
@@ -3036,11 +3041,6 @@
       "id": "build_target",
       "kind": "function",
       "file": "tools/govkit/fixture_target.py"
-    },
-    {
-      "id": "build_target",
-      "kind": "function",
-      "file": "tools/govkit/fixtures/retired_edits.py"
     },
     {
       "id": "build_target",
@@ -10608,6 +10608,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "load_fixture_target",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "load_fork_cutoff",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -13923,6 +13928,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "read_boot_id",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_bound_key",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -14388,6 +14398,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_down_population",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
+    },
+    {
       "id": "read_drift_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -14539,6 +14554,11 @@
     },
     {
       "id": "read_fixture_members",
+      "kind": "function",
+      "file": "tools/govkit/step_gate.py"
+    },
+    {
+      "id": "read_fixture_raises",
       "kind": "function",
       "file": "tools/govkit/step_gate.py"
     },
@@ -14873,6 +14893,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_image_changes",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "read_image_paths",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
@@ -15141,6 +15166,11 @@
       "id": "read_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "read_line_ending_config",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_line_mode",
@@ -15779,6 +15809,11 @@
     },
     {
       "id": "read_registry_at",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "read_registry_entries",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
     },
@@ -17648,6 +17683,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "render_conf_rest",
+      "kind": "function",
+      "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
       "id": "render_convention",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
@@ -18106,6 +18146,11 @@
       "id": "render_roles_index",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "render_row_order",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "render_rows",
@@ -19428,6 +19473,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "resolve_lander_kit",
+      "kind": "function",
+      "file": "tools/push-main.sh"
+    },
+    {
       "id": "resolve_landing_at",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -19435,7 +19485,7 @@
     {
       "id": "resolve_landing_base",
       "kind": "function",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "resolve_landing_node",
@@ -20081,6 +20131,11 @@
       "id": "resolve_remote",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_remote",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "resolve_remote",
@@ -21083,6 +21138,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "run_down",
+      "kind": "function",
+      "file": "tools/lib/resolve-python.test.sh"
+    },
+    {
       "id": "run_down_git",
       "kind": "function",
       "file": "tools/lib/resolve-python.test.sh"
@@ -21666,6 +21726,11 @@
       "id": "run_mirror_landed_parity",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_missing_target_plant",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "run_mode",
@@ -22341,6 +22406,11 @@
       "id": "run_wf",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_window_id_plant",
+      "kind": "function",
+      "file": "tools/govkit/shims.py"
     },
     {
       "id": "run_window_plant",
@@ -26555,7 +26625,7 @@
     {
       "id": "write_atomic",
       "kind": "function",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "write_atomic",

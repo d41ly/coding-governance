@@ -27,6 +27,7 @@ import tempfile
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 import govkit  # noqa: E402 — the deployer itself, for its tool root, its slug and its dispatch tables
+from fixture_target import build_scratch_gov, build_target  # noqa: E402 — the scratch repositories' factory
 
 PFX = govkit.derive_tool_root(govkit.repo_root())
 PLANTS = ("fragment-withdrawn", "fragment-rollback", "edited-gone", "edited-row", "keep",
@@ -106,13 +107,6 @@ def write_commit(root: pathlib.Path, msg: str) -> None:
         raise OSError(f"git commit in {root.as_posix()} failed: {p.stderr.strip()}")
 
 
-def build_repo(root: pathlib.Path) -> None:
-    root.mkdir(parents=True)
-    for args in (("init", "-q", "-b", "main"), ("config", "user.email", "fixture@retired.invalid"),
-                 ("config", "user.name", "retired-edits fixture"), ("config", "core.autocrlf", "false")):
-        run_git(root, *args)
-
-
 def write_gov_files(g: pathlib.Path, files: dict, drop: tuple = ()) -> None:
     for rel, body in files.items():
         (g / resolve_kit_path(DEMO, rel)).write_bytes(body.encode("utf-8"))
@@ -120,11 +114,10 @@ def write_gov_files(g: pathlib.Path, files: dict, drop: tuple = ()) -> None:
         (g / resolve_kit_path(DEMO, rel)).unlink()
 
 
-def build_scratch_gov(tmp: pathlib.Path) -> pathlib.Path:
+def build_retired_gov(tmp: pathlib.Path) -> pathlib.Path:
     """A gov holding a copy of this kit's deployer, gov's policy kit, a settings-merge entry and the
-    demo kit, committed once."""
-    g = tmp / "gov"
-    build_repo(g)
+    demo kit, committed once, in the scratch repository `fixture_target`'s factory makes."""
+    g = build_scratch_gov(tmp / "gov")
     gk = g / resolve_kit_path(govkit.GOVKIT_DIR.name)
     gk.mkdir(parents=True)
     for name in ("govkit.py", "adopters.toml", "upgrade_steps.py"):
@@ -150,16 +143,9 @@ def build_scratch_gov(tmp: pathlib.Path) -> pathlib.Path:
     return g
 
 
-def build_target(tmp: pathlib.Path) -> pathlib.Path:
-    t = tmp / "t"
-    build_repo(t)
-    (t / "README.md").write_text("target\n", encoding="utf-8", newline="\n")
-    (t / ".governance").mkdir()
-    (t / ".governance" / "deploy.toml").write_text(
-        f'gov_source = "local"\nprefix = "{PFX}"\nkits = ["demo", "settings-merge"]\n',
-        encoding="utf-8", newline="\n")
-    write_commit(t, "base")
-    return t
+def build_retired_target(tmp: pathlib.Path) -> pathlib.Path:
+    """The adopter target `tmp/t`, through `fixture_target`'s factory (TOOL-dSafePassage-26 S19)."""
+    return build_target(tmp, f'gov_source = "local"\nprefix = "{PFX}"\nkits = ["demo", "settings-merge"]\n', "t")
 
 
 def run_govkit(g: pathlib.Path, t: pathlib.Path, *args: str, stub: str = "",
@@ -212,7 +198,7 @@ def run_update(g, t, *flags, stub="", rerender_off=False) -> str:
 
 def run_plant(tmp: pathlib.Path, plant: str, stub: str, write_withdrawals: bool,
               rerender_off: bool) -> list[tuple[str, str, str]]:
-    g, t = build_scratch_gov(tmp), build_target(tmp)
+    g, t = build_retired_gov(tmp), build_retired_target(tmp)
     p = run_govkit(g, t, "apply")
     if p.returncode != 0:
         raise OSError(f"the scratch install refused (exit {p.returncode}): {(p.stdout + p.stderr)[-900:]}")

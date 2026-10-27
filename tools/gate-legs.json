@@ -1443,7 +1443,7 @@
       "{prefix}/govkit/upgrade_steps.py",
       "frozen"
     ],
-    "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through govkit's derive_push_base (TOOL-dSafePassage-1).", "history": "it reads every landed row and program at that base out of the object store and compares them with HEAD's (TOOL-dSafePassage-1)."},
+    "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through the step module's resolve_landing_base, the base kit epoch reads (TOOL-dSafePassage-1, -26).", "history": "it reads every landed row and program at that base out of the object store and compares them with HEAD's (TOOL-dSafePassage-1)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 120

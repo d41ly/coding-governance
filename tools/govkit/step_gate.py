@@ -15,8 +15,8 @@ spells the tool root as `{prefix}`, so one id names one member at every install 
 the plants and the witnesses are loaded from the TIP's tree and run over both sides, so one predicate
 grades the base and the tip and a class joining in the range is never red for its own arrival.
 
-THE BASE is govkit's `resolve_landing_base`, the one `epoch` grades from: `--base`, else a non-zero
-`GATE_PUSH_BASE`, else the merge-base with the default branch. The base side is read in a detached
+THE BASE is `resolve_landing_base`, the step module's, the one `epoch` grades from: `--base`, else a
+non-zero `GATE_PUSH_BASE`, else the merge-base with the default branch. The base side is read in a detached
 worktree at that commit, sparse past `memory/` (no class reads it), removed in a `finally`.
 
 THE VERDICT. Every member present at the base and absent at the tip is a vanish. It is witnessed when
@@ -29,8 +29,14 @@ member it names (the `upgrade-walk` leg's question). Any member no class reader 
 reads and never declares in `[config]`, a verb of a CLI no `VERB_SOURCES` row names, an agent or a
 Skill an adopter wrote for itself. A wider reader joins by changing its class row.
 
+THE READER CONTRACT (TOOL-dSafePassage-26 S38). A reader returns an empty set where its source is
+absent at the revision it reads, so a class whose source the base lacks reads as joining, counted on
+the summary line; a reader that raises is a refusal naming the class, the side (`base` or `tip`)
+and the error, never a traceback.
+
 Exit 0 green, 1 a vanished member no row names, 2 a refusal: a class empty at the tip, a malformed
-class row, a reader or plant that will not load, a base or a base worktree that will not resolve.
+class row, a reader or plant that will not load or that raises, a base or a base worktree that will
+not resolve.
 """
 
 from __future__ import annotations
@@ -70,7 +76,8 @@ VERB_SOURCES = (
 # The fixture's own cases beside each class row's plant: S4's and S5's registry shapes.
 FIXTURE_CLASS = "sg-fixture"
 FIXTURE_MARK = "sg-fixture.txt"
-REGISTRY_PLANTS = ("empty-class", "no-plant", "own-record", "own-record-unnamed")
+REGISTRY_PLANTS = ("empty-class", "no-plant", "own-record", "own-record-unnamed", "reader-raises",
+                   "base-without-source")
 _MODULES: dict[pathlib.Path, object] = {}
 
 
@@ -145,10 +152,17 @@ def read_surface_classes(root) -> list[dict]:
     return out
 
 
-def read_surface_population(root, classes: list[dict]) -> set[str]:
-    """Every member over one tree, `<class>:<name>`: each class row's reader run over `root`."""
-    root = pathlib.Path(root)
-    return {f"{c['id']}:{name}" for c in classes for name in c["reader"](root)}
+def read_surface_population(root, classes: list[dict], side: str = "tip") -> set[str]:
+    """Every member over one tree, `<class>:<name>`: each class row's reader run over `root`, the
+    `side` it is. A reader that raises is a Refusal naming the class, the side and the error."""
+    root, out = pathlib.Path(root), set()
+    for c in classes:
+        try:
+            names = c["reader"](root)
+        except Exception as e:  # ponytail: any reader failure is the class's, named, never a traceback
+            raise Refusal(f"class {c['id']}'s reader raised on the {side} side: {type(e).__name__}: {e}") from None
+        out |= {f"{c['id']}:{name}" for name in names}
+    return out
 
 
 def write_sparse_checkout(tree, sha: str) -> None:
@@ -182,7 +196,7 @@ def read_base_population(root, sha: str, classes: list[dict]) -> set[str]:
         if p.returncode != 0:
             raise Refusal(f"the base worktree at {sha[:8]} will not add: {p.stderr.strip()}")
         write_sparse_checkout(tree, sha)
-        return read_surface_population(tree, classes)
+        return read_surface_population(tree, classes, "base")
     finally:
         run_git_text(root, "worktree", "remove", "--force", str(tree))
         if tmp.exists():
@@ -226,11 +240,15 @@ def check_step_gate(root, base: str | None) -> int:
         for c in empty:
             print(f"step-gate: REFUSED · class {c} is empty at the tip, and a green over an empty class grades nothing")
         return 2
-    vanished = derive_vanished_members(read_base_population(root, sha, classes), tip)
+    base_pop = read_base_population(root, sha, classes)
+    vanished = derive_vanished_members(base_pop, tip)
     witnessed = read_witnessed_members(root, classes)
     red = [m for m in vanished if m not in witnessed]
+    at_base = {m.split(":", 1)[0] for m in base_pop}
+    joining = sorted(c for c in counts if c not in at_base)
     print(f"step-gate: {len(classes)} classes · {len(tip)} members at the tip · {len(vanished)} vanished · "
-          f"{len(vanished) - len(red)} witnessed")
+          f"{len(vanished) - len(red)} witnessed · {len(joining)} joining"
+          + (f" ({', '.join(joining)})" if joining else ""))
     for m in red:
         print(f"step-gate: RED {m} vanished with no [[upgrade]] or [[retired]] row naming it in surfaces")
     return 1 if red else 0
@@ -346,6 +364,11 @@ def read_entry_members(root) -> set[str]:
 def read_fixture_members(root) -> set[str]:
     """The fixture class's members: `kept`, and `gone` only where the plant's mark is absent."""
     return {"kept"} | (set() if (pathlib.Path(root) / FIXTURE_MARK).is_file() else {"gone"})
+
+
+def read_fixture_raises(root) -> set[str]:
+    """The `reader-raises` plant's reader: it raises, as a reader over a source it cannot parse would."""
+    raise RuntimeError(f"the reader-raises plant's reader over {pathlib.Path(root).name}")
 
 
 def read_fixture_successors(root) -> set[str]:
@@ -549,17 +572,20 @@ def write_class_row_plant(clone, case: str) -> str:
     names the member that vanishes, or names another."""
     clone = pathlib.Path(clone)
     me = f"{{prefix}}/{HERE.name}/{pathlib.Path(__file__).name}"
-    reader = "read_fixture_successors" if case == "empty-class" else "read_fixture_members"
+    reader = {"empty-class": "read_fixture_successors", "base-without-source": "read_fixture_successors",
+              "reader-raises": "read_fixture_raises"}.get(case, "read_fixture_members")
     row = [f'\n[[class]]\nid = "{FIXTURE_CLASS}"\nreader = "{me}:{reader}"\n',
            "" if case == "no-plant" else f'plant = "{me}:write_content_plant"\n',
            f'witness = "{me}:read_fixture_successors"\n' if case.startswith("own-record") else "",
            f'summary = "the step gate fixture\'s {case} class"\n']
     rel = gk.resolve_tool_path(clone, HERE.name, CLASSES_FILE).relative_to(clone).as_posix()
     write_plant_edit(clone, rel, lambda t: t + "".join(row))
-    if case.startswith("own-record"):
-        (clone / FIXTURE_MARK).write_text("gone\n" if case == "own-record" else "other\n", encoding="utf-8", newline="\n")
+    if case.startswith("own-record") or case == "base-without-source":
+        # base-without-source: the mark is the class's source, absent at the base, so it joins.
+        (clone / FIXTURE_MARK).write_text({"own-record": "gone\n", "base-without-source": "joined\n"}.get(
+            case, "other\n"), encoding="utf-8", newline="\n")
         run_git_text(clone, "add", "--", FIXTURE_MARK)
-        return f"{FIXTURE_CLASS}:gone"
+        return f"{FIXTURE_CLASS}:gone" if case.startswith("own-record") else ""
     return ""
 
 

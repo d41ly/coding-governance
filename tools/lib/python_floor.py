@@ -2,7 +2,7 @@
 the copies' check, and the floor step's down (TOOL-dSafePassage-11).
 
     python <prefix>/lib/python_floor.py check [--rev <sha>]    # every floor statement and copy finding
-    python <prefix>/lib/python_floor.py down <prior> <target>  # the step's down: grade, then restore
+    python <prefix>/lib/python_floor.py down <prior> <target> <to>  # the step's down: grade, then restore
 
 THE DECLARATION is `python-floor.txt` beside this file, one `<major>.<minor>` line. Every other
 spelling of the floor is one of two kinds. A GENERATED COPY is the resolver block's `_rp_floor`
@@ -13,8 +13,11 @@ hold the copies to each other. A POINTER is prose naming `python-floor.txt` and 
 THE QUERY. `scan_floor_statements` runs FLOOR_STATEMENT_RX over the tracked files outside `memory/`,
 so it finds a statement whatever version it names; on gov's tree after the raise it finds none.
 
-THE DOWN. `check_down_floor` grades every tracked `.py` and `.toml` of a target under the floor it
-restores: by a real interpreter at that floor where `resolve_floor_interpreter` finds one, mode
+THE DOWN. `check_down_floor` grades the files the rollback restores, read at its `--to` commit
+`<to>`, under the floor it restores (TOOL-dSafePassage-26 S10, S11): in an adopter, each receipt row
+gov shipped ending `.py` or `.toml`, its source read from gov at `<to>`, and every `.governance/*.toml`
+of the target, never the adopter's other files; on gov's own tree, gov's tracked set at `<to>`. By a
+real interpreter at that floor where `resolve_floor_interpreter` finds one, mode
 `interpreter <path>`; elsewhere, mode `static`, by `ast.parse` at that floor's feature version, the
 four PEP 701 shapes over the tokens, the running `tomllib`, and the four TOML 1.1 deltas. WHAT THE
 STATIC MODE DOES NOT SEE: every other grammar change after the restored floor that `feature_version`
@@ -37,13 +40,15 @@ HERE = pathlib.Path(__file__).absolute().parent
 DECLARATION = "python-floor.txt"
 FLOOR_LITERAL = re.compile(r'^(\s*_rp_floor=")([^"]*)("\s*)$', re.M)
 FLOOR_VALUE = re.compile(r"(\d+)\.(\d+)")
-# PINNED on 2026-10-23 at a255d0de, where it finds the six statements of the raise and no other line.
+# PINNED on 2026-10-23 at a255d0de, where it finds the six statements of the raise and no other line;
+# the last alternative, TOOL-dSafePassage-26 S49, adds the lexicon selftest's seventh at 3708a705.
 FLOOR_STATEMENT_RX = re.compile(r"""(?ix)
   \b(?:c?python|py)\s*(?:>=|≥|=>)\s*\d+\.\d+
 | \bc?python\s*\d+\.\d+\s*(?:\+|or\s+(?:newer|later|above))
 | \bat\s+least\s+c?python\s*\d+\.\d+
 | \bpython-version\s*:\s*["']?\d+\.\d+
 | \brequires-python\b
+| \bno\s+declared\s+python\s+floor\b
 """)
 PARITY_GREP = ["grep", "-l", "^# >>> resolve_python", "--", "*.sh", "*.py", ".githooks/*",
                "WIRE-INTO-PROJECT.md"]
@@ -282,30 +287,66 @@ def _scan_toml11(text):
     return sorted(found)
 
 
-def check_down_floor(target, prior):
-    """(mode, findings) for the down to the floor `prior`, "<major>.<minor>": every tracked `.py`
-    and `.toml` of `target` graded by a real interpreter at that floor where one resolves, mode
+def read_down_population(target, to_commit):
+    """{label: bytes} the down grades (S11): on gov's own tree, every tracked `.py` and `.toml` of
+    gov at `to_commit`; in an adopter, each receipt row gov shipped (any role but `adopter-owned`)
+    whose `path` ends `.py` or `.toml`, its `source` read from gov at `to_commit` and labelled by its
+    `path`, a source absent there skipped since the rollback removes it, plus every
+    `.governance/*.toml` of the target as it stands. Gov is the repository holding this file."""
+    target = pathlib.Path(target).resolve()
+    gov = next((d for d in (HERE, *HERE.parents) if (d / ".git").exists()), HERE).resolve()
+    if not run_git(gov, "rev-parse", "--verify", "--quiet", f"{to_commit}^{{commit}}").strip():
+        raise ValueError(f"<to> {to_commit!r} names no commit in {gov.as_posix()}")
+
+    def blob(rel):
+        out = subprocess.run(["git", "-C", str(gov), "show", f"{to_commit}:{rel}"], capture_output=True)
+        return out.stdout if out.returncode == 0 else None
+
+    if target == gov:
+        rels = run_git(gov, "ls-tree", "-r", "--name-only", "-z", to_commit).split("\0")
+        return {r: blob(r) for r in rels if r.endswith((".py", ".toml"))}
+    try:
+        rows = json.loads((target / ".governance" / "install.json").read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    out = {}
+    for row in rows:
+        if (isinstance(row, dict) and str(row.get("path", "")).endswith((".py", ".toml"))
+                and row.get("role") != "adopter-owned" and isinstance(row.get("source"), str)):
+            data = blob(row["source"])
+            if data is not None:
+                out[row["path"]] = data
+    for f in sorted((target / ".governance").glob("*.toml")):
+        out[f".governance/{f.name}"] = f.read_bytes()
+    return out
+
+
+def check_down_floor(target, prior, to_commit):
+    """(mode, findings) for the down to the floor `prior`, "<major>.<minor>": `read_down_population`
+    at `to_commit` graded by a real interpreter at that floor where one resolves, mode
     `interpreter <path>`, else statically, mode `static`. Each finding is `path:line: what`."""
     m = FLOOR_VALUE.fullmatch(prior)
     if not m:
         raise ValueError(f"the prior floor must be <major>.<minor>, not {prior!r}")
-    target = pathlib.Path(target)
-    files = [p for p in run_git(target, "ls-files", "-z").split("\0") if p.endswith((".py", ".toml"))]
+    population = read_down_population(target, to_commit)
     interp = resolve_floor_interpreter(prior)
     if interp:
-        p = subprocess.run([interp, "-I", "-c", CHILD], input=json.dumps(files), capture_output=True,
-                           text=True, encoding="utf-8", errors="replace", cwd=target)
+        import tempfile
+        with tempfile.TemporaryDirectory(prefix="gk-floor-") as td:
+            for rel, data in population.items():
+                (pathlib.Path(td) / rel).parent.mkdir(parents=True, exist_ok=True)
+                (pathlib.Path(td) / rel).write_bytes(data or b"")
+            p = subprocess.run([interp, "-I", "-c", CHILD], input=json.dumps(sorted(population)),
+                               capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=td)
         found = [ln for ln in p.stdout.splitlines() if ln.strip()]
         if p.returncode != 0:
             found.append(f"(interpreter {interp} exited {p.returncode}: {p.stderr.strip()[-300:]})")
         return f"interpreter {interp}", found
     feature = (int(m[1]), int(m[2]))
     found = []
-    for rel in files:
-        try:
-            data = (target / rel).read_bytes()
-        except OSError as exc:
-            found.append(f"{rel}:0: unreadable: {exc}")
+    for rel, data in sorted(population.items()):
+        if data is None:
+            found.append(f"{rel}:0: unreadable at the rollback's --to commit")
             continue
         if rel.endswith(".py"):
             try:
@@ -359,10 +400,10 @@ def main(argv):
         for path, line, text in found:
             print(f"{path}:{line}: {text}")
         return 1 if found else 0
-    if argv[:1] == ["down"] and len(argv) == 3:
+    if argv[:1] == ["down"] and len(argv) == 4:
         prior, target = argv[1], pathlib.Path(argv[2])
         try:
-            mode, found = check_down_floor(target, prior)
+            mode, found = check_down_floor(target, prior, argv[3])
         except ValueError as exc:
             print(f"python-floor down: {exc}", file=sys.stderr)
             return 2

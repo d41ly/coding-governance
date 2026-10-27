@@ -4,20 +4,22 @@
     python <prefix>/govkit/steps/fanout_cap.py up|down|witness <target>
 
 Its row is the agent-cap descriptor's `[[upgrade]]`. The UP moves `.agent-cap.conf`'s `FANOUT_CAP`
-into the policy key `runtime.agents-in-flight` and retires the file, so the limit reads the same on
-either side of it; the DOWN restores both files byte-identical; the WITNESS exits 0 when the file is
-absent, which is the step applied.
+into the policy key `runtime.agents-in-flight` and takes the line out, so the limit reads the same
+on either side of it; the DOWN restores both files byte-identical; the WITNESS exits 0 when no
+`FANOUT_CAP` assignment is left in the file, or there is no file, which is the step applied.
 
 THE UP, in order. No `.agent-cap.conf`: exit 0, nothing written. Otherwise the file's working-tree
-bytes, the bytes the before-image keeps, are read in the policy reader's legacy grammar
-(`FANOUT_CAP=<n>` or `FANOUT_CAP="<n>"`, a BOM and a trailing CR tolerated, the last such line
-winning), and the up exits 1 WRITING NOTHING on a value that is not an integer of at least 1, on any
-other assignment, or where the conf or the policy file differs from its blob at HEAD — the policy
-reader reads committed revisions only, so an uncommitted edit is one it would not see. Where gov's
+bytes, the whole of which the before-image keeps, are read in the policy reader's legacy grammar,
+`read_legacy_fanout`'s (TOOL-dSafePassage-26 S30): `FANOUT_CAP=<n>` or `FANOUT_CAP="<n>"`, a BOM and a
+trailing CR tolerated, the last such line winning, and every other line — another key, a blank, a
+comment — legal and ignored. The up exits 1 WRITING NOTHING on a value that is not an integer of at
+least 1, or where the conf or the policy file differs from its blob at HEAD — the policy reader
+reads committed revisions only, so an uncommitted edit is one it would not see. It takes out only
+the `FANOUT_CAP` lines, and removes the file only where blanks and comments alone remain. Where gov's
 `policy.py get runtime.agents-in-flight --rev HEAD --explain`, run in the target, gives the reason
 `lowered to <n> by FANOUT_CAP`, the key is set to `<n>` through `render_policy_text`; otherwise the
-file lowers nothing and the policy file is left byte-identical, restating no default. The file is
-removed LAST, so the witness changes last. The pre-write reads run only while no before-image
+file lowers nothing and the policy file is left byte-identical, restating no default. The conf is
+rewritten or removed LAST, so the witness changes last. The pre-write reads run only while no before-image
 exists: a re-run over a killed up recomputes from the first image and converges.
 
 Exit 0 done, 1 refused naming the file (nothing written), 2 a usage error.
@@ -33,7 +35,6 @@ STEP_ID = "agent-cap/fanout-cap-to-agents-in-flight"
 CONF = ".agent-cap.conf"
 POLICY = ".governance/policy.toml"
 FANOUT_LINE = re.compile(r"^\s*FANOUT_CAP\s*=(.*)$")
-ASSIGN_LINE = re.compile(r"^\s*(?:export\s+)?[A-Za-z_][A-Za-z0-9_]*\s*=")
 LOWERED_RE = re.compile(r"lowered to (\d+) by FANOUT_CAP")
 GOV = pathlib.Path(__file__).resolve().parents[2]  # `{gov}`: the tool root this step ships in
 
@@ -101,7 +102,7 @@ def resolve_kit_dir(home, anchor, here):
 
 def parse_conf(data: bytes):
     """The `FANOUT_CAP` value `.agent-cap.conf`'s bytes carry, None where no line sets it; a value
-    that is not an integer of at least 1, or any other assignment, is a refusal at its line."""
+    that is not an integer of at least 1 is a refusal at its line. Any other line is legal."""
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError as e:
@@ -112,9 +113,6 @@ def parse_conf(data: bytes):
         m = FANOUT_LINE.match(ln)
         if m:
             found = (m[1].strip(), n)
-        elif ASSIGN_LINE.match(ln):
-            raise Refusal(f"{CONF}:{n}: an assignment other than FANOUT_CAP, which no key receives, so "
-                          f"retiring the file would drop it")
     if found is None:
         return None
     raw, n = found
@@ -122,6 +120,15 @@ def parse_conf(data: bytes):
     if not re.fullmatch(r"[0-9]+", value) or int(value) < 1:
         raise Refusal(f"{CONF}:{n}: FANOUT_CAP must be an integer of at least 1")
     return int(value)
+
+
+def render_conf_rest(data: bytes) -> bytes | None:
+    """`.agent-cap.conf`'s bytes with every `FANOUT_CAP` line taken out, each other line byte for
+    byte; None where only blanks and comments remain, the file then removed."""
+    lines = data.decode("utf-8").splitlines(keepends=True)
+    rest = [ln for ln in lines if not FANOUT_LINE.match(ln.removeprefix("\ufeff").rstrip("\r\n"))]
+    left = [ln.removeprefix("\ufeff").strip() for ln in rest]
+    return None if all(not ln or ln.startswith("#") for ln in left) else "".join(rest).encode("utf-8")
 
 
 def check_committed(target: pathlib.Path, rel: str) -> bool:
@@ -152,16 +159,17 @@ def cmd_up(target: pathlib.Path) -> int:
     def derive_after(before):
         if before is not None:
             n = parse_conf(before[CONF])
-            after = {CONF: None}
+            after = {CONF: render_conf_rest(before[CONF])}
             if POLICY in before:
                 after[POLICY] = render_policy_bytes(before[POLICY], n)
             return after
-        n = parse_conf(conf.read_bytes())
+        data = conf.read_bytes()
+        n = parse_conf(data)
         for rel in (CONF, POLICY):
             if not check_committed(target, rel):
                 raise Refusal(f"{rel}: differs from its blob at HEAD, and the policy reader reads "
                               f"committed revisions only; commit it, then re-run the step")
-        after = {CONF: None}
+        after = {CONF: render_conf_rest(data)}
         if n is None:
             return after
         got = subprocess.run([sys.executable, str(policy_py), "get", "runtime.agents-in-flight",
@@ -180,8 +188,11 @@ def cmd_up(target: pathlib.Path) -> int:
     if after.get(POLICY) is not None:
         (target / POLICY).parent.mkdir(parents=True, exist_ok=True)
         (target / POLICY).write_bytes(after[POLICY])
-    conf.unlink()  # LAST: the witness reads this file's absence
-    print(f"fanout-cap: up · {CONF} retired"
+    if after[CONF] is None:  # LAST: the witness reads the line's absence
+        conf.unlink()
+    else:
+        conf.write_bytes(after[CONF])
+    print(f"fanout-cap: up · {CONF} " + ("retired" if after[CONF] is None else "kept, its FANOUT_CAP taken out")
           + (" · runtime.agents-in-flight set in " + POLICY if POLICY in after else
              f" · it lowered nothing, so {POLICY} is unchanged"))
     return 0
@@ -194,8 +205,11 @@ def cmd_down(target: pathlib.Path) -> int:
 
 
 def cmd_witness(target: pathlib.Path) -> int:
-    held = (target / CONF).exists()
-    print(f"fanout-cap: witness · {CONF} " + ("present: not applied" if held else "absent: applied"))
+    conf = target / CONF
+    text = conf.read_bytes().decode("utf-8", "replace") if conf.is_file() else ""
+    held = any(FANOUT_LINE.match(ln.removeprefix("\ufeff").rstrip("\r")) for ln in text.split("\n"))
+    print(f"fanout-cap: witness · {CONF} " + ("assigns FANOUT_CAP: not applied" if held else
+                                             "assigns no FANOUT_CAP, or is absent: applied"))
     return 1 if held else 0
 
 
