@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 1 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0179@f74e2fff whole
 **Carries:** node:tag-namespace.role
@@ -16,8 +16,11 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-14-deviation-141.md](../build/2026-10-26-build-TOOL-dBoundRoles-14-deviation-141.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-14-deviation-142.md](../build/2026-10-26-build-TOOL-dBoundRoles-14-deviation-142.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-14-deviation-143.md](../build/2026-10-26-build-TOOL-dBoundRoles-14-deviation-143.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -36,14 +39,16 @@ keeps its own `:` separator beside the tag grammar's `.` (research-tags-b F1).
   S2's row shape (`ns`, `owner`, `layer`, `source`, `extractor`, `role`, `purpose-source`,
   `join-armed-by`), per §4 "### The two rows". Observed by AC4.
 - **S2** — `extract_role` in `tools/playbook/tag_index.py`: one member `role.<slot>` per role file
-  `tools/roles/agents/<slot>.agent.md`, `<slot>` the front matter's `name`, parsed by
-  `roles_lib.parse_front_matter` imported through `resolve_kit_dir("roles", "roles_lib.py", here)`,
-  so no second front-matter grammar exists. The row's text carries the role's raw `rules` value for
-  S5. Observed by AC1.
+  `tools/roles/agents/<slot>.agent.md`, `<slot>` the front matter's `name`, parsed by the roles kit's
+  `parse_front_matter` behind the verb `check_roles.py --print-tag-rows role`, run as a subprocess
+  and found through the inline `resolve_kit_dir("roles", "check_roles.py", here)` (§4 "The
+  extractors", §8 F5), so no second front-matter grammar exists and no roles module is imported. The
+  row's text carries the role's raw `rules` value for S5. Observed by AC1.
 - **S3** — `extract_field` in `tools/playbook/tag_index.py`: one member `field.<family>.<name>` per
   read key of `READ_FAMILIES` in `tools/roles/roles_lib.py`, its text the native key
   (`task:title`), and one member `field.stage.<seg>` per stage key of every `tools/roles/workflows.toml`
-  entry, `<seg>` the key folded by `roles_lib.derive_stage_field_tag`. Observed by AC3.
+  entry, `<seg>` the key folded by `derive_stage_field_tag` behind the same verb's `stage` mode.
+  Observed by AC3.
 - **S4** — The one read-key vocabulary, kept in `tools/roles/roles_lib.py`: `READ_KEYS` is derived
   from a new literal `READ_FAMILIES` (a dict from family to its field names, the same 23 keys
   `READ_KEYS` holds at base), `derive_field_tag(key)` maps a native key to its tag, and
@@ -148,10 +153,18 @@ extract_field(path, text)  -> roles_lib.py:    ("field.<family>.<name>", "member
                               workflows.toml:  ("field.stage.<seg>", "member", line), text = the stage key
 ```
 
-`extract_field` reads `READ_FAMILIES` from the blob with `ast.parse` and `ast.literal_eval` of that
-one assignment, so the index reads the committed vocabulary, never the importing process's module.
-The `workflows.toml` half parses the blob with `tomllib`. The extractors never validate: a malformed
-`name` reaches PLAY-dOrderedCharter-10 S3's `check_tag_shape`, which reds it with its reason.
+`extract_field` reads `READ_FAMILIES` from the blob with `ast.parse` and `ast.literal_eval` of that one
+assignment, so the index reads the committed vocabulary, never the importing process's module. The role
+grammar is reached by subprocess, since a kit imports no sibling kit (PLAY-dOrderedCharter-7 §4 "The
+policy reads"; TOOL-dDeclaredLoop-18 §4, "the policy kit is reached only by that subprocess"):
+`extract_role` and the `workflows.toml` half of `extract_field` run the roles kit's
+`check_roles.py --print-tag-rows role|stage` under `sys.executable`, the blob's text on stdin. The
+verb, minted here, prints one JSON object per member, `{"tag", "line", "text"}`, from
+`parse_front_matter` over a role file or from `derive_stage_field_tag` over each `stages` key of a
+`tomllib` parse, deduped; it reads only the text it is handed, so the rows stay keyed by committed
+blob. A blob it cannot parse exits 2 naming the defect, which the extractor prints and yields nothing
+for. The extractors never validate: a malformed `name` reaches PLAY-dOrderedCharter-10 S3's
+`check_tag_shape`, which reds it with its reason.
 
 ### The read-key vocabulary
 
@@ -199,9 +212,9 @@ and this join grades the same value against the units.
 ### Inventory
 
 Minted: the two rows of S1; `extract_role` and `extract_field`; `READ_FAMILIES`, `derive_field_tag`,
-`parse_read_key` and `derive_stage_field_tag` in `roles_lib.py`; `check_role_bindings`; the plants of
-S8. Naming cells: each function is asked of `python tools/lexicon/lexicon.py --suggest <name> --as
-py.function` at the pass.
+`parse_read_key` and `derive_stage_field_tag` in `roles_lib.py`; the `--print-tag-rows role|stage`
+mode of `check_roles.py`; `check_role_bindings`; the plants of S8. Naming cells: each function is
+asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
 
 ### Migration
 
@@ -221,7 +234,7 @@ namespace's extractor, and on the `roles catalogue` leg for R3.
 - `tools/playbook/gov_tag.py`
 - `tools/playbook/README.md`
 - `tools/roles/roles_lib.py`
-- `tools/roles/check_roles.py`
+- `tools/roles/check_roles.py` (R3 and the `--print-tag-rows` mode)
 - `tools/roles/handoff.py`
 - `tools/roles/agents/` (the ten `reads:` lines)
 - `tools/roles/README.md` (the catalogue region, rendered by `check_roles.py --write`)
@@ -231,7 +244,9 @@ namespace's extractor, and on the `roles catalogue` leg for R3.
 - **Renaming the stage keys to kebab case.** Every harness template and its suite spells them as
   JSON keys, and the fold gives the same tag with none of that churn (§8 F2).
 - **`READ_KEYS` read by importing `roles_lib` inside the extractor.** The import reads the working
-  tree, and the index's rows are keyed by committed blob (PLAY-dOrderedCharter-19 S4).
+  tree, and the index's rows are keyed by committed blob (PLAY-dOrderedCharter-19 S4); a kit imports
+  no sibling kit either (PLAY-dOrderedCharter-7 §4), the rule that puts the role grammar behind S2's
+  subprocess verb.
 - **A second front-matter parser in `tag_index.py`.** `parse_front_matter` refuses an indented,
   repeated or unknown key, and a copy would drift from it.
 
@@ -239,7 +254,8 @@ namespace's extractor, and on the `roles catalogue` leg for R3.
 
 - security — no write path; the extractors parse committed blobs read-only, and `ast.literal_eval`
   evaluates one literal and never runs code.
-- perf / scale — two extractors over eleven blobs; the index re-parses only changed blobs.
+- perf / scale — two extractors over eleven blobs, one subprocess per role or `workflows.toml` blob;
+  the index re-parses only changed blobs.
 - error / empty / loading states — an empty population prints `unarmed`, never green; a roles kit the
   index cannot resolve leaves both namespaces `unarmed` with one line saying why.
 - observability — `gov_tag.py check` prints each namespace's member count and the binding join's
@@ -257,9 +273,10 @@ namespace's extractor, and on the `roles catalogue` leg for R3.
 - **AC1** — When `python gov_tag.py --fixture --plant role-rows` runs, its fixture holding role files
   named `gov-builder` and `gov-skeptic` and a guide citing `role.gov-builder` and `role.gov-buildr`, the
   index holds both `role` members and the check exits 1 naming `role.gov-buildr` alone as cited but
-  undeclared.
+  undeclared; and `grep -nE "import roles_lib|roles_lib\.(parse|derive)" tag_index.py` run in
+  `tools/playbook/` prints nothing.
   Red when: `extract_role` yields nothing, so both citations read undeclared, or the `role` row is
-  absent, so both read `namespace not registered`.
+  absent, so both read `namespace not registered`, or the extractor imports the roles library.
 - **AC2** — When `python gov_tag.py --fixture --plant role-binding` runs, a unit scoped
   `role.gov-builder` and `practice.yagni` beside a `gov-builder` whose `rules` lacks `yagni` exits 1
   naming the unit; a second unit scoped `practice.verify` and `role.gov-skeptic` beside a
@@ -328,6 +345,17 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `
   RESOLVED (agent, 2026-10-25, delegated): the build run re-grounds on each section at its base and
   stops this unit if one is still absent then, rung 1, the brief's rule for every unbuilt parent.
   widens: none · relaxes: none
+- **F5 — How do the playbook kit's extractors reach the roles kit's front-matter parser and stage
+  fold?** A kit imports no sibling kit (PLAY-dOrderedCharter-7 §4; TOOL-dDeclaredLoop-18 §4, the
+  pattern this unit copies). Options: (a) a roles-kit verb, `check_roles.py --print-tag-rows role|stage`,
+  minted here and run as a subprocess with the blob's text on stdin; (b) a declared `requires_if` row
+  on the playbook kit's descriptor naming `roles`, keeping the import, the shape of
+  `tools/memory-tree/kit.toml:8`; (c) a parser and a fold copied into `tag_index.py`. (b) makes the
+  playbook kit the one in-process consumer of a kit its siblings reach by subprocess, and (c) is the
+  second grammar §4 rejects. Rev-3 imported `roles_lib` through `resolve_kit_dir`, which the rule
+  rules out. RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, PLAY-dOrderedCharter-7 §4 and
+  TOOL-dDeclaredLoop-18 §4.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -336,6 +364,11 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC6 · a fixture role whose `
   at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-59 and TOOL-dBoundRoles-60, the HIGH promotion and the minors batch of the round-1 audit of units 52 to 58; nothing else moved.
+- rev-4 · 2026-10-26 · S2 · S3 · §4 The extractors · §4 Inventory · §4 Files touched · §4
+  Alternatives rejected · §5 · AC1 · §8 F5 · re-grounded on the cross-check record
+  `2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck`, row 27: the extractors reach the role
+  grammar through the roles kit's new `check_roles.py --print-tag-rows` by subprocess and import no
+  roles module; the rejected `READ_KEYS` import now also cites the sibling-kit rule.
 
 ## 10. Reuse audit
 

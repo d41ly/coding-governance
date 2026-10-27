@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-21 — the effort and model keys, `default` reserved, and the gate grant a role field, every reader re-pointed
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 4 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0186@e356242a whole
 **Carries:** node:policy-key.roles.effort.<role>
@@ -17,8 +17,12 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-21-deviation-211.md](../build/2026-10-26-build-TOOL-dBoundRoles-21-deviation-211.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-21-deviation-212.md](../build/2026-10-26-build-TOOL-dBoundRoles-21-deviation-212.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-21-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-21-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -34,12 +38,14 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
 
 ## 2. Scope (IN)
 
-- **S1** — One policy read for the roles kit, `read_policy_setting(key, root)` in
-  `tools/roles/roles_lib.py`: it calls TOOL-dGroundRules-2 S6's `resolve(key, root, rev)` from
-  `tools/policy/policy.py`, imported through `resolve_kit_dir("policy", "policy.py", here)`, at one
-  landed revision resolved once per run, and returns the value when the resolution's source is `file`
-  and `None` when it is `default` (TOOL-dGroundRules-3 S2). A `Refusal` is a `RolesError` naming the key
-  and the reader's line; no policy kit found yields `None` for every key and one note. Every call
+- **S1** — One policy read for the roles kit, `read_policy_setting(key, root, with_default=False)` in
+  `tools/roles/roles_lib.py`: it runs TOOL-dGroundRules-2 S7's `policy.py get <key> --json` as a
+  subprocess in `root`, the policy kit found through `resolve_kit_dir("policy", "policy.py", here)`,
+  since a kit imports no sibling kit (§8 F2); `get` reads the landed revision (TOOL-dGroundRules-2 S1).
+  It returns the printed `value` when its `source` is `file` and `None` when it is `default`
+  (TOOL-dGroundRules-3 S2), or the value whatever its source under `with_default`, the form a read with
+  a catalogue default takes (TOOL-dBoundRoles-22 S5). An exit 2 is a `RolesError` naming the key and the
+  reader's stderr line; no policy kit found yields `None` for every key and one note. Every call
   spells its key first, as a literal or an f-string of the key pattern, the shape TOOL-dGroundRules-8's
   reader-coverage arm counts. Observed by AC2 and AC7.
 - **S2** — The effort order, `resolve_stage_efforts(policy, workflow, root)` and `resolve_effort(policy,
@@ -88,12 +94,12 @@ fallback dConvergedCharter retires. `resolve_stage_efforts`, R12, `handoff.py`'s
 - `roles.harness.<role>` and a second harness adapter: dWellOiledMachine's. The model key is keyed per
   harness so a second adapter needs no new key.
 - The stage rows' own `effort` column: TOOL-dBoundRoles-22's, which places it in this unit's order.
-- Presets: dKeptSession adds a preset step to the reader; this unit reads whatever `resolve` returns.
+- Presets: dKeptSession adds a preset step to the reader; this unit reads whatever `get` returns.
 
 ### Edges
 
 - **consumes-from** `TOOL-dBoundRoles-2` — `role-schema.toml`, the declaration the `effort` and `gates` rows join
-- **consumes-from** external — TOOL-dGroundRules-2 S1, S6 and TOOL-dGroundRules-3 S2's `resolve` and its sources, and TOOL-dGroundRules-1 S3, S6's catalogue rows and shrink-only list
+- **consumes-from** external — TOOL-dGroundRules-2 S1 and S7's `policy.py get` and TOOL-dGroundRules-3 S2's sources, and TOOL-dGroundRules-1 S3, S6's catalogue rows and shrink-only list
 - **hands-off** `TOOL-dBoundRoles-22` — `resolve_stage_efforts`, re-pointed, which reads each stage row's declared effort in its place in the order
 - **hands-off** `TOOL-dBoundRoles-16` — `resolve_stage_efforts`, the resolver the shapes' efforts read, keys first and the house file by workflow and stage
 - **hands-off** `TOOL-dBoundRoles-23` — `roles.effort.default`, the blanket whose floor and provenance it checks
@@ -197,9 +203,8 @@ session, as the house file's header says of its own values today.
 
 ### Alternatives rejected
 
-- **`policy.py get` as a subprocess per key.** A render reads up to one model key and two effort keys
-  per role plus every stage key, about forty processes per run, each resolving the landed revision
-  again (§8 F2).
+- **`resolve` imported in process.** A kit imports no sibling kit, and TOOL-dDeclaredLoop-18 §4, the
+  rev-2 precedent, now reaches the policy kit by subprocess only (§8 F2).
 - **The declared effort before the house file.** It silently drops every level an adopter set in its
   house file the moment gov's role declares one (§8 F1).
 
@@ -207,13 +212,14 @@ session, as the house file's header says of its own values today.
 
 - security — no new write path; every key is read at the landed revision through the guarded file's
   one reader, so an agent's uncommitted edit to the policy file moves no level.
-- perf / scale — one landed revision per run and one `resolve` per key read, about forty per render;
-  the pass measures the render's wall before and after and states both in its commit.
+- perf / scale — one `policy.py get` process per key read, about forty per render, each deriving the
+  landed revision; the pass measures the render's wall before and after and states both in its commit.
 - error / empty / loading states — no policy kit is one note and the keys read as unset; a reader
   refusal is exit 2 naming the key; an absent house file is an empty fallback.
-- observability — `stage-efforts` prints the levels; `resolve` with `--explain` names each key's source.
+- observability — `stage-efforts` prints the levels; `policy.py get <key> --explain` names each key's source.
 - risks — a stale render after a key change; the restart line `render_agents.py --write` prints covers
-  it, as for the house file today.
+  it, as for the house file today. A fetch landing mid-render can give two keys two landed revisions;
+  the next render reads one.
 - testing — each criterion is a probe over a fixture repository; the arms in §7 are observed RED then
   GREEN by the main loop at the close.
 - migration — none owed by a default adopter, as §4 Migration says.
@@ -251,9 +257,10 @@ session, as the house file's header says of its own values today.
   check_roles.py` there prints no R12 line for the absent file.
   Red when: an absent house file still refuses, so the declared value is never reached.
 - **AC7** — When `grep -cE '^roles\.(effort|model)' unsummarised-keys.txt` runs in `tools/policy/`, it
-  prints 0, and `git grep -nE 'tomllib.*policy\.toml|\.governance/policy' -- tools/roles` prints only
-  comment lines.
-  Red when: a key is read by a second parser in the roles kit, or a row stays unsummarised.
+  prints 0, `git grep -nE 'tomllib.*policy\.toml|\.governance/policy' -- tools/roles` prints only
+  comment lines, and `git grep -nwE '(from|import) policy' -- tools/roles` prints nothing.
+  Red when: a key is read by a second parser in the roles kit, the policy kit is imported, or a row
+  stays unsummarised.
 
 ## 7. Gates
 
@@ -275,12 +282,17 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a 
   2026-10-25, delegated): (a), rung 1, the clause text "read only where no key ... is set" and systems.md
   `[design-role-shapes]`; I9's order is corrected here and named in this writer's return.
   widens: none · relaxes: none
-- **F2 — How does the roles kit call dGroundRules's reader?** Options: (a) `policy.py get` as a
-  subprocess per key; (b) `resolve` imported through `resolve_kit_dir("policy", "policy.py", here)`, the
-  landed revision resolved once. (a) costs a process and a revision walk per key, about forty a render.
-  RESOLVED (agent, 2026-10-25, delegated): (b), rung 3, the import TOOL-dDeclaredLoop-18 §4 makes for
-  `read_catalogue_row` and the brief's I8 admits ("S6's `resolve` ... located through
-  `roles_lib.resolve_kit_dir`").
+- **F2 — How does the roles kit call dGroundRules's reader?** Options: (a) `policy.py get <key> --json`
+  as a subprocess per key, each call reading the landed revision `get` derives; (b) `resolve` imported
+  through `resolve_kit_dir("policy", "policy.py", here)`, the landed revision resolved once; (c) an ask
+  to dGroundRules for a batch `get` reading every key of a run at one revision. (b) imports a sibling
+  kit: TOOL-dDeclaredLoop-18 §4, the rev-2 pick's precedent, now reads "A kit imports no sibling kit, so
+  the policy kit is reached only by that subprocess" (its rev-2), and PLAY-dOrderedCharter-7 §4 "The
+  policy reads" makes `get` the one seam. (c) waits on a new build, dGroundRules having landed
+  (`e6dd731b5`). A `--rev` pinned once per run would need a second remote ladder, since no `policy.py`
+  verb prints the landed revision whole. (a) costs a process per key, about forty a render, which §5 measures.
+  RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, TOOL-dDeclaredLoop-18 §4 and
+  PLAY-dOrderedCharter-7 §4 "The policy reads".
   widens: none · relaxes: none
 - **FACT-QUESTION · F3 — Does `harness-args` read an effort or a grant that a key could replace?**
   Probe: `sed -n 453,471p tools/roles/handoff.py`. Observation, 2026-10-25: `print_harness_args` reads
@@ -306,13 +318,18 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 · a 
   v2:1187-1190, the brief's I8, I9 and I11, scout C's row for cl-0186, and the roles kit at base
   `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-10-26 · S1 · §3 · §4 Alternatives rejected · §5 · AC7 · §8 F2 · §10 · re-grounded per
+  `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` row 36: TOOL-dDeclaredLoop-18 rev-2
+  makes no `resolve` import, so `read_policy_setting` runs `policy.py get --json` by subprocess, F2
+  re-resolved; it gains `with_default` for TOOL-dBoundRoles-22 S5's limit.
 
 ## 10. Reuse audit
 
 The seams extended are `resolve_effort` and `resolve_stage_efforts` (`tools/roles/roles_lib.py:565-576`),
 `load_policy` and its `[gates]` grading (`:373-485`), `print_stage_efforts` (`tools/roles/handoff.py:474`),
 `render_agent_file` and `render_roles_index` (`tools/roles/render_agents.py:142`, `:207`), each verified
-at `4ed9e567`; the reader is TOOL-dGroundRules-2 S6's `resolve`, DEFERRED. `python
+at `4ed9e567`; the reader is TOOL-dGroundRules-2 S7's `get`, built since (`cmd_get`,
+`tools/policy/policy.py:1332` at `c8d46e188`, whose `--json` prints `value`, `source` and `reason`). `python
 tools/codebase-map/reuse_lookup.py "resolve a stage's reasoning effort from policy keys then role then
 default"` ranked `load_policy`, `resolve_kit_dir` and generic `resolve`/`key` stems and named no policy-key
 reader, the expected answer: no `tools/policy/` exists at base. The recall probe returned scout C's row,

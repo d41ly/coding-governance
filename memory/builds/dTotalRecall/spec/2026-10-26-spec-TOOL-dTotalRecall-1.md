@@ -1,6 +1,6 @@
 # TOOL-dTotalRecall-1 — the record-kind registry, the memory contract's one declaration of every kind
 
-**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 1 · advances TOOL-dTotalRecall-27
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 1 · advances TOOL-dTotalRecall-27
 
 **Carries:** cl-dClosedLoop-0212@121cf0ba whole
 **Carries:** node:system.memory-structure
@@ -16,15 +16,23 @@
 | [2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-b.md) | research | TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 |
 | [2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-c.md](../build/2026-10-25-build-TOOL-dTotalRecall-1-reuse-scout-c.md) | research | TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-17 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-57 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
+| [2026-10-26-build-TOOL-dTotalRecall-1-crosscheck-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-crosscheck-returns.md) | research | — |
 | [2026-10-26-build-TOOL-dTotalRecall-1-departures-spec.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-departures-spec.md) | journal | — |
 | [2026-10-26-build-TOOL-dTotalRecall-1-deviation-11.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-deviation-11.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-1-deviation-12.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-deviation-12.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | — |
+| [2026-10-26-build-TOOL-dTotalRecall-1-reground-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-reground-returns.md) | research | — |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-fix-return.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-spec-stage-returns.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dTotalRecall-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dTotalRecall-1-3-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-4-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-4-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-5-spec-reviewer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-5-spec-reviewer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-6-spec-writer.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-owner-review-stop.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-owner-review-stop.md) | research | — |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-crosscheck.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-40 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-53 TOOL-dTotalRecall-59 TOOL-dTotalRecall-62 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-79 TOOL-dTotalRecall-81 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 |
+| [2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-parents-reground.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-11 TOOL-dTotalRecall-15 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-22 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-43 TOOL-dTotalRecall-76 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-1-spec-fix-brief.md) | research | TOOL-dTotalRecall-2 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-14 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-21 TOOL-dTotalRecall-23 TOOL-dTotalRecall-26 |
 | [2026-10-26-prompt-TOOL-dTotalRecall-36-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dTotalRecall-36-1-spec-writer.md) | journal | TOOL-dTotalRecall-36 |
@@ -56,18 +64,22 @@ check per kind (gap-mem-01).
   `readers`, `lifecycle`, `check` (§4 "Data model"). This unit requires `name`, `tag`, `schema`,
   `writer` and `check` on every row; `layer`, `home`, `readers` and `lifecycle` are admitted and
   required from TOOL-dTotalRecall-18. Observed by AC1 and AC2.
-- **S2** — Today's kinds registered as rows (§4 "The rows"): the five Serves kinds of `RECORD_KIND_TOKENS`
-  (`tools/memory-tree/tree_lib.py:406`), `spec`, runlog's run record (`tools/runlog/record.py:176`), the
-  three kinds this unit owns, `backlog-row`, `design-record` and `dossier`, and every kind
-  PLAY-dOrderedCharter-7 S7's factory `tools/memory-tree/build_records.py` defines at the build run's
-  base, dPlacedRequest's `probe` and `probe-trigger` (TOOL-dPlacedRequest-7 S6) among them. Observed by
-  AC1 and AC8.
+- **S2** — Today's kinds registered as rows (§4 "The rows"): the four untyped Serves kinds of
+  `RECORD_KIND_TOKENS` (`tools/memory-tree/tree_lib.py:406`; PLAY-dOrderedCharter-42 S1 makes the tuple
+  those four plus `TYPED_RECORD_KINDS`), `spec`, runlog's run record (`tools/runlog/record.py:176`), the
+  three kinds this unit owns, `backlog-row`, `design-record` and `dossier`, and one row per member of
+  `TYPED_RECORD_KINDS` at the build run's base, the factory's kind list (PLAY-dOrderedCharter-42 S2):
+  `deviation` and dPlacedRequest's `probe` and `probe-trigger` (TOOL-dPlacedRequest-7 S6) among them,
+  so `deviation` has one row, a factory kind. Observed by AC1 and AC8.
 - **S3** — The conformance gate, `check_record_kinds(root)` in `tools/memory-tree/record_kinds.py`, run
-  as `python record_kinds.py --check` and as the new leg `record-kinds` in `tools/gate-legs.json`. It
+  as `python record_kinds.py --check` and as the new leg `record-kinds`, declared once in its
+  `[[exempt_leg]]` row (S11) with every manifest key, `enforces` holding every tag of the
+  `kind.record-kind` row's `binds` (PLAY-dOrderedCharter-7 S3, S5), and rendered into
+  `tools/gate-legs.json` by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1, S2). It
   reds a row missing a required column, a `writer` that is empty, a `check` naming no leg of
   `tools/gate-legs.json`, a `schema.source` whose literal no longer matches the row's `fields` either
-  way, a kind `build_records.py` defines with no row and a row naming a factory kind it does not define.
-  Observed by AC2, AC3, AC8 and AC11.
+  way, a member of `TYPED_RECORD_KINDS` with no row and a factory-kind row naming no member.
+  Observed by AC1, AC2, AC3, AC8 and AC11.
 - **S4** — The generated field check: for each row of `form = "fields"`, every tracked record under its
   `home` whose path is not in the legacy population (S8) carries each of the row's `fields` as a
   `**Key:**` line in the row's order. Observed by AC7.
@@ -90,14 +102,14 @@ check per kind (gap-mem-01).
   --writer <door> --check <leg> --field <Key>…` appends a conforming row and refuses one missing a
   required column; the `kind.record-kind` row of `tools/playbook/kinds.toml` (PLAY-dOrderedCharter-7
   S4) names it as `factory`, `record-kinds` as `gate` and `dTotalRecall` as `owner`, and leaves
-  `tools/playbook/core-pending.txt`. Observed by AC10.
+  `tools/playbook/core-pending.txt`, S3's `enforces` meeting S5's contract. Observed by AC1 and AC10.
 - **S10** — Gap keys as a native-id class: a `[[native]]` row `gap-key` in
   `tools/playbook/namespaces.toml` (PLAY-dOrderedCharter-28 S2), its pattern `record_kinds:GAP_KEY_RE`
   and its resolver `record_kinds:read_gap_keys`, which reads the first cell of every gap row of each
   tracked `*-gap-register.md`; its resolution planted. Observed by AC9.
-- **S11** — The leg's meta-gate rows: the `record-kinds` leg in `tools/govkit/registry.toml`'s
-  `[[exempt_leg]]` rows, `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt` and
-  the `gate-legs` claim of `memory/map/features/memory-tree-hygiene.md`. NOT OBSERVED by a criterion:
+- **S11** — The leg's meta-gate rows: the `record-kinds` leg's declaration in
+  `tools/govkit/registry.toml`'s `[[exempt_leg]]` rows, `enforces` among its keys (S3),
+  `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt` and the `gate-legs` claim of `memory/map/features/memory-tree-hygiene.md`. NOT OBSERVED by a criterion:
   each row is graded by its own meta-gate at the close.
 - **S12** — The docs: `tools/memory-tree/README.md` gains a section naming the registry, its columns,
   `new`, `--check`, `--template` and `--population`. NOT OBSERVED by a criterion: prose, read by the
@@ -131,7 +143,7 @@ check per kind (gap-mem-01).
 - **hands-off** `TOOL-dTotalRecall-3` — `record-kinds.toml`, where the `record-kind.claim` row lands
 - **hands-off** `TOOL-dTotalRecall-19` — `record-kinds.toml`, whose rows unit 19 gives the `root` column its cause refusal reads
 - **hands-off** `TOOL-dTotalRecall-9` — `record-kinds.toml`, whose rows unit 9 gives the `sections` column and whose `home` column decides a record's kind
-- **consumes-from** external — PLAY-dOrderedCharter-7 S4, S5 and S7 (`kinds.toml`, its conformance contract, `build_records.py`), PLAY-dOrderedCharter-28 S2 (`[[native]]` rows), TOOL-dSafePassage-10 S1 (`surface-classes.toml`), TOOL-dWitnessedBar-13 S2 and -15 S1 (the ledger and `seed_population`); all DEFERRED at base, and the build run re-grounds on their landed code
+- **consumes-from** external — PLAY-dOrderedCharter-7 S3, S4, S5 and S7 (the meta-check, `kinds.toml`, its conformance contract, `build_records.py`), PLAY-dOrderedCharter-42 S1 and S2 (`TYPED_RECORD_KINDS`), TOOL-dWitnessedBar-11 S1 and S2 (the leg declaration and `leg_factory.py`), PLAY-dOrderedCharter-28 S2 (`[[native]]` rows), TOOL-dSafePassage-10 S1 (`surface-classes.toml`), TOOL-dWitnessedBar-13 S2 and -15 S1 (the ledger and `seed_population`); all DEFERRED at base, and the build run re-grounds on their landed code
 - **hands-off** `TOOL-dTotalRecall-40` — `record_kinds.py` and its `--check`, which that unit's alias census joins (the round-1 audit's id 36)
 - **hands-off** `TOOL-dTotalRecall-42` — `check_record_kinds` and its empty-home rule, which that unit extends with the `unarmed` key, the bare-directory refusal and `derive_record_kind` (the round-1 audit's id 51)
 - **hands-off** `TOOL-dTotalRecall-43` — `record_kinds.py`, `check_record_kinds`, its `new` verb, its leg's meta-gate rows and the legacy registration, which that unit changes for the round-1 audit's ids 2, 5, 6, 25, 29, 40 and 59
@@ -149,10 +161,10 @@ tag = "record.deviation"
 layer = ""                       # required from TOOL-dTotalRecall-18
 home = ""
 id-rule = "<date>-build-<unit id>-deviation-<n>.md"
-schema = { form = "fields", source = "tools/memory-tree/deviation_join.py:REQUIRED", fields = [
+schema = { form = "fields", source = "tools/memory-tree/build_records.py:<deviation's field table>", fields = [
   "Departs from", "Hand-off", "Before", "After", "Cause", "Reason", "Evidence", "Risk", "Approver",
   "Follow-through", "Caused-by"] }
-writer = "hand"
+writer = "build_records.py --build <slug> --unit <id> <deviation's field flags>"
 readers = []
 lifecycle = ""
 check = "memory hygiene"
@@ -171,9 +183,16 @@ check = "memory hygiene"
   schema that is not a pure literal carries no `source`, and its owner's leg, named in `check`, grades
   it: runlog's `RECORD_SCHEMA` reads the name `RECORD_CAP_BYTES` at `tools/runlog/record.py:178`, so
   `ast.literal_eval` refuses it (probed at base).
-- `writer` is a door, spelled as the command that writes the kind (`gen_build_index.py --new-spec`,
-  `build_records.py new probe`), `generator:<path>` for a generated kind, or `hand` for a kind no
-  command writes yet. Empty is red (S3); `hand` is legal until TOOL-dTotalRecall-2 registers a door.
+- `writer` is a door, spelled as the command that writes the kind (`gen_build_index.py --new-spec`),
+  `generator:<path>` for a generated kind, or `hand` for a kind no command writes yet. A factory
+  kind's writer is the command its owning spec names (`probe.py trigger` and `probe.py pin`,
+  TOOL-dPlacedRequest-7 S3-S5; `manifest-check.sh --card --follow`, TOOL-dPlacedRequest-2 S5;
+  `drift_report.py --gate-health --write`, TOOL-dWitnessedBar-1 S4; `ratchet.py widen`,
+  TOOL-dWitnessedBar-14 S5; `build_records.py new exception`, PLAY-dOrderedCharter-7 S8), else the
+  factory with `--build`, `--unit` and the kind's field flags. No parent claims a generic
+  `build_records.py new <kind>` (TOOL-dPlacedRequest-7:104-106), so the build run re-grounds each
+  factory cell on the landed factory. Empty is red (S3); `hand` is legal until TOOL-dTotalRecall-2
+  registers a door.
 - `check` names one leg of `tools/gate-legs.json` by its `name`.
 - `id-rule` is the record's name grammar, or `""` for a kind keyed by path.
 - Two columns later units add are admitted by S3 and never red: `root` (TOOL-dTotalRecall-19, true on
@@ -189,15 +208,15 @@ check = "memory hygiene"
 | `diff-review` | fields | none (`Serves`, `Verdict`) | `tier2-review.js` | `memory hygiene` |
 | `journal` | fields | none (`Serves`) | `hand` | `memory hygiene` |
 | `research` | fields | none (`Serves`) | `hand` | `memory hygiene` |
-| `deviation` | fields | `deviation_join.py:REQUIRED` | `hand` | `memory hygiene` |
 | `run-record` | header | none (`RECORD_SCHEMA`, not a pure literal) | `runlog/record.py write_record` | `runlog record schema` |
 | `backlog-row` | rows | none | `hand` | `memory hygiene` |
 | `design-record` | fields | none (`Serves`) | `hand` | `memory hygiene` |
 | `dossier` | header | none | `hand` | `codebase-map gate coverage` |
-| each `build_records.py` kind | fields | `build_records.py:<its field tuple>` | `build_records.py new <kind>` | its own leg |
+| each member of `TYPED_RECORD_KINDS` | fields | `build_records.py:<its field tuple>` | its owner's command, else the factory and its flags | its own leg (`memory hygiene` for `deviation`) |
 
-The last row stands for every kind the factory defines at the build run's base; `probe` and
-`probe-trigger` are two of them. The writer cells marked `hand` are the 32-of-76 class gap-mem-37
+The last row stands for every member of `TYPED_RECORD_KINDS` at the build run's base; `deviation`,
+`probe` and `probe-trigger` are three of them, and a `-<kind>-<n>.md` record is graded once, by its
+factory row. The writer cells marked `hand` are the 32-of-76 class gap-mem-37
 names, and TOOL-dTotalRecall-2 replaces each with its door.
 
 ### The view
@@ -267,9 +286,9 @@ py.function` at the pass.
 - **Import each schema owner's module.** `tools/runlog/` is a sibling copy-installed kit, so an
   import breaks the kit rule; `ast.literal_eval` over the file text reads a literal, and a non-literal
   schema is graded by its owner's leg instead.
-- **Copy `deviation_join.py`'s required tuple into the registry and drop the source.** The deviation
-  join keeps its own grammar (PLAY-dOrderedCharter-7 S7 keeps it there); the registry points at it and
-  S3 compares the two.
+- **Copy the factory's per-kind fields into the registry and drop the source.** The factory keeps each
+  typed kind's required fields (PLAY-dOrderedCharter-7 S7); the registry points at it and S3 compares
+  the two.
 
 ## 5. Production-readiness checklist
 
@@ -292,8 +311,11 @@ py.function` at the pass.
 
 - **AC1** — When `python record_kinds.py --check` runs from `tools/memory-tree/` at the pass tip, it
   exits 0 and prints one count line naming every row of S2 and, for each `fields` kind, its graded
-  and legacy record counts, the legacy count non-zero for `deviation`.
-  Red when: a registered kind is missing from the file, or the check reads an empty registry as green.
+  and legacy record counts, the legacy count non-zero for `deviation`; and a `python -c` probe reading
+  the `record-kinds` row of `tools/gate-legs.json` and the `kind.record-kind` row of
+  `tools/playbook/kinds.toml` prints a non-empty `enforces` holding every tag of that row's `binds`.
+  Red when: a registered kind is missing from the file, the check reads an empty registry as green,
+  or the leg carries no `enforces`, which PLAY-dOrderedCharter-7 S3's meta-check reds.
 - **AC2** — When `python record_kinds.py --fixture --plant writer-missing` runs, it exits 1 naming the
   planted kind and the column `writer`; without `--plant` it exits 0.
   Red when: `writer` is optional or an empty string passes.
@@ -319,10 +341,12 @@ py.function` at the pass.
   population (`--plant field-missing`), `--check` exits 1 naming the record and the field; the same
   record listed in the `record-kinds-legacy` ledger (`--plant field-missing-legacy`) exits 0.
   Red when: a legacy record is graded, or a new one is not.
-- **AC8** — When the fixture's factory module defines a kind the registry has no row for (`--plant
-  factory-kind-unrowed`), `--check` exits 1 naming that kind; at the pass tip the `probe` and
-  `probe-trigger` rows are present and `--check` exits 0.
-  Red when: the join reads one direction only, so a factory kind with no row passes.
+- **AC8** — When the fixture's typed kind list, the tuple `check_record_kinds` takes in place of
+  `TYPED_RECORD_KINDS`, names a kind the registry has no row for (`--plant factory-kind-unrowed`),
+  `--check` exits 1 naming that kind; at the pass tip one row each for `deviation`, `probe` and
+  `probe-trigger` is present and `--check` exits 0.
+  Red when: the join reads one direction only, so a factory kind with no row passes, or `deviation`
+  holds a second row beside its factory row.
 - **AC9** — When the fixture's deviation record carries `Follow-through: gap gap-mem-99` and the gap
   register holds `gap-mem-01` only (`--plant gap-unresolved`), `--check` exits 1 naming `gap-mem-99`;
   with `gap gap-mem-01` it exits 0.
@@ -346,11 +370,12 @@ New arm: tools/govkit/step_gate.py · covers AC3 AC4 · the `record-kind-schema`
 ## 8. Open questions
 
 - **F1 — Who owns the record-kind factory: this registry, or dConvergedCharter as
-  TOOL-dPlacedRequest-1 §3 (line 137) and PLAY-dOrderedCharter-7 §3 state?** Options: (a) this
-  registry, as cl-dClosedLoop-0212 says ("the registry being the record-kind factory"); (b)
+  TOOL-dPlacedRequest-1 §3 (lines 145-146) and PLAY-dOrderedCharter-7 §3 (line 135) state?** Options:
+  (a) this registry, as cl-dClosedLoop-0212 says ("the registry being the record-kind factory"); (b)
   dConvergedCharter's, leaving the `kind.record-kind` row on the pending list. RESOLVED (agent,
-  2026-10-26, delegated): (a), rung 1, the clause text binds. The return names an ask to dPlacedRequest
-  and one to dOrderedCharter, each to re-point its non-goal line. widens: none · relaxes: none
+  2026-10-26, delegated): (a), rung 1, the clause text binds. The build run's re-ground holds two asks
+  as preconditions of the pass: one to dPlacedRequest and one to dOrderedCharter, each to re-point the
+  non-goal line cited above. widens: none · relaxes: none
 - **F2 — How does the registry hold a schema another module already declares?** Options: (a) a
   `source` pointer read by `ast.literal_eval`, the row's `fields` compared both ways; (b) the
   registry alone, the owner modules re-pointed to read it; (c) the owner alone, the registry holding a
@@ -375,6 +400,11 @@ New arm: tools/govkit/step_gate.py · covers AC3 AC4 · the `record-kind-schema`
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
   edges of TOOL-dTotalRecall-40, TOOL-dTotalRecall-42, TOOL-dTotalRecall-43, written by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the hands-off mirror of TOOL-dTotalRecall-53, each a consumes-from edge of a unit the round-1 spec audit of units 36 to 43 promoted.
+- rev-4 · 2026-10-26 · §2 S2, S3, S9, S11 · §3 the external edge · §4 data model, writer bullet, rows, alternatives · §6 AC1,
+  AC8 · §8 F1 · the parents' re-ground, rows 2, 4, 5 and 6 of
+  `2026-10-26-build-TOOL-dTotalRecall-1-parents-crosscheck.md`: factory writers name each owner's
+  command or the factory and its flags, `deviation` is one factory row joined through
+  `TYPED_RECORD_KINDS`, the leg carries `enforces`, and F1 re-cites TOOL-dPlacedRequest-1:145-146.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step
 
-**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 26 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0190@03bbbf1e whole
 
@@ -15,8 +15,11 @@
 | [2026-10-26-build-TOOL-dBoundRoles-25-deviation-251.md](../build/2026-10-26-build-TOOL-dBoundRoles-25-deviation-251.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-25-deviation-252.md](../build/2026-10-26-build-TOOL-dBoundRoles-25-deviation-252.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-25-deviation-253.md](../build/2026-10-26-build-TOOL-dBoundRoles-25-deviation-253.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-25-deviation-254.md](../build/2026-10-26-build-TOOL-dBoundRoles-25-deviation-254.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -54,11 +57,19 @@ them.
   Observed by AC4, AC5 and AC6.
 - **S4** — The helpers' homes (§4 "Disposition", §8 F3). A helper read by one kit moves into that
   kit. A helper read by two kits moves into `tools/hooks/scratch-guard.js`'s `module.exports`, which
-  both packs already import. Observed by AC9.
+  the pack already reads for rule 6's index readers. A kit imports no sibling kit (TOOL-dGroundRules-1
+  §4), so `tools/roles/kit.toml`'s `requires_if` gains a row naming `agent-cap` whose `why` names
+  `spawn-guard.js`'s require of `scratch-guard.js` and the pack's refusal where it does not resolve.
+  Observed by AC9.
 - **S5** — The suite. `tools/roles/spawn-guard.test.sh` holds every arm of
   `tools/hooks/agent-cap.test.sh` over a moved rule, retargeted, plus the arms of AC4 to AC6. The
-  roles kit withholds the suite as `project-owned`. A new leg, `spawn-guard self-test`, runs it.
-  Observed by AC8.
+  roles kit withholds the suite as `project-owned`. A new leg, `spawn-guard self-test`, runs it,
+  declared once as an `[[exempt_leg]]` row of `tools/govkit/registry.toml` by `leg_factory.py new
+  --exempt` (TOOL-dWitnessedBar-11 S1, S3), its `enforces` that of `agent-cap self-test` as that
+  unit's S6 wrote it; `tools/gate-legs.json` is re-rendered by `--write`, never edited. That leg still
+  on PLAY-dOrderedCharter-7's pending list stops the unit, as that list only shrinks. Under
+  `core.bypass = never` the meta-check reds this guarded leg (PLAY-dOrderedCharter-7 S10) while
+  TOOL-dWitnessedBar-11 §8 F5 is open; the leg keeps its guard and takes F5's outcome. Observed by AC8.
 - **S6** — The wiring. Gov's `.claude/settings.json` wires the pack and no `agent-cap.js` command.
   `tools/settings-merge.py`'s default fragment is the roles kit's `spawn-guard.fragment.json`, read
   from its file and never typed (§8 F4). `tools/check-wiring.sh` grades the pack's fragment through
@@ -75,7 +86,7 @@ them.
   Its up wires the pack before it unwires agent-cap, and its down restores the settings file
   byte-identical. Observed by AC12 and AC13.
 - **S8** — The retirement. `tools/hooks/agent-cap.js` and `tools/hooks/agent-cap.test.sh` are deleted,
-  and the leg `agent-cap self-test` retires with its `[[exempt_leg]]` row. The hooks kit keeps its
+  and the leg `agent-cap self-test` retires with its `[[exempt_leg]]` declaration (S5). The hooks kit keeps its
   registry id `agent-cap` (§8 F5), and its `version_from` moves to a `KIT_AGENT_CAP_VERSION` constant
   in `tools/hooks/scratch-guard.js` that continues the kit's version sequence. Every reader is
   disposed in the pass's commit (§4 "Readers disposed"). The by-name readers below are what
@@ -185,7 +196,7 @@ them.
 | any other check `main()` runs on the call, `checkOptinPackPresent` among them | `tools/roles/spawn-guard.js`, unchanged, in `main()`'s order |
 | `resolveKitDir` and `resolveHarnessName` | `tools/roles/spawn-guard.js`, between the same `// >>> resolveKitDir` markers, so `tools/lib/resolve-python.test.sh` re-points its slice and its truth table runs unchanged |
 | an export only review-kit modules import (the script views, `boundedK`, `intConsts`, `joinCall`, `topLevelArgs`, `MAX_VERIFIERS`, `MAX_LENSES`) | `tools/workflows/script-views.js`, a new review-kit module; `check-verifier-fanout.js` and `check-review-join.js` import it from beside themselves |
-| an export imported by the pack and by a review-kit module (`extractWorkflowArgs`, `extractBuildSlug`) | `tools/hooks/scratch-guard.js`'s `module.exports` |
+| an export imported by the pack and by a review-kit module (`extractWorkflowArgs`, `extractBuildSlug`) | `tools/hooks/scratch-guard.js`'s `module.exports`, over S4's declared edge |
 | an export no file imports | deleted |
 
 The pack and `spec-audit-optin.js` already probe the hooks kit beside their own kit for
@@ -252,7 +263,7 @@ The pass re-derives S8's readers at the build run's base. Each is disposed in th
 | the version: `version_from`, `tools/check-kit-versions.sh`, the `gov:kit agent-cap@` markers | the constant in `scratch-guard.js`; the checker reads that file |
 | a constant extracted from the file (`tools/check-playbook-parity.sh`) | extracted from the file S4 moved it to |
 | a fixture copying the file (`tools/govkit/selftest.py`, `tools/check-hook-destinations.test.sh`, `tools/check-wiring.test.sh`) | copies `scratch-guard.js`, or the pack where the case is about the spawn guard |
-| the leg and its rows | renamed `spawn-guard self-test`, run from the roles kit; its budget, evidence and pin rows re-keyed, its ceiling and budget re-measured at the pass |
+| the leg and its rows | renamed `spawn-guard self-test` in its declaration and re-rendered (S5), run from the roles kit; its budget, evidence and pin rows re-keyed, its ceiling and budget re-measured at the pass |
 | prose and comments | name the pack, `scratch-guard.js` or the moved rule's new home |
 | a harness template's comment | re-rendered with its template, which moves that harness's blob (§5 risks) |
 | the dossiers | `memory/map/features/agent-cap.md` drops the file; `memory/map/features/roles.md` claims the pack, re-rendered by `python tools/codebase-map/gen_map.py --write` |
@@ -265,7 +276,7 @@ The pass re-derives S8's readers at the build run's base. Each is disposed in th
 | the module `tools/workflows/script-views.js` | the review kit | — |
 | `cmd_up`, `cmd_down`, `cmd_witness`, `main` | `tools/govkit/steps/spawn_guard_pack.py` | `py.function` snake |
 | step id `agent-cap/spawn-guard-to-roles-pack` | the S7 row | — |
-| leg `spawn-guard self-test` | `tools/gate-legs.json`, chunk `selftests`, subject `kit`, guard the pack's three files and `{prefix}/hooks/scratch-guard.js` | — |
+| leg `spawn-guard self-test` | an `[[exempt_leg]]` row of `tools/govkit/registry.toml`, rendered into `tools/gate-legs.json`: chunk `selftests`, subject `kit`, `enforces` the retired leg's, guard the pack's three files and `{prefix}/hooks/scratch-guard.js` | — |
 | `KIT_AGENT_CAP_VERSION` re-homed | `tools/hooks/scratch-guard.js` | — |
 
 ### Rollout
@@ -312,7 +323,7 @@ build's own close. The pass records in its acceptance ledger which harnesses thi
   `tools/check-playbook-parity.sh`, `tools/check-playbook-parity.test.sh`,
   `tools/check-hook-destinations.test.sh`, `tools/check-agent-cap-restatement.sh`,
   `tools/check-agent-cap-restatement.test.sh`, `tools/lib/resolve-python.test.sh`
-- `tools/gate-legs.json`, `tools/run-gates/selftest-budgets.txt`, `tools/run-gates/ceiling-evidence.txt`,
+- `tools/gate-legs.json` (rendered), `tools/run-gates/selftest-budgets.txt`, `tools/run-gates/ceiling-evidence.txt`,
   `tools/run-gates/windows-only-legs.txt`, `tools/run-gates/run-selftests.sh`
 - `tools/codebase-map/map_lib.py`, `tools/lexicon/lexicon.py`, `tools/drift-audit/README.md`,
   `.lexicon.conf`
@@ -422,6 +433,10 @@ build's own close. The pass records in its acceptance ledger which harnesses thi
 - **AC17** — When `grep -n 'landed' help/roles.md` runs, it prints the line naming the landed-blob
   refusal under "What the hooks refuse".
   Red when: the page still lists only a path match.
+- **AC18** — When `python tools/run-gates/leg_factory.py --list` runs on the committed tree, it prints
+  `spawn-guard self-test` declared in `tools/govkit/registry.toml` and no `agent-cap self-test`; `--check`
+  exits 0, and the leg's manifest row carries a non-empty `enforces`.
+  Red when: the leg is a hand-written manifest row, or carries no `enforces`.
 
 ## 7. Gates
 
@@ -452,11 +467,16 @@ New arm: tools/check-wiring.test.sh · covers AC10 · a scratch settings file wi
   their landed bytes, as §4 Rollout gives. widens: none · relaxes: none
 - **F3 — Where do the helpers agent-cap exports go once it is deleted?** TOOL-dFairHearing-16 §3 hands
   their "last home" to this build. Options: (a) by importer: one kit's helpers into that kit, two
-  kits' into `scratch-guard.js`'s exports; (b) all into the pack; (c) all into `scratch-guard.js`.
+  kits' into `scratch-guard.js`'s exports; (b) all into the pack; (c) all into `scratch-guard.js`;
+  (d) the two kits' helpers as a `tools/lib/` canonical block inlined into each under a parity row.
   (b) makes the review kit import the roles kit for a script lexer it alone reads. (c) loads a lexer
-  of about a thousand lines into a hook that runs on every Bash and Edit call. RESOLVED (agent,
-  2026-10-25, delegated): (a), rung 3, tie-broken by reuse of the export seam scratch-guard already
-  serves to both packs. widens: none · relaxes: none
+  of about a thousand lines into a hook that runs on every Bash and Edit call. The rev-1 pick, (a),
+  left the pack's require of `scratch-guard.js` undeclared, which PLAY-dOrderedCharter-7 §4 rules out
+  ("A kit may not import a sibling kit"). (d) moves two exports but not rule 6's index readers, which
+  the pack reads from the same file, and the parity loop greps `#` markers in `.sh` and `.py` only
+  (`tools/lib/resolve-python.test.sh:226`). RESOLVED (agent, 2026-10-26, delegated): (a), rung 1,
+  naming PLAY-dOrderedCharter-7, the pack's one in-process edge declared as S4's `requires_if` row,
+  the declaration the rule admits (`tools/memory-tree/kit.toml:8`). widens: none · relaxes: none
 - **F4 — What does settings-merge wire with no `--fragment` once agent-cap is gone?** Options: (a) the
   roles kit's `spawn-guard.fragment.json`, read from its file; (b) nothing, `--fragment` required;
   (c) a built-in copy of the pack's fragment. (b) breaks the hooks kit's `[adopt] via =
@@ -489,6 +509,11 @@ New arm: tools/check-wiring.test.sh · covers AC10 · a scratch settings file wi
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **consumes-from** and **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-38, TOOL-dBoundRoles-42, TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dBoundRoles-46, -48 and -50, promotions of the round-1 audit of units 37 to 44; the -50 bullet hands this pass the leg rename on two live §7 lines. Nothing else moved.
 - rev-4 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-58, the minors batch of the round-1 audit of units 45 to 51; nothing else moved.
+- rev-5 · 2026-10-26 · S4 · S5 · S8 · §4 Disposition, Readers disposed, Inventory, Files touched · AC18 ·
+  §8 F3 · re-grounded by `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` rows 44
+  and 45: the renamed leg is declared once through TOOL-dWitnessedBar-11's factory with `enforces`,
+  the manifest rendered; the pack's require of `scratch-guard.js` is a declared `requires_if` edge, F3
+  re-resolved.
 
 ## 10. Reuse audit
 

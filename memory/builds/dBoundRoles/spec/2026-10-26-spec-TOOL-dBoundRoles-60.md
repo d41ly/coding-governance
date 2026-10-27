@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-60 — the round-1 audit of units 52 to 58, its 37 minors: criteria that can fail and can pass, arms observed where their code lives, one read-key parse, floors moved with their arms, and write sets that name every file a pass writes
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-6 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 33 · advances TOOL-dBoundRoles-27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,9 @@
 | [2026-10-26-build-TOOL-dBoundRoles-59-round4-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-59-round4-fix-return.md) | research | TOOL-dBoundRoles-59 |
 | [2026-10-26-build-TOOL-dBoundRoles-60-deviation-601.md](../build/2026-10-26-build-TOOL-dBoundRoles-60-deviation-601.md) | deviation | — |
 | [2026-10-26-build-TOOL-dBoundRoles-60-deviation-602.md](../build/2026-10-26-build-TOOL-dBoundRoles-60-deviation-602.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-60-deviation-603.md](../build/2026-10-26-build-TOOL-dBoundRoles-60-deviation-603.md) | deviation | — |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 |
 | [2026-10-26-prompt-TOOL-dBoundRoles-59-round4-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-59-round4-fix-brief.md) | research | TOOL-dBoundRoles-59 |
 | [2026-10-26-review-TOOL-dBoundRoles-59-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-59-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-59 |
 
@@ -39,7 +42,7 @@ merged several into one item. Id 10 was refuted by the audit and id 21 is unit 5
 | M9 | 22 | unit 58 AC5 | S17 |
 | M10 | 25 | unit 56 S3, §4, §7 | S18 |
 | M11 | 28 | units 54 and 55 AC1, AC2, §7 | S19 |
-| M12 | 30 | `tools/gate-legs.json`, unit 56 §5 | S20 |
+| M12 | 30 | the leg's declaration in `tools/govkit/registry.toml`, unit 56 §5 | S20 |
 | M13 | 33 | unit 57 S1, AC1 | S21 |
 | M14 | 34 | unit 57 AC1 | S22 |
 | M15 | 35 | unit 54 S1, S2, AC1 | S23 |
@@ -107,10 +110,12 @@ merged several into one item. Id 10 was refuted by the audit and id 21 is unit 5
   and state the arm's life, its pass to unit 19's, so M8's close stages no arm on a check that is gone.
   This pass observes both arms on the tree archived at the parent of unit 19's pass commit. Observed by
   AC11.
-- **S20** — id 30. The `scratch-guard self-test` row of `tools/gate-legs.json` guards
-  `{prefix}/memory-tree/tree_lib.py`, so a commit touching only `parse_spec_h1` runs 56's parity case.
-  `tools/gate-legs.json` is watched too, so this pass's commit carries the re-stamp of S18. Observed by
-  AC12.
+- **S20** — id 30. The `scratch-guard self-test` leg's one declaration, its `[[exempt_leg]]` row in
+  `tools/govkit/registry.toml` (TOOL-dWitnessedBar-11 S1), guards `{prefix}/memory-tree/tree_lib.py`,
+  so a commit touching only `parse_spec_h1` runs 56's parity case. The declaration keeps the `enforces`
+  that unit's S6 wrote, and `python tools/run-gates/leg_factory.py --write` re-renders
+  `tools/gate-legs.json`, never edited by hand (its S2). The manifest is watched, so this pass's commit
+  carries the re-stamp of S18 beside the declaration and the manifest. Observed by AC12.
 - **S21** — id 33. 57's no-search-tool half reads the whole rendered Skill text; the token-presence half
   keeps reading the description. Observed by AC13.
 - **S22** — id 34. The invariant lives in an undecorated `check_skill_description(text)` in
@@ -227,7 +232,8 @@ Read at base `462d20f3` on 2026-10-26:
   `:1615-1618` reads tokens from `desc` only; `SKILL.template.md:66` holds the body's fallback.
 - `memory/guides/SESSION-KICKOFF.md:6` watches `manifest-check.sh` and `tools/gate-legs.json`.
 - `tools/gate-legs.json` guards `scratch-guard self-test` on `{prefix}/hooks/`, `{prefix}/lib/` and
-  `skills/session-kickoff/`; `kickoff engine size <=18KiB` has no guard.
+  `skills/session-kickoff/`, a leg `tools/govkit/registry.toml:555` declares `[[exempt_leg]]`;
+  `kickoff engine size <=18KiB` has no guard.
 - `tools/roles/adopt-roles.test.sh:73-81`: the floor's comment terms sum to `FLOOR_ASSERTIONS=50`.
 
 ### Inventory
@@ -249,7 +255,8 @@ Live at landing, at order 33, after every unit it repairs and after unit 59.
 - `tools/roles/spawn-guard.test.sh`
 - `tools/hooks/scratch-guard.test.sh`
 - `tools/memory-recall/selftest.py`
-- `tools/gate-legs.json`
+- `tools/govkit/registry.toml`
+- `tools/gate-legs.json`, rendered
 - `memory/guides/SESSION-KICKOFF.md`
 - `memory/map/generated/symbols.json`
 - the specs of units 14, 19, 46, 47, 49, 52, 53, 54, 55, 56, 57 and 58, rev bumps, and the ledgers the
@@ -315,8 +322,9 @@ Live at landing, at order 33, after every unit it repairs and after unit 59.
   module prints 0 for each.
   Red when: M8's close is asked to stage an arm on a deleted check.
 - **AC12** — When `python tools/check-spec-tokens.py --legs-for tools/memory-tree/tree_lib.py` runs, it
-  lists `scratch-guard self-test`.
-  Red when: a tree_lib-only commit skips the parity case on a guarded run.
+  lists `scratch-guard self-test`, and `python tools/run-gates/leg_factory.py --check` exits 0.
+  Red when: a tree_lib-only commit skips the parity case on a guarded run, or the manifest differs
+  from the leg's declaration.
 - **AC13** — When a `python -c` probe loads the one function `check_skill_description` by `ast` from the
   memory-recall kit's self-test module and calls it on the template's text, it passes; with "fall back to
   `Grep`" restored in the body, or "Grep and Glob own those" in the description, it fails naming `Grep`.
@@ -385,10 +393,12 @@ S20's guard is not an arm: AC12 observes it directly, red before the edit and gr
 - **F4 — 57 AC1: run the suite, or lift the invariant (id 34)?** Options: (a) one suite run read by line;
   (b) S22's undecorated function loaded by `ast`. (a) runs a self-test suite inside a pass, which M6
   refuses. RESOLVED (agent, 2026-10-26, delegated): (b). widens: none · relaxes: none
-- **F5 — Widen the leg's guard, or state the gap (id 30)?** Options: (a) the guard in
-  `tools/gate-legs.json`; (b) a §5 sentence. (a) closes the gap and (b) records it. RESOLVED (agent,
-  2026-10-26, delegated): (a), rung 3, the most feature-rich survivor; the guard widens a leg's reach and
-  grants nothing. widens: none · relaxes: none
+- **F5 — Widen the leg's guard, or state the gap (id 30)?** Options: (a) the guard widened in the
+  leg's declaration and the manifest re-rendered; (b) a §5 sentence. (a) closes the gap and (b)
+  records it. The rev-1 pick, the guard edited in `tools/gate-legs.json`, is ruled out by
+  TOOL-dWitnessedBar-11 S1 and S2, which declare each leg once and make the manifest a render whose
+  `--check` reds a hand edit. RESOLVED (agent, 2026-10-26, delegated): (a), rung 1, naming
+  TOOL-dWitnessedBar-11; the guard widens a leg's reach and grants nothing. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -398,6 +408,10 @@ S20's guard is not an arm: AC12 observes it directly, red before the edit and gr
 - rev-3 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-64, the minors batch of the round-1 audit of units 61 to 63; nothing else moved.
 - rev-4 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-66, the minors batch of the round-1 audit of unit 64; nothing else moved.
 - rev-5 · 2026-10-26 · §3 · the Edges block gains the bullet mirroring TOOL-dBoundRoles-69, the minors batch of the round-1 audit of units 65 and 66; nothing else moved.
+- rev-6 · 2026-10-26 · §1 · S20 · §4 Evidence, Files touched · AC12 · §8 F5 · re-grounded on
+  TOOL-dWitnessedBar-11 by `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` row 53: the
+  guard is widened in the leg's `[[exempt_leg]]` declaration, its `enforces` kept, and the manifest
+  re-rendered by `leg_factory.py --write`; F5 re-resolved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-22 — workflow entries as data: ordered stages, each naming its role, fan, cap, effort and rows, every cap under the agent limit
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 5 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0187@5afc67cc whole
 
@@ -12,7 +12,10 @@
 | [2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dBoundRoles-1-spec-stage-returns.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-22-deviation-221.md](../build/2026-10-26-build-TOOL-dBoundRoles-22-deviation-221.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-22-deviation-222.md](../build/2026-10-26-build-TOOL-dBoundRoles-22-deviation-222.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -48,9 +51,10 @@ harness.
   kinds of TOOL-dDeclaredLoop-29 S3; and a `cap` above the repository's agent limit, each one R9 line
   naming the entry and the stage. Observed by AC4 and AC5.
 - **S5** — The agent limit read once per run, `read_agent_limit(root)` in `roles_lib.py`: the resolved
-  value of `runtime.agents-in-flight` (TOOL-dGroundRules-10, catalogue default 6) through the same
-  `resolve` import TOOL-dBoundRoles-21 S1 makes, whatever its source. With no policy kit found the cap
-  arm prints `unarmed` once and grades nothing, never green. Observed by AC5.
+  value of `runtime.agents-in-flight` (TOOL-dGroundRules-10, catalogue default 6), whatever its source,
+  through TOOL-dBoundRoles-21 S1's `read_policy_setting` with `with_default`, the roles kit's one runner
+  of the `policy.py get` subprocess. With no policy kit found the cap arm prints `unarmed` once and
+  grades nothing, never green. Observed by AC5.
 - **S6** — Gov's four workflow-driver entries rewritten as rows, per §4 "### Gov's rows", each value
   the harness literal or resolved level it states at base, so no harness call changes in this unit.
   Observed by AC1 and AC3.
@@ -59,9 +63,8 @@ harness.
 
 - The five kinds as named defaults over the rows, the checklist, the orientation template, the merge,
   the twin rule and the experiment kind: TOOL-dBoundRoles-16's, over these rows (§8 F1).
-- A scenario's workflow entries and role rows composed per build: TOOL-dBoundRoles-20 composes the
-  `workflow` and `role` rows a repository's overlay or a scenario activates, through
-  PLAY-dOrderedCharter-35's `compose_rows`, and `load_workflows` returns that composition (§8 F2).
+- A repository's workflow entries and role rows composed with gov's: TOOL-dBoundRoles-20's, and
+  `load_workflows` returns that composition. A scenario's, composed per build, is §8 F2, open.
 - Harnesses reading `fan` and `cap` from the rows: the harness literals (`MAX_VERIFIERS` at
   `tools/workflows/tier2-review.js:1352`, `SPEC_WRITERS` at `tools/workflows/unattended-build.js:942`)
   stay until TOOL-dBoundRoles-16 binds the shapes to the calls.
@@ -75,7 +78,7 @@ harness.
 - **consumes-from** `TOOL-dBoundRoles-21` — `resolve_stage_efforts`, the order a row's declared effort takes its place in
 - **consumes-from** external — TOOL-dGroundRules-10's `runtime.agents-in-flight` and TOOL-dDeclaredLoop-29 S3's closed set of row kinds
 - **hands-off** `TOOL-dBoundRoles-16` — `workflow.stages`, the rows the five kinds are named defaults over
-- **hands-off** `TOOL-dBoundRoles-20` — `workflow.stages`, the rows a repository's and a scenario's workflow entries compose with gov's
+- **hands-off** `TOOL-dBoundRoles-20` — `workflow.stages`, the rows a repository's workflow entries compose with gov's, and a scenario's under §8 F2
 - **hands-off** `TOOL-dBoundRoles-43` — the stage rows and the effort order, whose every reader unit 43 re-points and whose steps it floors (ids 18 and 50 of the round-1 spec audit)
 
 ## 4. Design
@@ -110,9 +113,11 @@ returns = ["finding"]
 | `effort` | the stage's declared level, one of `EFFORT_LEVELS` |
 | `receives`, `returns` | the row kinds the stage takes and hands on, from `seam`, `criterion`, `interface`, `fork`, `finding`, `repair` (TOOL-dDeclaredLoop-29 S3), empty where none |
 
-The row kinds are read from the loop kit through `resolve_kit_dir("loop", "upstream.py", here)` where it
-resolves, so the set has one home; where it does not, the two lists are graded by the `seg` shape alone
-and one note says so.
+The row kinds have one home, TOOL-dDeclaredLoop-29 S3's closed set in the loop kit, which this kit
+never imports (its §4 "Where each part sits": "The roles kit never imports the loop kit"). They are
+read by running §8 F5's loop-kit verb as a subprocess, found through `resolve_kit_dir("loop", "upstream.py", here)`;
+where the kit or the verb does not answer, the two lists are graded by the `seg` shape alone and one
+note says so.
 
 ### Gov's rows
 
@@ -144,7 +149,7 @@ stage.
 ### The cap
 
 ```
-limit = read_agent_limit(root)          # resolve("runtime.agents-in-flight", root, rev).value
+limit = read_agent_limit(root)   # read_policy_setting("runtime.agents-in-flight", root, with_default=True)
 for each entry, for each row:  red when row.cap > limit
     "entry <n> (<name>) stage <key> caps <cap> agents, above runtime.agents-in-flight <limit>"
 ```
@@ -191,7 +196,7 @@ no Workflow call changes.
 ## 5. Production-readiness checklist
 
 - security — no new write path; the cap arm bounds what an entry may declare, under the one limit.
-- perf / scale — one `resolve` per run for the limit; the rows are a handful per entry.
+- perf / scale — one `policy.py get` per run for the limit and one kinds verb; the rows are a handful per entry.
 - error / empty / loading states — no policy kit prints `unarmed` for the cap arm; an entry with no
   rows on a `workflow` driver is an R9 line, never an empty map passed to a harness.
 - observability — `check_roles.py`'s summary counts the stage rows graded and prints the limit it
@@ -220,7 +225,8 @@ no Workflow call changes.
   deleted and no key set, it prints the rows' declared levels.
   Red when: the row's `effort` is read before the keys, so a set key loses to a row.
 - **AC4** — When the scratch copy's row carries `fan = 0`, `effort = "huge"` and
-  `returns = ["bug"]`, `python check_roles.py --root <repo>` exits 1 with three R9 lines naming the stage.
+  `returns = ["bug"]`, `python check_roles.py --root <repo>` beside a loop kit answering §8 F5's verb
+  exits 1 with three R9 lines naming the stage; with no loop kit it prints two and the `seg`-shape note.
   Red when: the row fields are read without validation, so a harness receives a zero fan.
 - **AC5** — When the scratch copy's `judge` row carries `cap = 7` and the fixture's limit resolves to 6,
   `python check_roles.py --root <fixture>` exits 1 with one R9 line naming `judge`, 7 and 6; at `cap = 6`
@@ -246,12 +252,17 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 AC5 · a fixture kit 
   carries the clause whole with that one phrase built by the unit after it.
   widens: none · relaxes: none
 - **F2 — "A scenario's workflow entries and role rows composed per build": which unit composes them?**
-  Options: (a) TOOL-dBoundRoles-20, which registers the role and workflow kinds a scenario's `activates`
-  table names (TOOL-dDeclaredLoop-27 S3) and composes rows through `compose_rows`; (b) this unit,
-  minting those kind rows ahead of the unit that owns them. (b) runs against the build order, the
-  kinds at order 23 and this unit at 5. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the order
-  constraint; this unit's rows are what the composition composes, handed off on `workflow.stages`.
-  widens: none · relaxes: none
+  A scenario activates only the kinds of TOOL-dDeclaredLoop-27 S3's `activatable` list, `kind.item` and
+  `kind.splice`, a set field `widens = "add"`, "so each later build admits its own kind's rows by adding
+  its kind". It holds neither `kind.role` nor `kind.workflow`, and TOOL-dBoundRoles-20 at `c8d46e188` adds neither, so
+  the rev-2 pick, unit 20 as registering the kinds a scenario's `activates` table names, is not borne
+  out. Options: (a) TOOL-dBoundRoles-20 adds the two kinds to the `activatable` list and composes a
+  scenario's activated rows with gov's and a repository's; (b) this unit mints them, against the build
+  order (the kinds at order 23, this unit at 5); (c) the scenario half recorded unowned in this build, a
+  scenario activating no role or workflow row until a later build adds the kinds. (a) carries the
+  clause whole on the unit owning the kinds, at the cost of a scope change to unit 20; (c) leaves the
+  clause's scenario half unbuilt. Recommendation (a). OPEN for the owner: whether unit 20's scope gains
+  the two `activatable` members or the half is recorded unowned.
 - **F3 — Is a row's `effort` required?** Options: (a) required, the clause's "every stage naming its
   ... effort"; (b) optional, the order falling to the role's declaration. RESOLVED (agent, 2026-10-25,
   delegated): (a), rung 1, the clause text; TOOL-dBoundRoles-16 may let a kind supply it.
@@ -261,12 +272,30 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 AC5 · a fixture kit 
   unit if `runtime.agents-in-flight` has no catalogue row then; the row kinds fall back to the `seg` shape
   with a note where the loop kit is absent, rung 1, the brief's rule for unbuilt parents.
   widens: none · relaxes: none
+- **F5 — How does the roles kit read the loop kit's closed set of row kinds?** A kit imports no
+  sibling kit (TOOL-dGroundRules-1 §4; TOOL-dDeclaredLoop-12 S4), and TOOL-dDeclaredLoop-29's verbs are
+  `upstream.py rows`, `join --write` and `--fixture` (its S8, S9 and §4 "Where each part sits"), none
+  printing S3's set. Options: (a) an ask to dDeclaredLoop for `upstream.py kinds`, printing the set one kind per line,
+  run as a subprocess; (b) a declared `requires_if` row on `tools/roles/kit.toml` naming `loop`, R9
+  importing `upstream.py` in process, which the rule admits only as a declaration `govkit selfcheck`
+  grades and that installs nothing (`tools/memory-tree/kit.toml:8`); (c) the `seg` shape alone,
+  always. (a) is one read-only verb over a set that already exists, and keeps the edge in the shape
+  that spec's §4 states; until it lands the `seg`-shape fallback runs with its note, so AC4's third line
+  waits on it. (b) binds the roles kit to a loop module's names. (c) drops S4's closed-set check.
+  Recommendation (a), the precedent of TOOL-dDeclaredLoop-12 §8 F5. OPEN for the owner: the ask the
+  build run files is "TOOL-dDeclaredLoop-29: `upstream.py kinds` prints S3's closed set of establishes
+  kinds, one per line".
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 22, the brief's I10, scout C's row for
   cl-0187, the night pass two's point 1, and the roles kit at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring the edges of TOOL-dBoundRoles-43, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-10-26 · S5 · §3 · §4 The row, The cap · §5 · AC4 · §8 F2 F5 · re-grounded per
+  `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` rows 40, 41 and 42: the agent limit
+  is read through `read_policy_setting`'s `policy.py get` subprocess; the row kinds through a loop-kit
+  verb by subprocess, F5 open for that ask; F2 re-opened for the owner, since
+  TOOL-dDeclaredLoop-27 S3's `activatable` list holds neither kind.
 
 ## 10. Reuse audit
 

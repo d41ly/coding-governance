@@ -1,6 +1,6 @@
 # TOOL-dBoundRoles-11 — every fork resolved by the role that meets it with its full record, or held as `run.on-owner-question` says
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
+**Status:** DEFERRED · rev-3 · 2026-10-26 · node d · Tier-2 · base 4ed9e567 · streams tooling · order 21 · advances TOOL-dBoundRoles-27
 
 **Carries:** cl-dClosedLoop-0176@6a45e0b7 whole
 **Carries:** node:policy-key.run.on-owner-question
@@ -14,8 +14,11 @@
 | [2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-agent-ledger.md) | journal | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-37 TOOL-dBoundRoles-38 TOOL-dBoundRoles-39 TOOL-dBoundRoles-40 TOOL-dBoundRoles-41 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-44 TOOL-dBoundRoles-45 TOOL-dBoundRoles-46 TOOL-dBoundRoles-47 TOOL-dBoundRoles-48 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-51 TOOL-dBoundRoles-52 TOOL-dBoundRoles-53 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-61 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-65 TOOL-dBoundRoles-66 TOOL-dBoundRoles-67 TOOL-dBoundRoles-68 TOOL-dBoundRoles-69 |
 | [2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dBoundRoles-1-spec-fix-return.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-26-build-TOOL-dBoundRoles-11-deviation-111.md](../build/2026-10-26-build-TOOL-dBoundRoles-11-deviation-111.md) | deviation | — |
+| [2026-10-26-build-TOOL-dBoundRoles-11-deviation-112.md](../build/2026-10-26-build-TOOL-dBoundRoles-11-deviation-112.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
 | [2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dBoundRoles-1-spec-fix-brief.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-10 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-crosscheck.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-9 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-37 TOOL-dBoundRoles-42 TOOL-dBoundRoles-43 TOOL-dBoundRoles-49 TOOL-dBoundRoles-50 TOOL-dBoundRoles-54 TOOL-dBoundRoles-55 TOOL-dBoundRoles-56 TOOL-dBoundRoles-57 TOOL-dBoundRoles-58 TOOL-dBoundRoles-59 TOOL-dBoundRoles-60 TOOL-dBoundRoles-62 TOOL-dBoundRoles-63 TOOL-dBoundRoles-64 TOOL-dBoundRoles-66 TOOL-dBoundRoles-69 |
+| [2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dBoundRoles-1-parents-reground.md) | research | TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-12 TOOL-dBoundRoles-14 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-25 TOOL-dBoundRoles-43 TOOL-dBoundRoles-60 |
 | [2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dBoundRoles-1-spec-audit-round1.md) | spec-audit | TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 |
 
 <!-- /gen:spec-records -->
@@ -55,7 +58,11 @@ hold at the one admission point.
   `park-build` and `stop-run`, its default `best-effort-recorded` (v2:1231, shared interface I18).
   Observed by AC5.
 - **S5** — The one reader, `resolve_owner_question(kind, attended, repo, rev)` in
-  `tools/roles/roles_lib.py`, the key read through TOOL-dGroundRules-2 S6's `resolve` (I8), and its
+  `tools/roles/roles_lib.py`, the key read by running TOOL-dGroundRules-2 S7's `policy.py get
+  run.on-owner-question --rev <rev>` as a subprocess in `repo`, the policy kit located by
+  `resolve_kit_dir("policy", "policy.py", here)` as TOOL-dBoundRoles-15 S6 reads its key, since a kit
+  imports no sibling kit (PLAY-dOrderedCharter-7 §4 "The policy reads"; I8). A `get` exit 2, or no
+  policy kit found, refuses naming the key and the reader's line or the kit. Its
   shell door `python tools/roles/handoff.py owner-question --kind <kind> [--attended]`, which prints the
   answer. A question of kind `fork` or `owner-gate`, raised while the owner is away, answers the key's
   value, `best-effort-recorded` read as `resolve`; a question raised while the owner attends, a
@@ -94,7 +101,7 @@ hold at the one admission point.
 ### Edges
 
 - **hands-off** `TOOL-dBoundRoles-26` — `run.on-owner-question`, its one reader `resolve_owner_question`, which that unit gives the budget-spent branch choosing only among endings
-- **consumes-from** external — TOOL-dGroundRules-2 S6's `resolve` and S7's `policy.py get`, the catalogue of TOOL-dGroundRules-1 S3, TOOL-dDeclaredLoop-6 S4's `new policy-key`, and PLAY-dOrderedCharter-7 S1's principle registry, each specced and unbuilt at base `4ed9e567`
+- **consumes-from** external — TOOL-dGroundRules-2 S7's `policy.py get`, the catalogue of TOOL-dGroundRules-1 S3, TOOL-dDeclaredLoop-6 S4's `new policy-key`, and PLAY-dOrderedCharter-7 S1's principle registry, each specced and unbuilt at base `4ed9e567`
 - **hands-off** `TOOL-dBoundRoles-43` — the key unit 11 reads, which unit 43 routes through `read_policy_setting` (id 31 of the round-1 spec audit)
 - **hands-off** `TOOL-dBoundRoles-44` — `FORK_RECORD_CUTOFF`, which unit 44 places after this build's spec dates (id 16 of the round-1 spec audit)
 
@@ -147,7 +154,7 @@ silence.
 
 ```python
 def resolve_owner_question(kind, attended, repo, rev="HEAD"):
-    """'resolve' | 'park-item' | 'park-build' | 'stop-run' | 'owner', read once through resolve()."""
+    """'resolve' | 'park-item' | 'park-build' | 'stop-run' | 'owner', the key read once by `policy.py get`."""
 ```
 
 | kind | owner attends | owner away |
@@ -302,6 +309,10 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC5 · the reader under each 
 - rev-1 · 2026-10-25 · initial draft, from the packet's Items 11, the brief's I8, I18 and I19, scout B's
   row for cl-0176, v2's P18 and `[policies]` row 1231, and TOOL-dDeclaredLoop-19 at base `4ed9e567`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullets mirroring the edges of TOOL-dBoundRoles-43, TOOL-dBoundRoles-44, promoted by the round-1 spec audit of the 26 unit specs; nothing else moved.
+- rev-3 · 2026-10-26 · S5 · §3 · §4 The reader · re-grounded per
+  `build/2026-10-26-build-TOOL-dBoundRoles-1-parents-crosscheck.md` row 18: `run.on-owner-question` is
+  read by the `policy.py get` subprocess, the one seam PLAY-dOrderedCharter-7 §4 lets a sibling kit
+  reach, never by an in-process `resolve()`.
 
 ## 10. Reuse audit
 
