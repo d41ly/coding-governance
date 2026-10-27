@@ -271,3 +271,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-27T18:52:54Z dispatch · item e41136f3 TOOL-dSafePassage-40 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-40.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-40-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
 
 2026-10-27T18:53:00Z brief · item TOOL-dSafePassage-40 · reason 3d142a75de5b memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-40-build-brief.md
+
+2026-10-27T19:08:40Z rescope · item add TOOL-dSafePassage-68 · reason the main loop's kill probe after TOOL-dSafePassage-40 found every upgrade-walk case broken: TOOL-dSafePassage-26 gave run_step_isolated a fifth parameter 'to', and the leg's child walk swaps in a four-argument run(), so each spawned update dies with TypeError at the first witness; the stand-in forwards the real signature, at order 7
