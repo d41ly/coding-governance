@@ -9,10 +9,19 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+keepalive-reaped: yes
+hold-run: 
+hold-streak: 1 · at a28d77ad
+resume-owed: none · owner
+held-at: 2026-10-27T07:36:22Z
+hold-reason: the spec-audit chain does not converge (highs 15, 10, 9, 5, 5, 4, 4, 5 over eight rounds, every high since round 3 on TOOL-dLinkedLibrary-8's CI census); the parked question asks the owner to keep auditing, stop the chain as for dKeptSession, or re-scope the census
+hold-until: owner
+hold-code: host-owner-action
+held-from: REVIEWING
 refreshed-at: 2bd5e10d4e861245d1a5adea5d53b45f90826489 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5a91830114df92e6f0655a423cd5cfe9d05bd0d4
-phase: REVIEWING
+witness: a28d77ad16e3b462951f4aa31681c59a7b1ced2c
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -181,3 +190,5 @@ base: 5fede642ad2ff1418f12b5d7117129edc8287d7e
 2026-10-27T07:06:06Z review · item dLinkedLibrary-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 21 · disposition promote
 
 2026-10-27T07:27:45Z decision · item The spec-audit chain does not converge: highs per round 15, 10, 9, 5, 5, 4, 4, 5 over eight rounds at precision 0.83 to 0.98, and every high since round 3 falls on TOOL-dLinkedLibrary-8's CI census, which reads CI YAML and its byte decoding by hand. The owner's ruling of 2026-10-27 stops the chain only at a round confirming no HIGH, and M4 ends it only below the precision floor, so neither bound is reachable. Which way does the spec run go? · reason Options: (a) keep auditing round after round under the ruling as written, each round about 1.8M subagent tokens and an hour; (b) stop the chain now, as the owner ruled for dKeptSession after its round 6: TOOL-dLinkedLibrary-97 to -102 close under a recorded override of specs-audited, every unit is deferred, and the run closes and lands; (c) re-scope the CI census: read CI files through a YAML parser, a new external dependency, or narrow the census to the CI forms it can read and refuse the rest, then audit that one redesign. Refused because (a) spends without a bound the ruling never set, (b) relaxes the owner's own stop rule, and (c) is a new dependency, M3 veto 2; none is the run's to take.
+
+2026-10-27T07:36:23Z hold · item host-owner-action · reason until owner · reaped 54d55780 · resume none(owner)
