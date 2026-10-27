@@ -21,8 +21,8 @@ hold-code: owner-decision
 held-from: RUNNING
 refreshed-at: 558b755a1e7e9fed1107cec2a5af7e33e4e363da · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3d57d3f168e568ccbdb48f41a67a98ea3740c7c4
-phase: RUNNING
+witness: de997afe9a050c75185625e6b50b8160a2a948ff
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
