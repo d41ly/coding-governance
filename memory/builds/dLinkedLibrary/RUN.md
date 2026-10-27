@@ -112,3 +112,17 @@ base: 5fede642ad2ff1418f12b5d7117129edc8287d7e
 2026-10-27T00:54:08Z rescope · item add TOOL-dLinkedLibrary-74 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 1 34 3 23 4 38 12 42 11 26 13 37 5 7 22 29 30 41 43 (items M1-M16) and LOW ids 6 16 17 28 31 32 44 45 46 36 (items L1-L10); repairs none
 
 2026-10-27T01:20:47Z review · item dLinkedLibrary-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 29 · disposition promote
+
+2026-10-27T02:05:09Z rescope · item add TOOL-dLinkedLibrary-75 · reason spec-audit of units 65 to 74 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-65-spec-audit.md) finding id 25 at HIGH, report item H1 (ids 12 and 41 bind the same defect at MEDIUM, item M3, batched in TOOL-dLinkedLibrary-80); repairs TOOL-dLinkedLibrary-74
+
+2026-10-27T02:05:17Z rescope · item add TOOL-dLinkedLibrary-76 · reason spec-audit of units 65 to 74 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-65-spec-audit.md) finding id 32 at HIGH, report item H2; repairs TOOL-dLinkedLibrary-71
+
+2026-10-27T02:05:17Z rescope · item add TOOL-dLinkedLibrary-77 · reason spec-audit of units 65 to 74 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-65-spec-audit.md) finding id 34 at HIGH, report item H3; repairs TOOL-dLinkedLibrary-73
+
+2026-10-27T02:05:18Z rescope · item add TOOL-dLinkedLibrary-78 · reason spec-audit of units 65 to 74 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-65-spec-audit.md) finding id 35 at HIGH, report item H4; repairs TOOL-dLinkedLibrary-73
+
+2026-10-27T02:05:19Z rescope · item add TOOL-dLinkedLibrary-79 · reason spec-audit of units 65 to 74 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-65-spec-audit.md) finding id 36 at HIGH, report item H5; repairs TOOL-dLinkedLibrary-74
+
+2026-10-27T02:05:20Z rescope · item add TOOL-dLinkedLibrary-80 · reason spec-audit of units 65 to 74 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-65-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 1 11 27 2 12 41 10 26 28 40 22 21 43 42 4 15 37 20 14 38 13 23 24 39 (items M1-M18) and LOW ids 6 7 17 8 3 16 (items L1-L5); repairs none
+
+2026-10-27T02:32:14Z review · item dLinkedLibrary-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 30 · disposition promote
