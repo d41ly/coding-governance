@@ -15,6 +15,7 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-27-build-TOOL-dRankedPlan-1-departures-spec.md](../build/2026-10-27-build-TOOL-dRankedPlan-1-departures-spec.md) | journal | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-departures-spec.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-departures-spec.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-1-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-1-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-2-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-2-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-3-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-3-spec-writer.md) | journal | — |

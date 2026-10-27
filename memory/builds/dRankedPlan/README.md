@@ -169,7 +169,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-82 — the spec tokens leg's ceiling covers the packet join over this run's live chain, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-27-spec-TOOL-dRankedPlan-82.md) | — | 1 | CLOSED | rev-2 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 141 bound to this build, across 4 record folder(s).
+Records: 142 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
