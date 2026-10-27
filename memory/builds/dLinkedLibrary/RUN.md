@@ -140,3 +140,15 @@ base: 5fede642ad2ff1418f12b5d7117129edc8287d7e
 2026-10-27T03:25:12Z rescope · item add TOOL-dLinkedLibrary-86 · reason spec-audit of units 75 to 80 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-75-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 1 2 16 22 40 3 4 5 12 14 15 39 17 23 25 26 27 28 29 37 38 41 (items M1-M18) and LOW ids 6 18 7 8 19 42 10 11 21 24 (items L1-L7); repairs none
 
 2026-10-27T03:38:32Z review · item dLinkedLibrary-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 32 · disposition promote
+
+2026-10-27T04:33:31Z rescope · item add TOOL-dLinkedLibrary-87 · reason spec-audit of units 81 to 86 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-81-spec-audit.md) finding id 1 at HIGH, report item H1 (id 28 binds the same gap at MEDIUM, item M13, batched in TOOL-dLinkedLibrary-91); repairs TOOL-dLinkedLibrary-81
+
+2026-10-27T04:33:32Z rescope · item add TOOL-dLinkedLibrary-88 · reason spec-audit of units 81 to 86 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-81-spec-audit.md) finding id 27 at HIGH, report item H2; repairs TOOL-dLinkedLibrary-81
+
+2026-10-27T04:33:32Z rescope · item add TOOL-dLinkedLibrary-89 · reason spec-audit of units 81 to 86 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-81-spec-audit.md) finding id 30 at HIGH, report item H3; repairs TOOL-dLinkedLibrary-84
+
+2026-10-27T04:33:33Z rescope · item add TOOL-dLinkedLibrary-90 · reason spec-audit of units 81 to 86 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-81-spec-audit.md) finding id 33 at HIGH, report item H4; repairs TOOL-dLinkedLibrary-86
+
+2026-10-27T04:33:34Z rescope · item add TOOL-dLinkedLibrary-91 · reason spec-audit of units 81 to 86 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-81-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 2 3 32 5 6 29 8 13 34 14 23 15 18 21 22 24 28 35 36 (items M1-M15) and LOW ids 4 7 25 9 11 12 16 26 17 19 37 (items L1-L9); repairs none
+
+2026-10-27T04:54:26Z review · item dLinkedLibrary-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 30 · disposition promote
