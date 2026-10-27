@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-84 — the record door matches a namespace entry exactly or by prefix, so the single attendance ref sits behind its session rule
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 64 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 64 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

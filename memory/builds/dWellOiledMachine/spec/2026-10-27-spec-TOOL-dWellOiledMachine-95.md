@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-95 — unit 90 never widens the shared spec token read: its S1 is handed whole to unit 93's caller-side join before unit 90 builds
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 66 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 66 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

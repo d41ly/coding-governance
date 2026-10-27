@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-79 — the spec audit's 49 medium and low findings, batched: capability rows, pack shapes, launch environment, registries, renders and the records that miscount
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 63 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 63 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

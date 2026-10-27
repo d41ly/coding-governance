@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-113 — spec 103's AC1 counts the predicate loader in spec 96's §6 preamble alone, so the fixture's copy no longer reads red
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-30 — act binding and shape-run rows for an experiment's acts, read at the experiment kind's harness
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 34 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 34 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0308@afc642fa whole
 

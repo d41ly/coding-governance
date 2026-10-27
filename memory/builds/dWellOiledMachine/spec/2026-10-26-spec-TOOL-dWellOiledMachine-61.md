@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-61 — the node profile at the node's home: read whole, schema-checked both ways, written only by the owner's guarded command
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0338@3c1ea0eb whole
 **Carries:** node:record-kind.node-profile

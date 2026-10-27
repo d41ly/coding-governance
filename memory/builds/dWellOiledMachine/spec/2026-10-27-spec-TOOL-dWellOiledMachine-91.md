@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-91 — the stall reset taken only from a limit record that is this session's, recent and still in force
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 56 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 56 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

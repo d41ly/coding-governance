@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-29 — the measured `browser` row and the `visual.capture` command adapter: a pinned tree served, the cache busted, the viewports taken, screenshots kept by hash after the scan
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 58 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 58 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0307@7b420e28 whole
 

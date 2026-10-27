@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-50 — the wait graph across builds: built at half a wait's deadline, one owner item per cycle, and a parent ending incomplete releasing its dependents
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 47 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 47 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0328@ff7cfaee whole
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-98 — one ordering probe, defined once in spec 95: an amendment is an ancestor of the amended unit's build commit, never the first subject a log prints
 
-**Status:** OPEN · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

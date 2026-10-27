@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-16 — the journal grammar moved into the core, its runtime producer, and its retention by `runtime.journal`
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0294@41b6d311 whole
 **Carries:** node:record-kind.journal

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-76 — a mailbox intake ratifies only on the proof of its own request, never a borrowed one
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 42 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 42 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

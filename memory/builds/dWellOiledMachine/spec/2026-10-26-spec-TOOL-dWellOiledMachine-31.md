@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-31 — a hook pack's refusal text: its rule, remedy and actor declared in the pack contract and checked at registration
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0309@3da1a616 whole
 

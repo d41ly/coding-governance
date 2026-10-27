@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-10 — the one enforcement surface: the kits' fragments as packs behind one dispatcher entry per event, failing closed
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0288@c845fe18 whole
 **Carries:** node:point.hook-packs

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-43 — the in-flight ledger: a slot per agent at SubagentStart and SubagentStop, Workflow reservations converted by run, a sweep keyed to the session's liveness, and its split fallback
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 36 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 36 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0321@f02a952d whole
 

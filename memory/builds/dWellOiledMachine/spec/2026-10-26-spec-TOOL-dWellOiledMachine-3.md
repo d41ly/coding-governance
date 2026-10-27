@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-3 — the owner's lifecycle requests: pause, resume, withdraw, supersede, attend and unattend through one guarded command
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 45 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 45 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0281@b4f7b233 whole
 **Carries:** node:item.life.request

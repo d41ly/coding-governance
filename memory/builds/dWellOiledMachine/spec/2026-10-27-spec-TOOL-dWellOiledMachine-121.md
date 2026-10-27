@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-121 — the round-6 promotions audit's 17 medium and low findings, batched: the walk's consumers and exemption, path spellings, flattened slices, bounded fixture ranges and criteria green at base
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 74 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 74 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

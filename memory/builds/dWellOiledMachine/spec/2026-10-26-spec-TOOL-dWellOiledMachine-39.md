@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-39 — every act's minimal binding record pushed to `refs/gov/bindings`, and one reader over `<current default>..HEAD` that never passes a binding it cannot find
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0317@9d62f0b1 whole
 

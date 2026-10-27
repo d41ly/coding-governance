@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-35 — the session node derived from bindings: `runs-in` and `after`, acts and sessions as native-id classes, the live inbox and the card's session list
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0313@ab83255b whole
 

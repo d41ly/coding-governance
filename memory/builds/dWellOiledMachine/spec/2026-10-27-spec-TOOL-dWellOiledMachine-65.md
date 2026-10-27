@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-65 — the stall journal line carries the limit's reset, and the limit hold reads it there
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 54 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 54 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

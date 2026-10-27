@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-105 — spec 97's S24 says what "before units 91 to 94 build" means, and its §5 names the ancestry probe as the detector
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

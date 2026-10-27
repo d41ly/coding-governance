@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-27 — intake for a prompt that reaches no owner session: the mailbox and cadence origins, only owner origin ratifying, and the interim roots drained
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 41 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 41 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0305@f0329aee whole
 

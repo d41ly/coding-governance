@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-20 — the `hook` and `point` tag namespaces, and the point registry they read
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 4 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0298@0b701ed6 whole
 **Carries:** node:tag-namespace.hook

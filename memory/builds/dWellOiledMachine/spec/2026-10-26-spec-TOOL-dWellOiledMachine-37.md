@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-37 — the launch preflight: no hook- or permission-skipping launch, trusted hooks by hash, an allowlisted environment, the credential order, and relative worktree pointers
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 29 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 29 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0315@b5839378 whole
 **Carries:** node:policy-key.runtime.secret-home

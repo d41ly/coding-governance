@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-124 — spec 121's AC4 is observed both ways: its walk count reads red over spec 115 before the cross-read and green after, and §4 records both readings
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 75 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 75 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

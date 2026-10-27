@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-44 — the memory-mirror point: a stand-in adapter fed from the change feed, four reads that consult it, and every verdict computed locally
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 57 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 57 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0322@a00b6c23 whole
 **Carries:** node:point.memory-mirrors

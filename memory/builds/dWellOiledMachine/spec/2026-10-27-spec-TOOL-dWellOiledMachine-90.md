@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-90 — the promotions audit's 55 medium and low findings, batched: claims, fixtures, readers, registries and the sibling records that drifted
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 65 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 65 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

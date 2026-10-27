@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-11 — workspaces by `build.worktree`: the allocator, the commit queue, integration before release, and a sweep that reaps only what it allocated
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 20 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 20 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0289@dc7da053 whole
 **Carries:** node:record-kind.workspace

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-123 — spec 121's AC4 requires the absence checks S5 writes into spec 115, so deleting them can never turn AC4 green
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 75 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 75 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

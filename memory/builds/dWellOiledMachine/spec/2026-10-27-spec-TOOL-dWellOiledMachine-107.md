@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-107 — spec 97's ordering check is observed red: a fixture where spec 91 already holds the amendment's string and one of four amendments lands late
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

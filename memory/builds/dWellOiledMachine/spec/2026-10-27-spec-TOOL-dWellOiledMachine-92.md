@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-92 — the lifted node lock handed to TOOL-dPlacedRequest-24 and -11 by an ask row, and unit 83's claim on their contract withdrawn
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 31 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 31 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

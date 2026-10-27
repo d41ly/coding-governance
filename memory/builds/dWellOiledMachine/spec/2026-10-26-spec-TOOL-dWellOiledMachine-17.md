@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-17 — the grant enforced on every adapter row, and the secret value scan at every publishing boundary with its shape report beside it
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0295@2b8dd6cc whole
 **Carries:** node:policy-key.runtime.secret-scan

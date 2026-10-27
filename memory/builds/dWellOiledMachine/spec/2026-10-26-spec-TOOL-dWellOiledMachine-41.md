@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-41 — a unit of a leased build offered at placement to another session or node as `build.unit-holders` says, its holder driving only that unit's passes on its own branch
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 50 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 50 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0319@2ffabe1b whole
 **Carries:** node:policy-key.build.unit-holders

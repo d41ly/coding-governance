@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-24 — the journal's count of map reads outside a slice: a record pack on every shell call that runs `gov map`, judged against the role's slice
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 55 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 55 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0302@0a747a85 whole
 

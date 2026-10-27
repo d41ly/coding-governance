@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-34 — `gov trace <key>` and `gov why <key>` over the one index, one timeline engine bounded by `trace.rows`, and the health and stall logs folded into the journal grammar
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 53 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 53 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0312@60d68fcb whole
 **Carries:** node:policy-key.trace.rows

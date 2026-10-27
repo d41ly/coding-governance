@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-12 — sessions bound on every source, a card never silently undelivered, and each compaction flushed, journaled and re-oriented
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 17 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 17 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0290@b1905801 whole
 **Carries:** node:record-kind.session-binding

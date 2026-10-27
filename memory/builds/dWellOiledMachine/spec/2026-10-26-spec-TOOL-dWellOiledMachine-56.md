@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-56 — the act's harness and credential resolved per role through Roles' resolver, a harness row for how it reads the credential, and the launch pinned out of bare mode
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 30 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 30 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0334@4fe16106 whole
 **Carries:** node:policy-key.runtime.act-harness

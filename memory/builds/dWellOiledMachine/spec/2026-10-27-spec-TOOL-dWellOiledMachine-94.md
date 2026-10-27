@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-94 — the round-2 promotions audit's 37 medium and low findings, batched: verbs, stores, claim layout, coverage lists, renders and citations
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

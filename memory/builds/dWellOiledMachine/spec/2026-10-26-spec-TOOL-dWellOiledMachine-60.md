@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-60 — the landing, its lease beat and its `landed` notice in one atomic push, and the commit queue's push through the same fence
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 25 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0337@91e18a60 whole
 

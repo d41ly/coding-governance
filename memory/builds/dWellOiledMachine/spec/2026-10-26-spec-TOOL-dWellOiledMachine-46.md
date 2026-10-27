@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-46 — the progress ledger per item instance: no-progress and repeat counted on witnesses, a lifetime relaunch cap, and a lease renewed only on progress
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 48 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 48 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0324@1b8963c8 whole
 **Carries:** node:policy-key.runtime.no-progress

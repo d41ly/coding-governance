@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-21 — the hook-message and harness-prompt templates: hook text and Workflow prompts as slot-line templates over registered units
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 13 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 13 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0299@1be73e25 whole
 

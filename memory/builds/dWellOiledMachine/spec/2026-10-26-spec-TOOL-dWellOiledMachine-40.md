@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-40 — the commit queue pushes the build's branch as `build.push` says, taking no lander lock and running no bar but a declared branch bar
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 23 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 23 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0318@800a78ec whole
 **Carries:** node:policy-key.build.push

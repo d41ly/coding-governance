@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-54 — discovery and the pick: one read of a project's claimable ready set, a pure replaceable pick filtered by the node profile, and the preset check refusing a harness with no model
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 51 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 51 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0332@aef236e5 whole
 

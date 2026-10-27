@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-103 — spec 96's AC5 checks its ordering by ancestry: the parse amendment is an ancestor of unit 93's build commit
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

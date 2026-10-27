@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-28 — the unattended kit dissolved: its hooks and its tick taken into the runtime kit, `RESUME_SCHEDULE_*` retired, `/unattended` a client of `run`, with the upgrade steps that carry adopters across
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 61 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 61 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0306@a3aa83b5 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-38 — the per-session orientation card retired into the session binding, with the write gate's card and route reads re-pointed in the same unit
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0316@8f48a4b0 whole
 

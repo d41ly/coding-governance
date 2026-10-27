@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-100 — spec 95's AC2 checks its ordering by ancestry: each rev bump is an ancestor of unit 90's build commit
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

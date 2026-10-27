@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-4 — the prompt-submit pack: each owner prompt written verbatim to the intake record, its secrets redacted and its size capped
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 40 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 40 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0282@328da93b whole
 **Carries:** node:item.entry.intake

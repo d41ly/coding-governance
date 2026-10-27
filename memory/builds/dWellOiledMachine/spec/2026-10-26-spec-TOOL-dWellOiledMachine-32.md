@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-32 — the act as the key: minted at launch with the harness session id, its record, its cost and duration, and the identity committed records may carry
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 15 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 15 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0310@6e643d4a whole
 **Carries:** node:record-kind.act

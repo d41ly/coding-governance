@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-126 — the round-7 promotions audit's 11 medium and low findings, batched: 97 S1's unquoted pathspec, criteria that observe 108 S8 and S10 and the edges, the token checker's own predicate, a positive count that can fail, a pinned held_halves read and observers that read 115
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 76 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 76 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

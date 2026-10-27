@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-9 — agent slots reserved under `runtime.agents-in-flight`: the slot ledger and the supervisor's reservations
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 35 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 35 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0287@1aa49fdd whole
 

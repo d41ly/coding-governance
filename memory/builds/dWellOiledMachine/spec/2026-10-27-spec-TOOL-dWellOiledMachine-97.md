@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-97 — the round-3 promotions audit's 23 medium and low findings, batched: pathspecs, the fixture session, probe environments, the ask row, renders and criteria green before their build
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

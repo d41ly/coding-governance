@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-58 — the record door: every coordination write bound to its writer's session binding, and the two closing items it admits
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 26 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 26 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0505@d65ddfae whole
 **Carries:** node:item.life.unlease

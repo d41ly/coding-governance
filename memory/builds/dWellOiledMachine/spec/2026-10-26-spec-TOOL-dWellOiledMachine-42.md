@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-42 — `gov-session` retired with an upgrade step: a hand-off becomes an `intake` message or a unit offered at placement, every reader re-pointed in the same unit
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 52 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 52 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0320@2dda5d80 whole
 

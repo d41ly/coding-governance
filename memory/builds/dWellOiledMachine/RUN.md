@@ -177,3 +177,253 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T11:30:50Z rescope · item add TOOL-dWellOiledMachine-126 · reason promoted from the spec audit of the round-7 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-116-spec-audit.md), its 11 minor findings batched into one unit, 7 MEDIUM (findings 3 4 7 10 11 14 16) and 4 LOW (findings 5 8 12 15), repairing no one unit since they land on specs 120 and 121
 
 2026-10-27T11:50:34Z review · item dWellOiledMachine-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 11 · disposition promote
+
+2026-10-27T12:12:51Z rescope · item defer TOOL-dWellOiledMachine-1 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:12:54Z rescope · item defer TOOL-dWellOiledMachine-16 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:12:56Z rescope · item defer TOOL-dWellOiledMachine-61 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:12:58Z rescope · item defer TOOL-dWellOiledMachine-72 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:01Z rescope · item defer TOOL-dWellOiledMachine-20 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:04Z rescope · item defer TOOL-dWellOiledMachine-86 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:07Z rescope · item defer TOOL-dWellOiledMachine-88 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:09Z rescope · item defer TOOL-dWellOiledMachine-22 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:11Z rescope · item defer TOOL-dWellOiledMachine-17 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:16Z rescope · item defer TOOL-dWellOiledMachine-14 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:19Z rescope · item defer TOOL-dWellOiledMachine-13 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:21Z rescope · item defer TOOL-dWellOiledMachine-68 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:27Z rescope · item defer TOOL-dWellOiledMachine-15 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:31Z rescope · item defer TOOL-dWellOiledMachine-36 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:35Z rescope · item defer TOOL-dWellOiledMachine-10 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:38Z rescope · item defer TOOL-dWellOiledMachine-31 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:44Z rescope · item defer TOOL-dWellOiledMachine-69 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:49Z rescope · item defer TOOL-dWellOiledMachine-71 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:53Z rescope · item defer TOOL-dWellOiledMachine-21 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:13:58Z rescope · item defer TOOL-dWellOiledMachine-82 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:03Z rescope · item defer TOOL-dWellOiledMachine-2 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:08Z rescope · item defer TOOL-dWellOiledMachine-32 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:09Z rescope · item defer TOOL-dWellOiledMachine-39 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:12Z rescope · item defer TOOL-dWellOiledMachine-67 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:14Z rescope · item defer TOOL-dWellOiledMachine-12 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:16Z rescope · item defer TOOL-dWellOiledMachine-38 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:19Z rescope · item defer TOOL-dWellOiledMachine-77 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:24Z rescope · item defer TOOL-dWellOiledMachine-23 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:26Z rescope · item defer TOOL-dWellOiledMachine-73 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:27Z rescope · item defer TOOL-dWellOiledMachine-11 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:30Z rescope · item defer TOOL-dWellOiledMachine-33 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:32Z rescope · item defer TOOL-dWellOiledMachine-35 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:35Z rescope · item defer TOOL-dWellOiledMachine-40 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:39Z rescope · item defer TOOL-dWellOiledMachine-55 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:41Z rescope · item defer TOOL-dWellOiledMachine-60 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:43Z rescope · item defer TOOL-dWellOiledMachine-58 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:46Z rescope · item defer TOOL-dWellOiledMachine-57 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:48Z rescope · item defer TOOL-dWellOiledMachine-63 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:50Z rescope · item defer TOOL-dWellOiledMachine-6 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:52Z rescope · item defer TOOL-dWellOiledMachine-87 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:55Z rescope · item defer TOOL-dWellOiledMachine-37 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:14:58Z rescope · item defer TOOL-dWellOiledMachine-78 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:00Z rescope · item defer TOOL-dWellOiledMachine-56 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:02Z rescope · item defer TOOL-dWellOiledMachine-80 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:06Z rescope · item defer TOOL-dWellOiledMachine-83 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:08Z rescope · item defer TOOL-dWellOiledMachine-89 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:10Z rescope · item defer TOOL-dWellOiledMachine-8 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:15Z rescope · item defer TOOL-dWellOiledMachine-92 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:17Z rescope · item defer TOOL-dWellOiledMachine-7 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:19Z rescope · item defer TOOL-dWellOiledMachine-74 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:21Z rescope · item defer TOOL-dWellOiledMachine-19 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:23Z rescope · item defer TOOL-dWellOiledMachine-30 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:25Z rescope · item defer TOOL-dWellOiledMachine-9 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:29Z rescope · item defer TOOL-dWellOiledMachine-43 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:31Z rescope · item defer TOOL-dWellOiledMachine-70 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:33Z rescope · item defer TOOL-dWellOiledMachine-45 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:35Z rescope · item defer TOOL-dWellOiledMachine-66 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:37Z rescope · item defer TOOL-dWellOiledMachine-53 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:39Z rescope · item defer TOOL-dWellOiledMachine-52 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:43Z rescope · item defer TOOL-dWellOiledMachine-4 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:46Z rescope · item defer TOOL-dWellOiledMachine-27 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:48Z rescope · item defer TOOL-dWellOiledMachine-75 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:50Z rescope · item defer TOOL-dWellOiledMachine-5 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:53Z rescope · item defer TOOL-dWellOiledMachine-76 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:55Z rescope · item defer TOOL-dWellOiledMachine-48 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:15:58Z rescope · item defer TOOL-dWellOiledMachine-18 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:03Z rescope · item defer TOOL-dWellOiledMachine-3 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:07Z rescope · item defer TOOL-dWellOiledMachine-47 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:11Z rescope · item defer TOOL-dWellOiledMachine-50 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:15Z rescope · item defer TOOL-dWellOiledMachine-46 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:19Z rescope · item defer TOOL-dWellOiledMachine-49 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:21Z rescope · item defer TOOL-dWellOiledMachine-41 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:25Z rescope · item defer TOOL-dWellOiledMachine-54 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:28Z rescope · item defer TOOL-dWellOiledMachine-42 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:32Z rescope · item defer TOOL-dWellOiledMachine-34 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:35Z rescope · item defer TOOL-dWellOiledMachine-51 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:38Z rescope · item defer TOOL-dWellOiledMachine-65 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:43Z rescope · item defer TOOL-dWellOiledMachine-24 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:48Z rescope · item defer TOOL-dWellOiledMachine-81 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:52Z rescope · item defer TOOL-dWellOiledMachine-59 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:55Z rescope · item defer TOOL-dWellOiledMachine-91 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:16:58Z rescope · item defer TOOL-dWellOiledMachine-44 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:01Z rescope · item defer TOOL-dWellOiledMachine-29 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:04Z rescope · item defer TOOL-dWellOiledMachine-26 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:07Z rescope · item defer TOOL-dWellOiledMachine-25 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:11Z rescope · item defer TOOL-dWellOiledMachine-28 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:17Z rescope · item defer TOOL-dWellOiledMachine-64 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:20Z rescope · item defer TOOL-dWellOiledMachine-79 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:23Z rescope · item defer TOOL-dWellOiledMachine-84 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:25Z rescope · item defer TOOL-dWellOiledMachine-85 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:28Z rescope · item defer TOOL-dWellOiledMachine-90 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:33Z rescope · item defer TOOL-dWellOiledMachine-93 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:35Z rescope · item defer TOOL-dWellOiledMachine-95 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:38Z rescope · item defer TOOL-dWellOiledMachine-100 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:40Z rescope · item defer TOOL-dWellOiledMachine-101 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:44Z rescope · item defer TOOL-dWellOiledMachine-94 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:49Z rescope · item defer TOOL-dWellOiledMachine-96 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:51Z rescope · item defer TOOL-dWellOiledMachine-98 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:54Z rescope · item defer TOOL-dWellOiledMachine-99 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:57Z rescope · item defer TOOL-dWellOiledMachine-102 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:17:59Z rescope · item defer TOOL-dWellOiledMachine-103 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:02Z rescope · item defer TOOL-dWellOiledMachine-104 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:04Z rescope · item defer TOOL-dWellOiledMachine-97 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:07Z rescope · item defer TOOL-dWellOiledMachine-105 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:09Z rescope · item defer TOOL-dWellOiledMachine-106 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:12Z rescope · item defer TOOL-dWellOiledMachine-107 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:15Z rescope · item defer TOOL-dWellOiledMachine-113 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:20Z rescope · item defer TOOL-dWellOiledMachine-108 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:24Z rescope · item defer TOOL-dWellOiledMachine-114 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:30Z rescope · item defer TOOL-dWellOiledMachine-109 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:34Z rescope · item defer TOOL-dWellOiledMachine-110 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:36Z rescope · item defer TOOL-dWellOiledMachine-111 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:38Z rescope · item defer TOOL-dWellOiledMachine-112 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:40Z rescope · item defer TOOL-dWellOiledMachine-115 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:41Z rescope · item defer TOOL-dWellOiledMachine-116 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:45Z rescope · item defer TOOL-dWellOiledMachine-117 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:47Z rescope · item defer TOOL-dWellOiledMachine-118 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:50Z rescope · item defer TOOL-dWellOiledMachine-119 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:53Z rescope · item defer TOOL-dWellOiledMachine-120 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:56Z rescope · item defer TOOL-dWellOiledMachine-121 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:18:58Z rescope · item defer TOOL-dWellOiledMachine-122 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:19:00Z rescope · item defer TOOL-dWellOiledMachine-123 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:19:02Z rescope · item defer TOOL-dWellOiledMachine-124 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:19:04Z rescope · item defer TOOL-dWellOiledMachine-125 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-27T12:19:06Z rescope · item defer TOOL-dWellOiledMachine-126 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 8 by the owner's ruling of 2026-10-27 (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-stop-chain.md), carried forward to the build run

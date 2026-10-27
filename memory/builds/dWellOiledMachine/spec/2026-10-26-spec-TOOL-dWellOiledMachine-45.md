@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-45 — the admission queue: every spawn and Workflow call waits its turn under `runtime.agents-in-flight`, clamped to the share it can hold, and handed to the executor past the hook's hold
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 37 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 37 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0323@eafe421b whole
 

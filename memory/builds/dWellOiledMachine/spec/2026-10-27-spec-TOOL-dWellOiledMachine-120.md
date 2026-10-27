@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-120 — every path to the two unbuilt fixtures that the cross-read writes into a criterion is quoted, so the spec-token join skips it
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 73 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 73 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

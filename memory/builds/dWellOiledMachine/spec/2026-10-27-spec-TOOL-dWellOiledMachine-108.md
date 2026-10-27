@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-108 — the round-4 promotions audit's 22 medium and low findings, batched: the arm parse, liveness halves, scoped greps, stale figures and the ask's second row
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 70 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 70 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

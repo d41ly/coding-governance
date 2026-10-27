@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-19 — act binding against the resolved shape's digest, `roles.shape-enforce`, the journal reconciled against the shape, and each non-review act's shape-run row
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 33 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 33 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0297@c082d7d0 whole
 **Carries:** node:point.role-harnesses

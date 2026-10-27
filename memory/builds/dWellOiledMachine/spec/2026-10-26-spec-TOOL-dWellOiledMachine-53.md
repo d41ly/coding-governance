@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-53 — admission under `runtime.admission-scope`: the node's plan and hardware ledgers, charged by every project and weighed by the profile's shares
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 38 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 38 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0331@df99638c whole
 **Carries:** node:policy-key.runtime.admission-scope

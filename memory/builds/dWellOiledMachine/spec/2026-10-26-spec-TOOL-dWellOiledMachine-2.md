@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-2 — the `next` verb over the position function, the `next —` micro-format, and every declared command ending with one
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 14 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 14 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0280@62ada92d whole
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-15 — the node registry's runtime facts, the clock offset measured at each beat and correcting a holder's stamp where a lease's expiry is judged
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0293@8132ebad whole
 

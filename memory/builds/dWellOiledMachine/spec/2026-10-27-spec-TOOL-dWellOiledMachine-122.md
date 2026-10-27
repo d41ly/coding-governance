@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-122 — spec 121's AC4 counts `not in ok` inside spec 115's walk alone, so the absence checks S5 writes elsewhere in 115 no longer read red
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 75 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 75 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

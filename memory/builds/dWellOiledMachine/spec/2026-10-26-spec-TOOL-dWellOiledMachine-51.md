@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-51 — each build's spend derived from its `trace.cost` rows and trended, `build.spend-cap` measured by default and set from that evidence, and a build reaching a set cap ending as `flow.on-exhausted` says
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 54 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 54 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0329@4e8f519b whole
 **Carries:** node:policy-key.build.spend-cap

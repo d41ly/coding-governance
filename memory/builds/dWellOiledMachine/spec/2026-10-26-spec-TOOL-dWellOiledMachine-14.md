@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-14 — harness adapters with capability tables, measured and never claimed, and their install targets
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0292@7eaaf1a6 whole
 **Carries:** node:point.harness-adapters

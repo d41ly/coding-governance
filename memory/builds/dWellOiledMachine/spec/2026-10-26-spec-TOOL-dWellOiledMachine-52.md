@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-52 — the node beat: the supervisor's beat carrying the node's capacity, free slots, load, holds and plan allowance, and nothing of another project
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 39 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 39 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0330@9b33b8bb whole
 

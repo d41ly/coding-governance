@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-8 — the persisted-return store, keyed per spawn site, and the shared deferral block
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 31 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 31 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0286@459158b1 whole
 **Carries:** node:record-kind.return

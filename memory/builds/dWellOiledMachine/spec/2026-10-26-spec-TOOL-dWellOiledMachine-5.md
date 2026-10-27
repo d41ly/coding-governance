@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-5 — Plan's ratification and the placement dispositions re-pointed to the intake record, RC-9's fallback drained per harness, and fallback witnesses kept readable
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 42 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 42 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0283@b08404fd whole
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-125 — 97 AC1 runs 90 AC20's walk over the two files at their repository paths, as spec 121 has 108 S10 spell it
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 75 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 75 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

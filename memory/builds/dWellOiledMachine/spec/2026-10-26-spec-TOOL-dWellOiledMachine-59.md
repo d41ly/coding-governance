@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-59 — a cadence run's own rework budget on its period lease, the cadence-items point, and the tick that runs them
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 56 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 56 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0336@cd3fcb78 whole
 **Carries:** node:point.cadence-items

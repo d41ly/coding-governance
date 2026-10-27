@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-25 — the supervisor the only driver in every mode: `run` hands a build to it, the owner's session its client, the hosted fallback act-bound, and `/build` a client of `run`
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 60 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 60 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0303@b32fa809 whole
 **Carries:** node:point.actor-kinds

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-49 — the refusal breaker: every refusal journaled with its rule, one rule's repeats ending the act, and a remedy another guard refuses refused at registration
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 49 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 49 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0327@e342bb96 whole
 **Carries:** node:policy-key.runtime.refusal-repeats

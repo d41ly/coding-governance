@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-6 — the supervisor: `resume-tick.sh` grown into the executor's seam, one act session per role act, relaunch by policy, and a reconcile before the first beat
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 28 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 28 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0284@8ad94483 whole
 **Carries:** node:point.command-adapters

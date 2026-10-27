@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-115 — the round-5 promotions audit's 24 medium and low findings, batched: loader counts, pathspecs, the bare-bash walk, the predicate's cache and attribution, fixture directories and citations
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 72 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 72 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 

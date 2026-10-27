@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-57 — the secret scan over coordination payloads and adapter boundaries, the door's token-shape refusal, and the request record bound to its intake
 
-**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 27 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 27 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0335@523e4c44 whole
 

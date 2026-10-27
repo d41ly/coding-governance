@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-7 — act binding and the epoch check at the Workflow, Agent and shell call, decided in the dispatcher's PermissionRequest entry, with in-script spawns declared and reconciled
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 32 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 32 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0285@d2c4cd28 whole
 

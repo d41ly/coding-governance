@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-33 — the `Gov-*` trailers written from the binding at every commit site, and the commit-key check at the push and in `commit-msg`
 
-**Status:** OPEN · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0311@d9f33c79 whole
 **Carries:** node:policy-key.commits.edge-check

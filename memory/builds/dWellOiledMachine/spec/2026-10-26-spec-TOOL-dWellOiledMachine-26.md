@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-26 — the `step —` announcement before each act while attended, and once when attendance begins, rendered from `next` and the item's declaration
 
-**Status:** OPEN · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 59 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 59 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0304@498bf1e8 whole
 

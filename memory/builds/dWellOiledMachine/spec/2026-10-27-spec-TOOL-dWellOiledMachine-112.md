@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-112 — spec 108's ordering check is observed red: a fixture where the amendment of spec 97 lands after unit 92 builds and before unit 94
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 71 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 71 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
