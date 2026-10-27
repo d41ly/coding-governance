@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-55 — a shell-fed heredoc body resolves a bound name against the enclosing file's bindings
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-55-deviation-551.md](../build/2026-10-27-build-TOOL-dRankedPlan-55-deviation-551.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) | spec-audit | TOOL-dRankedPlan-59 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,8 @@ bindings as well as the body's own. It repairs `TOOL-dRankedPlan-46`, so it sits
 - **consumes-from** `TOOL-dRankedPlan-46` — S1's shell arm, whose body reading S1 gives the enclosing bindings; without it no body reaches the shell reader
 - **consumes-from** `TOOL-dRankedPlan-49` — S1's file-wide bindings and S2's resolution, which S1 carries into a body
 - **hands-off** `TOOL-dRankedPlan-56` — the inherited bindings, with which that unit reads a `bash -c` word and a here-string
+- **hands-off** `TOOL-dRankedPlan-66` — the inherited bindings, which that unit gives each command substitution of an expanded body (spec audit of units 53 to 62, id 31)
+- **hands-off** `TOOL-dRankedPlan-67` — §3 and §4 Evidence, which that unit's items for findings 35 and 20 amend and re-cite; carry S14 and S28 of that unit into this unit's pass (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -145,6 +148,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 46 to 52, finding 32 (HIGH,
   item H2), repairing `TOOL-dRankedPlan-46`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-66`, the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

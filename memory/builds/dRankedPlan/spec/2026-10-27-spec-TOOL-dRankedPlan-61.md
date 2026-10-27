@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-61 — the symbol-render rule reaches every function-minting unit, selected by its Inventory row
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 23 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 23 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-61-deviation-611.md](../build/2026-10-27-build-TOOL-dRankedPlan-61-deviation-611.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) | spec-audit | TOOL-dRankedPlan-59 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-62 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,7 @@ selection by Inventory row, and the rule carried into every unit it selects. It 
 - **consumes-from** `TOOL-dRankedPlan-37` — its Files touched and §7, which carry S1 for `read_ratifying_exit`
 - **consumes-from** `TOOL-dRankedPlan-52` — S11 and AC11, whose selector S2 supersedes
 - **hands-off** `TOOL-dRankedPlan-62` — S2's Inventory selector, over which that unit's item for finding 2 observes that a prose-only spec is not selected
+- **hands-off** `TOOL-dRankedPlan-67` — AC1, AC2 and §10, which that unit's items for findings 36, 6 and 22 correct; carry S19, S22 and S29 of that unit into this unit's pass (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -140,6 +142,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 46 to 52, finding 22 (HIGH,
   item H8; finding 2 is its medium face), repairing `TOOL-dRankedPlan-52`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

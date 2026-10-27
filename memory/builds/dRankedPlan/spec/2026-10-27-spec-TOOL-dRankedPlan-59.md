@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-59 — a wrapper call reads its script word past the interpreter's options, as a bare call does
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-59-deviation-591.md](../build/2026-10-27-build-TOOL-dRankedPlan-59-deviation-591.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) | spec-audit | TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,7 @@ one order above it.
 
 - **consumes-from** `TOOL-dRankedPlan-50` — S1's wrapper call and `SHELL_WRAPPER_COMMANDS`, whose first arm S1 restates; without them there is no wrapper call to read
 - **hands-off** `TOOL-dRankedPlan-62` — S1's restated arm, which that unit's item for finding 17 matches in unit 50's §4 table
+- **hands-off** `TOOL-dRankedPlan-67` — §4 Evidence, which that unit's item for finding 20 re-cites; carry S28 of that unit into this unit's pass (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -145,6 +147,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 46 to 52, finding 30 (HIGH,
   item H6), repairing `TOOL-dRankedPlan-50`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

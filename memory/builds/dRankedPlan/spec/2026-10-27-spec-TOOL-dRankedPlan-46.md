@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-46 — a heredoc body fed to a shell is read by the shell reader, through its own command-word test
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -66,6 +66,7 @@ checked before any interpreter test. Finding 30, the Python arm of the same item
 - **hands-off** `TOOL-dRankedPlan-55` — S1's body reading, which that unit gives the enclosing file's bindings (spec audit of units 46 to 52, id 32)
 - **hands-off** `TOOL-dRankedPlan-56` — `SHELL_BODY_WORDS` and the shell arm, over which that unit reads a `bash -c` word and a here-string (spec audit of units 46 to 52, id 27)
 - **hands-off** `TOOL-dRankedPlan-62` — S1's normalizations, S2, AC2, §4 Evidence, §7 and the `New arm:` line, which that unit's items for findings 10, 15, 16, 19, 24 and 33 plant or correct; carry S6, S14, S15's AC2 Red-when, S19 and S22 of that unit into this unit's pass (spec audit of units 46 to 52)
+- **hands-off** `TOOL-dRankedPlan-67` — §4 Evidence, whose citation that unit's AC8 observes carried by its findings 3 and 17 item; nothing new to carry here beyond unit 62's S22 (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -155,6 +156,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 38 to 45, finding 1 (HIGH,
   item H1, shared with finding 30), repairing `TOOL-dRankedPlan-45`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-53`, the hands-off edge to `TOOL-dRankedPlan-55`, the hands-off edge to `TOOL-dRankedPlan-56`, the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

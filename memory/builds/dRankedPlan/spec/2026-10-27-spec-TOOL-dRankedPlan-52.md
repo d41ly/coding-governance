@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-52 — the spec audit of units 38 to 45: its 25 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -207,6 +207,7 @@ items to carry into its own pass. This unit builds the rest and observes every i
 - **hands-off** `TOOL-dRankedPlan-57` — S7's `piece` tokens and rebuilt word, through which that unit reads a substitution's words in an assignment (spec audit of units 46 to 52, id 28)
 - **hands-off** `TOOL-dRankedPlan-61` — S11 and AC11, whose selector that unit replaces with an Inventory-row reading (spec audit of units 46 to 52, id 22)
 - **hands-off** `TOOL-dRankedPlan-62` — S3 to S5, S7, S10, AC3 to AC5, AC10 and §7, which that unit's items for findings 1, 4, 5, 13, 14, 24, 25 and 26 narrow, restate or observe; carry S1, S2, S4, S5, S6 and S17 of that unit into this unit's pass (spec audit of units 46 to 52)
+- **hands-off** `TOOL-dRankedPlan-67` — S7's piece rule and AC10, which that unit's items for findings 34 and 4 extend and observe; carry S18 of that unit into this unit's pass (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -373,6 +374,7 @@ none
   11 LOW findings, ids 2 3 4 5 6 9 11 12 14 15 16 18 19 20 21 23 24 25 26 27 28 29 31 32 36, batched
   under BUILD-METHOD M4.
 - rev-2 · 2026-10-27 · §3 · gains the consumes-from edge to `TOOL-dRankedPlan-58`, the hands-off edge to `TOOL-dRankedPlan-53`, the hands-off edge to `TOOL-dRankedPlan-54`, the hands-off edge to `TOOL-dRankedPlan-56`, the hands-off edge to `TOOL-dRankedPlan-57`, the hands-off edge to `TOOL-dRankedPlan-61`, the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

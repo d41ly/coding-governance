@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-60 — a JavaScript argv element naming a same-file binding resolves to that binding's strings
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-60-deviation-601.md](../build/2026-10-27-build-TOOL-dRankedPlan-60-deviation-601.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) | spec-audit | TOOL-dRankedPlan-59 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,9 @@ order above it.
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-48` — S1's `str` tokens and S3's array elements, over which S1 collects the bindings and S2 resolves an element; without them there is no string text to compare
+- **hands-off** `TOOL-dRankedPlan-63` — S1's collector and S2's resolution, whose binding extent that unit restates through the shared expression-end reader (spec audit of units 53 to 62, id 32)
+- **hands-off** `TOOL-dRankedPlan-64` — S1's collector and S2's resolution, which that unit gives one binding per declarator (spec audit of units 53 to 62, id 21)
+- **hands-off** `TOOL-dRankedPlan-67` — §3 and the §4 table, which that unit's item for finding 33 amends; carry S17 of that unit into this unit's pass (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -143,6 +147,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 46 to 52, finding 31 (HIGH,
   item H7), repairing `TOOL-dRankedPlan-48`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-63`, the hands-off edge to `TOOL-dRankedPlan-64`, the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

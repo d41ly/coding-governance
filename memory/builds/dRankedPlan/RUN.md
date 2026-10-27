@@ -133,3 +133,15 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T05:06:09Z review · item dRankedPlan-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 23 · disposition promote
 
 2026-10-27T05:11:28Z decision · item the audit chain feeds on one unbounded mechanism: the static caller check of read_plan_ratification · reason rounds 3-5 promoted 22 highs, nearly all refining the shell, Python and JS caller readers of TOOL-dRankedPlan-22/30-32/38-41/46-51/53-60 (heredocs, -c words, here-strings, wrappers, bindings); a static parser of arbitrary shell is never complete, so M4's precision bound (0.93, 0.86, 0.94) will not end it. Options: (a) keep promoting; (b) cap the chain as for dPlacedRequest, dDeclaredLoop and dKeptSession; (c) re-scope TOOL-dRankedPlan-22 from a static caller check to a runtime guard in the predicate itself, retiring the parser units. Refused: (b) is an owner cap, and (c) retires units and changes a design the audit confirmed, a fork the mandate does not delegate. The run keeps promoting under (a).
+
+2026-10-27T06:23:27Z rescope · item add TOOL-dRankedPlan-63 · reason spec-audit of TOOL-dRankedPlan-53 to -62 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) id 32 HIGH item H1 (shared with id 21): unit 60's JS binding ends on the declaration's first line, so a path.join binding written across lines passes; repairs TOOL-dRankedPlan-60
+
+2026-10-27T06:23:29Z rescope · item add TOOL-dRankedPlan-64 · reason spec-audit of TOOL-dRankedPlan-53 to -62 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) id 21 HIGH item H1 (shared with id 32): unit 60 S1 types its own extent rule beside read_ts_expr_end and leaves a declarator list's later bindings unread; repairs TOOL-dRankedPlan-60
+
+2026-10-27T06:23:31Z rescope · item add TOOL-dRankedPlan-65 · reason spec-audit of TOOL-dRankedPlan-53 to -62 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) id 29 HIGH item H2: a double-quoted -c carrier with escaped inner quotes passes the line rule; repairs TOOL-dRankedPlan-56
+
+2026-10-27T06:23:34Z rescope · item add TOOL-dRankedPlan-66 · reason spec-audit of TOOL-dRankedPlan-53 to -62 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) id 31 HIGH item H3: an expanded heredoc body fed to a command word in neither the shell nor the Python class is read by nothing; repairs TOOL-dRankedPlan-53
+
+2026-10-27T06:23:36Z rescope · item add TOOL-dRankedPlan-67 · reason spec-audit of TOOL-dRankedPlan-53 to -62 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) the 30 MEDIUM and LOW findings batched into one unit: ids 1 2 3 4 5 6 7 8 10 11 12 13 14 15 16 17 18 19 20 22 23 24 25 26 30 33 34 35 36 37 (items M1 to M14 and L1 to L8)
+
+2026-10-27T06:39:39Z review · item dRankedPlan-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 30 · disposition promote

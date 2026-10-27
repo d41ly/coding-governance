@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-57 — a shell assignment whose value is a command substitution binds the words inside it
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-57-deviation-571.md](../build/2026-10-27-build-TOOL-dRankedPlan-57-deviation-571.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) | spec-audit | TOOL-dRankedPlan-59 TOOL-dRankedPlan-55 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ to the name. It repairs `TOOL-dRankedPlan-49`, so it sits one order above it.
 
 - **consumes-from** `TOOL-dRankedPlan-49` — S1's collector and S2's resolution, whose value rule S1 widens; without them no binding exists
 - **consumes-from** `TOOL-dRankedPlan-52` — S7's `piece` tokens and the rebuilt outer word, through which S1 finds the `$()` in a value
+- **hands-off** `TOOL-dRankedPlan-67` — S1's substitution value, which that unit's item for finding 34 extends to a backtick span; carry S18 of that unit into this unit's pass (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -147,6 +149,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 46 to 52, finding 28 (HIGH,
   item H4), repairing `TOOL-dRankedPlan-49`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

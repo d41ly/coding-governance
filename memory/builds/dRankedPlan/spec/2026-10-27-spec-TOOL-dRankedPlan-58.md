@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-58 — every `ratify.py` word comparison of the shell reader goes through one resolving test
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 22 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-58-deviation-581.md](../build/2026-10-27-build-TOOL-dRankedPlan-58-deviation-581.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md) | spec-audit | TOOL-dRankedPlan-59 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ present or later, resolves. It repairs `TOOL-dRankedPlan-49`, so it sits one ord
 - **consumes-from** `TOOL-dRankedPlan-50` — S1's wrapper-call test, a comparison site S1 routes through the test
 - **hands-off** `TOOL-dRankedPlan-52` — `resolve_ratify_word`, which that unit's S13 line rule calls for its `ratify.py` comparison
 - **hands-off** `TOOL-dRankedPlan-62` — `resolve_ratify_word`, over which that unit's item for finding 8 plants the bound path behind `timeout`
+- **hands-off** `TOOL-dRankedPlan-67` — `resolve_ratify_word`, S1 and §4 Evidence, over which that unit's items for findings 11 and 20 plant and re-cite; carry S13 and S28 of that unit into this unit's pass (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -143,6 +145,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 46 to 52, finding 29 (HIGH,
   item H5; finding 8 is its medium face), repairing `TOOL-dRankedPlan-49`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

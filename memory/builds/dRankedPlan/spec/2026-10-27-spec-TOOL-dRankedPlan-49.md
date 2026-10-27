@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-49 — a shell word naming a variable bound to a `ratify.py` path names `ratify.py`
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -68,6 +68,7 @@ twin, so it sits one order above it.
 - **hands-off** `TOOL-dRankedPlan-57` — S1's collector, whose value rule that unit widens to a command substitution's words (spec audit of units 46 to 52, id 28)
 - **hands-off** `TOOL-dRankedPlan-58` — S2's resolution, which that unit makes the one test every `ratify.py` comparison calls (spec audit of units 46 to 52, id 29)
 - **hands-off** `TOOL-dRankedPlan-62` — S1, §7, §10 and its Alternatives rejected, which that unit's items for findings 12, 21 and 24 extend or correct; carry S6 and S23's text of that unit into this unit's pass (spec audit of units 46 to 52)
+- **hands-off** `TOOL-dRankedPlan-67` — S1's bindings, which that unit's item for finding 11 has every resolving site pass, and its Alternatives rejected, which that unit's AC23 observes carried from unit 62's S23 (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -153,6 +154,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 38 to 45, finding 33 (HIGH,
   item H3), repairing `TOOL-dRankedPlan-45`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-55`, the hands-off edge to `TOOL-dRankedPlan-57`, the hands-off edge to `TOOL-dRankedPlan-58`, the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

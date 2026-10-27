@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-50 — a command run through `timeout` or a same-file `$@` wrapper function is read through its arguments
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 9 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -72,6 +72,7 @@ interpreter-plus-variable form. It repairs `TOOL-dRankedPlan-40`, so it sits one
 - **hands-off** `TOOL-dRankedPlan-58` — S1's wrapper-call test, which that unit routes through `resolve_ratify_word` (spec audit of units 46 to 52, id 29)
 - **hands-off** `TOOL-dRankedPlan-59` — S1's first arm, which that unit restates past the interpreter's options (spec audit of units 46 to 52, id 30)
 - **hands-off** `TOOL-dRankedPlan-62` — S1's direct arm, S2, §4, §7 and §10, which that unit's items for findings 9, 17, 20 and 24 plant or correct; carry S6, S11 and S12's `spans` keyword with its copies, Files touched and leg line, of that unit into this unit's pass (spec audit of units 46 to 52)
+- **hands-off** `TOOL-dRankedPlan-67` — the `spans` keyword this unit builds, whose close rule that unit's item for finding 37 corrects; carry S20 of that unit into this unit's pass (spec audit of units 53 to 62)
 
 ## 4. Design
 
@@ -189,6 +190,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 38 to 45, finding 34 (HIGH,
   item H4), repairing `TOOL-dRankedPlan-40`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-58`, the hands-off edge to `TOOL-dRankedPlan-59`, the hands-off edge to `TOOL-dRankedPlan-62`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-67`, each the reciprocal of that promoted unit's own edge (spec audit of units 53 to 62, `reviews/2026-10-27-review-TOOL-dRankedPlan-53-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 
