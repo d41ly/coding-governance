@@ -90,3 +90,25 @@ base: 5fede642ad2ff1418f12b5d7117129edc8287d7e
 2026-10-26T23:17:11Z rescope · item add TOOL-dLinkedLibrary-64 · reason spec-audit of units 37 to 53 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-37-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 5 6 20 7 8 18 19 25 28 30 31 32 33 34 (items M1-M12) and LOW ids 9 10 11 13 14 15 21 22 23 (items L1-L9); repairs none
 
 2026-10-26T23:38:55Z review · item dLinkedLibrary-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 10 · minors 23 · disposition promote
+
+2026-10-27T00:53:58Z rescope · item add TOOL-dLinkedLibrary-65 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 24 at HIGH, report item H1 (id 33 shares it, its own unit); repairs TOOL-dLinkedLibrary-54
+
+2026-10-27T00:53:59Z rescope · item add TOOL-dLinkedLibrary-66 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 33 at HIGH, report item H1 (id 24 shares it, its own unit); repairs TOOL-dLinkedLibrary-55
+
+2026-10-27T00:54:00Z rescope · item add TOOL-dLinkedLibrary-67 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 2 at HIGH, report item H2; repairs TOOL-dLinkedLibrary-61
+
+2026-10-27T00:54:02Z rescope · item add TOOL-dLinkedLibrary-68 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 18 at HIGH, report item H3; repairs TOOL-dLinkedLibrary-59
+
+2026-10-27T00:54:03Z rescope · item add TOOL-dLinkedLibrary-69 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 19 at HIGH, report item H4 (id 35 shares it, its own unit); repairs TOOL-dLinkedLibrary-57
+
+2026-10-27T00:54:04Z rescope · item add TOOL-dLinkedLibrary-70 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 35 at HIGH, report item H4 (id 19 shares it, its own unit); repairs TOOL-dLinkedLibrary-57
+
+2026-10-27T00:54:05Z rescope · item add TOOL-dLinkedLibrary-71 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 15 at HIGH, report item H5 (id 40 shares it, its own unit); repairs TOOL-dLinkedLibrary-63
+
+2026-10-27T00:54:06Z rescope · item add TOOL-dLinkedLibrary-72 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 40 at HIGH, report item H5 (id 15 shares it, its own unit); repairs TOOL-dLinkedLibrary-63
+
+2026-10-27T00:54:07Z rescope · item add TOOL-dLinkedLibrary-73 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) finding id 39 at HIGH, report item H6; repairs TOOL-dLinkedLibrary-63
+
+2026-10-27T00:54:08Z rescope · item add TOOL-dLinkedLibrary-74 · reason spec-audit of units 54 to 64 round1 (reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) minors batched in one unit (BUILD-METHOD M4): MEDIUM ids 1 34 3 23 4 38 12 42 11 26 13 37 5 7 22 29 30 41 43 (items M1-M16) and LOW ids 6 16 17 28 31 32 44 45 46 36 (items L1-L10); repairs none
+
+2026-10-27T01:20:47Z review · item dLinkedLibrary-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 9 · minors 29 · disposition promote
