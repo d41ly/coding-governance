@@ -364,3 +364,5 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T20:33:15Z resume · item dRankedPlan · reason held · keepalive b425cd37 · manual
 
 2026-10-27T20:33:32Z rescope · item add TOOL-dRankedPlan-82 · reason owner-authorized at the hand-off of 2026-10-27 ("Raise the spec-tokens leg's ceiling in tools/gate-legs.json enough for the live chain's packet join, then resume dRankedPlan, re-run the close and land it"): the spec tokens leg's 390s ceiling cannot hold the packet join over this run's live chain (killed twice in the close's bar); sized through derive-ceilings.py --observed as TOOL-dGroundRules-87 was, built in this run
+
+2026-10-27T21:13:52Z brief · item TOOL-dRankedPlan-82 · reason 35dc3e181a21 memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-82-spec-brief.md

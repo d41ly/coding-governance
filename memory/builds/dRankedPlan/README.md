@@ -166,7 +166,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-80 — a JavaScript declarator that opens with a destructuring pattern ends at its value, so the declarator after it is bound](spec/2026-10-27-spec-TOOL-dRankedPlan-80.md) | 25 | 2 | DEFERRED | rev-1 | 2026-10-27 |
 | [TOOL-dRankedPlan-77 — the spec audit of units 63 to 67: its 16 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-77.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-81 — the spec audit of units 68 to 77: its 20 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-81.md) | 27 | 2 | DEFERRED | rev-1 | 2026-10-27 |
-| [TOOL-dRankedPlan-82 — the spec tokens leg's ceiling covers the packet join over this run's live chain, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-27-spec-TOOL-dRankedPlan-82.md) | 28 | 1 | DEFERRED | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-82 — the spec tokens leg's ceiling covers the packet join over this run's live chain, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-27-spec-TOOL-dRankedPlan-82.md) | — | 1 | DEFERRED | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
 Records: 135 bound to this build, across 4 record folder(s).
@@ -246,7 +246,8 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 80 spec(s) at 
 | 25 | `TOOL-dRankedPlan-67`, `TOOL-dRankedPlan-73`, `TOOL-dRankedPlan-74`, `TOOL-dRankedPlan-75`, `TOOL-dRankedPlan-76`, `TOOL-dRankedPlan-78`, `TOOL-dRankedPlan-79`, `TOOL-dRankedPlan-80` | no |
 | 26 | `TOOL-dRankedPlan-77` | no |
 | 27 | `TOOL-dRankedPlan-81` | no |
-| 28 | `TOOL-dRankedPlan-82` | no |
+
+Unordered: `TOOL-dRankedPlan-82`.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
