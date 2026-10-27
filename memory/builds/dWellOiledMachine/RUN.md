@@ -452,3 +452,5 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T20:33:01Z rescope · item add TOOL-dWellOiledMachine-127 · reason owner-ordered at the hand-off (memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-1-owner-raise-ceilings.md): the close's bar timed out spec tokens (512s alone vs its 390s ceiling) and routed commits (358s alone vs 300s); this unit raises both ceilings from readings of each leg alone through derive-ceilings.py --observed, the route TOOL-dGroundRules-87 took, and is the one unit this spec run builds
 
 2026-10-27T21:13:39Z brief · item TOOL-dWellOiledMachine-127 · reason e90d284841e7 memory/builds/dWellOiledMachine/prompts/2026-10-27-prompt-TOOL-dWellOiledMachine-127-spec-brief.md
+
+2026-10-27T21:38:34Z dispatch · item a286be1c TOOL-dWellOiledMachine-127 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md memory/builds/dWellOiledMachine/spec/2026-10-27-spec-TOOL-dWellOiledMachine-127.md memory/builds/dWellOiledMachine/README.md memory/LIVE.md memory/map/generated/symbols.json
