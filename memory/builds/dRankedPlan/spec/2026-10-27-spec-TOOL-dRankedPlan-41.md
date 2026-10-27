@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-41 — the shell caller reader tokenizes through the shared shell tokenizer, and a file it cannot tokenize exits 2
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-38-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-38-promoted-fix-return.md) | research | TOOL-dRankedPlan-38 TOOL-dRankedPlan-45 |
 | [2026-10-27-build-TOOL-dRankedPlan-41-deviation-411.md](../build/2026-10-27-build-TOOL-dRankedPlan-41-deviation-411.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-38-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-38-promoted-fix-brief.md) | research | TOOL-dRankedPlan-38 TOOL-dRankedPlan-45 |
+| [2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) | spec-audit | TOOL-dRankedPlan-43 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-44 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 |
 
 <!-- /gen:spec-records -->
 
@@ -80,6 +81,9 @@ above it.
 - **consumes-from** `TOOL-dRankedPlan-32` — `read_shell_callers` and S2's invocation forms, whose tokenizing S3 re-points; without them there is no reader to feed
 - **consumes-from** external — dTotalRecall's `tools/lib/extract_code.py`, its `scan_shell_tokens` and its parity row (TOOL-dTotalRecall-13 S1, S3), built before this build run
 - **hands-off** `TOOL-dRankedPlan-45` — S1's separators mode and S4's error rule, over which that unit's items for findings 13, 14 and 20 add the prefilter, the heredoc reading and the JavaScript tokenizer
+- **hands-off** `TOOL-dRankedPlan-49` — S3's commands and words, over which that unit collects the shell assignments a `$name` script word resolves through (spec audit of units 38 to 45, id 33)
+- **hands-off** `TOOL-dRankedPlan-51` — S3's command model, whose boundary that unit widens to the op tokens `(`, `)`, `{` and `}` (spec audit of units 38 to 45, id 35)
+- **hands-off** `TOOL-dRankedPlan-52` — the separators mode, the copies, Files touched and §7, which that unit's items for findings 5, 9, 11, 23, 24 and 25 extend or correct; carry S6, S9, S10 and S16 into this unit's pass (spec audit of units 38 to 45, ids 5, 9, 11, 23, 24, 25)
 
 ## 4. Design
 
@@ -192,6 +196,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 30 to 37, finding 33 (HIGH,
   item H3; finding 13 is its medium face), repairing `TOOL-dRankedPlan-32`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-49`, the hands-off edge to `TOOL-dRankedPlan-51`, the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

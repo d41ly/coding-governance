@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-38 — a shell or hook line naming the session predicate is a caller, beside the invocation rule
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-38-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-38-promoted-fix-return.md) | research | TOOL-dRankedPlan-41 TOOL-dRankedPlan-45 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-38-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-38-1-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-38-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-38-promoted-fix-brief.md) | research | TOOL-dRankedPlan-41 TOOL-dRankedPlan-45 |
+| [2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) | spec-audit | TOOL-dRankedPlan-43 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-44 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 |
 
 <!-- /gen:spec-records -->
 
@@ -65,6 +66,7 @@ call to any naming of the predicate, so the in-process forms are refused too. It
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-32` — `read_shell_callers` and S5's caller definition, beside which S1 restores the textual rule; without them there is no shell reader to widen
+- **hands-off** `TOOL-dRankedPlan-52` — S2's plants, AC3 and the arm line, which that unit's item for finding 6 completes with the `caller-hook-comment` plant; carry S15 into this unit's pass (spec audit of units 38 to 45, id 6)
 
 ## 4. Design
 
@@ -159,6 +161,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 30 to 37, finding 1 (HIGH,
   item H1), repairing `TOOL-dRankedPlan-32`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

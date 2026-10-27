@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-45 — the spec audit of units 30 to 37: its 32 medium and low findings, closed in one batch
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 20 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 20 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-27-build-TOOL-dRankedPlan-38-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-38-promoted-fix-return.md) | research | TOOL-dRankedPlan-38 TOOL-dRankedPlan-41 |
 | [2026-10-27-build-TOOL-dRankedPlan-45-deviation-451.md](../build/2026-10-27-build-TOOL-dRankedPlan-45-deviation-451.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-38-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-38-promoted-fix-brief.md) | research | TOOL-dRankedPlan-38 TOOL-dRankedPlan-41 |
+| [2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) | spec-audit | TOOL-dRankedPlan-43 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-44 TOOL-dRankedPlan-42 |
 
 <!-- /gen:spec-records -->
 
@@ -224,6 +225,11 @@ observes every item at its tip.
 - **consumes-from** `TOOL-dRankedPlan-16` — §3's hands-off line to unit 37, whose figure S11 respells away
 - **consumes-from** `TOOL-dRankedPlan-41` — the separators mode and its exit 2, over which S9 adds the prefilter, S10 the heredoc token and S16 the JavaScript tokenizer
 - **consumes-from** `TOOL-dRankedPlan-43` — the rename walk, over which S20 states and plants the replace-in-one-commit case
+- **hands-off** `TOOL-dRankedPlan-46` — S10's `heredoc` token and its routing table, whose shell arm that unit restates as its own command-word test (spec audit of units 38 to 45, id 1)
+- **hands-off** `TOOL-dRankedPlan-47` — S10's `heredoc` token, its routing table and the `caller-heredoc-argv` plant, whose Python arm that unit restates over unit 32's interpreter class (spec audit of units 38 to 45, id 30)
+- **hands-off** `TOOL-dRankedPlan-48` — S16's `read_js_callers` reading and the `caller-js-argv` plant, whose element text that unit takes from the tokenizer's new string mode (spec audit of units 38 to 45, id 8)
+- **hands-off** `TOOL-dRankedPlan-49` — S3's bound-name rule for Python, whose shell twin that unit adds (spec audit of units 38 to 45, id 33)
+- **hands-off** `TOOL-dRankedPlan-52` — S10's heredoc token, S21's seed check, S31's seed, AC8, AC10, AC12, AC22, AC23, §4 and §5, which that unit's items for findings 3, 4, 16, 18, 21, 24, 26, 29, 31 and 36 correct or extend; carry S9, S12, S18 and S19 into this unit's pass (spec audit of units 38 to 45)
 
 ## 4. Design
 
@@ -413,6 +419,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 30 to 37: its 23 MEDIUM and
   9 LOW findings, ids 3 4 5 6 7 9 11 12 13 14 15 16 17 18 20 21 23 24 25 27 28 29 30 31 32 35 36 37 39
   40 41 42, batched under BUILD-METHOD M4.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-46`, the hands-off edge to `TOOL-dRankedPlan-47`, the hands-off edge to `TOOL-dRankedPlan-48`, the hands-off edge to `TOOL-dRankedPlan-49`, the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

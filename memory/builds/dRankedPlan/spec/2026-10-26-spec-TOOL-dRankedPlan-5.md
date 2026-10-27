@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-5 — the live-build mapping carried out: each live build kept or absorbed, recorded per build
 
-**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0373@f1eb8c00 whole
 
@@ -80,6 +80,7 @@ absorbed, and the plan view showing each.
 - **consumes-from** `TOOL-dRankedPlan-9` — `read_plan_ratification`, the witness S4 requires before any mapping record is written
 - **consumes-from** external — dDeclaredLoop's disposition record and `check_disposition_record` (TOOL-dDeclaredLoop-16 S4, S5); dPlacedRequest's `item.entry.place-owner` row (TOOL-dPlacedRequest-3 S2)
 - **hands-off** `TOOL-dRankedPlan-29` — the mapping records, AC1 and `derive_mapping`, which that unit's S1 to S3, S29 and S30 correct (round-1 spec audit, ids 6, 7, 14, 35, 42)
+- **hands-off** `TOOL-dRankedPlan-52` — `derive_mapping`'s Files touched and §7 leg line, which that unit's item for finding 25 completes with `memory/map/generated/symbols.json` and the freshness and recall legs; carry S10 into this unit's pass (spec audit of units 38 to 45, id 25)
 
 ## 4. Design
 
@@ -227,6 +228,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC5 · the `plan-mapping
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 5, v2:1787-1792, v1:147-177,
   walkthrough:356 and :362-363, TOOL-dDeclaredLoop-16, TOOL-dPlacedRequest-3 S2, and scout B's row -5.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

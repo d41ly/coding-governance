@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-44 — dormancy disposal orders its kept dispositions across items by ancestry, and holds on a conflict
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 12 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-44-deviation-441.md](../build/2026-10-27-build-TOOL-dRankedPlan-44-deviation-441.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) | spec-audit | TOOL-dRankedPlan-43 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +70,7 @@ and sits one order above it.
 
 - **consumes-from** `TOOL-dRankedPlan-35` — `derive_newest_disposition` and its `why` convention, whose conflict key S2 widens to the item; without it there is no order to pass the union to
 - **consumes-from** `TOOL-dRankedPlan-4` — `read_build_disposition`, `DISPOSAL_MOVES`, `dispose` and its `dispose-*` plants, whose per-item pick S3 supersedes with one ordered pick; without them there is no disposal to order
+- **hands-off** `TOOL-dRankedPlan-52` — `read_kept_dispositions`' Files touched and §7 leg line, which that unit's item for finding 25 completes with `memory/map/generated/symbols.json` and the freshness and recall legs; carry S10 into this unit's pass (spec audit of units 38 to 45, id 25)
 
 ## 4. Design
 
@@ -165,6 +167,7 @@ none
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 30 to 37, finding 22 (HIGH,
   item H6, found against `TOOL-dRankedPlan-35`), repairing `TOOL-dRankedPlan-4`, whose
   `read_build_disposition` carries the defect.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

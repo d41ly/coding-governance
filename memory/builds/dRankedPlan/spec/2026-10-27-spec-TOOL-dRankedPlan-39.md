@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-39 — a command led by a compound-command reserved word is read past that word
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-39-deviation-391.md](../build/2026-10-27-build-TOOL-dRankedPlan-39-deviation-391.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) | spec-audit | TOOL-dRankedPlan-43 TOOL-dRankedPlan-38 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-44 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,8 @@ of the forms the reader reads. Finding 34, the prefix commands and the case arm 
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-32` — `read_shell_callers` and S2's command-word rule, which S1 reads past the reserved words; without it there is no command word to find
+- **hands-off** `TOOL-dRankedPlan-51` — `SHELL_RESERVED_WORDS`, from which that unit takes the `{` the tokenizer never yields as a word (spec audit of units 38 to 45, id 35)
+- **hands-off** `TOOL-dRankedPlan-52` — `SHELL_RESERVED_WORDS`, §4 Evidence and §10, which that unit's items for findings 2, 15 and 20 probe and correct; carry S17 and S21 into this unit's pass (spec audit of units 38 to 45, ids 2, 15, 20)
 
 ## 4. Design
 
@@ -139,6 +142,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 30 to 37, finding 2 (HIGH,
   item H2, shared with finding 34), repairing `TOOL-dRankedPlan-32`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-51`, the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-40 — a command led by a prefix command or a case-arm pattern is read past it
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 8 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-40-deviation-401.md](../build/2026-10-27-build-TOOL-dRankedPlan-40-deviation-401.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) | spec-audit | TOOL-dRankedPlan-43 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-41 TOOL-dRankedPlan-44 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,9 @@ before the command word is read. Finding 2, the compound-command reserved words 
 ### Edges
 
 - **consumes-from** `TOOL-dRankedPlan-32` — `read_shell_callers` and S2's command-word rule, which S1 and S2 read past the prefix and the pattern; without it there is no command word to find
+- **hands-off** `TOOL-dRankedPlan-50` — S1's prefix skip and §3's wrapper non-goal, after which that unit reads `timeout` and same-file `$@` wrapper functions, and whose premise it corrects (spec audit of units 38 to 45, id 34)
+- **hands-off** `TOOL-dRankedPlan-51` — S2's case-arm rule and the `caller-shell-case` plant, which that unit restates over the `)` op (spec audit of units 38 to 45, id 35)
+- **hands-off** `TOOL-dRankedPlan-52` — `SHELL_PREFIX_COMMANDS`, S1's skip and §10, which that unit's items for findings 2, 12 and 19 probe, give an option table and correct; carry S20 into this unit's pass (spec audit of units 38 to 45, ids 2, 12, 19)
 
 ## 4. Design
 
@@ -143,6 +147,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 30 to 37, finding 34 (HIGH,
   item H2, shared with finding 2), repairing `TOOL-dRankedPlan-32`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-50`, the hands-off edge to `TOOL-dRankedPlan-51`, the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

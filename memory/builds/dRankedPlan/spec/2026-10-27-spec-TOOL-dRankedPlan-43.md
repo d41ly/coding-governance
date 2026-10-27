@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-43 — a disposition record's first appearance follows renames and never copies
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-43-deviation-431.md](../build/2026-10-27-build-TOOL-dRankedPlan-43-deviation-431.md) | deviation | — |
+| [2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) | spec-audit | TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-44 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,7 @@ path to its oldest add. It repairs `TOOL-dRankedPlan-34`, so it sits one order a
 
 - **consumes-from** `TOOL-dRankedPlan-34` — `read_first_appearance` and the `reader-bound` and `terminal-reentry` plants, whose `--follow` read S1 rewrites; without them there is no date to correct
 - **hands-off** `TOOL-dRankedPlan-45` — S1's rename walk, over which that unit's item for finding 36 states and plants the replace-in-one-commit case
+- **hands-off** `TOOL-dRankedPlan-52` — S3's edit to unit 34, which that unit's item for finding 28 withdraws; carry S24 into this unit's pass (spec audit of units 38 to 45, id 28)
 
 ## 4. Design
 
@@ -152,6 +154,7 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of units 30 to 37, finding 19 (HIGH,
   item H5), repairing `TOOL-dRankedPlan-34`.
+- rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
 
 ## 10. Reuse audit
 

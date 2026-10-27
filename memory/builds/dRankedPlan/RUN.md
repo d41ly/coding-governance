@@ -93,3 +93,19 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T02:00:02Z review · item dRankedPlan-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 32 · disposition promote
 
 2026-10-27T02:17:14Z decision · item cap the dRankedPlan spec-audit promotion chain? · reason options: (a) keep promoting per M4 until a round's precision falls below the review protocol's floor — rounds 1-3 ran at 1.00, 0.91, 0.93 with 9, 7 and 7 highs, so no end is in sight; (b) stop at the first round confirming no BLOCKER and no HIGH, as the owner ruled for dPlacedRequest, dDeclaredLoop and dKeptSession; (c) another cap. Refused to choose: an owner cap on the chain is the owner's, and those rulings name their builds, not this one. The run keeps promoting under (a) meanwhile.
+
+2026-10-27T03:26:38Z rescope · item add TOOL-dRankedPlan-46 · reason spec-audit of TOOL-dRankedPlan-38 to -45 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) id 1 HIGH item H1 (shared with id 30): S10's bash or sh body arm is stated through an interpreter class it contradicts, so a body fed to a shell has no reachable reader; repairs TOOL-dRankedPlan-45
+
+2026-10-27T03:26:41Z rescope · item add TOOL-dRankedPlan-47 · reason spec-audit of TOOL-dRankedPlan-38 to -45 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) id 30 HIGH item H1 (shared with id 1): a heredoc body fed to a $ variable interpreter such as "$py" reaches only the textual rule, so its argv call to ratify.py passes; repairs TOOL-dRankedPlan-45
+
+2026-10-27T03:26:44Z rescope · item add TOOL-dRankedPlan-48 · reason spec-audit of TOOL-dRankedPlan-38 to -45 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) id 8 HIGH item H2: S16 reads JavaScript argv elements from string texts scan_ts_tokens never emits; repairs TOOL-dRankedPlan-45
+
+2026-10-27T03:26:46Z rescope · item add TOOL-dRankedPlan-49 · reason spec-audit of TOOL-dRankedPlan-38 to -45 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) id 33 HIGH item H3: a shell script path bound to a variable and invoked through it is read by no rule; repairs TOOL-dRankedPlan-45, whose S3 resolves bound names for Python only
+
+2026-10-27T03:26:49Z rescope · item add TOOL-dRankedPlan-50 · reason spec-audit of TOOL-dRankedPlan-38 to -45 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) id 34 HIGH item H4: the prefix-command set rests on a false no-tracked-file premise, so timeout and same-file function wrappers pass the ban; repairs TOOL-dRankedPlan-40
+
+2026-10-27T03:26:51Z rescope · item add TOOL-dRankedPlan-51 · reason spec-audit of TOOL-dRankedPlan-38 to -45 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) id 35 HIGH item H5: the op tokens ( ) { } have no reading, so brace groups, subshells and function bodies fail open; repairs TOOL-dRankedPlan-41
+
+2026-10-27T03:26:52Z rescope · item add TOOL-dRankedPlan-52 · reason spec-audit of TOOL-dRankedPlan-38 to -45 round 1 (reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) the 25 MEDIUM and LOW findings batched into one unit: ids 2 3 4 5 6 9 11 12 14 15 16 18 19 20 21 23 24 25 26 27 28 29 31 32 36 (items M1 to M12 and L1 to L11)
+
+2026-10-27T03:48:14Z review · item dRankedPlan-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 25 · disposition promote

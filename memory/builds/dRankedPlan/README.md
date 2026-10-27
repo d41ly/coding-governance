@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45
+ids: TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52
 spec-audit: 2026-10-21
 parents: dDeclaredLoop dTotalRecall dBoundRoles
 may: PLAY-dClosedLoop-3
@@ -76,11 +76,11 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 43 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 50 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15
 ids TOOL-dRankedPlan-16 TOOL-dRankedPlan-17 TOOL-dRankedPlan-18 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29
 ids TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43
-ids TOOL-dRankedPlan-44 TOOL-dRankedPlan-45
+ids TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -99,7 +99,7 @@ ids TOOL-dRankedPlan-44 TOOL-dRankedPlan-45
 | [TOOL-dRankedPlan-21 — a plan row is ratified by the recorded crossing of its build's `plan.exit`, read in any session](spec/2026-10-26-spec-TOOL-dRankedPlan-21.md) | 6 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-22 — the session-scoped ratification predicate is asked only at the act it ratifies, gated over the tree](spec/2026-10-26-spec-TOOL-dRankedPlan-22.md) | 6 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-35 — the newest disposition is ordered by ancestry, and kept records the order cannot rank hold the gate when their words differ](spec/2026-10-27-spec-TOOL-dRankedPlan-35.md) | 6 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dRankedPlan-43 — a disposition record's first appearance follows renames and never copies](spec/2026-10-27-spec-TOOL-dRankedPlan-43.md) | 6 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-43 — a disposition record's first appearance follows renames and never copies](spec/2026-10-27-spec-TOOL-dRankedPlan-43.md) | 6 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-13 — the plan record's intent fields: affected systems derived from the `code` record and checked, open questions as fork tags](spec/2026-10-26-spec-TOOL-dRankedPlan-13.md) | 7 | 2 | OPEN | rev-3 | 2026-10-27 |
 | [TOOL-dRankedPlan-20 — a plan record's `Scenario: none` reads as no re-pick, and a build that never enters `planning` pins on its first transition](spec/2026-10-26-spec-TOOL-dRankedPlan-20.md) | 7 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-30 — the declared callers of the session-scoped predicate are kit anchors, resolved at run time](spec/2026-10-27-spec-TOOL-dRankedPlan-30.md) | 7 | 2 | OPEN | rev-2 | 2026-10-27 |
@@ -107,18 +107,20 @@ ids TOOL-dRankedPlan-44 TOOL-dRankedPlan-45
 | [TOOL-dRankedPlan-32 — the caller predicate reads invocations by their structure, so an argv list counts and a resolver line does not](spec/2026-10-27-spec-TOOL-dRankedPlan-32.md) | 7 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-11 — each role item's memory read set sized at Plan, as `id#tag` keys](spec/2026-10-26-spec-TOOL-dRankedPlan-11.md) | 8 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-36 — a build's first transition is checked against the scenario it pins, and never meets the no-record exit](spec/2026-10-27-spec-TOOL-dRankedPlan-36.md) | 8 | 2 | OPEN | rev-2 | 2026-10-27 |
-| [TOOL-dRankedPlan-38 — a shell or hook line naming the session predicate is a caller, beside the invocation rule](spec/2026-10-27-spec-TOOL-dRankedPlan-38.md) | 8 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dRankedPlan-39 — a command led by a compound-command reserved word is read past that word](spec/2026-10-27-spec-TOOL-dRankedPlan-39.md) | 8 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dRankedPlan-40 — a command led by a prefix command or a case-arm pattern is read past it](spec/2026-10-27-spec-TOOL-dRankedPlan-40.md) | 8 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dRankedPlan-41 — the shell caller reader tokenizes through the shared shell tokenizer, and a file it cannot tokenize exits 2](spec/2026-10-27-spec-TOOL-dRankedPlan-41.md) | 8 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-38 — a shell or hook line naming the session predicate is a caller, beside the invocation rule](spec/2026-10-27-spec-TOOL-dRankedPlan-38.md) | 8 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-39 — a command led by a compound-command reserved word is read past that word](spec/2026-10-27-spec-TOOL-dRankedPlan-39.md) | 8 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-40 — a command led by a prefix command or a case-arm pattern is read past it](spec/2026-10-27-spec-TOOL-dRankedPlan-40.md) | 8 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-41 — the shell caller reader tokenizes through the shared shell tokenizer, and a file it cannot tokenize exits 2](spec/2026-10-27-spec-TOOL-dRankedPlan-41.md) | 8 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-12 — `plan.record` declaring the probes owed before Design](spec/2026-10-26-spec-TOOL-dRankedPlan-12.md) | 9 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-50 — a command run through `timeout` or a same-file `$@` wrapper function is read through its arguments](spec/2026-10-27-spec-TOOL-dRankedPlan-50.md) | 9 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-51 — the op tokens `(`, `)`, `{` and `}` end a command, so a brace group, a subshell or a function body is read](spec/2026-10-27-spec-TOOL-dRankedPlan-51.md) | 9 | 2 | OPEN | rev-1 | 2026-10-27 |
 | [TOOL-dRankedPlan-19 — `plan.exit` admits a move only over a witnessed plan record](spec/2026-10-26-spec-TOOL-dRankedPlan-19.md) | 10 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest](spec/2026-10-26-spec-TOOL-dRankedPlan-3.md) | 10 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-28 — the `triage` and `dupes` record kinds join the binding reader, the factory table and the HYGIENE kind list](spec/2026-10-26-spec-TOOL-dRankedPlan-28.md) | 11 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-33 — the shared `plan.exit` fixtures plant a witnessed plan record, so the precondition holds only where a plant removes it](spec/2026-10-27-spec-TOOL-dRankedPlan-33.md) | 11 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-4 — dormancy disposal: a dormant build moved by the owner's disposition, shown in the plan view](spec/2026-10-26-spec-TOOL-dRankedPlan-4.md) | 11 | 2 | OPEN | rev-4 | 2026-10-27 |
-| [TOOL-dRankedPlan-44 — dormancy disposal orders its kept dispositions across items by ancestry, and holds on a conflict](spec/2026-10-27-spec-TOOL-dRankedPlan-44.md) | 12 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dRankedPlan-5 — the live-build mapping carried out: each live build kept or absorbed, recorded per build](spec/2026-10-26-spec-TOOL-dRankedPlan-5.md) | 12 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-44 — dormancy disposal orders its kept dispositions across items by ancestry, and holds on a conflict](spec/2026-10-27-spec-TOOL-dRankedPlan-44.md) | 12 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-5 — the live-build mapping carried out: each live build kept or absorbed, recorded per build](spec/2026-10-26-spec-TOOL-dRankedPlan-5.md) | 12 | 2 | OPEN | rev-3 | 2026-10-27 |
 | [TOOL-dRankedPlan-15 — the plan revision record: a fork the goal cannot survive moves the build back to planning, and Design re-enters on the ratified revision](spec/2026-10-26-spec-TOOL-dRankedPlan-15.md) | 13 | 2 | OPEN | rev-3 | 2026-10-27 |
 | [TOOL-dRankedPlan-23 — `show` reports a revision's ratification from the record of how the re-entering move was admitted](spec/2026-10-26-spec-TOOL-dRankedPlan-23.md) | 14 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-6 — Plan Review: the plan record a review subject, run with the lenses of the preset `review.pin` passes until dCalibratedLens's Plan lenses land](spec/2026-10-26-spec-TOOL-dRankedPlan-6.md) | 14 | 2 | OPEN | rev-2 | 2026-10-27 |
@@ -127,24 +129,29 @@ ids TOOL-dRankedPlan-44 TOOL-dRankedPlan-45
 | [TOOL-dRankedPlan-29 — the round-1 spec audit's 39 medium and low findings, closed in one batch](spec/2026-10-26-spec-TOOL-dRankedPlan-29.md) | 17 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-37 — the spec audit of units 19 to 29: its 25 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-37.md) | 18 | 2 | OPEN | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-42 — the `~` refusal of `--asks --path` is observed on the literal value, past the shell's tilde expansion](spec/2026-10-27-spec-TOOL-dRankedPlan-42.md) | 19 | 2 | OPEN | rev-1 | 2026-10-27 |
-| [TOOL-dRankedPlan-45 — the spec audit of units 30 to 37: its 32 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-45.md) | 20 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-45 — the spec audit of units 30 to 37: its 32 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-45.md) | 20 | 2 | OPEN | rev-2 | 2026-10-27 |
+| [TOOL-dRankedPlan-46 — a heredoc body fed to a shell is read by the shell reader, through its own command-word test](spec/2026-10-27-spec-TOOL-dRankedPlan-46.md) | 21 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-47 — a heredoc body fed to a Python interpreter is read by the Python reader, over unit 32's interpreter class](spec/2026-10-27-spec-TOOL-dRankedPlan-47.md) | 21 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-48 — the TypeScript tokenizer emits string literal text behind an opt-in keyword, so the JavaScript reader reads argv arrays](spec/2026-10-27-spec-TOOL-dRankedPlan-48.md) | 21 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-49 — a shell word naming a variable bound to a `ratify.py` path names `ratify.py`](spec/2026-10-27-spec-TOOL-dRankedPlan-49.md) | 21 | 2 | OPEN | rev-1 | 2026-10-27 |
+| [TOOL-dRankedPlan-52 — the spec audit of units 38 to 45: its 25 medium and low findings, closed in one batch](spec/2026-10-27-spec-TOOL-dRankedPlan-52.md) | 22 | 2 | OPEN | rev-1 | 2026-10-27 |
 <!-- /gen:build-units -->
 
-Records: 54 bound to this build, across 4 record folder(s).
+Records: 62 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45.
+Ids no `spec-audit` record has ever named: TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52.
 
 Ids whose spec moved past its audited revision: TOOL-dRankedPlan-1@rev-1 TOOL-dRankedPlan-10@rev-1 TOOL-dRankedPlan-11@rev-1 TOOL-dRankedPlan-12@rev-1 TOOL-dRankedPlan-13@rev-1 TOOL-dRankedPlan-14@rev-1 TOOL-dRankedPlan-15@rev-1 TOOL-dRankedPlan-16@rev-1 TOOL-dRankedPlan-19@rev-1
 TOOL-dRankedPlan-2@rev-1 TOOL-dRankedPlan-20@rev-1 TOOL-dRankedPlan-21@rev-1 TOOL-dRankedPlan-22@rev-1 TOOL-dRankedPlan-23@rev-1 TOOL-dRankedPlan-24@rev-1 TOOL-dRankedPlan-25@rev-1 TOOL-dRankedPlan-26@rev-1 TOOL-dRankedPlan-27@rev-1 TOOL-dRankedPlan-28@rev-1 TOOL-dRankedPlan-29@rev-1
 TOOL-dRankedPlan-3@rev-1 TOOL-dRankedPlan-4@rev-1 TOOL-dRankedPlan-5@rev-1 TOOL-dRankedPlan-6@rev-1 TOOL-dRankedPlan-7@rev-1 TOOL-dRankedPlan-8@rev-1 TOOL-dRankedPlan-9@rev-1 TOOL-dRankedPlan-30@rev-1 TOOL-dRankedPlan-31@rev-1 TOOL-dRankedPlan-32@rev-1 TOOL-dRankedPlan-33@rev-1
-TOOL-dRankedPlan-34@rev-1 TOOL-dRankedPlan-35@rev-1 TOOL-dRankedPlan-36@rev-1 TOOL-dRankedPlan-37@rev-1.
+TOOL-dRankedPlan-34@rev-1 TOOL-dRankedPlan-35@rev-1 TOOL-dRankedPlan-36@rev-1 TOOL-dRankedPlan-37@rev-1 TOOL-dRankedPlan-38@rev-1 TOOL-dRankedPlan-39@rev-1 TOOL-dRankedPlan-40@rev-1 TOOL-dRankedPlan-41@rev-1 TOOL-dRankedPlan-43@rev-1 TOOL-dRankedPlan-44@rev-1 TOOL-dRankedPlan-45@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 43 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 50 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 16
 - carried in parts: 0 (none)
@@ -159,7 +166,9 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 43 spec(s) at 
   `spec/2026-10-27-spec-TOOL-dRankedPlan-30.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-31.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-32.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-33.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-27-spec-TOOL-dRankedPlan-34.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-35.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-36.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-37.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-27-spec-TOOL-dRankedPlan-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-40.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-41.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-27-spec-TOOL-dRankedPlan-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-44.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-45.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-27-spec-TOOL-dRankedPlan-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-44.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-45.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dRankedPlan-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-48.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-49.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-27-spec-TOOL-dRankedPlan-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-27-spec-TOOL-dRankedPlan-52.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0372, cl-dClosedLoop-0382, cl-dClosedLoop-0497, cl-dClosedLoop-0498
 <!-- /gen:build-coverage -->
 
@@ -175,7 +184,7 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 43 spec(s) at 
 | 6 | `TOOL-dRankedPlan-14`, `TOOL-dRankedPlan-21`, `TOOL-dRankedPlan-22`, `TOOL-dRankedPlan-35`, `TOOL-dRankedPlan-43` | no |
 | 7 | `TOOL-dRankedPlan-13`, `TOOL-dRankedPlan-20`, `TOOL-dRankedPlan-30`, `TOOL-dRankedPlan-31`, `TOOL-dRankedPlan-32` | no |
 | 8 | `TOOL-dRankedPlan-11`, `TOOL-dRankedPlan-36`, `TOOL-dRankedPlan-38`, `TOOL-dRankedPlan-39`, `TOOL-dRankedPlan-40`, `TOOL-dRankedPlan-41` | no |
-| 9 | `TOOL-dRankedPlan-12` | no |
+| 9 | `TOOL-dRankedPlan-12`, `TOOL-dRankedPlan-50`, `TOOL-dRankedPlan-51` | no |
 | 10 | `TOOL-dRankedPlan-19`, `TOOL-dRankedPlan-3` | no |
 | 11 | `TOOL-dRankedPlan-28`, `TOOL-dRankedPlan-33`, `TOOL-dRankedPlan-4` | yes |
 | 12 | `TOOL-dRankedPlan-44`, `TOOL-dRankedPlan-5` | yes |
@@ -187,6 +196,8 @@ Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 43 spec(s) at 
 | 18 | `TOOL-dRankedPlan-37` | no |
 | 19 | `TOOL-dRankedPlan-42` | no |
 | 20 | `TOOL-dRankedPlan-45` | no |
+| 21 | `TOOL-dRankedPlan-46`, `TOOL-dRankedPlan-47`, `TOOL-dRankedPlan-48`, `TOOL-dRankedPlan-49` | no |
+| 22 | `TOOL-dRankedPlan-52` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
