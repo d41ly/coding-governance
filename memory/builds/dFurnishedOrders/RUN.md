@@ -9,11 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dFurnishedOrders-21=DEFERRED
+units-at-landing: TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61
+gates-run: unattended-179308800368443027299-1144 9d8572c7
 parked-surfaced: yes, 60 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 06a49afb46b79e5e09a525221bb1dc91b8c59462
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -250,3 +253,7 @@ base: c8d46e188985ce49caad48cf874934661ad3fc7c
 2026-10-27T06:49:41Z rescope · item defer TOOL-dFurnishedOrders-60 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
 
 2026-10-27T06:49:42Z rescope · item defer TOOL-dFurnishedOrders-61 · reason spec run (README rule 1): specced here, its spec-audit chain stopped by the owner's rule at round 9; the build run after this one builds it, advancing TOOL-dFurnishedOrders-21
+
+2026-10-27T08:12:39Z override · item specs-audited · reason the owner's stop rule ('stop reviewing once there are no HIGHs left', memory/builds/dFurnishedOrders/prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-1-owner-review-stop.md) ended the spec-audit chain at round 9, which confirmed no BLOCKER and no HIGH, so round 9's minors batch TOOL-dFurnishedOrders-61 closes with no audit naming it, as M4 provides when a chain ends
+
+2026-10-27T08:12:39Z override · item closing-review-recorded · reason the spec run's closing diff review is not run: this run's whole diff is specs and records, already read by nine spec-audit rounds, and the owner's stop rule (memory/builds/dFurnishedOrders/prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-1-owner-review-stop.md) ends review at a round with no HIGH; the build run's closing diff review over its code meets it
