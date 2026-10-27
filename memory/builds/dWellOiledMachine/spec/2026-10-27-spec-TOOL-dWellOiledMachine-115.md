@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-115 — the round-5 promotions audit's 24 medium and low findings, batched: loader counts, pathspecs, the bare-bash walk, the predicate's cache and attribution, fixture directories and citations
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 72 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 72 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-115-deviation-1151.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-115-deviation-1151.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-109-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-109-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 |
 
 <!-- /gen:spec-records -->
 
@@ -175,6 +176,12 @@ spec N's own amendment lands at the same M2 cross-read.
 - **consumes-from** `TOOL-dWellOiledMachine-106` — §3 Edges and §4 Evidence (S4, S5, S17)
 - **consumes-from** `TOOL-dWellOiledMachine-107` — §3 Edges, §4's fixture, §5, §10 and the S2 and AC2 fixture texts (S4, S14, S21, S22)
 - **consumes-from** `TOOL-dWellOiledMachine-108` — S10, S11, S21, §4, AC8, AC10, AC11, AC15 and AC19 (S6 to S12, S16, S18, S19, S23, S24)
+- **hands-off** `TOOL-dWellOiledMachine-116` — AC4's second clause, rewritten to count the two full paths S6 writes into 108 AC8 and the bare pathspec as gone (round-6 promotions audit, finding 1)
+- **hands-off** `TOOL-dWellOiledMachine-117` — AC4's first clause and §4 Evidence, which ask git for the two files at their repository paths and record why (round-6 promotions audit, finding 9)
+- **hands-off** `TOOL-dWellOiledMachine-118` — AC4's red case and §4 Evidence, which name a reverted S6 and record the reading that shows it red (round-6 promotions audit, finding 18)
+- **hands-off** `TOOL-dWellOiledMachine-119` — AC6's first clause and red case, which run the walk over the two repository paths (round-6 promotions audit, finding 21)
+- **hands-off** `TOOL-dWellOiledMachine-120` — S6, §5's risks line and §7, which quote every path to the two unbuilt fixtures that the cross-read writes into a criterion (round-6 promotions audit, finding 17)
+- **hands-off** `TOOL-dWellOiledMachine-121` — S10, S11, S12, S19, §4, §6's preamble, AC3, AC6 to AC9, AC12, AC14, AC16 and §10, amended before this unit's own amendments land (round-6 promotions audit, findings 2, 3, 4, 6, 7, 8, 10, 11, 13, 15, 22, 24, 25 and 27)
 
 ## 4. Design
 
@@ -418,6 +425,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, the round-5 promotions audit's 24 medium and low findings
   batched.
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-6
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-116, TOOL-dWellOiledMachine-117, TOOL-dWellOiledMachine-118, TOOL-dWellOiledMachine-119, TOOL-dWellOiledMachine-120, TOOL-dWellOiledMachine-121.
 
 ## 10. Reuse audit
 

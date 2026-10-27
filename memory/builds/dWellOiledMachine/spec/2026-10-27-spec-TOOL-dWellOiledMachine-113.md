@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-113 — spec 103's AC1 counts the predicate loader in spec 96's §6 preamble alone, so the fixture's copy no longer reads red
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-113-deviation-1131.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-113-deviation-1131.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-109-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-109-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,7 @@ unit scopes the count to 96's §6 preamble, the one place 103 S2 writes.
 
 - **consumes-from** `TOOL-dWellOiledMachine-103` — AC1's last clause, which this unit rewrites before unit 103's pass
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the ordering predicate AC3 loads from spec 95 and calls
+- **hands-off** `TOOL-dWellOiledMachine-121` — S1 and AC1, which name the rewritten clause by its place and read the whole-file count as gone (round-6 promotions audit, finding 28)
 
 ## 4. Design
 
@@ -118,6 +120,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-5 promotions, finding
   20 (H3).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-6
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-121.
 
 ## 10. Reuse audit
 
