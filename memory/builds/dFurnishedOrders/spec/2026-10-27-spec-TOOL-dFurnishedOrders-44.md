@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-44 — the step's receipt homes held to the receipt `apply` writes: one govkit selftest arm applies every shipped kit to a scratch target with a per-kit override and compares both ways
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 8 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +66,8 @@ one step after it (order 8), after unit 43 by the dispatch's id sort.
 
 - **consumes-from** `TOOL-dFurnishedOrders-43` — `derive_receipt_homes`, whose answer S2 compares with the receipt `apply` writes (ids 1, 14)
 - **hands-off** `TOOL-dFurnishedOrders-46` — the registry descriptors S1's `apply` reads outside the `govkit selftest` guard, which unit 46 S8 adds to it (id 22)
+- **hands-off** `TOOL-dFurnishedOrders-47` — the arm's `p.returncode != 0 -> FAIL` line and S1's refusal sentence, which unit 47 S1 and S2 replace with the receipt-alone outcome rule (id 10 of the fifth audit)
+- **hands-off** `TOOL-dFurnishedOrders-48` — S3's DEAD PROBE clauses, AC2 and the arm's compare, which unit 48 S10 to S13 and S22 settle (ids 4, 15, 34, 5, 17 of the fifth audit)
 
 ## 4. Design
 
@@ -177,6 +181,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 · `apply --all` into a scra
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-3 promotions, id 14
   (HIGH, item H1, shared with id 1).
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-47, TOOL-dFurnishedOrders-48, promoted from the spec audit of the round-4 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,12 +1,14 @@
 # TOOL-dFurnishedOrders-45 — the fourth spec audit's 8 upgrade-step minors: a copied kit.toml matched on its own `home`, a top level compared as a file, every git child stripped of the leaking variables, live fixtures, one tool-root search and a deploy descriptor refused by name
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
+**Status:** OPEN · rev-2 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-46 |
 
 <!-- /gen:spec-records -->
 
@@ -86,6 +88,8 @@ item each.
 - **consumes-from** `TOOL-dFurnishedOrders-40` — S1's home sketch, S4's prefix read, §5 and AC2 and AC3's fixtures, which S1, S5, S6 and S8 settle (ids 25, 5, 13, 27)
 - **consumes-from** `TOOL-dFurnishedOrders-41` — S2's top-level refusal, S5's tool-root search, S6's `kit.toml` compare and AC3 and AC5's fixtures, which S1 to S5 and S7 settle (ids 25, 9, 31, 32, 5, 18)
 - **consumes-from** `TOOL-dFurnishedOrders-43` — `derive_receipt_homes`, whose deploy read and descriptor unpack S6 and S8 hold (ids 13, 27)
+- **hands-off** `TOOL-dFurnishedOrders-48` — S4's environment, S7's tracked search, S8's shape guard and AC3, AC5, AC6 and AC7, which unit 48 S4 to S9, S19, S20, S25 and S26 settle (ids 2, 31, 3, 19, 24, 30, 13, 22, 32, 18 of the fifth audit)
+- **hands-off** `TOOL-dFurnishedOrders-49` — §4 clause 1's write-set record, which unit 49 S1 re-reads from the pass commits (id 6 of the fifth audit)
 
 ## 4. Design
 
@@ -229,6 +233,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC6 AC7 · a renamed
 
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-3 promotions' govkit upgrade-step
   minors batched: 4 MEDIUM and 4 LOW.
+- rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-48, TOOL-dFurnishedOrders-49, promoted from the spec audit of the round-4 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md`); nothing else moved.
 
 ## 10. Reuse audit
 
