@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-35 — the round-1 audit of units 15 to 26: its 39 minors, one filtered population, one plan source, pinned plants and the texts that cite them
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-6 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,8 @@
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-35-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-35-build-brief.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md) | research | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-35-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-35-2-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-34 |
 
 <!-- /gen:spec-records -->
@@ -66,22 +68,33 @@ reading, because a built spec is not rewritten, and a criterion here observes it
 That is 20 MEDIUM and 19 LOW findings by raw id; the report refuted none and left none unverified.
 D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corrected fix.
 
+Rev-6 rebases every item on the run branch's HEAD `56aef62aa`, where TOOL-dSafePassage-26 (CLOSED at
+`dfcef45a7`) and every unit before this one in the build order are built. Every code line this spec
+cites was read there on 2026-10-28, unless the item pins it at `3708a705`. Where a unit already built
+an item, or a different rule for it, the item says so and keeps only its residual. S15, S16, S18,
+S29, S34 and S35 are built and read as written. S5 keeps its boot-clock half, S27 keeps its plant,
+and S25 and S28 are struck (§8 F3, F4).
+
 ## 2. Scope (IN)
 
 ### Gov's planned destinations, and the file class's one source (D-8, D-9)
 
 - **S1** — id 14. The step gate's side. `read_plan_destinations(root)` returns the `dest` of each
   `planned_writes` row whose `kind` is `write` and whose `missing` is empty: the population `apply`
-  lands, `LANDABLE_ROLES` (`tools/govkit/govkit.py:3830`), under the filter its existing consumers
-  apply (`:4682-4684`, `:5059-5060`). A `side-effect` row does not join, because `apply` writes only
-  the landable roles, and a `.gitattributes:<pattern>` pin row (`:4057-4061`) is an `order` row and
-  never joins. TOOL-dSafePassage-21 S1 and its §4 table are read with this filter. Observed by AC1.
+  lands, `LANDABLE_ROLES` (`tools/govkit/govkit.py:3926`), under the filter its existing consumers
+  apply (`:4780`, `:5146`). At HEAD the function (`:9671-9690`) filters on `missing` alone (`:9687`).
+  A `side-effect` row does not join, because `apply` writes only the landable roles, and a
+  `.gitattributes:<pattern>` pin row (`:4160-4161`) is an `order` row and never joins.
+  TOOL-dSafePassage-21 S1 and its §4 table are read with this filter. Observed by AC1.
 - **S2** — id 31. The receipt's side. TOOL-dSafePassage-8's source-mode rewrite of the receipt's
-  `files` calls the filtered function of S1, so the receipt holds no pseudo-destination, and
-  TOOL-dSafePassage-21 S3's parity is graded over the filtered set. Observed by AC2.
+  `files` calls the filtered function of S1 (`tools/govkit/govkit.py:9756`), so the receipt holds no
+  pseudo-destination, and TOOL-dSafePassage-21 S3's parity is graded over the filtered set. Observed
+  by AC2.
 - **S3** — id 43. The plan on every tree. `read_file_members(root)` in `tools/govkit/step_gate.py`
   returns `read_plan_destinations(root)` whether or not the tree carries a source receipt, which
-  supersedes TOOL-dSafePassage-21 S2's two-source table; a receipt is never the class's source. A
+  supersedes TOOL-dSafePassage-21 S2's two-source table; a receipt is never the class's source. At
+  HEAD the function (`step_gate.py:269-284`) reads a source-mode receipt's rows where one exists, and
+  its receipt branch, with that branch's not-JSON `Refusal`, leaves the function with this item. A
   branch carrying the last landing's receipt whose commits stop shipping a file then shows that
   file's `file:` vanish on the branch. TOOL-dSafePassage-26 S24's prepared-merge observation is read as the plan source on
   that tree. Observed by AC3.
@@ -89,21 +102,29 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 ### The lock's plants and its margin (D-10, D-11, D-12, D-31)
 
 - **S4** — id 2. `lock-live-slow-census` places its delay after the real `scan_processes` returns,
-  so the census's sample predates the delay. The delay is 6 s, and the holder takes its lock within
-  0.5 s of starting, so under a judge that reads the clock after the census the estimate lands near
-  `started + 6`, past `started + REUSE_MARGIN_S` by more than 3 s. The build shows that staged judge
-  copy reclaiming on this plant before the arm counts. Observed by AC4.
-- **S5** — id 16. `lock-reused` writes the lock with `started` 600 s before now, and `started_boot`
-  600 s before the boot reading where `TOOL-dSafePassage-32` records one, before it starts the live
-  pid, so "created after `started`" holds at any census latency. Observed by AC5.
-- **S6** — id 17. The `govkit selftest` leg's guard in `tools/gate-legs.json` gains
-  `{prefix}/process-monitor/census.py`, the module whose `age_s` the reclaim's arm rests on, so an edit
-  to it alone selects the leg (`tools/run-gates/run-gates.sh:3278-3288` matches guards by prefix).
-  Observed by AC6.
-- **S7** — id 19. The comment on `REUSE_MARGIN_S` and TOOL-dSafePassage-22 S2's bound are stated per
-  backend: `windows-join` rounds `age_s` with PowerShell's `[int]` (`tools/process-monitor/census.py:66`),
-  0.5 s; `posix-ps` takes `etimes`, which `ps` truncates (`:208-220`), 1 s. The 2 s margin covers the
-  larger, and the comment says so. Observed by AC7.
+  so the census's sample predates the delay. That order is built: the `FIXTURE_LOCK_CHILD` text
+  wraps `scan_processes` and sleeps after it returns (`tools/govkit/upgrade_steps.py:2555-2560`). The
+  residual is the delay's size. It is 3 s at HEAD (`:3069`); it becomes 6 s, with the plant's comment
+  (`:3100-3101`). The holder takes its lock at once (`:3102-3104`), so under a judge that reads the
+  clock after the census the estimate lands near `started + 6`, past `started + REUSE_MARGIN_S` by
+  more than 3 s. The build shows that staged judge copy reclaiming on this plant before the arm
+  counts. Observed by AC4.
+- **S5** — id 16. `lock-reused` writes the lock with `started` 600 s before now after it starts the
+  live pid; that half is built (`tools/govkit/upgrade_steps.py:3094-3098`). The residual is the
+  boot half: the plant also writes `started_boot` 600 s before `read_boot_clock()` wherever that
+  returns a reading, so "created after `started`" holds at any census latency on a `posix-ps` judge
+  too. At HEAD the plant writes no `started_boot`, so a `posix-ps` judge with a boot clock falls back
+  to the wall and reads the reused pid `unknown` (`:1697-1705`, TOOL-dSafePassage-32 S5): the plant
+  printed `lock: FAILED` under node d's WSL on 2026-10-28 (§8 F4). Observed by AC5.
+- **S6** — id 17. The `govkit selftest` leg's guard in `tools/gate-legs.json` (the leg at `:1487`)
+  gains `{prefix}/process-monitor/census.py`, the module whose `age_s` the reclaim's arm rests on, so
+  an edit to it alone selects the leg (`tools/run-gates/run-gates.sh:3221`, a `git diff` per guarded
+  leg over its guard pathspecs). Observed by AC6.
+- **S7** — id 19. The comment on `REUSE_MARGIN_S` (`tools/govkit/upgrade_steps.py:248-251`) and
+  TOOL-dSafePassage-22 S2's bound are stated per backend: `windows-join` rounds `age_s` with
+  PowerShell's `[int]` (`tools/process-monitor/census.py:66`), 0.5 s; `posix-ps` takes `etimes`, which
+  `ps` truncates (`:195-220`), 1 s. The 2 s margin covers the larger, and the comment says so.
+  Observed by AC7.
 
 ### The step contract's credentials and its reading (D-24, D-33)
 
@@ -118,19 +139,20 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
   is not refused. Observed by AC8.
 - **S9** — id 28. The Inventory sentence of TOOL-dSafePassage-20 and TOOL-dSafePassage-24, "an anchor
   of `tools/govkit/refusal_join.py`, armed by the §7 arm", is read as: the new branch raises the
-  count floor `BRANCH_PIN` (`tools/govkit/refusal_join.py:235`) by one, the refusal is reached only by
-  the §7 self-test arm, and the module's join half does not run, because nothing passes it a
-  reached-set (`:84-88`, the open ask TOOL-dUnstalledConvoy-36). NOT OBSERVED: a reading of two specs'
-  inventory prose, which changes no code and no gate.
+  count floor `BRANCH_PIN` (`tools/govkit/refusal_join.py:41`, compared at `:296`) by one, the
+  refusal is reached only by the §7 self-test arm, and the module's join half does not run, because
+  nothing passes it the reached-set that `:305-313` join on (the open ask TOOL-dUnstalledConvoy-36).
+  NOT OBSERVED: a reading of two specs' inventory prose, which changes no code and no gate.
 
 ### The lander's snapshots (D-34, D-14, D-13)
 
 - **S10** — id 25. `write_untracked_snapshot <file>` in `tools/push-main.sh`, beside
-  `remove_new_untracked`, writes the sorted NUL-separated `git ls-files --others --exclude-standard -z`
-  that helper reads. Every snapshot site calls it: `cmd_prepare`'s one snapshot
-  (`TOOL-dSafePassage-27`), the attended path's gov-first snapshot (TOOL-dSafePassage-25 S2) and the
-  attended regeneration's (`tools/push-main.sh:1100`). The comment at `:777-783` names those three
-  callers and what each one's tree holds when it takes the snapshot. Observed by AC9.
+  `remove_new_untracked` (`:926`), writes the sorted NUL-separated
+  `git ls-files --others --exclude-standard -z` that helper reads. Every snapshot site calls it:
+  `cmd_prepare`'s one snapshot (`TOOL-dSafePassage-27`, `:1090`), the attended path's gov-first
+  snapshot (TOOL-dSafePassage-25 S2, `:1290`) and the attended regeneration's (`:1309`). The comment
+  at `:919-925` names those three callers and what each one's tree holds when it takes the snapshot.
+  Observed by AC9.
 - **S11** — id 36. `write_untracked_snapshot` returns non-zero when `mktemp`, `git ls-files` or the
   sort fails, read through `PIPESTATUS`, and each caller refuses on that return with its stage's
   refusal line before the stage runs, so a snapshot that cannot be written never falls through to a
@@ -145,7 +167,7 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 ### The resolver's parity (D-23)
 
 - **S13** — id 24. TOOL-dSafePassage-23's AC6 is read through the comparison the parity arm of
-  `tools/lib/resolve-python.test.sh` makes (`:159-233`), run as a direct probe: each inline
+  `tools/lib/resolve-python.test.sh` makes (its §2, `:330-412`), run as a direct probe: each inline
   `resolve_python` block, between its `# >>> resolve_python` and `# <<< resolve_python` markers with CR
   bytes stripped, equals the canonical block of `tools/lib/resolve-python.sh`. The build stages one
   copy left on the pre-unit echo rule, red by that probe and green by
@@ -155,14 +177,17 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 ### The step record's criteria (D-27, D-28)
 
 - **S14** — id 3. TOOL-dSafePassage-16's AC4 is read as a case-blind grep of the sentence its S3
-  prescribes, `below schema 4 no step row is persisted`, which the receipt section of
-  `help/upgrade-steps.md` carries verbatim. Observed by AC13.
+  prescribes, `below schema 4 no step row is persisted`. `set_step_state`'s docstring carries it
+  (`tools/govkit/upgrade_steps.py:828`); the receipt section of `help/upgrade-steps.md` does not, and
+  says "Before schema 4 no step row is written" (`:131`). The residual words that sentence as
+  "Below schema 4 no step row is persisted", the rest of its paragraph unchanged. Observed by AC13.
 - **S15** — id 5. TOOL-dSafePassage-16's AC3 is read through an `ast` probe of
   `tools/govkit/upgrade_steps.py`: one definition of `test_steps_recordable`, and among its calls one
-  whose enclosing function is `set_step_state`, whatever calls the walks add. Observed by AC14.
+  whose enclosing function is `set_step_state`, whatever calls the walks add. Built: the probe prints
+  one definition (`:798`) and one call (`:837`) at HEAD. Observed by AC14.
 - **S16** — id 21. That criterion's red case is kept as its own probe: the body of `set_step_state`,
-  read by `ast`, compares the receipt's `schema` nowhere beside its call of the predicate.
-  Observed by AC14.
+  read by `ast`, compares the receipt's `schema` nowhere beside its call of the predicate. Built: the
+  probe finds no such comparison at HEAD. Observed by AC14.
 
 ### The downs with no image (D-25, D-29, D-26, D-30)
 
@@ -170,7 +195,8 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
   size-limits step's down, which left TOOL-dSafePassage-1 at that unit's §8 F8 stop. NOT OBSERVED
   here — TOOL-dSafePassage-61's AC7 observes it.
 - **S18** — id 10. TOOL-dSafePassage-18's Inventory is read with `schema-step-early` among its minted
-  `rollback` plants, beside `schema-step` and `schema-step-kill`. Observed by AC16.
+  `rollback` plants, beside `schema-step` and `schema-step-kill`. Built: `ROLLBACK_SCHEMA_PLANTS`
+  holds all three (`tools/govkit/upgrade_steps.py:2593`). Observed by AC16.
 - **S19** — id 42. The `rollback-update` family gains `schema-step-kill-shipped-rows`: the reverse set
   uses the shipped row shapes, a `reverted = "down-exit"` row shaped as the floor row and a row whose
   witness is "the file is absent", applied by witness alone. The fixture kills the run after the
@@ -195,46 +221,71 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 
 - **S22** — id 4. `<to>` on `bash tools/lib/python-floor.sh down` is optional and defaults to the
   target's `HEAD`, so `check_down_floor(target, prior, to_commit)` always grades bytes at a commit.
-  TOOL-dSafePassage-11's AC6 and AC7 hold as written under the five-element call form, their plant
-  committed at `HEAD`, "with the plant removed" read as removed in a commit. TOOL-dSafePassage-26
+  At HEAD only the four-argument form dispatches (`tools/lib/python-floor.sh:33`,
+  `tools/lib/python_floor.py:407`). TOOL-dSafePassage-11's AC6 and AC7 hold as written under the
+  five-element call form, their plant committed at `HEAD`, and the plant's absence they name read as
+  a commit that takes it out. TOOL-dSafePassage-26
   S10's six-element argv is what the floor row ships, and TOOL-dSafePassage-17's §4 floor-row block is
   read with that argv and its own `reverted = "down-exit"` line (§8 F1). Observed by AC19.
 - **S23** — id 15. TOOL-dSafePassage-26's AC47 is read as `tools/lexicon/selftest.py:109`, the line
   holding "no declared Python floor" at `3708a705`. Observed by AC20.
-- **S24** — id 30. The step module imports nothing from govkit, with its edges derived. At the pass an
-  `ast` probe lists every govkit name `tools/govkit/upgrade_steps.py` references. The set derived at
-  writing from TOOL-dSafePassage-7 S2 and TOOL-dSafePassage-2 §4 is `resolve_shell_argv` with
-  `resolve_bash`, `resolve_tokens`, `target_context` and `resolve_kit_dir`
-  (`tools/govkit/govkit.py:1144`, `:1200`, `:1233`, `:1436`, `:197`). The first four move into
-  `upgrade_steps.py` and govkit imports them back, as TOOL-dSafePassage-26 S14 moves `blob_at`;
-  `resolve_kit_dir` enters as an inline copy under its existing `# >>> resolve_kit_dir` parity block
-  (`tools/govkit/govkit.py:196`), which the resolver's parity arm already grades in Python files.
-  Observed by AC21.
-- **S25** — id 32. TOOL-dSafePassage-26's §7 leg line owes `memory-hygiene self-test` and
-  `build-index selftest`, the two legs whose guard `tools/check-spec-tokens.py` in its Files touched
-  trips. When this pass runs and that spec is still live, the two names join its leg line as a rev
-  bump of it with its §9 line; a terminal spec is outside the guards join. Observed by AC22.
-- **S26** — id 44. The boot rows of the lock's namespace verdict, run after the `platform` row and
-  before `TOOL-dSafePassage-31`'s `pid_ns` row: the same `host` and `platform` with two non-empty
-  `boot_id` values that differ read `dead`, since the reboot ended the holder; a `platform` that
-  differs reads `unknown`; a lock carrying none of `platform`, `boot_id` and `pid_ns` goes on to
-  `TOOL-dSafePassage-31`'s row, which reads it `unknown` on a Linux judge and passes it to
-  TOOL-dSafePassage-2 S7's census test elsewhere. TOOL-dSafePassage-26 §4 "Migration" is read as these
-  rows. Observed by AC23.
+- **S24** — id 30. The step module's argv resolution owns its closure, which is the `ast` closure of
+  the four functions finding 30 names, derived over `tools/govkit/govkit.py` at HEAD on 2026-10-28,
+  as TOOL-dSafePassage-42 S14 reads it. Five functions move into `tools/govkit/upgrade_steps.py`:
+  `resolve_shell_argv` (`:1264`), `resolve_bash` (`:1208`), `resolve_tokens` (`:1297`),
+  `target_context` (`:1500`) and `demand_safe_token` (`:1470`), which `target_context` calls. Eight
+  constants move with them: `_BASH` (`:1205`), `TOKEN_RX` (`:1202`), `OPT_IN_ALL` (`:577`),
+  `PER_KIT_PATH_TOKENS` (`:1464`), `SEEDED_TOKENS` (`:1461`), `ANSWER_VALUE_RE` (`:1467`),
+  `DRIVE_PREFIX_RE` (`:1365`) and `TOKEN_VALUE_RE` (`:1344`). `Refusal` is already the step module's
+  (`upgrade_steps.py:254`, bound back at `govkit.py:143`). govkit binds each moved name back from the
+  step module, as it binds `blob_at` (`govkit.py:6832`), so its own readers keep their spelling.
+  `resolve_kit_dir` enters the step module as an inline copy under its `# >>> resolve_kit_dir` block
+  (`govkit.py:223-261`), which the parity arm grades in Python files
+  (`tools/lib/resolve-python.test.sh:343`, its population `:397`), and `check_holder_dead`
+  (`upgrade_steps.py:1683`) and `build_update_gov` (`:3236`) call that copy. The arm at
+  `tools/govkit/selftest.py:17329-17338` clears and restores the step module's `_BASH`, the cache
+  the moved `resolve_bash` reads. The ten other names the step module borrows through `load_govkit`
+  stay borrowed, by §4 "What the step module still borrows". The `load_govkit` docstring
+  (`upgrade_steps.py:1929-1932`), which names four of its borrowings and the kit-dir resolver among
+  them, is rewritten to name those ten. Observed by AC21.
+- **S25** — id 32. Struck on 2026-10-28. TOOL-dSafePassage-26 is CLOSED at `dfcef45a7`, a terminal
+  spec is outside the guards join, and its leg line is not edited. NOT OBSERVED: no file moves.
+- **S26** — id 44. The boot rows of the lock's namespace verdict. At HEAD `check_holder_dead` reads
+  `platform` and `boot_id` in one loop, either differing `unknown`
+  (`tools/govkit/upgrade_steps.py:1668-1671`). The residual splits that loop: a `platform` that
+  differs reads `unknown`; then the same `host` and `platform` with two non-empty `boot_id` values
+  that differ read `dead`, since the reboot ended the holder; a lock carrying none of `platform`,
+  `boot_id` and `pid_ns` goes on to `TOOL-dSafePassage-31`'s row (`:1672-1680`), which reads it
+  `unknown` on a Linux judge and passes it to TOOL-dSafePassage-2 S7's census test elsewhere. The
+  function's docstring (`:1653-1654`) and the lock paragraph of `help/upgrade-steps.md` (`:181-183`)
+  state the new row. `FIXTURE_LOCK_CHILD` gains `bootid <value>`, standing `<value>` in for
+  `read_boot_id` in that process only, as `pidns <value>` stands in for `read_pid_namespace`
+  (`:2540-2541`, `:2545`), since node d reads no boot id. TOOL-dSafePassage-26 §4 "Migration" is
+  read as these rows. Observed by AC23.
 - **S27** — id 45. TOOL-dSafePassage-26 S13's carried `core.autocrlf` and `core.eol` are read in the
-  target: `git -C <target> config --get core.autocrlf`, and the same for `core.eol`, under the parent's
-  ambient environment, so each carried pair equals the target's own effective value, its local
-  setting included. Observed by AC24.
-- **S28** — id 46. TOOL-dSafePassage-26 S31's corrupt image: an image that does not parse is
-  discarded and rewritten only when `git -C <t> status --porcelain`, the image and its sibling aside,
-  prints nothing, so no path has changed since `HEAD`; otherwise the up exits 1 naming the image (§8
-  F3). A stale `<image>.govkit-new` sibling, which `write_atomic` leaves on a kill
-  (`tools/govkit/govkit.py:4198-4221`), is unlinked by the walk before the up spawns and is never
-  staged. That unit's AC30 is read with the image planted by a direct write. Observed by AC25.
+  target. Built: `read_line_ending_config` reads both by one `git -C <target> config --get-regexp`
+  under the parent's environment less git's location variables
+  (`tools/govkit/upgrade_steps.py:913-930`), and `build_step_env` carries them (`:947`). The
+  residual is the `isolation` plant `autocrlf-local`, which observes a target's local setting
+  winning over the parent's global one. Observed by AC24.
+- **S28** — id 46. Struck on 2026-10-28; TOOL-dSafePassage-26 S31's image-scoped rule is kept (§8
+  F3). `write_before_image` (`tools/govkit/upgrade_steps.py:656-666`) reads an image that does not
+  parse as absent only where `read_image_changes` (`:694-706`) finds no path it lists changed after
+  the image was written, and otherwise refuses naming the image; the `truncated-image` plant
+  (`:2938`) and TOOL-dSafePassage-26's AC30 observe both sides. A tree-wide
+  `git -C <t> status --porcelain` test would refuse over any unrelated dirty path. The stale
+  `<image>.govkit-new` sibling is not swept: `write_atomic` (`:1888-1925`) overwrites a stale
+  sibling on the next write to its destination by its own stated rule (`:1907-1909`), and the re-run
+  of a killed image write writes that image, so the sibling is consumed. What neither rule covers: a
+  sibling whose image is never written again, its step's witness made to hold by hand, stays
+  untracked, and the lander's `git add -A` (`tools/push-main.sh:1109`, `:1279`) would stage it. NOT
+  OBSERVED: no code moves, and no `raise Refusal` site is added.
 - **S29** — id 47. TOOL-dSafePassage-26's AC46 is read with `GOV_PYTHON` unset and `python3`, `python`
   and `py` all fakes first on `PATH`: `python3` exits 1 under `-I` and 0 without, the other two exit
-  9009, since `tools/lib/resolve-python.sh:30` tries every candidate before it refuses. The run exits
-  non-zero and stderr names `python3` with `did not run`. Observed by AC26.
+  9009, since `resolve_python` tries every candidate before it refuses
+  (`tools/lib/resolve-python.sh:36`). The run exits non-zero and stderr names `python3` with
+  `did not run`. Built: arm (b) of `tools/lib/resolve-python.test.sh` runs exactly this case
+  (`:82-87`). Observed by AC26.
 - **S30** — id 6. TOOL-dSafePassage-26 S40 is read as a recorded reading, that the build-order table's
   `Parallel` column is M6's candidate set; the edges it names already exist at HEAD, so S40 declares
   none. NOT OBSERVED: a reading of that item's role, and no pass changes what it reads.
@@ -250,11 +301,15 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 - **S34** — id 8. TOOL-dSafePassage-26's Inventory is read with `resolve_landing_base` under "Moved,
   not minted": from `tools/govkit/govkit.py`, where TOOL-dSafePassage-10 mints it (its §4 "The
   base"), into `tools/govkit/upgrade_steps.py`, govkit importing it back, and its S2 names that unit's
-  function by name. Observed by AC27.
+  function by name. Built: one definition (`tools/govkit/upgrade_steps.py:1825`), bound back at
+  `tools/govkit/govkit.py:14084`. Observed by AC27.
 - **S35** — id 23. TOOL-dSafePassage-26 S2's sentence on readers is read as: at TOOL-dSafePassage-10's
   landing `resolve_landing_base` is called by `cmd_epoch` in `tools/govkit/govkit.py` and by
   `tools/govkit/step_gate.py`, and `derive_push_base` by `cmd_frozen` in `tools/govkit/upgrade_steps.py`;
-  its §10 cites TOOL-dSafePassage-10 §4 "The base" as the seam extended. Observed by AC27.
+  its §10 cites TOOL-dSafePassage-10 §4 "The base" as the seam extended. At HEAD the three callers
+  call `resolve_landing_base` itself: `cmd_epoch` (`tools/govkit/govkit.py:14123`), `cmd_frozen`
+  (`tools/govkit/upgrade_steps.py:1987`) and the step gate (`tools/govkit/step_gate.py:227`, `:675`).
+  Observed by AC27.
 - **S36** — id 9. TOOL-dSafePassage-26 S52's first kit-resolution site is read as
   `tools/push-main.sh:445`, where `resolve_kit_dir "$py"` sits; `:440` is that pair's
   `resolve_python` line. NOT OBSERVED: a cite, and TOOL-dSafePassage-26's AC50 finds every site
@@ -263,18 +318,21 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
   anchor for it, so S52 and §10 carry one number. NOT OBSERVED, for S36's reason.
 - **S38** — id 34. The same site, read by the blast-radius lens at HEAD and at `3708a705` alike:
   `grep -n 'resolve_kit_dir "$py"' tools/push-main.sh` printed 445, 735, 763, 809 and 831 at this
-  disposal. NOT OBSERVED, for S36's reason.
+  disposal. At HEAD the same grep prints one line, `:855`. NOT OBSERVED, for S36's reason.
 - **S39** — id 26, the skeptic's corrected fix. `render_row_order_key(kind, path)` in
   `tools/govkit/govkit.py` holds the one `update-<kind>-{render_order_slug(path)}` spelling. TOOL-dSafePassage-26
-  S18's `write_row_order` and `write_conflict_candidate` (`tools/govkit/govkit.py:9063-9072`) both
-  call it, the latter for its candidate directory, so the order and its directory share one key.
+  S18's `write_row_order` (`tools/govkit/govkit.py:9613-9622`, its spelling at `:9619`) and
+  `write_conflict_candidate` (`:9514-9528`, its spelling at `:9522`) both call it, the latter for
+  its candidate directory, so the order and its directory share one key.
   That unit's AC17 is read as AC28 of this unit. Observed by AC28.
 
 ## 3. Non-goals (OUT)
 
 - Every high: units 27 to 34.
-- Rewriting a built spec. An item that corrects a built spec's text states the reading here; S25 edits
-  a live spec only.
+- Rewriting a built spec. An item that corrects a built spec's text states the reading here, and no
+  item edits another spec.
+- Moving the ten names the step module still borrows through `load_govkit` (§4): finding 30 names
+  none of them, and no criterion needs them moved.
 - The report's left-shift lints beyond the arms named in §7: a spec lint for `<path>:<line>` cites, an
   already-green-at-HEAD check, and the checklist entries the report proposes per item.
 
@@ -290,7 +348,7 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 - **consumes-from** `TOOL-dSafePassage-23` — the resolver's AC6, which S13 reads
 - **consumes-from** `TOOL-dSafePassage-24` — the step contract's refusal and its uncovered sentence, which S8 and S9 extend and read
 - **consumes-from** `TOOL-dSafePassage-25` — the gov-first snapshot sites and their fixture, which S10, S11 and S12 amend
-- **consumes-from** `TOOL-dSafePassage-26` — the base rule, the floor down, the step module, the lock's namespace, the carried keys, the image writer, the outbox orders and the criteria S22 to S39 read
+- **consumes-from** `TOOL-dSafePassage-26` — the base rule, the floor down, the step module and its `load_govkit` borrowing, the lock's namespace, the carried keys, the image writer and its corrupt-image rule, the outbox orders and the criteria S22 to S39 read
 - **consumes-from** `TOOL-dSafePassage-27` — the prepared path's one snapshot, which S10 routes through the helper
 - **consumes-from** `TOOL-dSafePassage-29` — `STEP_REFUSED_KEYS`, which S8 extends with the credential values
 - **consumes-from** `TOOL-dSafePassage-31` — the `pid_ns` row, before which S26 places the boot rows
@@ -306,11 +364,13 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 ### The cites, by phrase
 
 S21's readings. Each phrase is quoted from the cited spec's text at this disposal, and each prints
-once under `git grep -c -F`.
+once under `git grep -c -F`. The first row's phrase is cut at its line's end: the sentence wraps in
+TOOL-dSafePassage-1 (`:180-181`), so the longer quote matched no line, at `3708a705` either
+(re-run 2026-10-28).
 
 | Citing spec | Cited spec | Section | Phrase |
 |---|---|---|---|
-| TOOL-dSafePassage-20 §1 | TOOL-dSafePassage-1 | §4, the derived introducing commit | `The derivation reads the declaring files' blobs commit by commit` |
+| TOOL-dSafePassage-20 §1 | TOOL-dSafePassage-1 | §4, the derived introducing commit | `The derivation reads the declaring files'` |
 | TOOL-dSafePassage-20 §1 | TOOL-dSafePassage-2 | §4 | `is the reader's derived value` |
 | TOOL-dSafePassage-20 §1 | TOOL-dSafePassage-3 | §4 Data model | `that is neither a 40-hex string nor` |
 | TOOL-dSafePassage-16 §1 | TOOL-dSafePassage-3 | §4 Data model | `an id that is not a string, a state outside the three` |
@@ -321,15 +381,40 @@ once under `git grep -c -F`.
 
 ### The lock's namespace verdict, whole
 
-The rows after this unit, in the order `check_holder_dead` applies them:
+The rows in the order `check_holder_dead` applies them (`tools/govkit/upgrade_steps.py:1663-1708`),
+at HEAD and after this unit. Only the `boot_id` row moves.
 
-| Test | Verdict |
-|---|---|
-| lock `host` differs (TOOL-dSafePassage-2 S7) | `unknown` |
-| lock `platform` differs (TOOL-dSafePassage-26 S33) | `unknown` |
-| same `host` and `platform`, both `boot_id` non-empty and different (S26) | `dead` |
-| `pid_ns` differs, or absent on a Linux judge (`TOOL-dSafePassage-31`) | `unknown` |
-| otherwise | the census test of TOOL-dSafePassage-2 S7, in `TOOL-dSafePassage-32`'s frame |
+| Test | At HEAD | After this unit |
+|---|---|---|
+| no readable record | `unknown` | `unknown` |
+| lock `host` differs (TOOL-dSafePassage-2 S7) | `unknown` | `unknown` |
+| lock `platform` differs (TOOL-dSafePassage-26 S33) | `unknown` | `unknown` |
+| same `host` and `platform`, both `boot_id` non-empty and different (S26) | `unknown` | `dead` |
+| one `boot_id` empty and the other not | `unknown` | `unknown` |
+| `pid_ns` differs, or absent on a Linux judge (`TOOL-dSafePassage-31`) | `unknown` | `unknown` |
+| otherwise | the census test of TOOL-dSafePassage-2 S7, in `TOOL-dSafePassage-32`'s frame | the same |
+
+### What the step module still borrows
+
+S24 moves the closure finding 30 names. The step module reads ten other govkit names through
+`load_govkit` (`tools/govkit/upgrade_steps.py:1928-1942`), which imports govkit at call time and
+holds no `import` statement, so TOOL-dSafePassage-26's AC3 holds with them. They stay borrowed: they
+are govkit's `update` state and deployer readers, finding 30 names none of them (the report's D-17),
+and moving them meets no criterion. The `ast` probe of AC21 sees nine; `take_write_lock` is read
+inside the `FIXTURE_LOCK_CHILD` program text, which `ast` holds as a string.
+
+| Name | Read at, in `upgrade_steps.py` | Defined at, in `govkit.py` |
+|---|---|---|
+| `derive_tool_root` | `:328`, `:591`, `:980` | `:181` |
+| `resolve_prefix_token` | `:341` | `:207` |
+| `load_deploy` | `:983` | `:1618` |
+| `git_pathspec` | `:1343` | `:6863` |
+| `write_row_order` | `:1280` | `:9613` |
+| `ATTENDED_ORDER_PREFIX` | `:1279` | `:7164` |
+| `STAGING_JOURNAL_REL` | `:1242`, `:1252`, `:3507` | `:7162` |
+| `RECLAIM_GUARD_SUFFIX` | `:1727`, `:3037` | `:7160` |
+| `WRITE_LOCK_REL` | `:3036` | `:7156` |
+| `take_write_lock` | `:2578`, in the program text | `:7545` |
 
 ### Inventory
 
@@ -337,11 +422,14 @@ Minted: `write_untracked_snapshot` in `tools/push-main.sh` (cell `sh.function`, 
 `python tools/lexicon/lexicon.py --suggest write_untracked_snapshot --as sh.function` on 2026-10-23);
 `render_row_order_key` in `tools/govkit/govkit.py` (cell `py.function`, verb `render`, OK by the same
 command with `--as py.function`); the plants `stale-receipt`, `local-url-userinfo`,
-`schema-step-kill-shipped-rows`, `lock-other-boot`, `lock-no-namespace`, `autocrlf-local`,
-`corrupt-image` and `stale-image-sibling`. Moved, not minted: `resolve_shell_argv`, `resolve_bash`,
-`resolve_tokens` and `target_context`, into `tools/govkit/upgrade_steps.py`. No conf key, gate leg or
-policy key; S6 edits one leg's guard. S28's refusal is one new `raise Refusal` site, so
-`tools/govkit/refusal_join.py`'s `BRANCH_PIN` moves by one.
+`schema-step-kill-shipped-rows`, `lock-other-boot`, `lock-no-namespace` and `autocrlf-local`; the
+`FIXTURE_LOCK_CHILD` argument `bootid`. Moved, not minted, into `tools/govkit/upgrade_steps.py`: the
+five functions and eight constants of S24. Copied, not minted: `resolve_kit_dir`, under its parity
+block. No conf key, gate leg or policy key; S6 edits one leg's guard. No item adds a `raise Refusal`
+site: S24's moves keep the branch count, the `resolve_kit_dir` copy raises `LookupError`, which the
+matcher does not count (`tools/govkit/refusal_join.py:259-269`), and S3 takes one branch out of
+`read_file_members`. `BRANCH_PIN` (`:41`) is a floor of 327 under a count of 450 at HEAD, so it does
+not move.
 
 ### Migration
 
@@ -361,16 +449,12 @@ do not split into two disjoint write sets by M6.
 - `tools/govkit/upgrade_steps.py`
 - `tools/govkit/step_gate.py`
 - `tools/govkit/selftest.py`
-- `tools/govkit/refusal_join.py`
 - `tools/gate-legs.json`
 - `tools/push-main.sh`
 - `tools/push-main.test.sh`
 - `tools/lib/python-floor.sh`
 - `tools/lib/python_floor.py`
-- `tools/lib/resolve-python.test.sh`
 - `help/upgrade-steps.md`
-
-TOOL-dSafePassage-26's spec joins this unit's `--dispatch --writes` when S25 edits it.
 
 ### Alternatives rejected
 
@@ -379,18 +463,25 @@ TOOL-dSafePassage-26's spec joins this unit's `--dispatch --writes` when S25 edi
 - **Folding each minor into its unit's spec.** The disposal promotes, never folds (BUILD-METHOD M4).
 - **A receipt cross-check in the file class (S3).** On a branch the receipt is the last landing's, so
   a cross-check would differ on every branch that changes a destination.
+- **A tree-wide clean-tree test for a corrupt image (rev-5's S28).** It would refuse over any
+  unrelated dirty path, where TOOL-dSafePassage-26 S31's rule refuses only over a path the image
+  lists (§8 F3).
+- **Moving every borrowed name, so the step module reads nothing off `load_govkit` (AC21 as rev-5
+  wrote it).** It moves the write lock, the staging journal and the outbox writer, govkit's own
+  `update` state, which no finding names.
 
 ## 5. Production-readiness checklist
 
 - security: S8 refuses credential-bearing values and never prints one; S27 carries the target's own
   line-ending values and no credential; S26 reclaims only a lock a reboot provably ended on one host.
 - perf / scale: one `git config` read per step for S27; nothing else measurable.
-- error / empty / loading states: S11's unwritable snapshot and S28's corrupt image each refuse by
-  name, never silently.
+- error / empty / loading states: S11's unwritable snapshot refuses by its stage's name, never
+  silently.
 - observability: every new refusal names its file, key or stage.
 - risks: S26 reads a differing `boot_id` as dead on one hostname, so two kernels that share a hostname
-  and a tree would be judged one host, which the help page states; S24 moves four functions other
-  suites monkeypatch, and govkit re-imports each name.
+  and a tree would be judged one host, which the help page states; S24 moves five functions and
+  eight constants, govkit binds each name back, and the one suite write to a moved name,
+  `govkit._BASH` (`tools/govkit/selftest.py:17330`, `:17338`), moves to the step module's.
 - testing: the probes and fixtures of §6 and the arms of §7.
 - migration: §4 "Migration".
 - user docs: `help/upgrade-steps.md` (S8, S14, S26).
@@ -398,7 +489,9 @@ TOOL-dSafePassage-26's spec joins this unit's `--dispatch --writes` when S25 edi
 ## 6. Acceptance criteria
 
 The criterion AC15 moved to TOOL-dSafePassage-61 on 2026-10-26, as its AC7, with S17; the label is
-not reused here.
+not reused here. AC22 and AC25 were struck on 2026-10-28 with S25 and S28; neither label is reused.
+The criteria AC14, AC16, AC20, AC26 and AC27 observe code that is built at HEAD, and each is a
+regression guard that this pass must keep green.
 
 - **AC1** — When a `python -c` probe imports `tools/govkit/govkit.py` by path and calls
   `read_plan_destinations` on gov's root, no destination starts with `.gitattributes:` and each is the
@@ -414,18 +507,24 @@ not reused here.
   member.
   Red when: the class reads the stale receipt and the branch is green.
 - **AC4** — When `python3 "tools/govkit/upgrade_steps.py" fixture lock --plant lock-live-slow-census`
-  runs, the take refuses busy and exits 1, and the same plant run against a judge copy that reads the
-  clock after the census reclaims.
+  runs, the take refuses naming the live holder and exits 1, the census delayed 6 s, and the same
+  plant run against a judge copy that reads the clock after the census reclaims.
   Red when: the plant is green under the staged judge copy.
 - **AC5** — When `python3 "tools/govkit/upgrade_steps.py" fixture lock --plant lock-reused` runs five
-  times in a row, each reclaims and exits 0, and the lock it planted reads a `started` 600 s before the
-  run.
-  Red when: any run reads the reused pid `live`.
+  times in a row on node d, and once under
+  `wsl.exe -- bash -c 'cd /mnt/c/<checkout> && python3 tools/govkit/upgrade_steps.py fixture lock --plant lock-reused'`
+  with the checkout's path inside the program text, every run prints no `lock: FAILED` line and
+  reclaims naming `a reused pid`. The lock it planted reads a `started` 600 s before the run, and
+  under WSL a `started_boot` 600 s before the boot reading.
+  Red when: any run reads the reused pid `live`, or the WSL run reads it `unknown` for want of a
+  boot-clock start.
+  fixture: node d's default WSL distribution, `claude-u26`, ran Python 3.14.4 with `CLOCK_BOOTTIME`
+  on 2026-10-28, and at HEAD the WSL run printed `lock: FAILED`.
 - **AC6** — When a `python -c` probe loads `tools/gate-legs.json`, the `govkit selftest` leg's guard
   holds `tools/process-monitor/census.py`, spelled under the leg file's `{prefix}`.
   Red when: an edit to the census alone selects no leg that runs the reclaim's arm.
-- **AC7** — When `git grep -n -A4 "REUSE_MARGIN_S =" -- tools/govkit/upgrade_steps.py` runs, the
-  comment names `windows-join` with 0.5 s and `posix-ps` with 1 s.
+- **AC7** — When `git grep -n -B6 "^REUSE_MARGIN_S =" -- tools/govkit/upgrade_steps.py` runs, the
+  comment above the constant names `windows-join` with 0.5 s and `posix-ps` with 1 s.
   Red when: one bound is stated for both backends.
 - **AC8** — When `python3 "tools/govkit/upgrade_steps.py" fixture isolation --plant local-url-userinfo`
   runs, with `remote.origin.url` an `https` URL carrying a user and a password, the step is refused
@@ -467,7 +566,7 @@ not reused here.
   Red when: the re-run stops on a row whose witness no down can falsify, or a second down changes a
   byte.
 - **AC18** — When `git grep -c -F "<phrase>" -- <cited spec>` runs for each row of §4 "The cites, by
-  phrase", each prints 1.
+  phrase", each prints `<cited spec>:1`.
   Red when: a phrase is quoted that its spec does not carry, or carries twice.
 - **AC19** — When `bash tools/lib/python-floor.sh down 3.11 <clone>` runs from a scratch clone whose
   plant `v = f"{"X" if c else "y"}"` is committed at `HEAD`, it exits 1 naming the plant, and
@@ -478,19 +577,24 @@ not reused here.
 - **AC20** — When `python tools/lib/python_floor.py check --rev 3708a705` runs, it prints seven
   statements, `tools/lexicon/selftest.py:109` among them.
   Red when: the pattern is widened until line 108 matches.
-  figure: seven and the line are PINNED at `3708a705`, re-derived by this command.
-- **AC21** — When a `python -c` probe parses `tools/govkit/upgrade_steps.py` with `ast`, it finds no
-  import of `govkit` and no name govkit defines that the module does not define or copy itself, and
-  `git grep -c "^# >>> resolve_kit_dir" -- tools/govkit/upgrade_steps.py` prints 1.
-  Red when: the step module reaches back into govkit for a function.
-- **AC22** — When `python tools/check-spec-tokens.py` runs after the pass, its guards line names no
-  hit `memory-hygiene self-test <- tools/check-spec-tokens.py` or
-  `build-index selftest <- tools/check-spec-tokens.py` against TOOL-dSafePassage-26's spec.
-  Red when: that spec is live and its leg line still omits either leg.
+  figure: seven and the line are PINNED at `3708a705`, re-derived by this command; re-run at HEAD
+  `56aef62aa` on 2026-10-28, after TOOL-dSafePassage-69, it printed the same seven.
+- **AC21** — When a `python -c` probe parses `tools/govkit/upgrade_steps.py` with `ast`, the module
+  defines the five functions, the eight constants and `resolve_kit_dir` that S24 names, holds no
+  `import` or `from` naming `govkit`, and the attributes it reads off a `load_govkit()` result, bound
+  to a name or read inline, are exactly the nine `ast`-visible names of §4 "What the step module still
+  borrows"; `git grep -c "^# >>> resolve_kit_dir" -- tools/govkit/upgrade_steps.py` prints
+  `tools/govkit/upgrade_steps.py:1`.
+  Red when: a name of S24's closure is still read off `load_govkit()`, or a borrowed name joins the
+  module unlisted.
+  figure: the nine are PINNED at HEAD `56aef62aa` on 2026-10-28, where the same probe printed
+  thirteen: those nine and `resolve_shell_argv`, `resolve_tokens`, `target_context` and
+  `resolve_kit_dir`.
 - **AC23** — When `python3 "tools/govkit/upgrade_steps.py" fixture lock --plant lock-other-boot` runs,
-  a lock from this host and platform with a different non-empty `boot_id` is reclaimed and the run
-  exits 0; `--plant lock-no-namespace` is judged by the census on node d and reads `unknown` under the
-  fixture's Linux stub of `read_pid_namespace`.
+  a lock from this host and platform held by a live pid, its `boot_id` non-empty and other than the
+  judge's `bootid` stand-in, is reclaimed and the run exits 0; `--plant lock-no-namespace`, a lock
+  carrying none of `platform`, `boot_id` and `pid_ns`, is judged by the census on node d and reads
+  `unknown` under the fixture's `pidns` stand-in for `read_pid_namespace`.
   Red when: a lock a reboot ended refuses forever, or a lock with no namespace field is reclaimed on
   Linux.
 - **AC24** — When `python3 "tools/govkit/upgrade_steps.py" fixture isolation --plant autocrlf-local`
@@ -498,12 +602,6 @@ not reused here.
   `git hash-object --path` oid equals the one `git -C <t> hash-object --path` prints in the parent's
   environment, and the run exits 0.
   Red when: the parent's global value overrides the target's local one.
-- **AC25** — When `python3 "tools/govkit/upgrade_steps.py" fixture walk --plant corrupt-image` runs on
-  a clean scratch target, the image written as non-JSON is rewritten and the step applies; with
-  another tracked path changed, the up exits 1 naming the image; `--plant stale-image-sibling` leaves
-  no `.govkit-new` file under `.governance/steps/` and `git -C <t> diff --cached --name-only` names
-  none.
-  Red when: a corrupt image is read, discarded over a changed path, or its sibling is staged.
 - **AC26** — When `bash -c '. "$1"; resolve_python' _ tools/lib/resolve-python.sh` runs with
   `GOV_PYTHON` unset and fakes for `python3`, `python` and `py` first on `PATH`, it exits non-zero and
   stderr names `python3` with `did not run`.
@@ -521,9 +619,13 @@ not reused here.
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC5 AC8 AC17 AC23 AC24 AC25 · the self-test runs each plant this unit adds or pins, its failing cases staged by the staged judge copy, the stubs and committed direct writes · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by one
+New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC8 AC17 AC23 AC24 · the self-test runs each plant this unit adds or pins, its failing cases staged by the staged judge copy, the stubs and committed direct writes · none
 New arm: tools/push-main.test.sh · covers AC10 AC11 · the unwritable-snapshot landing and the attended landing with a failing witness, each failing case staged by a lander copy whose snapshot site keeps its inline line · none
-New arm: tools/lib/resolve-python.test.sh · covers AC26 · every launcher faked and the override unset, its failing case staged by a fake set that leaves `py` real · none
+
+AC5's boot half needs a Linux judge, which the self-test on node d and remote CI's `windows-latest`
+runners (`.github/workflows/remote-ci.yml:54`) are not, so no arm covers it and AC5 is observed by
+its own command. AC26's case is arm (b) of `tools/lib/resolve-python.test.sh` (`:82-87`), built by
+TOOL-dSafePassage-26, so no arm is added for it.
 
 ## 8. Open questions
 
@@ -538,10 +640,24 @@ New arm: tools/lib/resolve-python.test.sh · covers AC26 · every launcher faked
   second record of progress beside the receipt's. RESOLVED (agent, 2026-10-23, delegated): accept the
   idempotent second down, on rung 3. widens: none · relaxes: none
 - **F3 — When may a corrupt image be discarded (S28)?** Options: when no path has changed since
-  `HEAD`; when no path of a declared write set has changed; never, always refusing. No step declares a
-  write set, so the second cannot be built; the first keeps TOOL-dSafePassage-26 S31's recovery on a
-  clean tree and refuses wherever it cannot tell. RESOLVED (agent, 2026-10-23, delegated): the first,
-  on rung 3. widens: none · relaxes: none
+  `HEAD`; when no path of a declared write set has changed; when no path the image itself lists has
+  changed since it was written; never, always refusing. No step declares a write set, so the second
+  cannot be built. The 2026-10-23 pick was the first, before TOOL-dSafePassage-26 S31 built the
+  third (`tools/govkit/upgrade_steps.py:656-666`, `:694-706`), which this fork had not weighed. The
+  third refuses only over a path the image names, where the first refuses over any unrelated dirty
+  file, and it needs no new `raise Refusal` site. RESOLVED (agent, 2026-10-28, delegated): the third,
+  as built, by the main loop's recommendation (2) in
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md`;
+  S28 is struck and `BRANCH_PIN` does not move. widens: none · relaxes: none
+- **F4 — Is S5 built (the brief's recommendation (3))?** The brief recommends striking S5 as built,
+  since `lock-reused` already plants `started` 600 s back (`tools/govkit/upgrade_steps.py:3098`).
+  Options: strike S5 whole; or keep its `started_boot` half as the residual. The plant writes no
+  `started_boot`, so on a `posix-ps` judge with a boot clock the estimate falls back to the wall and
+  reads the reused pid `unknown` (`:1697-1705`); the plant printed `lock: FAILED` under node d's WSL
+  on 2026-10-28, a break remote CI's Windows runners never meet. Striking S5 whole would leave its
+  own `started_boot` clause unbuilt and finding 16 open on Linux. RESOLVED (agent, 2026-10-28,
+  delegated): keep the `started_boot` half; the recommendation is taken for the `started` half only.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -557,15 +673,34 @@ New arm: tools/lib/resolve-python.test.sh · covers AC26 · every launcher faked
   touched path trips, per the spec-tokens repair handoff
   `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
   criterion's meaning moved.
+- rev-6 · 2026-10-28 · §1 · S1 · S2 · S3 · S4 · S5 · S6 · S7 · S9 · S10 · S14 · S15 · S16 · S18 ·
+  S22 · S24 · S25 · S26 · S27 · S28 · S29 · S34 · S35 · S38 · S39 · §3 · §4 · §5 · AC4 · AC5 · AC7 ·
+  AC18 · AC20 · AC21 · AC22 · AC23 · AC25 · §7 · §8 · §10 · every item rebased on the run branch's
+  HEAD `56aef62aa` after the builder's DIVERGENCE hand-back, by the brief
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md`.
+  S24 and AC21 are scoped to finding 30's closure, the ten other borrowed names kept and listed in §4;
+  S28 and AC25 are struck for TOOL-dSafePassage-26 S31's image rule, so `BRANCH_PIN` does not move
+  (§8 F3); S25 and AC22 are struck, that spec being CLOSED; S27 keeps only its plant; S5 keeps its
+  `started_boot` half (§8 F4); S4 keeps the 6 s delay; S14 keeps the help sentence; S26's table
+  shows HEAD's verdicts; AC7 reads the comment above the constant and AC18's first phrase fits one
+  line; every cite moves to HEAD's lines.
 
 ## 10. Reuse audit
 
-The seams extended are named per item: `planned_writes` and `LANDABLE_ROLES`
-(`tools/govkit/govkit.py:3830`, `:3988`), the lander's snapshot pair (`tools/push-main.sh:777-793`),
-the resolver's parity arm (`tools/lib/resolve-python.test.sh:159-233`), `write_atomic`
-(`tools/govkit/govkit.py:4198-4221`), `write_conflict_candidate` (`:9063-9072`) and
-`render_order_slug` (`:5735`), the census backends (`tools/process-monitor/census.py:63-70`,
-`:194-228`), the leg guards (`tools/gate-legs.json`), and the specced seams of units 16 to 33.
+The seams extended are named per item, at HEAD `56aef62aa`: `planned_writes` and `LANDABLE_ROLES`
+(`tools/govkit/govkit.py:4084`, `:3926`), the lander's snapshot pair (`tools/push-main.sh:919-935`),
+the resolver's parity arm (`tools/lib/resolve-python.test.sh:330-412`), `write_conflict_candidate`
+(`tools/govkit/govkit.py:9514-9528`), `write_row_order` (`:9613-9622`) and `render_order_slug`
+(`:5845`), the census backends (`tools/process-monitor/census.py:63-70`, `:194-228`), the leg guards
+(`tools/gate-legs.json`), and the specced seams of units 16 to 33. S24 extends the import-back seam
+TOOL-dSafePassage-26 built, `blob_at = upgrade_steps.blob_at` (`tools/govkit/govkit.py:6832`) and
+`write_atomic` (`:4303`), and leaves `load_govkit` (`tools/govkit/upgrade_steps.py:1928-1942`) as
+the seam for every name it does not move. S28's rule is TOOL-dSafePassage-26 S31's, kept
+(`tools/govkit/upgrade_steps.py:656-706`), and its sibling rule is `write_atomic`'s
+(`:1888-1925`).
+`python tools/codebase-map/reuse_lookup.py "move a function into the step module and import it back into govkit"`
+ranked `step`, `read_steps` and `read_step_states`, none of them the import-back seam, which this
+revision found by reading `tools/govkit/govkit.py:6830-6832`.
 `python tools/codebase-map/reuse_lookup.py "snapshot the untracked files before a stage"` ranked
 `before`, `corpus_files` and `stage_or_fail`, none of them the lander's pair, which the batch found by
 reading `tools/push-main.sh`; every other seam was found by reading the line the report cites, and

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them
 
-**Status:** DEFERRED · rev-5 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-6 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -129,9 +129,9 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
   outside its population. Observed by AC11.
 - **S16** — id 3. Its command is read as `git grep -n` filtered of comment lines, not `git grep -c`,
   which prints `tools/push-main.sh:N` rather than a bare count. Observed by AC11.
-- **S17** — id 13. TOOL-dSafePassage-35 S10's rewritten comment at `tools/push-main.sh:777-783` may
+- **S17** — id 13. TOOL-dSafePassage-35 S10's rewritten comment at `tools/push-main.sh:919-925` may
   keep its phrase; no criterion depends on how a comment is worded. Observed by AC11.
-- **S18** — id 19. `remove_new_untracked` (`tools/push-main.sh:788`) calls
+- **S18** — id 19. `remove_new_untracked` (`tools/push-main.sh:926`) calls
   `write_untracked_snapshot "$now"` for its current set, so the two sets `comm -z -13` compares come
   from one writer, and AC9 is read as one code line spelling the read, inside
   `write_untracked_snapshot`. Observed by AC11.
@@ -149,16 +149,19 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
   `target_context` calls, move; the constants `_BASH`, `TOKEN_RX`, `OPT_IN_ALL`, `PER_KIT_PATH_TOKENS`,
   `SEEDED_TOKENS`, `ANSWER_VALUE_RE`, `DRIVE_PREFIX_RE` and `TOKEN_VALUE_RE`, and the class `Refusal`,
   are each moved or copied, govkit re-importing what moves; `resolve_kit_dir` (`:197`) stays the inline
-  copy S24 names. Its §5 risk line is read as five functions and eight constants. Observed by AC10.
+  copy S24 names. Its §5 risk line is read as five functions and eight constants. TOOL-dSafePassage-35
+  rev-6 S24 states this set itself, re-derived at HEAD `56aef62aa` on 2026-10-28 with the same
+  members, and names the ten other names its module borrows through `load_govkit` as kept; this item
+  is a recorded reading of that one. Observed by AC10.
 - **S19** — id 4. TOOL-dSafePassage-35 AC18 is read as a regression guard, green before that unit's
   pass, whose failing case is a later edit to a cited spec. NOT OBSERVED: the criterion stays as
   written, and only its role in the ledger changes.
 - **S20** — id 15. TOOL-dSafePassage-35 S21 is read as a recorded reading that no pass moves, its AC18
   the guard of S19. NOT OBSERVED, for S19's reason.
 - **S24** — id 16. TOOL-dSafePassage-35 S9's pin is read at `tools/govkit/refusal_join.py:41`, where
-  `BRANCH_PIN = 255` is defined, `:235` being its comparison; its S1 is read as: only
-  `tools/govkit/govkit.py:4682-4684` applies the `missing` filter, and `:5059-5061` filters on
-  `kind == "write"` alone. Observed by AC14.
+  `BRANCH_PIN` is defined, `:296` being its comparison at HEAD `56aef62aa`, as that unit's rev-6 S9
+  cites them; its S1 is read as: at `3708a705` only `tools/govkit/govkit.py:4682-4684` applies the
+  `missing` filter, and `:5059-5061` filters on `kind == "write"` alone. Observed by AC14.
 
 ### The lock record and its probes (D-12, D-25)
 
@@ -404,6 +407,11 @@ New arm: tools/push-main.test.sh · covers AC9 · the blanked derived count, its
   `tools/drift-audit/drift_signals.py` and `memory/DECISIONS.md`, which this pass no longer writes,
   and §4 Inventory, §5's risk and §10's pin cite follow; §8 F1's ruling is unchanged; by
   `memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-34-2-spec-writer.md`.
+- rev-6 · 2026-10-28 · S14 · S17 · S18 · S24 · the cross-read of TOOL-dSafePassage-35 rev-6: S14
+  notes that unit's S24 now states the closure itself, with the same members; S17's and S18's lander
+  cites and S24's comparison cite move to the lines that unit cites at HEAD `56aef62aa`, and S24
+  drops the stale pin value; no criterion's meaning moved; by
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-35-1-spec-writer.md`.
 
 ## 10. Reuse audit
 
