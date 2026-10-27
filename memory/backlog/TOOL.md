@@ -512,7 +512,7 @@ Cite ids, never line numbers.
 | [TOOL-dPolishedVitrine-15](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-13 | A FINISHED CLAIM THAT STANDS AT HEAD IS TRUSTED, AND THE KIT GATE WOULD… |
 | [TOOL-dPolishedVitrine-16](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO CONSUMERS HOLD AN unattended@1.20 THAT GOV NUMBERS TWICE. inCMS… |
 | [TOOL-dRankedPlan-17](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dRankedPlan-18](../builds/dRankedPlan/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A PLAN REVIEW'S FINDINGS HAVE NO DISPOSAL ROUTE. review.dispose… |
+| [TOOL-dRankedPlan-18](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-6 | 2026-10-26 | A PLAN REVIEW'S FINDINGS HAVE NO DISPOSAL ROUTE. review.dispose… |
 | [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |
 | [TOOL-dRemeasuredRender-3](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | inherited red: leg lexicon naming predicates red at 9b743831,… |
 | [TOOL-dRemeasuredRender-4](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | inherited red: leg playbook render wiring red at 9b743831, introduced… |

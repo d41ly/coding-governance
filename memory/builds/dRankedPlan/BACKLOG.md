@@ -10,3 +10,4 @@
 - SEV · TOOL-dRankedPlan-17 · MED · the build's units stay unbuilt and its owned gaps open
 - DEFERRED · TOOL-dRankedPlan-17 · until TOOL-dRankedPlan-81 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dRankedPlan-81 at order 27 today, closes it (README rule 1)
 - SEV · TOOL-dRankedPlan-18 · MED · a Plan Review's confirmed findings reach no plan draft
+- DEFERRED · TOOL-dRankedPlan-18 · until TOOL-dRankedPlan-6 · TOOL-dRankedPlan-6's build run lands Plan Review, and the route that disposes its confirmed findings to `item.plan.record` is armed there or by a later unit of the build run at the latest (the spec run carries it forward with the unit it waits on)

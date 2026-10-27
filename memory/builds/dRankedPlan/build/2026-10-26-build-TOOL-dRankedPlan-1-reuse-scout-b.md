@@ -26,7 +26,7 @@ I followed `reuse-lookup.agent.md`: one `reuse_lookup.py` query per behaviour, t
 - **Old line cites in research-plan:21/:94 and the walkthrough:**
   - They cite `render_live` at `gen_build_index.py:1766-1807` and `:1797`; it is now at :2080, with the dormant label at :2110.
   - The walkthrough's `plan_state` cite (:4411) is now :4458.
-- **TOOL-dPlacedRequest-3:90-95, §8 F8:** the `[[fixed-row]]` for `entry.intake` in TOOL-dDeclaredLoop-24 is triggered by dPlacedRequest declaring the item, but dWellOiledMachine declares it. As written it is never armed, so -10's "until the intake kind lands" probe has no row to read.
+- **dPlacedRequest's unit 3 (TOOL-dPlacedRequest-3:90-95), §8 F8:** the `[[fixed-row]]` for `entry.intake` in TOOL-dDeclaredLoop-24 is triggered by dPlacedRequest declaring the item, but dWellOiledMachine declares it. As written it is never armed, so -10's "until the intake kind lands" probe has no row to read.
 - **Missing loop.toml row:** TOOL-dDeclaredLoop-1 S2 ships exactly ten `[[workflow]]` rows in `loop.toml`. TOOL-dBoundRoles-1 S4 adds `plan` to `workflows.toml` but names no `loop.toml` row, so a `plan` workflow with `step = "step.plan"` is owed by nobody.
 - **The Codex row:** layer-runtime:833-835 records that Codex 0.139 *documents* UserPromptSubmit. The clause plants a Codex-shaped adapter that falls back, so the plant must leave the event undeclared as unmeasured.
 
