@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** DEFERRED · rev-10 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-11 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 part 1/2
 
@@ -20,6 +20,7 @@
 | [2026-10-26-prompt-TOOL-dSafePassage-5-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-build-brief.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
 | [2026-10-27-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | research | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-10-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-10-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-5-3-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-3-spec-writer.md) | research | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-5-4-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-4-spec-writer.md) | journal | — |
@@ -27,6 +28,7 @@
 | [2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md) | journal | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-5-7-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-7-spec-writer.md) | research | — |
 | [2026-10-27-prompt-TOOL-dSafePassage-5-8-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-8-spec-writer.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-9-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-9-spec-writer.md) | research | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 |
 
 <!-- /gen:spec-records -->
@@ -245,7 +247,7 @@ partial write. A step a later build adds whose witness holds over release-0 take
 | `reup` | no | after `down`, the walk again; the digest equals `up`'s |
 | `plants` | no | after `up`, each `[[plant]]` carried by its observation, or ordered |
 | `skip` | yes | step k's first `witness` call answers `ok`, so the walk passes it unrun; k is load-bearing when the digest differs from `up`'s or k's real witness then exits non-zero; under k's `[[condition]]` the walk without the skip stops at k and with it gets past k |
-| `kill` | yes | step k's `up` runs on a shadow copy of the target, its first write is applied to the target, and the child exits by `os._exit(137)`, k's first witness forced first where it holds (S6); the killed state holds the lock with a dead pid and k's row `failed` with `interrupted:`, except the schema step on release-0's schema-3 receipt, which holds no row for k (TOOL-dSafePassage-15 S4); a re-run's digest equals `up`'s; and from a copy of the killed state `update --rollback --to <pin> --write` reaches release-0's digest, the files the killed run moved returned because TOOL-dSafePassage-62 wrote the receipt naming them before the walk, and the held kit's put back before it by TOOL-dSafePassage-66 |
+| `kill` | yes | step k's `up` runs on a shadow copy of the target, its first write is applied to the target, and the child exits by `os._exit(137)`, k's first witness forced first where it holds (S6); the killed state holds the lock with a dead pid and k's row `failed` with `interrupted:`, except the schema step on release-0's schema-3 receipt, which holds no row for k (TOOL-dSafePassage-15 S4); a re-run's digest equals `up`'s with k's `steps` row read without `via`, which that row carries as `"via": "witness"` exactly when k's witness, run through `run_step_isolated` over a copy of the killed state, exits 0, and lacks otherwise, as TOOL-dSafePassage-33 S1 marks a step the walk applies by its witness alone (`tools/govkit/upgrade_steps.py:57`, `:1281`); and from a copy of the killed state `update --rollback --to <pin> --write` reaches release-0's digest, the files the killed run moved returned because TOOL-dSafePassage-62 wrote the receipt naming them before the walk, and the held kit's put back before it by TOOL-dSafePassage-66 |
 | `fail` | yes | step k's `up` answers `{"verdict": "failed", "rc": 1, "tail": "upgrade-walk: planted exit 1"}`, k's first witness forced first where it holds (S6); the walk exits 1, every step before k reads `applied`, the last `applied` row is k-1 (none for the first), k reads `failed` with `exit 1`, and no later step is recorded; the schema step on release-0's schema-3 receipt records no row, its step line ends `(not recorded: receipt below schema 4)`, and the receipt reads schema 3 with no `steps` and `gov_commit` the pin, its rows the ones the file pass moved, as the findings path writes them (`tools/govkit/govkit.py:12979-12988`) |
 | `shims` | no | the clone holds no tag; `read_releases` over it returns none; `check_shim_windows` holds every row `read_shim_rows` reads; each forwarder whose `from` the receipt installs is in the walked target; zero rows prints `shims: 0 declared`, counted as measured-nothing |
 | `isolation` | yes | `check_needs_target` over a scratch copy of release-0 returns `isolated` or `attended`; `breach` or `needs-target` is a red naming the step |
@@ -423,14 +425,18 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
   Red when: skipping a step is read as passing without comparing the outcome.
 - **AC7** — When `python "tools/govkit/upgrade_walk.py" --case kill` runs, each step's killed state
   shows a lock whose pid is dead and the step `failed` with `interrupted:`, the floor step printed
-  `forced`, the re-run's digest equals the `up` digest, the rollback from the killed state reaches
-  release-0's, every digest read as S4 states, and it exits 0; for `govkit/receipt-schema-4` the
+  `forced`, the re-run's digest equals the `up` digest with the step's `steps` row read without
+  `via`, the row carrying `"via": "witness"` exactly when the step's witness, run over a copy of the
+  killed state, exits 0, and no `via` otherwise (TOOL-dSafePassage-33 S1), the rollback from the
+  killed state reaches release-0's, every digest read as S4 states, and it exits 0; for `govkit/receipt-schema-4` the
   killed state holds no row for the step (TOOL-dSafePassage-15 S4); with `--inject witness-first`,
   and separately with `--inject not-rerunnable`, it exits 1 naming the arm.
   Red when: the kill lands before the step's first write or after the walk returns, so no partial
   state is ever re-run; or a step whose witness holds over release-0 is passed by that witness, so
   its up is never killed; or a step's first write is read from modification times where its
-  before-image or a single changed path names it, so the killed state is one its up cannot reach.
+  before-image or a single changed path names it, so the killed state is one its up cannot reach;
+  or a re-run passes that differs from `up` at any byte but the killed step's `via`, or whose row
+  carries `via` where the killed state's witness did not hold, or none where it held.
   cost: the longest case, tens of minutes over every step.
 - **AC8** — When `python "tools/govkit/upgrade_walk.py" --case fail` runs, for each step k the receipt
   names step k-1 as its last `applied` row and k `failed` with `exit 1`, no later step is
@@ -641,6 +647,10 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   the held kit a kill left to the new TOOL-dSafePassage-66, consumed here; a walk holding a kit read
   by its exit and withheld stamp; AC14 over the factory's callers, two `selftest.py` helpers renamed,
   by `2026-10-27-prompt-TOOL-dSafePassage-5-8-spec-writer.md`.
+- rev-11 · 2026-10-27 · §4 cases · AC7 · the fifth pass's one red, the `kill` re-run at
+  `govkit/receipt-schema-4` recording `"via": "witness"` where `up` records none, read as
+  TOOL-dSafePassage-33 S1 declares it, not a defect: the killed step's row carries the mark exactly
+  when the killed state's witness holds, by `2026-10-27-prompt-TOOL-dSafePassage-5-10-spec-writer.md`.
 
 ## 10. Reuse audit
 
