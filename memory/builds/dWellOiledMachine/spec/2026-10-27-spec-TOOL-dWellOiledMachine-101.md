@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-101 — spec 95's ordering check is observed red: a fixture where an older spec-set commit names unit 90 and the amendment lands late
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-101-deviation-1011.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-101-deviation-1011.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,7 @@ observed and not argued.
 - **consumes-from** `TOOL-dWellOiledMachine-95` — §4, §5's testing line and §6, which gain the fixture and AC6 before unit 95's pass
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the predicate the fixture runs
 - **hands-off** `TOOL-dWellOiledMachine-99` — AC6, which 95 S3's rewritten join names as an observer
+- **hands-off** `TOOL-dWellOiledMachine-115` — §4's fixture, §5, §10 and the S2 and AC2 fixture texts, which gain a per-run directory and name `build_fixture` (round-5 promotions audit, findings 18 and 31)
 
 ## 4. Design
 
@@ -148,6 +150,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   29 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-5
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-115.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-106 — spec 97's AC15 checks its ordering by ancestry, once per amended unit from 91 to 94
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-106-deviation-1061.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-106-deviation-1061.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 |
 
 <!-- /gen:spec-records -->
 
@@ -51,6 +52,8 @@ placeholder AC15 alone used.
 
 - **consumes-from** `TOOL-dWellOiledMachine-97` — AC15 and the §6 preamble, which this unit rewrites before unit 97's pass
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the predicate the rewritten AC15 loads from spec 95 and calls
+- **hands-off** `TOOL-dWellOiledMachine-114` — AC1's last clause, which counts the loader in spec 97's §6 preamble alone (round-5 promotions audit, finding 21)
+- **hands-off** `TOOL-dWellOiledMachine-115` — §3 Edges and §4 Evidence, which gain the edge to unit 107, the two loader copies and bullet-label citations (round-5 promotions audit, findings 2, 9 and 24)
 
 ## 4. Design
 
@@ -124,6 +127,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   21 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-5
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-114, TOOL-dWellOiledMachine-115.
 
 ## 10. Reuse audit
 

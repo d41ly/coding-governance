@@ -135,3 +135,19 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T07:38:34Z review · item dWellOiledMachine-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 10 · minors 22 · disposition promote
 
 2026-10-27T07:38:56Z decision · item Does the owner's ruling for dPlacedRequest, dDeclaredLoop and dKeptSession — stop the spec-audit chain at the first round confirming no BLOCKER and no HIGH, closing later minors batches under a recorded override of specs-audited — apply to dWellOiledMachine? · reason options: (a) apply it, so the chain ends at the first no-high round; (b) run M4 as written, bounded only by a round's precision falling below the review protocol's floor. Refused to choose: the ruling was given per build (memory/builds/dKeptSession/prompts/2026-10-26-prompt-KICK-dKeptSession-1-owner-review-until-no-high.md) and no standing rule extends it, so the run follows M4; rounds 1-5 read precision 0.93, 0.94, 0.91, 0.83, 0.97 and promoted 17, 11, 4, 3, 11 units, so the chain has not shrunk to an end
+
+2026-10-27T08:32:19Z review · item dWellOiledMachine-spec-set-r6 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 5 · minors 24 · disposition promote
+
+2026-10-27T08:39:37Z rescope · item add TOOL-dWellOiledMachine-109 · reason promoted from the spec audit of the round-5 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md), finding 27 at BLOCKER, item B1, repairing TOOL-dWellOiledMachine-108
+
+2026-10-27T08:39:40Z rescope · item add TOOL-dWellOiledMachine-110 · reason promoted from the spec audit of the round-5 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md), finding 4 at HIGH, item H1, repairing TOOL-dWellOiledMachine-108
+
+2026-10-27T08:39:42Z rescope · item add TOOL-dWellOiledMachine-111 · reason promoted from the spec audit of the round-5 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md), finding 5 at HIGH, item H2 (shared with finding 29), repairing TOOL-dWellOiledMachine-108
+
+2026-10-27T08:39:44Z rescope · item add TOOL-dWellOiledMachine-112 · reason promoted from the spec audit of the round-5 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md), finding 29 at HIGH, item H2 (shared with finding 5), repairing TOOL-dWellOiledMachine-108
+
+2026-10-27T08:39:47Z rescope · item add TOOL-dWellOiledMachine-113 · reason promoted from the spec audit of the round-5 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md), finding 20 at HIGH, item H3, repairing TOOL-dWellOiledMachine-103
+
+2026-10-27T08:39:49Z rescope · item add TOOL-dWellOiledMachine-114 · reason promoted from the spec audit of the round-5 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md), finding 21 at HIGH, item H4, repairing TOOL-dWellOiledMachine-106
+
+2026-10-27T08:39:52Z rescope · item add TOOL-dWellOiledMachine-115 · reason promoted from the spec audit of the round-5 promotions (memory/builds/dWellOiledMachine/reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md), its 24 minor findings batched into one unit, 14 MEDIUM (findings 1 2 3 8 9 10 11 12 14 16 23 26 30 31) and 10 LOW (findings 6 7 13 15 17 18 19 24 25 32), repairing no one unit

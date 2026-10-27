@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-98 — one ordering probe, defined once in spec 95: an amendment is an ancestor of the amended unit's build commit, never the first subject a log prints
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 67 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-98-deviation-981.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-98-deviation-981.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,13 @@ of the built unit's build commit.
 - **hands-off** `TOOL-dWellOiledMachine-106` — the predicate 97 AC15 loads from spec 95 and calls for specs 91 to 94
 - **hands-off** `TOOL-dWellOiledMachine-107` — the predicate 97's staged red case runs on a fixture repository
 - **hands-off** `TOOL-dWellOiledMachine-108` — the predicate the batch's ordering criteria call for its own rev bumps
+- **hands-off** `TOOL-dWellOiledMachine-109` — the predicate 109's ordering check calls for its rev bump of spec 108 (round-5 promotions audit, finding 27)
+- **hands-off** `TOOL-dWellOiledMachine-110` — the predicate 110's ordering check calls for its rev bump of spec 108 (round-5 promotions audit, finding 4)
+- **hands-off** `TOOL-dWellOiledMachine-111` — the predicate 108 AC21's rewritten loop and 111's ordering check call (round-5 promotions audit, finding 5)
+- **hands-off** `TOOL-dWellOiledMachine-112` — the predicate 112's fixture loads from spec 95 and runs (round-5 promotions audit, finding 29)
+- **hands-off** `TOOL-dWellOiledMachine-113` — the predicate 113's ordering check calls for its rev bump of spec 103 (round-5 promotions audit, finding 20)
+- **hands-off** `TOOL-dWellOiledMachine-114` — the predicate 114's ordering check calls for its rev bump of spec 106 (round-5 promotions audit, finding 21)
+- **hands-off** `TOOL-dWellOiledMachine-115` — §4's predicate, §4 Evidence and §5's perf line, which gain the `_SUBJ` cache, trailer-aware attribution and bullet-label citations before this unit's amendment of spec 95 lands (round-5 promotions audit, findings 14, 15 and 17)
 
 ## 4. Design
 
@@ -196,6 +204,8 @@ No arm is added or moved: the predicate is a probe in spec text, and each criter
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   1 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-5
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-109, TOOL-dWellOiledMachine-110, TOOL-dWellOiledMachine-111, TOOL-dWellOiledMachine-112, TOOL-dWellOiledMachine-113, TOOL-dWellOiledMachine-114, TOOL-dWellOiledMachine-115.
 
 ## 10. Reuse audit
 

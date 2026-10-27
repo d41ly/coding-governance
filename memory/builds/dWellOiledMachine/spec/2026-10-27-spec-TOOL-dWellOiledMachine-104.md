@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-104 — spec 96's ordering check is observed red: a fixture where unit 93's own pass touches spec 93 and no amendment precedes it
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-104-deviation-1041.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-104-deviation-1041.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 |
 
 <!-- /gen:spec-records -->
 
@@ -51,6 +52,7 @@ holding that trap, a prefix-matching id and both orders, so each red case is obs
 - **consumes-from** `TOOL-dWellOiledMachine-96` — §4, §5's testing line and §6, which gain the fixture and AC8 before unit 96's pass
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the predicate the fixture loads from spec 95 and runs
 - **hands-off** `TOOL-dWellOiledMachine-102` — AC8, which 96 S4's rewritten join names as an observer
+- **hands-off** `TOOL-dWellOiledMachine-115` — §3 Edges, §4's fixture, §5, §10 and the S2 and AC2 fixture texts, which gain the edge to unit 103, a per-run directory and `build_fixture` (round-5 promotions audit, findings 1, 18 and 31)
 
 ## 4. Design
 
@@ -141,6 +143,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   30 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-5
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-115.
 
 ## 10. Reuse audit
 

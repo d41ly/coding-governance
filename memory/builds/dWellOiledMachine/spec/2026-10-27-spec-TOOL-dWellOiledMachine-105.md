@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-105 — spec 97's S24 says what "before units 91 to 94 build" means, and its §5 names the ancestry probe as the detector
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-105-deviation-1051.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-105-deviation-1051.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ unit gives S24 the commit pair per unit and re-points §5 at TOOL-dWellOiledMach
 - **consumes-from** `TOOL-dWellOiledMachine-97` — S24 and §5's risks line, which this unit rewrites before unit 97's pass
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the predicate whose ancestry relation S24 names, and which AC4 runs
 - **consumes-from** `TOOL-dWellOiledMachine-107` — 97 AC16, which S24's join names as an observer
+- **hands-off** `TOOL-dWellOiledMachine-115` — §4 Evidence's citations of spec 97, rewritten by bullet label (round-5 promotions audit, finding 6)
 
 ## 4. Design
 
@@ -130,6 +132,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   13 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-5
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-115.
 
 ## 10. Reuse audit
 

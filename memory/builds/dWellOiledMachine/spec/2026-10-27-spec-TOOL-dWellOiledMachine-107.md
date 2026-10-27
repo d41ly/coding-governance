@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-107 — spec 97's ordering check is observed red: a fixture where spec 91 already holds the amendment's string and one of four amendments lands late
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 69 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-107-deviation-1071.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-107-deviation-1071.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-108 |
 
 <!-- /gen:spec-records -->
 
@@ -51,6 +52,7 @@ TOOL-dWellOiledMachine-98's predicate, in AC15's loop, on a scratch fixture hold
 - **consumes-from** `TOOL-dWellOiledMachine-97` — §4, §5's testing line and §6, which gain the fixture and AC16 before unit 97's pass
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the predicate the fixture loads from spec 95 and runs
 - **hands-off** `TOOL-dWellOiledMachine-105` — AC16, which 97 S24's rewritten join names as an observer
+- **hands-off** `TOOL-dWellOiledMachine-115` — §3 Edges, §4's fixture, §5, §10 and the S2 and AC2 fixture texts, which gain the edge to unit 106, AC15's own loop, a per-run directory and `build_fixture` (round-5 promotions audit, findings 2, 18, 19 and 31)
 
 ## 4. Design
 
@@ -144,6 +146,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   31 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-5
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-115.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-103 — spec 96's AC5 checks its ordering by ancestry: the parse amendment is an ancestor of unit 93's build commit
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 68 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-103-deviation-1031.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-103-deviation-1031.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,8 @@ placeholder AC5 alone used.
 
 - **consumes-from** `TOOL-dWellOiledMachine-96` — AC5 and the §6 preamble, which this unit rewrites before unit 96's pass
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the predicate the rewritten AC5 loads from spec 95 and calls
+- **hands-off** `TOOL-dWellOiledMachine-113` — AC1's last clause, which counts the loader in spec 96's §6 preamble alone (round-5 promotions audit, finding 20)
+- **hands-off** `TOOL-dWellOiledMachine-115` — §3 Edges and §4 Evidence, which gain the edge to unit 104, the two loader copies and bullet-label citations (round-5 promotions audit, findings 1, 8 and 24)
 
 ## 4. Design
 
@@ -122,6 +125,8 @@ none
 
 - rev-1 · 2026-10-27 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   20 (H1).
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-5
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-113, TOOL-dWellOiledMachine-115.
 
 ## 10. Reuse audit
 

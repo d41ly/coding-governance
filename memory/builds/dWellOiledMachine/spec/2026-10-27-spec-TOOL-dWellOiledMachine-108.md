@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-108 — the round-4 promotions audit's 22 medium and low findings, batched: the arm parse, liveness halves, scoped greps, stale figures and the ask's second row
 
-**Status:** OPEN · rev-1 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 70 · advances TOOL-dWellOiledMachine-62
+**Status:** OPEN · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 70 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-27-build-TOOL-dWellOiledMachine-108-deviation-1081.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-108-deviation-1081.md) | deviation | — |
+| [2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-98-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 |
 
 <!-- /gen:spec-records -->
 
@@ -148,6 +149,11 @@ N's own amendment lands at the same M2 cross-read.
 - **consumes-from** `TOOL-dWellOiledMachine-96` — §1, S2, S3, §3, §4, AC1 and AC3 (S1, S2, S5 to S7, S11, S15, S16, S20)
 - **consumes-from** `TOOL-dWellOiledMachine-97` — S1, S2, S15, S19, S20, §3 Edges, §4 Evidence, AC1, AC8 and AC12 (S4, S8 to S10, S12 to S14, S17, S19, S21, S22)
 - **consumes-from** `TOOL-dWellOiledMachine-98` — the ordering predicate AC21 calls
+- **hands-off** `TOOL-dWellOiledMachine-109` — AC12, rewritten to grep the two full paths over 90's AC20 slice (round-5 promotions audit, finding 27)
+- **hands-off** `TOOL-dWellOiledMachine-110` — S12, S13 and §6, which gain the joins, the exact §4 line and AC22 reading spec 97 (round-5 promotions audit, finding 4)
+- **hands-off** `TOOL-dWellOiledMachine-111` — AC21, whose spec-97 clause becomes one predicate call per unit from 90 to 94 (round-5 promotions audit, finding 5)
+- **hands-off** `TOOL-dWellOiledMachine-112` — S23, §4, §5's testing line and §6, which gain the fixture and AC23 that observe AC21's loop red (round-5 promotions audit, finding 29)
+- **hands-off** `TOOL-dWellOiledMachine-115` — S10, S11, S21, §4, AC8, AC10, AC11, AC15 and AC19, amended before this unit's own amendments land (round-5 promotions audit, findings 3, 7, 10, 11, 12, 13, 15, 16, 23, 25, 30 and 32)
 
 ## 4. Design
 
@@ -327,6 +333,8 @@ amended units declare stay on their own §7 lines.
 
 - rev-1 · 2026-10-27 · initial draft, the round-4 promotions audit's 22 medium and low findings
   batched.
+- rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-5
+  promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-109, TOOL-dWellOiledMachine-110, TOOL-dWellOiledMachine-111, TOOL-dWellOiledMachine-112, TOOL-dWellOiledMachine-115.
 
 ## 10. Reuse audit
 
