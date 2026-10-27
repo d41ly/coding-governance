@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** DEFERRED · rev-8 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-9 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -119,9 +119,11 @@ TOOL-dSafePassage-N, each item naming the unit it amends; cites are at base `370
   (`tools/govkit/govkit.py:10667`, `:10805`), the `update-withdrawn-` site (`:10760`) and
   unit 2's `write_attended_order` call it. Unit 9's AC7 is read as AC17. Observed by AC17.
 - S19. id 31, the skeptic's fix. The fixtures of `upgrade_steps.py`, `fixtures/retired_edits.py`
-  and `upgrade_walk.py` in `tools/govkit/` build targets through `build_target` and govs through
-  `build_scratch_gov` in `tools/govkit/fixture_target.py`, lifted from `build_gov17`
-  (`tools/govkit/selftest.py:1728`). Observed by AC18.
+  and `upgrade_walk.py` in `tools/govkit/` build targets through `build_target` and synthetic govs
+  through `build_scratch_gov` in `tools/govkit/fixture_target.py`, lifted from `build_gov17`
+  (`tools/govkit/selftest.py:1728`). `upgrade_walk.py` builds no synthetic gov: its one gov is
+  TOOL-dSafePassage-5 S2's `git clone --no-tags` of gov at the pin, whose own `apply` writes
+  release-0, so it stays a clone. Observed by AC18.
 
 ### The resolver's text (D-23)
 
@@ -616,6 +618,10 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
   floor step's id leaves backticks; and AC50 observes the calls by grep, the stages' unchanged
   lines staying the push-main arm's, by
   `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`; no other section moved.
+- rev-9 · 2026-10-27 · S19 · S19 sent every gov `upgrade_walk.py` builds through
+  `build_scratch_gov`, which disagreed with TOOL-dSafePassage-5 S2 and its §8 F1, whose release-0
+  is written by the pinned clone's own `apply`; S19 now binds synthetic govs alone and names that
+  clone, by `2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 

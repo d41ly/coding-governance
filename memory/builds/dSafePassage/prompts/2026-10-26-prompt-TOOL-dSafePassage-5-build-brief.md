@@ -66,3 +66,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The floor step `lib/python-floor-3.15`'s down refuses on gov's own tree today: two lines that landed under the old floor do not compile under 3.11 — `tools/govkit/upgrade_steps.py:2864` (`b'v2
 '` inside an f-string's braces) and `tools/memory-recall/check-recall.py:394` (`'#'` inside one). If your criteria walk that step's down on gov's tree, and rewriting those two lines is outside your spec's Files touched, that is a DIVERGENCE hand-back, never a silent fixture exclusion.
 - `python_floor.py check` run from a hook does not drop `GIT_ENV_LEAKS` (`run_git`); the step runner strips them, so a step's down is safe.
+
+## From the first dispatch (2026-10-27)
+
+- The first builder handed release-0 back: the pin's adopters refused it. Spec rev-7 takes four kits out by F3 and answers the rest; it adds `ci_file` and `lexicon_conf` answers from reading the pinned renderer, not from a measurement. Confirm on your first probe; if `apply` still does not exit 0, that is a DIVERGENCE hand-back naming the kit and its refusal (F3).
