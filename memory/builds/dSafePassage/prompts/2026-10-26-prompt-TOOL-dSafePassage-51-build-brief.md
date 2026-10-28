@@ -56,3 +56,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## Carried from earlier passes (2026-10-28)
+
+- Rev-4 strikes the order-sweep items (S2, S3, AC2 and the hand-out half of S1) and keeps AC1 and the rest. TOOL-dSafePassage-49's pass (c24318735) already built S4's ordering (deviation 181): the config read comes before the rev-parse refusal.
+- TOOL-49 also built the re-downed rolled-back row and the `.gitmodules` refusal, so S8, S10 and S15 may partly hold at HEAD. Read the code first. Where an item already holds, observe it and record that in the ledger instead of rebuilding it, as TOOL-dSafePassage-47, -50 and -52 did.
