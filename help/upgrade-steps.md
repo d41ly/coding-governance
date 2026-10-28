@@ -63,8 +63,10 @@ starts it:
   and `refs/`), so a branch named `config` is never mistaken for one; a submodule repository whose
   config git cannot read refuses the step, naming that config file "or a file it includes" and
   git's exit code, and so does a `.gitmodules` that does not parse, or that is no regular file, a
-  directory, a FIFO or a dangling link say, naming it. The walk never follows a link under
-  `modules/`, a Windows junction included: a link there, or a directory there that will not list,
+  directory or a FIFO say, naming it. A linked `.gitmodules` (a symlink, a junction or any other
+  reparse point) refuses the step naming it, and is never followed or read. The walk never follows
+  a link at `modules/` or under it, a Windows junction included: `modules/` itself linked, a link
+  there, a dangling one or one to a file among them, or a directory there that will not list,
   refuses the step naming its path. A `modules/` git never created, in your git directory or in a
   submodule's, is an empty listing, never a refusal:
   a target with no submodules, or whose submodules have none nested, passes with no refusal. A submodule
