@@ -19,8 +19,8 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: c8d46e188985ce49caad48cf874934661ad3fc7c · park · 43 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: feb0dd606dd790fadaaa05f905bb330bbe921490
-phase: VERIFYING
+witness: 84ffa523fb484515f62181115a512d7e7b145bf1
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -401,3 +401,25 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T13:46:50Z brief · item TOOL-dSafePassage-59 · reason 87388565fa2f memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-59-build-brief.md
 
 2026-10-28T14:01:05Z dispatch · item 36bc5d25 TOOL-dSafePassage-59 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-59.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-59-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-59-order-check.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-51.md memory/builds/dSafePassage/BACKLOG.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-28T19:02:29Z rescope · item add TOOL-dSafePassage-72 · reason the closing review's round-1 HIGH promoted by M4 (review 2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md)
+
+2026-10-28T19:02:39Z rescope · item add TOOL-dSafePassage-73 · reason the closing review's round-1 HIGH promoted by M4 (review 2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md)
+
+2026-10-28T19:02:49Z rescope · item add TOOL-dSafePassage-74 · reason the closing review's round-1 HIGH promoted by M4 (review 2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md)
+
+2026-10-28T19:02:58Z rescope · item add TOOL-dSafePassage-75 · reason the closing review's round-1 HIGH promoted by M4 (review 2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md)
+
+2026-10-28T19:03:03Z rescope · item add TOOL-dSafePassage-76 · reason the closing review's round-1 mediums and lows batched by M4 into two disjoint write sets
+
+2026-10-28T19:03:11Z rescope · item add TOOL-dSafePassage-77 · reason the closing review's round-1 mediums and lows batched by M4 into two disjoint write sets
+
+2026-10-28T19:03:18Z rescope · item add TOOL-dSafePassage-78 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T19:03:26Z rescope · item add TOOL-dSafePassage-80 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T19:03:35Z rescope · item add TOOL-dSafePassage-81 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T19:03:42Z rescope · item add TOOL-dSafePassage-82 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T19:03:50Z rescope · item add TOOL-dSafePassage-83 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
