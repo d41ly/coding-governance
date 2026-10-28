@@ -17,7 +17,7 @@ hold-reason: TOOL-dSafePassage-11 raises the interpreter floor to Python 3.15 an
 hold-until: owner
 hold-code: host-owner-action
 held-from: BUILDING
-refreshed-at: c8d46e188985ce49caad48cf874934661ad3fc7c · park · 43 touching
+refreshed-at: 0c0f3a18370405a51f97df5d1d12bf1a0da2cf74 · park · 135 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 84ffa523fb484515f62181115a512d7e7b145bf1
 phase: BUILDING
@@ -423,3 +423,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T19:03:42Z rescope · item add TOOL-dSafePassage-82 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
 
 2026-10-28T19:03:50Z rescope · item add TOOL-dSafePassage-83 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T20:03:24Z decision · item the close's spec audit round 1 over TOOL-dSafePassage-72 to -83 (0 blockers, 1 high, 32 minors) was folded into the eleven specs by their writers rather than promoted, and --review refuses fold on a spec audit (check 37) · reason options: (a) accept the folds, each spec's §9 naming the audit record; (b) revert the folds and promote one unit for the HIGH and one or two batches for the minors; the run took (a) to keep building, so no review row is recorded for this round

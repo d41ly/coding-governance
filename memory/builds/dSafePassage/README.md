@@ -220,32 +220,32 @@ ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePas
 | [TOOL-dSafePassage-56 — the walk tests for a link on every path it enters, the root and each `modules/` it recurses into, before listing it](spec/2026-10-23-spec-TOOL-dSafePassage-56.md) | 15 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the commit-order criterion's attribution and form, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-59.md) | 15 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [TOOL-dSafePassage-72 — a before-image path is contained by one predicate govkit's destinations share, and refused where any segment on it is a link](spec/2026-10-28-spec-TOOL-dSafePassage-72.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
-| [TOOL-dSafePassage-73 — the forward and reverse walks read "no up on record" through one predicate, so a step re-applied by its witness after a rollback keeps its `via` mark](spec/2026-10-28-spec-TOOL-dSafePassage-73.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
-| [TOOL-dSafePassage-74 — the introducing commit is found by the TOML parse alone, so a row id in any string spelling the reader accepts is found](spec/2026-10-28-spec-TOOL-dSafePassage-74.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-28 |
-| [TOOL-dSafePassage-75 — the step environment keeps `GOV_PYTHON`, so the floor step resolves the interpreter every gate and hook resolves](spec/2026-10-28-spec-TOOL-dSafePassage-75.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-28 |
-| [TOOL-dSafePassage-76 — the closing review's nine engine-side minors, from a before-image restoring into the git directory to a walk refusal blamed on the config](spec/2026-10-28-spec-TOOL-dSafePassage-76.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
-| [TOOL-dSafePassage-77 — the closing review's five walk-leg minors: an order matched by its kind, an arm graded by its defect, a dirty tree refused, reds counted per unit](spec/2026-10-28-spec-TOOL-dSafePassage-77.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
-| [TOOL-dSafePassage-78 — the govkit selftest arms red at the build's head: three arms read against the product they grade, and a walk run over a receipt below schema 3](spec/2026-10-28-spec-TOOL-dSafePassage-78.md) | 16 | 2 | DEFERRED | rev-1 | 2026-10-28 |
-| [TOOL-dSafePassage-80 — five leg ceilings clear their evidence by the declared margin, and upgrade-walk is budgeted](spec/2026-10-28-spec-TOOL-dSafePassage-80.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
-| [TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin](spec/2026-10-28-spec-TOOL-dSafePassage-81.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
-| [TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names](spec/2026-10-28-spec-TOOL-dSafePassage-82.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
-| [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dSafePassage-72 — a before-image path is contained by one predicate govkit's destinations share, and refused where any segment on it is a link](spec/2026-10-28-spec-TOOL-dSafePassage-72.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dSafePassage-73 — the forward and reverse walks read "no up on record" through one predicate, so a step re-applied by its witness after a rollback keeps its `via` mark](spec/2026-10-28-spec-TOOL-dSafePassage-73.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dSafePassage-74 — the introducing commit is found by the TOML parse alone, so a row id in any string spelling the reader accepts is found](spec/2026-10-28-spec-TOOL-dSafePassage-74.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
+| [TOOL-dSafePassage-75 — the step environment keeps `GOV_PYTHON`, so the floor step resolves the interpreter every gate and hook resolves](spec/2026-10-28-spec-TOOL-dSafePassage-75.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
+| [TOOL-dSafePassage-76 — the closing review's nine engine-side minors, from a before-image restoring into the git directory to a walk refusal blamed on the config](spec/2026-10-28-spec-TOOL-dSafePassage-76.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
+| [TOOL-dSafePassage-77 — the closing review's five walk-leg minors: an order matched by its kind, an arm graded by its defect, a dirty tree refused, reds counted per unit](spec/2026-10-28-spec-TOOL-dSafePassage-77.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
+| [TOOL-dSafePassage-78 — the govkit selftest arms red at the build's head: three arms read against the product they grade, and a walk run over a receipt below schema 3](spec/2026-10-28-spec-TOOL-dSafePassage-78.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-28 |
+| [TOOL-dSafePassage-80 — five leg ceilings clear their evidence by the declared margin, and upgrade-walk is budgeted](spec/2026-10-28-spec-TOOL-dSafePassage-80.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
+| [TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin](spec/2026-10-28-spec-TOOL-dSafePassage-81.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names](spec/2026-10-28-spec-TOOL-dSafePassage-82.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 381 bound to this build, across 4 record folder(s).
+Records: 382 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65
-TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80
-TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83.
+TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71.
 
 Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-15@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1
 TOOL-dSafePassage-19@rev-1 TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1
 TOOL-dSafePassage-29@rev-1 TOOL-dSafePassage-3@rev-1 TOOL-dSafePassage-30@rev-1 TOOL-dSafePassage-31@rev-1 TOOL-dSafePassage-32@rev-1 TOOL-dSafePassage-33@rev-1 TOOL-dSafePassage-34@rev-1 TOOL-dSafePassage-35@rev-1 TOOL-dSafePassage-36@rev-1 TOOL-dSafePassage-37@rev-1 TOOL-dSafePassage-38@rev-1
 TOOL-dSafePassage-39@rev-1 TOOL-dSafePassage-4@rev-1 TOOL-dSafePassage-40@rev-1 TOOL-dSafePassage-41@rev-1 TOOL-dSafePassage-42@rev-1 TOOL-dSafePassage-43@rev-1 TOOL-dSafePassage-44@rev-1 TOOL-dSafePassage-45@rev-1 TOOL-dSafePassage-46@rev-1 TOOL-dSafePassage-47@rev-1 TOOL-dSafePassage-48@rev-1
-TOOL-dSafePassage-49@rev-2 TOOL-dSafePassage-5@rev-1 TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-51@rev-1 TOOL-dSafePassage-52@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1.
+TOOL-dSafePassage-49@rev-2 TOOL-dSafePassage-5@rev-1 TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-51@rev-1 TOOL-dSafePassage-52@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1 TOOL-dSafePassage-72@rev-3 TOOL-dSafePassage-73@rev-3
+TOOL-dSafePassage-74@rev-2 TOOL-dSafePassage-75@rev-2 TOOL-dSafePassage-76@rev-3 TOOL-dSafePassage-77@rev-3 TOOL-dSafePassage-78@rev-1 TOOL-dSafePassage-80@rev-4 TOOL-dSafePassage-81@rev-3 TOOL-dSafePassage-82@rev-3 TOOL-dSafePassage-83@rev-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->

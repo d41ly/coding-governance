@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-82-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-82-spec-brief.md) | research | TOOL-dSafePassage-82 |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 |
 
 <!-- /gen:spec-records -->
 
@@ -29,7 +30,9 @@ for them, and the ceiling raises their new evidence rows ask for are TOOL-dSafeP
   them: 5 to TOOL-dSafePassage-67, -68 and -69; 11 to -69; 26 to -67, -68 and -69. Each payload
   names what the consumer's own line says it took. Each of the three specs bumps its rev, logs it in
   §9 naming §3 and check 12, and moves its header date to the pass date; each stays CLOSED.
-  TOOL-dSafePassage-67, -68 and -69 do not change. §4 "The edge ruling" gives the reason.
+  TOOL-dSafePassage-67, -68 and -69 do not change. §4 "The edge ruling" gives the reason. The
+  build README's generated blocks render those headers, so the pass commit carries
+  `python tools/memory-tree/gen_build_index.py --write`'s re-render with them.
   Observed by AC1, AC2 and AC6.
 - **S2 — check 23, the unevidenced criteria.** Every criterion of the eight units gains a ledger
   line in one of the two legal forms:
@@ -279,10 +282,12 @@ None. Every file S1 to S4 touches is a record under `memory/`, which no adopter 
 
 ### Rollout
 
-Order 16, the last pass of the order. TOOL-dSafePassage-72 to -78, -80, -81 and -82 build first.
--80 and -82 edit `tools/gate-legs.json` and -82 edits the gate-runner registries, and every watched
-commit landing after S4's advance counts toward check 9 again. Building last leaves the close's own
-commits as the only ones counted. TOOL-dSafePassage-61, held on TOOL-dGroundRules-13, is not waited
+Order 16, after TOOL-dSafePassage-72 to -78, -80 and -82, and before -81, which builds last because
+its renames must see every sibling's names. -80 and -82 edit the watched `tools/gate-legs.json`, and
+each re-stamps `last-audit` in its own commit, so `last-audit` will already have moved twice before
+this pass; S4 moves it a third time and is the only one to advance `last-body-change`. Every watched
+commit landing after S4's advance counts toward check 9 again. -81 touches no watched path, so
+building before it leaves the close's own commits as the only ones counted. TOOL-dSafePassage-61, held on TOOL-dGroundRules-13, is not waited
 for. The main loop's ledger edits named in §3 "Edges" are committed first.
 
 ### Files touched (estimate)
@@ -301,6 +306,8 @@ for. The main loop's ledger edits named in §3 "Edges" are committed first.
 - the ledgers of TOOL-dSafePassage-25, -27, -28, -32, -34 and -35 under the same folder
 - `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md`
 - `memory/guides/SESSION-KICKOFF.md`
+- `memory/builds/dSafePassage/README.md`, and the other outputs `gen_build_index.py --write`
+  re-renders
 
 ### Alternatives rejected
 
@@ -321,7 +328,7 @@ for. The main loop's ledger edits named in §3 "Edges" are committed first.
 - observability: check 12's join and check 23's coverage read the new lines on every bar; the
   manifest's delta line records what the re-read found.
 - risks: each S1 rev bump is a departure the close's `deviations.py --write` must record. Ten
-  watched commits after S4 red check 9 again, so the pass is the order's last.
+  watched commits after S4 red check 9 again, so only -81, which touches no watched path, follows.
 - testing: AC1 to AC5 and AC7 are direct probes; AC6 is the main loop's.
 - migration: none.
 - user docs: N/A — no page under `help/` reads these records.
@@ -358,8 +365,10 @@ for. The main loop's ledger edits named in §3 "Edges" are committed first.
 - **AC6** — When the main loop runs `bash tools/memory-tree/check-memory-hygiene.sh` and
   `bash skills/session-kickoff/manifest-check.sh` in a clone of the pass head whose `origin/HEAD`
   points at main, the hygiene run prints no check 12 line naming a dSafePassage spec and no check 23
-  line naming a `TOOL-dSafePassage` id, and the manifest run prints no `MANIFEST check 9` line.
-  Red when: any of the reds of §4 "The reds, reproduced" survives.
+  line naming a `TOOL-dSafePassage` id and no `HYGIENE check 9` line, and the manifest run prints
+  no `MANIFEST check 9` line.
+  Red when: any of the reds of §4 "The reds, reproduced" survives, or S1's header moves leave the
+  build README's generated blocks stale.
   permission: the builder role runs only the naming lexicon (`tools/roles/house/policy.toml:28`); the
   main loop observes both.
   cost: the hygiene run took 279 s alone in the clone.
@@ -439,6 +448,13 @@ ceilings are TOOL-dSafePassage-80's.
 - rev-4 · 2026-10-28 · AC5 · the spec-token checker's path join, relayed by the coordinator, read
   the backticked command's quoting as a path. The command moves to a fenced block, its manifest
   path held in a variable.
+- rev-5 · 2026-10-28 · S1 · §4 · §5 · AC6 · folded the round-1 spec audit
+  2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1 (the
+  build's reviews folder)
+  at the fixes its skeptic judged sound: M13 (S1's pass re-renders the build README, which joins
+  Files touched, and AC6 also refuses `HYGIENE check 9`), M1's sentence for this unit (Rollout:
+  `last-audit` will have moved twice, by -80 and -82, before this pass), and L1 (Rollout: after
+  -82, before -81, which builds last). The header's node reads `a`, this host.
 
 ## 10. Reuse audit
 

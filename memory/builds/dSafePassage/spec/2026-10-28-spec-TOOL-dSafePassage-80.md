@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-80 — five leg ceilings clear their evidence by the declared margin, and upgrade-walk is budgeted
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-5
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-80-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-80-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-80-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-80-spec-brief.md) | research | — |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -26,7 +27,10 @@ The second red leg is `every held leg is budgeted, every budget row resolves`. I
 
 This unit sets the five integers to the least value the first check passes, by the rounding the
 manifest already uses. It adds the budget row by that file's own rule, and commits the three
-evidence rows the ceilings rest on, so neither leg names any of these legs.
+evidence rows the ceilings rest on, so neither leg names any of these legs. The budget row puts
+`upgrade-walk` into the foreign-prefix parity leg's population, so `tools/govkit/upgrade_walk.py`
+honours that leg's probe. The commit stages the watched `tools/gate-legs.json`, so it re-stamps the
+kickoff manifest's `last-audit`.
 
 ## 2. Scope (IN)
 
@@ -41,8 +45,9 @@ evidence rows the ceilings rest on, so neither leg names any of these legs.
 - **S4** — The pass commits `tools/run-gates/ceiling-evidence.txt` exactly as the close's writes
   left it in the working tree, §4 "The evidence rows". That is three rows: `upgrade-walk` and
   `routed commits name a specced unit` added, and `spec tokens (a spec's own names resolve)` raised.
-  Each was written by `derive-ceilings.py --write --observed` under `GOV_NODE=a`, and each is kept
-  as written, node `a` included. No other line of the file moves. Observed by AC1 and AC5.
+  Each was written by `derive-ceilings.py --write --observed` on node `a`: the host
+  `daily-agent @ COMPEETO-AGENT`, which the charter's node registry names `a` (`AGENTS.md:106`).
+  Each is kept as written. No other line of the file moves. Observed by AC1 and AC5.
 - **S5** — `tools/run-gates/selftest-budgets.txt` gains an `upgrade-walk` row of 10770 s, by the
   file's own rule against the 7177 s reading, with an empty argv column so the command is taken from
   `tools/gate-legs.json`, §4 "The budget row". Observed by AC4.
@@ -52,6 +57,14 @@ evidence rows the ceilings rest on, so neither leg names any of these legs.
 - **S7** — `spec tokens (a spec's own names resolve)`'s `ceiling` (`tools/gate-legs.json:1749`) goes
   from 390 to 740, clearing its evidence row of 366.0 s (`tools/run-gates/ceiling-evidence.txt:134`,
   S4). Observed by AC1, AC2 and AC3.
+- **S8** — `tools/govkit/upgrade_walk.py` honours `FOREIGN_PREFIX_PROBE=1`: after its first case,
+  `up`, it prints the line `foreign-prefix-probe: stopped after 1 arm` bare and walks no further case
+  and no case arm, §4 "The probe honour". S5's row puts `upgrade-walk` into the population of
+  `foreign-prefix parity (every self-test at three prefixes)`, which reds a row that prints no marker
+  as an undeclared whole run. Observed by AC6.
+- **S9** — The pass commit re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md`, after the
+  §B claims `tools/gate-legs.json` feeds are re-read, §4 "The manifest re-stamp". The pre-commit hook
+  refuses a commit that stages a watched path with no re-stamp. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -63,8 +76,16 @@ evidence rows the ceilings rest on, so neither leg names any of these legs.
 - Any change to `tools/run-gates/ceiling-margin.txt`, to `upgrade-walk`'s own cost, or to why
   `routed commits name a specced unit` and `spec tokens (a spec's own names resolve)` take as long as
   they do.
-- The three rows' node column, which reads `a`. The readings were taken on node `a`, and the check
-  reads the seconds and not the node (`tools/run-gates/derive-ceilings.py:683`).
+- The three rows' node column, which reads `a`, the true node. The readings were taken on
+  `daily-agent @ COMPEETO-AGENT` (`hostname` and `whoami` there print `compeeto-agent` and
+  `daily-agent`), which `AGENTS.md:106` registers as node `a`. The interpreter floor's hold, under
+  which node `a` resolved only 3.14.6 (`memory/builds/dSafePassage/RUN.md:16`), is past: the owner
+  installed 3.15 there, and its resolver runs Python 3.15.2. The `step-gate` and `docs` rows read
+  node `d`, and this unit does not touch them.
+- A `WHOLE_RUN` or `GOV_LAYOUT` declaration for `upgrade-walk` in
+  `tools/run-gates/foreign-prefix.gov.test.sh`, §4 "Alternatives rejected".
+- A way to hold a budget row out of remote CI's scheduled matrix. None exists, and the finding below
+  leaves that to the owner.
 - A budget row for the two older legs. Both carry `"subject": "repo"` and chunk `declarations`
   (`tools/gate-legs.json:1101-1102`, `:1747-1748`), so neither is held and neither owes a row
   (`tools/run-gates/run-selftests.sh:945-962`).
@@ -84,10 +105,21 @@ rule in two. The `ceiling` S3 raises is a hang bound and not a cost verdict
 `tools/run-gates/selftest-budgets.txt` (`:11-14`), which S5 adds.
 
 - **Who pays it.** `upgrade-walk` carries `"subject": "kit"`, so the runner holds it on a default bar
-  and runs it only when `GATE_SELFTESTS` asks (`tools/run-gates/run-gates.sh:3249-3250`). Remote CI
-  sets no `GATE_SELFTESTS` (`.github/workflows/remote-ci.yml`), and the pre-push hook demands a
-  self-test run only when the pusher sets it (`.githooks/pre-push:1653`). A default bar is not
-  slowed.
+  and runs it only when `GATE_SELFTESTS` asks (`tools/run-gates/run-gates.sh:3249-3250`). The
+  pre-push hook demands a self-test run only when the pusher sets it (`.githooks/pre-push:1653`).
+  Remote CI's push-triggered bar sets no `GATE_SELFTESTS`, so a default bar is not slowed.
+- **The nightly held CI run pays it, from S5 on.** Remote CI's `held-plan` and `held` jobs run on
+  the daily schedule `23 4 * * *` and on a manual dispatch (`.github/workflows/remote-ci.yml:41`,
+  `:154`, `:313`). Their matrix is every row `run-selftests.sh --list` prints (`:206`), and the
+  union check refuses a matrix that is not that whole population (`:292-294`). S5's row enrolls
+  `upgrade-walk` in it. The job bounds a row at `budget + max(floor, fraction × budget)` (`:274`),
+  so 10770 + 10770 = 21540 s. The cap is `timeout-minutes × 60 − 600` (`:271`), and the `held` job
+  declares 360 minutes (`:318`), so the cap is 21000 s. The row is platform-bounded and runs under a
+  21000 s bound, up to about 5.8 hours of hosted Windows runner time every day. A hosted runner more
+  than about 2.9 times slower than the 7177 s reading (21000 / 7177) is killed at the cap and reds
+  the nightly run. The owner's choice is to keep the row and accept that cost, which this unit
+  does, or to hold the row out of the scheduled matrix. No mechanism for that exists today: the
+  union check is what forbids leaving a row out, so holding it out is a unit of its own.
 - **What it costs where it runs.** On a bar that runs the held legs, 7177 s is about two hours, and
   the bar can finish no sooner than its longest leg. The next-longest evidenced leg is
   `govkit selftest` at 3358.7 s (`ceiling-evidence.txt`), and the whole-run wall of 21600 s was
@@ -112,8 +144,8 @@ expensive cases only when their inputs move. This unit takes none of them.
 ### Edges
 
 - **consumes-from** external — three rows of `tools/run-gates/ceiling-evidence.txt`, written at the
-  close by `derive-ceilings.py --write --observed` under `GOV_NODE=a` and present only in the
-  working tree at writing time: `upgrade-walk` at 7177.0 s, `routed commits name a specced unit` at
+  close on node `a` by `derive-ceilings.py --write --observed` and present only in the working tree
+  at writing time: `upgrade-walk` at 7177.0 s, `routed commits name a specced unit` at
   253.0 s, and `spec tokens (a spec's own names resolve)` raised from 195.0 s to 366.0 s
   (`git show HEAD:tools/run-gates/ceiling-evidence.txt` holds none of the three values). S4 commits
   them and does not produce them. If the working tree no longer holds them, the pass stops and
@@ -202,7 +234,8 @@ runs no `derive-ceilings.py --write`.
 The file's rule is the worst observed reading times 1.5, floored at 60 s
 (`tools/run-gates/selftest-budgets.txt:20`). Its rows round the product up to a multiple of 10:
 44 of the 48 rows whose reading reads `worst of <n> readings <s>s, x1.5` equal
-`max(60, 10 × ⌈1.5 × s / 10⌉)`, read at `83817478f`. For `upgrade-walk`, 1.5 × 7177 = 10765.5, so the row is 10770.
+`max(60, 10 × ⌈1.5 × s / 10⌉)`, read at `83817478f`. For `upgrade-walk`, 1.5 × 7177 = 10765.5,
+so the row is 10770.
 
 The row's columns are `<name>`, `<budget seconds>`, `<argv>`, `<the reading>` (`:49`). The argv
 column is empty, as `govkit selftest`'s is (`:66`), so `read_population` takes the command from the
@@ -285,9 +318,63 @@ The budget probe printed `unbudgeted ['upgrade-walk']` and `upgrade-walk None 10
 §4's row appended in memory it printed `unbudgeted []` and `upgrade-walk 10770 10770 argv-empty`;
 with a 7200 budget appended instead, its second line read `upgrade-walk 7200 10770 argv-empty`.
 
+### The probe honour
+
+Every suite in the foreign-prefix leg's population honours `FOREIGN_PREFIX_PROBE=1` by stopping
+after its first subject-touching arm with the line `foreign-prefix-probe: stopped after 1 arm`
+(`tools/run-gates/foreign-prefix.gov.test.sh:31-35`). `run_row` greps for that exact whole line and
+reds a probe row that lacks it (`:568-577`). The idiom is the one each Python suite already
+carries, for example `tools/govkit/selftest.py:5136-5140`.
+
+The site sits in `main`'s case loop (`tools/govkit/upgrade_walk.py:934-939`), after `reds += got`.
+The first case is `up` (`CASES` at `:43`), which builds release-0 and walks every declared step up
+through the deployer's own `update`, so it touches the walk's subject. When the variable reads `1`,
+the loop prints the marker with a plain `print`, flushed, and breaks. `print_line` is not used,
+because it prefixes `upgrade-walk: ` (`:58-59`) and the leg matches the whole line. The case-arm
+block that follows (`:940-941`) gains the same condition, so a probe runs no arm. The summary and
+the `GREEN` or `RED:` line print as they do today, with `up` the only case named, and the exit is
+`1 if reds else 0`.
+
+```python
+        probe = os.environ.get("FOREIGN_PREFIX_PROBE") == "1"
+        for c in ([case] if case else CASES):
+            ...
+            reds += got
+            # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the case above walked the subject, and a probe stops here.
+            if probe:
+                print("foreign-prefix-probe: stopped after 1 arm", flush=True)
+                break
+        if not case and not inject and not probe:
+            reds += run_case_arms(ctx)
+```
+
+`probe` is a local of `main`, so no top-level name is minted. `--case up` was measured at 231 s on
+this build's pass of TOOL-dSafePassage-5
+(`memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-5-ledger.md:28`), so a probe
+costs about that plus the release-0 build, at each of the three prefixes. The foreign-prefix leg
+runs probes in a pool, each under `HANG_FACTOR` (3) times its budget
+(`tools/run-gates/foreign-prefix.gov.test.sh:550`, `:569-572`).
+
+### The manifest re-stamp
+
+`.githooks/pre-commit` runs `manifest-check.sh --staged` (`.githooks/pre-commit:236-239`). Its C5s
+leg refuses a commit whose staged files touch a watched path while the staged manifest's audit
+stamp equals HEAD's (`skills/session-kickoff/manifest-check.sh:1775-1788`).
+`memory/guides/SESSION-KICKOFF.md:6` watches `tools/gate-legs.json`, and none of this unit's other
+files.
+
+The pass re-reads the §B command block that the leg manifest feeds
+(`memory/guides/SESSION-KICKOFF.md:89-98`): the bar, its knobs, the held self-tests and the held
+population on demand. This unit changes no leg's name, command, chunk, subject or guard, only five
+ceilings, so no §B line moves. The pass rewrites the `last-audit:` line to
+`<ISO datetime> @ <full sha of HEAD>` (`skills/session-kickoff/manifest-check.sh:1525`, "sha = HEAD
+on any branch"). The commit message carries the `manifest-audit:` line TOOL-dSafePassage-5's pass
+carried (`7c51ef25f`), stating delta none and the watched change.
+
 ### Inventory
 
-None minted. No leg, key, file or arm label is added. S5 adds a row to an existing declaration.
+None minted. No leg, key, file, top-level name or arm label is added. S5 adds a row to an existing
+declaration, and S8 a local and a marker line every probed suite already prints.
 
 ### Migration
 
@@ -307,7 +394,12 @@ None, and no adopter receives any of these values:
 ### Rollout
 
 Live at landing, at order 16. TOOL-dSafePassage-61 also writes `tools/gate-legs.json` at order 16
-and is held on TOOL-dGroundRules-13; its rows and these five lines are disjoint. A future runner
+and is held on TOOL-dGroundRules-13; its rows and these five lines are disjoint.
+TOOL-dSafePassage-77 edits `upgrade_walk.py`'s summary line (`:943-950`) and TOOL-dSafePassage-82
+its release build call (`:911`). Both are lines S8 does not edit, and dispatch order sequences
+them. The round-1 spec audit's H1 has TOOL-dSafePassage-77 build after this unit, which commits the
+evidence file its tree-clean check would refuse. TOOL-dSafePassage-82 and TOOL-dSafePassage-83 also
+re-stamp `last-audit`, so each finds it already moved. A future runner
 reading of a killed leg is admitted only inside `[ceiling, ceiling + 35]`
 (`tools/run-gates/derive-ceilings.py:286`, `CEILING_WINDOW_S` at `:108`), so from the new values
 for these legs, as for any raised ceiling.
@@ -317,6 +409,8 @@ for these legs, as for any raised ceiling.
 - `tools/gate-legs.json`
 - `tools/run-gates/ceiling-evidence.txt`
 - `tools/run-gates/selftest-budgets.txt`
+- `tools/govkit/upgrade_walk.py`
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Alternatives rejected
 
@@ -335,6 +429,11 @@ for these legs, as for any raised ceiling.
   different (`tools/run-gates/selftest-budgets.txt:11-14`), and its own rule gives 10770.
 - **The budget row's argv written out.** It would be a second copy of the manifest's command for the
   same leg, which the empty column exists to avoid (`tools/run-gates/run-selftests.sh:643-644`).
+- **A `WHOLE_RUN` declaration for the row.** It runs the whole walk at each of three prefixes, about
+  3 × 7177 = 21531 s, past the foreign-prefix leg's own 7500 s ceiling and near the 21600 s wall.
+- **A `GOV_LAYOUT` declaration alone.** It skips the row at the repository root only
+  (`tools/run-gates/foreign-prefix.gov.test.sh:612-614`), so the two moved prefixes still run it as
+  a probe and still need the marker.
 - **Re-measuring `upgrade-walk` on a quiet host first.** The evidence file is monotone
   (`tools/run-gates/ceiling-evidence.txt:7-11`), so a quieter reading cannot lower the row without
   `--reset`, and both checks grade the row as it stands. Whether a quiet run is cheaper is part of
@@ -342,22 +441,25 @@ for these legs, as for any raised ceiling.
 
 ## 5. Production-readiness checklist
 
-- security: N/A — five integers and two declaration rows in gov-side files; no write path, input or
-  surface.
+- security: N/A — five integers, two declaration rows, a manifest stamp and an early stop in a
+  gov-only leg; no write path, input or surface.
 - perf / scale: a healthy leg's run time does not move. A hung leg runs longer before its ceiling
   fires: `upgrade-walk` four hours, the two small legs about two minutes, and on every default bar
   `routed commits name a specced unit` 510 s and `spec tokens (a spec's own names resolve)` 740 s.
   §3 states the cost finding.
-- error / empty / loading states: N/A — neither check's messages change.
+- error / empty / loading states: N/A — neither check's messages change; a probe run prints the
+  marker, the summary and its verdict, and exits as a full run would.
 - observability: `--check` keeps naming all five legs on its out-of-band line, since their rows are
   operator readings (`tools/run-gates/derive-ceilings.py:706-710`); a self-test sweep now grades
   `upgrade-walk` against a budget.
 - risks: the two older legs are sized from readings taken alone, and timed out in the pool at their
   old ceilings, so a pooled run may still need the serial retry; a hung `upgrade-walk` on a self-test
   bar is cut by the 21600 s wall before its serial retry can finish; `upgrade-walk`'s reading was
-  taken under load.
+  taken under load; the nightly held run carries `upgrade-walk` platform-bounded at 21000 s; the
+  foreign-prefix leg gains about three `up` cases of its own cost.
 - testing: AC1's and AC4's probes, each staged red by today's files; AC2 observes the ceiling check
-  itself, and §7 names the budget leg.
+  itself; AC6 runs the walk under the probe; AC7 runs the manifest check over the staged pass; §7
+  names the budget leg and the foreign-prefix arm.
 - migration: none.
 - user docs: N/A — no page under `help/` states these ceilings or budgets, and no adopter receives
   them.
@@ -397,22 +499,39 @@ for these legs, as for any raised ceiling.
   node `a`, and no other line is removed.
   Red when: the pass ran a fresh `--write`, so another row moved; or a row was retyped with another
   node or value.
+- **AC6** — When `FOREIGN_PREFIX_PROBE=1 python tools/govkit/upgrade_walk.py` runs from the
+  repository root, it prints `foreign-prefix-probe: stopped after 1 arm` as a whole line, its
+  `upgrade-walk: summary` line names the `up` case and no other and carries no `arms` field, and it
+  exits 0.
+  Red when: the site is absent, as at `83817478f`, so no marker prints and the run walks every case
+  and arm.
+  cost: one release-0 build and the `up` case, about four to five minutes from the 231 s `up`
+  reading; the red side is the whole walk, about two hours.
+- **AC7** — When, with the pass staged, `bash skills/session-kickoff/manifest-check.sh --staged`
+  runs, it exits 0, and `git diff --cached -U0 -- memory/guides/SESSION-KICKOFF.md` shows one hunk,
+  the `last-audit:` line replaced by one naming the HEAD sha the pass was built on.
+  Red when: the pass stages `tools/gate-legs.json` with no re-stamp, so the check fails 5 naming
+  it.
 
 ## 7. Gates
 
-`leg ceilings clear their evidenced maximum` · `every held leg is budgeted, every budget row resolves` · `routed commits name a specced unit` · `spec tokens (a spec's own names resolve)` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy fixtures` · `memory hygiene`
+`leg ceilings clear their evidenced maximum` · `every held leg is budgeted, every budget row resolves` · `routed commits name a specced unit` · `spec tokens (a spec's own names resolve)` · `foreign-prefix parity (every self-test at three prefixes)` · `upgrade-walk` · `kickoff-manifest ratchet` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy fixtures` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `memory hygiene`
 
-No `New arm:` line: this unit adds or moves no suite arm. Each of the first two legs' own failing
-case is its arm. `leg ceilings clear their evidenced maximum` runs `derive-ceilings.py --check` on
+New arm: tools/run-gates/foreign-prefix.gov.test.sh · covers AC6 · the `upgrade-walk` row S5 adds to its population; `--plan` with the row staged prints it as a probe row, and `--kit upgrade_walk.py` with S5's row and no S8 site reds it as an undeclared whole run, at the first prefix, after about two hours · none
+
+The two ceiling and budget legs carry no `New arm:` line, because each one's own failing case is its
+arm. `leg ceilings clear their evidenced maximum` runs `derive-ceilings.py --check` on
 every bar, and at `83817478f`, with the close's three evidence rows, it names all five legs.
 `every held leg is budgeted, every budget row resolves` names `upgrade-walk` at `83817478f`, which
 the main loop observed by a run. Those are the REDs the close recorded. The main loop observes both
 legs GREEN at the close, and the two older legs complete under their new ceilings on the close's
 bar. The budget leg's checker is not an acceptance token, because the spec-token join refuses its
 script at command position as a suite invocation (`tools/check-spec-tokens.py:400-404`); AC4 is its
-direct probe. The four legs after the two older ones are the ones whose `guard` names
-`{prefix}/gate-legs.json`. The broad `{prefix}/` and `{prefix}/run-gates/` guards, the only ones
-that reach the two `run-gates` files, are outside the join.
+direct probe. The foreign-prefix leg and `upgrade-walk` are the legs S8 moves.
+`kickoff-manifest ratchet` is S9's. The guarded legs follow: four whose `guard` names
+`{prefix}/gate-legs.json`, three whose `guard` names `{prefix}/govkit/`, and the two whose `guard`
+names `memory/`. The broad `{prefix}/` and `{prefix}/run-gates/` guards, the only ones that reach
+the two `run-gates` files, are outside the join.
 
 ## 8. Open questions
 
@@ -444,8 +563,19 @@ none
   adopter, and §7 names both legs.
 - rev-4 · 2026-10-28 · §3 · §4 · §5 · AC2 · §7 · §10 · the coordinator's third hand-off during this
   dispatch. The spec-token checker resolved the bare citation of the run-gates README to the
-  repository root's 119-line file. It now reads `tools/run-gates/README.md:603-606`, and every other bare
-  `file:line` citation is spelled with its full path, so none resolves against the root.
+  repository root's 119-line file. It now reads `tools/run-gates/README.md:603-606`, and every other
+  bare `file:line` citation is spelled with its full path, so none resolves against the root.
+- rev-5 · 2026-10-28 · S4 · S8 · S9 · §1 · §3 · §4 · §5 · AC6 · AC7 · §7 · the round-1 spec audit,
+  `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`,
+  folded at the fixes the skeptic judged sound, by the coordinator's fourth hand-off. M1: S9 and AC7
+  re-stamp `last-audit` in `memory/guides/SESSION-KICKOFF.md`, and §7 names
+  `kickoff-manifest ratchet`. M9: §3's "Who pays it" names the nightly held CI run S5 enrolls, with
+  its 21540 s bound, 21000 s cap and platform-bounded run. M10: S8 and AC6 make `upgrade_walk.py`
+  honour the foreign-prefix probe, §7 names that leg and its arm, and the two declaration routes are
+  rejected in §4. M2 is DISPOSED, its premise wrong: the readings were taken on
+  `daily-agent @ COMPEETO-AGENT`, which `AGENTS.md:106` registers as node `a`, and the owner
+  installed 3.15 there. The rows stay as written and AC5 is unchanged. S4 and the §3 Edges no
+  longer call the tag an override, and the header's node is corrected from `d` to `a`.
 
 ## 10. Reuse audit
 

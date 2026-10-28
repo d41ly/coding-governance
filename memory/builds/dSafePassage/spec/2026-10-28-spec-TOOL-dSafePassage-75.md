@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-75 — the step environment keeps `GOV_PYTHON`, so the floor step resolves the interpreter every gate and hook resolves
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-72-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-72-spec-brief.md) | research | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -64,7 +65,7 @@ of the witness. The edge join counts CLOSED specs, and a CLOSED spec cannot take
 
 ### Observed at base
 
-A scratchpad probe on node d on 2026-10-28, at `83817478`, wrote three fake launchers reporting
+A scratchpad probe on node a on 2026-10-28, at `83817478`, wrote three fake launchers reporting
 `3.12`, put them first on `PATH`, set `GOV_PYTHON` to a Python 3.15 executable, and ran the floor
 row's witness through `run_step_isolated(row, "witness", <gov>, <gov>)`.
 
@@ -192,6 +193,10 @@ none
   by `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-72-1-spec-writer.md`.
 - rev-2 · 2026-10-28 · §7 · the leg line names `policy fixtures`, the leg whose guard
   `tools/govkit/selftest.py`, listed in §4's files touched, trips.
+- rev-3 · 2026-10-28 · §4 · the header's node and §4's probe read `a`, the host the probe ran on,
+  as the coordinator directed with the fold of
+  `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`,
+  which names no item against this spec.
 
 ## 10. Reuse audit
 

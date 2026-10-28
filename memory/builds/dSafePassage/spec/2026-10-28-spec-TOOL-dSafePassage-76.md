@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-76 — the closing review's nine engine-side minors, from a before-image restoring into the git directory to a walk refusal blamed on the config
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-76-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-76-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-76-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-76-spec-brief.md) | research | TOOL-dSafePassage-77 |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -45,9 +46,13 @@ commit for every citation here.
 - **S3** — M3, the reverse walk's kill recovery stages. In `run_reverse_walk`, the paths staged after
   a down that took effect (`:2164`) are `paths`, read before the down (`:2128`), or where that is
   empty, the paths of the image the index holds, read by `read_image_paths` from
-  `git show :<image path>` when the working tree has no image. `derive_down_verdict`'s
+  `git show :<image path>` when the working tree has no image. Both reads go through one
+  parse-and-contain function with the source passed in, so the index copy is graded as the working
+  tree's is. An index image that does not parse, or has no `paths`, an LFS pointer, a clean-filtered
+  form or a truncated older image say, is a `Refusal` naming the image and telling the operator to
+  stage the restored paths by hand: never a traceback, never a silent `[]`. `derive_down_verdict`'s
   `image_present` and move 3's `via` test keep reading the working tree. The source is §8 F1's
-  recommendation. Observed by AC3.
+  resolution. Observed by AC3.
 - **S4** — M4, a rollback over a receipt that records a step id gov has since retired.
   `derive_reverse_steps` (`:2041-2056`) takes out of `gone` (`:2049`) each id a `[[retired]]` row of
   gov's HEAD names, read by `read_retired(gov_root, "HEAD", None)`, as `check_gov_first` does
@@ -202,7 +207,7 @@ That costs one read; a re-render over a real edit costs the edit.
 | `help/upgrade-steps.md` | "When" (`:271-274`) | "A receipt recording a step id a `[[retired]]` row names is refused only where that step was introduced after `<rev>`, since its down is owed and no row declares one." |
 | `help/upgrade-steps.md` | the config check (`:54-82`) | "A refusal by the walk itself, a link, a `.gitmodules` or a config that does not read, or a repository git will not open, reads `the repositories a step could enter from the target could not be cleared: <reason>`; only a refused key reads that your config declares it." |
 | `help/upgrade-steps.md` | the schema step's paragraph (`:184`), its three usage markers kept | "`update --write` walks this step like any other; to run it by hand outside a walk:" in place of "Until the deployer runs steps itself, run the step by hand:" |
-| `help/python-floor.md` | "The upgrade step" (`:75-76`) | "`<to>` is required in an adopter, whose `HEAD` gov's repository never holds; left out on gov's own tree, it defaults to gov's `HEAD`." |
+| `help/python-floor.md` | "The upgrade step" (`:74-76`), in place of its usage spelling `down 3.12 <target> [<to>]` and its clause "left out, `<to>` defaults to the target's `HEAD`" | "Its down, `python-floor.sh down 3.12 <target> [<to>, required outside gov]`, runs only in `govkit update --rollback`, whose `--to` commit is `<to>`. `<to>` is required in an adopter, whose `HEAD` gov's repository never holds; left out on gov's own tree, it defaults to gov's `HEAD`, so the down always grades bytes at a commit." |
 | `help/update-edits.md` | "A rendered file you edited" (`:37-45`) | "A rendered file git cannot hash through its own filters, a required clean filter that fails say, cannot be proven unedited, so it reads `render-edited` too." |
 
 ### Inventory
@@ -246,6 +251,11 @@ names its one page sentence.
 - `help/upgrade-steps.md`
 - `help/python-floor.md`
 - `help/update-edits.md`
+- `memory/map/generated/symbols.json`
+
+The map is regenerated in the pass commit by running the codebase-map kit's `gen_map.py --write`,
+since `read_git_dir` and `derive_gov_root` are new top-level names it maps; the generator itself is
+not edited.
 
 ### Alternatives rejected
 
@@ -266,8 +276,9 @@ names its one page sentence.
 - perf / scale: one `rev-parse` per target and process (S1); one `git show` per reverse row that
   lost its image (S3).
 - error / empty / loading states: a target git names no git directory for is graded by the
-  lexical arm alone (S1); an
-  index holding no image stages nothing (S3); a retired id with no derivable commit refuses (S4).
+  lexical arm alone (S1); an index holding no image stages nothing, and one holding an image that
+  does not parse or has no `paths` refuses naming it (S3); a retired id with no derivable commit
+  refuses (S4).
 - observability: S8's prefix names the real cause; S5's exit-2 line says why `<to>` is required.
 - risks: S1 refuses a step whose up names a `.git` path; no shipped step does
   (`tools/govkit/steps.toml`). S6 can order an unedited render behind a broken filter, which §4 S6
@@ -298,10 +309,15 @@ names its one page sentence.
 - **AC3** — When `python3 "tools/govkit/upgrade_steps.py" fixture rollback --plant kill-after-down-stage`
   runs, it exits 0 with no `rollback: FAILED` line. Its rollback is killed after `fx/s1`'s down
   restored, then run again, and it prints that `git diff --cached --name-status` lists `D s1.txt` and a
-  `D` line for the step's before-image, and that `fx/s1` reads `rolled-back`.
-  Red when: the re-run stages `paths` alone, `[]`, so the index still holds both files.
+  `D` line for the step's before-image, and that `fx/s1` reads `rolled-back`. Its variant
+  `kill-after-down-stage-garbled`, whose staged image is overwritten in the index by non-JSON bytes
+  before the re-run, exits 1 with no `rollback: FAILED` line, and prints that the re-run's refusal
+  names the image and the restored paths to stage by hand, with no `Traceback`.
+  Red when: the re-run stages `paths` alone, `[]`, so the index still holds both files; or the
+  garbled index image raises `JSONDecodeError` or `KeyError` as a traceback.
 - **AC4** — When `python3 "tools/govkit/upgrade_steps.py" fixture rollback-update --plant retired-step`
-  runs, it exits 0 with no `rollback-update: FAILED` line. Its scratch gov lands `fx/s2` at B and
+  runs, it exits 1, as a refusing plant of that family does (`tools/govkit/upgrade_steps.py:101-103`,
+  `:4684-4686`), with no `rollback-update: FAILED` line. Its scratch gov lands `fx/s2` at B and
   names it in a `[[retired]]` row at C, and a target updated to C records `fx/s2` `applied`. The
   plant prints that `update --rollback --to B --write` exits 0, and that
   `update --rollback --to A --write` exits 2 naming `fx/s2`, its `[[retired]]` row and that its down
@@ -323,8 +339,13 @@ names its one page sentence.
   the edit is overwritten.
 - **AC7** — When `python -c "import sys, inspect; sys.path.insert(0, 'tools/govkit'); import upgrade_steps as u; print(list(inspect.signature(u.run_step_walk).parameters))"`
   runs, it prints the five names `gov_root`, `target`, `receipt_path`, `receipt` and `rows`. And
-  `git grep -n "run_step_walk(" -- tools/` shows no call passing a sixth argument.
-  Red when: the parameter stays, or a caller still passes it and raises `TypeError`.
+  `git grep -n "run_step_walk(" -- tools/` shows no single-line call passing a sixth argument. And a
+  `python -c` check parsing `tools/govkit/govkit.py` and the govkit selftest module with `ast`, and
+  the `FIXTURE_WALK_CHILD` string of `tools/govkit/upgrade_steps.py` with `ast.parse`, finds every
+  Call whose function name ends `run_step_walk` with `len(args) + len(keywords) == 5`, the wrapped
+  calls at `govkit.py:9454-9455` and `:11726-11727` among them.
+  Red when: the parameter stays, or a caller still passes it, as a wrapped call whose sixth argument
+  sits alone on its own line, and raises `TypeError`.
 - **AC8** — When `python3 "tools/govkit/upgrade_steps.py" fixture isolation --plant submodule-config-malformed`
   runs, it exits 1, as at HEAD, with no `isolation: FAILED` line, and its `refused` line holds
   `up: the repositories a step could enter from the target could not be cleared: ` and
@@ -334,16 +355,18 @@ names its one page sentence.
   executor prefix leads the line.
 - **AC9** — When `git grep -n -F -e "is not downed again" -e "this run already has" -e "inside your repository's git directory" -e "left unstaged" -e "since its down is owed" -e "could not be cleared" -e "to run it by hand outside a walk" -- help/upgrade-steps.md`
   runs, it prints one line per phrase, and
-  `git grep -n -F -e "is required in an adopter" -- help/python-floor.md` and
-  `git grep -n -F -e "cannot be proven unedited" -- help/update-edits.md` each print one line. And
-  `git grep -n -F "One recorded \`rolled-back\` whose witness holds is downed again" -- help/upgrade-steps.md`
-  and `git grep -n -F "Until the deployer runs steps itself" -- help/upgrade-steps.md` print nothing.
+  `git grep -n -F -e "is required in an adopter" -e "required outside gov]" -- help/python-floor.md`
+  prints one line per phrase, and
+  `git grep -n -F -e "cannot be proven unedited" -- help/update-edits.md` prints one line. And
+  `git grep -n -F "One recorded \`rolled-back\` whose witness holds is downed again" -- help/upgrade-steps.md`,
+  `git grep -n -F "Until the deployer runs steps itself" -- help/upgrade-steps.md` and
+  `git grep -n -F "defaults to the target's" -- help/python-floor.md` print nothing.
   Red when: a page still documents the unreachable re-down or a deployer that does not walk steps,
   or lacks a sentence §4 "The pages" lists.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `python resolver (behaviour + inline parity + idiom ban)` · `upgrade-walk` · `step-rows-frozen` · `step-gate` · `docs` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `python resolver (behaviour + inline parity + idiom ban)` · `upgrade-walk` · `step-rows-frozen` · `step-gate` · `docs` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `recall floor` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 · `[dSP-76]` rows beside the `[dSP-1 S3]` containment check (`tools/govkit/selftest.py:3093-3094`) feeding `check_contained` AC1's paths over scratch targets, their failing case staged by a working copy whose `check_contained` lacks the `.git` refusals · `BRANCH_PIN` by the measured delta
 New arm: tools/govkit/selftest.py · covers AC2 AC3 · `check_step_walk` and `check_step_rollback` rows running the plants `kill-before-stage` and `kill-after-down-stage`, tagged `dSP-76`, staged red by today's move 1 and today's `paths`-only staging · none
@@ -396,6 +419,18 @@ AC7 and AC9 are greps and a signature read; no arm is added for them.
   its §4 row and AC9 grep; §8 F1 resolved to (c) and F2 to (a), delegated by the coordinator.
 - rev-3 · 2026-10-28 · AC1 · AC2 · AC3 · the scratch-fixture paths the spec-token checker read as
   untracked repo paths are spelled out of backticks; no observation changes.
+- rev-4 · 2026-10-28 · S3 · §4 · §5 · AC3 · AC4 · AC7 · AC9 · §7 · folded the round-1 spec audit,
+  `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`:
+  M16, S3's index read refuses an image that does not parse, with AC3's garbled variant; M4 and
+  L15, the `help/python-floor.md` row takes `:74-76` in place of the optional usage and the
+  default-to-`HEAD` clause, AC9 adding the negative grep; M7, AC7 adds the skeptic's corrected `ast`
+  arity check over the wrapped callers and the fixture child; L8, AC4 expects exit 1; M11 and L5,
+  `symbols.json` in Files touched and `codebase-map coverage + freshness` on the leg line. The
+  header's node is corrected to `a`.
+- rev-5 · 2026-10-28 · AC7 · §4 · §7 · folded the spec-token checker's rev-4 report: AC7 names the govkit
+  selftest module in prose, the observation staying the `ast` probe; the map generator leaves Files
+  touched, named in prose as the command the pass runs; `recall floor` joins the leg line, tripped by
+  `symbols.json`.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-74 — the introducing commit is found by the TOML parse alone, so a row id in any string spelling the reader accepts is found
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-72-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-72-spec-brief.md) | research | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-75 |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -26,11 +27,14 @@ row, and `derive_reverse_steps` downs it on every rollback whatever `--to` says.
 - **S1** — The parse decides. In `derive_introduced` (`tools/govkit/upgrade_steps.py:911-980`),
   each declaring blob the walk reads is parsed with `tomllib`, and an id counts as held where a
   `[[<table>]]` row's parsed `id` equals it, as the code after the test already does
-  (`:966-974`). The raw-text test at `:963-965` is not kept, and `for i in hits` becomes a pass over
-  `want`. Observed by AC1 and AC2.
-- **S2** — Both readers inherit it. `read_steps` (`:862-864`) and `read_retired` (`:906-908`) call
-  `derive_introduced`, so a succession row's derived commit is found in any spelling too.
-  Observed by AC2.
+  (`:966-974`). The raw-text test at `:963-965` is not kept, and `for i in hits:` becomes
+  `for i in want & held:`, a new set, because the loop's body discards each found id from `want`
+  and iterating `want` itself would raise on the change in size. Observed by AC1 and AC2.
+- **S2** — Three readers inherit it. `read_steps` (`:861-864`) and `read_retired` (`:907-908`) call
+  `derive_introduced`, so a succession row's derived commit is found in any spelling too, and so
+  does `resolve_shim_landing` (`tools/govkit/shims.py:330`), so a `[[shim]]` id lands in any
+  spelling. Observed by AC2 for the first two; the third is NOT OBSERVED by a new criterion, for
+  the reason §3 gives.
 - **S3** — The docstring. `derive_introduced`'s last sentence, "a blob is parsed only where it
   spells a wanted id" (`:919-920`), says every declaring blob is parsed and the walk still stops
   at the last hit. Observed by AC3.
@@ -43,6 +47,13 @@ row, and `derive_reverse_steps` downs it on every rollback whatever `--to` says.
   no change.
 - `help/upgrade-steps.md`. Its opening paragraph already says the introducing commit is the first
   first-parent commit that holds the row (lines 7-9), which is what the code will now do.
+- A criterion of its own for the shim reader. gov declares no `[[shim]]` row
+  (`tools/govkit/shims.toml` holds none at `83817478`), so no shim id is walked today. The shims
+  kit's own window plants, `window-prefix-id` and `window-comment-id`
+  (`tools/govkit/shims.py:525-538`), drive `resolve_shim_landing` over double-quoted ids and a
+  comment that spells one, and both read the same under a parse with no raw-text test in front of
+  it. That agrees with the function's own docstring (`:317-319`), which promises the row with
+  exactly that id and never a substring search.
 
 ### Edges
 
@@ -57,7 +68,7 @@ CLOSED specs, and a CLOSED spec cannot take the matching `hands-off` line.
 
 ### Observed at base
 
-A scratchpad probe on node d on 2026-10-28 committed one `steps.toml` holding four rows, each id
+A scratchpad probe on node a on 2026-10-28 committed one `steps.toml` holding four rows, each id
 spelled one way, and called `derive_introduced(g, "HEAD", ["steps.toml"], "upgrade", ids)` at
 `83817478`.
 
@@ -84,7 +95,8 @@ on 2026-10-28 (PINNED).
 
 Process time measured 1.06 to 1.80 s for every variant, with no ordering between them. The walk's
 cost is `git log` and `cat-file --batch`, which the test never avoided, since every changed
-declaring blob is read before the test runs (`:950`).
+declaring blob is read before the test runs (`:950`). The shim walk is not measured: with no
+`[[shim]]` row declared, `resolve_shim_landing` is called for no id outside its own plants.
 
 ### Inventory
 
@@ -166,9 +178,10 @@ four write `tools/govkit/upgrade_steps.py` and `tools/govkit/selftest.py`.
   Red when: either reader still reads a single-quoted row `unlanded`.
   fixture: the scratch gov `build_steps_gov` builds (`tools/govkit/selftest.py:2895-2912`), with
   `render_row`'s double-quoted `id` (`:2922-2927`) as the control.
-- **AC3** — When `git grep -n -e "in want if" -e "parsed only where" -- tools/govkit/upgrade_steps.py`
-  runs, it prints nothing.
-  Red when: the raw-text test or the docstring's claim about it is kept.
+- **AC3** — When `git grep -n -F "f'\"{i}\"' in text" -- tools/govkit/upgrade_steps.py` and
+  `git grep -n "parsed only where" -- tools/govkit/upgrade_steps.py` run, each prints nothing.
+  Red when: the raw-text test itself, or the docstring's claim about it, is kept. A correct rewrite
+  of the loop does not trip it, since neither pattern is a substring of `for i in want & held:`.
 
 ## 7. Gates
 
@@ -187,6 +200,11 @@ none
   by `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-72-1-spec-writer.md`.
 - rev-2 · 2026-10-28 · §7 · the leg line names `policy fixtures`, the leg whose guard
   `tools/govkit/selftest.py`, listed in §4's files touched, trips.
+- rev-3 · 2026-10-28 · S1 · S2 · §3 · §4 · AC3 · folded L2 and L13 of
+  `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`:
+  S1 spells the loop as `for i in want & held:` and AC3 greps the raw-text test itself;
+  S2 names `resolve_shim_landing` as a third reader, §3 says why it takes no criterion
+  and §4 says its walk is unmeasured. The header's node reads `a`, the host the probes ran on.
 
 ## 10. Reuse audit
 

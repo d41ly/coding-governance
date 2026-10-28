@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-82-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-82-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-82-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-82-spec-brief.md) | research | TOOL-dSafePassage-83 |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -55,9 +56,10 @@ not the instance.
   named values; a sibling kit gov carries routed through `resolve_kit_dir`; declaration data spelled
   with the drained `{prefix}/` token and resolved where it is read; prose in a manifest field spelled
   `<prefix>/`. The floor row's three argvs at `tools/govkit/steps.toml:34-36` name a new program
-  in gov's own govkit steps directory, beside the schema row's program, which finds
-  `tools/lib/python-floor.sh` through `resolve_kit_dir` (§8 F1).
-  Observed by AC4, AC5, AC6 and AC11.
+  in gov's own govkit steps directory, beside the schema row's program. It loads the step module
+  by path as `tools/govkit/steps/fanout_cap.py`'s `load_steps` does, finds
+  `tools/lib/python-floor.sh` through that module's `resolve_kit_dir`, and runs it under its
+  `resolve_bash`; it imports nothing from govkit (§8 F1). Observed by AC4, AC5, AC6 and AC11.
 - **S4 — harness arms.** Each of the eight unarmed exit sites is armed or pinned, by the leg's own
   two remedies:
   - `tools/push-main.sh:1319` and `:1325` are armed: arm 39 of `tools/push-main.test.sh` and arm 40
@@ -86,14 +88,25 @@ not the instance.
     `memory/project/spawn-idiom-sites.txt:169` goes from 43 to 42, the count left once
     TOOL-dSafePassage-11 took the suite's PEP 701 check out.
   Observed by AC8, AC10 and AC11.
+- **S7 — the manifest re-stamp.** `tools/gate-legs.json` is a `watch:` path of
+  `memory/guides/SESSION-KICKOFF.md`, and `.githooks/pre-commit` runs the ratchet's staged leg, which
+  refuses a commit staging a watched path with no re-stamp. The commit that stages `gate-legs.json`
+  therefore stages the manifest too: its §B claims that `gate-legs.json` feeds are re-read, the
+  Gate commands block's single-sourcing line among them, and `last-audit` is re-stamped to the
+  pass's parent with an advanced datetime. `last-body-change` does not move; that advance is
+  TOOL-dSafePassage-83's. Observed by AC12.
+- **S8 — the map.** The floor program mints `main`, a name `memory/map/generated/symbols.json`
+  maps, so the pass commit carries `python tools/codebase-map/gen_map.py --write`'s regeneration of
+  `memory/map/generated/`, as TOOL-dSafePassage-81 does for its renames. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
 - The legs TOOL-dSafePassage-80 owns, `leg ceilings clear their evidenced maximum` and
   `every held leg is budgeted, every budget row resolves`, and those TOOL-dSafePassage-81 owns,
   `lexicon naming predicates` and `lexicon wiring`.
-- The records legs and the two timed-out legs, `memory hygiene`, `kickoff-manifest ratchet`,
-  `routed commits name a specced unit` and `spec tokens`, which TOOL-dSafePassage-83 owns.
+- The records legs, `memory hygiene` and the manifest ratchet's check 9, which TOOL-dSafePassage-83
+  owns, and the two timed-out legs, `routed commits name a specced unit` and `spec tokens`, whose
+  ceilings are TOOL-dSafePassage-80's. S7's re-stamp is the one manifest edit this unit makes.
 - Draining any registry row this build did not move: the 35 carried `govkit.py` encoding sites, the
   carried spawn-idiom rows, and every pin already in `memory/project/unarmed-branches.txt`.
 - Any change to a gate's predicate, its drained-token set or its population. Each leg stays as it is
@@ -174,7 +187,7 @@ one its shape admits.
 | Declaration data a reader resolves | `usage.toml` all 59 · `docs_leg.py:501`, `:507` · `tools/govkit/fixtures/release-0/arms.toml:42`, `:59` · `plants.toml` 21, 29, 104, 112, 124 · `deploy.toml` 41, 43, 47, 48 | Spelled `{prefix}/…`, and resolved by `gk.resolve_prefix_token(value, gk.derive_tool_root(root))` (`govkit.py:218`, `:192`) where the file is read and before any join or fingerprint. `docs_leg.read_usage_rows` resolves each `[[usage]]` `id` and `entry`, and stops prepending `"{prefix}/" +` to a class's `rows` (`docs_leg.py:206`), since the value now carries the token. `check_page_command` resolves through the same call where it now substitutes the literal `"tools/"` (`:306`). `upgrade_walk.py` resolves the three fixture files' fields against the pinned clone's tool root. Every resolved id, entry, path and text is byte-identical to today's, so no help page's usage anchor or fingerprint moves. |
 | Prose in a manifest field | `gate-legs.json:1480`, the `upgrade-walk` row's `reads.history` | `<prefix>/govkit`. |
 | A suite assertion on printed paths | `resolve-python.test.sh:264` | It matches each printed statement by a path assembled from the suite's own variables. The same line is S6's `var-pipe` site, and one edit answers both. |
-| A step row's program | `steps.toml:34-36` | The three argvs name a new program in gov's govkit steps directory, python_floor.py, which resolves `tools/lib/python-floor.sh` through `gk.resolve_kit_dir("lib", "python-floor.sh", …)` and runs it under `gk.resolve_bash()` with its own arguments, passing the exit through (§8 F1). |
+| A step row's program | `steps.toml:34-36` | The three argvs name a new program in gov's govkit steps directory, python_floor.py. It loads `tools/govkit/upgrade_steps.py` by path as `fanout_cap.py`'s `load_steps` does, because the runner's `-I` drops the step's directory from `sys.path`, then calls that module's `resolve_kit_dir("lib", "python-floor.sh", …)` (`upgrade_steps.py:293`) and runs the script under its `resolve_bash()` (`:347`) with its own arguments, passing the exit through. It imports nothing from govkit, the rule `tools/govkit/steps/receipt_schema_4.py:22` states (§8 F1). |
 
 ### The probes
 
@@ -265,10 +278,9 @@ TOOL-dSafePassage-81 and -83. Units -72, -73, -74, -75, -76, -78 and -81 edit
 `tools/lib/python-floor.sh` and adds arm 1e to `tools/lib/resolve-python.test.sh`; -77 edits
 `tools/govkit/upgrade_walk.py` and the release-0 `arms.toml` and `plants.toml`; -80 edits three
 `ceiling` lines of `tools/gate-legs.json`, disjoint from `:1480`. Building after them lets one pass
-measure every class at the tree they leave. It builds before -81 because -81 states it is the last
-of order 16 to build, renaming against every name its siblings mint, and this pass mints only
-constants. TOOL-dSafePassage-83 follows this pass, because the manifest advance it makes counts
-watched commits, and `tools/gate-legs.json` is watched. TOOL-dSafePassage-61 holds order 16, is held
+measure every class at the tree they leave. TOOL-dSafePassage-83 builds next and -81 last: -81's
+renames must see every sibling's names, this pass's `main` included, and 83's manifest advance
+counts watched commits, so it follows this pass's S7 re-stamp of the watched `tools/gate-legs.json`. TOOL-dSafePassage-61 holds order 16, is held
 on TOOL-dGroundRules-13, and is not waited for.
 
 ### Files touched (estimate)
@@ -293,6 +305,9 @@ on TOOL-dGroundRules-13, and is not waited for.
 - `tools/gate-legs.json`
 - `memory/project/unarmed-branches.txt`
 - `memory/project/spawn-idiom-sites.txt`
+- `memory/guides/SESSION-KICKOFF.md`
+- `memory/map/generated/symbols.json`, and whatever else `gen_map.py --write` rewrites under
+  `memory/map/generated/`
 
 ### Alternatives rejected
 
@@ -357,7 +372,8 @@ on TOOL-dGroundRules-13, and is not waited for.
   `gov_plant`, `condition` and `arm` lines equal the same lines at `83817478f`, such as
   `upgrade-walk: plant · engine-edit · path tools/memory-tree/README.md · expect carried`.
   Red when: a `{prefix}/` spelling of S3 reaches the walk unresolved, so a line prints the token.
-  The listing mode runs no case and builds no clone.
+  cost: the listing mode builds the pinned clone (`tools/govkit/upgrade_walk.py:911`, which clones
+  at `:173`), about a minute, and applies no target and runs no case.
 - **AC5** — When `python <scratch>/usage_probe.py` runs, it prints equal row counts, `moved []` and
   `literal 0`.
   Red when: a rewritten id, entry or `rows` value resolves to something other than its
@@ -368,7 +384,11 @@ on TOOL-dGroundRules-13, and is not waited for.
   and no argv in `tools/govkit/steps.toml` spells the path of `tools/lib/python-floor.sh`. That
   program's `preflight` verb, run by `python` from the repository root, prints the `python-floor:` line and exits 0, and with `GOV_PYTHON` naming a fake that reports
   3.14 and `PATH` holding no launcher at the floor, it exits 1 with the resolver's own refusal.
-  Red when: the row still spells the kit path, or the replacement exits 0 below the floor.
+  When the floor row's witness runs through `run_step_isolated` on gov's own tree, as
+  TOOL-dSafePassage-75's AC2 runs it, the verdict is `ok`, so the program works under the runner's
+  isolated `-I` launch.
+  Red when: the row still spells the kit path, the replacement exits 0 below the floor, or it fails
+  to load its module under `-I`.
   fixture: the below-floor fake is two lines written to the scratchpad, the shape
   `tools/lib/resolve-python.test.sh:193` already plants.
 - **AC7** — When `grep -cP '^tools/lib/python-floor\.sh\texit\t' memory/project/unarmed-branches.txt`
@@ -389,7 +409,7 @@ on TOOL-dGroundRules-13, and is not waited for.
   it prints nothing: the five rows keep their ceilings 55, 57, 189, 74 and 44 until the owner rules
   on §8 F2.
   Red when: the pass moves a ceiling or a reason in the file, a change F2 leaves to the owner.
-  figure: the measured counts 56, 58, 190, 76 and 45 are PINNED to the discovery bar on node d at
+  figure: the measured counts 56, 58, 190, 76 and 45 are PINNED to the discovery bar on node a at
   `83817478f`.
 - **AC10** — When `bash -n tools/push-main.sh` and `bash -n tools/push-main.test.sh` run, each exits
   0, and `grep -cF "| sed 's/^/  /'" tools/push-main.sh` prints 4, the four sites `60d90cb7`
@@ -409,10 +429,20 @@ on TOOL-dGroundRules-13, and is not waited for.
   added in a file of §4; or the spawn budget reds a row other than the five.
   permission: a role agent may not run these six (scratch-guard row G1); the main loop observes them.
   cost: the install-prefix leg's ceiling is 2940 s and the spawn budget's 2400 s.
+- **AC12** — When `git show --stat --format= HEAD` runs at the commit that stages
+  `tools/gate-legs.json`, it lists `memory/guides/SESSION-KICKOFF.md` too, and that file's
+  `last-audit:` line names the commit's parent and a datetime later than the one at `83817478f`,
+  while its `last-body-change:` line is unchanged.
+  Red when: the commit stages the watched file alone, which the pre-commit ratchet refuses, or the
+  re-stamp moves `last-body-change`, the advance TOOL-dSafePassage-83 owns.
+- **AC13** — When `python tools/codebase-map/gen_map.py --check` runs at the pass's commit, it exits
+  0, and a `python` one-liner loading `memory/map/generated/symbols.json` finds the floor program's
+  `main`.
+  Red when: the commit mints the program's names with no regeneration, so the check exits 1.
 
 ## 7. Gates
 
-`encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `remote literals (kit code names no remote)` · `harness arms (fail branches armed or pinned)` · `spawn budget (forks per hot entrypoint)` · `shell hygiene (a fork spent on builtin work)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `policy fixtures` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `upgrade-walk` · `docs` · `step-rows-frozen` · `python resolver (behaviour + inline parity + idiom ban)` · `push-main self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `remote literals (kit code names no remote)` · `harness arms (fail branches armed or pinned)` · `spawn budget (forks per hot entrypoint)` · `shell hygiene (a fork spent on builtin work)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `policy fixtures` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `upgrade-walk` · `docs` · `step-rows-frozen` · `python resolver (behaviour + inline parity + idiom ban)` · `push-main self-test` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/push-main.test.sh · covers AC7 AC8 · arms 39 and 40 assert their sites' full messages and arms 33, 34, 37 and 40 read one resolution, staged red by shortening either message in tools/push-main.sh · none
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the seven-statement assertion counts lines with no pipe and names paths from the suite's variables, staged red by a check printing six statements · none
@@ -422,7 +452,8 @@ The first six legs are the ones this unit closes. Each one's failing case is the
 red at `83817478f`, and the main loop observes each GREEN at the close. The next nine are the legs
 whose `guard` a path under §4 "Files touched (estimate)" trips, the broad `tools/`, `tools/lib/`,
 `tools/memory-tree/` and `.githooks/` guards aside. The rest observe the fixtures, the walk, the
-docs rows, the frozen rows and the two suites this unit edits.
+docs rows, the frozen rows, the two suites this unit edits, the manifest S7 re-stamps and the map S8
+regenerates.
 
 ## 8. Open questions
 
@@ -433,15 +464,17 @@ docs rows, the frozen rows and the two suites this unit edits.
   - (a) A placeholder naming the row's own entry directory in gov, so the argv reads
     `{kit}/python-floor.sh`. It changes the step-row grammar, a contract adopters' descriptors use,
     and `help/upgrade-steps.md` with it. M3 veto 2 makes that an owner turn.
-  - (b) A program python_floor.py in govkit's steps directory that finds the lib through
-    `gk.resolve_kit_dir("lib", "python-floor.sh", …)` and runs it under `gk.resolve_bash()` with its
-    own arguments, passing the exit through. The row's three argvs name it under `{gov}/govkit/steps/`,
+  - (b) A program python_floor.py in govkit's steps directory that loads `tools/govkit/upgrade_steps.py`
+    by path, as `fanout_cap.py`'s `load_steps` does, finds the lib through that module's
+    `resolve_kit_dir("lib", "python-floor.sh", …)`, and runs it under its `resolve_bash()` with its
+    own arguments, passing the exit through. It imports nothing from govkit. The row's three argvs name it under `{gov}/govkit/steps/`,
     as the schema row's do. It adds one file and one process per run, and the preflight still runs
     the resolver from bash.
   Recommendation: (b). It is the leg's own named remedy, it changes no contract, and it is the only
   option a delegated resolver may take.
   RESOLVED (agent, 2026-10-28, delegated): (b), the program under `tools/govkit/steps/` resolving
-  the floor script through `resolve_kit_dir`, ruled by the build's coordinator.
+  the floor script through `resolve_kit_dir`, ruled by the build's coordinator; rev-4 takes the
+  step module's own copy of it, by the spec audit's L11.
 - **F2 — How do the five fork-count rows pass?** The counter now sees a fork the resolver always
   spent (§4 "The spawn budget"). `fork-ceilings.txt:12-14` call the ceilings shrink-only and state no
   terms on which a run may raise one, so by M3 a raise is the owner's.
@@ -475,13 +508,23 @@ docs rows, the frozen rows and the two suites this unit edits.
   lib/python-floor-3.15 is written as an id outside backticks; the floor script is spelled by its
   tracked path `tools/lib/python-floor.sh`; the absent sibling suite is named without a path; and
   the release-0 fixture file is spelled from the repository root.
+- rev-4 · 2026-10-28 · S3 · S7 · S8 · §3 · §4 · AC4 · AC6 · AC12 · AC13 · §7 · §8 F1 · §10 · folded
+  the round-1 spec audit 2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1 (the
+  build's reviews folder)
+  at the fixes its skeptic judged sound: M1 (S7, AC12, the manifest in Files touched and the ratchet
+  on §7), M11 and L5 (S8, AC13, the map in Files touched and its leg on §7), L4 (AC4's clone cost,
+  §3's owner of the two timed-out legs), L11 (the floor program loads the step module by path and
+  imports nothing from govkit, AC6 runs it under `run_step_isolated`, §10 cites `fanout_cap.py`),
+  and L1 (Rollout: 83 next, 81 last). The header's node reads `a`, this host.
 
 ## 10. Reuse audit
 
 The seams are the existing ones. Kit paths go through `tools/govkit/govkit.py`'s inlined
 `resolve_kit_dir` (`:235`), `resolve_prefix_token` (`:218`) and `derive_tool_root` (`:192`), the
 canonical copies being `tools/lib/resolve_kit_dir.py` and `tools/lib/resolve_prefix_token.py`.
-`tools/push-main.sh` already routes its kits through `resolve_lander_kit`. The registries are
+`tools/push-main.sh` already routes its kits through `resolve_lander_kit`. The floor program extends
+the step-program seam of `tools/govkit/steps/fanout_cap.py`, whose `load_steps` loads
+`tools/govkit/upgrade_steps.py` by path and reaches `resolve_kit_dir` and `resolve_bash` there. The registries are
 `memory/project/encoding-posture-sites.txt`, `memory/project/spawn-idiom-sites.txt`,
 `memory/project/unarmed-branches.txt` and `memory/project/fork-ceilings.txt`, each moved only by its
 own header's rule. `python tools/codebase-map/reuse_lookup.py "spell a sibling kit path without a

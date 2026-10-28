@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-73 — the forward and reverse walks read "no up on record" through one predicate, so a step re-applied by its witness after a rollback keeps its `via` mark
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-72-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-72-spec-brief.md) | research | TOOL-dSafePassage-72 TOOL-dSafePassage-74 TOOL-dSafePassage-75 |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -74,7 +75,7 @@ CLOSED specs, and a CLOSED spec cannot take the matching `hands-off` line.
 
 ### Observed at base
 
-A scratchpad probe on node d on 2026-10-28 drove the `rollback` family's scratch gov through
+A scratchpad probe on node a on 2026-10-28 drove the `rollback` family's scratch gov through
 `FIXTURE_WALK_CHILD` and `FIXTURE_REVERSE_CHILD` four times over one target, with
 `s2.witness-absent` planted, at `83817478`.
 
@@ -111,7 +112,8 @@ image path.
 
 ### Inventory
 
-Minted: the function `test_up_unrecorded` in `tools/govkit/upgrade_steps.py`.
+Minted: the function `test_up_unrecorded` in `tools/govkit/upgrade_steps.py`, a top-level name
+`memory/map/generated/symbols.json` maps, so this pass regenerates that file.
 `python tools/lexicon/lexicon.py --suggest test_up_unrecorded --as py.function` answered OK on
 2026-10-28, leading with the declared verb `test`. The plant `witness-only-reup` and the arm tag
 `[dSP-73]` are minted. No `Refusal` site, conf key, gate leg or receipt field.
@@ -125,13 +127,16 @@ its next rollback stops as today until the operator runs it again from a state t
 ### Rollout
 
 Live at landing, in order 16 with TOOL-dSafePassage-72, -74 and -75, sequenced by M6 because all
-four write `tools/govkit/upgrade_steps.py` and `tools/govkit/selftest.py`.
+four write `tools/govkit/upgrade_steps.py` and `tools/govkit/selftest.py`. The pass runs
+`python tools/codebase-map/gen_map.py --write` and commits `symbols.json` with the code, as
+TOOL-dSafePassage-81 §4 Rollout does, so the pre-commit map gate passes.
 
 ### Files touched (estimate)
 
 - `tools/govkit/upgrade_steps.py`
 - `tools/govkit/selftest.py`
 - `help/upgrade-steps.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -188,7 +193,7 @@ The probes run from the repository root.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `upgrade-walk` · `docs` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `policy fixtures` · `codebase-map coverage + freshness` · `upgrade-walk` · `docs` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/upgrade_steps.py · covers AC3 · the `rollback` family's `witness-only-reup` plant, run by `check_step_rollback`'s table row in `tools/govkit/selftest.py`; observed RED at base 83817478, where the second reverse walk stops at `fx/s2`, and GREEN after the build · none
 
@@ -217,6 +222,11 @@ New arm: tools/govkit/selftest.py · covers AC1 · a `[dSP-73]` check of `test_u
   repair; §4 Migration says so.
 - rev-3 · 2026-10-28 · §7 · the leg line names `policy fixtures`, the leg whose guard
   `tools/govkit/selftest.py`, listed in §4's files touched, trips.
+- rev-4 · 2026-10-28 · §4 · §7 · folded this spec's part of M11 and L5 of
+  `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`:
+  `symbols.json` in Files touched, regenerated in the pass's commit, with
+  `codebase-map coverage + freshness` and `recall floor` on the leg line. The header's node reads
+  `a`, the host the probe ran on.
 
 ## 10. Reuse audit
 

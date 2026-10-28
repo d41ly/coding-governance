@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-81-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-81-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-81-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-81-spec-brief.md) | research | — |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -359,7 +360,11 @@ measured one.
 
 ### Rollout
 
-Order 16, live at landing. This unit's pass is the last of order 16 to be built. TOOL-dSafePassage-72,
+Order 16, live at landing. This unit's pass is the last of order 16 to be built: after
+TOOL-dSafePassage-72 to -78, -80, -82 and -83. The reason is the population. Its renames must see
+every name each sibling adds or deletes, so no sibling may land after it. TOOL-dSafePassage-83's
+Rollout is to state the same order, with 83 building before this unit (round-1 spec audit L1).
+TOOL-dSafePassage-72,
 -73, -74, -75, -76 and -78 edit `tools/govkit/upgrade_steps.py`, `tools/govkit/selftest.py`,
 `tools/govkit/govkit.py` or `tools/lib/python_floor.py`. TOOL-dSafePassage-77 edits
 `tools/govkit/upgrade_walk.py`, and -80 edits `tools/gate-legs.json`. Several of them change lines this
@@ -373,7 +378,9 @@ siblings' inventories mint only declared-verb names (`derive_contained_rel`, `te
 helpers could add to it. TOOL-dSafePassage-61 is held on TOOL-dGroundRules-13 and is not waited for.
 Names it adds when it lands are its own pass's to keep at the pin.
 
-The rename and the `symbols.json` regeneration land as one commit. `.githooks/pre-commit:280` runs the
+The rename and the `symbols.json` regeneration land as one commit. This pass is not the map's only
+writer: each sibling that mints a top-level name regenerates `symbols.json` in its own commit (round-1
+spec audit M11), and this pass regenerates it again for its own renames. `.githooks/pre-commit:280` runs the
 codebase-map gate whenever a staged path is a `.py` file, and that gate refuses a stale artifact.
 
 ### Inventory
@@ -440,7 +447,7 @@ module attribute another module imports. `govkit.py` binds names from `upgrade_s
   Red when: an introduced definition keeps a name with no declared leading verb, as 70 did at
   `83817478f`.
   figure: DERIVED at observation from the two lists.
-  cost: about 6 s per `--list` on node d, plus two shared clones.
+  cost: about 6 s per `--list` on node a, plus two shared clones.
 - **AC2** — When `python tools/lexicon/lexicon.py --suggest <target> --as py.function` runs for each
   `py.function` target in §4's table, and `--as sh.function` for rows 69 and 70, every one of the 70
   lines begins `OK —`.
@@ -494,7 +501,7 @@ module attribute another module imports. `govkit.py` binds names from `upgrade_s
   Red when: an introduced offender survives, so the line reads `over pin`; or the drain is not
   recorded, so it reads `UNDER pin`, which is the state S1 and S2 alone leave (§4 "The arithmetic").
   figure: the count is DERIVED by `--measure` at observation; 1211 is the expected figure at writing.
-  cost: about 6 s on node d.
+  cost: about 6 s on node a.
 - **AC8** — When `python tools/lexicon/lexicon.py --check` runs at the pass tip, it exits 0 and its
   `P1 verb` line reads `offenders=<n>`, where `<n>` is the value `grep -n VERB_OFFENDER_PIN .lexicon.conf`
   prints. `git diff -U0 <pass base> -- .lexicon.conf` shows one changed line, the pin, and one block of
@@ -502,15 +509,25 @@ module attribute another module imports. `govkit.py` binds names from `upgrade_s
   Red when: the pin stays at 1212, so `--check` exits 1 printing `UNDER pin 1212`; or the pin is
   written without its block, or another line of the conf moves.
   figure: `<n>` is DERIVED by `--measure` at the tip; 1211 if no sibling of order 16 moves it.
+  When `bash tools/lexicon/adopt-lexicon.sh --check` runs at the tip, it exits 0 and prints no
+  `THE DECLARATION DOES NOT GRADE` line. That is the `lexicon wiring` leg's own command, which
+  re-runs `lexicon.py` against the pin (`tools/lexicon/adopt-lexicon.sh:675-684`).
+  Red when: for that command, the pin and the count disagree, so it prints that line and exits 1, as
+  the discovery bar at `83817478f` recorded.
 
 ## 7. Gates
 
-`lexicon naming predicates` · `straggler-guard arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `recall floor arms` · `recall floor` · `upgrade-walk` · `docs` · `push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`lexicon naming predicates` · `lexicon wiring` · `straggler-guard arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `policy fixtures` · `recall floor arms` · `recall floor` · `upgrade-walk` · `docs` · `push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 No `New arm:` line: this unit adds and moves no suite arm. The leg's own pin is its arm.
 `lexicon naming predicates` runs `lexicon.py` on every bar, and at `83817478f` it prints
 `verb offenders 1281 over pin 1212` and exits 1. That is the RED, and AC7 and AC8 observe the same
-checker GREEN at the tip, at the pin S6 writes. What it does not check: whether a new name is APT. Any declared leading verb
+checker GREEN at the tip, at the pin S6 writes. `lexicon wiring` runs `adopt-lexicon.sh --check` on
+every bar, with no guard, and that check re-runs `lexicon.py` against the pin. Its failing case is the
+discovery bar's red at `83817478f`, `GATE FAIL  lexicon wiring  (exit 1)` on the same
+1281-over-1212 count. AC8 observes the same command exit 0 at the tip, and the main loop observes
+the leg green there, as for the naming leg. Its other arms, the canon-overlay arm and the Skill
+check, are not touched by this unit and stay graded by that leg. What it does not check: whether a new name is APT. Any declared leading verb
 passes, and F2 is where aptness is ruled. `govkit selftest`, `govkit refusal join`,
 `govkit acceptance matrix`, `policy fixtures`, `recall floor arms`, `recall floor` and
 `straggler-guard arms` are the legs whose guards the touched paths trip, as derived from
@@ -571,6 +588,13 @@ execute the renamed helpers or grade the regenerated map.
   as a suite invocation at command position. AC6 now names that file as the value of the
   `symbols.json` entry's `file` field, its observation stays on the `symbols.json` probe and
   `gen_map.py --check`, and the suite runs only as the `push-main self-test` leg in §7.
+- rev-4 · 2026-10-28 · §4 · AC8 · §7 · folded the round-1 spec audit
+  `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`
+  at its sound fixes. M12 and L10: `lexicon wiring` joins the §7 leg line with its failing case, and
+  AC8 observes `adopt-lexicon.sh --check` exit 0. L1, this side: §4 "Rollout" places this pass last
+  of order 16, after 72 to 78, 80, 82 and 83, because its renames must see every sibling's names.
+  M11: §4 no longer leaves this pass as the map's only writer. The header's node corrected from `d`
+  to `a`, the host these readings were taken on, as are the two `cost:` lines.
 
 ## 10. Reuse audit
 

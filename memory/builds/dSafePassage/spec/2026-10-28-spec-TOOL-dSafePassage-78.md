@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-78 — the govkit selftest arms red at the build's head: three arms read against the product they grade, and a walk run over a receipt below schema 3
 
-**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-78-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-78-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-78-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-78-spec-brief.md) | research | — |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -33,7 +34,8 @@ and one is the product, which walks a receipt its first step refuses.
   asserts its path and not the step id: the containment refusal names the path only
   (`upgrade_steps.py:1044`), as the builder's own probe recorded ("each refused naming the step or
   the path", `f82623237`) and as TOOL-dSafePassage-72 AC3 keeps it. The block's comment
-  (`selftest.py:4426-4428`) says three refusals and a repository target. Observed by AC1 and AC2.
+  (`selftest.py:4426-4428`) says three refusals and a repository target. Observed by AC1, over the
+  edited block; the block's run is §7's first New arm, observed red then green at the close.
 - **S2** — `[dSP-3 AC2]` ×2, the product is wrong. An unscoped `update --write` over a schema-2
   receipt reaches the walk with the receipt still at 2: the lift to 3 is the clean run's re-stamp
   (`tools/govkit/govkit.py:12733-12740`), after the walk, and the pre-walk write (`:11720`) persists
@@ -44,28 +46,28 @@ and one is the product, which walks a receipt its first step refuses.
   with its reason and the pending count, as it does for `--kits` and a run with findings. The clean
   run's stamp lifts the receipt to 3, and the next `update --write` walks from there. The comment
   above the walk (`:11702-11708`) names the third condition. Both arms then hold as written.
-  Observed by AC3.
+  Observed by AC2.
 - **S3** — `[dSP-3 AC9]`, the arm is wrong. TOOL-dSafePassage-3 AC9 observes a clean
   `update --write` "with no walk", and the arm's loop (`selftest.py:4741-4749`) runs an unscoped
   update, which since TOOL-dSafePassage-2 walks the schema step and lifts a schema-3 receipt to 4 by
   design (the `[dSP-15]` `schema-3-update` row, `selftest.py:4390-4392`). The loop's run passes `--kits` with the installed kit, a run
   that walks no step (`govkit.py:11714-11716`), and its comment (`selftest.py:4741`) says so.
-  Observed by AC4.
+  Observed by AC3.
 - **S4** — The page. The `--kits` bullet of `help/upgrade-steps.md` (`:218-220`) gains S2's
-  sentence, §4 "The page". Observed by AC5.
+  sentence, §4 "The page". Observed by AC4.
 - **S5** — `[dSP-8] AC3`, the arm is wrong. It compares the source receipt's `files` with every
   `plan` row but `UNRES.` (`selftest.py:5032-5033`), 337 destinations against 231 rows, PINNED as
   measured at `83817478f`. TOOL-dSafePassage-35 S1 and S2 narrowed the receipt to the rows `apply`
   lands, `kind == "write"` with nothing missing (`govkit.py:9372-9374`), so the 87 `ORDER`, 16
   `SIDE` and 3 `BLOCK` destinations are absent by design. The arm reads its destinations through
   `extract_plan_writes(pl.stdout, with_kept=True)` (`selftest.py:250-257`), plan's `write` and
-  `KEEP` rows, in place of its own filter. Observed by AC6.
+  `KEEP` rows, in place of its own filter. Observed by AC5.
 - **S6** — `[dSafePassage-6] AC6 … --expect <other> … missing` ×10, the arm is wrong. Its check
   (`selftest.py:19185`) requires `"MISS" not in _p.stdout` on every case. TOOL-dSafePassage-26 S9
   (`dfcef45a7`) added the ten cases that exit 1 by design (`:19156-19161`), and
   `print_observations` prints `MISS` on every unmatched observation (`tools/govkit/shims.py:485-494`).
   The check asserts `(_rc == 1) == ("MISS" in _p.stdout)`, the form its sibling `_rte_cases` check
-  already uses (`selftest.py:19222-19223`). Observed by AC7.
+  already uses (`selftest.py:19222-19223`). Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -74,9 +76,8 @@ and one is the product, which walks a receipt its first step refuses.
 - `run_step_walk`'s unread sixth parameter. TOOL-dSafePassage-76 S7 takes it out of the signature
   and out of the call S1 edits (`selftest.py:4448`).
 - Naming the step in the containment refusal. §4 "Alternatives rejected" says why.
-- The page's "Until the deployer runs steps itself, run the step by hand" (`help/upgrade-steps.md:184`),
-  read while writing S4: `update --write` has walked the steps since TOOL-dSafePassage-2. It is not
-  one of this brief's items; recommended as an ask of its own.
+- The page's "Until the deployer runs steps itself" sentence (`help/upgrade-steps.md:184`) is
+  TOOL-dSafePassage-76 S9's, which replaces it.
 
 ### Edges
 
@@ -167,39 +168,7 @@ line filter goes with the hand-written set: a hole row is `ORDER`, which the hel
 Each runs from the root of a `git clone --shared` of the build head under the temp root, from a
 file written to the scratchpad, and loads no `tools/govkit/selftest.py`.
 
-The walk probe, for AC1. It trims its arguments to `run_step_walk`'s arity, because
-TOOL-dSafePassage-76 S7 takes the sixth one out:
-
-```python
-import json, pathlib, subprocess, sys, tempfile
-sys.path.insert(0, "tools/govkit")
-import upgrade_steps as us
-seen = ["python", "-c", "import pathlib, sys; sys.exit(not (pathlib.Path(sys.argv[1]) / 'x.txt').is_file())", "{target}"]
-writes = ["python", "-c", "import json, pathlib, sys; t = pathlib.Path(sys.argv[1]); (t / 'x.txt').write_text('x'); "
-          "i = t / '.governance/steps/fx/x.before.json'; i.parent.mkdir(parents=True, exist_ok=True); "
-          "i.write_text(json.dumps({'step': 'fx/x', 'paths': {'x.txt': {'before': None, 'after': None}}}))", "{target}"]
-spoils = ["python", "-c", "import sys; open(sys.argv[1], 'w').write('not json')", "{target}/.governance/install.json"]
-escapes = [a.replace("'x.txt': {", "'../x.txt': {") for a in writes]
-for case, witness, up, needle in (("spoiled", spoils, writes, "fx/x witness: "),
-                                  ("unstaged", seen, writes, "fx/x: `git add` refused the step's writes"),
-                                  ("escaping", seen, escapes, "'../x.txt' is not a path inside the target")):
-    t = pathlib.Path(tempfile.mkdtemp(prefix="p78-"))
-    subprocess.run(["git", "init", "-q", str(t)], check=True)
-    if case == "unstaged":
-        (t / ".git" / "index.lock").write_text("", encoding="utf-8")
-    (t / ".governance").mkdir()
-    rp = t / ".governance" / "install.json"
-    rp.write_text('{"schema": 4, "steps": []}\n', encoding="utf-8")
-    row = us.StepRow("fx/x", up, ["python", "-c", "pass"], witness, None, [], False, "fx", 1, None)
-    args = [pathlib.Path.cwd(), t, rp, json.loads(rp.read_text(encoding="utf-8")), [row], "HEAD"]
-    try:
-        us.run_step_walk(*args[:us.run_step_walk.__code__.co_argcount])
-        print(case, "not refused")
-    except us.Refusal as e:
-        print(case, needle in str(e), str(e)[:160])
-```
-
-The schema probe, for AC3 and AC4: `python <scratch>/schema_probe.py <schema> [update args...]`.
+The schema probe, for AC2 and AC3: `python <scratch>/schema_probe.py <schema> [update args...]`.
 It installs `check-wiring` into a scratch target, plants the receipt at `<schema>` with no `steps`
 (below 3, one engine row's `gov_oid` taken out), commits, and runs `update --write` with the extra
 arguments. It prints the exit, the schema, whether the row's `gov_oid` is back, the first `steps`
@@ -242,7 +211,7 @@ if schema < 3:
     print(q.returncode, rec.get("schema"), [(s["id"], s["state"]) for s in rec.get("steps") or []][:1])
 ```
 
-The source probe, for AC6. It prints whether the receipt's paths equal plan's `write` and `KEEP`
+The source probe, for AC5. It prints whether the receipt's paths equal plan's `write` and `KEEP`
 rows, then whether they equal every row but `UNRES.`, the set the arm compares today:
 
 ```python
@@ -261,8 +230,7 @@ print(files == {d for m, d in rows if m in ("write", "KEEP")}, files == {d for m
 
 ### Measured at writing time
 
-At `83817478f`, in the clone: the walk probe printed `True` for all three cases; the schema probe at
-`2` printed `1 2 True []`; with S2 staged it printed `0 3 True []`, the not-walked line and
+At `83817478f`, in the clone: the schema probe at `2` printed `1 2 True []`; with S2 staged it printed `0 3 True []`, the not-walked line and
 `0 4 [('govkit/receipt-schema-4', 'applied')]`; at `3 --kits check-wiring` it printed
 `0 3 True []`; the source probe printed `True False`. With S1 to S3, S5 and S6 staged together,
 `check_receipt_schema`, `check_source_mode`, the walk-refusal block and the shim block each printed
@@ -320,44 +288,39 @@ edits (`selftest.py:4448`), and its S9 adds a no-walk line beside the bullet S4 
 - observability: the not-walked line names the schema and the next run that walks.
 - risks: a receipt below 3 reaches 4 in two runs, not one; the page says so. S1's `index.lock` is
   inside a scratch repository the block owns.
-- testing: the four arms of §7, each staged red by today's code, and §4's three probes.
+- testing: the four arms of §7, each staged red by today's code, §6 AC1's grep, and §4's two probes.
 - migration: none.
 - user docs: S4's sentence.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When §4's walk probe runs, it prints `spoiled True`, `unstaged True` and
-  `escaping True`.
-  Red when: the probe's target gets no `git init`, so each case prints `False` on the
-  `rev-parse --absolute-git-dir` refusal.
-  fixture: a `git clone --shared` of the build head under the temp root.
-- **AC2** — When `git grep -n -F -e '"git", "init", "-q", str(t)' -e '".git" / "index.lock"' -e 'case == "escaping" or "fx/x" in refused' -- tools/govkit/selftest.py`
+- **AC1** — When `git grep -n -F -e '"git", "init", "-q", str(t)' -e '".git" / "index.lock"' -e 'case == "escaping" or "fx/x" in refused' -- tools/govkit/selftest.py`
   runs, it prints three lines, each inside `check_step_walk`.
   Red when: the block still builds its target with no repository, so the first pattern prints
   nothing.
-- **AC3** — When §4's schema probe runs as `python <scratch>/schema_probe.py 2`, it prints
+- **AC2** — When §4's schema probe runs as `python <scratch>/schema_probe.py 2`, it prints
   `0 3 True []`, a line holding `steps: not walked — the receipt is at schema 2`, and
   `0 4 [('govkit/receipt-schema-4', 'applied')]`.
   Red when: the walk runs over the schema-2 receipt, and the first line reads `1 2 True []`.
   cost: two installs and three `update` runs, under a minute.
   fixture: a `git clone --shared` of the build head under the temp root.
   figure: PINNED, measured at `83817478f`.
-- **AC4** — When the schema probe runs as `python <scratch>/schema_probe.py 3 --kits check-wiring`,
+- **AC3** — When the schema probe runs as `python <scratch>/schema_probe.py 3 --kits check-wiring`,
   it prints `0 3 True []`, and
   `git grep -n -F 'run("update", "--target", str(t), "--write", "--kits", kit)' -- tools/govkit/selftest.py`
   prints the AC9 loop's line.
   Red when: the loop still runs unscoped, so the grep prints nothing and its schema-3 case reads 4.
-- **AC5** — When `git grep -n -F "A receipt below schema 3 is not walked either" -- help/upgrade-steps.md`
+- **AC4** — When `git grep -n -F "A receipt below schema 3 is not walked either" -- help/upgrade-steps.md`
   runs, it prints one line, inside the `--kits` bullet.
   Red when: the page is silent on the not-walked run, so an adopter reads it as a fault.
-- **AC6** — When §4's source probe runs, it prints `True False`, and
+- **AC5** — When §4's source probe runs, it prints `True False`, and
   `git grep -n -F "dests = extract_plan_writes(pl.stdout, with_kept=True)" -- tools/govkit/selftest.py`
   prints one line.
   Red when: the arm still compares every row but `UNRES.`, so the grep prints nothing; or the receipt
   gains an `ORDER` or `SIDE` destination, so the probe's first value prints `False`.
   cost: a clone of gov, one source-mode `update` and one `plan`, about a minute.
   fixture: a `git clone --shared` of the build head under the temp root.
-- **AC7** — When `python tools/govkit/shims.py --fixture --plant window --window 2 --releases 1 --expect allowed`
+- **AC6** — When `python tools/govkit/shims.py --fixture --plant window --window 2 --releases 1 --expect allowed`
   runs, it exits 1 printing `MISS` and `0 of 1 observation(s) matched`; with `--expect held` it exits
   0 and prints no `MISS`; and `git grep -c -F '(_rc == 1) == ("MISS" in _p.stdout)' -- tools/govkit/selftest.py`
   prints `2`.
@@ -367,12 +330,12 @@ edits (`selftest.py:4448`), and its S9 adds a no-walk line beside the bullet S4 
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `upgrade-walk` · `docs` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 · the three `[dSP-2] S2` rows of `check_step_walk`, staged red by a working copy whose block builds its target with no `git init`, as at `83817478f` · none
-New arm: tools/govkit/selftest.py · covers AC3 AC4 · the `[dSP-3 AC2]` and `[dSP-3 AC9]` rows of `check_receipt_schema`, staged red by a `govkit.py` copy whose walk branch walks a receipt below 3, and by the AC9 loop run unscoped · none
-New arm: tools/govkit/selftest.py · covers AC6 · the `[dSP-8] AC3` files row of `check_source_mode`, staged red by the arm's filter at `83817478f`, every row but `UNRES.` · none
-New arm: tools/govkit/selftest.py · covers AC7 · the ten `[dSafePassage-6] AC6 ... missing` rows of `main`'s shim block, staged red by the check at `83817478f`, `"MISS" not in _p.stdout` · none
+New arm: tools/govkit/selftest.py · covers AC1 · the three `[dSP-2] S2` rows of `check_step_walk`, staged red by a working copy whose block builds its target with no `git init`, as at `83817478f` · none
+New arm: tools/govkit/selftest.py · covers AC2 AC3 · the `[dSP-3 AC2]` and `[dSP-3 AC9]` rows of `check_receipt_schema`, staged red by a `govkit.py` copy whose walk branch walks a receipt below 3, and by the AC9 loop run unscoped · none
+New arm: tools/govkit/selftest.py · covers AC5 · the `[dSP-8] AC3` files row of `check_source_mode`, staged red by the arm's filter at `83817478f`, every row but `UNRES.` · none
+New arm: tools/govkit/selftest.py · covers AC6 · the ten `[dSafePassage-6] AC6 ... missing` rows of `main`'s shim block, staged red by the check at `83817478f`, `"MISS" not in _p.stdout` · none
 
-AC5 is a grep. No floor moves: each arm keeps its count of `check` calls.
+AC4 is a grep. No floor moves: each arm keeps its count of `check` calls.
 
 ## 8. Open questions
 
@@ -386,6 +349,16 @@ none
   `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-1-close-arms-b-researcher.md`;
   each was reproduced at `83817478f` in a `git clone --shared` under the temp root. Two candidates
   for S2 were staged and measured in that clone; §4 "Alternatives rejected" records the one not taken.
+- rev-2 · 2026-10-28 · header · S1 · §3 · §4 · §5 · §6 · §7 · AC1 · folded the round-1 spec audit,
+  `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`,
+  at the fixes its skeptic judged sound. L9 (id 17): the walk probe ran its own `git init` and was
+  green at base, so AC1 observed nothing S1 edits; AC1 and the walk probe leave the spec, and S1 is
+  observed by the grep, now AC1, and by §7's first New arm. AC2 to AC7 renumber to AC1 to AC6, with
+  every scope join and `covers` field. The fix's other option, running the block extracted from the
+  suite file, was not taken: the gate-guard's D4 row refuses that file by name
+  (`tools/unattended/gate-guard.js:32`), and a probe reaching it through a scratch script would only
+  hide it from the guard. L12 (id 25): the §3 non-goal on `help/upgrade-steps.md:184` now names
+  TOOL-dSafePassage-76 S9 as its owner, with no ask. The header's node is `a`, this host.
 
 ## 10. Reuse audit
 

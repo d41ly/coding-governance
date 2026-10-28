@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-77 — the closing review's five walk-leg minors: an order matched by its kind, an arm graded by its defect, a dirty tree refused, reds counted per unit
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · closes TOOL-dSafePassage-79 · ratified 2026-10-28
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · closes TOOL-dSafePassage-79 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-28-prompt-TOOL-dSafePassage-76-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-76-spec-brief.md) | research | TOOL-dSafePassage-76 |
+| [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 
 <!-- /gen:spec-records -->
 
@@ -39,13 +40,17 @@ its fixtures, apart from the engine batch TOOL-dSafePassage-76; §8 F2 names the
   `lines`, the case's reds or, for exit 2, the `Stop`'s message. `run_case_arms` (`:813-836`) grades
   each set by it in place of `got == want` (`:826-834`), and a set caught for another reason prints
   `arm <names> · <case> · red, but no red names <needle>` and is a red. Observed by AC2 and AC8.
-- **S3** — M8, the leg refuses a tree it would not run. `check_tree_clean(gov_root, own)` returns the
-  paths `git status --porcelain --untracked-files=no` lists outside `own`, the files the leg reads
-  from the working tree: `tools/govkit/upgrade_walk.py`, `tools/govkit/fixture_target.py` and
-  `tools/govkit/fixtures/release-0/`. `main` (`:875`), on every run but `--list`, calls it before
-  `build_release_tree` (`:911`) and raises `Stop` (exit 2) with
-  `the working tree differs from HEAD at <paths>, and the walk runs HEAD's committed bytes; commit
-  or stash them`. Observed by AC3 and AC5.
+- **S3** — M8, the leg refuses an engine it would not run. `check_tree_clean(gov_root, own)` returns
+  the paths `git status --porcelain --untracked-files=no -- <govkit dir> <lib dir>` lists outside
+  `own`: only the engine files the walk takes from HEAD, never the whole tree. The two directories
+  are the leg's own (`HERE`, `tools/govkit/upgrade_walk.py:41`) and its sibling `lib`, and `own` is
+  the files the leg reads from the working tree, the leg itself, `fixture_target.py` and
+  `fixtures/release-0/`. Every one of these is spelled from `HERE` relative to the toplevel, never as
+  a literal prefix, as `tools/check-install-prefix.sh` asks of shipped code. A dirty record, help
+  page or run-gates evidence file is outside the population and never refuses. `main` (`:875`), on
+  every run but `--list`, calls it before `build_release_tree` (`:911`) and raises `Stop` (exit 2)
+  with `the working tree differs from HEAD at <paths>, engine files the walk takes from HEAD's
+  committed bytes; commit or stash them`. Observed by AC3 and AC5.
 - **S4** — M10, the summary counts units. `render_case_counts(per_case)` renders each case as
   `<case> <n - u> passed <u> red`, where `u` counts the units that redded: the row id for a per-step
   case and the plant id for `plants`, each the second ` · ` field of a red line, and the case itself
@@ -66,11 +71,15 @@ its fixtures, apart from the engine batch TOOL-dSafePassage-76; §8 F2 names the
 - **S7** — The graders' arm. `check_graders()` runs on every invocation, after the arguments parse
   and before anything is measured. It feeds S1, S2, S3 and S4's functions fabricated inputs, prints
   `upgrade-walk: grader · <name> · ok`, or `· RED · <what it saw>`, for `order-kind`, `arm-needle`,
-  `tree-clean` and `case-counts`, and exits 1 on any red. Observed by AC1, AC2, AC3 and AC4.
+  `tree-clean`, `case-counts` and `fixture-keys`, and exits 1 on any red. `fixture-keys` reads a
+  scratch fixture directory through `read_plant_rows` and `read_arm_rows`, which take it as their
+  `fixture` argument, and requires the `Stop` S1 and S2 name for an `ordered` plant with no `order`
+  and an arm with no `needle`, each naming its row. Observed by AC1, AC2, AC3, AC4 and AC11.
 - **S8** — The page. The leg's section of `help/upgrade-steps.md` (`:371-413`) says that a plant is
   ordered when an order of its kind names it, that an arm's case must go red naming its defect, that
-  each run checks its own graders first, and that a working tree differing from HEAD outside the
-  leg's own files is a fifth exit-2 cause, beside the four `:409-413` lists. Observed by AC10.
+  each run checks its own graders first, and that an engine file under the leg's `govkit` or `lib`
+  directory that differs from HEAD, outside the leg's own files, is a fifth exit-2 cause, beside the
+  four `:409-413` lists. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -79,6 +88,9 @@ its fixtures, apart from the engine batch TOOL-dSafePassage-76; §8 F2 names the
   unreferenced, so the clone cannot fetch it without a ref written into gov's own store.
 - Refusing untracked files. A file HEAD does not hold is walked by nobody, so nothing claims it ran,
   and a step reaching one needs a tracked edit, which S3 refuses.
+- Refusing a dirty file outside the engine directories, a record, a help page or
+  `tools/run-gates/ceiling-evidence.txt` say. The walk reads none of them from the working tree, and
+  a mid-build tree routinely holds such edits.
 - The `--list` mode's dirty tree. It walks nothing, and govkit selftest runs it over the working tree
   (`tools/govkit/selftest.py:19288`).
 - TOOL-dSafePassage-68's hand-off of `check_walk_exit`'s tail. The review's checklist row for unreceived
@@ -140,7 +152,8 @@ so it no longer passes for the arm's defect.
 |---|---|---|
 | `order-kind` | a scratch `git init` tree whose outbox holds only `update-rollback-demo.md`, its text naming `.claude/skills/lexicon/SKILL.md`, and the `edited-render` row | `check_plant_rows` reds it, then reads it `ordered` once `<render_row_order_key("render-edited", path)>.md` is written |
 | `arm-needle` | the `witness-first` row with its needle | `check_arm_caught` is false over a `first write undetermined` red, false at `got = 0`, and true over a red naming `.uw-arm/1-payload` |
-| `tree-clean` | a scratch repository tracking `tools/govkit/steps.toml` and `tools/govkit/fixtures/release-0/plants.toml` | `check_tree_clean` returns `[]` with `plants.toml` edited or an untracked file added, and `["tools/govkit/steps.toml"]` with `steps.toml` edited |
+| `tree-clean` | a scratch repository laid out as gov, its paths spelled from `HERE`'s place in the toplevel, tracking the govkit `steps.toml`, the fixture's `plants.toml`, a file under `memory/` and `tools/run-gates/ceiling-evidence.txt` | `check_tree_clean` returns `[]` with `plants.toml` edited, an untracked file added, the `memory/` file edited, or the evidence file edited, and the govkit `steps.toml` alone with `steps.toml` edited |
+| `fixture-keys` | a scratch fixture directory holding an `expect = "ordered"` plant with no `order`, then an `[[arm]]` with no `needle` | each read raises `Stop` naming the row's id or name |
 | `case-counts` | `down` at `n = 1` with two red lines, `kill` at `n = 2` with two red lines on one row | the line holds `down 0 passed 1 red`, `kill 1 passed 1 red` and `red lines 4` |
 
 Each is a pure call or a scratch repository, seconds in all, so it runs on every invocation, the
@@ -160,7 +173,9 @@ For the row §8 F1 files, `<id>` the id its resolver mints:
 
 Minted, each answering OK to `python tools/lexicon/lexicon.py --suggest <name> --as py.function` on
 2026-10-28: `check_arm_caught`, `check_tree_clean`, `render_case_counts` and `check_graders`, all in
-`tools/govkit/upgrade_walk.py`. The fixture keys `order` on `[[plant]]` and `needle` on `[[arm]]`, the
+`tools/govkit/upgrade_walk.py`. They are top-level names `memory/map/generated/symbols.json` maps,
+so the pass commit regenerates it with `python tools/codebase-map/gen_map.py --write`. The fixture
+keys `order` on `[[plant]]` and `needle` on `[[arm]]`, the
 grader names of S7, and the summary's `red lines` segment. No flag is added, so the `usage.toml`
 row `script:tools/govkit/upgrade_walk.py` (`tools/govkit/usage.toml:187-190`) and the page's usage
 marker do not move. No `Refusal` site is added: the leg raises its own `Stop`, which
@@ -173,7 +188,10 @@ None. The fixture files gain keys the leg alone reads.
 ### Rollout
 
 Live at landing, at order 16. The leg's files are this unit's alone. `help/upgrade-steps.md` is also
-TOOL-dSafePassage-76's, so per §8 F2's recommendation this unit builds after 76 by order of dispatch.
+TOOL-dSafePassage-76's, so per §8 F2's resolution this unit builds after 76 by order of dispatch. It
+also builds after TOOL-dSafePassage-80, whose S4 commits `tools/run-gates/ceiling-evidence.txt`, the
+close's uncommitted evidence now in the build worktree. AC5 to AC8, which run the walk, run only after
+this unit's own edits outside the leg, the page's included, are committed.
 
 ### Files touched (estimate)
 
@@ -181,6 +199,7 @@ TOOL-dSafePassage-76's, so per §8 F2's recommendation this unit builds after 76
 - `tools/govkit/fixtures/release-0/arms.toml`
 - `tools/govkit/fixtures/release-0/plants.toml`
 - `help/upgrade-steps.md`
+- `memory/map/generated/symbols.json`, regenerated in the pass commit
 
 ### Alternatives rejected
 
@@ -202,9 +221,10 @@ TOOL-dSafePassage-76's, so per §8 F2's recommendation this unit builds after 76
   naming the row; a dirty tree is a `Stop` naming its paths.
 - observability: four grader lines on every run; each arm line names its needle when it misses; the
   summary adds `red lines <k>`.
-- risks: S3 makes the leg exit 2 on a local run over uncommitted engine edits, where it printed
-  green. That is the finding; the bar already refuses to stamp such a tree
-  (`tools/run-gates/run-gates.sh:5701-5703`).
+- risks: S3 makes the leg exit 2 on a local run over uncommitted edits under its `govkit` or `lib`
+  directory, where it printed green. That is the finding; the bar already refuses to stamp such a
+  tree (`tools/run-gates/run-gates.sh:5701-5703`). An edit anywhere else, records and evidence
+  included, leaves the leg running, which the `tree-clean` grader pins.
 - testing: S7's graders, each staged red, and the arms of §7.
 - migration: none.
 - user docs: S8's four sentences.
@@ -227,13 +247,16 @@ TOOL-dSafePassage-76's, so per §8 F2's recommendation this unit builds after 76
   line, it exits 2 printing `upgrade-walk: nothing measured: the working tree differs from HEAD at
   tools/govkit/steps.toml`, before any clone. With that line in
   `tools/govkit/fixtures/release-0/plants.toml` instead, it passes the check and goes on to build
-  release-0; `--list` exits 0 in both.
-  Red when: the leg walks HEAD's engine and prints its cases over an edit it never ran.
+  release-0, and so it does with that line in `tools/run-gates/ceiling-evidence.txt` or a file
+  under `memory/`; `--list` exits 0 in every case.
+  Red when: the leg walks HEAD's engine and prints its cases over an edit it never ran; or it
+  refuses a dirty file outside its engine directories.
 - **AC6** — When `python tools/govkit/upgrade_walk.py --case up --inject missing-plant` runs, it exits
   2 printing a `Stop` line that opens `plant missing-plant:`, names the arm's planted path, the
   file arms.toml declares at `:59`, and ends `is absent at release-0`, and
-  `git grep -c -F "is absent at release-0" -- tools/govkit/upgrade_walk.py` prints `1`, the one
-  `Stop` in `write_plant_edits`.
+  `git grep -c -F 'is absent at release-0")' -- tools/govkit/upgrade_walk.py`, which counts the
+  `Stop` literals and not the module docstring's exit-2 line (`:23`), prints `1`, the one in
+  `write_plant_edits`. At `83817478f` it prints `2` (`:145`, `:847`).
   Red when: the arm's plant is tested by a second existence check rather than joining
   `write_plant_edits`, so the grep counts 2.
   cost: release-0 is applied before the first case tree, several minutes.
@@ -249,19 +272,28 @@ TOOL-dSafePassage-76's, so per §8 F2's recommendation this unit builds after 76
   Red when: a row's `needle` is text its case never prints, so the leg's arm pass would read that
   arm uncaught.
   cost: one case per arm over release-0, several minutes to tens of minutes each.
-- **AC9** — When `git grep -n -F "THE UPGRADE-WALK LEG'S SUMMARY SUBTRACTS RED LINES FROM A COUNT OF UNITS" -- memory/builds/dSafePassage/BACKLOG.md`
-  runs, it prints the ask row, and its `DEFERRED` line names `until TOOL-dSafePassage-77`.
-  Red when: TOOL-dSafePassage-69's hand-off still has no receiving row.
+- **AC9** — When `python tools/memory-tree/gen_build_index.py --asks TOOL-dSafePassage-79` runs after
+  this unit's CLOSED flip and the index's re-render, it prints the ask as terminal, decided by
+  TOOL-dSafePassage-77's `closes`, and
+  `git grep -n -F "TOOL-dSafePassage-79" -- memory/backlog/TOOL.md` prints nothing, the live-ask
+  index no longer listing it.
+  Red when: the header's `closes` does not close the ask, so it stays live and DEFERRED.
+  fixture: the row is already filed at `memory/builds/dSafePassage/BACKLOG.md:7`; what this observes
+  is the close, at the main loop's CLOSED flip.
 - **AC10** — When `git grep -n -F -e "an order of its kind" -e "naming its defect" -e "checks its own graders" -e "differs from HEAD" -- help/upgrade-steps.md`
   runs, it prints one line per phrase.
   Red when: the leg's section still says a plant is ordered when any order names it, or its exit-2 list
   (`:410-412`) omits the dirty tree.
+- **AC11** — When `python tools/govkit/upgrade_walk.py --list` runs, it prints
+  `upgrade-walk: grader · fixture-keys · ok`.
+  Red when: a missing `order` or `needle` reads as a default rather than a `Stop`, so the grader
+  prints `RED`.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `upgrade-walk` · `docs` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `upgrade-walk` · `docs` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `recall floor` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/upgrade_walk.py · covers AC1 AC2 AC3 AC4 · `check_graders`, run first on every invocation, each grader staged red by a working copy carrying today's code: the outbox substring match, `got == want` grading, no clean check, and `n - k` · none
+New arm: tools/govkit/upgrade_walk.py · covers AC1 AC2 AC3 AC4 AC11 · `check_graders`, run first on every invocation, each grader staged red by a working copy carrying today's code: the outbox substring match, `got == want` grading, no clean check or a whole-tree one (red on the `memory/` and evidence rows), `n - k`, and a defaulted missing key · none
 New arm: tools/govkit/fixtures/release-0/arms.toml · covers AC6 AC8 · every `[[arm]]` row's `needle`, graded by `check_arm_caught` in the leg's arm pass, and `missing-plant` reaching `write_plant_edits`, staged red by a needle naming text its case never prints · none
 
 AC5 and AC7 run the leg's own cases; AC9 and AC10 are greps.
@@ -308,6 +340,18 @@ AC5 and AC7 run the leg's own cases; AC9 and AC10 are greps.
 - rev-3 · 2026-10-28 · S5 · AC6 · §8 · S5 and F1's resolution name the ask TOOL-dSafePassage-79 the
   main loop filed, with the header's `closes`; AC6's planted path is spelled out of backticks for the
   spec-token checker.
+- rev-4 · 2026-10-28 · S3 · S7 · S8 · §3 · §4 · §5 · AC5 · AC6 · AC9 · AC11 · §7 · folded the round-1
+  spec audit,
+  `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`:
+  H1 and M8, S3 narrowed to the engine files under the leg's `govkit` and `lib` directories, with
+  `tree-clean` rows for a dirty `memory/` file and `tools/run-gates/ceiling-evidence.txt`, and this
+  unit building after TOOL-dSafePassage-80 with its walk ACs run over committed non-leg edits; M3
+  and L16, AC6 counts the `Stop` literals, recording the base count 2; L3, AC9 observes the ask's
+  close; L6, the `fixture-keys` grader and AC11, every path spelled from `HERE`, and
+  `install-prefix (shipped surface)` on the leg line; M11 and L5, `symbols.json` in Files touched
+  and `codebase-map coverage + freshness` on the leg line. The header's node is corrected to `a`.
+- rev-5 · 2026-10-28 · §7 · folded the spec-token checker's rev-4 report: `recall floor` joins the leg line,
+  tripped by `memory/map/generated/symbols.json` in Files touched.
 
 ## 10. Reuse audit
 
