@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-14 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-60 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-79 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83
+ids: TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-14 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-60 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-79 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84
 spec-audit: 2026-10-21
 parents: dGroundRules
 may: PLAY-dClosedLoop-3
@@ -137,16 +137,17 @@ none
 | 78 | `TOOL-dSafePassage-81` | **Derived:** TOOL-dSafePassage-1 | the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin |
 | 79 | `TOOL-dSafePassage-82` | **Derived:** TOOL-dSafePassage-1 | the six product lint legs this build's diff turned red, each cleared by the remedy its own message names |
 | 80 | `TOOL-dSafePassage-83` | **Derived:** TOOL-dSafePassage-1 | the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited |
+| 81 | `TOOL-dSafePassage-84` | **Derived:** TOOL-dSafePassage-78 | the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 80 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 81 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-14
 ids TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28
 ids TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42
 ids TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56
 ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-60 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70
-ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-79 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83
+ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-79 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -231,14 +232,15 @@ ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePas
 | [TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin](spec/2026-10-28-spec-TOOL-dSafePassage-81.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names](spec/2026-10-28-spec-TOOL-dSafePassage-82.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
+| [TOOL-dSafePassage-84 — the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked](spec/2026-10-29-spec-TOOL-dSafePassage-84.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 400 bound to this build, across 4 record folder(s).
+Records: 403 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65
-TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71.
+TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-84.
 
 Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-15@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1
 TOOL-dSafePassage-19@rev-1 TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1
@@ -250,7 +252,7 @@ TOOL-dSafePassage-74@rev-2 TOOL-dSafePassage-75@rev-2 TOOL-dSafePassage-76@rev-3
 
 <!-- gen:build-coverage -->
 
-Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 79 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 80 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 11
 - carried in parts: 2 (cl-dClosedLoop-0018, cl-dClosedLoop-0022)
@@ -275,7 +277,7 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 79 spec(s) at 
   `spec/2026-10-28-spec-TOOL-dSafePassage-70.md` (TOOL-dSafePassage-35), `spec/2026-10-28-spec-TOOL-dSafePassage-71.md` (TOOL-dSafePassage-42), `spec/2026-10-28-spec-TOOL-dSafePassage-72.md` (TOOL-dSafePassage-1), `spec/2026-10-28-spec-TOOL-dSafePassage-73.md` (TOOL-dSafePassage-1),
   `spec/2026-10-28-spec-TOOL-dSafePassage-74.md` (TOOL-dSafePassage-1), `spec/2026-10-28-spec-TOOL-dSafePassage-75.md` (TOOL-dSafePassage-1), `spec/2026-10-28-spec-TOOL-dSafePassage-76.md` (TOOL-dSafePassage-1), `spec/2026-10-28-spec-TOOL-dSafePassage-77.md` (TOOL-dSafePassage-1),
   `spec/2026-10-28-spec-TOOL-dSafePassage-78.md` (TOOL-dSafePassage-1), `spec/2026-10-28-spec-TOOL-dSafePassage-80.md` (TOOL-dSafePassage-5), `spec/2026-10-28-spec-TOOL-dSafePassage-81.md` (TOOL-dSafePassage-1), `spec/2026-10-28-spec-TOOL-dSafePassage-82.md` (TOOL-dSafePassage-1),
-  `spec/2026-10-28-spec-TOOL-dSafePassage-83.md` (TOOL-dSafePassage-1)
+  `spec/2026-10-28-spec-TOOL-dSafePassage-83.md` (TOOL-dSafePassage-1), `spec/2026-10-29-spec-TOOL-dSafePassage-84.md` (TOOL-dSafePassage-78)
 - clauses the token arm cannot see: cl-dClosedLoop-0021
 <!-- /gen:build-coverage -->
 
@@ -298,7 +300,7 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 79 spec(s) at 
 | 13 | `TOOL-dSafePassage-49`, `TOOL-dSafePassage-52` | yes |
 | 14 | `TOOL-dSafePassage-51`, `TOOL-dSafePassage-57`, `TOOL-dSafePassage-58` | no |
 | 15 | `TOOL-dSafePassage-53`, `TOOL-dSafePassage-54`, `TOOL-dSafePassage-55`, `TOOL-dSafePassage-56`, `TOOL-dSafePassage-59` | unknown |
-| 16 | `TOOL-dSafePassage-61`, `TOOL-dSafePassage-72`, `TOOL-dSafePassage-73`, `TOOL-dSafePassage-74`, `TOOL-dSafePassage-75`, `TOOL-dSafePassage-76`, `TOOL-dSafePassage-77`, `TOOL-dSafePassage-78`, `TOOL-dSafePassage-80`, `TOOL-dSafePassage-81`, `TOOL-dSafePassage-82`, `TOOL-dSafePassage-83` | no |
+| 16 | `TOOL-dSafePassage-61`, `TOOL-dSafePassage-72`, `TOOL-dSafePassage-73`, `TOOL-dSafePassage-74`, `TOOL-dSafePassage-75`, `TOOL-dSafePassage-76`, `TOOL-dSafePassage-77`, `TOOL-dSafePassage-78`, `TOOL-dSafePassage-80`, `TOOL-dSafePassage-81`, `TOOL-dSafePassage-82`, `TOOL-dSafePassage-83`, `TOOL-dSafePassage-84` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
