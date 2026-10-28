@@ -233,7 +233,7 @@ ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePas
 | [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 382 bound to this build, across 4 record folder(s).
+Records: 393 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
