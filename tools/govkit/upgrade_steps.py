@@ -919,7 +919,8 @@ def derive_introduced(root, landed_ref: str, files: list[str], table: str,
     blob (TOOL-dSafePassage-26 S37): every path any vintage named is walked, and a blob counts only
     while its path is declared, so a moved descriptor is read at its old path. One `git log` names
     the changed blobs oldest first, `blob_at` reads each through one `cat-file --batch` it is
-    handed, a blob is parsed only where it spells a wanted id, and the walk stops at the last hit."""
+    handed, every declaring blob is parsed, so an id in any string spelling the reader accepts is
+    found (TOOL-dSafePassage-74), and the walk stops at the last hit."""
     want, found = set(ids), {}
     if not (landed_ref and want and files):
         return found
@@ -962,18 +963,14 @@ def derive_introduced(root, landed_ref: str, files: list[str], table: str,
                         continue
                 if path not in declared:
                     continue
-                hits = [i for i in want if f'"{i}"' in text]
-                if not hits:
-                    continue
                 try:
                     held = {r.get("id") for r in tomllib.loads(text.removeprefix("\ufeff")).get(table) or []
                             if isinstance(r, dict)}
-                except (tomllib.TOMLDecodeError, AttributeError):
-                    continue  # an unparsable vintage holds no row
-                for i in hits:
-                    if i in held:
-                        found[i] = (lines[0].strip(), pos)
-                        want.discard(i)
+                except (tomllib.TOMLDecodeError, AttributeError, TypeError):
+                    continue  # an unparsable or misshapen vintage holds no row
+                for i in want & held:
+                    found[i] = (lines[0].strip(), pos)
+                    want.discard(i)
             if not want:
                 break
     finally:

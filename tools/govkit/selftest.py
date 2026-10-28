@@ -3104,6 +3104,22 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
           "would not converge" in read_refusal(lambda: steps.write_before_image(im, "demo/first",
                                                                                 lambda before: {"a.txt": b"x"})))
 
+    # TOOL-dSafePassage-74 AC2: a single-quoted step row and a single-quoted [[retired]] row, both
+    # committed after a double-quoted control row, each read at its committing sha, never unlanded.
+    g = tmp / "sp-quotes"
+    first = build_steps_gov(g, {**files, "demo/kit.toml": demo_head + render_row("demo/first")})
+    write_file(g, "demo/kit.toml", demo_head + render_row("demo/first")
+               + render_row("demo/single").replace('id = "demo/single"', "id = 'demo/single'"))
+    write_file(g, f"{gkn}/registry.toml", reg + "\n[[retired]]\nid = 'gone'\nsuccessor = \"none\"\nsurfaces = []\n")
+    settle(g, "single-quoted rows")
+    second = run_gov_git(g, "rev-parse", "HEAD")
+    got74 = [(r.id, r.introduced) for r in steps.read_steps(g, "HEAD", "main")]
+    check("[dSP-74] AC2 a single-quoted step row reads its committing sha, ordered after the earlier row",
+          got74 == [("demo/first", first), ("demo/single", second)], str(got74))
+    got74 = [(r.id, r.retired) for r in steps.read_retired(g, "HEAD", "main")]
+    check("[dSP-74] AC2 a single-quoted [[retired]] row reads its committing sha",
+          got74 == [("gone", second)], str(got74))
+
     # TOOL-dSafePassage-72 AC1 to AC5: one predicate answers containment for the step module and for
     # govkit's destinations, and `check_contained` refuses a link on any existing segment before a
     # read or write. A form that could leave the scratch tree reaches only `check_contained` and
