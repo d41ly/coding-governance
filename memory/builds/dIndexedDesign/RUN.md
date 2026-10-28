@@ -9,10 +9,18 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at 6afe06d0
+resume-owed: none · owner
+held-at: 2026-10-28T07:49:41Z
+hold-reason: the spec-audit chain does not converge (high findings 6, 7, 6 over three rounds, round 3's back on unit 41's refusal-site surface); the parked question asks the owner to keep auditing, stop the chain as for dKeptSession and dLinkedLibrary, or re-scope
+hold-until: owner
+hold-code: host-owner-action
+held-from: REVIEWING
 refreshed-at: 1c31d2602aac85104828b50eaf06a43e8ee34591 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: c20c29685a6f3efafb7dc0bee67eefa6fe63a564
-phase: REVIEWING
+witness: 6afe06d0fa2da4d577f47addefc1dd94aaba9247
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -89,3 +97,5 @@ base: 57bc3b91861a061dc9f37529bfe41db756c24fcd
 2026-10-28T07:15:47Z review · item dIndexedDesign-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 20 · disposition promote
 
 2026-10-28T07:49:29Z decision · item The spec-audit chain does not converge: high findings ran 6, 7, 6 over three rounds (round 3's highs return to unit 41's refusal-site surface and to order slips between promoted units), with 7 promotions (TOOL-dIndexedDesign-47 to -53) still unaudited. Keep auditing, stop the chain as for dKeptSession and dLinkedLibrary, or re-scope? · reason options (a) round 4 over units 47-53 and onward, ~1h and ~2M subagent tokens a round with no sign of the highs falling; (b) stop as for dKeptSession and dLinkedLibrary: units 47-53 close under a recorded specs-audited override, closing-review-recorded overridden, every unit deferred to the build run, the run closes and lands; (c) re-scope the refusal-site and design-exit units before more rounds. Refused to pick: the owner's standing rule stops a chain without asking only at a no-HIGH round, and on a plateau holds for the owner's ruling
+
+2026-10-28T07:49:42Z hold · item host-owner-action · reason until owner · reaped beefbdcd · resume none(owner)
