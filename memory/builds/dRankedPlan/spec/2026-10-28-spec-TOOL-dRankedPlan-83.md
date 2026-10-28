@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-83 — the routed commits leg's ceiling covers this run's close, sized through `derive-ceilings.py --observed` from the main loop's reading of the leg alone
 
-**Status:** DEFERRED · rev-1 · 2026-10-28 · node a · Tier-1 · base 922d6b94 · streams tooling
+**Status:** INPROGRESS · rev-1 · 2026-10-28 · node a · Tier-1 · base 922d6b94 · streams tooling
 
 **Derived:** PLAY-dClosedLoop-2
 

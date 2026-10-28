@@ -111,6 +111,7 @@ receipt sync (installed files match the receipt)	1.0	2	a	2026-09-24	runner
 review-join ban (no ref-keyed join)	10.8	2	a	2026-09-24	runner
 review-join self-test	110.3	2	a	2026-09-24	runner
 review-protocol parity (kit vs dogfood)	7.0	2	a	2026-09-24	runner
+routed commits name a specced unit	354.0	1	a	2026-10-28	taken by the main loop, the leg alone on node a with GATE_PUSH_BASE=1a61f21a2, its deviation join armed, read twice with that base: at 9c135e17 after dRankedPlan's close, 37 commits past that base, rc 0, real 354.0s, another session's two staged hygiene checks running as it started; at 922d6b94, 39 commits past it, rc 0, real 295.5s, another worktree's dispatch running its check-spec-tokens.py across part of it; and a close-shaped reading at 922d6b94 with GATE_PUSH_BASE unset, rc 0, real 276.0s; all three censuses found the idle orphan run-gates.sh of unattended-dgroundrules-0e6f4a, pid 10907 from Oct 23; the largest governs; killed at its 300 s ceiling under dRankedPlan's close bar at 9c135e17, in the pool and on its serial retry
 row-grammar selftest	42.7	2	a	2026-09-24	runner
 row-keyed merge driver replay	269.1	2	a	2026-09-24	runner
 run-gates adopter e2e	49.4	2	a	2026-09-24	runner
