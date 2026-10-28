@@ -335,3 +335,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T05:32:31Z dispatch · item 73f2042b TOOL-dSafePassage-45 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-45.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-45-ledger.md memory/map/generated/symbols.json
 
 2026-10-28T05:33:31Z brief · item TOOL-dSafePassage-45 · reason 3f5f7300e495 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-45-build-brief.md
+
+2026-10-28T06:01:23Z brief · item TOOL-dSafePassage-46 · reason 54f7845f4470 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-46-build-brief.md
+
+2026-10-28T06:10:31Z dispatch · item c0952b6f TOOL-dSafePassage-46 · reason tools/push-main.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/.memory-tree.conf.example
+
+2026-10-28T06:38:10Z dispatch · item c0952b6f TOOL-dSafePassage-46 · reason tools/push-main.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/.memory-tree.conf.example memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-46-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-46.md

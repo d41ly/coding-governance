@@ -1399,27 +1399,33 @@ start = next(i for i, r in enumerate(rows) if r[0].startswith("cmd_prepare()"))
 end = next(i for i in range(start, len(rows)) if rows[i][0].startswith("}"))
 at = next((i for i in range(start, end) if re.match(r"[ \t]*if ! run_gov_first\b", rows[i][1])), end)
 print(sum(1 for raw, code, cont, here in rows[at:end] if not cont and not here and re.search(r"\breturn 1\b", code)))
-' "$HERE/memory-tree/check-arms.py" "$1" 2>/dev/null || echo 0
+' "$HERE/$_mt_rc/check-arms.py" "$1" 2>/dev/null || echo 0
 }
-d37=$(count37 "$HERE/push-main.sh")
-if [ "$d37" -gt 0 ] && [ "$d37" = "${#PREPARE_REFUSALS[@]}" ]; then
-  ok "37 cmd_prepare refuses $d37 way(s) after the gov-first walk, and PREPARE_REFUSALS carries a row for each"
+# TOOL-dSafePassage-46 S2: check-arms.py is loaded from the memory-tree kit arm 26's scan found
+# beside this lander (`_mt_rc`), never by a typed kit path, so the arm runs at any install prefix.
+if [ -n "$_mt_rc" ] && [ -f "$HERE/$_mt_rc/check-arms.py" ]; then
+  d37=$(count37 "$HERE/push-main.sh")
+  if [ "$d37" -gt 0 ] && [ "$d37" = "${#PREPARE_REFUSALS[@]}" ]; then
+    ok "37 cmd_prepare refuses $d37 way(s) after the gov-first walk, and PREPARE_REFUSALS carries a row for each"
+  else
+    bad "37 cmd_prepare refuses $d37 way(s) after the gov-first walk (0 means the anchor matched nothing), PREPARE_REFUSALS carries ${#PREPARE_REFUSALS[@]} row(s)"
+  fi
+  # AC9's blanking: a lander copy carrying a `# return 1` comment and an `echo "return 1"` line after
+  # the call, and a comment naming run_gov_first above the mint block, counts the same.
+  awk '/^  if ! run_minter/ { print "  # run_gov_first is named above the call" }
+       { print }
+       /^  if ! run_gov_first; then/ { print "    # return 1"; print "    echo \"return 1\" >/dev/null" }' \
+    "$HERE/push-main.sh" > "$tmp/lander37-blanked.sh"
+  b37=$(count37 "$tmp/lander37-blanked.sh")
+  # the anchors occur twice in the lander, so the plant's liveness is read inside cmd_prepare: three more lines
+  raw37() { awk '/^cmd_prepare\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
+  if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(raw37 "$tmp/lander37-blanked.sh")" = "$(( $(raw37 "$HERE/push-main.sh") + 3 ))" ]; then
+    ok "37 a commented and a quoted return 1, and run_gov_first named above the call, leave the count at $d37"
+  else
+    bad "37 the derived count moved on a lander copy carrying a commented and a quoted return 1 and an earlier run_gov_first: $b37, not $d37"
+  fi
 else
-  bad "37 cmd_prepare refuses $d37 way(s) after the gov-first walk (0 means the anchor matched nothing), PREPARE_REFUSALS carries ${#PREPARE_REFUSALS[@]} row(s)"
-fi
-# AC9's blanking: a lander copy carrying a `# return 1` comment and an `echo "return 1"` line after
-# the call, and a comment naming run_gov_first above the mint block, counts the same.
-awk '/^  if ! run_minter/ { print "  # run_gov_first is named above the call" }
-     { print }
-     /^  if ! run_gov_first; then/ { print "    # return 1"; print "    echo \"return 1\" >/dev/null" }' \
-  "$HERE/push-main.sh" > "$tmp/lander37-blanked.sh"
-b37=$(count37 "$tmp/lander37-blanked.sh")
-# the anchors occur twice in the lander, so the plant's liveness is read inside cmd_prepare: three more lines
-raw37() { awk '/^cmd_prepare\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
-if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(raw37 "$tmp/lander37-blanked.sh")" = "$(( $(raw37 "$HERE/push-main.sh") + 3 ))" ]; then
-  ok "37 a commented and a quoted return 1, and run_gov_first named above the call, leave the count at $d37"
-else
-  bad "37 the derived count moved on a lander copy carrying a commented and a quoted return 1 and an earlier run_gov_first: $b37, not $d37"
+  echo "  skip — 37 no memory-tree kit (check-arms.py) beside this lander, so the derived-count arm did not run"
 fi
 n37=0
 for _row37 in "${PREPARE_REFUSALS[@]}"; do

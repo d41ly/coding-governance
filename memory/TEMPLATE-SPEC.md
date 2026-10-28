@@ -511,6 +511,12 @@ write, and an author discovering that the negation is all there is has found som
   Red when: the fixture carries no clause and the arm stays silent.
 ```
 
+Once a spec's filename date reaches `SPEC_AC_ORDER_CUTOFF` (`.memory-tree.conf`; blank turns it
+off), a LIVE spec's criterion labels must ascend in the order this section lists them, and the
+`ac-order` join of `tools/check-spec-tokens.py` names the spec and the first label listed before a lower
+one (`AC2` of `AC2, AC1`). A repeated label is no descent, and a spec dated before the key keeps its
+order ungraded.
+
 Once a spec's filename date reaches `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`; blank turns it off),
 no backticked token in an acceptance bullet — nor on the §7 leg line — may spell a merge-bar or
 self-test-suite invocation: the runner, a `*.test.sh` at command position, or a non-empty
