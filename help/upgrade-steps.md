@@ -72,12 +72,16 @@ starts it:
   `core.editor`, `sequence.editor`, `core.gitProxy`, `remote.<x>.uploadpack` and `receivepack`,
   `hook.<x>.command`, `gc.recentObjectsHook` (run by `gc` and the auto-gc a commit or fetch
   starts), a `submodule.<x>.update` or `alias.<x>` beginning with `!`, and the trailer,
-  difftool, mergetool, browser, man, guitool and send-email commands. Credentials in a value are
-  refused too: a `remote.<x>.url`, `remote.<x>.pushurl`, `http.proxy` or `remote.<x>.proxy` that
-  is a `<scheme>://` URL carrying a user or password before its host, and any `http.sslKey`,
-  `http.sslCert` or `http.cookieFile`, or its `http.<url>.` form. An scp-form remote such as
-  `git@host:repo` carries no credential and is not refused. The refusal names each key
-  and the file declaring it, and never prints its value. A repository with a filter it relies on, Git LFS's say, in its own
+  difftool, mergetool, browser, man, guitool and send-email commands. Credentials are refused
+  too, as a class rather than a list: a `<scheme>://` URL carrying userinfo (a user or password
+  before its host) is refused wherever it appears, in any key's value (`remote.<x>.url`,
+  `submodule.<name>.url`, `url.<base>.insteadOf`, `http.proxy` and every other) or in a key's own
+  name (`url.<base>.insteadOf`, `http.<url>.sslVerify`, `credential.<url>.username`). The
+  credential-file keys are refused whatever they hold: `http.sslKey`, `http.sslCert`,
+  `http.cookieFile`, `http.proxySSLKey` and `http.proxySSLCert`, each in its `http.<url>.` form
+  too. An scp-form remote such as `git@host:repo` carries no credential and is not refused. The
+  refusal names each key and the file declaring it, with any userinfo in either written as
+  `<redacted>`, and never prints a value: a refusal never prints the credential. A repository with a filter it relies on, Git LFS's say, in its own
   config or a submodule's, or a local `core.editor` or difftool, has every step refused: remove
   the key for the run, or run the step attended. Nine keys of that shape are not refused: `merge.<driver>.driver`, since a step never
   merges and gov's own checkout declares two; `core.hooksPath`, since the setting gov passes

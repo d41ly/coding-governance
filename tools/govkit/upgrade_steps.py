@@ -186,7 +186,8 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-unpopulated-stub", "submodule-unpopulated-worktree",
                   "submodule-unpopulated-worktree-stub", "submodule-main-only",
                   "local-recent-objects-hook", "local-recent-objects-hook-stub", "local-ext-transport",
-                  "local-ext-transport-stub", "autocrlf", "autocrlf-local", "local-url-userinfo")
+                  "local-ext-transport-stub", "autocrlf", "autocrlf-local", "local-url-userinfo",
+                  "submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -1470,17 +1471,42 @@ def read_target_local_config(target) -> list[tuple[str, str, str | None, str]] |
     return rows
 
 
+# TOOL-dSafePassage-38 §4: a `<scheme>://` URL carrying userinfo before its host, and the
+# credential-file keys, `<x>` any one or more segments.
+CONFIG_USERINFO_RE = re.compile(r"(?i)\b[a-z][a-z0-9+.-]*://[^/\s@]+@")
+CREDENTIAL_FILE_KEY_RE = re.compile(r"(?i)http\.(?:.+\.)?(?:sslkey|sslcert|cookiefile|proxysslkey|proxysslcert)")
+
+
+def test_credential_bearing(key: str, value: str | None) -> bool:
+    """True when `value`, or the key's text between its first and last dot, holds a URL carrying
+    userinfo, or when `key` is a credential-file key (TOOL-dSafePassage-38 S1). An scp-form
+    `user@host:path` holds no `://` and is not credential-bearing."""
+    inner = key.split(".", 1)[1].rpartition(".")[0] if key.count(".") >= 2 else ""
+    return bool(CREDENTIAL_FILE_KEY_RE.fullmatch(key) or CONFIG_USERINFO_RE.search(inner)
+                or (value is not None and CONFIG_USERINFO_RE.search(value)))
+
+
+def render_redacted_config(text: str) -> str:
+    """`text` with the userinfo of every `<scheme>://<userinfo>@` written as `<redacted>`, scheme
+    and host kept (TOOL-dSafePassage-38 S2)."""
+    return CONFIG_USERINFO_RE.sub(lambda m: m.group(0).partition("://")[0] + "://<redacted>@", text)
+
+
 def check_target_local_config(target) -> list[str]:
     """Each kept row of `read_target_local_config` that a `STEP_REFUSED_KEYS` row matches, its key
-    by the pattern and its value by the row's rule (a bare key holds git's true), as
-    `<key> in <file>`, `(submodule <path>)` after it for a row outside the target's own repository
-    (TOOL-dSafePassage-24 S2, TOOL-dSafePassage-29 S1, TOOL-dSafePassage-30 S3); a read that failed
-    is the one entry, naming git's exit."""
+    by the pattern and its value by the row's rule (a bare key holds git's true), or that
+    `test_credential_bearing` holds True for, as `<key> in <file>`, `(submodule <path>)` after it
+    for a row outside the target's own repository, every entry through `render_redacted_config`
+    and none carrying a value (TOOL-dSafePassage-24 S2, TOOL-dSafePassage-29 S1,
+    TOOL-dSafePassage-30 S3, TOOL-dSafePassage-38 S1 S2); a read that failed is the one entry,
+    naming git's exit."""
     rows = read_target_local_config(target)
     if isinstance(rows, str):
-        return [rows]
-    return [f"{key} in {origin}" +(f" (submodule {via})" if via else "") for origin, key, value, via in rows
-            if any(re.fullmatch(re.sub(r"<[^>]+>", ".+", re.escape(pattern)), key, re.I)
+        return [render_redacted_config(rows)]
+    return [render_redacted_config(f"{key} in {origin}" + (f" (submodule {via})" if via else ""))
+            for origin, key, value, via in rows
+            if test_credential_bearing(key, value)
+            or any(re.fullmatch(re.sub(r"<[^>]+>", ".+", re.escape(pattern)), key, re.I)
                    and (rule == "any"
                         or (rule == "not a git false" and (value is None or value.strip().lower() not in GIT_FALSE))
                         or (rule == "begins with !" and value is not None and value.startswith("!"))
@@ -2744,6 +2770,27 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             expect(rep.get("add") == 0, "the scp-form remote: clean's git add did not run")
         except Refusal as e:
             expect(False, f"an scp-form remote with no credential was refused: {e}")
+        rc = 1
+    elif plant in ("submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo"):
+        # TOOL-dSafePassage-38 S3: a URL credential in a value or a key segment that no instance row
+        # names refuses the step, and the refusal prints the key redacted and never the credential.
+        cred = "https://dspuser38:dsppass38@example.invalid/"
+        section, key = {"submodule-url-userinfo": ('submodule "s"]\n\turl = ' + cred + "s.git", "submodule.s.url"),
+                        "insteadof-userinfo": (f'url "{cred}"]\n\tinsteadOf = https://example.invalid/',
+                                               "url.https://<redacted>@example.invalid/.insteadof"),
+                        "http-url-key-userinfo": (f'http "{cred}"]\n\tsslKey = /k',
+                                                  "http.https://<redacted>@example.invalid/.sslkey")}[plant]
+        cfg = target / ".git" / "config"
+        cfg.write_text(cfg.read_text(encoding="utf-8") + f"[{section}\n", encoding="utf-8", newline="\n")
+        try:
+            run_clean()
+            refused = ""
+        except Refusal as e:
+            refused = str(e)
+            print(f"isolation: {clean.id} · refused · {e}")
+        expect(f"{key} in .git/config" in refused, f"the step was not refused naming {key} in .git/config")
+        expect("dspuser38" not in refused and "dsppass38" not in refused, "the refusal prints the URL's user or password")
+        expect(not report.exists(), "the refused step spawned")
         rc = 1
     elif plant.startswith("local-"):
         # TOOL-dSafePassage-24 S4 and TOOL-dSafePassage-29 S4: an executor in the target's own config,

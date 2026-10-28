@@ -3517,6 +3517,17 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               rc == want and "isolation: FAILED" not in out and all(n in out for n in needles)
               and "gk-planted-user" not in out and "gk-planted-secret" not in out, out)
 
+    # TOOL-dSafePassage-38 AC1, AC2: a URL credential in a value or a key segment no instance row
+    # names refuses the step, the refusal naming the key redacted and printing neither planted token.
+    for plant, needle in (
+            ("submodule-url-userinfo", "submodule.s.url in .git/config, so nothing was spawned"),
+            ("insteadof-userinfo", "url.https://<redacted>@example.invalid/.insteadof in .git/config, so nothing"),
+            ("http-url-key-userinfo", "http.https://<redacted>@example.invalid/.sslkey in .git/config, so nothing")):
+        rc, out = fixture(us_py, plant)
+        check(f"[dSP-38] fixture isolation {plant} exits 1, names {needle} and prints no planted credential",
+              rc == 1 and "isolation: FAILED" not in out and needle in out
+              and "dspuser38" not in out and "dsppass38" not in out, out)
+
     # TOOL-dSafePassage-24 AC1 to AC4: an executor in the target's own config refuses the step before
     # any spawn, naming the key and its file ON the refusal line; each `-stub` twin skips the check and
     # its canary runs.

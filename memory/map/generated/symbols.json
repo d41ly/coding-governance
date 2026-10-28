@@ -18118,6 +18118,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "render_redacted_config",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "render_refusal_recipe",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -24501,6 +24506,11 @@
       "id": "test_cpu_clock_parses_every_shape",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_credential_bearing",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "test_crlf_working_copy_is_not_drift",
