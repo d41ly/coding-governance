@@ -170,7 +170,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-83 — the routed commits leg's ceiling covers this run's close, sized through `derive-ceilings.py --observed` from the main loop's reading of the leg alone](spec/2026-10-28-spec-TOOL-dRankedPlan-83.md) | — | 1 | CLOSED | rev-1 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 146 bound to this build, across 4 record folder(s).
+Records: 147 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
