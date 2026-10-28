@@ -9,7 +9,9 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179319231781634632077-1484 0f962505
+asks-at-landing: TOOL-dIndexedDesign-17=DEFERRED TOOL-dIndexedDesign-18=DEFERRED TOOL-dIndexedDesign-19=DEFERRED TOOL-dIndexedDesign-21=DEFERRED TOOL-dIndexedDesign-22=DEFERRED TOOL-dIndexedDesign-23=DEFERRED TOOL-dIndexedDesign-24=DEFERRED TOOL-dIndexedDesign-25=DEFERRED TOOL-dIndexedDesign-26=DEFERRED TOOL-dIndexedDesign-27=DEFERRED TOOL-dIndexedDesign-28=DEFERRED TOOL-dIndexedDesign-29=DEFERRED TOOL-dIndexedDesign-30=DEFERRED
+units-at-landing: TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53
+gates-run: unattended-179319441345052222651-13354 cc1d03c6
 parked-surfaced: yes, 42 surfaced
 keepalive-reaped: yes
 hold-run: 
@@ -23,7 +25,7 @@ held-from: REVIEWING
 refreshed-at: 1c31d2602aac85104828b50eaf06a43e8ee34591 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 20d03bcf94d4e213e9487cc915b3c9f2482a6e07
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -184,3 +186,7 @@ base: 57bc3b91861a061dc9f37529bfe41db756c24fcd
 2026-10-28T10:16:13Z rescope · item defer TOOL-dIndexedDesign-52 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
 
 2026-10-28T10:16:14Z rescope · item defer TOOL-dIndexedDesign-53 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T13:47:31Z override · item specs-audited · reason the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md) ends the spec-audit chain at round 3; its promotions TOOL-dIndexedDesign-47 to -53 close unaudited, as the owner ruled for dKeptSession and dLinkedLibrary
+
+2026-10-28T13:47:31Z override · item closing-review-recorded · reason a spec run writes no code, so its diff is specs and records only; the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md) takes the three-round spec-audit chain as the review of this spec-only diff, as for dKeptSession and dLinkedLibrary; the build run's closing diff review is unaffected
