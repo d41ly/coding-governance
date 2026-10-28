@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-78 — the govkit selftest arms red at the build's head: three arms read against the product they grade, and a walk run over a receipt below schema 3
 
-**Status:** DEFERRED · rev-2 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-28-build-TOOL-dSafePassage-78-ledger.md](../build/2026-10-28-build-TOOL-dSafePassage-78-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-78-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-78-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-78-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-78-build-brief.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-78-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-78-spec-brief.md) | research | — |

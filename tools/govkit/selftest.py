@@ -4568,8 +4568,9 @@ def check_step_walk() -> None:
           "reclaims the live holder and prints lock: FAILED",
           src.count(clock) == 1 and "lock: taken" in out and "lock: FAILED" in out, out[-3000:])
 
-    # The walk's two refusals, in process: a step that leaves the receipt unreadable, and a step's
-    # writes git will not stage (the target here is no repository).
+    # The walk's three refusals, in process, over a scratch repository: a step that leaves the receipt
+    # unreadable, a step's writes git will not stage while another process holds the index lock, and
+    # a before-image naming a path outside the target.
     us = govkit_module().upgrade_steps
     seen = ["python", "-c", "import pathlib, sys; sys.exit(not (pathlib.Path(sys.argv[1]) / 'x.txt').is_file())",
             "{target}"]
@@ -4584,6 +4585,9 @@ def check_step_walk() -> None:
                                       ("escaping", seen, escapes, "'../x.txt' is not a path inside the target")):
         with tempfile.TemporaryDirectory(prefix="gk-walk-ref-") as td:
             t = pathlib.Path(td)
+            subprocess.run(["git", "init", "-q", str(t)], check=True)
+            if case == "unstaged":
+                (t / ".git" / "index.lock").write_text("", encoding="utf-8")
             (t / ".governance").mkdir()
             rp = t / ".governance" / "install.json"
             rp.write_text('{"schema": 4, "steps": []}\n', encoding="utf-8")
@@ -4593,7 +4597,8 @@ def check_step_walk() -> None:
                 refused = ""
             except us.Refusal as e:
                 refused = str(e)
-            check(f"[dSP-2] S2 the walk refuses a {case} step, naming it", "fx/x" in refused and needle in refused,
+            check(f"[dSP-2] S2 the walk refuses a {case} step, naming it",
+                  (case == "escaping" or "fx/x" in refused) and needle in refused,
                   refused)
 
 
@@ -4909,11 +4914,12 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
     check("[dSP-3 AC2] ...and the clean run lifts it to schema 3, no further and with no `steps`",
           read(t).get("schema") == 3 and "steps" not in read(t), str(read(t).get("schema")))
 
-    # ---- AC9: a clean `update --write` never moves a receipt past 3 by itself, and keeps a 4.
+    # ---- AC9: a clean `update --write` that walks no step, a `--kits` run, never moves a receipt past
+    # ---- 3 by itself, and keeps a 4.
     for tag, fn, want in (("rs-ac9a", at(3), 3), ("rs-ac9b", lambda rec: None, 4)):
         t, _p = installed(tag)
         plant(t, fn)
-        p = run("update", "--target", str(t), "--write")
+        p = run("update", "--target", str(t), "--write", "--kits", kit)
         rec = read(t)
         check(f"[dSP-3 AC9] a clean `update --write` over a schema-{want} receipt leaves it at {want}",
               p.returncode == 0 and rec.get("schema") == want and ("steps" in rec) == (want == 4),
@@ -5200,8 +5206,7 @@ def check_source_mode(tmp: pathlib.Path) -> None:
     declared = us.read_steps(clone, "HEAD", None)
     states = {r.get("id"): r.get("state") for r in rec.get("steps") or []}
     pl = gk_run(gk, "plan", "--target", str(clone), cwd=clone)
-    dests = {d for m, d in _extract_plan_rows("\n".join(ln for ln in pl.stdout.splitlines() if "[hole" not in ln))
-             if m != "UNRES."}
+    dests = extract_plan_writes(pl.stdout, with_kept=True)
     files = [f for f in rec.get("files") or []]
     check("[dSP-8] AC3 update --write on a clone of gov exits 0 and writes a schema-4 source receipt, no gov_commit",
           p.returncode == 0 and rec.get("schema") == 4 and rec.get("mode") == "source" and "gov_commit" not in rec,
@@ -19353,7 +19358,7 @@ user_skills = "/tmp/gk-fake-skills"
     with _cf.ThreadPoolExecutor(max_workers=4) as _pool:
         for (_label, _argv, _rc, _line), _p in _pool.map(_run_shim_case, _shim_cases):
             _last = (_p.stdout.strip().splitlines() or [""])[-1]
-            check(_label, _p.returncode == _rc and _line in _last and "MISS" not in _p.stdout,
+            check(_label, _p.returncode == _rc and _line in _last and (_rc == 1) == ("MISS" in _p.stdout),
                   f"exit {_p.returncode}, expected {_rc}: {_p.stdout[-1200:]}{_p.stderr[-400:]}")
 
     # ---- TOOL-dSafePassage-9 AC1-AC6, AC8, AC9, AC12. WITHDRAWN FRAGMENTS, RETIRED EDITS AND EDITED

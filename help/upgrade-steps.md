@@ -230,6 +230,8 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
   walked` with the pending count; the next run without `--kits` walks them. A write run that
   already has a finding walks none either, and prints `steps: not walked — this run already has
   <n> finding(s) · <n> pending` in place of the count line.
+  A receipt below schema 3 is not walked either: the run prints `steps: not walked`, a clean run
+  lifts the receipt to 3, and the next `update --write` walks from there.
 
 Every write run prints one line with every count, zeros included:
 `govkit update — steps: <n> pending · <a> applied · <s> skipped · stopped at <id|none>`.

@@ -11705,15 +11705,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # killed step stops the walk with its failure recorded and the steps before it left applied, and
     # no down runs, here or in the verify rollback below. Only on an unscoped run that has no finding
     # yet (§8 F3): a subset of the steps would run a later one before an earlier one out of scope.
+    # And only over a receipt at schema 3 or above (TOOL-dSafePassage-78 S2): the first step starts
+    # from 3, and the lift to 3 is this run's own stamp below, after the walk, so the next run walks.
     # A stopped walk is a finding, so the `gov_commit` stamp below is withheld.
     _sw_pending = [] if rollback else upgrade_steps.derive_pending_steps(root, receipt, to_commit)
     if rollback:
         # TOOL-dSafePassage-4 S5: the reverse walk above took the steps back; none walks forward.
         print("govkit update — steps: not walked — a rollback walks no step forward")
-    elif kits or r.problems:
+    elif kits or r.problems or schema < 3:
         print(f"govkit update — steps: not walked — "
               + ("a --kits run walks no step, since a subset would run a later step before an "
-                 "earlier one" if kits else f"this run already has {len(r.problems)} finding(s)")
+                 "earlier one" if kits else f"this run already has {len(r.problems)} finding(s)"
+                 if r.problems else f"the receipt is at schema {schema}, and its first step starts "
+                 "from 3: this run lifts it to 3, and the next `update --write` walks them")
               + f" · {len(_sw_pending)} pending")
     else:
         # TOOL-dSafePassage-62 S1. THE ROWS THE WRITE LOOP STAMPED REACH THE DISK BEFORE THE FIRST
