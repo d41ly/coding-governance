@@ -1,4 +1,4 @@
-**Serves:** research TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-19 TOOL-dIndexedDesign-1
+**Serves:** research TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-1
 
 # Reuse scout D — dIndexedDesign
 
