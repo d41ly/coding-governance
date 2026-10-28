@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-55 — the roster hand-out refuses on TOOL-49 AC2's whole order predicate, written once as one probe
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
+**Status:** WONTDO · rev-2 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14 · retired: the dispatch edge refusal holds the order, TOOL-dSafePassage-49 rev-6 §8 F1
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,157 +11,93 @@
 | [2026-10-23-build-TOOL-dSafePassage-55-deviation-101.md](../build/2026-10-23-build-TOOL-dSafePassage-55-deviation-101.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-55-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-55-build-brief.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-55-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-55-1-spec-writer.md) | research | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-55-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-55-2-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
+Retired WONTDO at rev-2. No part of this unit's scope survives on its own.
+
 The spec audit of units 51 and 52
 (`memory/builds/dSafePassage/reviews/2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md`)
-confirmed finding **id 1** at HIGH, its item **H1**. TOOL-dSafePassage-51 S1 holds the roster back
-only while TOOL-dSafePassage-4's order is not above both TOOL-dSafePassage-43's and
-TOOL-dSafePassage-7's. TOOL-dSafePassage-49's §3 hands-off bullet to TOOL-dSafePassage-51 carries the
-same narrow wording. TOOL-dSafePassage-49 AC2 and TOOL-dSafePassage-51 AC1 also require
-TOOL-dSafePassage-18 and TOOL-dSafePassage-19 above TOOL-dSafePassage-4, and moving them is a
-separate header edit (TOOL-dSafePassage-49 §4 "The order move").
+confirmed finding **id 1** at HIGH, its item **H1**. TOOL-dSafePassage-51 S1 refused the roster
+hand-out on two of the four `order` relations TOOL-dSafePassage-49 AC2 named. Within one order the
+driver breaks ties by string id (`tools/workflows/unattended-build.js:608-613`), and
+`TOOL-dSafePassage-18` sorts before `TOOL-dSafePassage-4`. This unit was id 1's promotion: the four
+relations written once, as a probe the hand-out step ran.
 
-Within one order the driver breaks ties by string id (`tools/workflows/unattended-build.js:608-613`),
-and `TOOL-dSafePassage-18` sorts before `TOOL-dSafePassage-4`. So a sweep that moves TOOL-4 to order 3
-and leaves 18 and 19 there passes S1's refusal, and both consumers build before the unit they consume
-from.
+TOOL-dSafePassage-49 rev-6 re-resolved its §8 F1 to (d). It struck the header move this probe graded
+and struck AC2, the predicate the probe spelled. The relation the `order` verbs stood for is dispatch
+order. `--dispatch`'s edge refusal, TOOL-dTrueNorth-16 S2 in
+`tools/unattended/unattended.sh:13857-13926`, refuses a unit while a same-build unit it consumes from
+is neither CLOSED nor WONTDO, whatever the headers read. Its comment at `:13858-13860` names the
+same-order case id 1 found: a consumer and its producer at one order dispatch in either sequence.
 
-This unit is id 1's promotion. The refusal tests TOOL-dSafePassage-49 AC2's whole predicate, and the
-predicate is written once, as §4's probe, which the hand-out step runs. It builds at order 15, one
-above TOOL-dSafePassage-51 (order 14), whose S1 it repairs. The probe runs at the hand-out, before
-any pass, so the §3 hands-off bullets of TOOL-dSafePassage-49 and TOOL-dSafePassage-51 to this unit
-name it for the sweep that TOOL-dSafePassage-49 §8 F1(a) gives the build run.
+Every relation the probe tested is a declared edge, and the dispatch rows of
+`memory/builds/dSafePassage/RUN.md` show each held. TOOL-dSafePassage-43 consumes from
+TOOL-dSafePassage-3, and was dispatched at `:71` after `:55`. TOOL-dSafePassage-4 consumes from
+TOOL-dSafePassage-7 and TOOL-dSafePassage-43, and was dispatched at `:81` after `:75` and `:71`.
+TOOL-dSafePassage-18 and TOOL-dSafePassage-19 consume from TOOL-dSafePassage-4, and were dispatched
+at `:91` and `:95`. All of those specs are CLOSED, so no pass writes their headers.
 
 ## 2. Scope (IN)
 
-- **S1** — The probe. §4 "The order probe" reads the status header of every spec under
-  `memory/builds/dSafePassage/spec/` through `_parse_order` of `tools/memory-tree/gen_build_index.py`.
-  It checks four relations: TOOL-dSafePassage-43 above TOOL-dSafePassage-3; TOOL-dSafePassage-4 above
-  TOOL-dSafePassage-43 and above TOOL-dSafePassage-7; TOOL-dSafePassage-18 above TOOL-dSafePassage-4;
-  and TOOL-dSafePassage-19 above TOOL-dSafePassage-4. Each failed relation prints one line naming both
-  units and their orders, and the probe exits 1. With none failed it prints `order ok` and exits 0.
-  Observed by AC1, AC2 and AC3.
-- **S2** — The refusal. TOOL-dSafePassage-51 S1's refusal is read as "the build run hands out no
-  roster while §4's probe exits non-zero", in place of its two-relation condition.
-  TOOL-dSafePassage-49 AC2 is read as that probe's exit 0. TOOL-dSafePassage-49's §3 hands-off bullet
-  to TOOL-dSafePassage-51 is read with the same four relations. Observed by AC1 and AC2.
-- **S3** — One source. The probe's text lives in this spec's §4 alone. TOOL-dSafePassage-51 S1 and
-  TOOL-dSafePassage-49 AC2 cite it, and the build run copies it into its scratchpad and runs it from
-  there, never retyping a subset of it. Observed by AC3.
+- **S1** — STRUCK at rev-2, number retained so no cross-reference dangles. It was the order probe
+  over the status headers under `memory/builds/dSafePassage/spec/`. The headers it graded belong to
+  CLOSED specs, and the dispatch order they stood for is held by the edge refusal. NOT OBSERVED:
+  struck with the unit.
+- **S2** — STRUCK at rev-2. It widened TOOL-dSafePassage-51 S1's hand-out refusal to the probe.
+  That refusal is struck at TOOL-dSafePassage-51 rev-4. NOT OBSERVED: struck with the unit.
+- **S3** — STRUCK at rev-2. It kept the probe's text in one place, and nothing runs the probe now.
+  NOT OBSERVED: struck with the unit.
 
 ## 3. Non-goals (OUT)
 
-- Moving the headers. TOOL-dSafePassage-49 §8 F1(a) gives the sweep that move, and this unit only
-  refuses the hand-out until it is whole.
-- A change to `tools/workflows/unattended-build.js`. TOOL-dSafePassage-49 F1(c) refused it.
-- An order inversion between units no relation here names, which TOOL-dSafePassage-49 §7 already
-  leaves out.
-- The attribution of TOOL-dSafePassage-51 AC1 and AC2 to the sweep: finding 2, batched in
-  `TOOL-dSafePassage-59`.
+- Every part of the former scope, which §1 retires.
+- A change to `tools/workflows/unattended-build.js`'s tie-break. The edge refusal already holds
+  every same-build `consumes-from` edge at dispatch.
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-49` — AC2's four relations and F1(a)'s sweep, which S1 writes as one probe and S2 makes the hand-out's refusal; without them there is no predicate to run
-- **consumes-from** `TOOL-dSafePassage-51` — S1's hand-out refusal, which S2 widens to the whole predicate
-- **hands-off** `TOOL-dSafePassage-59` — TOOL-dSafePassage-51 AC1 and AC2 recorded as checks of the sweep, whose staged refusal is this unit's AC3, finding 2 of the spec audit of units 51 and 52
+- **consumes-from** `TOOL-dSafePassage-49` — nothing now; its AC2 and the header move this unit graded were struck at its rev-6 (§8 F1), and the edge stays only as the end that unit's hands-off bullet reads
 
 ## 4. Design
 
-### The order probe
-
-```python
-import sys, glob, os
-sys.path.insert(0, "tools/memory-tree")
-import gen_build_index as g
-d = sys.argv[1]
-o = {}
-for p in glob.glob(os.path.join(d, "*-spec-TOOL-dSafePassage-*.md")):
-    head = next(l for l in open(p, encoding="utf-8") if l.startswith("**Status:**"))
-    o[int(p.rsplit("-", 1)[1][:-3])] = g._parse_order(head, p)
-need = [(43, [3]), (4, [43, 7]), (18, [4]), (19, [4])]
-bad = [f"TOOL-dSafePassage-{a} at order {o[a]} is not above TOOL-dSafePassage-{b} at order {o[b]}"
-       for a, bs in need for b in bs if not o[a] > o[b]]
-print("\n".join(bad) or "order ok")
-sys.exit(1 if bad else 0)
-```
-
-It runs from the repository root as `python <scratchpad>/order_probe.py <spec directory>`.
-`_parse_order` is the parser that renders the README's build-order region, so the probe and the
-region read one grammar. This unit ran it on node d, Python 3.14.5, 2026-10-23, over three trees:
-
-| Tree | TOOL-4 | TOOL-18, TOOL-19 | Output | Exit |
-|---|---|---|---|---|
-| the spec directory at this spec's commit | order 2 | order 3 | two lines naming TOOL-43 and TOOL-7 | 1 |
-| a scratch copy, TOOL-4 moved to order 3 | order 3 | order 3 | two lines naming TOOL-18 and TOOL-19 | 1 |
-| the same copy, 18 and 19 moved to order 4 | order 3 | order 4 | `order ok` | 0 |
-
-### Inventory
-
-Minted: none in the tree. The probe is a scratch file the build run writes from §4. No function,
-constant, conf key, gate leg or policy key.
-
-### Migration
-
-None.
-
-### Rollout
-
-Live at the next hand-out. The unit sits at order 15, one above TOOL-dSafePassage-51. Its probe
-runs at the sweep, before the roster is handed out, and its own pass writes no file in the tree.
-
-### Files touched (estimate)
-
-None in the tree: the probe is a scratch file, and the sweep's header edits are TOOL-dSafePassage-49
-F1(a)'s.
-
-### Alternatives rejected
-
-- **Widening S1's sentence to four relations and leaving the check to whoever reads it.** The report
-  names the predicate's second copy as the defect's cause; a sentence is a third copy.
-- **A probe that reads the README's build-order region.** The region is rendered from the headers
-  after the sweep, so a probe over it would grade a render step rather than the move.
+N/A — retired WONTDO. The probe text of rev-1 is deleted, not kept disabled; the revision at
+`memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-55.md` in git history holds it.
 
 ## 5. Production-readiness checklist
 
-- security: N/A — a read-only probe over spec headers.
-- perf / scale: one header read per spec.
-- error / empty / loading states: a malformed `order` verb raises `_parse_order`'s `Problem`, which
-  stops the hand-out as a non-zero exit does.
-- observability: each failed relation names both units and both orders.
-- risks: a unit without an `order` verb reads `None`, and the comparison raises, which also stops
-  the hand-out.
-- testing: the three trees of §4 and the criteria of §6.
+- security: N/A — retired WONTDO; the unit builds nothing.
+- perf / scale: N/A — retired WONTDO.
+- error / empty / loading states: N/A — retired WONTDO.
+- observability: N/A — retired WONTDO.
+- risks: none; the order this unit guarded is held by the edge refusal §1 cites.
+- testing: N/A — retired WONTDO.
 - migration: none.
-- user docs: N/A — a build-run step with no `help/` page.
+- user docs: N/A — retired WONTDO, with no `help/` page.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When §4's probe runs over a scratch copy of `memory/builds/dSafePassage/spec/` in which
-  TOOL-dSafePassage-4's header reads `order 3` and TOOL-dSafePassage-18's and TOOL-dSafePassage-19's
-  still read `order 3`, it prints lines naming `TOOL-dSafePassage-18` and `TOOL-dSafePassage-19` and
-  exits 1.
-  Red when: the probe tests TOOL-dSafePassage-4 only against TOOL-dSafePassage-43 and
-  TOOL-dSafePassage-7, so the half-done sweep passes.
-- **AC2** — When the build run's sweep ends, §4's probe over `memory/builds/dSafePassage/spec/` prints
-  `order ok` and exits 0, before the roster is handed out.
-  Red when: the sweep left any of the four relations unmet and the roster went out.
-- **AC3** — When §4's probe runs over a scratch copy in which TOOL-dSafePassage-4's header still reads
-  `order 2`, it prints lines naming `TOOL-dSafePassage-43` and `TOOL-dSafePassage-7` and exits 1.
-  Red when: the probe cannot produce a negative on the unswept tree.
+- **AC1** — STRUCK at rev-2, number retained. It ran the probe over a scratch spec tree. The order
+  it graded is held at dispatch by `tools/unattended/unattended.sh:13857-13926`.
+  Red when: never; the unit is WONTDO.
+- **AC2** — STRUCK at rev-2, number retained. It ran the probe before the roster hand-out, which
+  `memory/builds/dSafePassage/RUN.md`'s dispatch rows now answer.
+  Red when: never; the unit is WONTDO.
+- **AC3** — STRUCK at rev-2, number retained. It ran the probe over a scratch copy of the spec
+  headers at their rev-1 orders, a red case for a predicate `tools/workflows/unattended-build.js`
+  never reads.
+  Red when: never; the unit is WONTDO.
 
 ## 7. Gates
 
 `spec tokens (a spec's own names resolve)` · `memory-hygiene self-test`
 
-This unit adds no arm and moves none. Its criteria are observed by the build run at the sweep, and
-the main loop records them in this unit's acceptance ledger under a `Pass: none` commit.
-
-What the check does not cover: a README build-order region left stale after the sweep, which the
-index generator's own check owns, and the commit order TOOL-dSafePassage-51 AC1 reads afterwards.
+This unit adds no arm and moves none. What the check does not cover: anything, since the unit builds
+nothing.
 
 ## 8. Open questions
 
@@ -171,13 +107,17 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 51 and 52's id 1
   (HIGH, item H1).
+- rev-2 · 2026-10-28 · S1 · S2 · S3 · AC1 · AC2 · AC3 · §1 · §3 · §4 · §5 · §7 · §10 · retired
+  WONTDO per `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-55-1-spec-writer.md`:
+  TOOL-dSafePassage-49 rev-6 struck F1(a)'s sweep and AC2, and `--dispatch`'s edge refusal holds the
+  order, by RUN.md's dispatch rows; the edges to TOOL-dSafePassage-51 and TOOL-dSafePassage-59 are
+  withdrawn with their mirrors.
 
 ## 10. Reuse audit
 
-The seam extended is `_parse_order` with `ORDER_RE` in `tools/memory-tree/gen_build_index.py`
-(`:212`, `:455`), the order-verb parser the build-order region is rendered from, read at source on
-2026-10-23. `python tools/codebase-map/reuse_lookup.py "check build order verbs of specs before handing out a roster"`
-ranked `check`, `before`, `build` and `roster`, name-token matches; none compares two units' orders,
-so the relations are new and the parse is reused.
+No seam is extended, because the unit is retired. The seam that already does its work is the edge
+refusal in `tools/unattended/unattended.sh:13857-13926`, read at HEAD `10511362a` on 2026-10-28, so
+no existing seam fits a new probe beside it and none is built. Rev-1 extended `_parse_order` in
+`tools/memory-tree/gen_build_index.py` (`:458`), which nothing here now calls.
 
 Recall terms used: `python tools/memory-recall/query.py "how the build run refuses to hand out a roster whose order verbs invert a consumes-from edge" --terms "spec audit promoted order verb hand-out roster sweep tie-break consumes-from header probe"`

@@ -361,3 +361,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T08:48:42Z brief · item TOOL-dSafePassage-49 · reason ed32b2f498ea memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md
 
 2026-10-28T09:19:55Z dispatch · item 5d4b43a7 TOOL-dSafePassage-49 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-49.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-49-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-49-deviation-181.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T10:01:52Z rescope · item retire TOOL-dSafePassage-55 · reason TOOL-dSafePassage-49 rev-6 struck F1(a)'s order sweep and AC2; 55's whole scope was the four-relation order probe over that sweep, each relation a declared consumes-from edge that --dispatch's edge refusal already enforces (unattended.sh:13857-13926) and RUN.md's dispatch rows show held; spec 55 rev-2 is WONTDO

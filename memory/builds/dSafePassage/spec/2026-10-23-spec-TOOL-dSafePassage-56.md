@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-56 — the walk tests for a link on every path it enters, the root and each `modules/` it recurses into, before listing it
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -60,8 +60,8 @@ that pass may build it.
 
 ## 3. Non-goals (OUT)
 
-- The test's form on Python 3.11, where `os.path.isjunction` does not exist: finding 18, batched in
-  `TOOL-dSafePassage-59`.
+- The test's form, one `os.lstat` read for its link bit and its reparse tag: finding 18, batched in
+  `TOOL-dSafePassage-59` S5.
 - A plant with a link at `<git_dir>/modules` itself, and the name-segment reading of
   `submodule-modules-link-loop`: finding 23, batched in `TOOL-dSafePassage-59`.
 - Reparse points other than symlinks and junctions, which TOOL-dSafePassage-51 §3 leaves out.
@@ -71,7 +71,7 @@ that pass may build it.
 
 - **consumes-from** `TOOL-dSafePassage-51` — S6's link rule, its child test, the `submodule-modules-link-loop` plant and §5's claim, which S1 names once and S2 applies to every path entered
 - **consumes-from** `TOOL-dSafePassage-53` — the listing handler this unit's test precedes, so a dangling link is refused before `os.scandir` can read it as absent
-- **hands-off** `TOOL-dSafePassage-59` — `test_path_linked`'s form without `os.path.isjunction` for the 3.11 floor, a plant linking `<git_dir>/modules` itself, and the `os.scandir` population tested before any type filter, findings 18, 23 and 24 of the spec audit of units 51 and 52
+- **hands-off** `TOOL-dSafePassage-59` — `test_path_linked`'s form as one `os.lstat` whose link bit or reparse tag refuses any link or reparse point, a plant linking `<git_dir>/modules` itself, and the `os.scandir` population tested before any type filter, findings 18, 23 and 24 of the spec audit of units 51 and 52
 
 ## 4. Design
 
@@ -183,6 +183,11 @@ none
   trips, per the spec-tokens repair handoff
   `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
   criterion's meaning moved.
+- rev-3 · 2026-10-28 · §3 · the non-goal and the hands-off bullet to `TOOL-dSafePassage-59` name
+  `test_path_linked`'s form as that unit's S5 now states it, one `os.lstat`, in place of a 3.11 floor
+  `tools/lib/python-floor.txt` no longer declares, per TOOL-dSafePassage-59 §8 F1 and
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-55-1-spec-writer.md`; no
+  scope item or criterion moved.
 
 ## 10. Reuse audit
 
