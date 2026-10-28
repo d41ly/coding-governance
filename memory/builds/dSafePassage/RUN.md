@@ -321,3 +321,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T02:48:01Z dispatch · item 166d170c TOOL-dSafePassage-42 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/push-main.sh tools/push-main.test.sh tools/run-gates/selftest-budgets.txt help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-42.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-42-ledger.md memory/map/generated/symbols.json
 
 2026-10-28T02:48:08Z brief · item TOOL-dSafePassage-42 · reason d32c89a21c39 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-42-build-brief.md
+
+2026-10-28T03:13:19Z rescope · item add TOOL-dSafePassage-71 · reason TOOL-dSafePassage-42's builder found the [dSP-36] staged-break arm in tools/govkit/selftest.py copying only govkit.py into its walk copy; upgrade_steps.py now imports fixture_target (TOOL-dSafePassage-5, -26), so the copy dies on ModuleNotFoundError before it can print isolation: FAILED and the arm reds govkit selftest; staged-break copies take every sibling module they import, gated as a class, adopted under M10 at order 10
