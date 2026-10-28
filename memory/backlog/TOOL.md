@@ -474,9 +474,19 @@ Cite ids, never line numbers.
 | [TOOL-dHonouredPark-8](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | --review keys its convergence loop on --subject alone, so a build's… |
 | [TOOL-dHonouredPark-9](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | The verdict-epoch bump is only ever discovered AFTER a red bar.… |
 | [TOOL-dHonouredPark-10](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | check 29 has no terminal-run exemption, so an ABORTED run that used the… |
-| [TOOL-dIndexedDesign-17](../builds/dIndexedDesign/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dIndexedDesign-18](../builds/dIndexedDesign/BACKLOG.md) | OPEN | LOW | — | 2026-10-23 | THE CARRIES INSTRUMENT READS NO AMENDMENT. carries.py (the bootstrap… |
-| [TOOL-dIndexedDesign-19](../builds/dIndexedDesign/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE repeat ROUTE READS A PLAYBOOK BY PATH. dKeptSession carries… |
+| [TOOL-dIndexedDesign-17](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | MED | TOOL-dIndexedDesign-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dIndexedDesign-18](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-16 | 2026-10-23 | THE CARRIES INSTRUMENT READS NO AMENDMENT. carries.py (the bootstrap… |
+| [TOOL-dIndexedDesign-19](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-10 | 2026-10-26 | THE repeat ROUTE READS A PLAYBOOK BY PATH. dKeptSession carries… |
+| [TOOL-dIndexedDesign-21](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-3 | 2026-10-28 | THE DESIGN AUDIT'S POLICY KEY IS READ AT THE LANDED REVISION.… |
+| [TOOL-dIndexedDesign-22](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-3 | 2026-10-28 | AN UNSET DERIVED-DEFAULT KEY IS A ROLES ERROR. TOOL-dBoundRoles-21 S1… |
+| [TOOL-dIndexedDesign-23](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-1 | 2026-10-28 | AN OWNING BUILD HAS NO WITNESS-READER CONTRACT TO ARM ITS STAND-IN… |
+| [TOOL-dIndexedDesign-24](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-13 | 2026-10-28 | THE SCOUT'S RETURN WOULD LAND A THIRD GRAMMAR. TOOL-aScoutedSeam-1 S5… |
+| [TOOL-dIndexedDesign-25](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-9 | 2026-10-28 | THE SECTION TABLE KEYS ON THE ORDINAL. TOOL-dTotalRecall-9's sections… |
+| [TOOL-dIndexedDesign-26](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | MED | TOOL-dIndexedDesign-12 | 2026-10-28 | implements ADMITS NO PINNED CLAUSE. PLAY-dOrderedCharter-28 S3 allows a… |
+| [TOOL-dIndexedDesign-27](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-15 | 2026-10-28 | THE plan WORKFLOW HAS NO HARNESS. TOOL-dBoundRoles-1 S4 gives the plan… |
+| [TOOL-dIndexedDesign-28](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-14 | 2026-10-28 | THE ### Bug classes FIELD DOES NOT READ THE SCOUT.… |
+| [TOOL-dIndexedDesign-29](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-20 | 2026-10-28 | ROW F6 READS NO FEATURE-LEVEL RE-ENTRY. TOOL-dDeclaredLoop-13's row F6… |
+| [TOOL-dIndexedDesign-30](../builds/dIndexedDesign/BACKLOG.md) | DEFERRED | LOW | TOOL-dIndexedDesign-20 | 2026-10-28 | TWO DECLARED-DIRECTION CLASSIFIERS. PLAY-dOrderedCharter-36 S5 specs a… |
 | [TOOL-dLinkedLibrary-26](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dLinkedLibrary-27](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-1 | 2026-10-26 | A REUSE ENTRY BESIDE ITS DOSSIER IS NO OVERLAY PART.… |
 | [TOOL-dLinkedLibrary-28](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-2 | 2026-10-26 | THE HOUSE INDEX HAS TWO SPECCED HOMES. TOOL-aScoutedSeam-1 S10 specs a… |
