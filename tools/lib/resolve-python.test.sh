@@ -326,6 +326,13 @@ run_down "$FT" "$(run_down_git rev-parse HEAD)"
 printf '[a]\nt = { x = 1,\n      y = 2 }\n' > "$FT/.governance/policy.toml"
 run_down "$FT" "$(run_down_git rev-parse HEAD)"
 { [ "$rc" = 1 ] && [[ $out == *".governance/policy.toml:"* ]]; } || bad "the down over a TOML 1.1 table in the adopter's policy file did not exit 1 naming it: rc=$rc $out"; ok
+# TOOL-dSafePassage-76 AC5: a <to> left out defaults to HEAD only on gov's own tree; an adopter's HEAD
+# is a commit gov's repository never holds, so there the down refuses at exit 2, saying <to> is required.
+out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FT" 2>&1); rc=$?; out=${out//$'\r'/}
+{ [ "$rc" = 2 ] && [[ $out == *"<to> is required outside gov's own tree"* ]]; } \
+  || bad "the down over an adopter with no <to> did not exit 2 saying <to> is required: rc=$rc $out"; ok
+out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FD" 2>&1); rc=$?; out=${out//$'\r'/}
+[ "$rc" != 2 ] || bad "the down over gov's own tree with no <to> exited 2, so its HEAD default is lost: $out"; ok
 
 # ---- 2. PARITY ----------------------------------------------------------------------------------
 # A TABLE of (marker, canonical source, exclude-prefix), not one hardcoded predicate. It held exactly

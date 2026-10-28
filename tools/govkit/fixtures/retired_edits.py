@@ -33,7 +33,7 @@ PFX = govkit.derive_tool_root(govkit.repo_root())
 PLANTS = ("fragment-withdrawn", "fragment-rollback", "edited-gone", "edited-row", "keep",
           "seed-retired-edited", "seed-retired-clean", "render-edited", "render-clean",
           "render-edited-no-oid", "render-eol-no-oid", "dispatch-gap", "edited-reshipped",
-          "edited-rolled-back", "render-edited-kill")
+          "edited-rolled-back", "render-edited-kill", "render-filter-broken")
 # Each stub is one statement over the scratch module `m`, run after it loads and before its `main`.
 STUBS = {
     "forked": 'm.UPDATE_ROLE["retired-edited"] = m.UPDATE_ROLE["forked"]',
@@ -332,9 +332,15 @@ def run_plant(tmp: pathlib.Path, plant: str, stub: str, write_withdrawals: bool,
     obs.append(("the render's recorded oid", "present" if any(
         f.get("path") == out_md and f.get("oid") for f in rec.get("files", [])) else "absent", "present"))
     edited = b"tpl v2\nthe target's edit\n"
-    if plant in ("render-edited", "render-edited-kill"):
+    if plant in ("render-edited", "render-edited-kill", "render-filter-broken"):
         (t / out_md).write_bytes(edited)
         write_commit(t, "the target edits the render")
+    if plant == "render-filter-broken":
+        # TOOL-dSafePassage-76 S6: the render mapped to a required clean filter that fails, so git
+        # cannot hash it and no clean hash can prove it unedited.
+        (t / ".gitattributes").write_text(f"{out_md} filter=broken\n", encoding="utf-8", newline="\n")
+        run_git(t, "config", "filter.broken.clean", "false")
+        run_git(t, "config", "filter.broken.required", "true")
     write_gov_files(g, {"tpl.md": "tpl v3\n", "eng.txt": "v3\n"})
     us = govkit.upgrade_steps
     if plant == "render-edited-kill":
@@ -370,11 +376,13 @@ def run_plant(tmp: pathlib.Path, plant: str, stub: str, write_withdrawals: bool,
                       ("the render", (read_bytes(t, out_md) or b"").decode(), "tpl v3\n")]
     rb = t / ".governance" / "outbox" / f"update-rollback-{DEMO}.md"
     rb_lines = rb.read_text(encoding="utf-8").splitlines() if rb.is_file() else []
-    return obs + [("verdict " + out_md, read_verdict(out, out_md), "render-edited"),
-                  ("the HELD BACK line", str(f"HELD BACK {DEMO}:" in out), "True"),
-                  ("render-edited orders", str(len(read_orders(t, "render-edited", out_md))), "1"),
-                  ("the edited bytes", "kept" if read_bytes(t, out_md) == edited else "overwritten",
-                   "kept"),
+    obs += [("verdict " + out_md, read_verdict(out, out_md), "render-edited"),
+            ("the HELD BACK line", str(f"HELD BACK {DEMO}:" in out), "True"),
+            ("render-edited orders", str(len(read_orders(t, "render-edited", out_md))), "1"),
+            ("the edited bytes", "kept" if read_bytes(t, out_md) == edited else "overwritten", "kept")]
+    if plant == "render-filter-broken":
+        return obs  # TOOL-dSafePassage-76 AC6: the hold, not what its rollback restores
+    return obs + [
                   # TOOL-dSafePassage-66 S2: put back before the walk, and still named by the order.
                   ("the demo kit's eng.txt", (read_bytes(t, eng) or b"").decode(), "v2\n"),
                   ("the order's restored line", str(f"restored  {eng}" in rb_lines), "True")]

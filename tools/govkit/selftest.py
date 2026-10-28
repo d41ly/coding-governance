@@ -3093,6 +3093,27 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
           "is not a step id" in read_refusal(lambda: steps.derive_image_path(g, "nope")))
     check("[dSP-1 S3] a before-image path climbing out of the target is refused",
           "is not a path inside the target" in read_refusal(lambda: steps.check_contained(g, "../x")))
+    # TOOL-dSafePassage-76 AC1: no before-image path inside the git directory, by a `.git` segment in
+    # any case with trailing dots or spaces, or by where it resolves, a separate git directory's too.
+    t76, s76 = tmp / "sp76-t", tmp / "sp76-sep"
+    subprocess.run(["git", "init", "-q", str(t76)], env=steps.build_tree_git_env(), capture_output=True, check=True)
+    subprocess.run(["git", "init", "-q", f"--separate-git-dir={s76 / 'gd'}", str(s76)],
+                   env=steps.build_tree_git_env(), capture_output=True, check=True)
+    for rel76 in (".git/hooks/post-checkout", ".GIT/config", ".git./x", ".git /x"):
+        got76 = read_refusal(lambda rel76=rel76: steps.check_contained(t76, rel76))
+        check(f"[dSP-76] a before-image path {rel76!r} inside the git directory is refused, naming it",
+              "inside the repository's git directory" in got76 and repr(rel76) in got76, got76)
+    check("[dSP-76] a plain before-image path inside the target is not refused",
+          read_refusal(lambda: steps.check_contained(t76, "docs/a.md")) == "")
+    got76 = read_refusal(lambda: steps.check_contained(s76, "gd/config"))
+    check("[dSP-76] a path inside a separate git directory is refused, naming that directory",
+          "inside the repository's git directory" in got76 and (s76 / "gd").resolve().as_posix() in got76, got76)
+    # S3's one parse: a working-tree image that does not parse is a refusal naming it, never a traceback.
+    (t76 / ".governance" / "steps" / "demo").mkdir(parents=True)
+    (t76 / ".governance" / "steps" / "demo" / "first.before.json").write_text("not json\n", encoding="utf-8")
+    got76 = read_refusal(lambda: steps.read_image_paths(t76, "demo/first"))
+    check("[dSP-76] a before-image that does not parse is refused by read_image_paths, naming it",
+          ".governance/steps/demo/first.before.json does not parse" in got76, got76)
     check("[dSP-1 S3] a value with no TOML scalar spelling is refused",
           "no TOML scalar spelling" in read_refusal(lambda: steps.render_toml_scalar([1])))
     im = tmp / "sp-image"
@@ -4455,6 +4476,10 @@ def check_step_walk() -> None:
                                           "walk: the re-run · fx/s3 applied · via None",
                                           "walk: failed record, no image · fx/s2 applied · via None",
                                           "walk: no record, image present · fx/s2 applied · via None")),
+            # TOOL-dSafePassage-76 AC2: a walk killed in s1's second witness; the re-run stages its writes.
+            ("walk", "kill-before-stage", 0, ("walk: after the kill · staged nothing · s1.txt and its image present",
+                                              "walk: the re-run · git diff --cached --name-only lists s1.txt yes · "
+                                              ".governance/steps/fx/s1.before.json yes · fx/s1 applied")),
             ("walk", "schema-3-kill", 0, (" whole · the up's temporary file present",
                                           "walk: the re-run's target and receipt equal an uninterrupted walk's")),
             ("lock", "lock-dead", 0, ("govkit update — reclaimed ", "lock: taken")),
@@ -4514,6 +4539,7 @@ def check_step_walk() -> None:
         out = p.stdout + p.stderr
         tag = ("dSP-15" if (plant or "").startswith("schema-3")
                else "dSP-40" if plant == "kill-after-up"
+               else "dSP-76" if plant == "kill-before-stage"
                else "dSP-33" if family == "walk" and plant in ("witness-holds", "fail-k")
                else "dSP-22" if plant == "lock-live-slow-census"
                else "dSP-31" if plant in ("lock-foreign-pidns", "lock-no-pidns")
@@ -4563,7 +4589,7 @@ def check_step_walk() -> None:
             rp.write_text('{"schema": 4, "steps": []}\n', encoding="utf-8")
             row = us.StepRow("fx/x", up, ["python", "-c", "pass"], witness, None, [], False, "fx", 1, None)
             try:
-                us.run_step_walk(HERE.parent.parent, t, rp, json.loads(rp.read_text(encoding="utf-8")), [row], "HEAD")
+                us.run_step_walk(HERE.parent.parent, t, rp, json.loads(rp.read_text(encoding="utf-8")), [row])
                 refused = ""
             except us.Refusal as e:
                 refused = str(e)
@@ -4645,6 +4671,15 @@ def check_step_rollback() -> None:
             # The four lines are anchored to the second walk's line, since the first reverse prints them too.
             ("rollback", "witness-only-reup", 0, ("rollback: fx/s2 recorded via witness after a rollback\n" + rolled
                                                   + "\nrollback: 4 reached · stopped at none", same)),
+            # TOOL-dSafePassage-76 AC3: a rollback killed after s1's down restored; the re-run stages
+            # the removals from the index's copy of the image, or refuses one that does not parse.
+            ("rollback", "kill-after-down-stage", 0, (
+                "rollback: after the kill · fx/s1 applied · down interrupted: ",
+                "rollback: the re-run · git diff --cached --name-status lists D s1.txt yes · "
+                "D .governance/steps/fx/s1.before.json yes · fx/s1 rolled-back")),
+            ("rollback", "kill-after-down-stage-garbled", 1, (
+                "rollback: refused · Refusal: fx/s1: the index's copy of its before-image .governance/steps/fx/s1.before.json",
+                "rollback: the re-run's refusal names the image and the restored paths to stage by hand: yes")),
             ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
                                         "in planted_caller\n")),
             ("rollback", "schema-step", 0, ("step fx/s1 · rolled-back\nstep govkit/receipt-schema-4 · rolled-back",
@@ -4688,6 +4723,12 @@ def check_step_rollback() -> None:
                 "rollback-update: re-run record · down govkit/receipt-schema-4: skipped (nothing applied)",
                 "rollback-update: the re-run's record equals the twin's line for line except started and the schema step",
                 "rollback-update: on t fx/s2's down ran 2 time(s) · fx/s1's down ran 2 time(s)")),
+            # TOOL-dSafePassage-76 AC4: a retired step id owing no down passes the rollback to B, and
+            # one owing a down refuses the rollback to A.
+            ("rollback-update", "retired-step", 1, (
+                "rollback-update: updated to C · exits 0 · fx/s2 applied",
+                "rollback-update: update --rollback --to B --write exits 0 · update --rollback --to A --write "
+                "exits 2, naming fx/s2, its [[retired]] row and that its down is owed: yes")),
             ("rollback-update", "schema-up-kill", 0, (
                 "rollback-update: after the kill · gov_commit A · tools/demo/one.txt row at B",
                 "rollback-update: the rollback exits 0 · tools/demo/one.txt b'v1\\n' · schema 3 · no steps · gov_commit A"))):
@@ -4695,6 +4736,7 @@ def check_step_rollback() -> None:
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
         tag = ("dSP-49" if plant == "rolled-back-witness-holds"
+               else "dSP-76" if plant in ("kill-after-down-stage", "kill-after-down-stage-garbled", "retired-step")
                else "dSP-73" if plant == "witness-only-reup"
                else "dSP-62" if plant == "schema-up-kill"
                else "dSP-70" if plant == "schema-step-kill-shipped-rows"
@@ -19335,6 +19377,9 @@ user_skills = "/tmp/gk-fake-skills"
     # inside `fx/s1` leaves it at its pre-run bytes and row; `render-edited` above carries AC2's
     # `eng.txt` and the order's `restored` line.
     _rte_cases += [("[dSafePassage-66] plant render-edited-kill matches its case", ["render-edited-kill"], 0)]
+    # TOOL-dSafePassage-76 AC6: a render git cannot hash through a failing required clean filter
+    # reads edited, so its kit is held, its order written and its bytes kept.
+    _rte_cases += [("[dSafePassage-76] plant render-filter-broken matches its case", ["render-filter-broken"], 0)]
     _rte_cases += [(f"[dSafePassage-9] plant {_pl} --stub {_st} stages its red", [_pl, "--stub", _st], 1)
                    for _pl, _st in (("edited-row", "forked"), ("keep", "report-omits"),
                                     ("render-edited", "today"), ("seed-retired-edited", "seed-override"),

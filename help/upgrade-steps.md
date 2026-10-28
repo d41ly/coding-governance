@@ -74,7 +74,10 @@ starts it:
   repository git will not open, such as one of a newer repository format than the installed git
   knows, refuses the step naming its git directory, though git reads its config with only a
   warning: no step reaches its keys through git. A nested submodule's path is mapped through its parent's
-  `.gitmodules` where the parent is checked out, and is its name, marked `by name`, where not. The check
+  `.gitmodules` where the parent is checked out, and is its name, marked `by name`, where not. A
+  refusal by the walk itself, a link, a `.gitmodules` or a config that does not read, or a
+  repository git will not open, reads `the repositories a step could enter from the target
+  could not be cleared: <reason>`; only a refused key reads that your config declares it. The check
   reads the submodules of the target's own worktree: in a linked worktree (`git worktree add`)
   that is `.git/worktrees/<name>/modules/`, never the main worktree's `.git/modules/`, which a step
   run in the linked worktree never enters. The refused keys are the class the check names among
@@ -184,7 +187,7 @@ Below schema 4 no step row is persisted: a step's failure or interruption on suc
 only in `update`'s output and findings. The `govkit/receipt-schema-4` row itself is written once
 that step's re-read of the receipt shows schema 4, like any other row. A row is recorded only on a
 receipt whose `schema` is a number of 4 or more and whose `steps` is a list; anything else is
-refused. Until the deployer runs steps itself, run the step by hand: <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#up 051ba178 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#witness f462d008 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#down a555ef91 -->
+refused. `update --write` walks this step like any other; to run it by hand outside a walk: <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#up 051ba178 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#witness f462d008 --> <!-- usage: script:tools/govkit/steps/receipt_schema_4.py#down a555ef91 -->
 
 ```sh
 python tools/govkit/steps/receipt_schema_4.py up <repo>       # schema 3 -> 4
@@ -210,7 +213,10 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
   whole or not at all. An image cut short by an older writer counts as absent when none of the
   paths it lists changed after it, and is written again. Where one did change, the up stops with
   exit 1 and names the image: its before bytes are gone, so put those paths back by hand and
-  remove the image.
+  remove the image. A path a before-image lists inside your repository's git directory, `.git` in
+  any case or wherever `git rev-parse --absolute-git-dir` points, is refused, so no up or down
+  writes there. A run after a kill stages the writes and the before-image a killed step
+  left unstaged, and a rollback run again after a kill stages what the killed down restored.
 - **A stopped walk.** An up that exits non-zero (`exit <rc>: <its last stderr line>`, or a line
   saying it wrote nothing on stderr and giving its last stdout line), or a witness
   that still fails after it (`witness does not hold after up`), stops the walk. The steps before it
@@ -221,7 +227,9 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
   it yourself; the next `update --write` skips the step once its witness holds.
 - **Read-only, and `--kits`.** Without `--write`, `update` prints `would walk <id>` for each pending
   step and runs none of them, witnesses included. A `--kits` run walks none and prints `steps: not
-  walked` with the pending count; the next run without `--kits` walks them.
+  walked` with the pending count; the next run without `--kits` walks them. A write run that
+  already has a finding walks none either, and prints `steps: not walked — this run already has
+  <n> finding(s) · <n> pending` in place of the count line.
 
 Every write run prints one line with every count, zeros included:
 `govkit update — steps: <n> pending · <a> applied · <s> skipped · stopped at <id|none>`.
@@ -275,13 +283,13 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
 - **When.** `<rev>` must be an ancestor of the receipt's `gov_commit`. A receipt with no
   `gov_commit`, a `<rev>` that is not an ancestor, `--rollback` with `--kits`, and a `<rev>` equal to
   the receipt's commit with no step to undo are each refused, naming why. Without `--to`,
-  `--rollback` does nothing.
+  `--rollback` does nothing. A receipt recording a step id a `[[retired]]` row names is refused
+  only where that step was introduced after `<rev>`, since its down is owed and no row declares one.
 - **What runs, in what order.** Every step introduced after `<rev>` that the receipt records
   `applied` or `failed`, or records nowhere, runs its `down`, newest first, so
-  `govkit/receipt-schema-4` comes last. A step recorded nowhere, or `rolled-back`, runs its witness
-  first and is skipped where the witness does not hold: `step <id> · skipped (nothing applied)`.
-  One recorded `rolled-back` whose witness holds is downed again, recorded `applied` meanwhile,
-  never `rolled-back` with a failure. A step that runs its down is marked `down interrupted: started <utc>, no exit recorded` before it
+  `govkit/receipt-schema-4` comes last. A step recorded nowhere runs its witness first and is
+  skipped where the witness does not hold: `step <id> · skipped (nothing applied)`. A step the
+  receipt already records `rolled-back` when the run starts is not downed again. A step that runs its down is marked `down interrupted: started <utc>, no exit recorded` before it
   starts, where the receipt holds `steps`, and reads `rolled-back` once the down exits 0 and is judged to have taken effect; what
   the down restored is staged. All of this happens before any file moves; then the files return to
   `<rev>`'s bytes as any `update --to <rev>` moves them, and the receipt's `gov_commit` is set to

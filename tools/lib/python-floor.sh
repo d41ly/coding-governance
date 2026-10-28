@@ -3,7 +3,7 @@
 # (TOOL-dSafePassage-11). The floor is declared once, in python-floor.txt beside this file.
 #
 #   bash <prefix>/lib/python-floor.sh preflight              # the step's up and its witness
-#   bash <prefix>/lib/python-floor.sh down <prior> <target> [<to>]  # the step's down, <to> the target's HEAD by default
+#   bash <prefix>/lib/python-floor.sh down <prior> <target> [<to>, required outside gov]  # the step's down, <to> gov's HEAD by default on gov's own tree
 #   bash <prefix>/lib/python-floor.sh floor                  # the declared floor, checked
 #
 # `preflight` sources the one resolver and calls it, so it refuses exactly as every gate and hook
@@ -42,5 +42,5 @@ case "${1:-}:$#" in
       printf 'python-floor: %s must be one <major>.<minor> line, and it reads %q\n' "$HERE/python-floor.txt" "$v" >&2; exit 1
     fi
     ;;
-  *) echo "usage: bash <prefix>/lib/python-floor.sh preflight | down <prior> <target> [<to>] | floor" >&2; exit 2 ;;
+  *) echo "usage: bash <prefix>/lib/python-floor.sh preflight | down <prior> <target> [<to>, required outside gov] | floor" >&2; exit 2 ;;
 esac

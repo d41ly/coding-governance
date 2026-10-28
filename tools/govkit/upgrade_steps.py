@@ -47,8 +47,9 @@ null for absent) and the sha256 the up leaves there (null for removed). An exist
 overwritten, so a re-run over a killed up computes from the first image and converges. The down,
 `write_from_before_image`, restores each path only where it still holds the image's after-hash or
 its before bytes, else refuses naming the path and restores nothing, so a later edit is never
-discarded silently; then it removes the image. A step program imports this file by its own path,
-because the runner's `-I` drops the script directory from `sys.path`.
+discarded silently; then it removes the image. No path an image lists may lie in the target's git
+directory, by its spelling or by where it resolves (TOOL-dSafePassage-76). A step program imports
+this file by its own path, because the runner's `-I` drops the script directory from `sys.path`.
 
 THE RECEIPT'S `steps` (TOOL-dSafePassage-3). A schema-4 receipt records each step's progress as
 `{"id", "introduced", "state"}` rows, `state` applied, failed (adding `failure`) or rolled-back; an
@@ -88,6 +89,8 @@ receipt records applied or failed, or records nowhere, newest first: per step it
 `reverted = "down-exit"` or with no before-image at the spawn on a row the receipt records nowhere or
 `applied` with `"via": "witness"` (TOOL-dSafePassage-33), else its witness, which must no longer
 hold, before the row reads `rolled-back`; the first stop ends the walk, and a re-run resumes there.
+A receipt id gov's HEAD no longer declares is refused before any down, but for one a `[[retired]]`
+row names that owes no down to `<rev>` (TOOL-dSafePassage-76).
 `write_rollback_record` begins `.governance/outbox/update-reverted-<from8>-<to8>.md` before the
 first down and finishes it before `update` returns. `fixture rollback|rollback-update` observe it.
 
@@ -107,6 +110,7 @@ from __future__ import annotations
 
 import ast
 import base64
+import functools
 import hashlib
 import importlib.util
 import json
@@ -1056,7 +1060,9 @@ def check_contained(target, rel: str) -> pathlib.Path:
     """`target`/`rel` normalised, refused where `derive_contained_rel` reads it as leaving the target,
     and where any existing segment on it from the target down is a link or other reparse point, or
     does not read as a path on this node (TOOL-dSafePassage-72 S3, S4). The walk stops at the first
-    segment that is absent or a file. The target root itself is not tested: callers resolve it."""
+    segment that is absent or a file. The target root itself is not tested: callers resolve it. A
+    path in the git directory is refused too, by a `.git` segment in any case with trailing dots or
+    spaces stripped, or where it resolves at or under `read_git_dir` (TOOL-dSafePassage-76 S1)."""
     norm = derive_contained_rel(rel)
     if norm is None:
         raise Refusal(f"'{rel}' is not a path inside the target, so no step may write it")
@@ -1073,7 +1079,28 @@ def check_contained(target, rel: str) -> pathlib.Path:
                           f"write follows, so where it leads is unknown")
         if not cur.is_dir():  # absent, or a file: nothing below it exists
             break
+    # TOOL-dSafePassage-76 S1: never into the git directory, by its spelling (any case, trailing dots
+    # or spaces) and then by where the path resolves, which catches a short name and a separate one.
+    if any(seg.casefold().rstrip(". ") == ".git" for seg in norm.split("/")):
+        raise Refusal(f"'{rel}' is inside the repository's git directory, so no step may write it")
+    gd = read_git_dir(pathlib.Path(target).resolve())
+    if gd and (pathlib.Path(target) / norm).resolve().is_relative_to(gd):
+        raise Refusal(f"'{rel}' is inside the repository's git directory {gd.as_posix()}, so no step "
+                      f"may write it")
     return pathlib.Path(target) / norm
+
+
+@functools.lru_cache(maxsize=None)
+def read_git_dir(target: pathlib.Path) -> pathlib.Path | None:
+    """The resolved git directory of the resolved `target`, `git rev-parse --absolute-git-dir` run
+    under `build_step_env` as `read_target_repositories` runs it (TOOL-dSafePassage-76 S1); None where
+    git names none, a target outside any repository."""
+    # ponytail: a target whose git directory moves mid-process reads the old one; no step moves it
+    with tempfile.TemporaryDirectory(prefix="gk-gitdir-", ignore_cleanup_errors=True) as td:
+        p = subprocess.run(["git", "-C", str(target), "rev-parse", "--absolute-git-dir"], env=build_step_env(td),
+                           stdin=subprocess.DEVNULL, capture_output=True)
+    out = p.stdout.decode("utf-8", "replace").strip()
+    return pathlib.Path(out).resolve() if p.returncode == 0 and out else None
 
 
 def write_before_image(target, step_id: str, derive_after) -> dict[str, bytes | None]:
@@ -1696,8 +1723,8 @@ def check_target_local_config(target) -> list[str]:
     `test_credential_bearing` holds True for, as `<key> in <file>`, `(submodule <path>)` after it
     for a row outside the target's own repository, every entry through `render_redacted_config`
     and none carrying a value (TOOL-dSafePassage-24 S2, TOOL-dSafePassage-29 S1,
-    TOOL-dSafePassage-30 S3, TOOL-dSafePassage-38 S1 S2); a read that failed is the one entry,
-    naming git's exit."""
+    TOOL-dSafePassage-30 S3, TOOL-dSafePassage-38 S1 S2). A walk or read that failed is a `Refusal`
+    carrying its reason through `render_redacted_config`, never a found key (TOOL-dSafePassage-76 S8)."""
     def refused(origin: str, key: str, value: str | None, via: str) -> bool:
         return test_credential_bearing(key, value) or any(
             re.fullmatch(re.sub(r"<[^>]+>", ".+", re.escape(pattern)), key, re.I)
@@ -1710,7 +1737,7 @@ def check_target_local_config(target) -> list[str]:
 
     rows = read_target_local_config(target, refused)
     if isinstance(rows, str):
-        return [render_redacted_config(rows)]
+        raise Refusal(render_redacted_config(rows))
     return [render_redacted_config(key) + render_redacted_config(f" in {origin}" + (f" (submodule {via})" if via else ""))
             for origin, key, value, via in rows if refused(origin, key, value, via)]
 
@@ -1733,7 +1760,11 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root, to: str | None
         return {"verdict": "attended", "rc": None, "tail": ""}
     if phase not in STEP_PHASES or not isinstance(getattr(row, phase), list):
         raise Refusal(f"{row.id}: no `{phase}` argv to run; a step runs one of {', '.join(STEP_PHASES)}")
-    found = check_target_local_config(target)
+    try:
+        found = check_target_local_config(target)
+    except Refusal as e:
+        raise Refusal(f"{row.id} {phase}: the repositories a step could enter from the target could not be "
+                      f"cleared: {e}, so nothing was spawned") from None
     if found:
         raise Refusal(f"{row.id} {phase}: the target's own git config declares what git runs as a program "
                       f"or sends as a credential, {', '.join(found)}, so nothing was spawned: remove it, "
@@ -1939,17 +1970,36 @@ def run_step_reread(row: StepRow, phase: str, target, gov_root, receipt_path, re
     return got
 
 
-def read_image_paths(target, step_id: str) -> list[str]:
+def read_image_paths(target, step_id: str, index: bool = False) -> list[str]:
     """Every path `step_id`'s before-image at `target` lists, each refused where it is not inside the
     target, then the image's own path; [] where there is no image. Read before a down, which takes
-    the image away."""
+    the image away. With `index`, the image is the copy the index holds, `git show :<image path>`,
+    which outlives a down killed before its staging (TOOL-dSafePassage-76 S3): graded as the working
+    tree's is. An image that does not parse or lists no paths, from either source, is a refusal
+    naming it, never a traceback."""
     image = derive_image_path(target, step_id)
-    if not image.is_file():
+    rel = image.relative_to(target).as_posix()
+    if index:
+        data = run_git(target, "show", f":{rel}")
+        if data is None:
+            return []
+    elif not image.is_file():
         return []
-    paths = sorted(json.loads(image.read_text(encoding="utf-8"))["paths"])
+    try:
+        held = json.loads(data.decode("utf-8") if index else image.read_text(encoding="utf-8"))["paths"]
+        if not (isinstance(held, dict) and held):
+            raise ValueError("no paths")
+        paths = sorted(held)
+    except (ValueError, KeyError, TypeError):
+        if not index:
+            raise Refusal(f"{step_id}: its before-image {rel} does not parse or lists no paths, so which "
+                          f"paths its step wrote is unknown; put back its committed copy, then run again") from None
+        raise Refusal(f"{step_id}: the index's copy of its before-image {rel} does not parse or lists no "
+                      f"paths, so which paths its down restored is unknown and none was staged; stage "
+                      f"the restored paths and the image's removal by hand, then run the rollback again") from None
     for p in paths:
         check_contained(target, p)  # the image is a step's output: no path outside the target
-    return paths + [image.relative_to(target).as_posix()]
+    return paths + [rel]
 
 
 def write_step_staged(target, step_id: str, paths: list[str], then: str) -> None:
@@ -1967,13 +2017,13 @@ def write_step_staged(target, step_id: str, paths: list[str], then: str) -> None
                           f"({', '.join(group)}), so they are not staged; {then}")
 
 
-def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[StepRow],
-                  to_commit: str) -> dict:
+def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[StepRow]) -> dict:
     """Walk `rows`, the pending steps in order, over `target` (TOOL-dSafePassage-2 S2), every spawn
     through `run_step_isolated`. Per step: (1) its witness; exit 0 records `applied`, with `"via":
     "witness"` (TOOL-dSafePassage-33) only where the receipt held no record of the step, or a
     `rolled-back` one, when this walk began and no before-image exists (TOOL-dSafePassage-40, -73's
-    `test_up_unrecorded`), its up never spawned; (2) a row needing target code records `failed` (`attended: ...`), writes the attended
+    `test_up_unrecorded`), its up never spawned; where a before-image exists, the paths it lists and
+    the image are staged first, a killed up's writes (TOOL-dSafePassage-76 S2); (2) a row needing target code records `failed` (`attended: ...`), writes the attended
     order and stops; (3) records `failed` (`interrupted: started <utc>, no exit recorded`) BEFORE
     the spawn, so a walk killed with its step leaves that failure; (4) runs the row's `resume` argv
     where the receipt held a `failed` row for it when this walk began and `resume` is an argv, else
@@ -2021,7 +2071,13 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
             # TOOL-dSafePassage-33 S2: the mark that lets the reverse walk read a missing image as
             # "never ran"; move 5 below, after an up, passes none. TOOL-dSafePassage-40 S1: only
             # where nothing says an up spawned; TOOL-dSafePassage-73 S2: the reverse walk's question.
-            fresh = test_up_unrecorded(began.get(row.id), derive_image_path(target, row.id).exists())
+            image = derive_image_path(target, row.id).exists()
+            fresh = test_up_unrecorded(began.get(row.id), image)
+            if image:
+                # TOOL-dSafePassage-76 S2: an up killed after its second witness left its writes and
+                # its image unstaged; they are staged here, as move 5 would have.
+                write_step_staged(target, row.id, read_image_paths(target, row.id),
+                                  "the step stays recorded interrupted and the next walk runs it again")
             unrecorded = persist(row, "applied", via="witness" if fresh else None)
             print(f"step {row.id} · skipped (witness holds){unrecorded}")
             out["skipped"] += 1
@@ -2077,10 +2133,28 @@ def derive_reverse_steps(gov_root, receipt: dict, to_commit: str) -> list[StepRo
     `read_steps` reads at gov's HEAD whose introducing commit is not an ancestor of `to_commit`, an
     unlanded row included, and which the receipt's `steps` records `applied` or `failed`, or records
     nowhere; in the reverse of the walk order, so the steps file's first row is downed last. A
-    receipt row whose id HEAD no longer declares is refused before any down: its down is unknown."""
-    rows = read_steps(gov_root, "HEAD", resolve_landed_ref(gov_root) or "")
+    receipt row whose id HEAD no longer declares is refused before any down: its down is unknown,
+    but for an id a `[[retired]]` row of HEAD names (TOOL-dSafePassage-76 S4), which passes where it
+    is recorded `rolled-back` or was introduced at an ancestor of `to_commit`, so it owes no down,
+    and is refused otherwise; nothing is read from its successor."""
+    landed = resolve_landed_ref(gov_root) or ""
+    rows = read_steps(gov_root, "HEAD", landed)
     recorded = {r["id"]: r["state"] for r in read_step_states(receipt)}
     gone = sorted(set(recorded) - {r.id for r in rows})
+    retired = {r.id: r for r in read_retired(gov_root, "HEAD", None)} if gone else {}
+    owed = [sid for sid in gone if sid in retired and recorded[sid] != "rolled-back"]
+    if owed:
+        tr, reg_rel, _raw, _entries = read_registry_at(gov_root, resolve_rev(gov_root, "HEAD"))
+        hit = derive_introduced(gov_root, landed, [reg_rel[:-len(REGISTRY_FILE)] + STEPS_FILE], "upgrade",
+                                owed, registry=(reg_rel, tr))
+        for sid in owed:
+            if sid not in hit or run_git(gov_root, "merge-base", "--is-ancestor", hit[sid][0], to_commit) is None:
+                r = retired[sid]
+                raise Refusal(f"the receipt records the step {sid} {recorded[sid]}, which {r.file} [[retired]] "
+                              f"row {r.row} retires, and it was not introduced at an ancestor of "
+                              f"{to_commit[:8]}, so its down is owed and no row declares one; nothing was "
+                              f"rolled back")
+    gone = [sid for sid in gone if sid not in retired]
     if gone:
         raise Refusal(f"the receipt records the step(s) {', '.join(gone)}, which gov's HEAD no longer "
                       f"declares, so no down argv is known for them; nothing was rolled back")
@@ -2130,7 +2204,8 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
     check exits <rc>`, else its witness, exit 0 stopping with `witness still holds after down`,
     `; before-image <path> absent` added where the row had no image; a
     down that took effect stages the paths its before-image listed (read before the down took the
-    image away) and the image, and records `rolled-back`. A
+    image away), or with none read, those of the image the index holds (TOOL-dSafePassage-76 S3),
+    and the image, and records `rolled-back`. A
     `failed` row is downed like an `applied` one: the down is what tolerates a partial up.
 
     After the down's re-read, `test_steps_recordable` decides whether that row's records are written
@@ -2205,8 +2280,10 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
             if recordable:
                 write_step_record(receipt_path, receipt, row, state, failure)
             return stop(row, failure)
-        write_step_staged(target, row.id, paths, "the step stays recorded down interrupted and the "
-                          "next rollback runs its down again")
+        # TOOL-dSafePassage-76 S3: a re-run after a down killed before this staging finds no image
+        # in the working tree, so the index's copy names what that down restored.
+        write_step_staged(target, row.id, paths or read_image_paths(target, row.id, index=True),
+                          "the step stays recorded down interrupted and the next rollback runs its down again")
         if recordable:
             write_step_record(receipt_path, receipt, row, "rolled-back")
         print(f"step {row.id} · rolled-back")
@@ -3337,6 +3414,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                     "modules-not-a-directory": "/.git/modules/a/modules does not list (NotADirectoryError"}.get(
                         kind, "/.gitmodules does not read")
             expect(name in refused and not done.exists(), f"the step was not refused naming `{name}`, or it spawned")
+            # TOOL-dSafePassage-76 S8: the walk's own refusal, never blamed on a config key
+            lead = f"{status.id} up: the repositories a step could enter from the target could not be cleared: "
+            expect(refused.startswith(lead), f"the refusal does not begin `{lead}`: {refused}")
         elif plant.endswith("-stub"):
             expect(not refused and done.exists(), "the stubbed check still refused, so nothing spawned")
             if kind != "unpopulated":
@@ -3380,7 +3460,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
 # then the pid and `<slug>.blocking`, and waits to be killed; `<slug>.block-after` does the same
 # after its first file (TOOL-dSafePassage-4). Its down writes `<slug>.down-saw`, each target file's
 # path and sha256 as the down found them (`<slug>.down-block` blocking first, TOOL-dSafePassage-39),
-# then restores from the image, `<slug>.down-fails` exiting
+# then restores from the image, `<slug>.down-block-after` blocking once it has (TOOL-dSafePassage-76),
+# `<slug>.down-fails` exiting
 # 1 first and `<slug>.down-keeps` exiting 0 with nothing restored; `<slug>.down-lowers` then sets the
 # receipt to schema 3 and takes `steps` out, as the schema step's down does (TOOL-dSafePassage-18).
 # `<slug>.witness-absent` makes its witness "the file is absent", and `<slug>.witness-always` one
@@ -3419,6 +3500,8 @@ if verb == "down":
         sys.exit(1)
     if not (reports / f"{slug}.down-keeps").exists():
         steps.write_from_before_image(target, f"fx/{slug}")
+        if (reports / f"{slug}.down-block-after").exists():
+            block()
     if (reports / f"{slug}.down-lowers").exists():
         import json
         rp = target / ".governance" / "install.json"
@@ -3448,11 +3531,12 @@ spec.loader.exec_module(us)
 gov, target, to = pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3]), sys.argv[4]
 rp = target / ".governance" / "install.json"
 receipt = json.loads(rp.read_text(encoding="utf-8"))
-out = us.run_step_walk(gov, target, rp, receipt, us.derive_pending_steps(gov, receipt, to), to)
+out = us.run_step_walk(gov, target, rp, receipt, us.derive_pending_steps(gov, receipt, to))
 print(f"walk: {out['pending']} pending · {out['applied']} applied · {out['skipped']} skipped · stopped at {out['stopped'] or 'none'}")
 sys.exit(1 if out["stopped"] else 0)
 '''
-# One reverse walk toward `to`, as `update --rollback` runs it (TOOL-dSafePassage-4). A fifth
+# One reverse walk toward `to`, as `update --rollback` runs it (TOOL-dSafePassage-4), a refusal
+# printed `rollback: refused · Refusal: <reason>` and exiting 1 (TOOL-dSafePassage-76). A fifth
 # argument, a step id, is recorded `rolled-back` after the rows are derived and before the walk
 # reads the receipt (TOOL-dSafePassage-49 S5), as a concurrent down would leave it.
 FIXTURE_REVERSE_CHILD = r'''import importlib.util, json, pathlib, sys
@@ -3470,7 +3554,11 @@ if len(sys.argv) > 5:
     rp.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"rollback: rows derived {[r.id for r in rows]} · then {sys.argv[5]} recorded "
           f"{next(r['state'] for r in us.read_step_states(receipt) if r['id'] == sys.argv[5])}")
-out = us.run_reverse_walk(gov, target, rp, receipt, rows, to)
+try:
+    out = us.run_reverse_walk(gov, target, rp, receipt, rows, to)
+except us.Refusal as e:
+    print(f"rollback: refused · Refusal: {e}")
+    sys.exit(1)
 print(f"rollback: {len(out['downs'])} reached · stopped at {out['stopped'] or 'none'}")
 print(f"rollback: verdicts {out['downs']}")
 sys.exit(1 if out["stopped"] else 0)
@@ -3533,7 +3621,7 @@ while sys.argv[4] != "-" and not pathlib.Path(sys.argv[4]).exists() and time.tim
 '''
 WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSafePassage-15
 WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending",
-               "truncated-image", "kill-after-up") + WALK_SCHEMA_PLANTS
+               "truncated-image", "kill-after-up", "kill-before-stage") + WALK_SCHEMA_PLANTS
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-foreign-namespace", "lock-unreadable",
                "lock-foreign-pidns", "lock-no-pidns", "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot",
                "lock-other-boot", "lock-no-namespace")
@@ -3544,11 +3632,12 @@ NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePass
 DOWN_KILLED_PLANTS = ("witness-only-down-killed", "unrecorded-witness-down-killed")  # TOOL-dSafePassage-39
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
                    "callers", "witness-only", "image-lost", "kill-after-up-image-lost",
-                   "rolled-back-witness-holds", "witness-only-reup") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
+                   "rolled-back-witness-holds", "witness-only-reup", "kill-after-down-stage",
+                   "kill-after-down-stage-garbled") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
 ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp",  # TOOL-dSafePassage-19
                                  "schema-step-kill-shipped-rows")  # TOOL-dSafePassage-70
 ROLLBACK_UPDATE_PLANTS = (("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
-                          + ("schema-up-kill",))  # TOOL-dSafePassage-62
+                          + ("schema-up-kill", "retired-step"))  # TOOL-dSafePassage-62, -76
 
 
 def build_fixture_env(**extra: str) -> dict[str, str]:
@@ -3859,16 +3948,44 @@ def run_walk_fixture(plant: str | None) -> int:
             expect(s3.get("state") == "applied" and "via" not in s3 and rc == 0,
                    "s3, whose up ran before the kill, is marked applied via its witness")
             image2 = derive_image_path(pathlib.Path("."), "fx/s2").as_posix()
+            # TOOL-dSafePassage-76 S2: move 1 now reads an image it finds, so the planted one is whole.
+            whole2 = json.dumps({"step": "fx/s2", "paths": {"s2.txt": {
+                "after": hashlib.sha256(b"s2\n").hexdigest(), "before": None}}}, indent=2, sort_keys=True) + "\n"
             for name, what, pre, files in (
                     ("t2", "failed record, no image",
                      [{"id": "fx/s2", "introduced": sha["B"], "state": "failed", "failure": "exit 1: fx"}], {}),
-                    ("t3", "no record, image present", None, {image2: "{}\n"})):
+                    ("t3", "no record, image present", None, {image2: whole2})):
                 tt = build_case_target(name, pre, {"s2.txt": "s2\n", **files})
                 rc_t, _out = walk(tt)
                 s2 = next((r for r in read_receipt_steps(tt) if r["id"] == "fx/s2"), {})
                 print(f"walk: {what} · fx/s2 {s2.get('state')} · via {s2.get('via')}")
                 expect(s2.get("state") == "applied" and "via" not in s2 and rc_t == 0,
                        f"s2 ({what}) is marked applied via its witness")
+        elif plant == "kill-before-stage":
+            # TOOL-dSafePassage-76 AC2: killed in s1's second witness, after its up wrote and before
+            # move 5 staged; the re-run passes s1 by its witness and must stage what the up wrote.
+            t = build_case_target("t")
+            fx = t.with_name("t.fx")
+            fx.mkdir()
+            (fx / "s1.witness-block").touch()
+            argv = [sys.executable, "-c", FIXTURE_WALK_CHILD, str(HERE / "upgrade_steps.py"), str(gov), str(t), sha["C"]]
+            why = run_killed(argv, fx, "s1", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            (fx / "s1.witness-block").unlink()
+            image = derive_image_path(pathlib.Path("."), "fx/s1").as_posix()
+            staged = run_fixture_git(t, "diff", "--cached", "--name-only").splitlines()
+            print(f"walk: after the kill · staged {staged or 'nothing'} · s1.txt and its image "
+                  f"{'present' if (t / 's1.txt').is_file() and (t / image).is_file() else 'NOT both present'}")
+            expect(not staged and (t / "s1.txt").is_file() and (t / image).is_file(),
+                   "the kill did not land after s1's up wrote, before anything was staged")
+            rc, out = walk(t)
+            staged = run_fixture_git(t, "diff", "--cached", "--name-only").splitlines()
+            s1 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s1"), {})
+            print(f"walk: the re-run · git diff --cached --name-only lists s1.txt "
+                  f"{'yes' if 's1.txt' in staged else 'NO'} · {image} {'yes' if image in staged else 'NO'} · "
+                  f"fx/s1 {s1.get('state')}")
+            expect("s1.txt" in staged and image in staged, "the re-run did not stage s1's write and its before-image")
+            expect(s1.get("state") == "applied" and rc == 0, f"fx/s1 does not read applied, or the re-run exited {rc}")
         elif plant == "attended":
             t = build_case_target("t")
             rc, out = walk(t)
@@ -4463,7 +4580,10 @@ def run_rollback_fixture(plant: str | None) -> int:
     DOWN_KILLED_PLANTS (TOOL-dSafePassage-39) kill the first reverse walk in `witness-only`'s s2's
     down, the second after taking s2's row out of the receipt, and the re-run must down s2 by its exit.
     `witness-only-reup` (TOOL-dSafePassage-73) runs `witness-only`'s walk and reverse walk, then a
-    second walk, which must mark s2 `via` its witness again, before the reverse walk below."""
+    second walk, which must mark s2 `via` its witness again, before the reverse walk below.
+    `kill-after-down-stage` (TOOL-dSafePassage-76) commits the walk's staging, kills the reverse
+    walk once s1's down restored, before its staging, and the re-run must stage both removals from
+    the index's copy of the image; `-garbled` overwrites that copy first, its re-run refusing, 1."""
     if plant == "callers":
         texts = {p.name: p.read_text(encoding="utf-8") for p in (pathlib.Path(__file__).resolve(), HERE / "govkit.py")}
         rc = run_callers_probe(texts)
@@ -4558,6 +4678,29 @@ def run_rollback_fixture(plant: str | None) -> int:
             receipt["steps"] = [r for r in receipt["steps"] if r["id"] != "fx/s2"]
             rp.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
             expect((t / "s2.txt").is_file(), "s2's file is not present for the unrecorded plant")
+        elif plant in ("kill-after-down-stage", "kill-after-down-stage-garbled"):
+            # TOOL-dSafePassage-76 AC3: the walk's staging committed, as an adopter commits an update,
+            # then the reverse walk killed once s1's down restored, before its staging; the reverse()
+            # below is the re-run. `-garbled` overwrites the index's image with bytes that are no JSON.
+            run_fixture_git(t, "commit", "-qm", "at C")
+            (fx / "s1.down-block-after").touch()
+            why = run_killed([sys.executable, "-c", FIXTURE_REVERSE_CHILD, str(HERE / "upgrade_steps.py"),
+                              str(gov), str(t), sha["A"]], fx, "s1", env)
+            expect(why is None, f"the kill was not staged: {why}")
+            (fx / "s1.down-block-after").unlink()
+            image = derive_image_path(pathlib.Path("."), "fx/s1").as_posix()
+            s1 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s1"), {})
+            gone = not (t / "s1.txt").exists() and not (t / image).exists()
+            indexed = run_fixture_git(t, "ls-files", "--", "s1.txt", image).splitlines()
+            print(f"rollback: after the kill · fx/s1 {s1.get('state')} · {s1.get('failure')} · s1.txt and its image "
+                  f"{'restored away' if gone else 'NOT both gone'} · the index holds {indexed}")
+            expect(s1.get("state") == "applied" and str(s1.get("failure", "")).startswith(DOWN_STOP_PREFIXES[0])
+                   and gone and sorted(indexed) == sorted(["s1.txt", image]),
+                   "the kill did not land after s1's down restored and before its staging")
+            if plant.endswith("-garbled"):
+                oid = subprocess.run(["git", "-C", str(t), "hash-object", "-w", "--stdin"], input=b"not json\n",
+                                     capture_output=True, env=env).stdout.decode("ascii").strip()
+                run_fixture_git(t, "update-index", "--cacheinfo", f"100644,{oid},{image}")
         elif plant == "witness-only-reup":
             # TOOL-dSafePassage-73 S5: down to A and up to C again; s2, recorded rolled-back as the
             # second walk begins, its witness holding with no up and no image, keeps its mark.
@@ -4721,6 +4864,24 @@ def run_rollback_fixture(plant: str | None) -> int:
                 same = (t2 / ".governance" / "install.json").read_bytes() == rp.read_bytes()
                 print(f"rollback: the re-run's receipt {'equals' if same else 'DIFFERS from'} an uninterrupted rollback's")
                 expect(same and rc_w2 == 0 and rc2 == 0, "the re-run's receipt is not an uninterrupted rollback's")
+        elif plant == "kill-after-down-stage":
+            image = derive_image_path(pathlib.Path("."), "fx/s1").as_posix()
+            status = run_fixture_git(t, "diff", "--cached", "--name-status").splitlines()
+            deleted = {ln.split("\t", 1)[1] for ln in status if ln.startswith("D\t")}
+            print(f"rollback: the re-run · git diff --cached --name-status lists D s1.txt "
+                  f"{'yes' if 's1.txt' in deleted else 'NO'} · D {image} {'yes' if image in deleted else 'NO'}"
+                  f" · fx/s1 {state.get('fx/s1', ('',))[0]}")
+            expect({"s1.txt", image} <= deleted, "the re-run did not stage the removal of s1.txt and of its before-image")
+            expect(got == rolled("s1") and state.get("fx/s1", ("",))[0] == "rolled-back" and rc == 0
+                   and "Traceback" not in out, f"the re-run did not record fx/s1 rolled-back, or exited {rc}")
+        elif plant == "kill-after-down-stage-garbled":
+            image = derive_image_path(pathlib.Path("."), "fx/s1").as_posix()
+            refusal = next((ln for ln in out.splitlines() if ln.startswith("rollback: refused · ")), "")
+            named = image in refusal and "stage the restored paths" in refusal and "by hand" in refusal
+            print(f"rollback: the re-run's refusal names the image and the restored paths to stage by hand: "
+                  f"{'yes' if named else 'NO'}")
+            expect(named and rc == 1 and "Traceback" not in out,
+                   f"the re-run did not refuse naming the garbled image, or exited {rc}, or printed a traceback")
         elif plant == "schema-step-early":
             # TOOL-dSafePassage-18 AC3: s2's down lowers the receipt before the last row, so the
             # walk stops there and downs nothing it could not record.
@@ -4738,7 +4899,8 @@ def run_rollback_update_fixture(plant: str | None) -> int:
     scratch gov with the one step `fx/s1` at B, a target updated from A to B with `s1` applied and
     committed, then `update --rollback --to A`; the refusing plants run `update` as each names. An
     unmet expectation prints `rollback-update: FAILED`; otherwise the exit is `update`'s, and 1 for
-    a refusing plant whose refusal held."""
+    a refusing plant whose refusal held. `retired-step` (TOOL-dSafePassage-76) lands `fx/s2` at B,
+    retires it at C, and rolls back to B, which passes, then to A, which refuses."""
     with tempfile.TemporaryDirectory(prefix="gk-rbu-", ignore_cleanup_errors=True) as td:
         tmp = pathlib.Path(td)
         fails: list[str] = []
@@ -4746,7 +4908,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
         killed = plant in ("schema-step-kill-before-stamp", "schema-step-kill-shipped-rows")
         shipped = plant == "schema-step-kill-shipped-rows"  # TOOL-dSafePassage-70 S2: the floor row's shape
         gov, targets, sha_a, sha_b, env = build_update_gov(
-            tmp, ("t", "t2") if killed else ("t",), ("s1", "s2") if shipped else ("s1",), fails,
+            tmp, ("t", "t2") if killed else ("t",), ("s1", "s2") if shipped or plant == "retired-step" else ("s1",), fails,
             schema3=schema or plant == "schema-up-kill", down_exit=("s2",) if shipped else ())
         t = targets["t"]
         reports, rp = t.with_name("t.fx"), t / ".governance" / "install.json"
@@ -4935,6 +5097,34 @@ def run_rollback_update_fixture(plant: str | None) -> int:
             expect("down fx/s1: rolled-back" in text and f"gov_commit: moved to {sha_a[:8]}" in text
                    and not any(ln.endswith("not finished") for ln in text), "the record does not name s1 rolled-back and the stamp moved")
             expect(rc == 0, f"update exited {rc}")
+        elif plant == "retired-step":
+            # TOOL-dSafePassage-76 AC4: C takes fx/s2 out of the steps file and names it in a
+            # `[[retired]]` row; the target, updated to C, still records it applied. Introduced at B,
+            # it owes no down to B and owes one to A, which no row declares.
+            gkd = gov / "tools" / HERE.name
+            (gkd / STEPS_FILE).write_text(render_fixture_row("s1"), encoding="utf-8", newline="\n")
+            with (gkd / REGISTRY_FILE).open("a", encoding="utf-8", newline="\n") as f:
+                f.write('\n[[retired]]\nid = "fx/s2"\nsuccessor = "none"\nsurfaces = []\n')
+            run_fixture_git(gov, "add", "-A")
+            run_fixture_git(gov, "commit", "-qm", "C")
+            sha_c = run_fixture_git(gov, "rev-parse", "HEAD")
+            rc_c, _o = govkit("--to", sha_c, "--write")
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-qm", "at C")
+            s2 = next((r for r in receipt().get("steps") or [] if r.get("id") == "fx/s2"), {})
+            print(f"rollback-update: updated to C · exits {rc_c} · fx/s2 {s2.get('state')}")
+            expect(rc_c == 0 and s2.get("state") == "applied", "the update to C did not keep fx/s2 recorded applied")
+            rc_b, out_b = govkit("--rollback", "--to", sha_b, "--write")
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-qm", "at B")
+            rc_a, out_a = govkit("--rollback", "--to", sha_a, "--write")
+            named = all(n in out_a for n in ("fx/s2", "[[retired]] row", "its down is owed"))
+            print(f"rollback-update: update --rollback --to B --write exits {rc_b} · update --rollback --to A "
+                  f"--write exits {rc_a}, naming fx/s2, its [[retired]] row and that its down is owed: "
+                  f"{'yes' if named else 'NO'}")
+            expect(rc_b == 0, f"the rollback to B, which owes fx/s2 no down, exited {rc_b}")
+            expect(rc_a == 2 and named, f"the rollback to A, which owes fx/s2 a down, exited {rc_a} or did not say so")
+            rc = 1
         elif plant == "read-only":
             before = spawns()
             rc, out = govkit("--rollback", "--to", sha_a)

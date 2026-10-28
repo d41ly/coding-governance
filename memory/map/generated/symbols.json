@@ -7648,6 +7648,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_gov_root",
+      "kind": "function",
+      "file": "tools/lib/python_floor.py"
+    },
+    {
       "id": "derive_governed_paths",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -14706,6 +14711,11 @@
       "id": "read_git",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "read_git_dir",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "read_git_dirs",

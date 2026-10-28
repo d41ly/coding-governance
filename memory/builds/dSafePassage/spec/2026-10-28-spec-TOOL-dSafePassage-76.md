@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-76 — the closing review's nine engine-side minors, from a before-image restoring into the git directory to a walk refusal blamed on the config
 
-**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** CLOSED · rev-5 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-28-build-TOOL-dSafePassage-76-ledger.md](../build/2026-10-28-build-TOOL-dSafePassage-76-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-76-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-76-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-76-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-76-build-brief.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-76-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-76-spec-brief.md) | research | TOOL-dSafePassage-77 |

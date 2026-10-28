@@ -2,7 +2,7 @@
 the copies' check, and the floor step's down (TOOL-dSafePassage-11).
 
     python <prefix>/lib/python_floor.py check [--rev <sha>]    # every floor statement and copy finding
-    python <prefix>/lib/python_floor.py down <prior> <target> [<to>]  # the step's down: grade, then restore
+    python <prefix>/lib/python_floor.py down <prior> <target> [<to>, required outside gov]  # the step's down: grade, then restore
 
 THE DECLARATION is `python-floor.txt` beside this file, one `<major>.<minor>` line. Every other
 spelling of the floor is one of two kinds. A GENERATED COPY is the resolver block's `_rp_floor`
@@ -290,14 +290,19 @@ def _scan_toml11(text):
     return sorted(found)
 
 
+def derive_gov_root():
+    """Gov's root, resolved: the nearest directory at or above this file holding a `.git`, or this
+    file's own directory where none does (TOOL-dSafePassage-76 S5)."""
+    return next((d for d in (HERE, *HERE.parents) if (d / ".git").exists()), HERE).resolve()
+
+
 def read_down_population(target, to_commit):
     """{label: bytes} the down grades (S11): on gov's own tree, every tracked `.py` and `.toml` of
     gov at `to_commit`; in an adopter, each receipt row gov shipped (any role but `adopter-owned`)
     whose `path` ends `.py` or `.toml`, its `source` read from gov at `to_commit` and labelled by its
     `path`, a source absent there skipped since the rollback removes it, plus every
     `.governance/*.toml` of the target as it stands. Gov is the repository holding this file."""
-    target = pathlib.Path(target).resolve()
-    gov = next((d for d in (HERE, *HERE.parents) if (d / ".git").exists()), HERE).resolve()
+    target, gov = pathlib.Path(target).resolve(), derive_gov_root()
     if not run_git(gov, "rev-parse", "--verify", "--quiet", f"{to_commit}^{{commit}}").strip():
         raise ValueError(f"<to> {to_commit!r} names no commit in {gov.as_posix()}")
 
@@ -407,7 +412,12 @@ def main(argv):
     if argv[:1] == ["down"] and len(argv) in (3, 4):
         prior, target = argv[1], pathlib.Path(argv[2])
         # TOOL-dSafePassage-35 S22: <to> defaults to the target's HEAD, so the down always grades
-        # bytes at a commit, never the working tree.
+        # bytes at a commit, never the working tree; TOOL-dSafePassage-76 S5: only on gov's own tree,
+        # since an adopter's HEAD is a commit gov's repository never holds.
+        if len(argv) == 3 and target.resolve() != derive_gov_root():
+            print("python-floor down: <to> is required outside gov's own tree: the target's HEAD is a "
+                  "commit gov's repository never holds", file=sys.stderr)
+            return 2
         to = argv[3] if len(argv) == 4 else (run_git(target, "rev-parse", "--verify", "--quiet", "HEAD").strip()
                                              or "HEAD")
         try:

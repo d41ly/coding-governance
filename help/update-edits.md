@@ -42,7 +42,9 @@ not run over your edit (you see its `HELD BACK` line), keeps your bytes, and alw
 edit into the kit's template or conf, restore the rendered file, and re-run `update`. A row whose
 receipt recorded only the bytes its install left (no `update` has re-rendered it yet) is compared
 with those bytes, line endings aside: an edit made before your first `update` is held and ordered
-the same way, and a file whose only change is CRLF or LF line endings reads unedited.
+the same way, and a file whose only change is CRLF or LF line endings reads unedited. A rendered
+file git cannot hash through its own filters, a required clean filter that fails say,
+cannot be proven unedited, so it reads `render-edited` too.
 
 ## A hook gov withdrew
 

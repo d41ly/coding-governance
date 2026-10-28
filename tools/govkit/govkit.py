@@ -9254,7 +9254,8 @@ def check_render_edited(target: pathlib.Path, row: dict) -> bool:
     output unstaged. A row with no `oid` but the `output_sha256` `apply` recorded (TOOL-dSafePassage-63
     S1) is edited when that hash names none of the file's raw bytes, those bytes with CRLF folded to
     LF, or the folded bytes written as CRLF: a line-ending-only difference reads unedited, as it does
-    through a clean filter. A row with neither field, or no file, cannot prove an edit: False."""
+    through a clean filter. A row with neither field, or no file, cannot prove an edit: False. A
+    clean hash that exits non-zero or prints nothing cannot prove it unedited: True."""
     path, rec = str(row.get("path")), row.get("oid")
     dp = target / path
     if not dp.is_file():
@@ -9267,7 +9268,9 @@ def check_render_edited(target: pathlib.Path, row: dict) -> bool:
         return out not in {_sha(raw), _sha(lf), _sha(lf.replace(b"\n", b"\r\n"))}
     cl = subprocess.run(["git", "-C", str(target), "hash-object", f"--path={path}", "--", str(dp)],
                         capture_output=True, text=True, encoding="utf-8", check=False)
-    return cl.returncode == 0 and bool(cl.stdout.strip()) and cl.stdout.strip() != rec
+    # TOOL-dSafePassage-76 S6: a hash git cannot take, a failing required clean filter say, proves
+    # nothing unedited, so it reads edited and the kit is held rather than the bytes re-rendered.
+    return cl.returncode != 0 or not cl.stdout.strip() or cl.stdout.strip() != rec
 
 
 def read_retired_edits_mode(target: pathlib.Path) -> str:
@@ -9448,8 +9451,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"govkit update — source mode on gov's own tree · {len(receipt['files'])} file row(s) "
               f"recorded, never graded · {to_commit[:8]}")
         _src_pending = upgrade_steps.derive_pending_steps(root, receipt, to_commit)
-        _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _src_pending,
-                                               to_commit)
+        _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _src_pending)
         print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
               f"· {_sw_walk['skipped']} skipped · stopped at {_sw_walk['stopped'] or 'none'}")
         if _sw_walk["stopped"]:
@@ -11720,8 +11722,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # and a rollback read each one as an adopter's edit and kept it. Above schema 4 the walk's
         # first record writes the same receipt; this closes the window before it.
         write_install_receipt(target, receipt_path, receipt)
-        _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _sw_pending,
-                                               to_commit)
+        _sw_walk = upgrade_steps.run_step_walk(root, target, receipt_path, receipt, _sw_pending)
         print(f"govkit update — steps: {_sw_walk['pending']} pending · {_sw_walk['applied']} applied "
               f"· {_sw_walk['skipped']} skipped · stopped at {_sw_walk['stopped'] or 'none'}")
         if _sw_walk["stopped"]:

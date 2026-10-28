@@ -38,7 +38,16 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 327    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 334    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 327 -> 334 at TOOL-dSafePassage-76, BY THE MEASURED DELTA: the matcher reads 466 over the
+# deployer's directory at that unit's base `f01ff3b9` and 473 on the tree it left, all seven in
+# `upgrade_steps.py`. `check_contained`'s two refusals of a path in the git directory, by a `.git`
+# segment and by where it resolves (S1, selftest's `[dSP-76]` rows); `read_image_paths`' two, an
+# image that does not parse or lists no paths in the working tree (selftest's `[dSP-76]` row) and in
+# the index (S3, `fixture rollback --plant kill-after-down-stage-garbled`); `derive_reverse_steps`'
+# refusal of a retired id that owes a down (S4, `fixture rollback-update --plant retired-step`); and
+# `check_target_local_config`'s refusal of a walk that failed with `run_step_isolated`'s wrap of it
+# (S8, `fixture isolation`'s unkeyed `submodule-*` plants).
 # 324 -> 327 at TOOL-dSafePassage-26, BY THE MEASURED DELTA: the matcher reads 447 over the
 # deployer's directory at that unit's base `31b078c3` and 450 on the tree it left, by this module's
 # own walk over each file at both ends. Four are new, each armed: `check_argv`'s refusal of `{to}`
