@@ -30,3 +30,5 @@ anchor-ref: refs/heads/main
 base: 57bc3b91861a061dc9f37529bfe41db756c24fcd
 
 ## Parked
+
+2026-10-28T02:33:04Z rescope · item add TOOL-dIndexedDesign-20 · reason TOOL-dIndexedDesign-8's writer split cl-dClosedLoop-0390 by M2's one-mechanism test: unit 8 carries part 1/2 (design.decompose, feature designs, forks); this unit carries part 2/2 (design.reentry, the additive-versus-breaking diff, design.input and the re-design inventory)
