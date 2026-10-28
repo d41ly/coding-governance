@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-71 — govkit selftest's staged-break copies of upgrade_steps.py take the whole govkit directory through one helper, and an arm reds a copy that hand-picks its files
 
-**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base c9baa97c · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-10-28 · node d · Tier-2 · base c9baa97c · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-42
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-26-build-TOOL-dSafePassage-71-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-71-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-71-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-71-1-spec-writer.md) | research | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-71-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-71-2-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-71-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-71-build-brief.md) | journal | — |

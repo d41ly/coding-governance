@@ -3458,6 +3458,50 @@ def check_steps_recordable() -> None:
               "as the predicate reads", ok, str(rec))
 
 
+def build_staged_copy(root: pathlib.Path, text: str) -> pathlib.Path:
+    """TOOL-dSafePassage-71 S1: copy this kit's whole directory to `root / HERE.name`, without
+    `__pycache__` (a stale `.pyc` can run in place of the break), write `text` as the copy's engine
+    and return its path. `upgrade_steps.py` reaches files beside it by import, by path and as text,
+    so a staged break that hand-picks its siblings dies on the next one it misses."""
+    dst = root / HERE.name
+    shutil.copytree(HERE, dst, ignore=shutil.ignore_patterns("__pycache__"))
+    py = dst / "upgrade_steps.py"
+    py.write_text(text, encoding="utf-8", newline="\n")
+    return py
+
+
+def read_handpicked_copies(text: str) -> tuple[list[int], int]:
+    """TOOL-dSafePassage-71 S3: the 1-based lines of `text` outside the staged-copy helper's body that
+    join a bare local name, other than `HERE`, to the engine's file name, and how many lines inside
+    that body do. The body is located by `_ast`; no helper found gives an inside count of 0."""
+    shape = _re.compile(r'(?<![\w.])(?<!/ )(?!HERE\b)[A-Za-z_]\w* / "upgrade_steps\.py"')
+    body = next(((n.lineno, n.end_lineno) for n in _ast.walk(_ast.parse(text))
+                 if isinstance(n, _ast.FunctionDef) and n.name == "build_staged_copy"), (0, -1))
+    hits = [i for i, ln in enumerate(text.splitlines(), 1) if shape.search(ln)]
+    return [i for i in hits if not body[0] <= i <= body[1]], sum(body[0] <= i <= body[1] for i in hits)
+
+
+def check_staged_copies(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-71 S4: no arm of this suite stages a copy of the engine by hand, the
+    predicate names a planted hand-picked line, and the helper's copy holds the kit's file set.
+    Not checked: a path built by `joinpath`, an f-string or a name held in a variable; a copy in any
+    other file; what a gov-tree copy carries; the sibling kit a copy resolves through `resolve_kit_dir`."""
+    own = (HERE / "selftest.py").read_text(encoding="utf-8")
+    outside, inside = read_handpicked_copies(own)
+    check("[dSP-71] AC4 no line of selftest.py outside build_staged_copy stages the engine in a bare "
+          "local directory, and the helper's own write is seen",
+          not outside and inside >= 1, f"outside: {outside}; inside: {inside}")
+    planted = own + "(rooted / " + '"upgrade_steps' + '.py"' + ").write_text(src)\n"
+    got = read_handpicked_copies(planted)[0]
+    check("[dSP-71] AC4 a hand-picked copy appended to selftest.py is named by its line",
+          got == [len(planted.splitlines())], f"named: {got}")
+    d = build_staged_copy(tmp, "").parent
+    rel = lambda r: {p.relative_to(r).as_posix() for p in r.rglob("*")  # noqa: E731
+                     if p.is_file() and "__pycache__" not in p.parts}
+    check("[dSP-71] AC3 build_staged_copy leaves the kit directory's file set, outside __pycache__",
+          rel(d) == rel(HERE), f"missing: {sorted(rel(HERE) - rel(d))}; extra: {sorted(rel(d) - rel(HERE))}")
+
+
 def check_step_isolation(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-7 AC1 to AC7 — `upgrade_steps.py fixture isolation` with every plant: each
     half of the contract green, each `-stub` plant red naming its canary, the needs-target check's
@@ -3627,16 +3671,14 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
           env.get("GIT_CONFIG_COUNT") == str(3 + _eol) and (env.get("GIT_CONFIG_KEY_2"), env.get("GIT_CONFIG_VALUE_2"))
           == ("protocol.ext.allow", "never"), str({k: v for k, v in env.items() if k.startswith("GIT_CONFIG_")}))
 
-    rooted = tmp / "common-rooted"
-    rooted.mkdir(parents=True)
-    shutil.copy(HERE / "govkit.py", rooted / "govkit.py")
     walk = '                mods = d / "modules"'
     src = us_py.read_text(encoding="utf-8")
-    (rooted / "upgrade_steps.py").write_text(src.replace(walk, '                mods = (pathlib.Path(git(target, '
-                                             '"rev-parse", "--path-format=absolute", "--git-common-dir").strip()) '
-                                             'if not via else d) / "modules"'), encoding="utf-8", newline="\n")
+    rooted = build_staged_copy(tmp / "common-rooted", src.replace(walk, '                mods = (pathlib.Path(git('
+                                                                  'target, "rev-parse", "--path-format=absolute", '
+                                                                  '"--git-common-dir").strip()) if not via else d) '
+                                                                  '/ "modules"'))
     for plant in ("submodule-unpopulated-worktree", "submodule-main-only"):
-        rc, out = fixture(rooted / "upgrade_steps.py", plant)
+        rc, out = fixture(rooted, plant)
         check(f"[dSP-36] a walk copy rooted at the common dir reds fixture isolation {plant}",
               src.count(walk) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
@@ -3653,15 +3695,10 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         rc, out = fixture(us_py, plant)
         check(f"[dSP-42] AC5 AC13 fixture isolation {plant} exits 1 and names {', '.join(needles)}",
               rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles), out)
-    first = tmp / "index-first"
-    first.mkdir(parents=True)
-    for f in ("govkit.py", "fixture_target.py"):
-        shutil.copy(HERE / f, first / f)
     gate = "if not read_config(d, label) and work is not None:"
-    (first / "upgrade_steps.py").write_text(src.replace(gate, 'if work is not None and git(work, "ls-files", "-s") '
-                                                        'is not None and not read_config(d, label):'),
-                                            encoding="utf-8", newline="\n")
-    rc, out = fixture(first / "upgrade_steps.py", "submodule-fsmonitor")
+    first = build_staged_copy(tmp / "index-first", src.replace(gate, 'if work is not None and git(work, "ls-files", '
+                                                               '"-s") is not None and not read_config(d, label):'))
+    rc, out = fixture(first, "submodule-fsmonitor")
     check("[dSP-42] AC5 a walk copy that reads the index before grading reds fixture isolation submodule-fsmonitor",
           src.count(gate) == 1 and rc == 1 and "fsmonitor canary: present" in out and "isolation: FAILED" in out, out)
 
@@ -3712,13 +3749,9 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         check(f"[dSP-42] AC4 sendemail.smtpServer = {host}: the check names {want} of the three keys",
               len(found) == want and all(any(k.lower() in e for e in found) for k in sorted(runs42)[:want]), str(found))
 
-    # AC6's red: the shipped pair copied, a direct spawn of `row["up"]` planted into the copy.
-    planted = tmp / "callers"
-    planted.mkdir(parents=True)
-    shutil.copy(HERE / "govkit.py", planted / "govkit.py")
+    # AC6's red: the kit copied whole, a direct spawn of `row["up"]` planted into the copy.
     text = us_py.read_text(encoding="utf-8") + '\n\ndef planted_spawn(row):\n    return subprocess.run(row["up"])\n'
-    (planted / "upgrade_steps.py").write_text(text, encoding="utf-8", newline="\n")
-    rc, out = fixture(planted / "upgrade_steps.py", "callers")
+    rc, out = fixture(build_staged_copy(tmp / "callers", text), "callers")
     check("[dSP-7] AC6 a planted spawn of row[\"up\"] reds the callers probe, naming its line",
           rc == 1 and f"upgrade_steps.py:{len(text.splitlines())}, in planted_spawn" in out, out)
 
@@ -3920,14 +3953,11 @@ def check_step_walk() -> None:
     late = "        rows, _counts = census.scan_processes()\n        now, now_boot = time.time(), read_boot_clock()\n"
     src = us_py.read_text(encoding="utf-8")
     with tempfile.TemporaryDirectory(prefix="gk-judge-", ignore_cleanup_errors=True) as td:
-        jd = pathlib.Path(td) / HERE.name
-        jd.mkdir()
-        shutil.copy(HERE / "govkit.py", jd / "govkit.py")
-        (jd / "upgrade_steps.py").write_text(src.replace(clock, late), encoding="utf-8", newline="\n")
+        jd = build_staged_copy(pathlib.Path(td), src.replace(clock, late))
         (pathlib.Path(td) / "process-monitor").mkdir()
         shutil.copy(govkit_module().resolve_kit_dir("process-monitor", "census.py", HERE) / "census.py",
                     pathlib.Path(td) / "process-monitor" / "census.py")
-        p = subprocess.run([sys.executable, str(jd / "upgrade_steps.py"), "fixture", "lock", "--plant",
+        p = subprocess.run([sys.executable, str(jd), "fixture", "lock", "--plant",
                             "lock-live-slow-census"], capture_output=True, text=True, encoding="utf-8",
                            errors="replace", timeout=600)
     out = p.stdout + p.stderr
@@ -4683,6 +4713,7 @@ def main() -> int:
         check_steps_recordable()
         check_step_isolation(tmp / "dsi")
         check_step_walk()
+        check_staged_copies(tmp / "dst")
         check_step_rollback()
         check_source_mode(tmp / "dgf")
         check_step_gate_fixture()

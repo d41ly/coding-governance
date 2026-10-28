@@ -2973,6 +2973,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "build_staged_copy",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "build_stale_dossiers",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -5786,6 +5791,11 @@
       "id": "check_staged_backlog",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
+    },
+    {
+      "id": "check_staged_copies",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_staged_render",
@@ -14776,6 +14786,11 @@
       "id": "read_handoff_row",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_handpicked_copies",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "read_header_key",
