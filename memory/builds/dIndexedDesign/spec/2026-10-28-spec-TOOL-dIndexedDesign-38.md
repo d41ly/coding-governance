@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-38 — the round-1 spec audit's 42 minors batched: shared budgets priced, one resolver and one path rule, readers that refuse what they cannot read, and every unbuildable criterion restated
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 17 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
+**Status:** OPEN · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 17 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 |
+| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-31-promoted-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-31-promoted-fix-return.md) | research | TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-38-1-spec-writer.md) | journal | — |
@@ -254,6 +254,10 @@ Every item builds at this unit's pass on the code its unit built, unless it says
 - **hands-off** `TOOL-dIndexedDesign-40` — S15 to S17, which that unit lands in the passes of units 6, 8 and 4, so this unit's pass writes none of them and AC12 finds them true (id 2)
 - **hands-off** `TOOL-dIndexedDesign-41` — S5 to S7, which that unit lands in the passes of units 16, 1 and 3 with no net `fail` site, so AC5 finds them true (id 3)
 - **hands-off** `TOOL-dIndexedDesign-46` — the items and criteria the audit's minors land on; that unit's S12 keeps S4's four stand-in rows, so this unit's pass deletes none of them (ids 4, 5, 6, 8, 9, 10, 15, 16, 18, 19, 22, 23, 24, 25, 28, 30 and 38)
+- **consumes-from** `TOOL-dIndexedDesign-50` — S2's `coverage: 'only'` reading and AC2's window, reachable from unit 35's pass commit once that unit lands unit 44's counts in unit 16's pass (id 3)
+- **hands-off** `TOOL-dIndexedDesign-51` — S22 and S35, which that unit restates at this unit's pass: S22's exit-2 refusal sets `_dx_msg` and refuses through unit 41 S1's composed sites, adding no `fail` site (id 20)
+- **hands-off** `TOOL-dIndexedDesign-52` — S3's `check_spec_audit_declared`, which that unit has refuse a present undated value and a cut-short conf, resting on S22's reading of exit 2 as a refusal (id 26)
+- **hands-off** `TOOL-dIndexedDesign-53` — S5's one-site sentence and AC5's third clause, which that unit's S1 supersedes at this unit's pass: `check_design_exit` holds no `fail <n> "` (id 2)
 
 ## 4. Design
 
@@ -480,6 +484,10 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC8 · an `**o
   edges of TOOL-dIndexedDesign-40, TOOL-dIndexedDesign-41 and TOOL-dIndexedDesign-46 and the
   consumes-from bullets mirroring the hands-off edges of TOOL-dIndexedDesign-39 and
   TOOL-dIndexedDesign-44, promoted by the round-1 spec audit of units 31 to 38; nothing else moved.
+- rev-3 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
+  edges of TOOL-dIndexedDesign-51, TOOL-dIndexedDesign-52 and TOOL-dIndexedDesign-53 and the
+  consumes-from bullet mirroring the hands-off edge of TOOL-dIndexedDesign-50, promoted by the round-1
+  spec audit of units 39 to 46; nothing else moved.
 
 ## 10. Reuse audit
 

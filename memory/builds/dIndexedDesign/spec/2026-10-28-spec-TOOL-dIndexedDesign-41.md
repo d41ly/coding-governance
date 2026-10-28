@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-41 — the design-exit refusals add no net `fail` site, so `unattended.sh` stays within its refusal ceiling at every pass tip
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 18 · advances TOOL-dIndexedDesign-17
+**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 18 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 |
+| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 TOOL-dIndexedDesign-47 TOOL-dIndexedDesign-48 TOOL-dIndexedDesign-49 TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dIndexedDesign-53 |
 | [2026-10-28-build-TOOL-dIndexedDesign-41-promoted-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-41-promoted-fix-return.md) | research | TOOL-dIndexedDesign-46 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-41-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-41-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-41-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-41-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-46 |
+| [2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-46 |
 
 <!-- /gen:spec-records -->
 
@@ -73,6 +74,11 @@ unit 38's 17.
 - **consumes-from** `TOOL-dIndexedDesign-1` — its `_hov` read and per-unit hand-off refusals, which S2 composes into `_dx_msg` in that unit's own pass commit (id 3)
 - **consumes-from** `TOOL-dIndexedDesign-3` — its unreadable `review.design` refusal, which S3 joins to an existing `check_authorization` site in that unit's own pass commit (id 3)
 - **consumes-from** `TOOL-dIndexedDesign-38` — S5 to S7, AC5 and §8 F2, which S4 finds true before that unit's pass (id 3)
+- **hands-off** `TOOL-dIndexedDesign-47` — AC2's armed half, which that unit replaces with a staged break deleting the THIN arm in a scratch clone (id 1)
+- **hands-off** `TOOL-dIndexedDesign-48` — S1's composed THIN site, whose literal run that unit supersedes with one no other site or arm line carries (id 10)
+- **hands-off** `TOOL-dIndexedDesign-49` — S1's `_d_why` and S2's `_dx_msg`, whose assignments that unit reads as the causes each needing its own arm (id 19)
+- **hands-off** `TOOL-dIndexedDesign-51` — AC1's three named passes and AC2's "second" plant, which that unit supersedes with a census at every commit changing the driver (id 20)
+- **hands-off** `TOOL-dIndexedDesign-53` — S3's site, which that unit names as `fail 55`, AC2's census fixture and S4's ledger note, beside which its S1 note sits (ids 2, 13 and 18)
 
 ## 4. Design
 
@@ -168,6 +174,10 @@ file. `harness arms (fail branches armed or pinned)` reads green at every tip fr
 - rev-1 · 2026-10-28 · initial draft, promoted from the round-1 spec audit of units 31 to 38, id 3
   (HIGH, item H3), on the skeptic's corrected fix with its literal-run correction, repairing
   TOOL-dIndexedDesign-38 S5 to S7 and AC5.
+- rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
+  edges of TOOL-dIndexedDesign-47, TOOL-dIndexedDesign-48, TOOL-dIndexedDesign-49,
+  TOOL-dIndexedDesign-51 and TOOL-dIndexedDesign-53, promoted by the round-1 spec audit of units 39 to
+  46; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -71,3 +71,19 @@ base: 57bc3b91861a061dc9f37529bfe41db756c24fcd
 2026-10-28T05:30:25Z rescope · item add TOOL-dIndexedDesign-46 · reason closes the 27 MEDIUM and LOW findings of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md batched in one unit, report ids 4 5 6 7 8 9 10 14 15 16 18 19 20 21 22 23 24 25 28 29 30 33 34 35 38 39 40
 
 2026-10-28T05:53:54Z review · item dIndexedDesign-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 27 · disposition promote
+
+2026-10-28T06:58:24Z rescope · item add TOOL-dIndexedDesign-47 · reason closes report id 1 at HIGH (item H1, shared with ids 10 and 19) of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md: unit 41 AC2's armed half becomes a staged break in a scratch clone that reads the composed THIN site UNARMED once the THIN arm is deleted, repairing TOOL-dIndexedDesign-41
+
+2026-10-28T06:58:25Z rescope · item add TOOL-dIndexedDesign-48 · reason closes report id 10 at HIGH (item H1, shared with ids 1 and 19) of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md: the composed THIN site opens with a literal run no other fail message or arm line carries and the THIN arm is re-pinned to it, repairing TOOL-dIndexedDesign-41
+
+2026-10-28T06:58:26Z rescope · item add TOOL-dIndexedDesign-49 · reason closes report id 19 at HIGH (item H1, shared with ids 1 and 10) of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md: every cause composed into the dispatch site is armed by its own clause text, derived from the code, repairing TOOL-dIndexedDesign-41
+
+2026-10-28T06:58:26Z rescope · item add TOOL-dIndexedDesign-50 · reason closes report id 3 at HIGH (item H2) of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md: unit 44's finder counts land in unit 16's pass commit so unit 35 AC3 and unit 38 AC2 are reachable, repairing TOOL-dIndexedDesign-44
+
+2026-10-28T06:58:27Z rescope · item add TOOL-dIndexedDesign-51 · reason closes report id 20 at HIGH (item H3) of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md: unit 38 S22 and S35 restated to the composed sites and the refusal census read at every pass commit that changes unattended.sh, repairing TOOL-dIndexedDesign-41
+
+2026-10-28T06:58:28Z rescope · item add TOOL-dIndexedDesign-52 · reason closes report id 26 at HIGH (item H4) of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md: the standalone design-exit opt-in reader refuses a present undated value and an unevaluable conf as the driver does, repairing TOOL-dIndexedDesign-46
+
+2026-10-28T06:58:28Z rescope · item add TOOL-dIndexedDesign-53 · reason closes the 20 MEDIUM and LOW findings of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-39-spec-audit-round1.md batched in one unit, report ids 2 4 5 6 7 8 9 11 12 13 15 16 18 21 22 23 24 25 28 29
+
+2026-10-28T07:15:47Z review · item dIndexedDesign-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 20 · disposition promote
