@@ -24,20 +24,20 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: 57bc3b91861a061dc9f37529bfe41db756c24fcd · handoff · 3 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5232949ca96452d710ca842e51f3fbc1e1679204
-phase: HELD
+witness: 922d6b94dc883869f13494f5e0c5c636e6cbaf3a
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-drankedplan-1fc3d7
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-27T20:33:07Z
+lease-utc: 2026-10-28T01:13:51Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 26296
 session: 43fa2011-5bb6-422a-bd52-776c30d97bd4
-keepalive: b425cd37
+keepalive: d8c7af59
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 anchor-ref: refs/heads/main
@@ -374,3 +374,7 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-28T00:55:17Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dRankedPlan && bash tools/push-main.sh --land --slug dRankedPlan && bash tools/unattended/unattended.sh --settle dRankedPlan
 
 2026-10-28T00:55:17Z hold · item owner-decision · reason until owner · reaped b425cd37 · resume none(owner)
+
+2026-10-28T01:14:02Z resume · item dRankedPlan · reason held · keepalive d8c7af59 · manual
+
+2026-10-28T01:14:20Z rescope · item add TOOL-dRankedPlan-83 · reason owner-authorized at the second hand-off of 2026-10-28 ("Raise the routed-commits leg's ceiling the same way as TOOL-dRankedPlan-82, then re-prepare onto origin/main, re-close and land dRankedPlan"): the routed commits leg's 300s ceiling timed out twice in the close's bar at 9c135e17 (CONTENDED) and ran 354s alone; sized through derive-ceilings.py --observed as TOOL-dRankedPlan-82 was, built in this run

@@ -41,3 +41,9 @@ ends the chain whatever it confirms.
 — owner, 2026-10-27, answering the run's hand-off `owner-decision` at `be042d1e2`, which parked the close's red
 spec tokens leg. The run adds `TOOL-dRankedPlan-82`, a Tier-1 micro-unit built in this run as `TOOL-dGroundRules-87`
 was, sizes the ceiling through `derive-ceilings.py --observed`, and then re-closes and lands.
+
+> Raise the routed-commits leg's ceiling the same way as TOOL-dRankedPlan-82, then re-prepare onto origin/main,
+> re-close and land dRankedPlan.
+
+— owner, 2026-10-28, answering the run's second hand-off `owner-decision` at `5232949ca`, which parked the close's
+red routed commits leg. The run adds `TOOL-dRankedPlan-83`, built in this run as `TOOL-dRankedPlan-82` was.
