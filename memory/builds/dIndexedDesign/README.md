@@ -104,7 +104,7 @@ ids TOOL-dIndexedDesign-26 TOOL-dIndexedDesign-27 TOOL-dIndexedDesign-28 TOOL-dI
 | [TOOL-dIndexedDesign-3 — design review by policy: `review.design` read at the guarded revision, its effort, and the opt-in guard](spec/2026-10-28-spec-TOOL-dIndexedDesign-3.md) | 16 | 2 | OPEN | rev-1 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 3 record folder(s).
+Records: 15 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
