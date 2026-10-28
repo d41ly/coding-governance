@@ -3933,7 +3933,10 @@ def check_step_rollback() -> None:
     the bytes its file pass moved, and the rollback from there returns them. TOOL-dSafePassage-39's AC1
     and AC3 are the two `-down-killed` rows, a rollback killed in s2's down keeping its `via` mark for
     the re-run, and AC2 the writer's carry below. TOOL-dSafePassage-40's AC2 is the
-    `kill-after-up-image-lost` row: a row whose up ran before a kill, its image lost, stops."""
+    `kill-after-up-image-lost` row: a row whose up ran before a kill, its image lost, stops.
+    TOOL-dSafePassage-70's AC1 is the `schema-step-kill-shipped-rows` row: a rollback killed past the
+    schema step's down, over rows whose witnesses still hold, downs them again on the re-run,
+    records nothing and stamps; its AC2 is the `schema-step-early` row."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -4008,6 +4011,14 @@ def check_step_rollback() -> None:
                 "the twin's · the record has the twin's finished shape",
                 "rollback-update: re-run record · down fx/s1: skipped (nothing applied)\n"
                 "rollback-update: re-run record · down govkit/receipt-schema-4: skipped (nothing applied)")),
+            ("rollback-update", "schema-step-kill-shipped-rows", 0, (
+                "rollback-update: the re-run exits 0 · its receipt's bytes equal the twin's · the target's bytes equal "
+                "the twin's · the record has the twin's finished shape",
+                "rollback-update: re-run record · down fx/s2: rolled-back\n"
+                "rollback-update: re-run record · down fx/s1: rolled-back\n"
+                "rollback-update: re-run record · down govkit/receipt-schema-4: skipped (nothing applied)",
+                "rollback-update: the re-run's record equals the twin's line for line except started and the schema step",
+                "rollback-update: on t fx/s2's down ran 2 time(s) · fx/s1's down ran 2 time(s)")),
             ("rollback-update", "schema-up-kill", 0, (
                 "rollback-update: after the kill · gov_commit A · tools/demo/one.txt row at B",
                 "rollback-update: the rollback exits 0 · tools/demo/one.txt b'v1\\n' · schema 3 · no steps · gov_commit A"))):
@@ -4015,6 +4026,7 @@ def check_step_rollback() -> None:
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
         tag = ("dSP-62" if plant == "schema-up-kill"
+               else "dSP-70" if plant == "schema-step-kill-shipped-rows"
                else "dSP-39" if plant in ("witness-only-down-killed", "unrecorded-witness-down-killed")
                else "dSP-33" if plant == "image-lost"
                else "dSP-40" if plant == "kill-after-up-image-lost"

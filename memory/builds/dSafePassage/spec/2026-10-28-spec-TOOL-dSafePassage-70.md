@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-70 — a rollback killed after the schema step's down resumes: the reverse walk persists nothing on a receipt already below schema 4, and stops only at the down that lowers it
 
-**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 717bf240 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-10-28 · node d · Tier-2 · base 717bf240 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-35
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-26-build-TOOL-dSafePassage-70-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-70-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-70-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-70-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

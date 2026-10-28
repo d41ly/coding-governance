@@ -232,7 +232,7 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
   `govkit/receipt-schema-4` comes last. A step recorded nowhere, or `rolled-back`, runs its witness
   first and is skipped where the witness does not hold: `step <id> · skipped (nothing applied)`. A
   step that runs its down is marked `down interrupted: started <utc>, no exit recorded` before it
-  starts, and reads `rolled-back` once the down exits 0 and is judged to have taken effect; what
+  starts, where the receipt holds `steps`, and reads `rolled-back` once the down exits 0 and is judged to have taken effect; what
   the down restored is staged. All of this happens before any file moves; then the files return to
   `<rev>`'s bytes as any `update --to <rev>` moves them, and the receipt's `gov_commit` is set to
   `<rev>`, its `schema` left as the downs left it. Without `--write` it prints `would roll back
@@ -256,6 +256,11 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
   exits non-zero (`reverted check exits <rc>`), stops the rollback with that step's state kept: no
   file moves, `gov_commit` does not move, and the run exits 1. Fix the cause and run the same
   command again; it resumes at that step.
+- **After a kill past the schema step.** A rollback killed after `govkit/receipt-schema-4`'s down
+  leaves the receipt at schema 3 with no `steps`. Run the same command again: it witness-probes
+  every step, runs the down again of each whose witness still holds, records nothing, since the
+  receipt has no `steps`, and moves the files and the stamp. Its record names the schema step
+  `skipped (nothing applied)`.
 - **A failed `update` never rolls back by itself.** A stopped walk leaves the steps before it
   applied and runs no down; only `update --rollback` runs downs.
 - **The record.** A `--write` rollback writes `.governance/outbox/update-reverted-<from8>-<to8>.md`
@@ -277,6 +282,7 @@ python tools/govkit/upgrade_steps.py fixture rollback --plant down-fails      # 
 python tools/govkit/upgrade_steps.py fixture rollback --plant witness-only    # no image: judged by the down
 python tools/govkit/upgrade_steps.py fixture rollback --plant node-witness    # reverted = "down-exit"
 python tools/govkit/upgrade_steps.py fixture rollback-update                  # update --rollback --to A
+python tools/govkit/upgrade_steps.py fixture rollback-update --plant schema-step-kill-shipped-rows  # killed past the schema step, resumes
 ```
 
 ## What `update` does with a retired kit

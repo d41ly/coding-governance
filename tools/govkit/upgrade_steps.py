@@ -83,7 +83,7 @@ an operator's. `fixture walk|lock|update` observe it in scratch repositories.
 THE REVERSE WALK (TOOL-dSafePassage-4). `update --rollback --to <rev> --write`, and nothing else,
 calls `run_reverse_walk` over `derive_reverse_steps`, the rows introduced after `<rev>` that the
 receipt records applied or failed, or records nowhere, newest first: per step its down, a
-`down interrupted:` failure persisted before the spawn, then `derive_down_verdict`'s judge
+`down interrupted:` failure persisted before the spawn where the receipt can hold it, then `derive_down_verdict`'s judge
 (TOOL-dSafePassage-17): the row's `reverted` argv, which must exit 0, or its down's own exit under
 `reverted = "down-exit"` or with no before-image at the spawn on a row the receipt records nowhere or
 `applied` with `"via": "witness"` (TOOL-dSafePassage-33), else its witness, which must no longer
@@ -1900,7 +1900,10 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
     (TOOL-dSafePassage-18): a down that leaves the receipt below schema 4, the schema step's, writes
     none, the field's absence being its record, and its verdict still reads `rolled-back`. Such a
     down before the last row stops the walk with `LOWERED_STOP`, since no later down could be
-    recorded.
+    recorded. Move 3's mark is persisted only where the receipt can hold it before the down, and
+    the stop fires only at the down that took the receipt below schema 4 (TOOL-dSafePassage-70): on
+    a receipt already below it, as after a kill past the schema step's down, every down runs, is
+    judged as on a schema-4 receipt, writes no row, and the walk reaches its last row.
 
     Its one caller is `update --rollback`: a stopped walk, the verify rollback and `apply` run no
     down. Returns `{"downs": [(id, verdict)], "stopped", "failure", "order"}`, `downs` the verdict
@@ -1930,11 +1933,15 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
             out["order"] = write_attended_order(target, gov_root, row, "down", to).relative_to(target).as_posix()
             return stop(row, f"{ATTENDED_STOP} — {out['order']} names its down")
         paths = read_image_paths(target, row.id)
+        # TOOL-dSafePassage-70 S1: below schema 4 no row can hold the mark, as the forward walk's
+        # persist asks; a down never raises the schema, so `held` is false only past the lowering.
+        held = test_steps_recordable(receipt)
         # TOOL-dSafePassage-39 S3: a row recorded nowhere with no image had no up on record, so it
         # is marked as the forward walk's witness skip is; a recorded row's mark the writer carries.
-        write_step_record(receipt_path, receipt, row, state, f"{DOWN_STOP_PREFIXES[0]} started "
-                          f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded",
-                          "witness" if record is None and not paths else None)
+        if held:
+            write_step_record(receipt_path, receipt, row, state, f"{DOWN_STOP_PREFIXES[0]} started "
+                              f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded",
+                              "witness" if record is None and not paths else None)
         got = run_step_reread(row, "down", target, gov_root, receipt_path, receipt, to)
         recordable = test_steps_recordable(receipt)  # TOOL-dSafePassage-18 S1: below 4, no row
         if got["verdict"] != "ok":
@@ -1942,7 +1949,7 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
             if recordable:
                 write_step_record(receipt_path, receipt, row, state, failure)
             return stop(row, failure)
-        if not recordable and n < len(rows):
+        if held and not recordable and n < len(rows):
             return stop(row, LOWERED_STOP)
         reverted, phase = derive_down_verdict(row, bool(paths), got["rc"], record)
         rc = got["rc"]
@@ -3058,7 +3065,8 @@ NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePass
 DOWN_KILLED_PLANTS = ("witness-only-down-killed", "unrecorded-witness-down-killed")  # TOOL-dSafePassage-39
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
                    "callers", "witness-only", "image-lost", "kill-after-up-image-lost") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
-ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp")  # TOOL-dSafePassage-19
+ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp",  # TOOL-dSafePassage-19
+                                 "schema-step-kill-shipped-rows")  # TOOL-dSafePassage-70
 ROLLBACK_UPDATE_PLANTS = (("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
                           + ("schema-up-kill",))  # TOOL-dSafePassage-62
 
@@ -3703,14 +3711,16 @@ def run_fixture_govkit(gov: pathlib.Path, env: dict, *args: str) -> tuple[int, s
 
 
 def build_update_gov(tmp: pathlib.Path, names, slugs, fails: list[str],
-                     schema3: bool = False) -> tuple[pathlib.Path, dict, str, str, dict]:
+                     schema3: bool = False, down_exit=()) -> tuple[pathlib.Path, dict, str, str, dict]:
     """The `update` and `rollback-update` families' scratch gov: at A copies of this checkout's
     `govkit.py`, `upgrade_steps.py` and the process-monitor census and a `demo` kit whose
     `one.txt` reads `v1`; a target per `names` installed at A by `apply` and committed; at B the
     steps `fx/<slug>` for each of `slugs` and `one.txt` reading `v2`. `schema3` forces each receipt
     `apply` wrote to schema 3 with `steps` taken out before that commit, and puts the copied
-    `govkit/receipt-schema-4` row first at B (TOOL-dSafePassage-15). A failed install is appended
-    to `fails`. Returns (gov, {name: target}, A, B, the env every govkit call runs under)."""
+    `govkit/receipt-schema-4` row first at B (TOOL-dSafePassage-15). Each slug of `down_exit` is
+    rendered with `reverted = "down-exit"`, the floor row's shape (TOOL-dSafePassage-70). A failed
+    install is appended to `fails`. Returns (gov, {name: target}, A, B, the env every govkit call
+    runs under)."""
     gov = tmp / "gov"
     gkd, demo = gov / "tools" / HERE.name, gov / "tools" / "demo"
     for d in (gkd, demo, gov / "tools" / "process-monitor"):
@@ -3751,7 +3761,8 @@ def build_update_gov(tmp: pathlib.Path, names, slugs, fails: list[str],
     (gkd / "steps").mkdir()
     (gkd / "steps" / "fx.py").write_text(FIXTURE_WALK_STEP, encoding="utf-8", newline="\n")
     (gkd / STEPS_FILE).write_text((write_fixture_schema_step(gkd) if schema3 else "")
-                                  + "".join(render_fixture_row(s) for s in slugs), encoding="utf-8", newline="\n")
+                                  + "".join(render_fixture_row(s, reverted="down-exit" if s in down_exit else None)
+                                            for s in slugs), encoding="utf-8", newline="\n")
     (demo / "one.txt").write_text("v2\n", encoding="utf-8", newline="\n")
     run_fixture_git(gov, "add", "-A")
     run_fixture_git(gov, "commit", "-qm", "B")
@@ -4222,9 +4233,11 @@ def run_rollback_update_fixture(plant: str | None) -> int:
         tmp = pathlib.Path(td)
         fails: list[str] = []
         schema = plant in ROLLBACK_UPDATE_SCHEMA_PLANTS
+        killed = plant in ("schema-step-kill-before-stamp", "schema-step-kill-shipped-rows")
+        shipped = plant == "schema-step-kill-shipped-rows"  # TOOL-dSafePassage-70 S2: the floor row's shape
         gov, targets, sha_a, sha_b, env = build_update_gov(
-            tmp, ("t", "t2") if plant == "schema-step-kill-before-stamp" else ("t",), ("s1",), fails,
-            schema3=schema or plant == "schema-up-kill")
+            tmp, ("t", "t2") if killed else ("t",), ("s1", "s2") if shipped else ("s1",), fails,
+            schema3=schema or plant == "schema-up-kill", down_exit=("s2",) if shipped else ())
         t = targets["t"]
         reports, rp = t.with_name("t.fx"), t / ".governance" / "install.json"
 
@@ -4251,6 +4264,13 @@ def run_rollback_update_fixture(plant: str | None) -> int:
             return rec.read_text(encoding="utf-8").splitlines() if rec.is_file() else []
 
         for tt in targets.values() if not fails and plant not in ("descendant", "schema-up-kill") else ():
+            if shipped:
+                # s1 applied by its witness alone, no before-image; s2's witness holds whatever the
+                # target holds, as the floor row's reads the node.
+                fx = tt.with_name(tt.name + ".fx")
+                fx.mkdir(exist_ok=True)
+                (fx / "s1.witness-absent").touch()
+                (fx / "s2.witness-always").touch()
             rc0, out0 = run_fixture_govkit(gov, env, "update", "--target", str(tt), "--to", sha_b, "--write")
             got0 = {r["id"]: r["state"] for r in receipt_of(tt).get("steps") or []}
             expect(rc0 == 0 and receipt_of(tt).get("gov_commit") == sha_b and got0.get("fx/s1") == "applied"
@@ -4293,7 +4313,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
         elif schema:
             # TOOL-dSafePassage-19 AC1: a rollback past the schema step, over a target updated from a
             # schema-3 receipt through it, stamps schema 3 with no `steps` and finishes its record.
-            twin = targets["t2" if plant == "schema-step-kill-before-stamp" else "t"]
+            twin = targets["t2" if killed else "t"]
             rc_t, _o = run_fixture_govkit(gov, env, "update", "--target", str(twin), "--rollback", "--to", sha_a, "--write")
             print(_o, end="")
             rec, text = receipt_of(twin), record_of(twin)
@@ -4307,7 +4327,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
                    and not any(ln.endswith("not finished") for ln in text),
                    "the record does not name the schema step rolled-back and the stamp moved, finished")
             rc = rc_t
-            if plant == "schema-step-kill-before-stamp":
+            if killed:
                 # AC2: `t` killed once the schema step's down has renamed schema 3 into place, before
                 # the write loop moves a file row; its re-run is compared with the twin above.
                 reports.mkdir(exist_ok=True)
@@ -4349,9 +4369,27 @@ def run_rollback_update_fixture(plant: str | None) -> int:
                 print("".join(f"rollback-update: re-run record · {ln}\n" for ln in text), end="")
                 expect(rc == 0 and same_receipt and a == b and shape,
                        "the re-run did not exit 0 matching the twin's receipt, target bytes and finished record")
-                expect(downs == ["down fx/s1: skipped (nothing applied)",
-                                 "down govkit/receipt-schema-4: skipped (nothing applied)"],
-                       "the re-run's down lines are not the two `skipped (nothing applied)` lines")
+                if not shipped:
+                    expect(downs == ["down fx/s1: skipped (nothing applied)",
+                                     "down govkit/receipt-schema-4: skipped (nothing applied)"],
+                           "the re-run's down lines are not the two `skipped (nothing applied)` lines")
+                else:
+                    # TOOL-dSafePassage-70 AC1: every line but `started` and the schema step's equals the
+                    # twin's, and each fx down ran twice on `t`, the second writing nothing.
+                    schema_line = "down govkit/receipt-schema-4: "
+                    differ = [(x, y) for x, y in zip(text, twin_text) if x != y and not
+                              (x.startswith("started ") and y.startswith("started "))]
+                    same_but_schema = (len(text) == len(twin_text) and differ == [
+                        (schema_line + "skipped (nothing applied)", schema_line + "rolled-back")])
+                    ran = {s: len((reports / f"{s}.down").read_text(encoding="utf-8").splitlines())
+                           if (reports / f"{s}.down").is_file() else 0 for s in ("s2", "s1")}
+                    print(f"rollback-update: the re-run's record equals the twin's line for line "
+                          f"{'except started and the schema step' if same_but_schema else f'NOT, differing in {differ}'}")
+                    print(f"rollback-update: on t fx/s2's down ran {ran['s2']} time(s) · fx/s1's down ran {ran['s1']} time(s)")
+                    expect(same_but_schema and downs == ["down fx/s2: rolled-back", "down fx/s1: rolled-back",
+                                                         schema_line + "skipped (nothing applied)"],
+                           "the re-run's record does not equal the twin's but for started and the schema step's line")
+                    expect(ran == {"s2": 2, "s1": 2}, "fx/s2's and fx/s1's downs did not each run twice on t")
         elif plant is None:
             # First a rollback whose down fails: it stops before any file row moves, the stamp held.
             reports.mkdir(exist_ok=True)
