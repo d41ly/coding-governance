@@ -43,3 +43,4 @@ Cite ids, never line numbers.
 | [PLAY-dOrderedCharter-56](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SLOTS NAME dBoundRoles AS THEIR RENDERER. PLAY-dOrderedCharter-17's… |
 | [PLAY-dOrderedCharter-57](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE LOAD SET TAKES NO FEATURE SELECTION. TOOL-dFurnishedOrders-18… |
 | [PLAY-dOrderedCharter-58](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE FEATURE SELECTOR NAMES THE WRONG ARMING BUILD.… |
+| [PLAY-dOrderedCharter-59](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TYPED-KIND FILE-NAME JOIN READS A LOOSE STEM. The typed-kind join… |

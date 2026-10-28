@@ -10,6 +10,7 @@
 - TOOL-dPlacedRequest-71 · filed 2026-10-26 · AN OFFER NAMES A NODE, NEVER A SESSION. TOOL-dPlacedRequest-20 S1 writes `offer: <fleet tag>` only, and cl-dClosedLoop-0319 offers a unit of a leased build to another session or node, so TOOL-dWellOiledMachine-41 cannot offer to a second session on the build's own node (TOOL-dWellOiledMachine-41 §8 F1) · accept `--lease offer unit <slug> <unit> --to <fleet tag>/<session>` writes `offer: <fleet tag>/<session>` and classes the lease `offered` for every other session, the named node included, until the deadline, seen as `acquire` from that node in another session printing `lease refused — offered`
 - TOOL-dPlacedRequest-68 · filed 2026-10-26 · THE PLACEMENT BLOCK CARRIES NO RE-ENTRY. TOOL-dFurnishedOrders-16 places an owner's late answer as an `amend` that names the item it re-enters, `reenters: <unit id>#<F-id>`, and TOOL-dPlacedRequest-4 S4's placement block has no such line · accept TOOL-dPlacedRequest-4 S4's block carries an optional `reenters:` line, seen on a fixture late answer
 - TOOL-dPlacedRequest-69 · filed 2026-10-26 · THE TESTER'S ACTOR IS SPELLED TWO WAYS. TOOL-dPlacedRequest-7's item table names the tester's actor `role:tester`, and TOOL-dWitnessedBar-23 S7 writes `role:gov-tester`; TOOL-dFurnishedOrders-15 uses `role:gov-tester` for the four tester items · accept TOOL-dPlacedRequest-7's item table spells the actor `role:gov-tester`, amended by a rev bump with its §9 line
+- TOOL-dPlacedRequest-73 · filed 2026-10-26 · A CARD KEY READ THROUGH `read_card_policy` HAS NO READER. `check_policy.py`'s `READER_SHAPES` counts a shell read only in the literal `policy.py get <key>` shape, so every card key TOOL-dPlacedRequest-2 S11 reads through `read_card_policy`, and `plan.kickoff` and `kickoff.runs` once dRankedPlan lands, shows as unread (TOOL-dRankedPlan-7 §8 F5, TOOL-dRankedPlan-8 §8 F6) · accept `scan_reader_keys` run over a planted shell file whose one read of a key is `read_card_policy <key>` returns that key, seen red on the planted file before the row lands
 
 ## Dispositions
 
@@ -22,3 +23,4 @@
 - SEV · TOOL-dPlacedRequest-71 · MED · a unit cannot be offered to a second session on the build's own node
 - SEV · TOOL-dPlacedRequest-68 · MED · a late answer's placement cannot name what it re-enters
 - SEV · TOOL-dPlacedRequest-69 · LOW · the item check reads the tester's items as an undeclared role
+- SEV · TOOL-dPlacedRequest-73 · MED · the reader-coverage arm reds every card key read through `read_card_policy` once dPlacedRequest lands
