@@ -188,7 +188,7 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "local-recent-objects-hook", "local-recent-objects-hook-stub", "local-ext-transport",
                   "local-ext-transport-stub", "autocrlf", "autocrlf-local", "local-url-userinfo",
                   "submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo",
-                  "submodule-fsmonitor", "submodule-name-differs")
+                  "submodule-fsmonitor", "submodule-name-differs", "ssh-scheme-bare-user")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -208,9 +208,8 @@ STEP_REFUSED_KEYS = (
     ("http.extraHeader", "any", "sent as a credential"),
     ("http.<x>.extraHeader", "any", "sent as a credential"),
     # TOOL-dSafePassage-35 S8: the credential-bearing values. An scp-form `user@host:path` is no URL
-    # and carries no credential.
-    ("remote.<x>.url", "a URL carrying userinfo", "sent as a credential"),
-    ("remote.<x>.pushurl", "a URL carrying userinfo", "sent as a credential"),
+    # and carries no credential. A remote's `url` and `pushurl` are graded by `test_credential_bearing`
+    # alone, which keeps an ssh-scheme bare user (TOOL-dSafePassage-44).
     ("http.proxy", "a URL carrying userinfo", "sent as a credential"),
     ("remote.<x>.proxy", "a URL carrying userinfo", "sent as a credential"),
     ("http.sslKey", "any", "read as a client credential"),
@@ -1498,17 +1497,22 @@ def read_target_local_config(target, refused) -> list[tuple[str, str, str | None
 
 # TOOL-dSafePassage-38 §4: a `<scheme>://` URL carrying userinfo before its host, and the
 # credential-file keys, `<x>` any one or more segments.
-CONFIG_USERINFO_RE = re.compile(r"(?i)\b[a-z][a-z0-9+.-]*://[^/\s@]+@")
+CONFIG_USERINFO_RE = re.compile(r"(?i)\b([a-z][a-z0-9+.-]*)://([^/\s@]+)@")
+# TOOL-dSafePassage-44 S1: a bare user under these schemes is ssh's login name, not a credential.
+SSH_BARE_USER_SCHEMES = ("ssh", "git+ssh", "ssh+git")
 CREDENTIAL_FILE_KEY_RE = re.compile(r"(?i)http\.(?:.+\.)?(?:sslkey|sslcert|cookiefile|proxysslkey|proxysslcert)")
 
 
 def test_credential_bearing(key: str, value: str | None) -> bool:
     """True when `value`, or the key's text between its first and last dot, holds a URL carrying
     userinfo, or when `key` is a credential-file key (TOOL-dSafePassage-38 S1). An scp-form
-    `user@host:path` holds no `://` and is not credential-bearing."""
+    `user@host:path` holds no `://` and is not credential-bearing, and neither is a bare user, no
+    `:` in it, under a scheme `SSH_BARE_USER_SCHEMES` names, read from the match inside the tested
+    text (TOOL-dSafePassage-44 S1)."""
     inner = key.split(".", 1)[1].rpartition(".")[0] if key.count(".") >= 2 else ""
-    return bool(CREDENTIAL_FILE_KEY_RE.fullmatch(key) or CONFIG_USERINFO_RE.search(inner)
-                or (value is not None and CONFIG_USERINFO_RE.search(value)))
+    return bool(CREDENTIAL_FILE_KEY_RE.fullmatch(key) or any(
+        not (m.group(1).lower() in SSH_BARE_USER_SCHEMES and ":" not in m.group(2))
+        for text in (inner, value or "") for m in CONFIG_USERINFO_RE.finditer(text)))
 
 
 def render_redacted_config(text: str) -> str:
@@ -2800,6 +2804,19 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         except Refusal as e:
             expect(False, f"an scp-form remote with no credential was refused: {e}")
         rc = 1
+    elif plant == "ssh-scheme-bare-user":
+        # TOOL-dSafePassage-44 S5: an ssh-scheme remote and insteadOf key with a bare user carry no
+        # credential, so the step spawns.
+        cfg = target / ".git" / "config"
+        cfg.write_text(cfg.read_text(encoding="utf-8") + "[remote \"origin\"]\n\turl = ssh://git@github.com/o/r.git\n"
+                       "[url \"ssh://git@github.com/\"]\n\tinsteadOf = https://github.com/\n",
+                       encoding="utf-8", newline="\n")
+        try:
+            rep = run_clean()
+            print(f"isolation: ssh-scheme bare user · not refused · git add exits {rep.get('add')}")
+            expect(rep.get("add") == 0, "the ssh-scheme bare-user remote: clean's git add did not run")
+        except Refusal as e:
+            expect(False, f"an ssh-scheme remote with a bare user was refused: {e}")
     elif plant in ("submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo"):
         # TOOL-dSafePassage-38 S3: a URL credential in a value or a key segment that no instance row
         # names refuses the step, and the refusal prints the key redacted and never the credential.

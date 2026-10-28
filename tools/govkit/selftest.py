@@ -3572,6 +3572,25 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               rc == 1 and "isolation: FAILED" not in out and needle in out
               and "dspuser38" not in out and "dsppass38" not in out, out)
 
+    # TOOL-dSafePassage-44 AC1: an ssh-scheme bare user is kept and a password or another scheme's
+    # user is not; the plant spawns, and a copy whose predicate has no exemption refuses it.
+    cred44 = govkit_module().upgrade_steps.test_credential_bearing
+    cases44 = ((("remote.origin.url", "ssh://git@github.com/o/r.git"), False),
+               (("remote.origin.url", "git+ssh://git@h/r"), False),
+               (("url.ssh://git@github.com/.insteadof", "https://github.com/"), False),
+               (("remote.origin.url", "ssh://u:p@h/r"), True), (("branch.main.remote", "https://u@h/r"), True))
+    wrong = [(a, want) for a, want in cases44 if cred44(*a) != want]
+    check("[dSP-44] AC1 test_credential_bearing keeps the three ssh-scheme bare users and refuses "
+          "ssh://u:p@h/r and https://u@h/r", not wrong, f"wrong: {wrong}")
+    rc, out = fixture(us_py, "ssh-scheme-bare-user")
+    check("[dSP-44] AC1 fixture isolation ssh-scheme-bare-user exits 0 with its step spawned",
+          rc == 0 and "isolation: FAILED" not in out and "ssh-scheme bare user · not refused · git add exits 0" in out, out)
+    src = us_py.read_text(encoding="utf-8")
+    exempt = 'not (m.group(1).lower() in SSH_BARE_USER_SCHEMES and ":" not in m.group(2))'
+    rc, out = fixture(build_staged_copy(tmp / "no-ssh-exemption", src.replace(exempt, "True")), "ssh-scheme-bare-user")
+    check("[dSP-44] AC1 a copy whose predicate has no ssh exemption refuses fixture isolation ssh-scheme-bare-user",
+          src.count(exempt) == 1 and rc == 1 and "an ssh-scheme remote with a bare user was refused" in out, out)
+
     # TOOL-dSafePassage-24 AC1 to AC4: an executor in the target's own config refuses the step before
     # any spawn, naming the key and its file ON the refusal line; each `-stub` twin skips the check and
     # its canary runs.

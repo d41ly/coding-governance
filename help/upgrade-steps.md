@@ -81,7 +81,11 @@ starts it:
   name (`url.<base>.insteadOf`, `http.<url>.sslVerify`, `credential.<url>.username`). The
   credential-file keys are refused whatever they hold: `http.sslKey`, `http.sslCert`,
   `http.cookieFile`, `http.proxySSLKey` and `http.proxySSLCert`, each in its `http.<url>.` form
-  too. An scp-form remote such as `git@host:repo` carries no credential and is not refused. The
+  too. An scp-form remote such as `git@host:repo` carries no credential and is not refused, and
+  neither is an ssh-scheme remote with a bare user, such as `ssh://git@host/repo` under `ssh`,
+  `git+ssh` or `ssh+git`, nor a `url.ssh://git@host/.insteadOf` key: ssh authenticates by key, so
+  the user name is no secret. A bare user under any other scheme, `https://user@host/` included, is
+  still refused, and so is a password under any scheme. The
   refusal names each key and the file declaring it, with any userinfo in either written as
   `<redacted>`, and never prints a value: a refusal never prints the credential. A repository with a filter it relies on, Git LFS's say, in its own
   config or a submodule's, or a local `core.editor` or difftool, has every step refused: remove
