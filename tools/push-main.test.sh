@@ -1414,7 +1414,9 @@ awk '/^  if ! run_minter/ { print "  # run_gov_first is named above the call" }
      /^  if ! run_gov_first; then/ { print "    # return 1"; print "    echo \"return 1\" >/dev/null" }' \
   "$HERE/push-main.sh" > "$tmp/lander37-blanked.sh"
 b37=$(count37 "$tmp/lander37-blanked.sh")
-if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(grep -c 'return 1' "$tmp/lander37-blanked.sh")" -gt "$(grep -c 'return 1' "$HERE/push-main.sh")" ]; then
+# the anchors occur twice in the lander, so the plant's liveness is read inside cmd_prepare: three more lines
+raw37() { awk '/^cmd_prepare\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
+if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(raw37 "$tmp/lander37-blanked.sh")" = "$(( $(raw37 "$HERE/push-main.sh") + 3 ))" ]; then
   ok "37 a commented and a quoted return 1, and run_gov_first named above the call, leave the count at $d37"
 else
   bad "37 the derived count moved on a lander copy carrying a commented and a quoted return 1 and an earlier run_gov_first: $b37, not $d37"

@@ -13403,6 +13403,11 @@
       "file": "tools/hooks/scratch-guard.test.sh"
     },
     {
+      "id": "raw37",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "raw_write_cells",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
