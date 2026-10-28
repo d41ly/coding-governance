@@ -62,8 +62,8 @@ starts it:
   that is `.git/worktrees/<name>/modules/`, never the main worktree's `.git/modules/`, which a step
   run in the linked worktree never enters. The refused keys are the class the check names among
   the keys `git help --config` lists: every key whose name says it runs something (a `program`,
-  `command`, `cmd`, `editor`, `path`, `driver`, `helper`, `pager`, a name ending in `hook` and
-  the like), and
+  `command`, `cmd`, `editor`, `path`, `driver`, `helper`, `pager`, `tunnel`, `httpd`,
+  `smtpServer`, a name ending in `hook` and the like), and
   gov's self-test re-reads that list on every run, so a key a later git adds fails the test until
   gov classifies it. Among them: `filter.<x>.clean`, `smudge` or `process`,
   `core.fsmonitor` set to anything but false, `diff.external`, `diff.<x>.textconv` or `command`,
@@ -72,7 +72,9 @@ starts it:
   `core.editor`, `sequence.editor`, `core.gitProxy`, `remote.<x>.uploadpack` and `receivepack`,
   `hook.<x>.command`, `gc.recentObjectsHook` (run by `gc` and the auto-gc a commit or fetch
   starts), a `submodule.<x>.update` or `alias.<x>` beginning with `!`, and the trailer,
-  difftool, mergetool, browser, man, guitool and send-email commands. Credentials are refused
+  difftool, mergetool, browser, man, guitool and send-email commands, `imap.tunnel` (run by
+  `imap-send`), `instaweb.httpd`, and a `sendemail.smtpServer` that is an absolute path, which
+  `send-email` runs as a program rather than reading as a host name. Credentials are refused
   too, as a class rather than a list: a `<scheme>://` URL carrying userinfo (a user or password
   before its host) is refused wherever it appears, in any key's value (`remote.<x>.url`,
   `submodule.<name>.url`, `url.<base>.insteadOf`, `http.proxy` and every other) or in a key's own

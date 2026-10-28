@@ -3640,14 +3640,40 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         check(f"[dSP-36] a walk copy rooted at the common dir reds fixture isolation {plant}",
               src.count(walk) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
+    # TOOL-dSafePassage-42 S8, S22, AC5 and AC13: a checked-out submodule's core.fsmonitor is refused
+    # before any index read runs it, and a de-initialised submodule is named by the path its
+    # .gitmodules maps it to, or by its name where no mapping is left; a walk copy that reads the
+    # index before grading runs the fsmonitor.
+    for plant, needles in (
+            ("submodule-fsmonitor", ("core.fsmonitor in .git/modules/sub/config (submodule sub)",
+                                     "fsmonitor canary: absent")),
+            ("submodule-name-differs", ("filter.canary.clean in .git/modules/nm/config (submodule lib/p)",
+                                        "filter.canary.clean in .git/modules/nm/config (submodule nm, by name)",
+                                        "name-differs canary: absent"))):
+        rc, out = fixture(us_py, plant)
+        check(f"[dSP-42] AC5 AC13 fixture isolation {plant} exits 1 and names {', '.join(needles)}",
+              rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles), out)
+    first = tmp / "index-first"
+    first.mkdir(parents=True)
+    for f in ("govkit.py", "fixture_target.py"):
+        shutil.copy(HERE / f, first / f)
+    gate = "if not read_config(d, label) and work is not None:"
+    (first / "upgrade_steps.py").write_text(src.replace(gate, 'if work is not None and git(work, "ls-files", "-s") '
+                                                        'is not None and not read_config(d, label):'),
+                                            encoding="utf-8", newline="\n")
+    rc, out = fixture(first / "upgrade_steps.py", "submodule-fsmonitor")
+    check("[dSP-42] AC5 a walk copy that reads the index before grading reds fixture isolation submodule-fsmonitor",
+          src.count(gate) == 1 and rc == 1 and "fsmonitor canary: present" in out and "isolation: FAILED" in out, out)
+
     # TOOL-dSafePassage-29 S3 and AC4, the class arm: every executor-shaped key `git help --config`
     # lists matches a `STEP_REFUSED_KEYS` or a `STEP_UNREFUSED_KEYS` row, the counts re-derived on
     # every run; an empty listing reds, and a table copy missing `gpg.program` names it.
-    # TOOL-dSafePassage-37 S1: a last segment ending in `hook` is kept too.
+    # TOOL-dSafePassage-37 S1: a last segment ending in `hook` is kept too. TOOL-dSafePassage-42 S7:
+    # and the last segments `tunnel`, `httpd` and `smtpserver`.
     us = govkit_module().upgrade_steps
     names = ("program", "command", "cmd", "editor", "gitproxy", "uploadpack", "receivepack", "driver", "clean",
              "smudge", "process", "textconv", "external", "fsmonitor", "sshcommand", "askpass", "helper",
-             "hookspath", "pager", "path", "update", "extraheader")
+             "hookspath", "pager", "path", "update", "extraheader", "tunnel", "httpd", "smtpserver")
     hp = subprocess.run(["git", "help", "--config"], capture_output=True, text=True, encoding="utf-8",
                         errors="replace", timeout=120)
     kept = [k for k in (ln.strip() for ln in hp.stdout.splitlines()) if k
@@ -3670,6 +3696,21 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
           "taken out of a copy of the table, the arm names it",
           hooked <= set(kept) and [k for k in kept if k not in matched(less) and k not in unrefused]
           == ["gc.recentObjectsHook"], f"hook-named keys kept: {sorted(hooked & set(kept))}")
+    runs42 = {"imap.tunnel", "instaweb.httpd", "sendemail.smtpServer"}
+    less = [r for r in us.STEP_REFUSED_KEYS if r[0] != "imap.tunnel"]
+    check("[dSP-42] AC4 the kept set holds imap.tunnel, instaweb.httpd and sendemail.smtpServer, and with the "
+          "imap.tunnel row taken out of a copy of the table, the arm names it",
+          runs42 <= set(kept) and [k for k in kept if k not in matched(less) and k not in unrefused]
+          == ["imap.tunnel"], f"kept: {sorted(runs42 & set(kept))}")
+    # S7's values: any tunnel or httpd, an absolute smtpServer, never a host name.
+    v42 = tmp / "dsp42-values"
+    subprocess.run(["git", "init", "-q", str(v42)], env=us.build_tree_git_env(), capture_output=True, check=True)
+    for host, want in (("/usr/bin/x", 3), ("smtp.example.com", 2)):
+        for k, v in (("imap.tunnel", "x"), ("instaweb.httpd", "x"), ("sendemail.smtpServer", host)):
+            subprocess.run(["git", "-C", str(v42), "config", k, v], env=us.build_tree_git_env(), check=True)
+        found = us.check_target_local_config(v42)
+        check(f"[dSP-42] AC4 sendemail.smtpServer = {host}: the check names {want} of the three keys",
+              len(found) == want and all(any(k.lower() in e for e in found) for k in sorted(runs42)[:want]), str(found))
 
     # AC6's red: the shipped pair copied, a direct spawn of `row["up"]` planted into the copy.
     planted = tmp / "callers"

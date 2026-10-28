@@ -927,7 +927,8 @@ run_regen() {  # -> 0 regenerated or announced-skipped · 1 a write failed or th
 # non-zero when <file> is empty (the `mktemp` failed), or `git ls-files` or the sort fails, read
 # through PIPESTATUS, and each caller refuses on that before its stage runs, so a snapshot that
 # cannot be written never falls through to a walk or a regeneration (TOOL-dSafePassage-35 S10, S11).
-# Its three callers, each on a tree it required clean, so every path cleaned is one the stage made:
+# `remove_new_untracked` writes its current set with it too. Its three stage callers, each on a tree
+# it required clean, so every path cleaned is one the stage made:
 # `cmd_prepare`'s one snapshot, before gov first and kept through the regeneration, its tree the
 # minted merge (TOOL-dSafePassage-27); the attended path's gov-first snapshot, its tree the mint
 # commit (TOOL-dSafePassage-25 S2); and the attended regeneration's, its tree gov first's commit.
@@ -943,8 +944,9 @@ remove_new_untracked() {  # snapshot file -> nothing on stdout
   local now
   [ -f "${1:-}" ] || return 0
   now=$(mktemp) || return 0
-  if git ls-files --others --exclude-standard -z > "$now" 2>/dev/null; then
-    LC_ALL=C sort -z -o "$now" "$now"
+  # the current set from the snapshot's own writer, so the two sets `comm` compares are one shape
+  # (TOOL-dSafePassage-42 S18)
+  if write_untracked_snapshot "$now"; then
     LC_ALL=C comm -z -13 "$1" "$now" | xargs -0 -r git clean -f -q -- >/dev/null 2>&1 || true
   fi
   rm -f "$now"

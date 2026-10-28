@@ -1384,13 +1384,41 @@ PREPARE_REFUSALS=(
   "compare-and-swap|regen-moves-branch|moved"
   "final checkout|unplantable: no fixture fails the closing git checkout without a lander switch|-"
 )
-d37=$(awk '/^cmd_prepare\(\)/,/^}/' "$HERE/push-main.sh" | sed -n '/run_gov_first/,$p' | grep -c 'return 1')
+# TOOL-dSafePassage-42 S12 and S13: the count reads check-arms' blanked lines (`scan_shell_lines`), so
+# a comment or a quoted `return 1` is not counted, from the `if ! run_gov_first` call, never the first
+# mention of the name, to cmd_prepare's closing brace, here-document and continued lines aside.
+_py37=$(resolve_python 2>/dev/null) || _py37=""
+count37() {  # lander path -> the count on stdout
+  "${_py37:-python3}" -c '
+import importlib.util, re, sys
+spec = importlib.util.spec_from_file_location("check_arms", sys.argv[1])
+arms = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(arms)
+rows = [r for r in arms.scan_shell_lines(open(sys.argv[2], encoding="utf-8").read()) if r]
+start = next(i for i, r in enumerate(rows) if r[0].startswith("cmd_prepare()"))
+end = next(i for i in range(start, len(rows)) if rows[i][0].startswith("}"))
+at = next((i for i in range(start, end) if re.match(r"[ \t]*if ! run_gov_first\b", rows[i][1])), end)
+print(sum(1 for raw, code, cont, here in rows[at:end] if not cont and not here and re.search(r"\breturn 1\b", code)))
+' "$HERE/memory-tree/check-arms.py" "$1" 2>/dev/null || echo 0
+}
+d37=$(count37 "$HERE/push-main.sh")
 if [ "$d37" -gt 0 ] && [ "$d37" = "${#PREPARE_REFUSALS[@]}" ]; then
   ok "37 cmd_prepare refuses $d37 way(s) after the gov-first walk, and PREPARE_REFUSALS carries a row for each"
 else
   bad "37 cmd_prepare refuses $d37 way(s) after the gov-first walk (0 means the anchor matched nothing), PREPARE_REFUSALS carries ${#PREPARE_REFUSALS[@]} row(s)"
 fi
-_py37=$(resolve_python 2>/dev/null) || _py37=""
+# AC9's blanking: a lander copy carrying a `# return 1` comment and an `echo "return 1"` line after
+# the call, and a comment naming run_gov_first above the mint block, counts the same.
+awk '/^  if ! run_minter/ { print "  # run_gov_first is named above the call" }
+     { print }
+     /^  if ! run_gov_first; then/ { print "    # return 1"; print "    echo \"return 1\" >/dev/null" }' \
+  "$HERE/push-main.sh" > "$tmp/lander37-blanked.sh"
+b37=$(count37 "$tmp/lander37-blanked.sh")
+if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(grep -c 'return 1' "$tmp/lander37-blanked.sh")" -gt "$(grep -c 'return 1' "$HERE/push-main.sh")" ]; then
+  ok "37 a commented and a quoted return 1, and run_gov_first named above the call, leave the count at $d37"
+else
+  bad "37 the derived count moved on a lander copy carrying a commented and a quoted return 1 and an earlier run_gov_first: $b37, not $d37"
+fi
 n37=0
 for _row37 in "${PREPARE_REFUSALS[@]}"; do
   n37=$((n37 + 1))

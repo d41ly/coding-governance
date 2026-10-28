@@ -6858,6 +6858,11 @@
       "file": "tools/memory-tree/hygiene-parity.test.sh"
     },
     {
+      "id": "count37",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "count7",
       "kind": "function",
       "file": "tools/memory-tree/hygiene-parity.test.sh"

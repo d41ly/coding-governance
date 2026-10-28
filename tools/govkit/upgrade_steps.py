@@ -187,12 +187,13 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-unpopulated-worktree-stub", "submodule-main-only",
                   "local-recent-objects-hook", "local-recent-objects-hook-stub", "local-ext-transport",
                   "local-ext-transport-stub", "autocrlf", "autocrlf-local", "local-url-userinfo",
-                  "submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo")
+                  "submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo",
+                  "submodule-fsmonitor", "submodule-name-differs")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
-# value rule is `any`, `not a git false`, `begins with !` or `a URL carrying userinfo`, a
-# `<scheme>://` value with an `@` before its host. selftest's class arm holds it, with
+# value rule is `any`, `not a git false`, `begins with !`, `an absolute path` (`/`, `\` or a drive
+# letter) or `a URL carrying userinfo`, a `<scheme>://` value with an `@` before its host. selftest's class arm holds it, with
 # `STEP_UNREFUSED_KEYS`, to every executor-shaped key `git help --config` lists.
 STEP_REFUSED_KEYS = (
     ("filter.<x>.clean", "any", "add, checkout, status"),
@@ -246,7 +247,12 @@ STEP_REFUSED_KEYS = (
     ("sendemail.ccCmd", "any", "send-email"),
     ("sendemail.toCmd", "any", "send-email"),
     ("sendemail.headerCmd", "any", "send-email"),
-    ("gc.recentObjectsHook", "any", "gc, repack --cruft, and the auto-gc of commit and fetch"))
+    ("gc.recentObjectsHook", "any", "gc, repack --cruft, and the auto-gc of commit and fetch"),
+    # TOOL-dSafePassage-42 S7: the last segments `tunnel`, `httpd` and `smtpserver`; an absolute
+    # `smtpServer` is a program git runs, a host name is not.
+    ("imap.tunnel", "any", "imap-send"),
+    ("instaweb.httpd", "any", "instaweb"),
+    ("sendemail.smtpServer", "an absolute path", "send-email"))
 # The executor-shaped keys the check does not refuse (TOOL-dSafePassage-29 S2), as (key pattern, why).
 STEP_UNREFUSED_KEYS = (
     ("merge.<driver>.driver", "a step does not merge, and gov's own checkout declares two (TOOL-dSafePassage-24 §3)"),
@@ -1387,44 +1393,56 @@ def derive_step_mode(row: StepRow) -> str:
     return "attended" if row.needs_target else "isolated"
 
 
-def read_target_repositories(target) -> list[dict[str, str]] | str:
+def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
     """Every repository a git command run in `target` can enter (TOOL-dSafePassage-30 S1), as
     `{"git_dir", "reached_by"}` rows, the target's own first with `reached_by` empty: each gitlink
     of a repository's index whose working directory holds a `.git` entry, walked again over that
     repository's index, and every directory under `<git dir>/modules/` (a submodule's own git
     directory for one) holding a `config`, populated or not, the target's `<git dir>` its own
     worktree's (TOOL-dSafePassage-36 S1), never the common one. Each is listed once by its resolved
-    path. Every git call runs under `build_step_env`'s environment; one that fails returns the call
-    and git's exit as a string, never an empty population."""
+    path. `read_config(git_dir, reached_by)` reads and grades each repository's config before any
+    index-reading command runs in it, and a repository it returns True for is refused, its index
+    never read (TOOL-dSafePassage-42 S8). A `modules/` row's `reached_by` is the path its worktree's
+    `.gitmodules` maps the name to, or the name and `, by name` where none does (S22). Every git
+    call runs under `build_step_env`'s environment; one that fails, or a `Refusal` `read_config`
+    raises, returns the call and git's exit as a string, never an empty population."""
     with tempfile.TemporaryDirectory(prefix="gk-repos-", ignore_cleanup_errors=True) as td:
         env = build_step_env(td)
 
-        def git(cwd, *args) -> str:
+        def git(cwd, *args, ok=(0,)) -> str:
             p = subprocess.run(["git", "-C", str(cwd), *args], env=env, stdin=subprocess.DEVNULL,
                                capture_output=True)
-            if p.returncode != 0:
+            if p.returncode not in ok:
                 raise Refusal(f"`git -C {pathlib.Path(cwd).as_posix()} {' '.join(args)}` exits {p.returncode}: "
                               f"{p.stderr.decode('utf-8', 'replace').strip()}")
             return p.stdout.decode("utf-8", "replace")
 
+        def submodule_paths(work) -> dict[str, str]:
+            """name -> path of `work`'s `.gitmodules`; `config -f` reads that one file and runs nothing."""
+            if work is None or not (work / ".gitmodules").is_file():
+                return {}
+            out = git(work, "config", "-z", "-f", ".gitmodules", "--get-regexp", r"^submodule\..*\.path$", ok=(0, 1))
+            return {k[len("submodule."):-len(".path")]: v
+                    for k, _, v in (e.partition("\n") for e in out.split("\0") if e)}
+
         rows: list[dict[str, str]] = []
         seen: set[pathlib.Path] = set()
 
-        def add(git_dir, reached_by: str, work) -> None:
+        def add(git_dir, reached_by: str, work, mark: str = "") -> None:
             d = pathlib.Path(git_dir).resolve()
             if d not in seen:
                 seen.add(d)
-                rows.append({"git_dir": d.as_posix(), "reached_by": reached_by})
-                queue.append((d, reached_by, work))
+                rows.append({"git_dir": d.as_posix(), "reached_by": reached_by + mark})
+                queue.append((d, reached_by, work, reached_by + mark))
 
-        queue: list[tuple[pathlib.Path, str, pathlib.Path | None]] = []
+        queue: list[tuple[pathlib.Path, str, pathlib.Path | None, str]] = []
         try:
             target = pathlib.Path(target)
             add(git(target, "rev-parse", "--absolute-git-dir").strip(), "", target)
             while queue:
-                d, via, work = queue.pop(0)
-                if work is not None:
-                    # an index read runs `core.fsmonitor`, which is graded only after this walk
+                d, via, work, label = queue.pop(0)
+                # graded first: an index read runs `core.fsmonitor`, so a refused repository's never runs
+                if not read_config(d, label) and work is not None:
                     for ent in git(work, "-c", "core.fsmonitor=false", "ls-files", "-s", "-z").split("\0"):
                         meta, _, path = ent.partition("\t")
                         if meta.startswith("160000 ") and (work / path / ".git").exists():
@@ -1435,40 +1453,47 @@ def read_target_repositories(target) -> list[dict[str, str]] | str:
                     if "config" in files:
                         # ponytail: inside a submodule's git dir only its own `modules/` holds more
                         dirs[:] = [x for x in dirs if x == "modules"]
-                        name = pathlib.Path(root).relative_to(mods).as_posix().replace("/modules/", "/")
-                        add(root, f"{via}/{name}".lstrip("/"), None)
+                        w, parts, mark = work, [], ""
+                        for name in pathlib.Path(root).relative_to(mods).as_posix().split("/modules/"):
+                            p = submodule_paths(w).get(name)
+                            parts.append(p or name)
+                            mark = mark if p else ", by name"
+                            w = w / p if p and (w / p / ".git").exists() else None
+                        add(root, f"{via}/{'/'.join(parts)}".lstrip("/"), None, mark)
         except Refusal as e:
             return str(e)
     return rows
 
 
-def read_target_local_config(target) -> list[tuple[str, str, str | None, str]] | str:
+def read_target_local_config(target, refused) -> list[tuple[str, str, str | None, str]] | str:
     """The config rows of every repository `read_target_repositories` finds (TOOL-dSafePassage-24
     S1, TOOL-dSafePassage-30 S2): `git --git-dir=<dir> config --list --show-scope --show-origin
     --includes -z` run in the target under `build_step_env`'s environment, so system and global are
     off, keeping the `local` and `worktree` rows, an included file's among them, as (origin file,
-    key, value or None for a bare key, the submodule path reaching it or empty). A git dir under the
-    target is passed relative to it, so its origin reads `.git/...`. A read that fails returns git's
-    exit and stderr as a string."""
-    repos = read_target_repositories(target)
-    if isinstance(repos, str):
-        return repos
+    key, value or None for a bare key, the submodule path reaching it or empty). Each repository's
+    rows are read, and graded by `refused(*row)`, as the walk reaches it, before its index is read
+    (TOOL-dSafePassage-42 S8). A git dir under the target is passed relative to it, so its origin
+    reads `.git/...`. A read that fails returns git's exit and stderr as a string."""
     root, rows = pathlib.Path(target).resolve(), []
     with tempfile.TemporaryDirectory(prefix="gk-cfg-", ignore_cleanup_errors=True) as td:
-        for repo in repos:
-            d = pathlib.Path(repo["git_dir"])
+        def read(d: pathlib.Path, via: str) -> bool:
             gd = d.relative_to(root).as_posix() if d.is_relative_to(root) else d.as_posix()
             p = subprocess.run(["git", "-C", str(target), f"--git-dir={gd}", "config", "--list", "--show-scope",
                                 "--show-origin", "--includes", "-z"], env=build_step_env(td),
                                stdin=subprocess.DEVNULL, capture_output=True)
             if p.returncode != 0:
-                return f"`git config --list` over {gd} exits {p.returncode}: {p.stderr.decode('utf-8', 'replace').strip()}"
-            f = p.stdout.decode("utf-8", "replace").split("\0")
+                raise Refusal(f"`git config --list` over {gd} exits {p.returncode}: "
+                              f"{p.stderr.decode('utf-8', 'replace').strip()}")
+            f, mine = p.stdout.decode("utf-8", "replace").split("\0"), []
             for scope, origin, kv in zip(f[0::3], f[1::3], f[2::3]):
                 if scope in ("local", "worktree"):
                     key, nl, value = kv.partition("\n")
-                    rows.append((origin.removeprefix("file:"), key, value if nl else None, repo["reached_by"]))
-    return rows
+                    mine.append((origin.removeprefix("file:"), key, value if nl else None, via))
+            rows.extend(mine)
+            return any(refused(*r) for r in mine)
+
+        repos = read_target_repositories(target, read)
+    return repos if isinstance(repos, str) else rows
 
 
 # TOOL-dSafePassage-38 §4: a `<scheme>://` URL carrying userinfo before its host, and the
@@ -1500,19 +1525,23 @@ def check_target_local_config(target) -> list[str]:
     and none carrying a value (TOOL-dSafePassage-24 S2, TOOL-dSafePassage-29 S1,
     TOOL-dSafePassage-30 S3, TOOL-dSafePassage-38 S1 S2); a read that failed is the one entry,
     naming git's exit."""
-    rows = read_target_local_config(target)
+    def refused(origin: str, key: str, value: str | None, via: str) -> bool:
+        return test_credential_bearing(key, value) or any(
+            re.fullmatch(re.sub(r"<[^>]+>", ".+", re.escape(pattern)), key, re.I)
+            and (rule == "any"
+                 or (rule == "not a git false" and (value is None or value.strip().lower() not in GIT_FALSE))
+                 or (rule == "begins with !" and value is not None and value.startswith("!"))
+                 or (rule == "an absolute path" and value is not None
+                     and re.match(r"[/\\]|[A-Za-z]:[/\\]", value.strip()))
+                 or (rule == "a URL carrying userinfo" and value is not None
+                     and re.match(r"[A-Za-z][A-Za-z0-9+.-]*://[^/?#@]*@", value.strip())))
+            for pattern, rule, _runs in STEP_REFUSED_KEYS)
+
+    rows = read_target_local_config(target, refused)
     if isinstance(rows, str):
         return [render_redacted_config(rows)]
     return [render_redacted_config(f"{key} in {origin}" + (f" (submodule {via})" if via else ""))
-            for origin, key, value, via in rows
-            if test_credential_bearing(key, value)
-            or any(re.fullmatch(re.sub(r"<[^>]+>", ".+", re.escape(pattern)), key, re.I)
-                   and (rule == "any"
-                        or (rule == "not a git false" and (value is None or value.strip().lower() not in GIT_FALSE))
-                        or (rule == "begins with !" and value is not None and value.startswith("!"))
-                        or (rule == "a URL carrying userinfo" and value is not None
-                            and re.match(r"[A-Za-z][A-Za-z0-9+.-]*://[^/?#@]*@", value.strip())))
-                   for pattern, rule, _runs in STEP_REFUSED_KEYS)]
+            for origin, key, value, via in rows if refused(origin, key, value, via)]
 
 
 def run_step_isolated(row: StepRow, phase: str, target, gov_root, to: str | None = None) -> dict:
@@ -2875,6 +2904,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         # target does not check out. TOOL-dSafePassage-36 S3: `unpopulated-worktree` sets it in a
         # linked-worktree target's own de-initialised submodule, whose step updates it and runs
         # `git status`, and `main-only` in the main worktree's, which that target never enters.
+        # TOOL-dSafePassage-42 S8: `fsmonitor` sets `core.fsmonitor` in a checked-out submodule, which
+        # an index read there would run; S22: `name-differs` sets the filter in a de-initialised
+        # submodule named `nm` at `lib/p`, reached only through `modules/`, then drops its mapping.
         kind = plant.removeprefix("submodule-").removesuffix("-stub")
         linked = kind in ("unpopulated-worktree", "main-only")
         fx = ["git", "-c", "protocol.file.allow=always", "-c", "user.name=gk-fx", "-c", "user.email=gk-fx@invalid"]
@@ -2895,7 +2927,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             return d
 
         sub = src("sub", *((src("inner"),) if kind == "nested" else ()))
-        fx_git(target, "submodule", "add", "-q", sub.as_posix(), "sub")
+        fx_git(target, "submodule", "add", "-q", *(("--name", "nm", sub.as_posix(), "lib/p") if kind == "name-differs"
+                                                   else (sub.as_posix(), "sub")))
         if kind == "nested":
             fx_git(target, "submodule", "update", "-q", "--init", "--recursive")
         stepped = target
@@ -2904,10 +2937,13 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             stepped = tmp / "wt"
             fx_git(target, "worktree", "add", "-q", stepped.as_posix())
             fx_git(stepped, "-c", "protocol.file.allow=always", "submodule", "update", "-q", "--init")
-        deep = {"nested": target / "sub" / "inner", "unpopulated-worktree": stepped / "sub"}.get(kind, target / "sub")
-        fx_git(deep, "config", "filter.canary.clean", f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
-        if kind == "unpopulated" or linked:
-            fx_git(stepped, "submodule", "deinit", "-q", "-f", "sub")
+        deep = {"nested": target / "sub" / "inner", "unpopulated-worktree": stepped / "sub",
+                "name-differs": target / "lib" / "p"}.get(kind, target / "sub")
+        key = "core.fsmonitor" if kind == "fsmonitor" else "filter.canary.clean"
+        fx_git(deep, "config", key, f": > '{(canaries / 'fsmonitor').as_posix()}'" if kind == "fsmonitor"
+               else f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
+        if kind in ("unpopulated", "name-differs") or linked:
+            fx_git(stepped, "submodule", "deinit", "-q", "-f", "lib/p" if kind == "name-differs" else "sub")
         else:
             # same size, new mtime: git cannot tell it changed without the clean filter
             (deep / "a.txt").write_text("b\n", encoding="utf-8", newline="\n")
@@ -2918,7 +2954,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                  "nested": ".git/modules/sub/modules/inner/config (submodule sub/inner)",
                  "unpopulated": ".git/modules/sub/config (submodule sub)",
                  "unpopulated-worktree": (target / ".git" / "worktrees" / "wt" / "modules" / "sub").resolve().as_posix()
-                 + "/config (submodule sub)"}.get(kind, "")
+                 + "/config (submodule sub)",
+                 "fsmonitor": ".git/modules/sub/config (submodule sub)",
+                 "name-differs": ".git/modules/nm/config (submodule lib/p)"}.get(kind, "")
         done = reports / "status.rc"
         status = (row("update", ["python", "{gov}/steps/update.py", "{target}", done.as_posix()]) if linked
                   else row("status", ["python", "{gov}/steps/status.py", "{target}", done.as_posix()]))
@@ -2941,8 +2979,18 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             if kind != "unpopulated":
                 expect(hit == ["filter-clean"], "the submodule's filter did not run under the stubbed check")
         else:
-            expect(f"filter.canary.clean in {where}" in refused, f"the step was not refused naming filter.canary.clean in {where}")
-            expect(not done.exists() and not hit, "the refused step spawned, or its filter ran")
+            expect(f"{key} in {where}" in refused, f"the step was not refused naming {key} in {where}")
+            expect(not done.exists() and not hit, f"the refused step spawned, or its {key} ran")
+        if kind == "name-differs":
+            fx_git(target, "config", "-f", ".gitmodules", "--unset", "submodule.nm.path")
+            try:
+                run_step_isolated(status, "up", stepped, gov)
+                refused = ""
+            except Refusal as e:
+                refused = str(e)
+                print(f"isolation: {status.id} · the .gitmodules mapping removed · refused · {e}")
+            expect(f"{key} in .git/modules/nm/config (submodule nm, by name)" in refused,
+                   "with no .gitmodules mapping the refusal does not name the submodule `nm, by name`")
         rc = 0 if kind == "main-only" else 1
     for f in fails:
         print(f"isolation: FAILED · {f}")
