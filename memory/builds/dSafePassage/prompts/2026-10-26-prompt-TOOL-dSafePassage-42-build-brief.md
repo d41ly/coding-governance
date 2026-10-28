@@ -56,3 +56,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## Carried from earlier passes (2026-10-28)
+
+- AC15 runs `wsl.exe -d Ubuntu`. This node has no distribution by that name; `wsl.exe -l -q` lists `claude-u26`. TOOL-dSafePassage-31's builder ran its WSL half under `wsl.exe -d claude-u26` and recorded the substitution on a `Decided:` trailer. Do the same.
+- Since rev-7, S14 binds back into govkit only the moved names that something still reads off govkit (TOOL-dSafePassage-35 S24, f8f919882). Read the closure from the code at HEAD, not from the spec's line cites.
