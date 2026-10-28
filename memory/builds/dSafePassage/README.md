@@ -198,7 +198,7 @@ ids TOOL-dSafePassage-71
 | [TOOL-dSafePassage-47 — the submodule walk lists a repository by git's own directory shape, and refuses one whose config git cannot read](spec/2026-10-23-spec-TOOL-dSafePassage-47.md) | 12 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-48 — the step contract refuses `sendemail.sendmailCmd` and every send-email executor key in its identity form](spec/2026-10-23-spec-TOOL-dSafePassage-48.md) | 12 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-50 — the spec audit of units 43 to 46, its five minors on TOOL-46: the lander arm placed after the scan it reads, its locator cited by content, and one owner for the cutoff paragraph](spec/2026-10-23-spec-TOOL-dSafePassage-50.md) | 12 | 2 | CLOSED | rev-2 | 2026-10-28 |
-| [TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-49.md) | 13 | 2 | DEFERRED | rev-5 | 2026-10-26 |
+| [TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-49.md) | 13 | 2 | DEFERRED | rev-6 | 2026-10-28 |
 | [TOOL-dSafePassage-52 — the spec audit of units 47 to 50, its seven minors on TOOL-50: a misplaced arm that aborts the suite, one scan line, the arm's place read by content, the template repaired through its render, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-52.md) | 13 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-51 — the step module's 15 audit minors from units 47 to 50: build order in commit order, the walk's checks in one sequence, the guard's keys, one section probe](spec/2026-10-23-spec-TOOL-dSafePassage-51.md) | 14 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-57 — TOOL-52 AC1 reads the arm: its guard taken from the suite by content, evaluated after the scan and alone under `set -u`](spec/2026-10-23-spec-TOOL-dSafePassage-57.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -211,7 +211,7 @@ ids TOOL-dSafePassage-71
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 345 bound to this build, across 4 record folder(s).
+Records: 347 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

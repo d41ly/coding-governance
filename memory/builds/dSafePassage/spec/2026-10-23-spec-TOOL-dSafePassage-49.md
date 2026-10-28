@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them
 
-**Status:** DEFERRED · rev-5 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-6 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -17,6 +17,8 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md) | research | — |
 | [2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-31-tokens-b-1-spec-writer.md) | research | TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-59 |
 | [2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-49-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-49-1-spec-writer.md) | research | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-49-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-49-2-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-50 |
 
 <!-- /gen:spec-records -->
@@ -85,13 +87,15 @@ Their items here add what the second finding found beyond the high's edit.
   `tools/govkit/selftest.py`, which already runs every `rollback` plant. So TOOL-dSafePassage-43's arm
   needs only TOOL-dSafePassage-3's `set_step_state` and can be staged red at its own pass. NOT
   OBSERVED: a reading of another unit's arm line; the main loop observes both arms at the close.
-- **S4** — id 19. TOOL-dSafePassage-4 builds strictly after TOOL-dSafePassage-43. The build driver
-  sorts the roster by `order` and breaks a tie by id string (`tools/workflows/unattended-build.js:608-613`),
-  `TOOL-dSafePassage-4` sorts before `TOOL-dSafePassage-43`, and dispatch is strictly sequential
-  (`:76-82`). So the order field is the only carrier. TOOL-dSafePassage-4 takes order 3, and its two
-  consumers now at order 3, TOOL-dSafePassage-18 and TOOL-dSafePassage-19, take order 4, as §4
-  "The order move" derives. The field is read when the roster is handed out, before any pass, so no
-  pass of this unit can write it: §8 F1. Observed by AC2.
+- **S4** — id 19. TOOL-dSafePassage-4 builds strictly after TOOL-dSafePassage-43. Struck at rev-6
+  as a header move, because the relation already held and no header can now carry it (§8 F1). The
+  premise that the `order` field is the only carrier was wrong. `--dispatch`'s edge refusal,
+  TOOL-dTrueNorth-16 S2 in `tools/unattended/unattended.sh:13857-13926`, refuses a unit while a
+  same-build unit it consumes from is neither CLOSED nor WONTDO. The build run dispatched
+  TOOL-dSafePassage-43, -7 and -2 before TOOL-dSafePassage-4, and TOOL-dSafePassage-4 before -18 and
+  -19, by `memory/builds/dSafePassage/RUN.md`'s dispatch rows. All six specs are CLOSED, so no pass
+  writes their headers. NOT OBSERVED: a finished dispatch sequence, which no write of this unit
+  moves; TOOL-dSafePassage-51 AC1 reads it from the `Pass:` trailers.
 
 ### The step row's one rule (D-5, D-9, D-17, D-21)
 
@@ -100,7 +104,11 @@ Their items here add what the second finding found beyond the high's edit.
   S3 does for an unrecorded row, and never `rolled-back` with a failure. Its `via` follows
   TOOL-dSafePassage-39 S3's rule, because no up is on record since the last down completed.
   TOOL-dSafePassage-4 §4's row "`rolled-back`, or none · witness holds · as an `applied` row" is read
-  with that state. The `rollback` family gains `rolled-back-witness-holds`. TOOL-dSafePassage-4's and
+  with that state. The `rollback` family gains `rolled-back-witness-holds`. `derive_reverse_steps`
+  skips a row the receipt records `rolled-back` (`tools/govkit/upgrade_steps.py:1957` at
+  `9e91439d0`), so the plant records s2 `rolled-back` after the rows are derived and before
+  `run_reverse_walk` reads the receipt, for example in the reverse child the fixture spawns. A plant
+  that records it before the derivation never reaches move 1. TOOL-dSafePassage-4's and
   TOOL-dSafePassage-43's §3 hands-off bullets to this unit name the reading. Observed by AC3.
 - **S9** — id 29, the skeptic's corrected fix. A row's `failure` is absent, `null` (read as absent) or
   a non-empty `str`. Any other type, and the empty string, is refused naming the step, in every state.
@@ -110,7 +118,9 @@ Their items here add what the second finding found beyond the high's edit.
   `test_steps_recordable`. It raises `Refusal` naming the step and the text on every refused row of
   §4 "The row rule", and returns `None` on an admitted one. `set_step_state` and `read_step_states`
   both call it and restate none of it, so TOOL-dSafePassage-43 S3's "the reader inherits it" is read
-  as that call. Observed by AC4 and AC5.
+  as that call. The rollback fixture's own stop check, `s.startswith(DOWN_STOP_PREFIXES)` at
+  `tools/govkit/upgrade_steps.py:4405` at `9e91439d0`, compares through `test_step_row` too, so the
+  module holds one such call. Observed by AC4 and AC5.
 - **S20** — id 33. The step-row arm stages a second failing case: a writer copy that admits any
   `failure` on an `applied` row, under which the `interrupted: started …` and `exit 1: x` rows go red.
   It is declared on this unit's `New arm:` line beside S16's agreement rows. Observed by AC4, whose
@@ -125,7 +135,9 @@ Their items here add what the second finding found beyond the high's edit.
 - **S13** — id 20. "Built from the constant" (TOOL-dSafePassage-43 S1) is observed: in
   `tools/govkit/upgrade_steps.py`, every string constant that opens with an entry of
   `DOWN_STOP_PREFIXES` lies inside that constant's own assignment. This includes each literal part of
-  an f-string, and fixture code compares through the constant too. Observed by AC6.
+  an f-string, and fixture code compares through the constant too. At `9e91439d0` the rollback
+  fixture's `down exit 1: fx: s3 down fails by its plant` and its s2 twin (`:4401-4402`) are retyped
+  literals, so the pass builds both from `DOWN_STOP_PREFIXES`. Observed by AC6.
 
 ### The ssh remote at TOOL-44's pass (D-6, D-13)
 
@@ -178,7 +190,9 @@ Their items here add what the second finding found beyond the high's edit.
 - **S17** — id 16. TOOL-dSafePassage-44's AC3 and TOOL-dSafePassage-45's AC2 second half are read
   over the "What a step can reach" section alone, extracted by §4 "The section probe". TOOL-44's AC3
   asserts a line holding both `ssh://` and `not refused`. TOOL-45's AC2 asserts a line holding
-  `protocol.ext.allow`. Observed by AC12.
+  `protocol.ext.allow`. At `9e91439d0` the two ssh tokens sit on adjacent lines,
+  `help/upgrade-steps.md:104-105`, so the pass reflows that sentence until one line carries both.
+  Observed by AC12.
 
 ### The `.gitmodules` read and the redactor (D-19, D-20)
 
@@ -192,9 +206,11 @@ Their items here add what the second finding found beyond the high's edit.
   subsection's last `@`, whatever lies between. TOOL-dSafePassage-45 S9's pattern stays for every
   other text. This unit ran S9's pattern on node d, 2026-10-23: `http.https://u:se/cret@h/.sslkey` and
   `http.https://u:se cret@h/.sslkey` came back unchanged, and the subsection rule returns
-  `http.https://<redacted>@h/.sslkey` for both. The `isolation` family gains
-  `subsection-password-space`, `[http "https://u:se cret@h/"] sslKey = x`, which TOOL-dSafePassage-45
-  AC6's no-substring assertion covers. Observed by AC14.
+  `"http.https://<redacted>@h/.sslkey"` for both. The `isolation` family gains
+  `subsection-password-space`, `[http "https://u:se cret@h/"] sslKey = x`. Its output is graded over
+  the refusal's named entries, the text between TOOL-dSafePassage-24's fixed lead and tail, and not
+  over the whole output as TOOL-dSafePassage-45 AC6 reads its own plants: the lead's ` credential`
+  holds `cre` and ` cr`, two pieces of `se cret` (§8 F2). Observed by AC14.
 
 ### Readings of pins and figures (D-15, D-16)
 
@@ -219,22 +235,23 @@ Their items here add what the second finding found beyond the high's edit.
 - Rewriting a built spec. An item that corrects a built spec's text states the reading here. The two
   edge pairs S6 and S12 name are the exception, because their findings ask the disposal to write them.
 - The report's left-shift gates and checklist entries.
-- The other same-order `consumes-from` edges the driver's id tie-break builds consumer first:
+- The other same-order `consumes-from` edges the driver's id tie-break would build consumer first:
   TOOL-dSafePassage-2 on TOOL-dSafePassage-7, TOOL-dSafePassage-11 on TOOL-dSafePassage-15 and
-  TOOL-dSafePassage-12 on TOOL-dSafePassage-8. No finding of this audit names them. S4 also moves
-  TOOL-dSafePassage-4 past TOOL-dSafePassage-7, and the rest are a follow-up for the owner.
+  TOOL-dSafePassage-12 on TOOL-dSafePassage-8. The same edge refusal held each one, producer first,
+  by `memory/builds/dSafePassage/RUN.md`'s dispatch rows `:75` before `:79`, `:85` before `:113` and
+  `:117` before `:123`, so no follow-up is owed.
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-4` — move 3, the down table, AC4 and the `order` verb, which S2, S4 and S5 read and move
+- **consumes-from** `TOOL-dSafePassage-4` — move 3, the down table and AC4, which S2 and S5 read; S4's move of its `order` verb is struck at rev-6 (§8 F1)
 - **consumes-from** `TOOL-dSafePassage-29` — the class arm and `STEP_UNREFUSED_KEYS`, which S8 widens to identity forms; without the arm there is nothing to widen
 - **consumes-from** `TOOL-dSafePassage-43` — `DOWN_STOP_PREFIXES`, the writer rule, its table, AC3 and its arm line, which S1, S3, S5, S9, S13, S16 and S20 amend and read
 - **consumes-from** `TOOL-dSafePassage-44` — AC1, AC2 and AC3 and the `ssh-scheme-bare-user` plant, which S6, S11 and S17 read
 - **consumes-from** `TOOL-dSafePassage-45` — S8's tested subsection, S9's redactor, S13's read, AC2, AC12, S11's pin and the PINNED figure, which S10, S14, S15, S17, S18 and S19 amend and read
 - **consumes-from** `TOOL-dSafePassage-47` — the candidate shape and the config-read refusal, beside which S7 adds the `rev-parse --git-dir` refusal
 - **consumes-from** `TOOL-dSafePassage-48` — the send-email rows in both forms, each kept `sendemail.<key>` and its identity form, and the `sendemail.sendmailCmd` row, which S8's arm holds to a derivation
-- **hands-off** `TOOL-dSafePassage-51` — F1(a)'s sweep ending on AC2's header probe, with no roster handed out while TOOL-dSafePassage-4's order is not above TOOL-dSafePassage-43's and TOOL-dSafePassage-7's, and amending the Rollouts of TOOL-dSafePassage-2, -7 and -43 to `TOOL-dSafePassage-4 builds at order 3`; S7's `rev-parse` run only after a config read that exited 0; no `UNLISTED_EXECUTOR_KEYS` in the module, the expected key a literal in `tools/govkit/selftest.py`; a staged move-3 copy for AC3; fixture code comparing through `test_step_row`; S18's `stat` before any open, with the `gitmodules-fifo` plant; S6's Readers reason; §4's section probe; and §10's lookups, findings 1, 10, 19, 2, 9, 14, 4, 3, 24, 13, 8 and 18 of the spec audit of units 47 to 50
-- **hands-off** `TOOL-dSafePassage-55` — F1(a)'s sweep ending on AC2 run as that unit's one order probe, all four relations, TOOL-dSafePassage-18 and TOOL-dSafePassage-19 above TOOL-dSafePassage-4 included, so no roster is handed out while the probe exits non-zero; the bullet to TOOL-dSafePassage-51 above is read with the same four relations, finding 1 of the spec audit of units 51 and 52
+- **hands-off** `TOOL-dSafePassage-51` — F1(a)'s sweep ending on AC2's header probe and amending the Rollouts of TOOL-dSafePassage-2, -7 and -43, both struck at rev-6 with F1(a) and AC2 (§8 F1); S7's `rev-parse` run only after a config read that exited 0; no `UNLISTED_EXECUTOR_KEYS` in the module, the expected key a literal in `tools/govkit/selftest.py`; a staged move-3 copy for AC3; fixture code comparing through `test_step_row`; S18's `stat` before any open, with the `gitmodules-fifo` plant; S6's Readers reason; §4's section probe; and §10's lookups, findings 1, 10, 19, 2, 9, 14, 4, 3, 24, 13, 8 and 18 of the spec audit of units 47 to 50
+- **hands-off** `TOOL-dSafePassage-55` — F1(a)'s sweep ending on AC2 run as that unit's one order probe, all four relations, finding 1 of the spec audit of units 51 and 52; struck at rev-6 with F1(a) and AC2 (§8 F1), so this unit leaves that unit nothing, and the edge stays only as the end its mirror reads
 
 ## 4. Design
 
@@ -252,20 +269,6 @@ Their items here add what the second finding found beyond the high's edit.
 | `failed` | none | `Refusal` naming the step |
 | `rolled-back` | none | admitted |
 | `rolled-back` | a text | `Refusal` naming the step and the text |
-
-### The order move
-
-S4's move, derived from every spec's §3 `consumes-from` bullets and `order` verbs at 2828457d. A
-unit moves only when a unit it consumes from reaches its order, and only these three do:
-
-| Unit | Order now | Order after S4 | Consumes from, with orders after S4 |
-|---|---|---|---|
-| `TOOL-dSafePassage-43` | 2 | 2 | TOOL-dSafePassage-3 (1) |
-| `TOOL-dSafePassage-4` | 2 | 3 | TOOL-dSafePassage-1, -3 (1); -2, -7, -43 (2) |
-| `TOOL-dSafePassage-18` | 3 | 4 | TOOL-dSafePassage-16 (2); -4 (3) |
-| `TOOL-dSafePassage-19` | 3 | 4 | TOOL-dSafePassage-2, -16 (2); -4 (3); -18 (4, built first by id) |
-
-No unit consuming from TOOL-dSafePassage-18 or TOOL-dSafePassage-19 sits below order 5.
 
 ### The arm's widening
 
@@ -307,8 +310,8 @@ None: no landed step row, receipt step or rollback record exists before this bui
 
 Live at landing. It builds at order 13, after every unit of the build. Its write set is
 `tools/govkit/upgrade_steps.py`, `tools/govkit/selftest.py` and `help/upgrade-steps.md`. That set does
-not meet `TOOL-dSafePassage-50`'s, and the two run at different orders anyway. S4's header move is not
-in this write set: §8 F1 places it before the roster is handed out.
+not meet `TOOL-dSafePassage-50`'s, and the two run at different orders anyway. No header move is
+owed (§8 F1).
 
 ### Files touched (estimate)
 
@@ -318,9 +321,8 @@ in this write set: §8 F1 places it before the roster is handed out.
 
 ### Alternatives rejected
 
-- **Moving TOOL-dSafePassage-43 to order 1 (S4).** It relies on the id tie-break within order 1,
-  leaves a same-order `consumes-from`, and leaves TOOL-dSafePassage-4 before TOOL-dSafePassage-7, which
-  it consumes; AC2 refuses it.
+- **Any header move (S4).** Every unit it would move is CLOSED and was dispatched after the units it
+  consumes from, so a moved verb would describe no dispatch still to come (§8 F1).
 - **Moving TOOL-dSafePassage-4's AC4 stop rows into TOOL-dSafePassage-43's pass (S1, S2).** The finder's
   fix of id 11, rejected by the skeptic: the plants are TOOL-dSafePassage-4's, and the criterion
   belongs with the walk that writes the rows.
@@ -341,8 +343,7 @@ in this write set: §8 F1 places it before the roster is handed out.
 - error / empty / loading states: a wrong-typed or empty `failure` is a counted problem, never a
   traceback (S9); an unreadable `.gitmodules` is a refusal naming it (S18).
 - observability: each refusal names its file or step; S19's redaction prints the scheme and host.
-- risks: S4 moves three build orders before the roster is handed out, which §8 F1 places; S7
-  refuses a submodule of a newer repository format than the installed git knows.
+- risks: S7 refuses a submodule of a newer repository format than the installed git knows.
 - testing: the probes and plants of §6, through §7's arm.
 - migration: none.
 - user docs: `help/upgrade-steps.md`, the section S17 scopes, which names S7's and S18's refusals.
@@ -353,16 +354,18 @@ in this write set: §8 F1 places it before the roster is handed out.
   `--plant witness-stays` run, and a `python -c` probe reads `DOWN_STOP_PREFIXES`, each stop text the
   two plants leave opens with one of its entries, and neither run prints a `Refusal` traceback.
   Red when: a stop text opens with no entry, or the writer refuses the reverse walk's own stop.
-- **AC2** — When a `python -c` probe reads the `order <n>` verb of each spec under
-  `memory/builds/dSafePassage/spec/`, TOOL-dSafePassage-43's order is greater than
-  TOOL-dSafePassage-3's, TOOL-dSafePassage-4's is greater than TOOL-dSafePassage-43's and
-  TOOL-dSafePassage-7's, and TOOL-dSafePassage-18's and TOOL-dSafePassage-19's are greater than
-  TOOL-dSafePassage-4's.
-  Red when: TOOL-dSafePassage-4 shares an order with a unit it consumes from.
+- **AC2** — STRUCK at rev-6, number retained so no cross-reference dangles. It read the `order <n>`
+  verbs under `memory/builds/dSafePassage/spec/`, and S4's move was never made. The relation it
+  guarded is dispatch order, which `--dispatch`'s edge refusal held: the dispatch rows of
+  `memory/builds/dSafePassage/RUN.md` show it (§8 F1). The pass's ledger answers this label in the
+  AMENDED form, naming rev-6.
+  Red when: never in this unit; no write of this unit's pass can move a header of a CLOSED spec.
 - **AC3** — When `python3 "tools/govkit/upgrade_steps.py" fixture rollback --plant rolled-back-witness-holds`
-  runs, `s2` is downed, ends `rolled-back` with no `failure`, no `Refusal` is printed, and the run
-  exits 0.
-  Red when: move 3 writes `rolled-back` with a failure and the writer stops the rollback.
+  runs, its rows line shows `s2` recorded `rolled-back` after `derive_reverse_steps` derived the rows
+  and before the walk reached s2 (S5). Then `s2` is downed and ends `rolled-back` with no `failure`,
+  no `Refusal` is printed, and the run exits 0.
+  Red when: move 3 writes `rolled-back` with a failure and the writer stops the rollback, or the plant
+  records s2 before the derivation and s2 never reaches move 1.
 - **AC4** — When a `python -c` probe imports `tools/govkit/upgrade_steps.py` by path and calls
   `test_step_row`, `set_step_state` and a `read_step_states` over a one-row receipt for each row of
   §4 "The row rule", the three agree on every row. `failure` valued `5` or `""` is refused in each
@@ -372,12 +375,15 @@ in this write set: §8 F1 places it before the roster is handed out.
 - **AC5** — When `govkit.py check --target <t>` reads a receipt whose `applied` row carries
   `"failure": 5`, and then `"failure": ""`, each run counts one problem naming the row and prints no
   traceback; and an `ast` walk of `tools/govkit/upgrade_steps.py` finds exactly one call whose
-  argument is `DOWN_STOP_PREFIXES` with the method `startswith`, inside `test_step_row`.
-  Red when: the reader restates the rule, or a wrong type escapes as a traceback.
+  argument is `DOWN_STOP_PREFIXES` with the method `startswith`, inside `test_step_row`. The walk
+  covers the whole module, the rollback fixture included.
+  Red when: the reader restates the rule, the fixture's stop check keeps its own `startswith` call,
+  or a wrong type escapes as a traceback.
 - **AC6** — When a `python -c` probe walks `tools/govkit/upgrade_steps.py` with `ast`, every string
   constant opening with an entry of `DOWN_STOP_PREFIXES`, f-string parts included, sits inside the
-  `DOWN_STOP_PREFIXES` assignment.
-  Red when: a stop text, TOOL-dSafePassage-33's included, is a retyped literal.
+  `DOWN_STOP_PREFIXES` assignment. The walk covers the rollback fixture.
+  Red when: a stop text, TOOL-dSafePassage-33's or a fixture's `down exit 1:` text included, is a
+  retyped literal.
 - **AC7** — When `python3 "tools/govkit/upgrade_steps.py" fixture isolation --plant ssh-scheme-bare-user`
   runs, it exits 0 with its step spawned; and a `python -c` probe finds no `STEP_REFUSED_KEYS` row whose
   pattern is `remote.<x>.url` or `remote.<x>.pushurl`.
@@ -400,27 +406,40 @@ in this write set: §8 F1 places it before the roster is handed out.
   runs, its refusal line holds the exact bytes `gc.recentobjectshook` and `.git/config`, and does not
   hold `gc.recentObjectsHook`.
   Red when: the refusal re-cases the key git printed.
-- **AC12** — When §4 "The section probe" runs over `help/upgrade-steps.md`, its output holds a line with
-  both `ssh://` and `not refused`, and a line holding `protocol.ext.allow`.
-  Red when: either claim sits outside the section, or the ssh line says the URL is refused.
+- **AC12** — When §4 "The section probe" runs over `help/upgrade-steps.md`, its output holds one line
+  with both `ssh://` and `not refused`, and a line holding `protocol.ext.allow`.
+  Red when: either claim sits outside the section, the ssh sentence still wraps its two tokens onto
+  two lines, or the ssh line says the URL is refused.
 - **AC13** — When `python3 "tools/govkit/upgrade_steps.py" fixture isolation --plant gitmodules-unreadable`
   runs, the step is refused naming the `.gitmodules` path, and the run exits 1.
   Red when: the directory is read as a missing file and every name is marked `by name`.
 - **AC14** — When a probe calls `render_redacted_config` on `"http.https://u:se\x20cret@h/.sslkey"`,
   `\x20` the space, and on `"http.https://u:se/cret@h/.sslkey"`, each returns
-  `"http.https://<redacted>@h/.sslkey"`; and `--plant subsection-password-space` prints no substring of
-  `se cret` longer than 2 characters.
-  Red when: a password holding a space or `/` prints.
+  `"http.https://<redacted>@h/.sslkey"`. And when
+  `python3 "tools/govkit/upgrade_steps.py" fixture isolation --plant subsection-password-space` runs,
+  it exits 1, and a probe grades its output in two spans:
+  - the refusal's named entries, the text after `sends as a credential, ` and before
+    `, so nothing was spawned` on the refusal line, the fixed lead and tail of TOOL-dSafePassage-24's
+    `Refusal` in `run_step_isolated` (`tools/govkit/upgrade_steps.py:1609-1611` at `9e91439d0`). It
+    holds `"http.https://<redacted>@h/.sslkey in .git/config"` and no 3-character piece of the planted
+    password `se cret`;
+  - the whole output, which holds neither the password nor any of its space-separated halves of 3 or
+    more characters, here `cret`.
+  Red when: a password holding a space or `/` prints, or the entries span is absent or names no
+  entry. The trap this grading avoids: every 3-character piece graded over the whole output is red
+  by construction, because the fixed lead's ` credential` holds `cre` and ` cr`. The 2-character
+  half `se` sits in the lead's `sends` for the same reason (§8 F2).
+  figure: the 3-character floor is TOOL-dSafePassage-45 AC6's "longer than 2 characters", kept.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC3 AC4 AC9 AC10 AC13 AC14 · the self-test runs the step-row agreement over §4's table and the four plants, and the widened class arm; its failing cases are staged by a writer copy admitting any `failure` on an `applied` row, a reader copy restating the rule, a walk copy without the `rev-parse` refusal, a table copy without `sendemail.<x>.ccCmd`, a `.gitmodules` read with no file test and a redactor copy stopping at a space · none
+New arm: tools/govkit/selftest.py · covers AC3 AC4 AC9 AC10 AC13 AC14 · the self-test runs the step-row agreement over §4's table and the four plants, and the widened class arm; its failing cases are staged by a writer copy admitting any `failure` on an `applied` row, a reader copy restating the rule, a walk copy without the `rev-parse` refusal, a table copy without `sendemail.<x>.ccCmd`, a `.gitmodules` read with no file test and a redactor copy stopping at a space, AC14's plant graded over the refusal's named entries and never over its fixed lead · none
 
 What the check does not cover: a stop text whose opening is right and whose rest is wrong, a key git's
-scripts read that neither its listing nor `UNLISTED_EXECUTOR_KEYS` names, and an order inversion
-between units no `consumes-from` bullet joins.
+scripts read that neither its listing nor `UNLISTED_EXECUTOR_KEYS` names, and a password piece that
+the refusal's fixed text happens to spell, which AC14 grades only inside the named entries.
 
 ## 8. Open questions
 
@@ -445,6 +464,32 @@ between units no `consumes-from` bullet joins.
     (a) is the only option AC2 admits. (b) fails AC2, which is veto 1. (c) changes
     `tools/workflows/unattended-build.js`, outside this build's goal, which is veto 2, and no grant names
     it. The run that applies (a) is this build's build run, before it hands out the roster.
+  - (d), added at rev-6: no header move. The relation the order verbs stood for is dispatch order,
+    and `--dispatch`'s edge refusal (`tools/unattended/unattended.sh:13857-13926`) holds it for every
+    `consumes-from` edge, whatever the headers read.
+  - Re-opened at rev-6, because (a) was never applied and cannot be now. TOOL-dSafePassage-4, -7,
+    -18, -19 and -43 are CLOSED with their headers at orders 2, 2, 3, 3 and 2, and a CLOSED spec's
+    header is no pass's to write. The build run dispatched them by `consumes-from` instead, as the
+    build brief's order states
+    (`memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md:10`)
+    and the dispatch rows of `memory/builds/dSafePassage/RUN.md` record:
+    TOOL-dSafePassage-3 at `:55`, -43 at `:71`, -7 at `:75`, -2 at `:79`, -4 at `:81`, -18 at `:91`
+    and -19 at `:95`. Every relation AC2 named holds in that sequence. RESOLVED (agent, 2026-10-28,
+    delegated): (d), on the main loop's recommendation in
+    `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-49-1-spec-writer.md`.
+    (a) is struck, AC2 is struck and S4 is NOT OBSERVED. (b) and (c) are moot for the same reason:
+    no dispatch they could order is still to come.
+- **F2 — Which halves of the planted password does AC14 grade over the whole output?** The main
+  loop recommended each space-separated half.
+  - (a) Every half. `se cret`'s half `se` sits in the fixed lead's `sends`, so AC14 would be red by
+    construction, the trap the revision exists to close.
+  - (b) Each half of 3 or more characters, the floor the entries span already uses, so every future
+    password is graded by one rule.
+  - (c) A plant password whose halves are each 3 characters or longer. It moves S19's measured texts
+    and AC14's redactor inputs for no gain over (b).
+  - Recommendation: (b).
+  - RESOLVED (agent, 2026-10-28, delegated): (b). The recommendation is taken except for halves
+    shorter than 3 characters, which the code shows would break AC14 as written.
 
 ## 9. Revision log
 
@@ -460,6 +505,13 @@ between units no `consumes-from` bullet joins.
   repair handoff
   `memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-1-spec-writer.md`; no
   criterion's meaning moved.
+- rev-6 · 2026-10-28 · S4 · S5 · S13 · S16 · S17 · S19 · §3 · §4 · §5 · AC2 · AC3 · AC5 · AC6 · AC12 ·
+  AC14 · §7 · §8 · the builder's divergence, folded per
+  `memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-49-1-spec-writer.md`:
+  AC14 grades the refusal's named entries for 3-character pieces and the whole output for the
+  password and its halves of 3 or more characters, F2 recording the rejected 2-character half; F1
+  re-resolved to (d), so F1(a)'s sweep, S4's move, §4 "The order move" and AC2 are struck, citing
+  RUN.md's dispatch rows; the rebuild notes folded into AC3, AC5, AC6 and AC12.
 
 ## 10. Reuse audit
 
@@ -469,8 +521,10 @@ TOOL-dSafePassage-4's reverse walk and plants, TOOL-dSafePassage-29's class arm,
 TOOL-dSafePassage-38's redactor, TOOL-dSafePassage-45's `.gitmodules` read and TOOL-dSafePassage-47's
 walk, all specced and unbuilt at the base. `python tools/codebase-map/reuse_lookup.py "classify a directory as a git repository by its layout"`
 and `"refuse a config key under a send-email identity"` ranked `git`, `run_git`, `classify`, `key`
-and `read_conf_key`, name-token matches, so no existing seam fits beyond those specs. The order move
-was derived from every spec's §3 bullets and `order` verbs, and the driver's sort was read at
-`tools/workflows/unattended-build.js:608-613`, not taken from a record.
+and `read_conf_key`, name-token matches, so no existing seam fits beyond those specs. Rev-6 adds no
+seam. AC14's span is bounded by two fixed pieces of TOOL-dSafePassage-24's `Refusal` in
+`run_step_isolated`, whose `a credential, ` and `, so nothing was spawned` the `[dSP-24]` needles in
+`tools/govkit/selftest.py` already pin. F1's re-resolution reads the existing edge refusal in
+`tools/unattended/unattended.sh:13857-13926`, which already guards what S4's move was for.
 
 Recall terms used: `python tools/memory-recall/query.py "how a spec audit finding on a submodule walk or a refused executor key is promoted and its reading carried to the faulted unit" --terms "spec audit promoted reading hands-off submodule walk repository shape refused executor sendemail identity"`

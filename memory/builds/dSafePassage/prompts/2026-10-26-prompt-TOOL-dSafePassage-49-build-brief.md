@@ -56,3 +56,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## From the first dispatch (2026-10-28)
+
+- The first builder (`wf_65aeefbf-dd6`) handed back AC14 (red by construction over TOOL-24's fixed lead) and AC2 (the order sweep that never ran). Rev-6 grades AC14 over the refusal's named entries only, and strikes AC2 and F1(a). AC2's ledger line uses the AMENDED form.
+- Rev-6 also folds in the rebuild notes: the AC3 plant records s2 `rolled-back` after `derive_reverse_steps`, the fixture's own stop check at `upgrade_steps.py:4405` and its two retyped literals go through `test_step_row` and `DOWN_STOP_PREFIXES`, and `help/upgrade-steps.md:104-105` is reflowed for AC12.
