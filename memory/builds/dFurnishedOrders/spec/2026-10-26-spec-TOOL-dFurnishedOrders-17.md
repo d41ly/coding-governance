@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-17 — the `code` slot rendered per item from its declared seed, as ranges under `memory.code-budget`
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 16 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 16 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0208@b6c1dedb whole
 **Carries:** node:policy-key.memory.code-budget
@@ -12,7 +12,13 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-17-deviation-171.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-17-deviation-171.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-17-1-spec-reviewer.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-17-1-spec-reviewer.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-17-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-17-2-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -33,13 +39,14 @@ files the spec writer read and all 12 of the builder's
 
 - **S1** — Who gets the slot: `render_code_slot` in `tools/roles/roles_lib.py` renders `### code`
   (J4) in a work order whose role is in `derive_role_set` (unit 12, J16) of `memory.code-roles`
-  (`working-roles`, `every-role` or `structural-roles`, default `every-role`); a role outside the set
-  gets no block. Observed by AC1.
+  (`working-roles`, `every-role` or `structural-roles`, default `every-role`), read as S4 says; a
+  role outside the set gets no block. Observed by AC1.
 - **S2** — The seed, J17: TOOL-dPlacedRequest-8 S4's `resolve_item_seed`, run as `loop_lib.py seed
   <item> --build <slug> --unit <id>` in a subprocess of the loop kit found by `resolve_kit_dir("loop",
-  "loop_lib.py", KIT_DIR)`; its paths are the seed, and its line `unarmed — <source>: <why>`, a
-  missing loop kit or a work order naming no item renders `not-installed` with that reason.
-  Observed by AC2.
+  "loop_lib.py", KIT_DIR)`; its paths are the seed, and its line `unarmed — <source>: <why>` or a
+  work order naming no item renders `not-installed` with that reason. With no loop kit found,
+  TOOL-dBoundRoles-3 S1 refuses the `--item` render with exit 1 before any slot is built, so the
+  slot has no missing-loop-kit state. Observed by AC2.
 - **S3** — The rows and their source: the slot's body is the rows `python code_record.py
   neighbourhood <path>…` prints for the seed, the reader found by `resolve_kit_dir("memory-tree",
   "code_record.py", KIT_DIR)`, each row in the grammar of §4 "The rows", ordered `def`, `caller`,
@@ -48,7 +55,11 @@ files the spec writer read and all 12 of the builder's
   the seed renders `searched-empty`. A printed row outside the grammar, a body line among them, is
   not handed, and the block's last line counts it. Observed by AC3 and AC4.
 - **S4** — The budget, `memory.code-budget`, a `<n>k` value read as n × 1,024 bytes (default `16k`,
-  NP-8), through J1's policy read; over it, unit 11's `derive_slot_cut` keeps whole rows in S3's
+  NP-8). Both keys are read through `read_policy_setting(<key>, root, with_default=True)`
+  (TOOL-dBoundRoles-21 S1), the roles kit's one runner of `policy.py get` (TOOL-dBoundRoles-43 S21),
+  so the catalogue answers each default; a None then means only that no policy kit was found, and
+  only then does the slot read `every-role` and `16k`, with that read's note naming the missing kit.
+  Over the budget, unit 11's `derive_slot_cut` keeps whole rows in S3's
   order and its cut line names the query that lists the rest, `python code_record.py neighbourhood
   <path>…`. Observed by AC5.
 - **S5** — The map's delivery extended: `gov-researcher` joins `ROLE_SETS`' `structural-roles` row
@@ -64,8 +75,9 @@ files the spec writer read and all 12 of the builder's
 
 ## 3. Non-goals (OUT)
 
-- The `code` record, its derivation, its tables and the reader of a seed's neighbourhood over them:
-  TOOL-dTotalRecall-8, a later build's surface this unit uses as a stand-in. This unit fixes the rows
+- The `code` record, its derivation and its tables: TOOL-dTotalRecall-8. The reader of a seed's
+  neighbourhood over them, which ask TOOL-dTotalRecall-103 asks that unit to land: a later build's
+  surface this unit uses as a stand-in. This unit fixes the rows
   it reads (§4) and names the hand-over; it builds no query over the record.
 - The `git grep` floor for a language with no extractor (night-pass.md:218): the record's readers'.
 - The seed resolver and the items' seed declarations: TOOL-dPlacedRequest-8.
@@ -80,7 +92,7 @@ files the spec writer read and all 12 of the builder's
 - **consumes-from** `TOOL-dFurnishedOrders-11` — `derive_slot_cut`, the whole-row cut S4 applies under `memory.code-budget`
 - **consumes-from** `TOOL-dFurnishedOrders-12` — `derive_role_set`, read for `memory.code-roles`, and its `structural-roles` row, which S5 extends with `gov-researcher`
 - **consumes-from** external — TOOL-dPlacedRequest-8 S4 (`resolve_item_seed`), TOOL-dBoundRoles-4 S1 (`render --for`), TOOL-dBoundRoles-17 S1 (`--item`); DEFERRED at base
-- **hands-off** external — dTotalRecall: TOOL-dTotalRecall-8's `code` record lands a `neighbourhood` reader printing §4's rows, which fills this slot; until then it renders `not-installed`
+- **hands-off** external — dTotalRecall: a `neighbourhood` reader printing §4's rows over TOOL-dTotalRecall-8's `code` record fills this slot; TOOL-dTotalRecall-8 lands no such reader (its §3 gives the `code` slot to dBoundRoles), and the open asks TOOL-dTotalRecall-103 (the reader) and TOOL-dTotalRecall-102 (the delivery named here) are what would make it land one; until then the slot renders `not-installed`
 - **hands-off** `TOOL-dFurnishedOrders-29` — the code slot's seed, its reader and its policy fixture, which unit 29 S10, S24 and S8 settle (ids 30, 16, 57, 26)
 
 ## 4. Design
@@ -161,8 +173,8 @@ Live at landing; the block reads `not-installed` until dTotalRecall's record and
 
 - security — no new write path; the rows are ranges and names from the repository's own record,
   and S3 refuses body lines, so no file content reaches a work order through this slot.
-- perf / scale — two subprocesses per work order, the seed and the reader; the body is bounded by
-  `memory.code-budget`.
+- perf / scale — four subprocesses per work order, the two policy reads, the seed and the reader;
+  the body is bounded by `memory.code-budget`.
 - error / empty / loading states — `not-installed` for an unarmed seed, no item, no record or no
   reader; `searched-empty` for a seed with no definition; a dropped row counted.
 - observability — the state line names its reason, and the cut line names the query for the rest.
@@ -180,11 +192,16 @@ Live at landing; the block reads `not-installed` until dTotalRecall's record and
   renders for the builder and the spec writer but not the orienter under the first, for all three
   under the second, and for the orienter and the spec writer but not the builder under the third.
   Red when: the key is ignored and every role gets the slot under every value.
-  fixture: the policy file is committed, since `resolve` reads the landed revision.
+  fixture: the policy file is committed, since `get` reads the landed revision (TOOL-dBoundRoles-21
+  S1).
 - **AC2** — When the AC1 render for `gov-builder` names `--item item.build.unit-pass` and a stub
-  `loop_lib.py` prints `unarmed — write-set: no spec`, the block reads `slot code · not-installed:`
-  followed by that line; with no `--item`, it reads `not-installed` naming the missing item.
+  `loop_lib.py` answers `declaration --item item.build.unit-pass --json` with a declaration whose
+  actor is `role:gov-builder`, and `seed` with `unarmed — write-set: no spec`, the block reads `slot
+  code · not-installed:` followed by that line; with no `--item`, it reads `not-installed` naming the
+  missing item.
   Red when: an unarmed seed renders `searched-empty`, so a slot that never ran reads as empty code.
+  fixture: the stub answers TOOL-dBoundRoles-3 S1's `declaration` verb, which that unit's §8 F5 asks
+  dDeclaredLoop for, so the render reaches the slot.
 - **AC3** — When the AC2 render has a stub seed printing `tools/roles/handoff.py` and no
   `code_record.py` resolves, the block reads `not-installed` naming dTotalRecall's code record; with
   a stub `code_record.py` exiting 2 on `neighbourhood`, it reads the same; with the stub printing no
@@ -213,7 +230,7 @@ Live at landing; the block reads `not-installed` until dTotalRecall's record and
 
 `policy fixtures` · `roles adopter self-test` · `roles catalogue` · `roles render selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
-New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 AC4 · a scratch adopter with stub seed and record readers, each `memory.code-roles` value, and a planted body line · none
+New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 AC4 · a scratch adopter with a stub loop kit answering `declaration` and `seed`, a stub record reader, each `memory.code-roles` value, and a planted body line · none
 
 ## 8. Open questions
 
@@ -251,12 +268,21 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 AC4 · a scratch adop
   scout B's row 17, the night pass's point 3 and NP-8, NP-9, the project map's delivery table, and
   the source at `1a3ce03d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S1, S2, S4 · §3 Non-goals, Edges · §5 perf · §6 AC1, AC2 · §7 New arm ·
+  §10 · re-grounded on dBoundRoles at `ac8ab8d5f` and dTotalRecall at `794a0f5fb`, by the
+  cross-check record `2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck`, rows 68, 71, 72
+  and 73: the hands-off bullet names asks TOOL-dTotalRecall-103 and -102 for the reader
+  TOOL-dTotalRecall-8 does not land; AC2's stub loop kit answers `declaration --item` beside `seed`;
+  S2 drops the missing-loop-kit state, which TOOL-dBoundRoles-3 S1 refuses first; both keys are read
+  through `read_policy_setting(..., with_default=True)`, the typed defaults kept only for no policy
+  kit, and AC1's fixture names `get`.
 
 ## 10. Reuse audit
 
 The seams extended: `render_handoff`'s `## Task` composition (`tools/roles/handoff.py:312-424`);
 unit 4's `render_slot`, unit 11's `derive_slot_cut` and unit 12's `derive_role_set` and
-`ROLE_SETS`, each reused rather than copied; `resolve_kit_dir` (`tools/roles/roles_lib.py:97`) for the
+`ROLE_SETS`, each reused rather than copied; TOOL-dBoundRoles-21 S1's `read_policy_setting` for
+both keys; `resolve_kit_dir` (`tools/roles/roles_lib.py:97`) for the
 loop kit's seed and the memory-tree kit's record reader. `python tools/codebase-map/reuse_lookup.py
 "render the code neighbourhood of an item's seed as ranges under a byte budget"` ranked name-stem
 noise (`seed`, `render`, `derive_budget_cut`, `read_history_range`); the closest code at base,

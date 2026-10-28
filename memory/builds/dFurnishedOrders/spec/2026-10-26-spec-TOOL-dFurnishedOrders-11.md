@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-11 — the work order's memory, code-notes, legacy and house-index slots, each under its own budget and its own answer
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 14 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 14 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0202@504bb58f whole
 **Carries:** node:policy-key.retrofit.slot-bytes
@@ -13,8 +13,12 @@
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-fix-return.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-fix-return.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-11-deviation-111.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-11-deviation-111.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-fix-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -64,11 +68,11 @@ house index lands, each value seen on a planted work order. Today `render_handof
   (systems `[cross]`), never cut mid-row. Observed by AC2 and AC4.
 - **S6** — The fourth state: `render_slot`'s closed state set gains `not-seeded`, written in the same
   grammar, `slot <point> · not-seeded: <why>` (J4). Observed by AC6.
-- **S7** — The policy reads, J1: `retrofit.slot-bytes` and `roles.orientation.house-index` through the
-  policy kit's `resolve(key, repo, rev)` (`tools/policy/policy.py:752`), the kit found by
-  `resolve_kit_dir("policy", "policy.py", KIT_DIR)`; with no policy kit resolved, each reads its
-  catalogue default (`1024`, `handed`) and the render's notes name the fallback. Observed by AC4 and
-  AC5.
+- **S7** — The policy reads, J1: `retrofit.slot-bytes` and `roles.orientation.house-index` through
+  `read_policy_setting(<key>, root, with_default=True)` (TOOL-dBoundRoles-21 S1), the roles kit's one
+  runner of `policy.py get` (TOOL-dBoundRoles-43 S21), so the catalogue answers each default; a None
+  then means only that no policy kit was found, and only then does each read `1024` and `handed`,
+  with that read's note naming the fallback. Observed by AC4 and AC5.
 - **S8** — The docs: `help/roles.md` "How a task reaches an agent" (`:13-27`) names the four slots,
   their states and the two keys; `tools/roles/README.md`'s handoff section names the renderers.
   Observed by AC7.
@@ -92,9 +96,9 @@ house index lands, each value seen on a planted work order. Today `render_handof
 - **consumes-from** `TOOL-dFurnishedOrders-4` — `render_slot`, the one renderer of a slot's head and state line, whose closed state set S6 extends with `not-seeded`
 - **hands-off** `TOOL-dFurnishedOrders-18` — `### code-notes`, the slot, its 2 KB cap and `render_code_notes_slot`, which unit 18 fills from the tag's bundle as `annotations.delivery` says
 - **hands-off** `TOOL-dFurnishedOrders-17` — `derive_slot_cut`, the whole-row cut unit 17 applies to the `code` slot under `memory.code-budget`
-- **consumes-from** external — TOOL-dTotalRecall-9 S5 and S8 (`record show`, the `reads:` list), TOOL-dWitnessedBar-13 S1, S2 and S8 (the legacy ledger and its memory-tree copy), TOOL-dPlacedRequest-8 S4 (`resolve_item_seed`), TOOL-dBoundRoles-17 S1 (the `--item` flag naming the item a seed is resolved for); each absent at base, and its absence is this unit's `not-installed` state
+- **consumes-from** external — TOOL-dTotalRecall-9 S5 and S8 (`record show`, the `reads:` list), TOOL-dWitnessedBar-13 S1, S2, S8 and S10 (the legacy ledger, its memory-tree copy and its CLI, which §8 F5 asks to widen), TOOL-dPlacedRequest-8 S4 (`resolve_item_seed`), TOOL-dBoundRoles-17 S1 (the `--item` flag naming the item a seed is resolved for); each absent at base, and its absence is this unit's `not-installed` state
 - **hands-off** external — TOOL-dTotalRecall-9 S8 writes its `reads:` list as the body of `### memory`; dLinkedLibrary's house index fills `### house-index` and carries the map for the reuse scout
-- **hands-off** `TOOL-dFurnishedOrders-29` — the legacy slot's seed, its two key reads and its ledger load, which unit 29 S10, S9, S6, S8 and S24 settle (ids 30, 16, 29, 27, 26, 57)
+- **hands-off** `TOOL-dFurnishedOrders-29` — the legacy slot's seed, its two key reads and its ledger read, which unit 29 S10, S9, S6, S8 and S24 settle (ids 30, 16, 29, 27, 26, 57)
 
 ## 4. Design
 
@@ -134,14 +138,15 @@ marker's `task-sha` covers them (`handoff.py:417-421`). Each head is J4's, spell
 
 | State | When |
 |---|---|
-| `not-installed: <why>` | no `legacy_ledger.py` resolves through `resolve_kit_dir("memory-tree", "legacy_ledger.py", KIT_DIR)`, its `read_registrations(root)` returns no population, or the seed is unarmed |
+| `not-installed: <why>` | no `legacy_ledger.py` resolves through `resolve_kit_dir("memory-tree", "legacy_ledger.py", KIT_DIR)`, its `registrations --json` prints no population, or the seed is unarmed |
 | `not-seeded: <population>,…` | a registered population has no ledger file at its `home`, so its check reads unarmed (retrofit.md:384), and no seeded population has a row under the write set |
 | `searched-empty` | every registered population is seeded and none holds a row under the write set |
 | `filled` | rows under the write set, one line per path, its populations and counts; an unseeded population is named on a last `not seeded: …` line |
 
 The states follow `memory/builds/dClosedLoop/build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md:380-385`.
-The ledger module is loaded by file under its own name, the reach F3 of unit 10 records for a sibling
-kit's module.
+The ledger is read by subprocess and never loaded, since a kit imports no sibling kit
+(TOOL-dGroundRules-1 §4): `python legacy_ledger.py registrations --json` once per render, then
+`read <population>` (TOOL-dWitnessedBar-13 S10) once per seeded population, the verbs §8 F5 asks for.
 
 ### The budgets, one key and one answer per slot
 
@@ -194,8 +199,8 @@ Live at landing; every slot but the legacy one renders its stand-in state until 
 
 - security — no new write path: the slots render what the repository's own ledgers and kits hold,
   and a seed path outside the repository is the seed resolver's refusal, not this unit's.
-- perf / scale — one subprocess for the seed and one file read per registered population; each slot
-  is bounded by its cap.
+- perf / scale — two policy reads, one subprocess for the seed, one for the registrations and one
+  `read` per seeded population; each slot is bounded by its cap.
 - error / empty / loading states — the four legacy states, `not-installed` for every absent source,
   `searched-empty` never confused with not run.
 - observability — each state line names its reason; the render's notes name a policy fallback.
@@ -223,15 +228,16 @@ Live at landing; every slot but the legacy one renders its stand-in state until 
   no row under the seed's paths) and `filled` with `tools/roles/handoff.py` and its count (a row
   under them); for `gov-spec-writer` it renders no `### legacy` block.
   Red when: an unseeded population renders `searched-empty`, so an unarmed check reads as clean.
-  fixture: stub `legacy_ledger.py` and `loop_lib.py` modules under the scratch adopter's kit dirs,
-  written to TOOL-dWitnessedBar-13 S1, S2 and TOOL-dPlacedRequest-8 S4's names; the tree holds none.
+  fixture: stub `legacy_ledger.py` and `loop_lib.py` commands under the scratch adopter's kit dirs,
+  answering §8 F5's `registrations --json`, TOOL-dWitnessedBar-13 S10's `read` and
+  TOOL-dPlacedRequest-8 S4's `seed`; the tree holds none.
 - **AC4** — When the AC3 `filled` fixture holds 30 rows under the seed and a committed
   `.governance/policy.toml` sets `retrofit.slot-bytes` to `512`, `1024` and `2048` in turn, the
   slot's body is within that many bytes each time and its cut line names the value; with no policy
   kit resolved, the body is within 1024 bytes and the render's notes name the fallback.
   Red when: the key is ignored and every value cuts at one size.
-  fixture: the policy file is committed in the scratch adopter, since `resolve` reads the landed
-  revision.
+  fixture: the policy file is committed in the scratch adopter, since `get` reads the landed
+  revision (TOOL-dBoundRoles-21 S1).
 - **AC5** — When the AC1 render runs for `gov-reuse-scout` with `roles.orientation.house-index` set
   to `handed`, `pointer` and `off` in turn, the first block after the opening line is `###
   house-index` reading `not-installed` and naming `handed`, then the same naming `pointer`, then no
@@ -280,20 +286,46 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC1 AC3 AC5 · a scratch adop
   than S1 to S3 cite, the build run re-grounds on its landed names and records the change as a rev
   bump with its §9 line, never a silent respelling. Rung 1, the build order the brief fixes.
   widens: none · relaxes: none
+- **F5 — How does the legacy slot read the ledger's registrations without loading a sibling kit's
+  module?** TOOL-dWitnessedBar-13 S10 gives the canonical file a CLI, `read|compare|carry
+  <population>`, and S8 copies the module into the memory-tree kit; no verb lists the registrations
+  `read_registrations(root)` returns, and S3 needs them to name the populations, their homes and which
+  are seeded. Options: (a) an ask of dWitnessedBar: the memory-tree copy of `legacy_ledger.py` carries
+  S10's CLI and gains `registrations --json`, printing each registration's population and home and
+  whether its ledger file is there, and S3 runs it and `read <population>` by subprocess; (b) a
+  declared `requires_if` row on `tools/roles/kit.toml` naming `memory-tree`, admitting the by-file
+  load as a DECLARATION `govkit selfcheck` grades, the shape `tools/memory-tree/kit.toml:8` uses for
+  its in-process edges, its why that the roles kit already `requires` memory-tree
+  (`tools/roles/kit.toml:12`), so the module is present wherever the roles kit is; (c) the roles kit
+  reads the `[[ledger]]` tables and ledger files itself, a second reader of one registration. (c)
+  copies TOOL-dWitnessedBar-13's reader; (b) needs no parent change but is the in-process sibling edge
+  TOOL-dGroundRules-1 §4 rules out, which no `requires_if` row on the roles kit declares today
+  (`tools/roles/kit.toml:19`); (a) is one verb over a function that already exists, the shape
+  TOOL-dBoundRoles-3 §8 F5 asks dDeclaredLoop for, and its cost is a wait, since AC3's `not-seeded`,
+  `searched-empty` and `filled` cases pass only against the landed verb. Recommendation (a). Open for
+  the owner: the ask the build run files is "TOOL-dWitnessedBar-13: the memory-tree copy of
+  `legacy_ledger.py` carries S10's CLI and gains `registrations --json`, printing each registration's
+  population, home and whether its ledger file exists".
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 11, the brief's J1, J4, J15, J17 and
   D4, scout B's row 11, systems `[cross]`, retrofit `[drain]` and the source at `1a3ce03d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S7 · §3 Edges · §4 The legacy states · §5 perf · §6 AC3, AC4 · §8 F5 ·
+  §10 · re-grounded on dBoundRoles at `ac8ab8d5f` and PLAY-dOrderedCharter-7, by the cross-check
+  record `2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck`, rows 46 and 47: both keys are
+  read through `read_policy_setting(..., with_default=True)`, the typed defaults kept only for no
+  policy kit, and AC4's fixture names `get`; the ledger is read by subprocess verbs, never loaded
+  by file, and F5, open for the owner, is the ask for the registrations verb.
 
 ## 10. Reuse audit
 
 The seams extended: `render_handoff`'s `## Task` composition (`tools/roles/handoff.py:312-424`),
 whose `Not supplied, optional:` line (`:412-414`) is today's only absent-input rendering; unit 4's
 `render_slot`, the one state-line renderer, which S6 extends rather than copies; `resolve_kit_dir`
-(`tools/roles/roles_lib.py:97`) and the load-by-file reach of `read_cap_answer` (`:136-158`) for the
-memory-tree and loop kits' modules. `python tools/codebase-map/reuse_lookup.py "render an optional
+(`tools/roles/roles_lib.py:97`) for the memory-tree and loop kits' commands, each run by subprocess;
+TOOL-dBoundRoles-21 S1's `read_policy_setting` for both keys. `python tools/codebase-map/reuse_lookup.py "render an optional
 work order slot with its own byte budget and a not installed state"` ranked name-stem noise
 (`note`, `render`, `render_cards_md`, `derive_budget_cut` in `reuse_lookup.py`); `derive_budget_cut`
 cuts a ranked list for the lookup's own output and is not a reachable library function of the roles

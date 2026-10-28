@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-48 — the fifth spec audit's 26 govkit, parity-arm, guard and ratchet minors: the ratchet's own predicate and a landing re-stamp, two tool-root answers, one environment strip, isolated DEAD PROBE clauses, a guard derived from the registry, homes from the receipt, and a deploy descriptor refused at its boundary
 
-**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node d · Tier-2 · base e8b9b07c · streams tooling · order 27 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,11 @@
 | [2026-10-27-build-TOOL-dFurnishedOrders-47-round5-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-47-round5-fix-return.md) | research | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-49 |
 | [2026-10-27-build-TOOL-dFurnishedOrders-48-deviation-481.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-48-deviation-481.md) | deviation | — |
 | [2026-10-27-build-TOOL-dFurnishedOrders-48-deviation-482.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-48-deviation-482.md) | deviation | — |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-48-deviation-483.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-48-deviation-483.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-47-round5-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-47-round5-fix-brief.md) | research | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-49 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-49 |
 
 <!-- /gen:spec-records -->
@@ -77,7 +81,7 @@ and closed by its own scope item. Ids the report merged into one item still take
   `tools/memory-tree/check-memory-hygiene.sh`, whose markers a mint also moves. So this build's last
   re-stamp is owed on the prepared merge after the last `push-main.sh --prepare` whose mint moved a
   watched path, as `263d31d59` did for dGroundRules. Each pass still bundles its own re-stamp with its
-  watched edit, this unit's `tools/gate-legs.json` edit included. Unit 46's ledger answers S1's "the
+  watched edit, this unit's `tools/gate-legs.json` render included. Unit 46's ledger answers S1's "the
   build's last" and its Rollout sentence (that the units move `KIT_RUN_GATES_VERSION` themselves) in
   the AMENDED form, naming this item. Observed by AC2.
 - **S4** — id 2. Two answers come back two ways. `derive_tool_root(root, tracked=True)` (unit 45 S7)
@@ -124,10 +128,15 @@ and closed by its own scope item. Ids the report merged into one item still take
   clause isolated. Observed by AC5.
 - **S13** — id 5. The sketch's literal. Unit 44 S3's third clause reads: memory-recall's answer is not
   exactly the one-element list `["scripts/recall"]`. Observed by AC5.
-- **S14** — id 9. The guard is held to the registry. The `govkit selftest` row's guard in
-  `tools/gate-legs.json` covers every `descriptor` key of `{prefix}/govkit/registry.toml` outside
-  `{prefix}/govkit/`. S16's arm holds that each run, in place of unit 46 S8's copy taken at one pass.
-  Observed by AC6.
+- **S14** — id 9. The guard is held to the registry. The `govkit selftest` leg's guard covers every
+  `descriptor` key of `{prefix}/govkit/registry.toml` outside `{prefix}/govkit/`. S16's arm holds
+  that each run, in place of unit 46 S8's copy taken at one pass. The guard is declared once, on the
+  leg's `[[exempt_leg]]` row at `tools/govkit/registry.toml:439`, which S17's and S18's rows join, and
+  `python tools/run-gates/leg_factory.py --write` renders it into `tools/gate-legs.json`
+  (TOOL-dWitnessedBar-11 S1, S2). Where the factory is not built at the pass (it is absent at
+  `1a61f21a2`), the pass edits the manifest row by hand, a row TOOL-dWitnessedBar-11 §4 "Migration"
+  moves whole onto that declaration, and its ledger records that the hand edit stood in for
+  `--write`. S16's arm reads the rendered manifest either way. Observed by AC6.
 - **S15** — id 35. Compared against the live keys. S16's arm reads the registry and the manifest on
   every run. A registry entry whose descriptor lies outside the guard reds it. Unit 46's ledger answers
   AC8 in the AMENDED form, naming this item. Observed by AC6.
@@ -140,10 +149,10 @@ and closed by its own scope item. Ids the report merged into one item still take
   key. Observed by AC6.
 - **S17** — id 11. The adopters `apply` runs. The required set holds the home directory
   `{prefix}/<home>/` of every non-flat entry `--all` selects, which covers its adopter scripts and
-  render templates. The guard gains those directories as rows. Observed by AC6.
+  render templates. The declaration's guard gains those directories as rows (S14). Observed by AC6.
 - **S18** — id 28. The flat sources `apply` reads. For every flat entry `--all` selects, the required
-  set holds each `src` among `resolve_entry`'s survivors (`tools/govkit/govkit.py:452`). The guard
-  gains each one as an exact file row. Observed by AC6.
+  set holds each `src` among `resolve_entry`'s survivors (`tools/govkit/govkit.py:452`). The
+  declaration's guard gains each one as an exact file row (S14). Observed by AC6.
 - **S19** — id 13. AC5 grades the wrong shape. Unit 45 AC5 becomes an `ast` walk over
   `tools/govkit/`. It flags a `Subscript`, or a `.get(` call, whose value is itself a subscript of a
   `read_shipped_descriptors` call or of a name bound from one. The unpack unit 43 S1 mandates,
@@ -201,6 +210,7 @@ and closed by its own scope item. Ids the report merged into one item still take
 - **consumes-from** `TOOL-dFurnishedOrders-45` — S4's environment, S7's tracked search, S8's shape guard and AC3, AC5, AC6 and AC7, which S4 to S9, S19, S20, S25 and S26 settle (ids 2, 31, 3, 19, 24, 30, 13, 22, 32, 18)
 - **consumes-from** `TOOL-dFurnishedOrders-46` — S1's re-stamp, AC1, S8's guard rows and AC8, which S1 to S3 and S14 to S18 settle (ids 1, 12, 23, 9, 35, 21, 11, 28)
 - **consumes-from** `TOOL-dFurnishedOrders-47` — the parity arm's receipt-alone outcome rule, under which S11's cases and S22's compare run their `apply --all` (ids 4, 15, 17, 34)
+- **consumes-from** external — TOOL-dWitnessedBar-11's `leg_factory.py` and the `govkit selftest` `[[exempt_leg]]` declaration S14's guard is rendered from, unbuilt at `1a61f21a2`
 - **hands-off** `TOOL-dFurnishedOrders-50` — S17's home rows and S16's guard arm, whose required set and reach unit 50 S1 to S5 settle (id 17 of the sixth audit)
 - **hands-off** `TOOL-dFurnishedOrders-52` — AC1, AC5, AC10, AC12, S16, S22, S25 and the write set, which unit 52 S1 to S7, S16 to S18, S21 and S26 settle (ids 1, 20, 28, 10, 2, 7, 23, 12, 18, 29, 11, 21 of the sixth audit)
 - **hands-off** `TOOL-dFurnishedOrders-58` — S14, S17 and S18's guard rows, the `dispatch` key and AC10's read, whose landing commit, union read and real ledger rows unit 58 S25, S11 to S13 and S10 settle (ids 22, 7, 15, 34 and 13 of the seventh audit)
@@ -214,9 +224,9 @@ M6 admits two batch units when their write sets are disjoint by all three of its
 minors split that way:
 
 - **Clause 1.** This unit writes `tools/govkit/steps/retired_dispatch_args.py`,
-  `tools/govkit/selftest.py`, `tools/govkit/govkit.py`, `tools/gate-legs.json` and
-  `memory/guides/SESSION-KICKOFF.md`. Unit 49 writes `tools/run-gates/selftest-budgets.txt` and
-  `tools/roles/adopt-roles.test.sh`. No path is in both. Unit 49 writes no path on the `watch:` line,
+  `tools/govkit/selftest.py`, `tools/govkit/govkit.py`, `tools/govkit/registry.toml`,
+  `tools/gate-legs.json` and `memory/guides/SESSION-KICKOFF.md`. Unit 49 writes
+  `tools/run-gates/selftest-budgets.txt` and `tools/roles/adopt-roles.test.sh`. No path is in both. Unit 49 writes no path on the `watch:` line,
   so every watched edit of the batch, and its re-stamp, is this unit's.
 - **Clause 2.** Neither reads a file the other writes as a contract or an acceptance input. Unit 49's
   criteria read the budget row, the gate-run windows, the roles suite and the pass commits of units 45
@@ -226,8 +236,9 @@ minors split that way:
   none.
 
 Why not three or more units: S14 to S18's arm lives in `tools/govkit/selftest.py` beside S10 to S13
-and S22, and its guard edit is the batch's one watched edit, which S1 to S3's re-stamp follows. So
-those items cannot leave this unit without breaking clause 1 or clause 2.
+and S22, and its guard edit, rendered into `tools/gate-legs.json`, is the batch's one watched edit,
+which S1 to S3's re-stamp follows. So those items cannot leave this unit without breaking clause 1
+or clause 2.
 
 ### How an item closes
 
@@ -296,7 +307,8 @@ for the kit epoch leg where its shipped bytes move. This pass bundles its own re
 - `tools/govkit/steps/retired_dispatch_args.py`
 - `tools/govkit/selftest.py`
 - `tools/govkit/govkit.py`
-- `tools/gate-legs.json`
+- `tools/govkit/registry.toml`
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`, or hand-edited where it is not built)
 - `memory/guides/SESSION-KICKOFF.md`
 
 ### Alternatives rejected
@@ -375,7 +387,10 @@ for the kit epoch leg where its shipped bytes move. This pass bundles its own re
     path;
   - a registry copy gaining an entry whose `descriptor` names a `kit.toml` in a new `scratch-kit`
     directory under `{prefix}`: that descriptor.
-  Red when: a kit added later, an adopter or a flat source that `apply` reads sits outside the guard.
+  Where `tools/run-gates/leg_factory.py` is built at the pass, `python tools/run-gates/leg_factory.py
+  --check` exits 0 on the tree.
+  Red when: a kit added later, an adopter or a flat source that `apply` reads sits outside the guard,
+  or a guard row is typed into the manifest that its declaration does not carry.
   fixture: scratch copies of `tools/gate-legs.json` and of the parsed registry, passed as arguments.
 - **AC7** — When `python -c` runs S19's `ast` walk over `tools/govkit/`, it prints nothing. Over a
   scratch file holding S20's three planted forms it prints each of the three lines. Over a file holding
@@ -453,6 +468,12 @@ The close also reads the `kickoff-manifest ratchet` leg on the prepared merge as
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-50, TOOL-dFurnishedOrders-52, promoted from the spec audit of the round-5 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md`); nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-58, promoted from the spec audit of the round-6 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-50-spec-audit-round1.md`); nothing else moved.
 - rev-4 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-61, promoted from the spec audit of the round-8 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-59-spec-audit-round1.md`); nothing else moved.
+- rev-5 · 2026-10-28 · §2 S3, S14, S17, S18 · §3 Edges · §4 "Why two units", Files touched · §6 AC6
+  · re-grounded on TOOL-dWitnessedBar-11, by the cross-check record
+  `build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`, row 124: the guard rows go
+  on the `govkit selftest` `[[exempt_leg]]` row at `tools/govkit/registry.toml:439` and are rendered
+  by `leg_factory.py --write`, a recorded hand edit standing in where it is not built, and Files
+  touched gains the registry; S16's arm still reads the rendered manifest; nothing else moved.
 
 ## 10. Reuse audit
 

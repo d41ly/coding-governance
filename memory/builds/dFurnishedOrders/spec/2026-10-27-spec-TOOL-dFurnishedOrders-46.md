@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-46 — the fourth spec audit's 18 roles, run-gates, process-monitor, unattended and kickoff minors: one re-stamp last, one bounded runner that carries its imports and kills on any exception, criteria that read the real gate, and the guards and pins the new arms move
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 47d3a464 · streams tooling · order 26 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,11 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-46-deviation-461.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-46-deviation-461.md) | deviation | — |
 | [2026-10-27-build-TOOL-dFurnishedOrders-46-deviation-462.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-46-deviation-462.md) | deviation | — |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-46-deviation-463.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-46-deviation-463.md) | deviation | — |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-46-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-46-1-spec-writer.md) | journal | — |
 | [2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 |
 
 <!-- /gen:spec-records -->
@@ -49,11 +54,11 @@ disjoint write sets by M6 (`TOOL-dFurnishedOrders-45` §4 "Why two units"):
 - **S1** — id 2. One re-stamp, after the build's last watched edit. Unit 39 moves
   `KIT_RUN_GATES_VERSION` (`tools/run-gates/run-gates.sh:36`), a path on
   `memory/guides/SESSION-KICKOFF.md`'s `watch:` line, after unit 37 S17's re-stamp at order 23; this
-  unit edits `tools/gate-legs.json` (S8) and moves that version again (S9, S17). This unit's pass
-  re-stamps the `last-audit:` line once, bundled with or after its own last commit touching a watched
-  path. Unit 39's ledger records that its watched edit is re-stamped by this item, and unit 42's ledger
-  answers AC2 in the AMENDED form, its S3 sentence that units 38 to 42 edit no watched path corrected
-  by this item. Observed by AC1.
+  unit's S8 render moves `tools/gate-legs.json`, and it moves that version again (S9, S17). This
+  unit's pass re-stamps the `last-audit:` line once, bundled with or after its own last commit
+  touching a watched path. Unit 39's ledger records that its watched edit is re-stamped by this item,
+  and unit 42's ledger answers AC2 in the AMENDED form, its S3 sentence that units 38 to 42 edit no
+  watched path corrected by this item. Observed by AC1.
 - **S2** — id 3. Unit 37 AC8's first arm read against the shared block. After unit 39 inlines the
   `run_bounded_py` block into `tools/roles/roles_lib.py`, every line `git grep -n -E
   "subprocess\.(run|Popen|check_output|call)\(" -- 'tools/roles/*.py'` prints lies between that file's
@@ -72,11 +77,13 @@ disjoint write sets by M6 (`TOOL-dFurnishedOrders-45` §4 "Why two units"):
   gate ledger). Unit 42's ledger answers S17's "stays inside its 60-second row" by that row, AMENDED,
   naming this item. Observed by AC4.
 - **S5** — id 15. The roles kit's imports judged by the lexicon kit's predicate. Unit 42 S7's gate is
-  `check_self_containment(Path("tools/roles"))` (`tools/lexicon/lexicon.py:2359`), whose problems are
-  empty and whose judged count is above zero; the unit 42 arm in the roles adopter suite calls it from
-  gov's lexicon kit, which that suite can reach because the roles kit marks it `project-owned`
-  (`tools/roles/kit.toml:46-48`). Unit 42's ledger answers AC4 in the AMENDED form, and unit 42 §10's
-  "none an import gate" is corrected by this item. Observed by AC5.
+  `check_self_containment` (`tools/lexicon/lexicon.py:2359`) over `tools/roles`, whose problems are
+  empty and whose judged count is above zero. A kit imports no sibling kit (TOOL-dGroundRules-1 §4,
+  PLAY-dOrderedCharter-7 §4), and the roles kit's `project-owned` rule (`tools/roles/kit.toml:46-48`)
+  withholds the suite from adopters without declaring an edge, so the unit 42 arm in the roles
+  adopter suite runs the predicate through the lexicon verb §8 F7 asks for, by subprocess, and no file
+  of the roles kit loads `lexicon.py` in process. Unit 42's ledger answers AC4 in the AMENDED form, and
+  unit 42 §10's "none an import gate" is corrected by this item. Observed by AC5.
 - **S6** — id 16. The ratchet observed by its own checker. Unit 42 AC2 is answered by
   `skills/session-kickoff/manifest-check.sh` itself, whose `splitspecs` (`:1433`) trims the `watch:`
   line and whose stamp walk (`:1521-1535`) validates the stamp, never by unit 42 §4's hand-split copy;
@@ -86,14 +93,19 @@ disjoint write sets by M6 (`TOOL-dFurnishedOrders-45` §4 "Why two units"):
   tools/lexicon/lexicon.py --offenders` prints at this pass, `miss` in the unattended adopter suite
   (unit 38 S1) among the arrivals, under a dated `RAISED` comment naming each arrived key and the unit
   that minted it, in the shape of `:173`. Observed by AC7.
-- **S8** — id 22. The govkit selftest guard covers what its arms read. The `govkit selftest` row of
-  `tools/gate-legs.json` gains, as exact files: `{prefix}/drift-audit/kit.toml`,
+- **S8** — id 22. The govkit selftest guard covers what its arms read. The `govkit selftest` leg's
+  guard gains, as exact files: `{prefix}/drift-audit/kit.toml`,
   `{prefix}/workflows/kit.toml`, `{prefix}/workflows/unattended-build.test.sh`,
   `{prefix}/memory-recall/kit.toml`, `{prefix}/process-monitor/kit.toml`,
   `{prefix}/pytest-parallel-guardrails/kit.toml` and `.githooks/pre-push.runlog.test.sh`, read by the
   arms of units 40, 41 and 43; and, for unit 44's `apply --all` arm, the descriptor of every registry
   entry outside `{prefix}/govkit/`, taken from `{prefix}/govkit/registry.toml`'s `descriptor` keys at
-  this pass. Observed by AC8.
+  this pass. The rows go on that leg's one declaration, the `[[exempt_leg]]` row at
+  `tools/govkit/registry.toml:439`, and `python tools/run-gates/leg_factory.py --write` renders them
+  into `tools/gate-legs.json` (TOOL-dWitnessedBar-11 S1, S2). Where the factory is not built at the
+  pass (it is absent at `1a61f21a2`), the pass edits the manifest row by hand, a row
+  TOOL-dWitnessedBar-11 §4 "Migration" moves whole onto that declaration, and its ledger records that
+  the hand edit stood in for `--write`. Observed by AC8.
 - **S9** — id 29. The block carries its imports. `import os`, `import signal`, `import subprocess` and
   `import tempfile` sit inside the `run_bounded_py` markers in the canonical `tools/lib/run_bounded.py`
   and so in every copy, as the `health_log_py` block carries its own (`tools/lib/health_log.py`).
@@ -163,6 +175,7 @@ disjoint write sets by M6 (`TOOL-dFurnishedOrders-45` §4 "Why two units"):
 - **consumes-from** `TOOL-dFurnishedOrders-42` — S2, S3, S7, S14, S17, S19, AC2, AC4 and AC13 and its staged breaks, which S1, S2, S4 to S6, S10, S12 and S18 settle (ids 2, 3, 10, 15, 16, 4, 12, 33)
 - **consumes-from** `TOOL-dFurnishedOrders-43` — the govkit selftest arm whose sibling reads S8 guards (id 22)
 - **consumes-from** `TOOL-dFurnishedOrders-44` — the `apply --all` arm whose registry descriptors S8 guards (id 22)
+- **consumes-from** external — TOOL-dWitnessedBar-11's `leg_factory.py` and the `[[exempt_leg]]` declaration S8's rows go on, and the lexicon kit's `--self-containment` mode, an ask (§8 F7), each unbuilt at `1a61f21a2`
 - **hands-off** `TOOL-dFurnishedOrders-48` — S1's re-stamp, AC1, S8's guard rows and AC8, which unit 48 S1 to S3 and S14 to S18 settle (ids 1, 12, 23, 9, 35, 21, 11, 28 of the fifth audit)
 - **hands-off** `TOOL-dFurnishedOrders-49` — Files touched, the dispatch row, S4's reading, AC4's bound and AC17's interrupt probe, which unit 49 S1 to S6 settle (ids 6, 27, 7, 16, 20, 26 of the fifth audit)
 - **hands-off** `TOOL-dFurnishedOrders-51` — AC17's interrupt arm, whose stub, pid and liveness read unit 51 S1 to S3 pin (id 24 of the sixth audit)
@@ -245,7 +258,8 @@ epoch leg where their shipped bytes move; S1's re-stamp lands after the last of 
 - `tools/process-monitor/adopt-process-monitor.sh`
 - `tools/unattended/adopt-unattended.test.sh`
 - `tools/unattended/unattended.sh`
-- `tools/gate-legs.json`
+- `tools/govkit/registry.toml`
+- `tools/gate-legs.json` (rendered by `leg_factory.py --write`, or hand-edited where it is not built)
 - `.lexicon.conf`
 - `memory/guides/SESSION-KICKOFF.md`
 
@@ -259,8 +273,8 @@ epoch leg where their shipped bytes move; S1's re-stamp lands after the last of 
   which compares only the text between the markers; imports inside the markers travel with it.
 - **Record census's runner as a non-goal and keep its name (S13).** Two Python functions named
   `run_bounded` with different signatures stay, and census keeps the pipe the block avoids.
-- **Inline `check_self_containment` into the roles kit (S5).** It reads the lexicon kit's own
-  extractor; the suite that calls it never ships, so the call reaches the one tree that has it.
+- **Inline `check_self_containment` into the roles kit (S5).** It copies the lexicon kit's predicate
+  and its extractor, the second copy id 15 found; the suite runs the one predicate by §8 F7's verb.
 
 ## 5. Production-readiness checklist
 
@@ -297,12 +311,15 @@ epoch leg where their shipped bytes move; S1's re-stamp lands after the last of 
   names the gate ledger and holds no `not measured`.
   Red when: the row stays a declaration nobody timed.
   figure: 51.124 is PINNED, read 2026-10-27; the added sleep is DERIVED from the arms at the pass.
-- **AC5** — When `python -c` imports the lexicon engine from `tools/lexicon` and calls
-  `check_self_containment` on `tools/roles`, its problems are empty and its judged count is above
-  zero; on a scratch copy of `tools/roles/` whose `handoff.py` gains `import gov_map`, a problem names
-  `handoff.py` and `gov_map`.
-  Red when: a sibling import passes, or the walk judges nothing and reads green.
+- **AC5** — When `python tools/lexicon/lexicon.py --self-containment tools/roles` (§8 F7's verb)
+  runs, it exits 0 and prints a judged count above zero; on a scratch copy of `tools/roles/` whose
+  `handoff.py` gains `import gov_map`, it exits 1 naming `handoff.py` and `gov_map`; and no line
+  `git grep -n -E "tools/lexicon|lexicon\.py" -- tools/roles/adopt-roles.test.sh` prints is a
+  `sys.path` insert or an `import`.
+  Red when: a sibling import passes, the walk judges nothing and reads green, or the suite loads the
+  lexicon kit in process.
   fixture: a scratch copy of `tools/roles/` under `%TEMP%`.
+  cost: observed once §8 F7's verb lands; until then the pass records the ask open and AC5 owed.
 - **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs on the tree at this unit's pass,
   it prints no line holding `watched files changed since last-audit`.
   Red when: a re-implemented predicate reads green while the ratchet is red.
@@ -313,8 +330,10 @@ epoch leg where their shipped bytes move; S1's re-stamp lands after the last of 
   Red when: a minted helper moves the count and the pin stays.
 - **AC8** — When `python -c` reads the `govkit selftest` row of `tools/gate-legs.json`, its guard holds
   every file S8 names, and `git ls-files --error-unmatch` finds each with `{prefix}` resolved to
-  `tools`.
-  Red when: a sibling file an arm reads is outside the guard.
+  `tools`; where `tools/run-gates/leg_factory.py` is built at the pass, `python
+  tools/run-gates/leg_factory.py --check` exits 0.
+  Red when: a sibling file an arm reads is outside the guard, or a guard row is typed into the
+  manifest that its declaration does not carry.
 - **AC9** — When `python -c` extracts the `run_bounded_py` block from the canonical run_bounded.py,
   `tools/run-gates/regen.py`, `tools/roles/roles_lib.py` and `tools/process-monitor/census.py`, parses
   each with `ast`, and lists every loaded name bound neither inside the block nor in `builtins`, it
@@ -364,10 +383,10 @@ epoch leg where their shipped bytes move; S1's re-stamp lands after the last of 
 
 ## 7. Gates
 
-`python resolver (behaviour + inline parity + idiom ban)` · `roles catalogue` · `roles adopter self-test` · `run-gates canary` · `run-gates gov canary` · `run-gates turnstile` · `run-gates run-log line` · `measure-legs selftest` · `process-monitor census selftest` · `process-monitor adopter selftest` · `straggler-guard arms` · `recall floor` · `recall floor arms` · `govkit acceptance matrix` · `govkit selftest` · `kickoff-manifest ratchet` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `unattended kit gate` · `policy fixtures` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`python resolver (behaviour + inline parity + idiom ban)` · `roles catalogue` · `roles adopter self-test` · `run-gates canary` · `run-gates gov canary` · `run-gates turnstile` · `run-gates run-log line` · `measure-legs selftest` · `process-monitor census selftest` · `process-monitor adopter selftest` · `straggler-guard arms` · `recall floor` · `recall floor arms` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `kickoff-manifest ratchet` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `unattended kit gate` · `policy fixtures` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/lib/resolve-python.test.sh · covers AC9 · the `run_bounded_py` row over four copies, each carrying the imports and the `BaseException` branch, and an unbound-name `ast` pass over the canonical block, staged by taking `import signal` out of one copy after deleting `tools/lib/__pycache__` and running Python with `-B` · none
-New arm: tools/roles/adopt-roles.test.sh · covers AC3 AC5 AC10 AC17 AC18 · a CRLF posture stub, the lexicon kit's self-containment walk over the roles kit, an env-carrying slot read, a patched wait raising `KeyboardInterrupt` and an aliased `subprocess` import, staged by restoring the raw decode after deleting `tools/roles/__pycache__` and running Python with `-B` · none
+New arm: tools/roles/adopt-roles.test.sh · covers AC3 AC5 AC10 AC17 AC18 · a CRLF posture stub, the lexicon kit's self-containment verb run over the roles kit, an env-carrying slot read, a patched wait raising `KeyboardInterrupt` and an aliased `subprocess` import, staged by restoring the raw decode after deleting `tools/roles/__pycache__` and running Python with `-B` · none
 New arm: tools/process-monitor/selftest.py · covers AC13 · `run_backend` over a sleeper and a missing program, staged by restoring the pipe-backed runner after deleting `tools/process-monitor/__pycache__` and running Python with `-B` · none
 New arm: tools/unattended/adopt-unattended.test.sh · covers AC14 AC16 · the kit's `miss` spelling and the class needle, staged by re-adding the per-pass line as `python3` under another root; the suite stays WAIVED at landing by the build README's rule, its arm owed with PLAY-dClosedLoop-18 · none
 
@@ -400,6 +419,23 @@ the `kickoff-manifest ratchet` leg as S1's.
 - **F6 — The units this one lands on are unbuilt.** Units 37 to 44 are specced and unbuilt at
   `47d3a464`. RESOLVED (agent, 2026-10-27, delegated): the build run re-grounds on each at the pass and
   records any item a landed unit already closed, rung 1, the brief's rule. widens: none · relaxes: none
+- **F7 — How does the roles suite reach `check_self_containment` (S5)?** A kit imports no sibling kit
+  (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7 §4), and a `sys.path` insert of another kit's
+  directory is such an import. `lexicon.py`'s modes (`tools/lexicon/lexicon.py:4358-4360`) take no
+  kit directory, and its own run walks only its own (`:2867`); `project-owned`
+  (`tools/roles/kit.toml:46-48`) withholds the suite and declares no edge. Options: (a) an ask of the
+  lexicon kit, a `--self-containment <kit-dir>` mode printing the problems and judged count
+  `check_self_containment(kit_dir)` returns and exiting 1 on any problem, which the arm runs by
+  subprocess; (b) a declared `requires_if` row on `tools/roles/kit.toml` naming `lexicon`, admitting
+  the in-process load as a DECLARATION `govkit selfcheck` grades, as the review-harness row does
+  (`:19`); (c) unit 42 §4's own `ast` walk kept as the gate and S5 dropped. (c) keeps the copy of the
+  predicate id 15 found; (b) declares to every adopter an edge only a withheld file holds, which the
+  review-harness precedent, an edge held wherever `/build` is used, does not admit; (a) is one mode
+  over a function that already takes its walk root as a parameter, and its cost is a wait, since AC5
+  passes only against the landed mode. Recommendation (a). Open for the owner: the ask the build run
+  files, on the build that owns `tools/lexicon/` at the pass, is "`lexicon.py --self-containment
+  <kit-dir>` prints `check_self_containment(kit_dir)`'s problems and its judged count, exiting 1 on
+  any problem".
 
 ## 9. Revision log
 
@@ -407,6 +443,15 @@ the `kickoff-manifest ratchet` leg as S1's.
   process-monitor, unattended, kickoff and gate-manifest minors batched: 9 MEDIUM and 9 LOW.
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullets mirroring TOOL-dFurnishedOrders-48, TOOL-dFurnishedOrders-49, promoted from the spec audit of the round-4 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-43-spec-audit-round1.md`); nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-51, promoted from the spec audit of the round-5 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-47-spec-audit-round1.md`); nothing else moved.
+- rev-4 · 2026-10-28 · §2 S1, S5, S8 · §3 Edges · §4 Files touched, Alternatives rejected · §6 AC5,
+  AC8 · §7 the leg line, which gains `govkit refusal join` for the registry's `{prefix}/govkit/`
+  guard, and the roles arm · §8 F7 · re-grounded on TOOL-dWitnessedBar-11 and the sibling-kit rule
+  (TOOL-dGroundRules-1 §4, PLAY-dOrderedCharter-7 §4), by the cross-check record
+  `build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`, rows 122 and 123: S8's
+  guard rows go on the `govkit selftest` `[[exempt_leg]]` declaration and are rendered by
+  `leg_factory.py --write`, a recorded hand edit standing in where it is not built; S5's check runs
+  through a lexicon verb by subprocess, and F7, open for the owner, is the ask for it; nothing else
+  moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-20 — the problems whose subject meets an item's seed, read from the register when the order is cut and handed as rows
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 17 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 17 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0211@6b17e1fe whole
 
@@ -10,7 +10,11 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-20-deviation-201.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-20-deviation-201.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -30,9 +34,12 @@ seed, and hands each one in the order as a `finding` row the return must answer.
 - **S1** — One reader of a `refs/gov/*` namespace. The bounded fetch half of `read_claims`
   (`tools/unattended/unattended.sh:2118-2150`: the one remote through `resolve_claim_remote`, a scratch
   directory, `observe_remote` fetching `+<ns>/*:<cache>/*` with no tags and no `FETCH_HEAD`, and the
-  three failure reasons) moves into `read_gov_namespace <ns> <cache> <policy>`, which leaves the
-  cache's `for-each-ref` records in a file and its reason in `GN_WHY`. `read_claims` calls it with
-  `refs/gov/runs` and `refs/gov/remote/runs`, its rows, its `strict`, `soft` and `quiet` lines and its
+  three failure reasons) moves into `read_gov_namespace <policy> <ns>…`, which fetches every named
+  namespace in one bounded fetch, one refspec `+<ns>/*:refs/gov/remote/<name>/*` each, `<name>` the
+  namespace's last component, and leaves the caches' `for-each-ref` records in a file and its reason
+  in `GN_WHY`. `read_claims` calls it with TOOL-dPlacedRequest-1 S4's two namespaces,
+  `refs/gov/leases` and the legacy `refs/gov/runs`, in one call (`refs/gov/runs` alone where that
+  section has not landed at the pass), its rows, its `strict`, `soft` and `quiet` lines and its
   status unchanged. Observed by AC1 and AC7.
 - **S2** — The verb. `unattended.sh --problems-for <item>` reads the item's seed paths on stdin, one
   per line, reads `refs/gov/problems` into `refs/gov/remote/problems` through S1 under the `soft`
@@ -61,8 +68,10 @@ seed, and hands each one in the order as a `finding` row the return must answer.
   TOOL-dPlacedRequest-8 S4's `python tools/loop/loop_lib.py seed <item tag> --build <slug>
   [--unit <id>] [--question <text>]` per render, pipes the paths to S2's verb, and renders the answer through
   `render_slot` (TOOL-dFurnishedOrders-4) as `slot problems · <state>` followed by the rows. A seed
-  printing `unarmed — <source>: <why>`, no loop kit, or no unattended driver resolved through
-  `roles_lib.resolve_kit_dir` renders `not-installed: <why>`. A render without `--item` adds no block.
+  printing `unarmed — <source>: <why>`, or no unattended driver resolved through
+  `roles_lib.resolve_kit_dir`, renders `not-installed: <why>`. With no loop kit found,
+  TOOL-dBoundRoles-3 S1 refuses the `--item` render with exit 1 before any block is built, so the
+  slot has no missing-loop-kit state. A render without `--item` adds no block.
   Observed by AC4 and AC6.
 - **S6** — Answered at the return. `read_upstream_rows(work_order)` (TOOL-dFurnishedOrders-19 S3,
   `tools/roles/roles_lib.py`) also returns the `problem#<id>` ids of the `### problems` block, after
@@ -308,6 +317,11 @@ observed RED then GREEN at the close as M8 owes, and its suite's clean reading i
   scout B's row for cl-0211, night-pass-two.md:290 and :333-335, TOOL-dPlacedRequest-12 and -8, and the
   driver and renderer at base `2193e25d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S1, S5 · re-grounded on dBoundRoles at `ac8ab8d5f` and dPlacedRequest, by
+  the cross-check record `2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck`, rows 86 and
+  88: S5 drops the missing-loop-kit state, which TOOL-dBoundRoles-3 S1 refuses first; S1's
+  namespace reader fetches a list of namespaces in one bounded fetch, and `read_claims` passes it
+  TOOL-dPlacedRequest-1 S4's `refs/gov/leases` and `refs/gov/runs`.
 
 ## 10. Reuse audit
 

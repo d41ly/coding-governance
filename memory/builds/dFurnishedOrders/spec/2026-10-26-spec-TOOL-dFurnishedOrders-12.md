@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-12 — the work order's `map` slot for the roles `memory.project-map` names, with each item's unfolds
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 2193e25d · streams tooling · order 15 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 2193e25d · streams tooling · order 15 · advances TOOL-dFurnishedOrders-21
 
 **Carries:** cl-dClosedLoop-0203@325cbb22 whole
 **Carries:** node:policy-key.memory.project-map
@@ -12,7 +12,11 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-reuse-scout-b.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
 | [2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dFurnishedOrders-1-spec-stage-returns.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-12-deviation-121.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-12-deviation-121.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dFurnishedOrders-1-spec-brief.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-42 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-16 |
 
 <!-- /gen:spec-records -->
@@ -57,10 +61,11 @@ kit's dossier map, not the project map (scout B, row 12). The delivery the owner
   budget and its own answer when it runs over"). An unfold is printed whole, as its item declared it.
   A renderer exit of 1 under `refuse` refuses the render, naming `memory.map-budget` and the
   renderer's line. Observed by AC5.
-- **S6** — The policy reads, J1: both keys through the policy kit's `resolve(key, repo, rev)`
-  (`tools/policy/policy.py:752`), found by `resolve_kit_dir("policy", "policy.py", KIT_DIR)`; with no
-  policy kit, each reads its catalogue default (`structural-roles`, `item-declared`) and the render's
-  notes say so. Observed by AC2 and AC4.
+- **S6** — The policy reads, J1: both keys through `read_policy_setting(<key>, root,
+  with_default=True)` (TOOL-dBoundRoles-21 S1), the roles kit's one runner of `policy.py get`
+  (TOOL-dBoundRoles-43 S21), so the catalogue answers each default; a None then means only that no
+  policy kit was found, and only then does each read `structural-roles` and `item-declared`, with
+  that read's note naming the missing kit. Observed by AC2 and AC4.
 - **S7** — The docs: `help/roles.md` "How a task reaches an agent" (`:13-27`) names the `map` slot,
   which roles get it under each value and what an unfold adds; `tools/roles/README.md`'s handoff
   section names `derive_role_set` and `render_map_slot`. Observed by AC6.
@@ -186,7 +191,8 @@ Live at landing; the slot renders `not-installed` until TOOL-dTotalRecall-14 lan
   `structural-roles`, `every-role` and `owner-only` in turn, the spec writer's `## Task` holds `###
   map` under the first two and not the third, and the builder's holds it under `every-role` only.
   Red when: a unit worker gets the map under the default, or `owner-only` still hands one.
-  fixture: the policy file is committed, since `resolve` reads the landed revision.
+  fixture: the policy file is committed, since `get` reads the landed revision (TOOL-dBoundRoles-21
+  S1).
 - **AC3** — When the AC2 render for `gov-spec-writer` under `structural-roles` names an item whose
   planted declaration carries `map = "none"`, no `### map` block renders; with `map = "base"`, it
   renders.
@@ -216,11 +222,13 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 · each `memory.proje
 ## 8. Open questions
 
 - **FACT-QUESTION · F1 — Can TOOL-dBoundRoles-1's `layer` tell the structural roles from the
-  working ones, as J16 words it?** Probe: `sed -n 120,134p` over
-  `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md`, counting the roster rows
-  carrying `layer.roles` and `layer.runtime`. Observation, run 2026-10-26: 12 rows carry
-  `layer.roles`, the twelve core roles, structural and working alike; 1 carries `layer.runtime`
-  (`gov-session`). Liveness: the second count is 1, so the probe sees a row whose layer differs.
+  working ones, as J16 words it?** Probe: ``grep -c -F '| `layer.roles` |'`` and
+  ``grep -c -F '| `layer.runtime` |'`` over
+  `memory/builds/dBoundRoles/spec/2026-10-25-spec-TOOL-dBoundRoles-1.md`, counting the roster
+  table's rows by their Layer cell, wherever the table sits. Observation, re-run
+  2026-10-28 at `1a61f21a2`: 12 rows carry `layer.roles`, the twelve core roles, structural and
+  working alike; 1 carries `layer.runtime` (`gov-session`). Liveness: the second count is 1, so the
+  probe sees a row whose layer differs.
   RESOLVED (agent, 2026-10-26, delegated): it cannot; the sets are declared, F2. Rung 2. widens:
   none · relaxes: none
 - **F2 — Where are the two typed sets declared?** Options: (a) `ROLE_SETS` in `roles_lib.py`
@@ -251,13 +259,20 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC2 AC4 · each `memory.proje
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 12, the brief's J1, J4, J16 and D2,
   scout B's row 12, project-map.md PM-1, PM-6 and `[delivery]`, and the source at `1a3ce03d`.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-29, promoted from the round-1 spec audit (`memory/builds/dFurnishedOrders/reviews/2026-10-26-review-TOOL-dFurnishedOrders-1-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S6 · §6 AC2 · §8 F1 · §10 · re-grounded on dBoundRoles at `ac8ab8d5f`, by
+  the cross-check record `2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck`, rows 50 and
+  51: F1's probe greps TOOL-dBoundRoles-1's roster rows by their Layer cell in place of the line
+  range its re-ground moved, its answer unchanged; both keys are read through
+  `read_policy_setting(..., with_default=True)`, the typed defaults kept only for no policy kit, and
+  AC2's fixture names `get`.
 
 ## 10. Reuse audit
 
 The seams extended: `render_handoff`'s `## Task` composition (`tools/roles/handoff.py:312-424`);
 unit 4's `render_slot`; `load_roles` (`tools/roles/roles_lib.py:355`) and the role index
 `render_roles_index` writes (`tools/roles/render_agents.py:207`), which `every-role` reads; and
-`resolve_kit_dir` (`roles_lib.py:97`) for the renderer, the registry and the policy kit. `python
+`resolve_kit_dir` (`roles_lib.py:97`) for the renderer and the registry; TOOL-dBoundRoles-21 S1's
+`read_policy_setting` for both keys. `python
 tools/codebase-map/reuse_lookup.py "hand a role the project map for the roles a policy key names"`
 ranked name-stem noise (`key`, `map_root`, `render_map_md`, `load_policy`); `render_map_md` renders
 the codebase-map kit's dossier map, not the project map, and no role-set reader exists, so

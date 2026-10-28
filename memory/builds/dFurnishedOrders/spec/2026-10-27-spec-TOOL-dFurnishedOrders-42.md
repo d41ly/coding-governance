@@ -1,6 +1,6 @@
 # TOOL-dFurnishedOrders-42 — the third spec audit's 19 roles, runlog, hooks, unattended and kickoff minors: criteria that read what they claim, one output for an empty transcript, imports gated as a class, the posture read decoded and bounded, and a runner bound a suite can lower
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node d · Tier-2 · base 08e30fef · streams tooling · order 25 · advances TOOL-dFurnishedOrders-21
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 08e30fef · streams tooling · order 25 · advances TOOL-dFurnishedOrders-21
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,11 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-38-round3-fix-return.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 |
 | [2026-10-27-build-TOOL-dFurnishedOrders-42-deviation-421.md](../build/2026-10-27-build-TOOL-dFurnishedOrders-42-deviation-421.md) | deviation | — |
+| [2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-1-agent-ledger.md) | journal | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-35 TOOL-dFurnishedOrders-36 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-43 TOOL-dFurnishedOrders-44 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-47 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-51 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-57 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-build-TOOL-dFurnishedOrders-42-deviation-422.md](../build/2026-10-28-build-TOOL-dFurnishedOrders-42-deviation-422.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dFurnishedOrders-38-round3-fix-brief.md) | research | TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-41 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-crosscheck.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-4 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-9 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-13 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-19 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-22 TOOL-dFurnishedOrders-23 TOOL-dFurnishedOrders-24 TOOL-dFurnishedOrders-25 TOOL-dFurnishedOrders-26 TOOL-dFurnishedOrders-27 TOOL-dFurnishedOrders-28 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-30 TOOL-dFurnishedOrders-31 TOOL-dFurnishedOrders-32 TOOL-dFurnishedOrders-33 TOOL-dFurnishedOrders-34 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 TOOL-dFurnishedOrders-45 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-49 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-52 TOOL-dFurnishedOrders-53 TOOL-dFurnishedOrders-54 TOOL-dFurnishedOrders-55 TOOL-dFurnishedOrders-56 TOOL-dFurnishedOrders-58 TOOL-dFurnishedOrders-59 TOOL-dFurnishedOrders-60 TOOL-dFurnishedOrders-61 |
+| [2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dFurnishedOrders-1-parents-reground.md) | research | TOOL-dFurnishedOrders-1 TOOL-dFurnishedOrders-2 TOOL-dFurnishedOrders-3 TOOL-dFurnishedOrders-5 TOOL-dFurnishedOrders-6 TOOL-dFurnishedOrders-7 TOOL-dFurnishedOrders-8 TOOL-dFurnishedOrders-10 TOOL-dFurnishedOrders-11 TOOL-dFurnishedOrders-12 TOOL-dFurnishedOrders-14 TOOL-dFurnishedOrders-15 TOOL-dFurnishedOrders-16 TOOL-dFurnishedOrders-17 TOOL-dFurnishedOrders-18 TOOL-dFurnishedOrders-20 TOOL-dFurnishedOrders-29 TOOL-dFurnishedOrders-37 TOOL-dFurnishedOrders-46 TOOL-dFurnishedOrders-48 TOOL-dFurnishedOrders-50 TOOL-dFurnishedOrders-58 |
 | [2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md](../reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md) | spec-audit | TOOL-dFurnishedOrders-40 TOOL-dFurnishedOrders-38 TOOL-dFurnishedOrders-39 TOOL-dFurnishedOrders-41 |
 
 <!-- /gen:spec-records -->
@@ -75,10 +79,15 @@ scope item each.
   ledger answers AC2 in the AMENDED form, three event lines then `untimed 0`, naming unit 37 S10 and
   this item, and the `turns` arm of `tools/runlog/selftest.py` expects four lines. Observed by AC3.
 - **S7** — id 4. The roles kit's imports gated as a class. `read_cap_answer`
-  (`tools/roles/roles_lib.py:140-156`) loads the policy kit's `budgets.py` through
-  `load_kit_module("policy", "budgets.py", "gov_policy_budgets")` (`TOOL-dFurnishedOrders-29` S6) and
-  keeps its `sys.path` insert of the policy kit's directory, which `budgets.py`'s own `import policy`
-  (`tools/policy/budgets.py:49`) reads; no `import` or `from` statement in `tools/roles/*.py` names a
+  (`tools/roles/roles_lib.py:140-156`) runs the policy kit's own census verb, `budgets.py resolve
+  --explain <request>` (`tools/policy/budgets.py:4`, `:360-399`), as a subprocess in `root`, found by
+  `resolve_kit_dir("policy", "budgets.py", kit_dir)` and run by unit 39's `run_bounded` under the
+  slot readers' 30-second bound. It reads the value and mode from the stdout row
+  `<cap>\t<value>\t<mode>\t<source>` and the rule from the stderr line `budgets: <cap> · <rule> ·
+  <reason>`. Its `import budgets` and its `sys.path` insert of the policy kit's directory go, since no
+  file under `tools/roles/` imports the policy kit (TOOL-dBoundRoles-43 S21) and a kit imports no
+  sibling kit (PLAY-dOrderedCharter-7 §4). An exit 2, or no kit, answers the handed-in value under
+  `refuse` as today, the rule naming why. No `import` or `from` statement in `tools/roles/*.py` names a
   module other than the roles kit's own modules and the standard library. Unit 37's ledger answers
   AC2's first arm in the AMENDED form, naming this item. Observed by AC4.
 - **S8** — id 5. Unit 37's criteria carry S33's branch. Where `grep -n "def validate_return"
@@ -149,7 +158,7 @@ scope item each.
 ### Edges
 
 - **consumes-from** `TOOL-dFurnishedOrders-16` — the `turns` verb's AC2 and its selftest arm, which S6 amends for the `untimed` line (id 22)
-- **consumes-from** `TOOL-dFurnishedOrders-29` — `load_kit_module` and `run_slot_reader`, through which S7 loads `budgets.py` and S17 lowers the bound (ids 4, 26)
+- **consumes-from** `TOOL-dFurnishedOrders-29` — `run_slot_reader` and its 30-second bound, which S17 lowers and S7's cap read takes (ids 4, 26)
 - **consumes-from** `TOOL-dFurnishedOrders-31` — S2's template-line render and AC1's arm assertions, which S12 grounds and S13 completes (ids 11, 35)
 - **consumes-from** `TOOL-dFurnishedOrders-32` — S1's duplicate-member case and AC2's fixture, which S9 and S10 settle (ids 6, 25)
 - **consumes-from** `TOOL-dFurnishedOrders-34` — the posture read, whose encoding, descendant bound and runner S14, S16 and S19 settle (ids 12, 21, 20)
@@ -192,8 +201,7 @@ measured 2026-10-27).
 
 ### Inventory
 
-Minted: the environment knob `ROLES_SLOT_BOUND` of S17; the private module name `gov_policy_budgets`
-of S7; the stdout line `untimed 0` for an empty transcript, a value of unit 37 S10's grammar. No
+Minted: the environment knob `ROLES_SLOT_BOUND` of S17; the stdout line `untimed 0` for an empty transcript, a value of unit 37 S10's grammar. No
 function.
 
 ### Migration
@@ -221,6 +229,8 @@ version move for the kit epoch leg.
 
 - **Admit `budgets` as the one bare sibling import (S7).** A named exception is a list, and the next
   sibling import passes beside it; the class gate fails on any.
+- **Load `budgets.py` by file under a private name (S7).** A by-file load is still an in-process
+  import of the policy kit, which TOOL-dBoundRoles-43 S21 forbids the roles kit.
 - **Re-price the roles adopter row instead of a knob (S17).** Every bar run would still pay a minute
   of sleep for two stubs.
 - **Match the posture line on its ASCII prefix (S14).** It changes the matched grammar of
@@ -229,7 +239,7 @@ version move for the kit epoch leg.
 ## 5. Production-readiness checklist
 
 - security — S11 keeps steps 6a and 9a denying every spec and product write on a broken index; S7
-  loads a sibling kit's module under a private name, from the resolved kit directory only.
+  loads no sibling module and runs only the resolved policy kit's census verb, under a bound.
 - perf / scale — S17 lets the roles suite run its bound arms in seconds; S15 removes an absolute wall
   clock from a criterion.
 - error / empty / loading states — S5 gives an empty transcript one output; S8 gives an unbuilt parent
@@ -259,7 +269,10 @@ version move for the kit epoch leg.
   Red when: an empty transcript is answered two ways, or unit 16's count reds on the added line.
   fixture: scratch transcripts roots under `%TEMP%`.
 - **AC4** — When §4 "The import gate" runs over `tools/roles/*.py` it prints nothing; run over a
-  scratch copy in which `handoff.py` gains `import gov_map`, it prints that line.
+  scratch copy in which `handoff.py` gains `import gov_map`, it prints that line; `git grep -n
+  "sys.path.insert" -- tools/roles/` piped to `grep -v -e "str(KIT_DIR)" -e "sys.argv\[1\]"` prints
+  nothing; and `python -c` calling `roles_lib.read_cap_answer` in a scratch repository whose committed
+  policy file sets the cap answers that value with the rule `budgets.py` prints.
   Red when: a bare sibling import passes because its name is not on a list.
   figure: it prints one line at `08e30fef` (PINNED), so it is red before the unit is built.
 - **AC5** — When `grep -n "def validate_return" tools/roles/roles_lib.py` prints nothing,
@@ -328,9 +341,12 @@ New arm: tools/unattended/unattended.test.sh · covers AC12 · a wrapped sibling
   `TOOL-dFurnishedOrders-41` §8 F1, rung 1, BUILD-METHOD M4's two-unit clause. widens: none ·
   relaxes: none
 - **F2 — How does the roles kit read the policy kit's caps module (S7)?** Options: (a)
-  `load_kit_module` with the class import gate; (b) `budgets` admitted as a named exception. (b) lets
-  any next sibling import pass. RESOLVED (agent, 2026-10-27, delegated): (a), rung 3, the
-  skeptic-judged first fix of id 4. widens: none · relaxes: none
+  `load_kit_module` with the class import gate; (b) `budgets` admitted as a named exception; (c) the
+  census verb `budgets.py resolve --explain` run by subprocess (`tools/policy/budgets.py:4`). (b) lets
+  any next sibling import pass. The 2026-10-27 pick, (a), loads the policy kit in process, which
+  TOOL-dBoundRoles-43 S21 ("no file under `tools/roles/` runs `get` outside it or imports the policy
+  kit") and PLAY-dOrderedCharter-7 §4 rule out. RESOLVED (agent, 2026-10-28, delegated): (c), rung 1,
+  TOOL-dBoundRoles-43 S21; the verb exists, so no parent change is asked. widens: none · relaxes: none
 - **F3 — How does a suite lower the runner's bound (S17)?** Options: (a) an environment knob read
   once, `CARD_MAP_BOUND`'s pattern; (b) a re-priced budget row. (b) keeps a minute of sleep on every
   bar. RESOLVED (agent, 2026-10-27, delegated): (a), rung 3, the skeptic-judged fix of id 26. widens:
@@ -349,11 +365,16 @@ New arm: tools/unattended/unattended.test.sh · covers AC12 · a wrapped sibling
 - rev-1 · 2026-10-27 · initial draft, the spec audit of the round-2 promotions' roles, runlog, hooks,
   unattended and kickoff minors batched: 17 MEDIUM and 2 LOW.
 - rev-2 · 2026-10-27 · §3 · the Edges block gains the **hands-off** bullet mirroring TOOL-dFurnishedOrders-46, promoted from the spec audit of the round-3 promotions (`memory/builds/dFurnishedOrders/reviews/2026-10-27-review-TOOL-dFurnishedOrders-38-spec-audit-round1.md`); nothing else moved.
+- rev-3 · 2026-10-28 · §2 S7; §3 Edges; §4 Inventory, Alternatives rejected; §5; §6 AC4; §8 F2
+  (re-resolved); §10 · re-grounded on the parents at `1a61f21a2` by the cross-check record
+  `memory/builds/dFurnishedOrders/build/2026-10-28-build-TOOL-dFurnishedOrders-1-parents-crosscheck.md`,
+  row 120.
 
 ## 10. Reuse audit
 
 The seams extended: the ratchet's own predicate (`skills/session-kickoff/manifest-check.sh:1525-1534`)
-for S2; `load_kit_module` (`TOOL-dFurnishedOrders-29` S6) for S7; `run_slot_reader` and unit 39's
+for S2; the policy kit's census verb `budgets.py resolve --explain` (`tools/policy/budgets.py:360-399`)
+for S7; `run_slot_reader` and unit 39's
 `run_bounded_py` block for S16, S17 and S19; `CARD_MAP_BOUND`'s read-once knob (unit 37 S13) as
 the pattern for `ROLES_SLOT_BOUND`; the sleeper-relative verdict of
 `skills/session-kickoff/manifest-check.test.sh:1741-1751` for S15. `python
