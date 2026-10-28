@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-45 — the spec audit of units 30 to 37: its 32 medium and low findings, closed in one batch
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 20 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 20 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,11 @@
 |---|---|---|
 | [2026-10-27-build-TOOL-dRankedPlan-38-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-38-promoted-fix-return.md) | research | TOOL-dRankedPlan-38 TOOL-dRankedPlan-41 |
 | [2026-10-27-build-TOOL-dRankedPlan-45-deviation-451.md](../build/2026-10-27-build-TOOL-dRankedPlan-45-deviation-451.md) | deviation | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-45-deviation-452.md](../build/2026-10-28-build-TOOL-dRankedPlan-45-deviation-452.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-38-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-38-promoted-fix-brief.md) | research | TOOL-dRankedPlan-38 TOOL-dRankedPlan-41 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 |
 | [2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md) | spec-audit | TOOL-dRankedPlan-43 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-44 TOOL-dRankedPlan-42 |
 
 <!-- /gen:spec-records -->
@@ -87,15 +91,18 @@ observes every item at its tip.
   with no plan record for `tFix`, `plan-record-unread` commits a tree with no copied memory-tree kit,
   and `plan-record-open-probe` commits its eleven-field record over the seeded one. Unit 33 §4's table
   is read from this sentence. Unit 33's builder takes it through its hands-off edge. Observed by AC4.
-- **S6** — Id 6, item M5 (with id 24). The row of `session-predicate callers (asked only at the act)` in
-  `tools/gate-legs.json`, and its `[[gate_leg]]` in `tools/loop/kit.toml`, each carry `ceiling = 300`,
-  the value `review-join ban (no ref-keyed join)` carries (`tools/gate-legs.json:717-724`). Its
-  `tools/run-gates/ceiling-evidence.txt` row is written by `derive-ceilings.py --write` from the
-  close's measured run. `TOOL-dRankedPlan-31`'s Files touched gains that file through its hands-off
-  edge. Observed by AC5.
+- **S6** — Id 6, item M5 (with id 24). The `[[gate_leg]]` of `session-predicate callers (asked only at
+  the act)` in `tools/loop/kit.toml`, its one declaration (TOOL-dWitnessedBar-11 S1), carries `ceiling
+  = 300`, the value `review-join ban (no ref-keyed join)` carries (`tools/gate-legs.json:717-724`), and
+  `leg_factory.py --write` renders it into `tools/gate-legs.json`, hand-written as the stand-in until
+  TOOL-dWitnessedBar-11 lands. Its `tools/run-gates/ceiling-evidence.txt` row is written by
+  `derive-ceilings.py --write` from the close's measured run. `TOOL-dRankedPlan-31`'s Files touched
+  gains that file through its hands-off edge. Observed by AC5.
 - **S7** — Id 24, item M5 (with id 6). `TOOL-dRankedPlan-31` §7 names `govkit selfcheck`,
   `codebase-map coverage + freshness` and `leg ceilings clear their evidenced maximum`, the unguarded
-  meta-gates that grade a new leg. The close runs the bar with `GATE_FULL=1`. Observed by AC5.
+  meta-gates that grade a new leg, and, once their units land, `gate-leg conformance`
+  (TOOL-dWitnessedBar-11 S4) and `core meta-check` (PLAY-dOrderedCharter-7 S11), which reds a leg
+  with no `enforces` (its S3). The close runs the bar with `GATE_FULL=1`. Observed by AC5.
 - **S8** — Id 11, item M6. `seed_plan_witness` (`TOOL-dRankedPlan-33` S1) writes the scratch
   `.memory-tree.conf` from the example conf with one key set, `FAMILIES`, to the example's value with
   `tooling:TOOL` appended, so the `TOOL-<slug>-1` it mints binds. It sets no other key. Observed by AC6.
@@ -140,10 +147,13 @@ observes every item at its tip.
   selftest` and every other leg whose guard is `{prefix}/loop/`. Each unit does it in its own pass,
   through its hands-off edge, and until the leg is in the manifest its §7 says so in prose. Observed by
   AC12.
-- **S18** — Id 28, item M13. Two guards widen in `tools/gate-legs.json` and in their kits' `[[gate_leg]]`
-  entries: `build-index selftest` gains `{prefix}/loop/`, and `loop selftest` gains
-  `{prefix}/memory-tree/`. `TOOL-dRankedPlan-37` AC11 reads: the manifest guard holds the added entries,
-  and the descriptor guard holds the same added entries beside its `{kit}/`. Observed by AC13.
+- **S18** — Id 28, item M13. Two guards widen in their kits' `[[gate_leg]]` declarations, under a
+  `[gate_leg.gov]` sub-table where gov's guard differs from an adopter's (TOOL-dWitnessedBar-11 S1),
+  and `leg_factory.py --write` renders `tools/gate-legs.json`: `build-index selftest` gains
+  `{prefix}/loop/`, and `loop selftest` gains `{prefix}/memory-tree/`. `TOOL-dRankedPlan-37` AC11
+  reads: the descriptor guard holds the added entries beside its `{kit}/`, and the rendered manifest
+  guard holds the same entries. Until TOOL-dWitnessedBar-11 lands, the manifest edit is the hand-written
+  stand-in. Observed by AC13.
 - **S19** — Id 30, item M14. `derive_step_scenarios(build, move_fields=None)` is the signature
   `TOOL-dRankedPlan-36` S2 needs. Its one call site, in `tools/loop/loop_transition.py` before
   `write_transition` writes, passes the pending move's fields. `TOOL-dRankedPlan-36`'s Files touched and
@@ -249,7 +259,9 @@ observes every item at its tip.
   extensionless hooks and `*.sh` files.
 - M13: `tools/memory-tree/kit.toml:277-280` gives `build-index selftest` the guard `["{kit}/"]`, while
   `tools/gate-legs.json:482-486` holds three entries, and `tools/govkit/govkit.py:2604-2605` says
-  nothing compares the two.
+  nothing compares the two. TOOL-dWitnessedBar-11 S1, S2 make the declaration the one place a leg's
+  keys live, `[gate_leg.gov]` holding gov's differing values, and `leg_factory.py --check` red a
+  manifest that differs from its render; PLAY-dOrderedCharter-7 S3 reds a leg with no `enforces`.
 - M16: `tools/unattended/unattended.test.sh:2537` and :6521 write their own `.memory-tree.conf`.
 - M18: `tools/memory-tree/routed_commits.py:155` and `tools/memory-tree/gen_build_index.py:3339` fold
   `\` at the caller, before the shape test.
@@ -287,7 +299,9 @@ units' hands-off edges, so each lands in its own unit's pass and is observed her
 - `tools/loop/ratify.py`: S1 to S3, S9, S10, S16, S20, S21, S31, S32
 - `tools/lib/extract_code.py`, `tools/lexicon/extract_code.py`, `tools/codebase-map/extract_code.py`,
   `tools/loop/extract_code.py`: S10's `heredoc` token
-- `tools/gate-legs.json`, `tools/loop/kit.toml`, `tools/memory-tree/kit.toml`: S6, S18
+- `tools/loop/kit.toml`, `tools/memory-tree/kit.toml`: S6, S18
+- `tools/gate-legs.json`: S6, S18, rendered by `leg_factory.py --write`, hand-written as the stand-in
+  until TOOL-dWitnessedBar-11 lands
 - `tools/run-gates/ceiling-evidence.txt`: S6
 - `tools/loop/scenario.py`, `tools/loop/loop_transition.py`: S22
 - `tools/memory-tree/tree_lib.py`: S23
@@ -333,10 +347,14 @@ units' hands-off edges, so each lands in its own unit's pass and is observed her
 - **AC4** — When the plants `plan-record-absent`, `plan-record-unread` and `plan-record-open-probe` run,
   their moves print `unwitnessed`, `unread`, and a refusal then an admission once the probe returns.
   Red when: a plant's state disagrees with S5's sentence.
-- **AC5** — When a probe reads `tools/gate-legs.json` and `tools/run-gates/ceiling-evidence.txt`, the
-  row `session-predicate callers (asked only at the act)` carries `ceiling` 300 and has an evidence row,
-  and `grep -c "govkit selfcheck"` over unit 31's spec prints at least 1.
-  Red when: the new leg has no ceiling or its meta-gates are unnamed.
+- **AC5** — When a probe reads `tools/loop/kit.toml` and `tools/run-gates/ceiling-evidence.txt`, the
+  `[[gate_leg]]` row `session-predicate callers (asked only at the act)` carries `ceiling` 300 and a
+  non-empty `enforces` and has an evidence row; `python tools/run-gates/leg_factory.py --check` exits
+  0; and `grep -c "govkit selfcheck"` and `grep -c "core meta-check"` over unit 31's spec each print at
+  least 1.
+  Red when: the new leg has no ceiling or no `enforces`, its manifest row differs from its
+  declaration, or its meta-gates are unnamed.
+  fixture: `leg_factory.py` lands with TOOL-dWitnessedBar-11; before it, the descriptor probe is read.
 - **AC6** — When `python ratify.py --fixture --seed <dir> --build tFix` runs over a fresh scratch
   repository, its `.memory-tree.conf` declares `tooling:TOOL` and the seeded record's `**Serves:**` line
   binds.
@@ -363,8 +381,11 @@ units' hands-off edges, so each lands in its own unit's pass and is observed her
   Red when: a unit touching the loop kit leaves the loop kit's suite unnamed.
 - **AC13** — When a probe reads `tools/gate-legs.json`, `tools/memory-tree/kit.toml` and the loop
   kit's `kit.toml`, `build-index selftest`'s guards hold `{prefix}/loop/` and `loop selftest`'s
-  hold `{prefix}/memory-tree/`, each spelled with its own placeholder in the descriptor.
-  Red when: a suite reads a sibling kit its guard does not name.
+  hold `{prefix}/memory-tree/`, each spelled with its own placeholder in the descriptor, and `python
+  tools/run-gates/leg_factory.py --check` exits 0.
+  Red when: a suite reads a sibling kit its guard does not name, or a guard is widened in the manifest
+  alone.
+  fixture: `leg_factory.py` lands with TOOL-dWitnessedBar-11; before it, the two reads are compared.
 - **AC14** — When `grep -n "derive_step_scenarios("` runs over the loop kit's `loop_transition.py` at
   this unit's tip, the call passes the pending move's fields.
   Red when: the first move's `scenario` field never reaches the check.
@@ -420,6 +441,7 @@ none
   9 LOW findings, ids 3 4 5 6 7 9 11 12 13 14 15 16 17 18 20 21 23 24 25 27 28 29 30 31 32 35 36 37 39
   40 41 42, batched under BUILD-METHOD M4.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-46`, the hands-off edge to `TOOL-dRankedPlan-47`, the hands-off edge to `TOOL-dRankedPlan-48`, the hands-off edge to `TOOL-dRankedPlan-49`, the hands-off edge to `TOOL-dRankedPlan-52`, each the reciprocal of that promoted unit's own edge (spec audit of units 38 to 45, `reviews/2026-10-27-review-TOOL-dRankedPlan-38-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-28 · §2 S6, S7, S18 · §4 Evidence, Files touched · §6 AC5, AC13 · re-grounded by the cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, row 63: a leg's `ceiling` and guards go on its one `[[gate_leg]]` declaration and `tools/gate-legs.json` is rendered by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1, S2), hand-written as the stand-in until that unit lands; S7 names `gate-leg conformance` and `core meta-check`, and AC5 reads the new leg's `enforces`.
 
 ## 10. Reuse audit
 

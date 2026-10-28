@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-13 — the plan record's intent fields: affected systems derived from the `code` record and checked, open questions as fork tags
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0381@634c7b47 whole
 
@@ -12,8 +12,13 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-a.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-27-build-TOOL-dRankedPlan-13-deviation-131.md](../build/2026-10-27-build-TOOL-dRankedPlan-13-deviation-131.md) | deviation | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-13-deviation-132.md](../build/2026-10-28-build-TOOL-dRankedPlan-13-deviation-132.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-13-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-13-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -89,14 +94,18 @@ tag `fork.<build>.<name>` in a registered `fork` namespace, so Design's forks ca
   The one call carries every entry of `FIELD_CHECKS`, TOOL-dRankedPlan-11's and -12's included.
   Observed by AC10.
 - **S10** — The leg `plan-fields selftest`, argv `python3 {kit}/plan_fields.py --selftest`, subject
-  `kit`, guard `{kit}/plan_fields.py`, declared as a `[[gate_leg]]` in `tools/memory-tree/kit.toml` and
-  in `tools/gate-legs.json`, with `enforces = ["principle.p32"]` (§8 F6) and the rows a new leg owes:
-  `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt` and the `gate-legs` claim of
-  `memory/map/features/memory-tree-hygiene.md`; `KIT_MEMORY_TREE_VERSION`
+  `kit`, guard `{kit}/plan_fields.py`, declared once, by `python tools/run-gates/leg_factory.py new`,
+  as a `[[gate_leg]]` row of `tools/memory-tree/kit.toml` holding every manifest key the leg carries,
+  `enforces = ["principle.p32"]` among them (§8 F6); `leg_factory.py --write` renders
+  `tools/gate-legs.json` from it (TOOL-dWitnessedBar-11 S1 to S3). `leg_factory.py` is not in the tree
+  at `d1721ef20`: until TOOL-dWitnessedBar-11 lands it, the pass hand-writes the manifest row the render
+  would write, and its deviation record names that hand edit as the stand-in. The other rows a new leg
+  owes: `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt` and the `gate-legs`
+  claim of `memory/map/features/memory-tree-hygiene.md`; `KIT_MEMORY_TREE_VERSION`
   (`tools/memory-tree/check-memory-hygiene.sh:69`) moves, since shipped bytes move. `--selftest` runs
   every plant of `--fixture --plant <case>`, a throwaway repository under the system temp directory
   holding a planted plan record and a stub `code_record.py` answering planted `code_file` rows.
-  NOT OBSERVED by a criterion: each meta-gate grades its row at the close.
+  Observed by AC11 for the declaration; each other meta-gate grades its row at the close.
 - **S11** — The page `help/plan.md` (TOOL-dRankedPlan-16 S9) gains a section "The plan record's
   intent fields": the three fields, their grammar, `derive`, `check`, `scope`, and the `unkitted`
   system. Observed by AC9.
@@ -120,6 +129,7 @@ tag `fork.<build>.<name>` in a registered `fork` namespace, so Design's forks ca
 - **hands-off** `TOOL-dRankedPlan-11` — `plan_fields.py`, the module and `FIELD_CHECKS` table that unit lists `Read sets` in
 - **hands-off** `TOOL-dRankedPlan-12` — `plan_fields.py`, the module and `FIELD_CHECKS` table that unit lists `Probes owed` in
 - **consumes-from** external — dTotalRecall: the `code` record, `code_file` and `code_meta` (TOOL-dTotalRecall-8 S6, S7, S9); the record-file factory's reader (PLAY-dOrderedCharter-7 S7); the namespace registry and the tag grammar (PLAY-dOrderedCharter-19 S1, S2); each DEFERRED at base and re-grounded on its landed code
+- **consumes-from** external — dWitnessedBar: the leg declared once and `leg_factory.py` (TOOL-dWitnessedBar-11 S1 to S3); DEFERRED at base, its factory absent at `d1721ef20`
 - **consumes-from** external — dPlacedRequest: `resolve_item_seed` and its `scope-paths` arm (TOOL-dPlacedRequest-8 S4), which that spec hands to this build to arm
 - **hands-off** external — dCalibratedLens' scope drift reads `Affected systems`; dIndexedDesign's `design.decompose` cites the `fork.*` tags
 - **hands-off** `TOOL-dRankedPlan-19` — S9's call of `check_plan_fields` inside `check_plan_record`, which carries the field refusals into the witness that unit's gate reads (round-1 spec audit, id 1)
@@ -192,8 +202,9 @@ Live at landing for every plan record written after it; a build with no plan rec
 - `tools/loop/loop_lib.py`: S8's arm
 - `tools/playbook/namespaces.toml`: S7's row
 - `tools/memory-tree/plan_record.py`: S9's call inside `check_plan_record`
-- `tools/memory-tree/kit.toml`: S10's `[[gate_leg]]`
-- `tools/gate-legs.json`: S10's leg
+- `tools/memory-tree/kit.toml`: S10's `[[gate_leg]]`, the leg's one declaration
+- `tools/gate-legs.json`: S10's leg, rendered by `leg_factory.py --write`, hand-written as its
+  stand-in until TOOL-dWitnessedBar-11 lands
 - `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt`: S10's rows
 - `memory/map/features/memory-tree-hygiene.md`: the `gate-legs` claim
 - `tools/memory-tree/check-memory-hygiene.sh`: `KIT_MEMORY_TREE_VERSION`
@@ -277,6 +288,13 @@ Live at landing for every plan record written after it; a build with no plan rec
   derived record it prints `item.plan.record — witnessed`.
   Red when: the schema check witnesses a plan record whose intent field check refuses.
   fixture: `plan_record.py` and `check_plan_record` land with TOOL-dRankedPlan-16.
+- **AC11** — When `grep -n -A12 'name = "plan-fields selftest"' kit.toml` runs over the memory-tree
+  kit's descriptor, it prints the leg's row holding `enforces = ["principle.p32"]`, and `python
+  leg_factory.py --check` exits 0.
+  Red when: the leg is written into the manifest beside its declaration, or declared with no
+  `enforces`.
+  fixture: `leg_factory.py` lands with TOOL-dWitnessedBar-11; before it, the grep alone is read, and
+  the manifest row is the stand-in the pass's deviation record names.
 
 ## 7. Gates
 
@@ -330,6 +348,7 @@ New arm: tools/loop/loop_lib.py · covers AC7 · TOOL-dPlacedRequest-8's `seed-s
   and S11, TOOL-dPlacedRequest-8 S4, PLAY-dOrderedCharter-19 S1, S2 and §4, and scout A's row 6.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-19`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 - rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
+- rev-4 · 2026-10-28 · §2 S10 · §3 Edges · §4 Files touched · §6 AC11 · re-grounded by the cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, row 31: the leg is declared once in its kit's `[[gate_leg]]` row, with `enforces`, and `tools/gate-legs.json` is rendered from it by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1 to S3), hand-written as the stand-in until that unit lands.
 
 ## 10. Reuse audit
 

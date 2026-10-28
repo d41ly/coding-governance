@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-37 — the spec audit of units 19 to 29: its 25 medium and low findings, closed in one batch
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 18 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,11 @@
 | [2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-30-promoted-fix-return.md) | research | TOOL-dRankedPlan-30 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 |
 | [2026-10-27-build-TOOL-dRankedPlan-37-deviation-371.md](../build/2026-10-27-build-TOOL-dRankedPlan-37-deviation-371.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-37-deviation-372.md](../build/2026-10-27-build-TOOL-dRankedPlan-37-deviation-372.md) | deviation | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-37-deviation-373.md](../build/2026-10-28-build-TOOL-dRankedPlan-37-deviation-373.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-30-promoted-fix-brief.md) | research | TOOL-dRankedPlan-30 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-45 |
 | [2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) | spec-audit | TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-36 TOOL-dRankedPlan-33 |
 
 <!-- /gen:spec-records -->
@@ -59,8 +63,11 @@ item, so its builder reads the change before building.
   `ratify.py --fixture --seed <dir> --build <slug>`, for each build whose move they write through
   `write_transition`. They are `gen_build_index.py --ratified-order --plant drafts-cross-session`
   (`TOOL-dRankedPlan-21` S4), with builds `dA`, `dB` and `dC`, and every `plan_revision.py --selftest`
-  plant that plants a `plan.exit` move (`TOOL-dRankedPlan-15` S6), with build `tFix`. The generator
-  reaches the loop kit by `backlog.resolve_kit_dir`, as `TOOL-dRankedPlan-21` S3 does. Observed by AC1.
+  plant that plants a `plan.exit` move (`TOOL-dRankedPlan-15` S6), with build `tFix`. The generator's
+  plant reaches the loop kit as `TOOL-dRankedPlan-21` S3 does, running its CLIs as subprocesses found
+  through `backlog.resolve_kit_dir`, `ratify.py --fixture --seed` and `loop_transition.py record` for
+  each move, and imports no loop-kit module (PLAY-dOrderedCharter-7 §4); `plan_revision.py`, inside the
+  loop kit, calls `write_transition` itself. Observed by AC1.
 - **S2** — Id 32, item M1 (with id 1). `TOOL-dRankedPlan-10` AC6, a `pre-placement` move admitted with
   no disposition, holds over the seeded record of `TOOL-dRankedPlan-33` S2. `TOOL-dRankedPlan-19` AC2's
   `pre-placement` variant of `plan-record-absent`, which has no record, is refused. The two criteria
@@ -103,9 +110,12 @@ item, so its builder reads the change before building.
 - **S12** — Id 9, item M7 (high face `TOOL-dRankedPlan-30`). At this unit's tip, `bash
   tools/check-install-prefix.sh --offenders` prints no key whose path is the loop kit's `ratify.py`.
   Observed by AC10.
-- **S13** — Id 11, item M8 (high face `TOOL-dRankedPlan-31`). Two guards widen, in
-  `tools/gate-legs.json` and in their kits' `[[gate_leg]]` entries. `build-index selftest` gains
-  `{prefix}/loop/ratify.py`, which `TOOL-dRankedPlan-21` S4's plant imports. `loop selftest` gains
+- **S13** — Id 11, item M8 (high face `TOOL-dRankedPlan-31`). Two guards widen in their kits'
+  `[[gate_leg]]` declarations, each leg's one declaration, under a `[gate_leg.gov]` sub-table where
+  gov's guard differs from an adopter's, and `python tools/run-gates/leg_factory.py --write` renders
+  `tools/gate-legs.json` (TOOL-dWitnessedBar-11 S1, S2); until that unit lands, the manifest edit is
+  the hand-written stand-in the pass's deviation record names. `build-index selftest` gains
+  `{prefix}/loop/ratify.py`, which `TOOL-dRankedPlan-21` S4's plant runs. `loop selftest` gains
   `{prefix}/memory-tree/plan_record.py` and `{prefix}/memory-tree/plan_fields.py`, which
   `TOOL-dRankedPlan-19`'s plants run. Unit 22's tree run has left the guarded leg through
   `TOOL-dRankedPlan-31`. Observed by AC11.
@@ -126,7 +136,8 @@ item, so its builder reads the change before building.
 - **S17** — Id 35, item M12. `read_ratifying_exit(repo, slug)` in `tools/loop/ratify.py` answers the
   newest of the build's `plan.exit` moves whose `ratification` is in `RATIFYING_EXITS`, or `None`.
   `check_ratified_order`'s ratified set (`TOOL-dRankedPlan-21` S3) is the set of rows whose build it
-  answers for. So a later crossing that records no owner act, a forged `before-placement` trailer
+  answers for: the verdict of `ratify.py <slug> --exited` (that unit's S1, §8 F3) reads `ratifying`
+  when `read_ratifying_exit` answers a move, so the generator still reads it by subprocess. So a later crossing that records no owner act, a forged `before-placement` trailer
   included, cannot downgrade a row an owner act ratified, which is unit 21 §3's rule that a revision
   keeps the row ratified. `read_exit_ratification` stays the newest-move reader `show` takes
   (`TOOL-dRankedPlan-23` S1). The `drafts-cross-session` plant gains a forged newer `plan.exit` move
@@ -223,6 +234,9 @@ item, so its builder reads the change before building.
   `tools/memory-tree/gen_build_index.py:3340` refuses `/`, a drive letter and `..`, but not `~`.
 - L5: `tools/roles/kit.toml:22` and `tools/memory-tree/kit.toml:6` each hold only a `version_from`
   pointer. `tools/push-main.sh:26-30` mints kit versions into the prepared merge.
+- M1, M8: PLAY-dOrderedCharter-7 §4 (its spec :202-205) has a kit reach a sibling only by running its
+  CLI, and `tools/memory-tree/kit.toml:8` declares no `requires_if` row for `loop`; TOOL-dWitnessedBar-11
+  S1, S2 make a leg's declaration the one home of its guard, the manifest rendered from it.
 
 ### The shared adding-commit reader (S14)
 
@@ -266,7 +280,9 @@ mints that kit's version, which is S24's own rule.
 - `tools/loop/plan_revision.py`: S1, S3, S4, S6, S7, S22
 - `tools/loop/ratify.py`: S14, S16, S17, S25
 - `tools/loop/scenario.py`: S10
-- `tools/gate-legs.json`, `tools/memory-tree/kit.toml`, `tools/loop/kit.toml`: S13
+- `tools/memory-tree/kit.toml`, `tools/loop/kit.toml`: S13's declarations
+- `tools/gate-legs.json`: S13, rendered by `leg_factory.py --write`, hand-written as the stand-in
+  until TOOL-dWitnessedBar-11 lands
 - `tools/unattended/unattended.test.sh`: S15
 - `tools/memory-tree/tree_lib.py`, `tools/memory-tree/routed_commits.py`, `tools/memory-tree/plan_fields.py`: S23
 - `memory/builds/dRankedPlan/spec/2026-10-26-spec-TOOL-dRankedPlan-16.md`: S19, S20
@@ -339,8 +355,10 @@ mints that kit's version, which is S24's own rule.
 - **AC11** — When a probe reads `tools/gate-legs.json`, the `build-index selftest` guard holds the
   loop kit's `ratify.py`, and the `loop selftest` guard holds the memory-tree kit's `plan_record.py`
   and `plan_fields.py`, each under `{prefix}` as S13 spells it. Each kit's `[[gate_leg]]` entry carries
-  the same guard.
-  Red when: a suite reads a sibling kit file its leg's guard does not name.
+  the same guard, and `python tools/run-gates/leg_factory.py --check` exits 0.
+  Red when: a suite reads a sibling kit file its leg's guard does not name, or a guard is widened in
+  the manifest alone.
+  fixture: `leg_factory.py` lands with TOOL-dWitnessedBar-11; before it, the two reads are compared.
 - **AC12** — When the plant `reader-bound` runs its `merged-add` case, the record from the branch
   forked after the newest transition is kept and the one forked before it is not. `grep -c
   "diff-filter=A" ratify.py` over the loop kit's module prints 1.
@@ -403,6 +421,7 @@ none
   under BUILD-METHOD M4.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-42`, the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 - rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-61`, each the reciprocal of that promoted unit's own edge (spec audit of units 46 to 52, `reviews/2026-10-27-review-TOOL-dRankedPlan-46-spec-audit.md`); no other section moves.
+- rev-4 · 2026-10-28 · §2 S1, S13, S17 · §4 Evidence, Files touched · §6 AC11 · re-grounded by the cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, rows 60 and 61: guards widen in each leg's one `[[gate_leg]]` declaration and `tools/gate-legs.json` is rendered by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1, S2), hand-written as the stand-in until that unit lands; the generator and its plant run the loop kit's CLIs as subprocesses and import none of its modules (PLAY-dOrderedCharter-7 §4), S17's ratified set read through `--exited`'s verdict.
 
 ## 10. Reuse audit
 

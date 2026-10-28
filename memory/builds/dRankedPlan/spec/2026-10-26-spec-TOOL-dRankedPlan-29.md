@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-29 — the round-1 spec audit's 39 medium and low findings, closed in one batch
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 17 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 17 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,12 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dRankedPlan-29-deviation-291.md](../build/2026-10-26-build-TOOL-dRankedPlan-29-deviation-291.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-29-deviation-292.md](../build/2026-10-28-build-TOOL-dRankedPlan-29-deviation-292.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-29-1-spec-reviewer.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-29-1-spec-reviewer.md) | journal | — |
 | [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 |
 
 <!-- /gen:spec-records -->
@@ -182,9 +187,14 @@ write sets under M6's clauses.
 - **S25** — Id 30, item M12. `TOOL-dRankedPlan-13`'s leg `plan-fields selftest` gains its
   `tools/run-gates/selftest-budgets.txt` row, its `WHOLE_RUN` entry in
   `tools/run-gates/foreign-prefix.gov.test.sh` (a `--selftest` mode of a shipped engine, as
-  `corpus-ids selftest` at `:125` is), and its manifest row's `chunk` and `ceiling` in
-  `tools/gate-legs.json`. Observed by AC20.
-- **S26** — Id 31, item M13. `TOOL-dRankedPlan-15`'s leg `loop plan revision` gains its claim in the
+  `corpus-ids selftest` at `:125` is), and its `chunk` and `ceiling` on its one declaration, the
+  `[[gate_leg]]` row of `tools/memory-tree/kit.toml` (`TOOL-dRankedPlan-13` S10), from which
+  `python tools/run-gates/leg_factory.py --write` renders `tools/gate-legs.json`
+  (TOOL-dWitnessedBar-11 S1, S2); until that unit lands, the manifest row is hand-written as the
+  stand-in unit 13's pass names. Observed by AC20.
+- **S26** — Id 31, item M13. `TOOL-dRankedPlan-15`'s leg `loop plan revision`, declared once with its
+  `enforces` in its `[[gate_leg]]` row of `tools/loop/kit.toml` (that unit's S6, the tag its §8
+  F8's) and rendered into `tools/gate-legs.json` as S25's leg is, gains its claim in the
   `gate-legs` list of `memory/map/features/loop.md` (the dossier `TOOL-dDeclaredLoop-3` creates), its
   `tools/run-gates/ceiling-evidence.txt` row, and its `WHOLE_RUN` entry in
   `tools/run-gates/foreign-prefix.gov.test.sh`. Observed by AC20.
@@ -332,8 +342,9 @@ watched change.
 - `tools/drift-audit/drift_report.py`, `tools/drift-audit/selftest.py`, `tools/drift-audit/README.md`: S20, S21
 - `tools/memory-tree/.memory-tree.conf.example`, `tools/memory-tree/README.md`: S21, S28
 - `tools/roles/adopt-roles.test.sh`, `tools/roles/handoff.py`: S22, S33
-- `tools/memory-tree/kit.toml`: S24
-- `tools/run-gates/selftest-budgets.txt`, `tools/run-gates/foreign-prefix.gov.test.sh`, `tools/run-gates/ceiling-evidence.txt`, `tools/gate-legs.json`: S25, S26
+- `tools/memory-tree/kit.toml`: S24, S25's `chunk` and `ceiling`
+- `tools/run-gates/selftest-budgets.txt`, `tools/run-gates/foreign-prefix.gov.test.sh`, `tools/run-gates/ceiling-evidence.txt`: S25, S26
+- `tools/gate-legs.json`: S25, S26, rendered by `leg_factory.py --write`, hand-written as the stand-in until TOOL-dWitnessedBar-11 lands
 - `memory/map/features/loop.md`: S26
 - `memory/guides/SESSION-KICKOFF.md`: S27
 - `tools/unattended/unattended.sh`, `tools/unattended/ASKS.template.md`, `memory/guides/UNATTENDED-ASKS.md`: S28
@@ -445,9 +456,13 @@ watched change.
 - **AC20** — When `grep -c "plan-fields selftest" tools/run-gates/selftest-budgets.txt
   tools/run-gates/foreign-prefix.gov.test.sh` and `grep -c "loop plan revision"
   tools/run-gates/ceiling-evidence.txt tools/run-gates/foreign-prefix.gov.test.sh memory/map/features/loop.md`
-  run, each file prints at least 1, and a probe reading `tools/gate-legs.json` finds `chunk` and
-  `ceiling` on the `plan-fields selftest` row.
-  Red when: a new leg lacks a row it owes.
+  run, each file prints at least 1; a probe reading `tools/memory-tree/kit.toml` finds `chunk` and
+  `ceiling` on the `plan-fields selftest` row, and one reading `tools/loop/kit.toml` finds a non-empty
+  `enforces` on the `loop plan revision` row; and `python tools/run-gates/leg_factory.py --check`
+  exits 0.
+  Red when: a new leg lacks a row it owes, or a manifest key is written beside its declaration.
+  fixture: `leg_factory.py` lands with TOOL-dWitnessedBar-11; before it, the two descriptor probes are
+  read, and the manifest rows are the stand-ins the passes name.
 - **AC21** — When `git rev-list -1 <re-stamp commit>..HEAD -- <the watch: paths of
   memory/guides/SESSION-KICKOFF.md>` runs at the tip, it prints nothing.
   Red when: a watched file changed after the last re-stamp.
@@ -529,6 +544,7 @@ New arm: skills/session-kickoff/card-store.fixture.sh · covers AC3 AC5 · `plan
   ids 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 22 23 24 25 26 29 30 31 32 33 34 35 36 38 40 41 42 43
   44 45 46 47 48 49, batched under BUILD-METHOD M4.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-28 · §2 S25, S26 · §4 Files touched · §6 AC20 · re-grounded by the cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, rows 54 and 55: each leg's keys go on its one `[[gate_leg]]` declaration, `enforces` among them, and `tools/gate-legs.json` is rendered by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1, S2), hand-written as the stand-in until that unit lands.
 
 ## 10. Reuse audit
 

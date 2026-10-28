@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-4 — dormancy disposal: a dormant build moved by the owner's disposition, shown in the plan view
 
-**Status:** DEFERRED · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 11 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0372@5c733981 whole
 
@@ -11,7 +11,12 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-27-build-TOOL-dRankedPlan-4-deviation-41.md](../build/2026-10-27-build-TOOL-dRankedPlan-4-deviation-41.md) | deviation | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-4-deviation-42.md](../build/2026-10-28-build-TOOL-dRankedPlan-4-deviation-42.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-4-1-spec-reviewer.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-4-1-spec-reviewer.md) | journal | — |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -42,11 +47,16 @@ showing the disposed state where they showed `dormant`. The one threshold stays 
   Observed by AC2.
 - **S3** — The disposal. `apply_build_disposal(repo, slug)` in `tools/loop/loop_transition.py`, run
   as `python tools/loop/loop_transition.py dispose --build <slug>`, reads the build's disposition
-  records (`record-kind.disposition`, TOOL-dDeclaredLoop-16 S4) added after its newest transition,
-  takes the newest whose `Item` and `Disposition` name one of §4's three moves, and records that move
+  records (`record-kind.disposition`, TOOL-dDeclaredLoop-16 S4) added after its newest transition
+  through `read_build_disposition`, built on TOOL-dRankedPlan-24's `read_item_disposition`, takes the
+  newest whose `Item` and `Disposition` name one of §4's three moves, and records that move
   through `write_transition` (TOOL-dDeclaredLoop-3 S5) with `--from` the state `derive_position`
   answers (TOOL-dDeclaredLoop-7 S1) and `--witness` the commit that added the disposition record. It
-  prints the writer's `transition —` line and exits 0. Observed by AC3, AC4.
+  prints the writer's `transition —` line and exits 0. `item.life.request` and `item.life.close` have
+  no `[[item]]` row (TOOL-dDeclaredLoop-13 §4 "The stand-ins"), so `check_disposition_record` admits
+  none of their records (TOOL-dDeclaredLoop-16 S5) and the reader returns them with no value filter
+  (TOOL-dRankedPlan-24 S1): `DISPOSAL_MOVES` is the closed set S3 grades each `Disposition` by, and
+  S4's `derive_move` refusal holds a move the build's table refuses. Observed by AC3, AC4.
 - **S4** — Held without the owner. With no such record, `dispose` writes nothing and exits 1,
   `dispose — <slug> held: no owner disposition names a move`. A record whose move the build's table
   refuses, as `derive_move` does T11 or T12 past the `pushed` fact, exits 2 naming the row and the
@@ -248,6 +258,10 @@ New arm: tools/loop/loop_transition.py · covers AC3 AC4 AC5 · the four `dispos
 - rev-2 · 2026-10-27 · §3 · gains the consumes-from edge to `TOOL-dRankedPlan-24`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 - rev-3 · 2026-10-27 · §3 · gains the consumes-from edge to `TOOL-dRankedPlan-35`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
 - rev-4 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-44`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
+- rev-5 · 2026-10-28 · S3 · re-grounded on the parents at `d1721ef20` by the cross-check record
+  `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, row 18: S3 names its reader and
+  grades the two life items' records itself, by `DISPOSAL_MOVES` and `derive_move`'s refusal, since
+  `check_disposition_record` admits nothing for an item with no `[[item]]` row; no other section moves.
 
 ## 10. Reuse audit
 
