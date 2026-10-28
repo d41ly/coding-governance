@@ -129,7 +129,7 @@ ids TOOL-dIndexedDesign-50 TOOL-dIndexedDesign-51 TOOL-dIndexedDesign-52 TOOL-dI
 | [TOOL-dIndexedDesign-53 — the round-1 audit of units 39 to 46: its 20 minors batched, one home for each record number, one reader per opt-in, and every criterion made to observe](spec/2026-10-28-spec-TOOL-dIndexedDesign-53.md) | 21 | 2 | DEFERRED | rev-1 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 73 bound to this build, across 4 record folder(s).
+Records: 74 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
