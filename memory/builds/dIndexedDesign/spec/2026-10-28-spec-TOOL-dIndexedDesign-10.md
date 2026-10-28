@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-10 — the playbook record kind: its row, its one resolver, the `repeat` route resolving through it, and `check-playbook` as Design's pack
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 13 · closes TOOL-dIndexedDesign-19 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 13 · closes TOOL-dIndexedDesign-19 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0392@c9f3c2f0 whole
 **Carries:** node:record-kind.playbook

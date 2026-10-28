@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-51 — unit 38's one-site rule is restated at S22 and S35 before unit 38's pass, and the refusal census is read at every pass commit that changes `unattended.sh`
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

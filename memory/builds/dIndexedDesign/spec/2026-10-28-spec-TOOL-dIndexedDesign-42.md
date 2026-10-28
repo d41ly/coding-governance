@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-42 — fork records are numbered within their build and joined by their `Fork` field, so two units' F1 forks never collide under the factory's per-build key
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

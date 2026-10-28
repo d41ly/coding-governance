@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-13 — the reuse scout's return under M1c's contract: the `seams` record, its caps and MUST definition, read once and its seams handed on as rows
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0395@07a81090 whole
 **Carries:** node:item.design.seams

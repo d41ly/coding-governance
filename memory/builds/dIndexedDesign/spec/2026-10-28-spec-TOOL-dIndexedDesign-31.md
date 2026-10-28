@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-31 — the blinded scout's input as a true allow-list: `derive_scouted_seam_input` names the keys a scout may see, and a planted unknown key is withheld
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 11 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 11 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

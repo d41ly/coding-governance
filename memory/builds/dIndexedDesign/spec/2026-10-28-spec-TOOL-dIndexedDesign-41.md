@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-41 — the design-exit refusals add no net `fail` site, so `unattended.sh` stays within its refusal ceiling at every pass tip
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 18 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 18 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

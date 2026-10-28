@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-47 — unit 41 AC2's armed half becomes a staged break: with the THIN arm deleted in a scratch clone, the composed THIN site reads UNARMED
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

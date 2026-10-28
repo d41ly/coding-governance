@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-43 — the typed record factory admits a field its kind declares repeatable, so an inventory with one `Of` and one `Verdict` line per row binds
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 11 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 11 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

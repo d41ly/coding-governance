@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-37 — one write-set path predicate, `check_meet_path`, that keeps root files, so the stream plan and the build order refuse two writers of one root file
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 16 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 16 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

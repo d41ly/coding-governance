@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-1 — the Design-to-Build hand-off as `design.handoff` says
 
-**Status:** OPEN · rev-4 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 4 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 4 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0383@77f2882f whole
 **Carries:** node:item.design.ready
@@ -24,6 +24,7 @@
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-4-reuse-scout.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-4-reuse-scout.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-5-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-5-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-fix-brief.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 |
+| [2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md) | research | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-spec-brief.md) | research | TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 |
 | [2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-3 |
 

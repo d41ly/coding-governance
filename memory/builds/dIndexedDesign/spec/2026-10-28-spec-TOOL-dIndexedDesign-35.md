@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-35 — the coverage lens runs as its own one-agent stage, so `SPEC_LENSES` stays at the agent-cap hook's five-lens bound and no checklist share reaches a lens that does not run
 
-**Status:** OPEN · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 4 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 4 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

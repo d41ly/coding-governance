@@ -19,20 +19,20 @@ hold-code: host-owner-action
 held-from: REVIEWING
 refreshed-at: 1c31d2602aac85104828b50eaf06a43e8ee34591 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 6afe06d0fa2da4d577f47addefc1dd94aaba9247
-phase: HELD
+witness: c218aa18db63a84091a7175bd63a9d473980b820
+phase: REVIEWING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dindexeddesign-516d37
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-10-28T01:10:54Z
+lease-utc: 2026-10-28T10:13:28Z
 pid-image: claude.exe
 host: compeeto
 pid: 18144
 session: 75965d52-bd39-4234-bbfb-fb440f651df7
-keepalive: beefbdcd
+keepalive: f4a5eecf
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 57bc3b91861a061dc9f37529bfe41db756c24fcd
 anchor-ref: refs/heads/main
@@ -99,3 +99,85 @@ base: 57bc3b91861a061dc9f37529bfe41db756c24fcd
 2026-10-28T07:49:29Z decision · item The spec-audit chain does not converge: high findings ran 6, 7, 6 over three rounds (round 3's highs return to unit 41's refusal-site surface and to order slips between promoted units), with 7 promotions (TOOL-dIndexedDesign-47 to -53) still unaudited. Keep auditing, stop the chain as for dKeptSession and dLinkedLibrary, or re-scope? · reason options (a) round 4 over units 47-53 and onward, ~1h and ~2M subagent tokens a round with no sign of the highs falling; (b) stop as for dKeptSession and dLinkedLibrary: units 47-53 close under a recorded specs-audited override, closing-review-recorded overridden, every unit deferred to the build run, the run closes and lands; (c) re-scope the refusal-site and design-exit units before more rounds. Refused to pick: the owner's standing rule stops a chain without asking only at a no-HIGH round, and on a plateau holds for the owner's ruling
 
 2026-10-28T07:49:42Z hold · item host-owner-action · reason until owner · reaped beefbdcd · resume none(owner)
+
+2026-10-28T10:13:32Z resume · item dIndexedDesign · reason held · keepalive f4a5eecf · manual
+
+2026-10-28T10:15:38Z rescope · item defer TOOL-dIndexedDesign-9 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:39Z rescope · item defer TOOL-dIndexedDesign-12 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:40Z rescope · item defer TOOL-dIndexedDesign-16 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:41Z rescope · item defer TOOL-dIndexedDesign-1 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:41Z rescope · item defer TOOL-dIndexedDesign-35 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:42Z rescope · item defer TOOL-dIndexedDesign-36 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:43Z rescope · item defer TOOL-dIndexedDesign-39 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:44Z rescope · item defer TOOL-dIndexedDesign-44 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:45Z rescope · item defer TOOL-dIndexedDesign-7 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:46Z rescope · item defer TOOL-dIndexedDesign-2 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:47Z rescope · item defer TOOL-dIndexedDesign-45 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:48Z rescope · item defer TOOL-dIndexedDesign-50 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:49Z rescope · item defer TOOL-dIndexedDesign-6 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:50Z rescope · item defer TOOL-dIndexedDesign-8 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:51Z rescope · item defer TOOL-dIndexedDesign-13 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:52Z rescope · item defer TOOL-dIndexedDesign-20 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:53Z rescope · item defer TOOL-dIndexedDesign-32 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:53Z rescope · item defer TOOL-dIndexedDesign-33 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:54Z rescope · item defer TOOL-dIndexedDesign-34 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:55Z rescope · item defer TOOL-dIndexedDesign-42 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:56Z rescope · item defer TOOL-dIndexedDesign-5 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:57Z rescope · item defer TOOL-dIndexedDesign-31 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:58Z rescope · item defer TOOL-dIndexedDesign-4 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:15:59Z rescope · item defer TOOL-dIndexedDesign-43 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:00Z rescope · item defer TOOL-dIndexedDesign-14 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:01Z rescope · item defer TOOL-dIndexedDesign-10 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:02Z rescope · item defer TOOL-dIndexedDesign-11 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:03Z rescope · item defer TOOL-dIndexedDesign-15 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:04Z rescope · item defer TOOL-dIndexedDesign-3 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:05Z rescope · item defer TOOL-dIndexedDesign-37 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:06Z rescope · item defer TOOL-dIndexedDesign-38 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:07Z rescope · item defer TOOL-dIndexedDesign-40 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:08Z rescope · item defer TOOL-dIndexedDesign-41 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:08Z rescope · item defer TOOL-dIndexedDesign-46 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:09Z rescope · item defer TOOL-dIndexedDesign-47 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:10Z rescope · item defer TOOL-dIndexedDesign-48 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:11Z rescope · item defer TOOL-dIndexedDesign-49 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:12Z rescope · item defer TOOL-dIndexedDesign-51 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:13Z rescope · item defer TOOL-dIndexedDesign-52 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-28T10:16:14Z rescope · item defer TOOL-dIndexedDesign-53 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-28 (memory/builds/dIndexedDesign/prompts/2026-10-28-prompt-TOOL-dIndexedDesign-1-owner-stop-chain.md), carried forward to the build run

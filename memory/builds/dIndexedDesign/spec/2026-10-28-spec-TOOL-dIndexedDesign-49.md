@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-49 — every cause composed into the `--dispatch` refusal is armed by its own clause text, and the cause list is derived from the code
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-6 — agreement and tier checks: the interface and scope axes, the tier rule as a predicate, and sibling specs read from unmerged refs
 
-**Status:** OPEN · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 7 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 7 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0388@deaac21c whole
 

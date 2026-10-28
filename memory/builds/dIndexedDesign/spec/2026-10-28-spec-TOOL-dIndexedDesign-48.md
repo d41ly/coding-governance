@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-48 — the composed THIN site opens with a literal run no other `fail` message or arm line carries, and the THIN arm is re-pinned to it
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

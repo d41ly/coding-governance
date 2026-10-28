@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-3 — design review by policy: `review.design` read at the guarded revision, its effort, and the opt-in guard
 
-**Status:** OPEN · rev-4 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 16 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 16 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0385@7bdb7329 whole
 

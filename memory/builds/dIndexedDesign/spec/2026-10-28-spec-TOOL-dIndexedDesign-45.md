@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-45 — the unattended protocol stops saying `--dispatch` refuses only MISSING and THIN, with no byte added under its size row
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 6 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 6 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-34 — re-entry's `diff` and `inventory` kinds bind as typed kinds, and the diff record has one writer of the typed name
 
-**Status:** OPEN · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

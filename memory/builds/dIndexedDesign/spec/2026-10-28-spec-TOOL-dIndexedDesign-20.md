@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-20 — two-level re-entry: `design.input`'s pin, `design.reentry`'s additive-versus-breaking diff record, and the re-design inventory
 
-**Status:** OPEN · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0390@a096f77c part 2/2
 **Carries:** node:item.design.input

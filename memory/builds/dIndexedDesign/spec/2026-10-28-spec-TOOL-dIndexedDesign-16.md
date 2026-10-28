@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-16 — design coverage by policy: the carries join read at each Design exit and each spec revision, `UNCARRIED`, and the coverage lens
 
-**Status:** OPEN · rev-4 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 3 · advances TOOL-dIndexedDesign-17 · closes TOOL-dIndexedDesign-18
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 3 · advances TOOL-dIndexedDesign-17 · closes TOOL-dIndexedDesign-18
 
 **Carries:** cl-dClosedLoop-0398@f6f6546a whole
 **Carries:** node:policy-key.design.coverage

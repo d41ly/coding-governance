@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-50 — unit 44's finder bookkeeping lands in unit 16's pass commit, so a `coverage: 'only'` run writes its record from unit 35's pass on
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 6 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 6 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

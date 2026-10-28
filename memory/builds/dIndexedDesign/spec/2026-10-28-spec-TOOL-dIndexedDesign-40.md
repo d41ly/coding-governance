@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-40 — the three new cutoff keys ship blank in the passes that add them, so `cutoff_keys_armed` holds its pin of 36 at every pass tip
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 18 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 18 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

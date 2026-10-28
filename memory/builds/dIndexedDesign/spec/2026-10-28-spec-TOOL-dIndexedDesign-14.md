@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-14 — the scout's bug classes by intent: at most five from the catalogue's index, armed only by a replay that beats the anchor ranking's top five
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 12 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 12 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0396@bf718415 whole
 

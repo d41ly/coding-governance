@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-52 — the standalone `--design-exit` opt-in reader refuses a present undated value and a conf it cannot evaluate, as the driver does
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 20 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 20 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-39 — unit 35's coverage stage lands inside unit 16's pass, so no commit of the build holds a six-entry `SPEC_LENSES`
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 5 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 5 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-38 — the round-1 spec audit's 42 minors batched: shared budgets priced, one resolver and one path rule, readers that refuse what they cannot read, and every unbuildable criterion restated
 
-**Status:** OPEN · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 17 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 17 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
 
 **Derived:** PLAY-dClosedLoop-2
 

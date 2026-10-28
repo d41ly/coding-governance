@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-36 — BUILD-METHOD M6 names the refusals `--dispatch` gained, and stops saying it refuses "on nothing else"
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 5 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 5 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-15 — the planner's `design.streams` item: the planning workflow, its run decision under `design.streams-when`, and the stream plan checked against order, write sets and the overlap record
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 15 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 15 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0397@155d665e whole
 **Carries:** node:item.design.streams

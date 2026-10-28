@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-33 — the scout record's `seams` kind binds as an untyped kind, so its reader, check 31 and unit 4's outcome join read a real population
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

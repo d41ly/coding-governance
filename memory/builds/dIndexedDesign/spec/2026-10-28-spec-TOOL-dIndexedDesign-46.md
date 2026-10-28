@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-46 — the round-1 audit of units 31 to 38: its 27 minors batched, one writer and one allocator per typed name, one predicate per question, and every vacuous criterion made to observe
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 19 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

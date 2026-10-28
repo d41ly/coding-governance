@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-2 — the design index: overlaps between live designs, as `design.overlap` says
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 6 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 6 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0384@372bd58d whole
 **Carries:** node:item.design.overlaps

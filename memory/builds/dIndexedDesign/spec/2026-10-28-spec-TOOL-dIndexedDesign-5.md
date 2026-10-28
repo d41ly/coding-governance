@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-5 — the research harness: one experiment factory on dBoundRoles' `experiment` shape, the reuse bench its first entry
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 10 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0387@f264e3f3 whole
 **Carries:** node:item.design.research

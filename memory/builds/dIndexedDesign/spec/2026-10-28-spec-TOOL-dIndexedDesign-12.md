@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-12 — the structured spec's typed edges: `implements=` and `decides=` read through one spec-site adapter, and `design.seams` reading a tag's bundle
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 2 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 2 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0394@97e00df6 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-53 — the round-1 audit of units 39 to 46: its 20 minors batched, one home for each record number, one reader per opt-in, and every criterion made to observe
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 21 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 21 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 

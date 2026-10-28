@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-8 — the feature level: `design.decompose`'s feature designs, roster and fork records, forks resolved as `design.forks` says
 
-**Status:** OPEN · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 8 · advances TOOL-dIndexedDesign-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 8 · advances TOOL-dIndexedDesign-17
 
 **Carries:** cl-dClosedLoop-0390@a096f77c part 1/2
 **Carries:** node:item.design.decompose
