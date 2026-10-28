@@ -380,3 +380,5 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-28T01:14:20Z rescope · item add TOOL-dRankedPlan-83 · reason owner-authorized at the second hand-off of 2026-10-28 ("Raise the routed-commits leg's ceiling the same way as TOOL-dRankedPlan-82, then re-prepare onto origin/main, re-close and land dRankedPlan"): the routed commits leg's 300s ceiling timed out twice in the close's bar at 9c135e17 (CONTENDED) and ran 354s alone; sized through derive-ceilings.py --observed as TOOL-dRankedPlan-82 was, built in this run
 
 2026-10-28T02:28:10Z brief · item TOOL-dRankedPlan-83 · reason 468defa546d0 memory/builds/dRankedPlan/prompts/2026-10-28-prompt-TOOL-dRankedPlan-83-spec-brief.md
+
+2026-10-28T03:07:00Z dispatch · item 5d724133 TOOL-dRankedPlan-83 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md memory/builds/dRankedPlan/spec/2026-10-28-spec-TOOL-dRankedPlan-83.md memory/builds/dRankedPlan/README.md memory/LIVE.md memory/map/generated/symbols.json

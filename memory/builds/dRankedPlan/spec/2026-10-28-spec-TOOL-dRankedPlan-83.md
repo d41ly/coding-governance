@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-28-build-TOOL-dRankedPlan-83-deviation-831.md](../build/2026-10-28-build-TOOL-dRankedPlan-83-deviation-831.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dRankedPlan-83-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-83-1-spec-writer.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dRankedPlan-83-2-builder.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-83-2-builder.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dRankedPlan-83-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-83-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
