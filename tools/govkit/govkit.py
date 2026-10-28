@@ -35,7 +35,6 @@ import hashlib
 import importlib.util
 import io
 import json
-import ntpath
 import os
 import pathlib
 import posixpath
@@ -1236,17 +1235,15 @@ def demand_contained_dest(dest: str, where: str) -> str:
     cheerfully PREVIEWS 26 escaping writes is its own defect, because the preview is what an operator
     approves. A guard in the write loop alone would leave the preview lying.
 
-    PURE STRING CONTAINMENT, no target root needed and none taken: a destination is a repo-relative
-    POSIX path, so it escapes exactly when it normalises to `..`-leading or is absolute. A drive
-    letter counts as absolute -- this tool's own node runs on Windows, where `C:/x` is not relative
-    and `ntpath` is the only thing that knows it.
+    PURE STRING CONTAINMENT, no target root needed and none taken. The decision is
+    `upgrade_steps.derive_contained_rel`'s, the one answer the step module's before-image paths
+    share (TOOL-dSafePassage-72 S2): a destination escapes when it normalises to `.`, `..` or a
+    `../` climb, is rooted, UNC or drive-absolute, or holds a colon anywhere (§8 F1).
     """
-    norm = posixpath.normpath(dest.replace("\\", "/"))
-    if (norm == ".." or norm.startswith("../") or posixpath.isabs(norm)
-            or ntpath.isabs(dest) or (len(dest) > 1 and dest[1] == ":")):
+    if upgrade_steps.derive_contained_rel(dest) is None:
         raise Refusal(
-            f"the resolved destination {dest!r} leaves the target repository (normalises to "
-            f"{norm!r}) -- refusing the whole run. Destinations are repo-relative by construction, "
+            f"the resolved destination {dest!r} leaves the target repository -- refusing the whole "
+            f"run. Destinations are repo-relative by construction, "
             f"and one that escapes is a write into a tree the operator did not name. Source: "
             f"{where}. This is almost always a `prefix` in the target's .governance/deploy.toml "
             f"carrying `..` or an absolute path")

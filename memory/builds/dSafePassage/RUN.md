@@ -425,3 +425,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T19:03:50Z rescope · item add TOOL-dSafePassage-83 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
 
 2026-10-28T20:03:24Z decision · item the close's spec audit round 1 over TOOL-dSafePassage-72 to -83 (0 blockers, 1 high, 32 minors) was folded into the eleven specs by their writers rather than promoted, and --review refuses fold on a spec audit (check 37) · reason options: (a) accept the folds, each spec's §9 naming the audit record; (b) revert the folds and promote one unit for the HIGH and one or two batches for the minors; the run took (a) to keep building, so no review row is recorded for this round
+
+2026-10-28T20:29:42Z dispatch · item 0b2dda4a TOOL-dSafePassage-72 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py help/upgrade-steps.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-72.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-72-ledger.md
+
+2026-10-28T20:29:49Z brief · item TOOL-dSafePassage-72 · reason b4de0835c978 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-72-build-brief.md

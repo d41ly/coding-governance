@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-72 — a before-image path is contained by one predicate govkit's destinations share, and refused where any segment on it is a link
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** CLOSED · rev-4 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-28-build-TOOL-dSafePassage-72-ledger.md](../build/2026-10-28-build-TOOL-dSafePassage-72-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-72-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-72-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-72-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-72-build-brief.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-72-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-72-spec-brief.md) | research | TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 |

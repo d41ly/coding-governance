@@ -110,8 +110,10 @@ import base64
 import hashlib
 import importlib.util
 import json
+import ntpath
 import os
 import pathlib
+import posixpath
 import re
 import shlex
 import shutil
@@ -1034,15 +1036,43 @@ def derive_image_path(target, step_id: str) -> pathlib.Path:
     m = ID_RE.fullmatch(step_id)
     if not m:
         raise Refusal(f"'{step_id}' is not a step id, so it has no before-image")
-    return pathlib.Path(target) / IMAGE_DIR / m[1] / f"{m[2]}.before.json"
+    return check_contained(target, f"{IMAGE_DIR}/{m[1]}/{m[2]}.before.json")
+
+
+def derive_contained_rel(rel: str) -> str | None:
+    """`rel` normalised, every `\\` folded to `/`, or None where it leaves the target or names no file
+    under it (TOOL-dSafePassage-72 S1): it normalises to `.`, `..` or a `../` climb, it is rooted, UNC
+    or drive-absolute, or it holds a colon anywhere, which also keeps an NTFS stream out. The one
+    answer `check_contained` and govkit's `demand_contained_dest` share."""
+    norm = posixpath.normpath(rel.replace("\\", "/"))
+    if (norm in (".", "..") or norm.startswith("../") or posixpath.isabs(norm)
+            or ntpath.isabs(rel) or ":" in rel):
+        return None
+    return norm
 
 
 def check_contained(target, rel: str) -> pathlib.Path:
-    """`target`/`rel`, refused where `rel` is absolute or climbs out of the target."""
-    pp = pathlib.PurePosixPath(rel)
-    if pp.is_absolute() or ".." in pp.parts or ":" in rel:
+    """`target`/`rel` normalised, refused where `derive_contained_rel` reads it as leaving the target,
+    and where any existing segment on it from the target down is a link or other reparse point, or
+    does not read as a path on this node (TOOL-dSafePassage-72 S3, S4). The walk stops at the first
+    segment that is absent or a file. The target root itself is not tested: callers resolve it."""
+    norm = derive_contained_rel(rel)
+    if norm is None:
         raise Refusal(f"'{rel}' is not a path inside the target, so no step may write it")
-    return pathlib.Path(target) / rel
+    cur = pathlib.Path(target)
+    for seg in norm.split("/"):
+        cur = cur / seg
+        try:
+            linked = test_path_linked(cur)
+        except (OSError, ValueError):
+            raise Refusal(f"'{rel}': {cur} does not read as a path on this node, so no step may "
+                          f"read or write it") from None
+        if linked:
+            raise Refusal(f"'{rel}': {cur} is a link or other reparse point, which no step read or "
+                          f"write follows, so where it leads is unknown")
+        if not cur.is_dir():  # absent, or a file: nothing below it exists
+            break
+    return pathlib.Path(target) / norm
 
 
 def write_before_image(target, step_id: str, derive_after) -> dict[str, bytes | None]:
@@ -1073,6 +1103,8 @@ def write_before_image(target, step_id: str, derive_after) -> dict[str, bytes | 
                               f"bytes are lost; restore those paths by hand, then remove the image")
             image.unlink()
     if held is not None:
+        for p in held:
+            check_contained(target, p)  # S6: no path's before bytes reach `derive_after` untested
         before = {p: None if v["before"] is None else base64.b64decode(v["before"]) for p, v in held.items()}
         after = derive_after(before)
         if set(after) != set(held) or any(

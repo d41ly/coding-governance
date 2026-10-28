@@ -15,6 +15,7 @@ Every fixture is a throwaway repo under `mktemp`-equivalent. Nothing is written 
 from __future__ import annotations
 
 import ast as _ast
+import base64
 import contextlib
 import hashlib
 import importlib.util
@@ -3102,6 +3103,86 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     check("[dSP-1 S3] a re-run computing another after-state than the image records is refused",
           "would not converge" in read_refusal(lambda: steps.write_before_image(im, "demo/first",
                                                                                 lambda before: {"a.txt": b"x"})))
+
+    # TOOL-dSafePassage-72 AC1 to AC5: one predicate answers containment for the step module and for
+    # govkit's destinations, and `check_contained` refuses a link on any existing segment before a
+    # read or write. A form that could leave the scratch tree reaches only `check_contained` and
+    # `read_image_paths`; the planted links point inside it. Not covered: a hard link, a device name.
+    bs = "\\"
+    bad72 = [".." + bs + "E.txt", bs + "Windows" + bs + "x", bs + bs + "srv" + bs + "share" + bs + "x", "C:x",
+             "C:/x", "ab:c", "x/a:b", "/x", "../x", "a/../../x", "..", "", ".", "a/.."]
+    got72 = ([r for r in bad72 if steps.derive_contained_rel(r) is not None],
+             [steps.derive_contained_rel(r) for r in ("a/b", "a" + bs + "b", "a/../b")])
+    check("[dSP-72] AC1 derive_contained_rel refuses every escaping form and normalises a contained one",
+          got72 == ([], ["a/b", "a/b", "b"]), str(got72))
+    gk72 = govkit_module()
+    leaked72 = [d for d in bad72 if "leaves the target repository" not in read_refusal(
+        lambda d=d: gk72.demand_contained_dest(d, "selftest"))]
+    check("[dSP-72] AC2 demand_contained_dest refuses every escaping form and returns a contained one",
+          leaked72 == [] and gk72.demand_contained_dest("a/b", "selftest") == "a/b", str(leaked72))
+
+    def plant_image72(t: pathlib.Path, step: str, paths: dict) -> None:
+        img = t / ".governance" / "steps" / step.split("/")[0] / f"{step.split('/')[1]}.before.json"
+        img.parent.mkdir(parents=True, exist_ok=True)
+        img.write_text(json.dumps({"step": step, "paths": paths}), encoding="utf-8", newline="\n")
+
+    pwned = {"before": base64.b64encode(b"pwned\n").decode(), "after": None}
+    lexical72 = [".." + bs + "ESCAPED.txt", bs + "rooted.txt", bs + bs + "localhost" + bs + "c$" + bs + "unc.txt"]
+    odd72 = ["a" + chr(0) + "b/x.txt"] + (["a?b/x.txt", "a|b/x.txt"] if os.name == "nt" else [])
+    for n, rel in enumerate(lexical72 + odd72):
+        t72 = tmp / "dsp72-forms" / f"c{n}" / "target"
+        plant_image72(t72, "demo/first", {rel: pwned})
+        want = "is not a path inside the target" if rel in lexical72 else "does not read as a path on this node"
+        got = [read_refusal(lambda: steps.check_contained(t72, rel)),
+               read_refusal(lambda: steps.read_image_paths(t72, "demo/first"))]
+        check(f"[dSP-72] AC3 {rel!r} is refused by check_contained and read_image_paths, {want!r}",
+              all(want in g for g in got), str(got))
+
+    def plant_link72(link: pathlib.Path, to: pathlib.Path) -> None:
+        if os.name == "nt":
+            subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(to)], capture_output=True)
+        else:
+            os.symlink(to, link, target_is_directory=True)
+
+    root72 = tmp / "dsp72-links"
+    t72, out72 = root72 / "target", root72 / "outside"
+    for d in (t72 / "plain", out72, root72 / "gone-to"):
+        d.mkdir(parents=True)
+    (out72 / "secret.txt").write_bytes(b"secret\n")
+    plant_link72(t72 / "lnk", out72)
+    plant_link72(t72 / "gone", root72 / "gone-to")
+    (root72 / "gone-to").rmdir()
+    plant_image72(t72, "demo/first", {"lnk/planted.txt": pwned})
+    down72 = read_refusal(lambda: steps.write_from_before_image(t72, "demo/first"))
+    check("[dSP-72] AC4 a down through a linked segment is refused naming it, writing nothing outside",
+          "lnk" in down72 and "reparse point" in down72 and not (out72 / "planted.txt").exists(), down72)
+    up72 = read_refusal(lambda: steps.write_before_image(t72, "demo/second",
+                                                         lambda before: {"lnk/secret.txt": b"x"}))
+    check("[dSP-72] AC4 an up naming a path through a link is refused and writes no image",
+          "lnk" in up72 and "reparse point" in up72
+          and not (t72 / ".governance/steps/demo/second.before.json").exists(), up72)
+    gone72 = read_refusal(lambda: steps.check_contained(t72, "gone/x.txt"))
+    check("[dSP-72] AC4 a dangling link is refused, never read as absent", "reparse point" in gone72, gone72)
+    t72b = root72 / "target-b"
+    t72b.mkdir()
+    plant_link72(t72b / ".governance", out72)
+    img72 = read_refusal(lambda: steps.derive_image_path(t72b, "demo/first"))
+    check("[dSP-72] AC4 a before-image whose .governance is a link is refused naming it",
+          ".governance" in img72 and "reparse point" in img72, img72)
+    plant_image72(t72, "demo/third", {"plain/f.txt": {"before": base64.b64encode(b"orig\n").decode(),
+                                                      "after": None}})
+    restored72 = steps.write_from_before_image(t72, "demo/third")
+    check("[dSP-72] AC4 control: a path under a plain directory restores, so the walk refuses only links",
+          restored72 == ["plain/f.txt"] and (t72 / "plain/f.txt").read_bytes() == b"orig\n",
+          str(restored72))
+    check("[dSP-72] AC4 outside/ holds only what was planted there",
+          sorted(p.name for p in out72.iterdir()) == ["secret.txt"], str(list(out72.iterdir())))
+    plant_image72(t72, "demo/held", {"lnk/secret.txt": {"before": None, "after": None}})
+    handed72: list = []
+    held72 = read_refusal(lambda: steps.write_before_image(t72, "demo/held",
+                                                           lambda before: handed72.append(before) or {}))
+    check("[dSP-72] AC5 a held image's path through a link is refused before derive_after is handed it",
+          "lnk" in held72 and handed72 == [], held72)
 
     # ---- AC3 and AC16: the commit is main's first-parent landing, never a branch commit.
     g = tmp / "sp-land"

@@ -302,6 +302,11 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
   exits non-zero (`reverted check exits <rc>`), stops the rollback with that step's state kept: no
   file moves, `gov_commit` does not move, and the run exits 1. Fix the cause and run the same
   command again; it resumes at that step.
+- **A before-image path outside the repository.** A path a before-image lists, or the image's own
+  path, is refused where it climbs out (`..`, or a backslash climb such as `..\x`), is rooted, UNC
+  or on a drive, holds a colon, or passes through a symlink, a junction or any other reparse point.
+  The refusal names the path, and for a link the segment that is linked, before anything is read
+  or written; a down restores nothing, and an up writes no image.
 - **After a kill past the schema step.** A rollback killed after `govkit/receipt-schema-4`'s down
   leaves the receipt at schema 3 with no `steps`. Run the same command again: it witness-probes
   every step, runs the down again of each whose witness still holds, records nothing, since the
