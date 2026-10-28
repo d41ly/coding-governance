@@ -272,7 +272,7 @@ ids TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine
 | [TOOL-dWellOiledMachine-127 — the spec tokens and routed commits ceilings cover this build's close and its landing push, each sized through `derive-ceilings.py --observed` from readings of the leg alone](spec/2026-10-27-spec-TOOL-dWellOiledMachine-127.md) | — | 1 | CLOSED | rev-3 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 154 bound to this build, across 4 record folder(s).
+Records: 155 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
