@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-19 — the dossier's header becomes the feature node, and its prose moves into units and records
 
-**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 10 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 10 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0256@aea4db49 whole
 
@@ -13,8 +13,11 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-c.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-c.md) | research | TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-19-deviation-191.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-19-deviation-191.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-19-deviation-192.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-19-deviation-192.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -36,11 +39,15 @@ feature, and gates the dossier so prose does not grow back.
   `FeatureNode` per dossier `load_map_tree` (:1120) parses: `tag` `feature.<feature>` (shared interface
   I16), `title` (the node's declared purpose, the field TOOL-dTotalRecall-16 names), `status`,
   `streams`, `decisions`, `globs`, the `symbols` TOOL-dTotalRecall-8 S12 admits where present, and
-  `path`. The header's grammar, `parse_dossier` (:1022), is unchanged. Observed by AC1.
+  `path`. The header's grammar, `parse_dossier` (:1022), is unchanged. `python
+  tools/codebase-map/gen_map.py --feature-nodes`, a new mode of its mode group (`gen_map.py:213`),
+  prints them, one JSON object per node, the rows S2 reads. Observed by AC1 and AC2.
 - **S2** — The node in the namespace. `extract_feature` (TOOL-dTotalRecall-9 S1, in
   `tools/memory-tree/record_extract.py`) gains the header as its second source: where the
   codebase-map kit resolves as an optional sibling through the inlined `resolve_kit_dir`, one row per
-  `FeatureNode`, tag its `tag`, `text` its title, `path` its dossier; a header row and a `gov:feature
+  object `gen_map.py --feature-nodes` prints (S1), run as a subprocess, since a kit imports no sibling
+  kit (TOOL-dGroundRules-1 §4) and `tools/memory-tree/kit.toml:8` declares no codebase-map edge; tag
+  its `tag`, `text` its title, `path` its dossier; a header row and a `gov:feature
   <tag>` anchor row of one tag fold into one member, the header its node and the anchor its site.
   Where the map does not resolve, anchor rows alone, as TOOL-dTotalRecall-9 lands them. Observed by AC2
   and AC3.
@@ -154,6 +161,7 @@ seam: <id> — reuse for <need>; extend via <point>
 |---|---|---|
 | `FeatureNode`, `read_feature_nodes`, `scan_prose_offenders` | class and functions, `map_lib.py` | `py.function`, asked at the pass |
 | `dossier_move.py` with `plan`, `apply`, `--fixture` | module and verbs | none |
+| `--feature-nodes` | mode of `gen_map.py` | none |
 | `test_dossier_holds_no_prose` | test, `test_codebase_map.py` | none |
 | `Prose:` | dossier line | none |
 | `<date>-build-TOOL-dLinkedLibrary-19-dossier-<feature>.md` | 32 records | none |
@@ -176,7 +184,7 @@ update's step.
 - `tools/codebase-map/dossier_move.py`: new, S3, S5
 - `tools/codebase-map/selftest.py`: S5's arms
 - `tools/codebase-map/test_codebase_map.py` and `tools/codebase-map/test_codebase_map.template.py`: S4
-- `tools/codebase-map/gen_map.py` and its render `memory/map/README.md`: S4's dossier-shape sentence
+- `tools/codebase-map/gen_map.py` and its render `memory/map/README.md`: S1's `--feature-nodes`, S4's dossier-shape sentence
 - `tools/codebase-map/README.md`: S4, S7
 - `tools/codebase-map/replay-phrases.py`: S4's re-point
 - `tools/memory-tree/record_extract.py`: S2
@@ -217,8 +225,10 @@ update's step.
 - **AC2** — When `python record_extract.py` runs its `feature` extractor over a fixture holding the
   dossier `alpha` and the anchors `gov:feature alpha` and `gov:feature gamma`, the namespace holds two
   members, `feature.alpha` with its title and one site, and `feature.gamma`; under the plant
-  `map-absent` it holds the two anchor members alone.
-  Red when: `feature.alpha` is counted twice, or the header is unread where the map resolves.
+  `map-absent` it holds the two anchor members alone; `git grep -n -E "(import|from) map_lib\b" --
+  tools/memory-tree/` prints nothing.
+  Red when: `feature.alpha` is counted twice, the header is unread where the map resolves, or
+  memory-tree imports the map's library.
 - **AC3** — When `python gov_tag.py check` runs over the index built at this unit's tip, its summary
   names the `feature` namespace with 32 members, never `unarmed`.
   Red when: the header nodes do not reach the namespace.
@@ -285,6 +295,11 @@ New arm: tools/codebase-map/test_codebase_map.py · covers AC6 · `test_dossier_
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-38, TOOL-dLinkedLibrary-39, TOOL-dLinkedLibrary-50, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-60, promoted from the spec audit of units 37 to 53; nothing else moved.
 - rev-4 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-74, promoted from the spec audit of units 54 to 64; nothing else moved.
+- rev-5 · 2026-10-28 · §2 S1 and S2 · §4 Inventory and Files touched · §6 AC2 · re-grounded on
+  TOOL-dGroundRules-1 §4, by the cross-check record
+  `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, row 56: `record_extract.py` reads the
+  header nodes from `gen_map.py --feature-nodes`, a codebase-map verb this unit mints over its own
+  `read_feature_nodes`, run by subprocess, and AC2 reds a memory-tree import of `map_lib`.
 
 ## 10. Reuse audit
 

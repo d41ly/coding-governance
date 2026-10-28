@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-23 — `adopt.instructions`: an adopter's own instruction files kept verbatim as a legacy block, every harness file wired at once, each paragraph ruled once
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 25 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 25 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0260@c677f704 whole
 **Carries:** node:item.adopt.instructions
@@ -14,8 +14,11 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-d.md) | research | TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-23-deviation-231.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-23-deviation-231.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-23-deviation-232.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-23-deviation-232.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -85,15 +88,28 @@ the generator already defines an `apply_region` of another signature); the `mark
   overlay`; `discard` adds nothing. The paragraph then leaves its pair through `splice_region` and the
   row's count falls by one; at zero the pair and the row go. A second ruling for one key exits 2
   naming the first. Observed by AC5.
-- **S8** — The item, `item.adopt.instructions`, a `[[item]]` row of `tools/loop/loop.toml` in
-  TOOL-dDeclaredLoop-12's schema beside TOOL-dLinkedLibrary-8 S9's five: actor `command`, needs the
-  install, proven by the legacy pairs and the `ruling` records, each proposal an owner item ruled once
-  (flow-steps.md:718). Observed by AC8.
+- **S8** — The item, `item.adopt.instructions`, one `[[item]]` row of `tools/loop/loop.toml` beside
+  TOOL-dLinkedLibrary-8 S9's five, spelled whole in TOOL-dDeclaredLoop-12's schema in §4 "The item"
+  (flow-steps.md:718): one `command` actor, `inputs` each naming a layer tag, an `allowance`, `returns`
+  written `record-kind.ruling@1` (TOOL-dDeclaredLoop-24 §4 "Records at a version"), a closed outcome set
+  with one route per outcome, proven by the legacy pairs and the `ruling` records, each proposal an
+  owner item ruled once, and `program = "adopt"` in place of `step`, TOOL-dLinkedLibrary-8 §8 F2's open
+  ask. flow-steps' Needs cell, the install, names the item's caller and no declared item, and
+  `check_program` refuses a need naming no row, so `needs` is empty. Observed by AC8.
 - **S9** — The marker member `marker.legacy` (I13), registered through TOOL-dLinkedLibrary-12's
   namespace rows with the check that reads it, `render_playbook.py --check-render`. Observed by AC8.
 - **S10** — The docs: a new page `help/adopting-instructions.md` (what install does with existing
   files, the block, the list, ruling a paragraph, the strict case) with its line in `help/README.md`,
   and `WIRE-INTO-PROJECT.md`'s agent-instructions step rewritten to it. Observed by AC9.
+- **S11** — The leg `adopt instructions selftest`, argv `python
+  {prefix}/playbook/adopt_instructions.py --selftest`, chunk `selftests`, subject `kit`, declared once by
+  `python tools/run-gates/leg_factory.py new` as a `[[gate_leg]]` row of `tools/playbook/kit.toml`, the
+  kit of `adopt_instructions.py`, and rendered into `tools/gate-legs.json` by its `--write`
+  (TOOL-dWitnessedBar-11 S1 to S3). It holds every manifest key the factory's gate grades, a `ceiling`
+  measured at its first clean run and a `purpose` among them, and `enforces = ["practice.verify"]`, the
+  tag TOOL-dWitnessedBar-51 S12 gives a self-test leg, since this unit's clause is in no v2
+  `[enforcement]` row and PLAY-dOrderedCharter-7 S3's meta-check reds a leg with no `enforces`.
+  Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -159,6 +175,32 @@ A paragraph is a run of lines between blank lines, a fenced block kept whole. It
 `<src>#p<sha8>`, the first eight hex of the SHA-256 of its text with whitespace runs folded to one
 space, so a key survives a re-wrap and two identical paragraphs share one ruling.
 
+### The item
+
+```toml
+# tools/loop/loop.toml
+[[item]]
+tag = "item.adopt.instructions"
+program = "adopt"                   # in place of `step`: TOOL-dLinkedLibrary-8 §8 F2's ask
+actor = "command:adopt.instructions"
+needs = []                          # the install runs it; no declared item precedes it
+inputs = ["layer.instruction:the harness files the entry-files scope wires", "layer.instruction:the instructions-legacy list"]
+allowance = ["product", "records"]  # the charter's tail, the harness files and the list; the ruling records
+returns = "record-kind.ruling@1"
+outcomes = ["captured", "ruled", "none"]
+witness = { class = "history", by = "the legacy pairs and the ruling records" }
+owner = "dLinkedLibrary"
+[item.routes]
+captured = "stand-in:tools/playbook/core.py"   # each paragraph an owner item, ruled once by `--rule`
+ruled = "transition"
+none = "transition"
+```
+
+`captured` leaves paragraphs to rule, and today's tool for the owner gate flow-steps names is S7's
+`--rule`; `ruled` is every pair drained, `none` no harness file to capture. `returns` names the `ruling`
+kind at version 1, its first pin. Whether a `transition` route from an item outside the five steps
+joins TOOL-dDeclaredLoop-13's tables waits on the same F2 ask.
+
 ### Inventory
 
 | Minted | Kind | Lexicon cell |
@@ -189,12 +231,11 @@ Live at landing. The `refuse` path is the strict preset's and lands with it; the
 - `tools/playbook/adopt_instructions.py` (new): S1, S3, S5, S6, S7, its plants
 - `tools/playbook/core.py`: the `instructions` verb's dispatch
 - `tools/playbook/render_playbook.py`: S2's refusal in the `entry-files` scope and S5's pair join
-- `tools/playbook/kit.toml`: S4's `project-owned` rule
+- `tools/playbook/kit.toml`: S4's `project-owned` rule and S11's `[[gate_leg]]` declaration
 - `tools/playbook/namespaces.toml`: S9's member
 - `tools/loop/loop.toml`: S8's row
-- `tools/memory-tree/record-kinds.toml`: the `ruling` row's three added `Ruling` values
 - `tools/agent-instructions/adopt-agent-instructions.sh`: its `wire` refusal message names `adopt instructions`
-- `tools/gate-legs.json`: the `adopt instructions selftest` leg
+- `tools/gate-legs.json`: rendered by `leg_factory.py --write`
 - `WIRE-INTO-PROJECT.md`, `help/adopting-instructions.md` (new), `help/README.md`: S10
 
 ### Alternatives rejected
@@ -253,19 +294,29 @@ Live at landing. The `refuse` path is the strict preset's and lands with it; the
 - **AC7** — When `git grep -n -A1 "instructions-legacy.txt" tools/playbook/kit.toml` runs, a
   `[[files]]` rule after the `**` engine rule names it `project-owned`.
   Red when: an update could write gov's list over an adopter's.
-- **AC8** — When `grep -n "item.adopt.instructions" loop.toml` and `grep -n "marker.legacy"
-  namespaces.toml` run, each finds its row.
-  Red when: either row is missing.
+- **AC8** — When `python loop_lib.py --check` runs in the loop kit at the pass tip, `check_program`
+  reads `item.adopt.instructions` and finds nothing in it, and over a scratch copy of `loop.toml` whose
+  row drops its `none` route it exits 1 naming the item and the outcome; and `grep -n "marker.legacy"
+  namespaces.toml` finds its row.
+  Red when: the item row is missing or outside the program check, or the namespace row is missing.
+  fixture: needs TOOL-dLinkedLibrary-8 §8 F2's ask landed in dDeclaredLoop; until then the row is a
+  stand-in the check names.
 - **AC9** — When `grep -n "legacy block" adopting-instructions.md` runs over the help page, it finds
   the sections on the block, the list, ruling and the strict case.
   Red when: the page is absent or omits one.
+- **AC10** — When a probe reads `tools/gate-legs.json` at the pass tip, the row named `adopt
+  instructions selftest` carries `enforces` holding `practice.verify` and an argv naming
+  `adopt_instructions.py --selftest`, and `python leg_factory.py --list` run from `tools/run-gates/`
+  names its declaring file `tools/playbook/kit.toml`.
+  Red when: the leg is hand-written into the manifest or carries no `enforces`, which
+  PLAY-dOrderedCharter-7 S3's meta-check reds with no pending row to excuse it.
 
 ## 7. Gates
 
 `agent-instructions wiring` · `agent-instructions self-test` · `govkit acceptance matrix` · `playbook render wiring` · `playbook render selftest` · `playbook validity gate` · `policy check` · `policy fixtures` · `memory hygiene` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates`
 
-The `adopt instructions selftest` leg this unit adds is declared by the arm line below, since the leg
-join resolves names against the manifest at base.
+The `adopt instructions selftest` leg S11 adds is named by the arm line below, since the leg join
+resolves names against the manifest at base.
 
 New arm: tools/playbook/adopt_instructions.py --selftest (the `adopt instructions selftest` leg) · covers AC1 AC2 AC3 AC4 AC5 AC6 · the six plants over scratch repositories under `%TEMP%`, the failing case a planted list row gained after install, staged by removing S5's base compare · none
 
@@ -298,6 +349,12 @@ New arm: tools/playbook/adopt_instructions.py --selftest (the `adopt instruction
   scout D's row for this unit.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-37, TOOL-dLinkedLibrary-40, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-64, promoted from the spec audit of units 37 to 53; nothing else moved.
+- rev-4 · 2026-10-28 · §2 S8, S11 · §4 The item, Files touched · §6 AC8, AC10 · §7 · re-grounded by the
+  cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, rows 67 and 68: the
+  leg is declared through `leg_factory.py new` in `tools/playbook/kit.toml` with `enforces`, and the
+  item row is spelled whole in TOOL-dDeclaredLoop-12's schema, graded by `check_program`; Files touched
+  drops the `ruling` row's values, since TOOL-dTotalRecall-1's row has no value column and the paragraph
+  values sit on TOOL-dLinkedLibrary-8's `ruling` row of the factory's per-kind table.
 
 ## 10. Reuse audit
 

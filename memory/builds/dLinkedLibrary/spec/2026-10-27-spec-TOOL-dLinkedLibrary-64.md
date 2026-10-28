@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-64 — the minors of the spec audit of units 37 to 53: 23 findings closed where the built code and records hold them
 
-**Status:** DEFERRED · rev-4 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 29 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 29 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,7 +12,9 @@
 | [2026-10-27-build-TOOL-dLinkedLibrary-54-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-54-promoted-fix-return.md) | research | TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-20 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-64-deviation-641.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-64-deviation-641.md) | deviation | — |
 | [2026-10-27-build-TOOL-dLinkedLibrary-64-deviation-642.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-64-deviation-642.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-64-deviation-643.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-64-deviation-643.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-54-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-54-promoted-fix-brief.md) | research | TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-20 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md](../reviews/2026-10-27-review-TOOL-dLinkedLibrary-54-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 |
 
 <!-- /gen:spec-records -->
@@ -86,8 +88,13 @@ split by M6's clauses leaves two disjoint write sets of useful size.
   with either mark, the same prefix test, raising `RegionError` naming the line, in the canonical
   `tools/lib/region.py` and every `region_py` copy. Observed by AC10.
 - **S14** — id 34, M12. `dossier_move.py apply` (`TOOL-dLinkedLibrary-50` S1) checks `--build` against
-  `SLUG_RE` (`tools/memory-tree/backlog.py:129`) and `--unit` against the id grammar of `GRANT_ID_RE`
-  (:453) before any path join, exiting 2 naming the value and writing nothing. Observed by AC11.
+  `SLUG_RE` and `--unit` against the id grammar of `GRANT_ID_RE` before any path join, exiting 2 naming
+  the value and writing nothing. A kit carries shared code inline and imports no sibling kit
+  (TOOL-dGroundRules-1 §4), so the two patterns move from `tools/memory-tree/backlog.py:129` and :453
+  into one canonical block `id_value_re` in `tools/lib/id_value_re.py`, `backlog.py` keeping them inline
+  under a new `id_value_re` `PARITY_ROWS` row of `tools/lib/resolve-python.test.sh` and
+  `dossier_move.py` carrying a copy, as TOOL-dTotalRecall-8 S5 moves `invocation_segments`. Observed by
+  AC11.
 - **S15** — id 9, L1. `TOOL-dLinkedLibrary-52` AC16's population is completed at this pass: for each leg
   of 52's S33 to S36, `tools/run-gates/ceiling-evidence.txt` and the claiming dossier carry its row, and
   unit 52's ledger answers AC16 AMENDED with the five-file reading. Observed by AC12.
@@ -179,6 +186,8 @@ split by M6's clauses leaves two disjoint write sets of useful size.
 - `tools/memory-tree/reuse_entries.py`: S2, S3, S7's re-file
 - `tools/memory-tree/gotchas.py`: S6, S17
 - `tools/codebase-map/dossier_move.py`, `tools/codebase-map/selftest.py`: S7, S8, S14 and their plants
+- `tools/lib/id_value_re.py` (new), `tools/memory-tree/backlog.py`, `tools/lib/resolve-python.test.sh`:
+  S14's canonical block, its inline copy and its parity row
 - `tools/memory-tree/adopt_program.py`: S9
 - `tools/memory-tree/kit.toml`, `tools/gate-legs.json`: S10, S11, S20
 - `tools/govkit/govkit.py`: S12
@@ -251,8 +260,11 @@ split by M6's clauses leaves two disjoint write sets of useful size.
   Red when: a body line the factory reads as MALFORMED is spliced in.
 - **AC11** — When `python dossier_move.py --fixture --plant bad-values` runs `apply
   --build .. --unit TOOL-x-1` and `apply --build dLinkedLibrary --unit TOOL-x-1/../y` in its scratch map,
-  each exits 2 naming the value and writes nothing.
-  Red when: a value holding `..` or a separator reaches a path join.
+  each exits 2 naming the value and writes nothing; `git grep -n -E "(import|from) backlog\b" --
+  tools/codebase-map/` prints nothing, and with one byte of `dossier_move.py`'s `id_value_re` copy
+  changed, `bash tools/lib/resolve-python.test.sh` reds naming the copy.
+  Red when: a value holding `..` or a separator reaches a path join, or the map kit imports the
+  patterns from memory-tree.
 - **AC12** — When `grep -c "<leg>" tools/run-gates/ceiling-evidence.txt memory/map/features/memory-tree-hygiene.md`
   runs for each leg of unit 52's S33 to S36, it prints 1 or more per file, and 52's ledger answers AC16
   AMENDED.
@@ -285,6 +297,7 @@ split by M6's clauses leaves two disjoint write sets of useful size.
 
 New arm: tools/memory-tree/reuse_entries.py · covers AC2 · the `accept-unanchored` plant, the failing case staged by an `accept` that skips `derive_unanchored` · none
 New arm: tools/memory-tree/gotchas.py · covers AC5 AC14 · the `observe-bash-led` and `observe-clean-hang` cases, the failing case staged by a bare `bash` and by the single clean-run spelling · none
+New arm: tools/lib/resolve-python.test.sh · covers AC11 · the `id_value_re` parity row, the failing case staged by one byte changed in `dossier_move.py`'s copy · none
 New arm: tools/codebase-map/selftest.py · covers AC6 AC11 · the `refile` and `bad-values` plants of `dossier_move.py --fixture`, the failing case staged by a file-name key and an unvalidated join · none
 New arm: tools/memory-tree/adopt_program.py · covers AC7 · the no-permissions and bracketed-secret jobs of the `ci-census` plant, the failing case staged by unit 51's rev-1 grant rule · none
 New arm: tools/memory-tree/marker-contract.test.sh · covers AC10 · the `<open>\t` and `<open>x` body cases, the failing case staged by an exact-match body test · none
@@ -310,14 +323,19 @@ New arm: tools/memory-tree/marker-contract.test.sh · covers AC10 · the `<open>
   audit of units 65 to 74; nothing else moved.
 - rev-4 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-86, promoted from the spec
   audit of units 75 to 80; nothing else moved.
+- rev-5 · 2026-10-28 · §2 S14 · §4 Files touched · §6 AC11 · §7 New arm · §10 · re-grounded on
+  TOOL-dGroundRules-1 §4, by the cross-check record
+  `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, row 85, which binds the clause
+  TOOL-dLinkedLibrary-74 S26 amends: `dossier_move.py` carries `SLUG_RE` and `GRANT_ID_RE` inline under
+  an `id_value_re` parity row, never importing `backlog.py`.
 
 ## 10. Reuse audit
 
 Every item extends the seam its finding names: unit 4's fixture harness, unit 1's `accept`,
 `resolve_bash` (`tools/memory-tree/corpus_ids.py:390`), unit 51's census, the leg factory's declarations,
 the factory's MALFORMED prefix test, `SLUG_RE` and `GRANT_ID_RE` (`tools/memory-tree/backlog.py:129`,
-:453), `gen_map.py`'s render set and the existing gotcha record; no item mints a second implementation of
-any. `python tools/codebase-map/reuse_lookup.py "resolve a marker word reader through the install
+:453) with S14's parity-gated `id_value_re` copy of both in the map kit, `gen_map.py`'s render set and
+the existing gotcha record; no item mints a second implementation of any. `python tools/codebase-map/reuse_lookup.py "resolve a marker word reader through the install
 receipt"` ranked `read`, `read_text`, `resolve` and `resolve_kit_dir`, none an owner test or a proposal
 guard, so no existing seam fits beyond those the items name.
 

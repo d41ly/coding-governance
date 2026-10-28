@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-1 — decisions split by kind: reuse entries as level-3 units, the major-decision log, its rows routed by two raters, and the `[records]` rule reworded
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 8 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 8 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0238@b2c1827b whole
 **Carries:** node:policy-key.decisions.major
@@ -21,6 +21,10 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-1-departures-spec.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-1-departures-spec.md) | journal | — |
 | [2026-10-27-build-TOOL-dLinkedLibrary-1-deviation-12.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-1-deviation-12.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-1-crosscheck-returns.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-1-crosscheck-returns.md) | research | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-1-deviation-13.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-1-deviation-13.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-1-reground-returns.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-1-reground-returns.md) | research | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-1-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-1-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-2-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-2-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-3-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-3-reuse-scout.md) | journal | — |
@@ -34,6 +38,10 @@
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-54-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-54-1-spec-writer.md) | journal | TOOL-dLinkedLibrary-54 |
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-86-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-86-1-spec-writer.md) | journal | TOOL-dLinkedLibrary-86 |
 | [2026-10-27-prompt-TOOL-dLinkedLibrary-87-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dLinkedLibrary-87-1-spec-writer.md) | journal | TOOL-dLinkedLibrary-87 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-1-spec-reviewer.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-1-spec-reviewer.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-2-spec-writer.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -72,16 +80,21 @@ row goes to its true home after two raters agree on it at kappa 0.8 or better, a
   <n> (--feature | --convention) --text "<MUST …>" --need <phrase>… --anchor <site>… --build <slug>
   --unit <id> [--decision <id>]` composes the part, runs PLAY-dOrderedCharter-15 S2's `instructions_edit.py
   propose` over it, and writes the proposal record
-  `memory/builds/<slug>/build/<date>-build-<unit id>-reuse-proposal-<n>.md` (`**Serves:** journal <unit
-  id>`) holding the part in a `toml` fence and the apply command `propose` printed; it writes nothing
-  under the map. `python reuse_entries.py accept <proposal>` runs that apply command, whose write
+  `memory/builds/<slug>/build/<date>-build-<unit id>-reuse-proposal-<n>.md` (`**Serves:** log <unit
+  id>`, the value every writer writes, `journal` its read-only alias, TOOL-dTotalRecall-18 S7, S8)
+  holding the part in a `toml` fence and the apply command `propose` printed; it writes nothing
+  under the map. The module writes the record itself, as `handoff.py` writes its `log` heads
+  (TOOL-dTotalRecall-18 S8): TOOL-dTotalRecall-2's door renders only the `**Serves:**` line and one
+  `- **<Key>:** ` line per field (its S3), so it cannot write the fence. `python reuse_entries.py accept <proposal>` runs that apply command, whose write
   `instructions.edit` admits only with the owner's proof (PLAY-dOrderedCharter-15 S3), and only on its
   success appends `- **Disposition:** accepted <date>` to the proposal; `reject <proposal> --why
   "<reason>"` appends `- **Disposition:** rejected <date> — <why>` and writes no part. An entry's state
   is `accepted` for a part on disk, `proposed` for a proposal with no disposition and `rejected` for a
   rejected one; only an accepted part is an instruction unit, so only it renders into work orders.
   Observed by AC3.
-- **S4** — `reuse.propose`, read through `resolve` (`tools/policy/policy.py:752`):
+- **S4** — `reuse.propose`, read by `read_policy_value("reuse.propose", root)` from the memory-tree
+  kit's adapter `tools/memory-tree/policy_value.py` (TOOL-dTotalRecall-8 S10), which runs `policy.py
+  get` as a subprocess, since a kit imports no sibling kit (PLAY-dOrderedCharter-7 §4 "The policy reads"):
   `derive_owed_units(root, slug)` and `python reuse_entries.py owed <slug>` print the units of a
   build that owe a reuse line when they close: under `new-seam`, the default, each unit whose
   spec's §10 records `no existing seam fits`; under `every-unit`, every unit of the build's roster; under `owner-asks`, none,
@@ -102,7 +115,7 @@ row goes to its true home after two raters agree on it at kappa 0.8 or better, a
   and the driver verb `unattended.sh --exhausted dLinkedLibrary`, and exits 3, so the run ends as
   `flow.on-exhausted` says, the ending TOOL-dDeclaredLoop-31 S3's.
   No row moves until `agree` prints `pass`. Observed by AC6.
-- **S7** — `decisions.major`, read through `resolve` by `decision_rubric.py route`: under
+- **S7** — `decisions.major`, read through the same adapter by `decision_rubric.py route`: under
   `author-rubric`, the default, the raters' agreed class settles a row; under `author-owner-ratifies`,
   an agreed `major` row is settled only by the owner's `ratified` mark on its line of the routing
   record; under `owner-only`, a row the raters class `major` or split on is settled only by the
@@ -119,10 +132,17 @@ row goes to its true home after two raters agree on it at kappa 0.8 or better, a
   TOOL-dLinkedLibrary-22's form (I6) and at most 300 characters. Major rows, unsettled rows and rows
   whose home the raters disagree on stay. Observed by AC8.
 - **S9** — The `decision` record kind: a row appended to `tools/memory-tree/record-kinds.toml`
-  through TOOL-dTotalRecall-1 S9's `python record_kinds.py new decision --tag record.decision --writer
-  hand --check "memory hygiene"`, schema form `rows`, home `memory/DECISIONS.md`, node
-  `record-kind.decision`; its writer stays `hand` until dScopedBuild's `build.distill` appends a
-  major fork's row. Observed by AC9.
+  through TOOL-dTotalRecall-1 S9's factory, `python record_kinds.py new decision --tag record.decision
+  --writer hand --check "memory hygiene" --purpose "the log of major product decisions; every other
+  decision row lives in its own home"`, the `--purpose` TOOL-dTotalRecall-16 S2 requires, with every
+  column TOOL-dTotalRecall-18 S1 requires, as TOOL-dTotalRecall-25 S1 spells its row: layer
+  `layer.memory`, home `memory/DECISIONS.md`, id-rule `""`, schema `{ form = "rows" }`, lifecycle
+  `append-only` (a landed row is never edited, `memory/DECISIONS.md:5-6`), and `readers = []` with
+  `readers-none = "no work-order read key hands the log; recall and TOOL-dLinkedLibrary-5's views
+  read it"`. S9's verb takes no flag for those six columns (TOOL-dTotalRecall-1:101-102), so the build
+  run sets them through TOOL-dTotalRecall-18's landed verb. Node `record-kind.decision`; its writer
+  stays `hand`, which TOOL-dTotalRecall-2 S9 keeps on a row whose form is not `fields`, until
+  dScopedBuild's `build.distill` appends a major fork's row. Observed by AC9.
 - **S10** — The map root admits the conventions folder: check 3's map arm in
   `tools/memory-tree/check-memory-hygiene.sh` (:850) adds `D:conventions`, and the "Codebase-map
   interop" prose of `tools/memory-tree/HYGIENE.template.md` names it, re-rendered into
@@ -137,7 +157,8 @@ row goes to its true home after two raters agree on it at kappa 0.8 or better, a
   `owed-every-unit`, `owed-owner-asks`; and `python decision_rubric.py --fixture [--plant <case>]`,
   cases `kappa`, `kappa-perfect`, `revise`, `exhausted`, `route`, `ratifies`, `owner-only`. Each builds
   a throwaway repository with stub `instructions_edit.py` and `budget.py` answering as their specs
-  state, and a planted `.governance/policy.toml` where a case sets a key. `gen_build_index.py
+  state, and a planted `.governance/policy.toml`, committed, where a case sets a key, since `get`
+  reads the landed policy and never the working tree (PLAY-dOrderedCharter-7 §4). `gen_build_index.py
   --selftest` runs every case. Observed by AC1 to AC8.
 - **S13** — The docs: `tools/memory-tree/README.md` names both modules and their verbs;
   `KIT_MEMORY_TREE_VERSION` moves. NOT OBSERVED by a criterion: prose, graded by `memory hygiene`.
@@ -164,7 +185,7 @@ row goes to its true home after two raters agree on it at kappa 0.8 or better, a
 - **hands-off** `TOOL-dLinkedLibrary-2` — `reuse.toml`, the entries the house index digests
 - **hands-off** `TOOL-dLinkedLibrary-8` — `derive_kappa`, the two-rater agreement `adopt.decisions` calls
 - **hands-off** `TOOL-dLinkedLibrary-19` — `reuse.toml`, the `propose` verb each dossier's `seam:` line seeds an entry through
-- **consumes-from** external — PLAY-dOrderedCharter-9 S1 and S4, -15 S2 and S3, -20 S1 (the unit row, `propose`, `add`, `instructions.edit`, the schema check); TOOL-dDeclaredLoop-30 S3 and -31 S3 (the draw and the ending); TOOL-dTotalRecall-1 S9 (the kind factory); each DEFERRED at base and built before this build run
+- **consumes-from** external — PLAY-dOrderedCharter-9 S1 and S4, -15 S2 and S3, -20 S1 (the unit row, `propose`, `add`, `instructions.edit`, the schema check); TOOL-dDeclaredLoop-30 S3 and -31 S3 (the draw and the ending); TOOL-dTotalRecall-1 S9 (the kind factory), -16 S2 and -18 S1 (its purpose and columns), -18 S7 and S8 (the `log` value) and -8 S10 (the memory-tree policy adapter); each DEFERRED at base and built before this build run
 - **hands-off** external — §8 F1's ask to dOrderedCharter, without which S3's `accept` refuses naming it
 - **hands-off** `TOOL-dLinkedLibrary-38` — `check_reuse_entries` and `propose`, whose feature rule unit 38 keys on the part name's stem before its first dot (id 1 of the round-1 spec audit)
 - **hands-off** `TOOL-dLinkedLibrary-52` — `decision_rubric.py`, whose labels reader and settler unit 52 exports for the adopt program, and the pointer row whose segment lead it fixes (ids 38, 19)
@@ -327,7 +348,7 @@ Live at landing. A tree with no map has no entries and S2 reads none; `propose -
   `Disposition` line and writes no part; under `reject`, the record gains `rejected` and no part.
   Red when: an unproven `accept` writes a part or marks the proposal accepted.
 - **AC4** — When the plants `owed-new-seam`, `owed-every-unit` and `owed-owner-asks` each set
-  `reuse.propose` in a planted `.governance/policy.toml` over a build of three units, one of whose
+  `reuse.propose` in a planted, committed `.governance/policy.toml` over a build of three units, one of whose
   §10 records `no existing seam fits`, `python reuse_entries.py owed tFix` prints that one unit, all
   three, and the `owner-asks` line in turn.
   Red when: a value's selection differs, or an unset key reads other than `new-seam`.
@@ -351,8 +372,8 @@ Live at landing. A tree with no map has no entries and S2 reads none; `propose -
   `decides=record-kind.decision`, and the routing record lists all six with their fates.
   Red when: a major, split or home-disputed row leaves the log, or a moved row's bytes change.
 - **AC9** — When `python record_kinds.py --check` runs at this unit's tip, it passes with the
-  `decision` row present.
-  Red when: the row is missing or names no leg.
+  `decision` row present, carrying S9's purpose and six columns.
+  Red when: the row is missing, names no leg, or lacks a column TOOL-dTotalRecall-16 or -18 requires.
   fixture: the registry is TOOL-dTotalRecall-1's, absent at base until it lands.
 - **AC10** — When `bash tools/memory-tree/check-memory-hygiene.sh --only 3` runs at this unit's tip
   with a convention part tracked, it prints no `unexpected entries` line naming `conventions`.
@@ -411,6 +432,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC5 AC6 
   TOOL-dDeclaredLoop-30 and -31, and scout A's row 1.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-38, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-59, TOOL-dLinkedLibrary-60, TOOL-dLinkedLibrary-64, promoted from the spec audit of units 37 to 53; nothing else moved.
+- rev-4 · 2026-10-28 · §2 S3, S4, S7, S9, S12 · §3 Edges · §6 AC4, AC9 · §10 · re-grounded on the parents at `1a61f21a2` per the cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck.md`, rows 1, 4 and 5: the `decision` row's call spells its purpose and every column; the proposal record serves `log`; both keys are read through the memory-tree policy adapter, the fixture's policy committed.
 
 ## 10. Reuse audit
 
@@ -418,7 +440,8 @@ The seams extended are PLAY-dOrderedCharter-9 S1's unit row and -15 S2's `propos
 entry is a row of and is written through; `row_grammar.parse_row` (`tools/memory-tree/row_grammar.py:598`)
 for the rows; the log's existing rotation and its note, which check 10 and check 24 already grade;
 TOOL-dDeclaredLoop-30's `budget.py draw` and -31's `--exhausted` for the re-run; TOOL-dTotalRecall-1
-S9's factory; and `resolve` (`tools/policy/policy.py:752`). `python tools/codebase-map/reuse_lookup.py
+S9's factory; and the memory-tree policy adapter `tools/memory-tree/policy_value.py` (TOOL-dTotalRecall-8
+S10), the policy kit's `get` reached by subprocess. `python tools/codebase-map/reuse_lookup.py
 "split decision log rows into major decisions and reuse entries rated by two raters with agreement"`
 ranked test helpers first (`rows` with fan-in 128, `row` 123) and then `extract_row` and
 `read_catalogue_row`; none rates or routes a row, and `git grep -i kappa` over `tools/` finds no

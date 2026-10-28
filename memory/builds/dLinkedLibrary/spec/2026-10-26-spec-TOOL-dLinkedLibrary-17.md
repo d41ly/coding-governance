@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-17 — typed edges from annotations, front matter, dossiers and decision rows, and the span rule with `gov:end <tag>`
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 13 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 13 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0254@e703feac whole
 
@@ -12,8 +12,11 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-b.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-17-deviation-171.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-17-deviation-171.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-17-deviation-172.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-17-deviation-172.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -43,26 +46,33 @@ TOOL-dTotalRecall-8 S2's `extract_ranges` adds on TOOL-dTotalRecall-13's lexer b
 and the bug-class `class` namespace (TOOL-dTotalRecall-9 S1). From this build: `parse_note_line` and
 `scan_annotations` (TOOL-dLinkedLibrary-4), `read_region` and `iter_family` in `tools/lib/region.py`
 and its memory-tree copy (TOOL-dLinkedLibrary-18 S2), `derive_decision_rows` with each log row's
-`decides` and the `from:` field on bug classes (TOOL-dLinkedLibrary-22 S1, S5, S6).
+`decides` and the `from:` field on bug classes (TOOL-dLinkedLibrary-22 S1, S5, S6). A kit imports no
+sibling kit (TOOL-dGroundRules-1 §4), so `edge_grammar.py`, a playbook-kit module, reads each
+memory-tree and codebase-map reader as JSON rows from a verb run as a subprocess, found through its
+inline `resolve_kit_dir`, as TOOL-dBoundRoles-14 S2 reads the roles kit: `annotations.py spans --json`
+(S4), `row_grammar.py --decisions --json` (TOOL-dLinkedLibrary-22 S5), and the two verbs §8 F4
+recommends, `gotchas.py --front-matter` and `gen_map.py --dossiers`; no kit found exits 2 naming it.
 
-- **S1** — The annotation adapter, `extract_annotation_edges(root, rows, code_rows)` in
-  `tools/playbook/edge_grammar.py`'s adapter table: each `gov:note` row of `scan_annotations` yields one
-  `part-of` edge per tag, from the note's span (S4) to the tag; each `gov:feature <tag>` row yields one
-  `implements` edge from the definition its line heads, or from its file where none derives, to
-  `feature.<name>`. Each edge is a record in PLAY-dOrderedCharter-24 S3's shape with its path, `line`,
+- **S1** — The annotation adapter, `extract_annotation_edges(root, rows)` in
+  `tools/playbook/edge_grammar.py`'s adapter table, over the rows `annotations.py spans --json` prints:
+  each `gov:note` row yields one `part-of` edge per tag, from the note's span (S4) to the tag; each
+  `gov:feature <tag>` row yields one `implements` edge from the definition its line heads, or from its
+  file where none derives, to `feature.<name>`. Each edge is a record in PLAY-dOrderedCharter-24 S3's shape with its path, `line`,
   the span's `end_line`, type and target, so `--check`, the resolver and the bundle read it as they read
   every other site. Observed by AC1.
 - **S2** — The front-matter adapter: each `memory/gotchas/*.md` class record whose front matter, parsed
-  by `gotchas.parse_front_matter` (`tools/memory-tree/gotchas.py:233`), carries
+  by `gotchas.parse_front_matter` (`tools/memory-tree/gotchas.py:233`) and printed one JSON object per
+  record by `gotchas.py --front-matter` (§8 F4), carries
   `from:`, a comma list of `<review record stem>#<finding id>` (TOOL-dLinkedLibrary-22 S1), yields one
   `caused-by` edge per item from the class's `class.<name>` tag to the section target
   `<review record stem>#<finding id>`; a class whose `from:` reads `none — <reason>`, or has none, yields
   none. Observed by AC2.
 - **S3** — The dossier adapter: each dossier under `memory/map/features/`, parsed by `parse_dossier`
-  (`tools/codebase-map/map_lib.py:1022`), yields one `part-of` edge to `feature.<feature>` from each
+  (`tools/codebase-map/map_lib.py:1022`) and printed one JSON object per dossier by `gen_map.py
+  --dossiers` (§8 F4), yields one `part-of` edge to `feature.<feature>` from each
   claimed key of its `claims` table and from each tracked path its `[paths] globs` match. The decision-row
-  adapter: each row `derive_decision_rows(root, conf)` (`tools/memory-tree/row_grammar.py`,
-  TOOL-dLinkedLibrary-22 S5) returns with `source = "log"` yields one `decides` edge per member of its
+  adapter: each row `python row_grammar.py --decisions --json` prints from `derive_decision_rows`
+  (`tools/memory-tree/row_grammar.py`, TOOL-dLinkedLibrary-22 S5) with `source = "log"` yields one `decides` edge per member of its
   `decides` list, from the row's id: its `decides=<target>[,<target>]` segments, each already parsed by
   `parse_edge_target`, and the commit that first added the row (TOOL-dLinkedLibrary-22 S6). A `trailer`
   row yields none here, since PLAY-dOrderedCharter-28 S5's commit adapter types `Decided:` already. The dossier's `decisions` list yields no edge, since
@@ -73,7 +83,9 @@ and its memory-tree copy (TOOL-dLinkedLibrary-18 S2), `derive_decision_rows` wit
   non-blank line by a definition's head line spans that definition's `line` to `end_line`; a note
   inside a definition's body, with no `gov:end`, spans to that definition's `end_line`; any other note
   spans to the first later `gov:end <tag>` in its file naming one of its tags. A definition whose
-  `code_row` carries no `end_line` derives no extent. Observed by AC4.
+  `code_row` carries no `end_line` derives no extent. The verb `annotations.py spans --json` prints one
+  object per `scan_annotations` row with its span's `line` and `end_line`, and for a `gov:feature` row
+  the key of the definition its line heads, or none, the rows S1 reads. Observed by AC4 and AC7.
 - **S5** — The span arm, `check_note_spans(rows, code_rows)` (I10), a `span` entry in `annotations.py`'s
   `ARMS` table behind `annotations.py check --only span`. Per file it builds the pairing text: the
   comment text of each note whose span S4 does not derive from a definition, its marker stripped so the
@@ -107,7 +119,7 @@ and its memory-tree copy (TOOL-dLinkedLibrary-18 S2), `derive_decision_rows` wit
 - Writing `decides` on decision rows and `from:` on bug classes: TOOL-dLinkedLibrary-22's backfill. This
   unit reads both.
 - The `refs=` segment of a `gov:note` and the `Decided:` trailer: PLAY-dOrderedCharter-28 S5's code and
-  commit adapters, the first re-pointed at `parse_note_line` by TOOL-dLinkedLibrary-4, the second
+  commit adapters, the first re-pointed at `annotations.py index`'s rows by TOOL-dLinkedLibrary-4, the second
   re-pointed at `commit_trailers.decided` by TOOL-dLinkedLibrary-22.
 - Definition extents: TOOL-dTotalRecall-8 S2 adds `end_line` through `extract_ranges`, on the lexer
   block TOOL-dTotalRecall-13 moves into `tools/lib`. Scout B named TOOL-dTotalRecall-13 alone; the
@@ -176,7 +188,8 @@ roles_dir="$1"
 |---|---|---|
 | `extract_annotation_edges`, `extract_class_edges`, `extract_dossier_edges`, `extract_decision_edges` | adapter functions, `edge_grammar.py` | `py.function`, asked at the pass |
 | `derive_note_span`, `check_note_spans`, `derive_span_share` | functions, `annotations.py` | `py.function`, asked at the pass |
-| `span-share`, `--feature`, `--pattern` | verb and flags of `annotations.py` | none |
+| `span-share`, `spans`, `--feature`, `--pattern` | verbs and flags of `annotations.py` | none |
+| `--front-matter`, `--dossiers` | modes of `gotchas.py` and `gen_map.py`, §8 F4's (a) | none |
 | `unterminated`, `orphan`, `mismatched`, `nested`, `crossed` | verdict words | none |
 | the plants of S7 | fixture cases | none |
 
@@ -195,7 +208,8 @@ Live at landing. The adapters feed the index on its next build; the span arm run
 
 - `tools/playbook/edge_grammar.py`: S1 to S3's four adapters in the site table
 - `tools/playbook/gov_tag.py`: the four `edges-*` plants of S7
-- `tools/memory-tree/annotations.py`: S4, S5, S6, the `span-*` plants
+- `tools/memory-tree/annotations.py`: S4 and its `spans` verb, S5, S6, the `span-*` plants
+- `tools/memory-tree/gotchas.py`, `tools/codebase-map/gen_map.py`: §8 F4's two verbs, under (a)
 
 ### Alternatives rejected
 
@@ -255,6 +269,11 @@ Live at landing. The adapters feed the index on its next build; the span arm run
   Red when: a share of 80% or more prints `hybrid holds`, or the measure counts spans with no extent.
   figure: DERIVED at the pass; 18 of 57 (32%) at the research's base by a brace heuristic, the figure
   this re-measure replaces.
+- **AC7** — When `git grep -n -E "(import|from) (gotchas|row_grammar|annotations|map_lib)\b" --
+  tools/playbook/edge_grammar.py` runs at the pass tip, it prints nothing, and in the `span-definition`
+  plant's scratch repository `python annotations.py spans --json` prints the note's row with the
+  decorated definition's `line` and `end_line`.
+  Red when: an adapter imports another kit's module, or the verb's span differs from S4's.
 
 ## 7. Gates
 
@@ -263,7 +282,7 @@ Live at landing. The adapters feed the index on its next build; the span arm run
 The `annotations` leg that runs S5's arm and the `tags` leg that reads the adapters' edges are
 TOOL-dLinkedLibrary-7's and PLAY-dOrderedCharter-19's, and neither exists at this spec's base.
 
-New arm: tools/memory-tree/annotations.py · covers AC4 AC5 AC6 · the `span-*` plants, each failing case staged by deleting one verdict's branch from `check_note_spans` · none
+New arm: tools/memory-tree/annotations.py · covers AC4 AC5 AC6 AC7 · the `span-*` plants, each failing case staged by deleting one verdict's branch from `check_note_spans` · none
 New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-render selftest runs `gov_tag.py --fixture` under the four `edges-*` plants, staged by an adapter dropped from the site table · none
 
 ## 8. Open questions
@@ -287,6 +306,19 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-
   the unit. The chain's fork rule parks nothing (the execution plan, lines 900-946), and the research
   names definitions alone as the survivor when the share is that high. RESOLVED (agent, 2026-10-26,
   delegated): (a), rung 1, the research's loss rule as v2's `[owed]` line states it. widens: none · relaxes: none
+- **F4 — How does `edge_grammar.py` reach the two readers no verb prints, `gotchas.parse_front_matter`
+  and `parse_dossier`?** A kit imports no sibling kit (TOOL-dGroundRules-1 §4), and
+  `tools/playbook/kit.toml:16` requires `playbook` alone; `gotchas.py`'s modes (`:1332-1371`) and
+  `gen_map.py`'s mode group (`:213`) print neither. Options: (a) this unit mints `gotchas.py
+  --front-matter`, one JSON object per `memory/gotchas/*.md` record with its path and front-matter keys,
+  and `gen_map.py --dossiers`, one per dossier with its path, `feature`, `decisions`, `claims` and
+  `globs`, each run by subprocess, the shape TOOL-dBoundRoles-14 §8 F5 settled on rung 1 for the roles
+  kit; (b) `requires_if` rows on `tools/playbook/kit.toml` for `memory-tree` and `codebase-map`, as
+  `tools/memory-tree/kit.toml:8` declares its in-process reads, keeping the two imports; (c) a parser
+  of each copied into `edge_grammar.py`. (b) makes the playbook kit the one in-process consumer of
+  kits its siblings reach by subprocess, as br14 F5 found, and (c) is a second grammar of each. No
+  other build owns either module's verbs; this build already edits both kits (TOOL-dLinkedLibrary-22,
+  TOOL-dLinkedLibrary-2), so (a) needs no ask. Recommendation (a). Open for the owner.
 
 ## 9. Revision log
 
@@ -294,13 +326,20 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-
   relational-syntax research, memory-plan `[edges]` and `[migration]`, PLAY-dOrderedCharter-24 S1 to
   S4, -28 S1 and S5, TOOL-dTotalRecall-8 S2 and S7, and scout B's row for this unit.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-41, TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
+- rev-3 · 2026-10-28 · §2 preconditions, S1 to S4 · §3 non-goals · §4 Inventory and Files touched ·
+  §6 AC7 · §7 New arm · §8 F4 added, open for the owner · §10 · re-grounded on TOOL-dGroundRules-1 §4,
+  by the cross-check record `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, row 52: the
+  four adapters read memory-tree's and codebase-map's readers as JSON rows from subprocess verbs,
+  `annotations.py spans` and `row_grammar.py --decisions` among them, the two verbs no kit prints yet
+  being F4's, and AC7 reds an import.
 
 ## 10. Reuse audit
 
 The seams extended are PLAY-dOrderedCharter-28 S5's site-adapter table in `edge_grammar.py`, which gains
 four adapters beside its code, commit and header sites; `parse_dossier` (`tools/codebase-map/map_lib.py:1022`),
 TOOL-dLinkedLibrary-22's `derive_decision_rows` over `derive_row_re` (`tools/memory-tree/row_grammar.py:204`)
-and `gotchas.parse_front_matter` (`tools/memory-tree/gotchas.py:233`), each the one reader of its site;
+and `gotchas.parse_front_matter` (`tools/memory-tree/gotchas.py:233`), each the one reader of its site,
+reached by a subprocess verb as TOOL-dBoundRoles-14 S2 reaches the roles kit;
 TOOL-dLinkedLibrary-18's `iter_family` for the pairing and `read_region` for each pair's body; and TOOL-dTotalRecall-8's `code_row` for extents.
 `python tools/codebase-map/reuse_lookup.py "pair open and close markers in source comments into spans"`
 ranked `pair` (`merge-rows.test.sh`), `opened`, `check_pair` (`tools/runlog/prose.py`) and

@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-7 — the `annotations` leg, the lookup under `annotations.lookup`, the read hook on shell reads, and the follow-through test
 
-**Status:** DEFERRED · rev-2 · 2026-10-26 · node d · Tier-2 · base 5fede642 · streams tooling · order 15 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 15 · advances TOOL-dLinkedLibrary-26
 
 **Carries:** cl-dClosedLoop-0244@e14fc5fd whole
 **Carries:** node:policy-key.annotations.lookup
@@ -15,8 +15,12 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-reuse-scout-b.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-spec-stage-returns.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-7-deviation-71.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-7-deviation-71.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-7-deviation-72.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-7-deviation-72.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-fix-brief.md) | research | TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-1 |
 | [2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dLinkedLibrary-1-spec-brief.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-74 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-74 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-7-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-7-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dLinkedLibrary-1-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 |
 
 <!-- /gen:spec-records -->
@@ -41,12 +45,14 @@ Preconditions this unit calls and does not build: `annotations.py` with `scan_an
 `check_grammar`, `check_resolve`, `check_feature_anchors` and the generated `annotations.json`
 (TOOL-dLinkedLibrary-4), `check_note_spans` (TOOL-dLinkedLibrary-17), `check_block_budget` with
 `annotation-resolve-legacy` and `untouched-long-blocks` (TOOL-dLinkedLibrary-11), `check_marker_words`
-(TOOL-dLinkedLibrary-12), the memory-tree policy adapter (TOOL-dTotalRecall-8 S10), and the landed
-`readPolicy` (`tools/policy/policy-mirror.js:132`).
+(TOOL-dLinkedLibrary-12), the memory-tree policy adapter (TOOL-dTotalRecall-8 S10), the landed
+`policy-mirror.js get` CLI (`tools/policy/policy-mirror.js:6`, `:160`), and the leg factory's `new` and
+`--write` (TOOL-dWitnessedBar-11 S1 to S3).
 
-- **S1** — The leg. One row in `tools/gate-legs.json`, shaped like the `recall floor` row: `"name":
-  "annotations"`, `"argv": ["python3", "{prefix}/memory-tree/annotations.py", "check"]`, `"chunk":
-  "declarations"`, `"subject": "repo"`, no `guard`, so it runs on every bar as `drift-audit records`
+- **S1** — The leg, declared once by `python tools/run-gates/leg_factory.py new` as a `[[gate_leg]]` row
+  of `tools/memory-tree/kit.toml` and rendered into `tools/gate-legs.json` by its `--write`
+  (TOOL-dWitnessedBar-11 S1 to S3): name `annotations`, argv `["python3",
+  "{prefix}/memory-tree/annotations.py", "check"]`, chunk `declarations`, subject `repo`, no `guard`, so it runs on every bar as `drift-audit records`
   does, and a `ceiling` measured at its first clean run. `annotations.py check` with no `--only` runs
   every entry of the module's `ARMS` table in one process: `markers` (TOOL-dLinkedLibrary-12),
   `grammar`, `resolve` and `feature` (TOOL-dLinkedLibrary-4), `budget` (TOOL-dLinkedLibrary-11) and
@@ -57,10 +63,16 @@ Preconditions this unit calls and does not build: `annotations.py` with `scan_an
   `annotations selftest`: argv `["python3", "{prefix}/memory-tree/annotations.py", "--selftest"]`,
   `chunk` `selftests`, `subject` `kit`, guard `{prefix}/memory-tree/annotations.py` and
   `{prefix}/memory-tree/marker-words.toml`, so the arms each unit declares on its `New arm:` line run
-  on the bar. Both legs' meta rows land with them: a `[[gate_leg]]` table each in
-  `tools/memory-tree/kit.toml`, rows in `tools/govkit/subject-pins.tsv`, the suite's row in
+  on the bar, declared the same way in the same file. Each declaration holds every manifest key the
+  factory's gate grades, a `ceiling` measured at its first clean run and a `purpose` among them, and an
+  `enforces`, since PLAY-dOrderedCharter-7 S3's meta-check reds a leg with none and its pending list
+  takes no row after its pass. This unit's clause is in no v2 `[enforcement]` row, so step 2 of
+  TOOL-dWitnessedBar-11's enforces rule names the tag: `annotations` carries `["practice.one-fact"]`, a
+  red being a code note that points at no record or holds what a record owns, and `annotations
+  selftest` `["practice.verify"]`, the tag TOOL-dWitnessedBar-51 S12 gives a self-test leg. Both legs'
+  meta rows land with them: rows in `tools/govkit/subject-pins.tsv`, the suite's row in
   `tools/run-gates/selftest-budgets.txt`, and both leg names in the `gate-legs` list of the
-  annotation-style dossier. Observed by AC1 and AC2.
+  annotation-style dossier. Observed by AC1, AC2 and AC10.
 - **S2** — The lookup, `lookup_annotations(root, tags=(), paths=(), value)` in
   `tools/memory-tree/annotations.py`, behind `annotations.py lookup (--tag <tag> | --path <path>)… [--json]`,
   under `annotations.lookup` read once by `read_policy_value("annotations.lookup", root)`. The marker
@@ -72,9 +84,11 @@ Preconditions this unit calls and does not build: `annotations.py` with `scan_an
   `<path>:<line> · <tags> · <definition> → <target>[ · refs <refs>]`. Observed by AC3.
 - **S3** — The read hook, `tools/hooks/annotations-read.js`, PostToolUse on `Read|Grep|Bash|PowerShell`
   through `tools/hooks/annotations-read.fragment.json`, merged into `.claude/settings.json` by
-  `settings-merge.py --fragment` as `scratch-guard.fragment.json` is. It reads `annotations.grammar`
-  through `readPolicy` (`require` of `../policy/policy-mirror.js`, as `tools/hooks/agent-cap.js:465`
-  does) and exits 0 printing nothing unless the value is `pushed-at-read`. Its paths: a Read's
+  `settings-merge.py --fragment` as `scratch-guard.fragment.json` is. It reads `annotations.grammar` by
+  spawning `node <policy kit>/policy-mirror.js get annotations.grammar --repo <repo>`, `node` being
+  `process.execPath`, under the bound below, the file located by `resolvePolicyHelper()` from
+  `scratch-guard.js` (§8 F5); a kit imports no sibling kit (TOOL-dGroundRules-1 §4), so the hook never
+  `require`s the policy kit. It exits 0 printing nothing unless the value is `pushed-at-read`. Its paths: a Read's
   `file_path`, a Grep's `path`, and the path arguments of `grep`, `rg`, `sed -n`, `cat`, `head`,
   `tail`, `git grep`, `git show <rev>:<path>`, `Get-Content` and `Select-String` in a shell command, read
   with scratch-guard's `buildCommandView` and `readTokenAt` and folded to repo-relative with its
@@ -88,15 +102,19 @@ Preconditions this unit calls and does not build: `annotations.py` with `scan_an
   nothing and exits 0. Observed by AC4 and AC5.
 - **S4** — The launcher, `tools/memory-tree/annotations.sh`, carrying the inline `resolve_python` block
   under its `PARITY_ROWS` row in `tools/lib/resolve-python.test.sh` and exec'ing `annotations.py "$@"`,
-  as `tools/memory-tree/merge-rows.sh` does for its driver; and `resolveBash`, added to
-  `tools/policy/policy-mirror.js`'s exports so the hook runs the launcher under the bash that function
-  finds. scratch-guard's exports gain `readTokenAt` and `buildNativePath`. Observed by AC4.
+  as `tools/memory-tree/merge-rows.sh` does for its driver. The hook runs it under the bash its own
+  `resolveBash` finds: an inline copy of `tools/policy/policy-mirror.js`'s module-private `resolveBash`
+  (`:66`), each candidate run against the launcher in place of the shim, held to the canonical's
+  candidate order by arm 2j of `tools/lib/resolve-python.test.sh`. scratch-guard's exports gain
+  `readTokenAt`, `buildNativePath` and, where KICK-dKeptSession-8 S5 has not landed it,
+  `resolvePolicyHelper` (§8 F5). Observed by AC4.
 - **S5** — The hook's own suite, `tools/hooks/annotations-read.test.sh`, and its leg `annotations-read
   self-test` (`chunk` `selftests`, `subject` `kit`, guard the hook, its suite, `scratch-guard.js` and
-  `annotations.py`), with its `[[files]]` rows in `tools/hooks/kit.toml` (the hook and fragment as
+  `annotations.py`), declared as S1's are but as a `[[gate_leg]]` row of `tools/hooks/kit.toml`, the kit
+  an adopter receives the hook with, `enforces = ["practice.verify"]`, with its `[[files]]` rows in `tools/hooks/kit.toml` (the hook and fragment as
   `engine`, the suite `project-owned`, as format-guard's three are), its `subject-pins.tsv` and
   `tools/run-gates/selftest-budgets.txt` rows and its `harness-hooks` claim in the dossier. Observed
-  by AC4 and AC5.
+  by AC4, AC5 and AC10.
 - **S6** — The follow-through test, `tools/runlog/follow_through.py`, over the transcripts the runlog
   kit already reads (`resolve_session_tree`, `read_records`, `extract_segments`, `tools/runlog/extract.py:266`,
   `:308`, `:372`). A qualifying read is a Read or shell read of a tracked code file whose read region,
@@ -142,7 +160,7 @@ Preconditions this unit calls and does not build: `annotations.py` with `scan_an
 - **consumes-from** `TOOL-dLinkedLibrary-4` — `parse_note_line`, with `scan_annotations`, `annotations.json` and the `grammar`, `resolve` and `feature` arms behind `annotations.py check`; and `pushed-at-read`, the value whose hook this unit builds
 - **consumes-from** `TOOL-dLinkedLibrary-17` — `check_note_spans`, the leg's `span` arm, run alone by `annotations.py check --only span`
 - **consumes-from** `TOOL-dLinkedLibrary-11` — `annotation-resolve-legacy`, with `untouched-long-blocks` and `check_block_budget`, the populations whose `[[ledger]]` rows name this unit's leg as their `leg`, and the leg's `budget` arm
-- **consumes-from** external — the memory-tree policy adapter (TOOL-dTotalRecall-8 S10) and the landed `readPolicy`, `settings-merge.py --fragment` and the runlog kit's transcript readers
+- **consumes-from** external — the memory-tree policy adapter (TOOL-dTotalRecall-8 S10), the landed `policy-mirror.js get` CLI, TOOL-dWitnessedBar-11's leg factory, `settings-merge.py --fragment` and the runlog kit's transcript readers
 - **hands-off** `TOOL-dLinkedLibrary-52` — the `annotations selftest` and read-hook legs and the read hook's bounds, which unit 52 completes (ids 37, 48, 73)
 
 ## 4. Design
@@ -154,8 +172,10 @@ Preconditions this unit calls and does not build: `annotations.py` with `scan_an
 - scratch-guard exports `buildCommandView` and `buildComparablePath` (`tools/hooks/scratch-guard.js:1615`)
   and defines `readTokenAt` (`:305`) and `buildNativePath` (`:819`); `tools/unattended/gate-guard.js:211`
   holds a diverged copy, so a third copy is refused and the hook requires the first.
-- `format-guard.js` already requires `scratch-guard.js` beside it (`tools/hooks/kit.toml:84-86`), and
-  `agent-cap.js:465` requires `../policy/policy-mirror.js` for `readPolicy`.
+- `format-guard.js` already requires `scratch-guard.js` beside it (`tools/hooks/kit.toml:84-86`).
+  `agent-cap.js:465-469` locates `../policy/policy-mirror.js` and `require`s it, the in-process read
+  KICK-dKeptSession-8 S5 replaces in its own hook with a spawn of the `get` CLI; `policy-mirror.js`
+  exports only `readPolicy` and `PolicyRefusal` (`:188`), so its `resolveBash` (`:66`) is private.
 - The harness's bundled schema gives PostToolUse `hookSpecificOutput.additionalContext` (§8 F4).
 - The research's measure: 2,866 code reads, 1,870 holding an id or pointer, 205 followed within 10 calls
   (11.0%), control 6.1%, exact within 3 calls 2.5%, "the hits are mostly sessions already working on that
@@ -172,7 +192,7 @@ Preconditions this unit calls and does not build: `annotations.py` with `scan_an
 | `lookup`, `--tag`, `--path`, `--json` | verb and flags of `annotations.py` | none |
 | `tools/memory-tree/annotations.sh` | launcher | none |
 | `tools/hooks/annotations-read.js`, its fragment and suite | hook | none |
-| `ANNOTATIONS_READ_BOUND_MS` | constant, the hook | none declared |
+| `ANNOTATIONS_READ_BOUND_MS`, `resolveBash` (inline copy) | constant and function, the hook | none declared |
 | `tools/runlog/follow_through.py`, `derive_follow_through` | module and function | `py.function`, asked at the pass |
 | `--baseline`, `--after` | flags of `follow_through.py` | none |
 | `keep voluntary`, `choose pushed-at-read`, `insufficient` | verdict words | none |
@@ -190,15 +210,16 @@ TOOL-dLinkedLibrary-11 seeded.
 
 ### Files touched (estimate)
 
-- `tools/gate-legs.json`: the three legs of S1 and S5
+- `tools/gate-legs.json`: rendered by `leg_factory.py --write` from the three declarations
 - `tools/memory-tree/annotations.py`: S2; `tools/memory-tree/annotations.sh` (new): S4
-- `tools/memory-tree/kit.toml`: the `[[gate_leg]]` table
+- `tools/memory-tree/kit.toml`: S1's two `[[gate_leg]]` declarations
 - `tools/hooks/annotations-read.js`, `tools/hooks/annotations-read.fragment.json`,
   `tools/hooks/annotations-read.test.sh` (new): S3, S5
-- `tools/hooks/kit.toml`: S5's `[[files]]` rows; `tools/hooks/scratch-guard.js`: two exports
-- `tools/policy/policy-mirror.js`: the `resolveBash` export
+- `tools/hooks/kit.toml`: S5's declaration and `[[files]]` rows; `tools/hooks/scratch-guard.js`: the
+  exports; `tools/hooks/agent-cap.js`: `POLICY_HELPER` re-pointed, only where this unit adds
+  `resolvePolicyHelper` (§8 F5)
 - `.claude/settings.json`: the hook's entry, merged by `settings-merge.py --fragment`
-- `tools/lib/resolve-python.test.sh`: the launcher's `PARITY_ROWS` row
+- `tools/lib/resolve-python.test.sh`: the launcher's `PARITY_ROWS` row and arm 2j's third order
 - `tools/govkit/subject-pins.tsv`, `tools/run-gates/selftest-budgets.txt`: the legs' meta rows
 - `memory/map/features/annotation-style.md`: its `gate-legs` and `harness-hooks` lists
 - `tools/runlog/follow_through.py` (new), `tools/runlog/selftest.py`: S6, its plants
@@ -219,7 +240,7 @@ TOOL-dLinkedLibrary-11 seeded.
 
 - security — the hook writes only its per-session list under the git common dir, interpolates no path
   into a command line, and passes paths to the launcher as arguments; a refusal never blocks a read.
-- perf / scale — under every value but `pushed-at-read` the hook costs one `readPolicy`, a git spawn,
+- perf / scale — under every value but `pushed-at-read` the hook costs one `policy-mirror.js get` spawn
   per matched call; under it, one bounded launcher run per call with an unpushed code path.
 - error / empty / loading states — the lookup prints `not installed` for an absent map and answers from
   the marker query; the test prints `insufficient` under its floor and chooses nothing.
@@ -275,6 +296,13 @@ TOOL-dLinkedLibrary-11 seeded.
 - **AC9** — When `grep -n "annotations.lookup\|pushed-at-read" annotations.md` runs over the help page,
   it finds the lookup's three values and the hook's firing rule.
   Red when: the page does not describe the lookup or the hook.
+- **AC10** — When a probe reads `tools/gate-legs.json` at the pass tip, the row named `annotations`
+  carries `enforces` holding `practice.one-fact`, and the rows `annotations selftest` and
+  `annotations-read self-test` each hold `practice.verify`; `python leg_factory.py --list` run from
+  `tools/run-gates/` names the first two declared in `tools/memory-tree/kit.toml` and the third in
+  `tools/hooks/kit.toml`.
+  Red when: a leg is hand-written into the manifest or carries no `enforces`, which
+  PLAY-dOrderedCharter-7 S3's meta-check reds with no pending row to excuse it.
 
 ## 7. Gates
 
@@ -283,7 +311,7 @@ TOOL-dLinkedLibrary-11 seeded.
 New arm: tools/hooks/annotations-read.test.sh · covers AC4 AC5 · the hook over a fixture repository, staged by a shell read that pushes nothing and a second read that pushes again · none
 New arm: tools/memory-tree/annotations.py · covers AC2 AC3 · the `leg-all-arms` and `lookup-values` plants, staged by an arm left out of `check` and a value returning another's rows · none
 New arm: tools/runlog/selftest.py · covers AC6 AC7 · `follow_through.py`'s plants, staged by counting a same-build follow · none
-New arm: tools/lib/resolve-python.test.sh · covers none · the launcher's `PARITY_ROWS` row, staged by one byte changed in its inline block · none
+New arm: tools/lib/resolve-python.test.sh · covers none · the launcher's `PARITY_ROWS` row, staged by one byte changed in its inline block, and arm 2j's order for the hook's `resolveBash`, staged by swapping its two Git for Windows paths · none
 
 ## 8. Open questions
 
@@ -312,6 +340,18 @@ New arm: tools/lib/resolve-python.test.sh · covers none · the launcher's `PARI
   2.1.292, 2026-10-26). Observation: the `PostToolUse` schema carries `additionalContext`. Liveness: the
   same probe reads `CwdChanged` and `PermissionDenied` without it. RESOLVED (agent, 2026-10-26,
   delegated): PostToolUse `hookSpecificOutput.additionalContext`, the channel S3 emits. widens: none · relaxes: none
+- **F5 — How does the hook read its value and find a bash, when it may not load the policy kit?**
+  TOOL-dGroundRules-1 §4 forbids a kit importing a sibling kit, and KICK-dKeptSession-8 S5 replaces its
+  hook's `require` of `policy-mirror.js` with a spawn of its `get` CLI. Options: (a) spawn `get`, the
+  file located by scratch-guard's `resolvePolicyHelper` (ks8 S5's export; dKeptSession is no parent of
+  this build, so where it has not landed this unit adds it in that spelling and re-points agent-cap's
+  `POLICY_HELPER`, the second instance extracting), and bash by an inline `resolveBash` held to the
+  canonical's order by arm 2j; (b) as (a), with bash printed by a new `policy-mirror.js` verb asked of
+  dGroundRules; (c) `require` the module and a new `resolveBash` export, as rev-2 did. (c) is the
+  import the rule forbids; (b) adds a second spawn per call and an ask outside this build's parents.
+  RESOLVED (agent, 2026-10-28, delegated): (a), rung 1 for the spawn (TOOL-dGroundRules-1 §4,
+  KICK-dKeptSession-8 S5), rung 3 for the copy, the one survivor needing no ask. widens: none ·
+  relaxes: none
 
 ## 9. Revision log
 
@@ -319,12 +359,19 @@ New arm: tools/lib/resolve-python.test.sh · covers none · the launcher's `PARI
   `[forks]` and `[answers]` (AN-1, AN-2, M15), layer-memory `[annotations]` tests owed, the
   research-memory-annotations measure and B4 rule, v2:1195 and :1355, and scout B's row for this unit.
 - rev-2 · 2026-10-26 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-52, promoted from the round-1 spec audit of the 25 unit specs; nothing else moved.
+- rev-3 · 2026-10-28 · §2 preconditions, S1, S3, S4, S5 · §3 Edges · §4 Evidence, Inventory, Files
+  touched · §5 perf · §6 AC10 · §7 arm line · §8 F5 · §10 · re-grounded by the cross-check record
+  `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, rows 20 and 21: the three legs are
+  declared through `leg_factory.py new`, two in `tools/memory-tree/kit.toml` and one in
+  `tools/hooks/kit.toml`, each with `enforces`, and the hook spawns `policy-mirror.js get` and finds
+  bash by an inline copy, never loading the policy kit.
 
 ## 10. Reuse audit
 
-The seams extended are the `recall floor` row's shape in `tools/gate-legs.json`; scratch-guard's
-exported parsers (`tools/hooks/scratch-guard.js:1615`), required as `format-guard.js` requires them;
-`readPolicy` (`tools/policy/policy-mirror.js:132`), required as `agent-cap.js:465` does; the launcher
+The seams extended are TOOL-dWitnessedBar-11's leg factory, which declares the three legs;
+scratch-guard's exported parsers (`tools/hooks/scratch-guard.js:1615`), required as `format-guard.js`
+requires them; the `policy-mirror.js get` CLI, spawned as KICK-dKeptSession-8 S5 spawns it, and
+`resolveBash`'s candidate order (`tools/policy/policy-mirror.js:66`), copied under arm 2j; the launcher
 pattern of `tools/memory-tree/merge-rows.sh`; the fragment wiring of `settings-merge.py --fragment`; and
 the runlog kit's transcript readers (`tools/runlog/extract.py:266`, `:308`, `:372`).
 `python tools/codebase-map/reuse_lookup.py "gate leg over annotation checks and a read hook on shell

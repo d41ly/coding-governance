@@ -1,6 +1,6 @@
 # TOOL-dLinkedLibrary-74 — the spec audit of units 54 to 64: its medium and low findings, batched
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node d · Tier-2 · base 5fede642 · streams tooling · order 30 · advances TOOL-dLinkedLibrary-26
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node d · Tier-2 · base 5fede642 · streams tooling · order 30 · advances TOOL-dLinkedLibrary-26
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,9 @@
 | [2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dLinkedLibrary-1-agent-ledger.md) | journal | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-38 TOOL-dLinkedLibrary-39 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-41 TOOL-dLinkedLibrary-42 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-44 TOOL-dLinkedLibrary-45 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-48 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-50 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-54 TOOL-dLinkedLibrary-55 TOOL-dLinkedLibrary-56 TOOL-dLinkedLibrary-57 TOOL-dLinkedLibrary-58 TOOL-dLinkedLibrary-59 TOOL-dLinkedLibrary-60 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-62 TOOL-dLinkedLibrary-63 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-65 TOOL-dLinkedLibrary-66 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-68 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-70 TOOL-dLinkedLibrary-71 TOOL-dLinkedLibrary-72 TOOL-dLinkedLibrary-73 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-76 TOOL-dLinkedLibrary-77 TOOL-dLinkedLibrary-78 TOOL-dLinkedLibrary-79 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-81 TOOL-dLinkedLibrary-82 TOOL-dLinkedLibrary-83 TOOL-dLinkedLibrary-84 TOOL-dLinkedLibrary-85 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-87 TOOL-dLinkedLibrary-88 TOOL-dLinkedLibrary-89 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-93 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-95 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
 | [2026-10-27-build-TOOL-dLinkedLibrary-74-deviation-741.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-74-deviation-741.md) | deviation | — |
 | [2026-10-27-build-TOOL-dLinkedLibrary-74-deviation-742.md](../build/2026-10-27-build-TOOL-dLinkedLibrary-74-deviation-742.md) | deviation | — |
+| [2026-10-28-build-TOOL-dLinkedLibrary-74-deviation-743.md](../build/2026-10-28-build-TOOL-dLinkedLibrary-74-deviation-743.md) | deviation | — |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-crosscheck.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-5 TOOL-dLinkedLibrary-6 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-11 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-15 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-18 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-20 TOOL-dLinkedLibrary-21 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-24 TOOL-dLinkedLibrary-25 TOOL-dLinkedLibrary-37 TOOL-dLinkedLibrary-40 TOOL-dLinkedLibrary-43 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-49 TOOL-dLinkedLibrary-51 TOOL-dLinkedLibrary-52 TOOL-dLinkedLibrary-53 TOOL-dLinkedLibrary-61 TOOL-dLinkedLibrary-64 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-75 TOOL-dLinkedLibrary-80 TOOL-dLinkedLibrary-86 TOOL-dLinkedLibrary-90 TOOL-dLinkedLibrary-91 TOOL-dLinkedLibrary-92 TOOL-dLinkedLibrary-94 TOOL-dLinkedLibrary-96 TOOL-dLinkedLibrary-97 TOOL-dLinkedLibrary-98 TOOL-dLinkedLibrary-99 TOOL-dLinkedLibrary-100 TOOL-dLinkedLibrary-101 TOOL-dLinkedLibrary-102 |
+| [2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dLinkedLibrary-1-parents-reground.md) | research | TOOL-dLinkedLibrary-1 TOOL-dLinkedLibrary-2 TOOL-dLinkedLibrary-3 TOOL-dLinkedLibrary-4 TOOL-dLinkedLibrary-7 TOOL-dLinkedLibrary-8 TOOL-dLinkedLibrary-9 TOOL-dLinkedLibrary-10 TOOL-dLinkedLibrary-12 TOOL-dLinkedLibrary-13 TOOL-dLinkedLibrary-14 TOOL-dLinkedLibrary-16 TOOL-dLinkedLibrary-17 TOOL-dLinkedLibrary-19 TOOL-dLinkedLibrary-22 TOOL-dLinkedLibrary-23 TOOL-dLinkedLibrary-46 TOOL-dLinkedLibrary-47 TOOL-dLinkedLibrary-52 |
 | [2026-10-27-review-TOOL-dLinkedLibrary-65-spec-audit.md](../reviews/2026-10-27-review-TOOL-dLinkedLibrary-65-spec-audit.md) | spec-audit | TOOL-dLinkedLibrary-65 TOOL-dLinkedLibrary-66 TOOL-dLinkedLibrary-67 TOOL-dLinkedLibrary-71 TOOL-dLinkedLibrary-72 TOOL-dLinkedLibrary-73 TOOL-dLinkedLibrary-69 TOOL-dLinkedLibrary-70 TOOL-dLinkedLibrary-68 |
 
 <!-- /gen:spec-records -->
@@ -127,9 +130,11 @@ moves, so no split by M6's clause 3 leaves two disjoint write sets.
   `tools/lib/region.sh` and `# >>> tree_kill_py -- canonical copy: regen.py in the run-gates kit
   (byte-identical; gated)` in `tools/run-gates/regen.py`, each inline copy carrying the same opener byte
   for byte. Observed by AC21.
-- **S26** — id 44, L7. `dossier_move.py apply` tests `--build` and `--unit` with `fullmatch` on
-  `SLUG_RE` and `GRANT_ID_RE` (`tools/memory-tree/backlog.py:129`, :453), never `match`, and the
-  `bad-values` plant gains a value ending in a newline for each flag. Observed by AC22.
+- **S26** — id 44, L7. `dossier_move.py apply` tests `--build` and `--unit` with `fullmatch` on its
+  inline `SLUG_RE` and `GRANT_ID_RE`, the `id_value_re` copy `TOOL-dLinkedLibrary-64` S14 carries under
+  its parity row (canonical `tools/lib/id_value_re.py`, from `tools/memory-tree/backlog.py:129`, :453),
+  never `match` and never an import of `backlog.py` (TOOL-dGroundRules-1 §4), and the `bad-values`
+  plant gains a value ending in a newline for each flag. Observed by AC22.
 - **S27** — id 45, L8. The canary's `mempause_sh` slice keeps `region_nth`'s status apart from `tr`'s:
   `_mpb=$(region_nth …)` is tested before `tr -d '\r'` runs, and an empty or failed slice fails through
   `check_mp_value` (`tools/run-gates/run-gates.test.sh:3450`) naming the absent `mempause_sh` block.
@@ -312,8 +317,9 @@ moves, so no split by M6's clause 3 leaves two disjoint write sets.
   `canonical copy:`, and the lines naming one stem are byte-identical.
   Red when: a canonical opener is bare, or a copy's opener differs.
 - **AC22** — When `python dossier_move.py --fixture --plant bad-values` runs, `--build` and `--unit` values
-  ending in a newline each exit 2 naming the value and write nothing.
-  Red when: a trailing newline passes validation.
+  ending in a newline each exit 2 naming the value and write nothing, and `git grep -n -E
+  "(import|from) backlog\b" -- tools/codebase-map/` prints nothing.
+  Red when: a trailing newline passes validation, or the map kit imports the patterns.
 - **AC23** — When the canary's slice is reproduced by hand with the `mempause_sh` block deleted from a
   copy of the gate runner, the check fails naming `mempause_sh`, not a value mismatch.
   Red when: an absent block reads as `127 127`.
@@ -354,6 +360,11 @@ New arm: tools/codebase-map/selftest.py · covers AC22 · the newline values of 
   audit of units 65 to 74; nothing else moved.
 - rev-3 · 2026-10-27 · §3 · the Edges block gains the bullets mirroring TOOL-dLinkedLibrary-86, promoted from the spec
   audit of units 75 to 80; nothing else moved.
+- rev-4 · 2026-10-28 · §2 S26 · §6 AC22 · §10 · re-grounded on TOOL-dGroundRules-1 §4 and
+  PLAY-dOrderedCharter-7 §4, by the cross-check record
+  `2026-10-28-build-TOOL-dLinkedLibrary-1-parents-crosscheck`, row 85: S26's `fullmatch` runs on the
+  inline `id_value_re` copy of `SLUG_RE` and `GRANT_ID_RE` that `TOOL-dLinkedLibrary-64` S14, revised
+  with it, carries under a parity row, and AC22 reds an import of `backlog.py`.
 
 ## 10. Reuse audit
 
@@ -361,7 +372,8 @@ Every item extends the seam its finding names: the units' acceptance ledgers, `r
 the `observe-tree-hang` case, TOOL-dSafePassage-1's before-image, unit 1's `propose`, the census's
 factory list, the `region_py` parity population, the canary's own slice, unit 63's census,
 `gen_map.py`'s render, `_scan_install_sites`' label, and `SLUG_RE` and `GRANT_ID_RE`
-(`tools/memory-tree/backlog.py:129`, :453); no item mints a second implementation of any. `python
+(`tools/memory-tree/backlog.py:129`, :453), which `dossier_move.py` reads as unit 64 S14's parity-gated
+inline copy, not a second implementation; no item mints a second implementation of any. `python
 tools/codebase-map/reuse_lookup.py "refuse a micro-format gate whose inline region reader is missing"`
 ranked `read`, `read_text`, `read_conf`, `read_journal` and `region`, none of them a seam an item lacks,
 so no existing seam fits beyond those the items name.
