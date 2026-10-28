@@ -135,7 +135,11 @@ blank = off), read as `AC_ORDER_KEY` through `read_cutoff_key`, arms the join th
 dated at or after it list its section 6 labels in ascending order. Unlike the relation keys above it
 is a CONSTANT, 2026-10-23, the earliest date that grades dSafePassage's own specs: an older live spec
 keeps an out-of-order list and is graded by nobody, which the conf comment states. A value that is
-not an ISO date refuses the run like every other cutoff.
+not an ISO date refuses the run like every other cutoff. The `ac-order` join itself is
+TOOL-dSafePassage-41's, landed in the same commit range as the key it reads: a graded spec whose
+labels descend is a hit naming the first label listed before a lower one, and its run line prints
+the graded count on every run. Under the unattended harness a spec goes DEFERRED to CLOSED in its
+pass commit, so the line grades 0 at a close and that 0 is not coverage; the suite's fixture is.
 
 **Terminal specs are outside the population by construction.** This repo cites a landed decision
 verbatim and never rewrites one, so grading a CLOSED spec would demand editing a frozen record to

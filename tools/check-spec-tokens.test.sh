@@ -51,7 +51,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # landed run's silence, each top-level. Counted by reading; OWED: observed at the close.
 # RAISED 199 -> 200 by TOOL-dSafePassage-34: its non-ISO SPEC_AC_ORDER_CUTOFF refusal arm, top-level.
 # Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=200
+# RAISED 200 -> 203 by TOOL-dSafePassage-41: its three ac-order arms, the dated red, the blank key and
+# the held-out date, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=203
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -925,6 +927,20 @@ git -C "$d" reset -q --hard "$clean"
 printf 'SPEC_AC_ORDER_CUTOFF="2026-9-8"\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 arm "a non-ISO SPEC_AC_ORDER_CUTOFF is REFUSED like the other cutoff keys" 1 "$d" "REFUSING — SPEC_AC_ORDER_CUTOFF 2026-9-8 is not an ISO date"
+git -C "$d" reset -q --hard "$clean"
+
+# TOOL-dSafePassage-41 AC1 — the ac-order join: a spec dated at the key listing AC2 before AC1 reds
+# naming the spec and AC2; the key blank, or set a day past the spec's date, grades it not at all.
+sed -i 's|^- \*\*AC1\*\* — |- **AC2** — a second criterion.\n- **AC1** — |' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+printf 'SPEC_AC_ORDER_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "TOOL-dSafePassage-41 a spec dated at SPEC_AC_ORDER_CUTOFF listing AC2 before AC1 REDS naming both" 1 "$d" '2026-09-02-spec-TOOL-tOne-1.md [ac-order] `ac-order <- AC2`'
+printf 'SPEC_AC_ORDER_CUTOFF=""\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "TOOL-dSafePassage-41 the out-of-order spec passes with SPEC_AC_ORDER_CUTOFF blank" 0 "$d" "ac-order join · 0 of 1 live spec(s) · SPEC_AC_ORDER_CUTOFF blank (arm off)"
+printf 'SPEC_AC_ORDER_CUTOFF="2026-09-03"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "TOOL-dSafePassage-41 the out-of-order spec dated a day before SPEC_AC_ORDER_CUTOFF is held out" 0 "$d" "ac-order join · 0 of 1 live spec(s) · graded at/after SPEC_AC_ORDER_CUTOFF 2026-09-03 · 0 out of order"
 git -C "$d" reset -q --hard "$clean"
 
 # AC17's relation, for the new key — a COMMITTED value not strictly past its own commit day is
