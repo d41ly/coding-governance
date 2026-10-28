@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-31 — the blinded scout's input as a true allow-list: `derive_scouted_seam_input` names the keys a scout may see, and a planted unknown key is withheld
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 11 · advances TOOL-dIndexedDesign-17
+**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 11 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
+| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 |
 | [2026-10-28-build-TOOL-dIndexedDesign-31-promoted-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-31-promoted-fix-return.md) | research | TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-31-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-31-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
+| [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 
 <!-- /gen:spec-records -->
 
@@ -72,6 +73,7 @@ scorer factory of TOOL-dFairHearing-12 S1 and TOOL-dFairHearing-14 S2.
 ### Edges
 
 - **consumes-from** `TOOL-dIndexedDesign-5` — the `scouted-seam` instance's `case_input` hook and `--blind`, whose deny-list body S1 replaces with `derive_scouted_seam_input` over `SCOUTED_SEAM_INPUT_KEYS`, and AC7, which S3 supersedes in that unit's ledger (id 37)
+- **hands-off** `TOOL-dIndexedDesign-46` — S1's required keys, which that unit types as non-empty strings (id 39)
 
 ## 4. Design
 
@@ -179,6 +181,9 @@ none
 
 - rev-1 · 2026-10-28 · initial draft, promoted from the round-1 spec audit of this build, id 37
   (BLOCKER, item B1), repairing TOOL-dIndexedDesign-5 S6 and AC7.
+- rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
+  edge of TOOL-dIndexedDesign-46, promoted by the round-1 spec audit of units 31 to 38; nothing else
+  moved.
 
 ## 10. Reuse audit
 

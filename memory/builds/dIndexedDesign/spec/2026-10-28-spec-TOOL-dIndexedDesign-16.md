@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-16 — design coverage by policy: the carries join read at each Design exit and each spec revision, `UNCARRIED`, and the coverage lens
 
-**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 3 · advances TOOL-dIndexedDesign-17 · closes TOOL-dIndexedDesign-18
+**Status:** OPEN · rev-3 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 3 · advances TOOL-dIndexedDesign-17 · closes TOOL-dIndexedDesign-18
 
 **Carries:** cl-dClosedLoop-0398@f6f6546a whole
 **Carries:** node:policy-key.design.coverage
@@ -10,7 +10,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
+| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-fix-return.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-20 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-a.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-reuse-scout-a.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-6 |
 | [2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-spec-stage-returns.md) | research | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 |
@@ -152,6 +152,9 @@ today; set, `design.coverage` decides.
 - **hands-off** `TOOL-dIndexedDesign-35` — S8's coverage lens, which that unit runs as its own one-agent stage so `SPEC_LENSES` stays at five (report id 28, HIGH)
 - **hands-off** `TOOL-dIndexedDesign-36` — the dispatch refusals this unit adds, which that unit names in BUILD-METHOD M6 (report id 33, HIGH)
 - **hands-off** `TOOL-dIndexedDesign-38` — the round-1 spec audit's minors that land on this spec, report ids 1, 2, 3, 9, 12, 13, 18, 24, 29 and 40, each a scope item of that batch unit
+- **hands-off** `TOOL-dIndexedDesign-39` — this unit's pass commit also carries unit 35's S1 to S4, as that unit's S1 requires, so S8's brief goes straight to `COVERAGE_BRIEF` and `SPEC_LENSES` never holds six entries; that unit's own pass observes every commit (id 1)
+- **hands-off** `TOOL-dIndexedDesign-41` — S7's refusals, which that unit's S1 composes in this unit's pass commit: `check_design_exit` holds no `fail` site, `--dispatch` refuses through the THIN site and the two `fail 31` sites fold into one, so the census stays at or under 323 (id 3)
+- **hands-off** `TOOL-dIndexedDesign-44` — S8's `coverage` argument and `coverage-lens` binding, whose coverage agent that unit counts as a finder (id 26)
 
 ## 4. Design
 
@@ -397,6 +400,9 @@ New arm: tools/workflows/tier2-review.js · covers AC10 · a live `coverage: 'on
   site re-read at base `57bc3b91`.
 - rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from edges of TOOL-dIndexedDesign-35, TOOL-dIndexedDesign-36, TOOL-dIndexedDesign-38,
   promoted by the round-1 spec audit of this build; nothing else moved.
+- rev-3 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
+  edges of TOOL-dIndexedDesign-39, TOOL-dIndexedDesign-41 and TOOL-dIndexedDesign-44, promoted by
+  the round-1 spec audit of units 31 to 38; nothing else moved.
 
 ## 10. Reuse audit
 

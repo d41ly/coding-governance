@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-35 — the coverage lens runs as its own one-agent stage, so `SPEC_LENSES` stays at the agent-cap hook's five-lens bound and no checklist share reaches a lens that does not run
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 4 · advances TOOL-dIndexedDesign-17
+**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 4 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
+| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 |
+| [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,9 @@ call outside any iteration, the shape the harness's `probe` and `synth` calls al
 
 - **consumes-from** `TOOL-dIndexedDesign-16` — its S8 coverage lens, the `coverage` argument's three values and `renderAuditBinding`'s `coverage-lens` line, whose sixth `SPEC_LENSES` entry S1 removes and S2 runs as `phase('Coverage')` (id 28)
 - **hands-off** `TOOL-dIndexedDesign-38` — the coverage stage this unit lands, which that unit's README and review-shape item documents beside the five spec lenses (id 29)
+- **hands-off** `TOOL-dIndexedDesign-39` — S1 to S4, which that unit's S1 builds inside unit 16's pass commit; this unit's own pass builds S5 and observes AC1 to AC4 (id 1)
+- **hands-off** `TOOL-dIndexedDesign-44` — the coverage stage of S2 and S3, whose agent that unit joins to every finder count, dead label, finding join and durable file (id 26)
+- **hands-off** `TOOL-dIndexedDesign-46` — S5's agent-cap arm, which that unit deletes, and the stage's lens-yield row and render step (ids 7, 20, 29, 30 and 33)
 
 ## 4. Design
 
@@ -171,6 +175,9 @@ none
 
 - rev-1 · 2026-10-28 · initial draft, promoted from the round-1 spec audit of this build, id 28
   (HIGH, item H2), repairing TOOL-dIndexedDesign-16 S8 and its Files touched.
+- rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
+  edges of TOOL-dIndexedDesign-39, TOOL-dIndexedDesign-44 and TOOL-dIndexedDesign-46, promoted by
+  the round-1 spec audit of units 31 to 38; nothing else moved.
 
 ## 10. Reuse audit
 

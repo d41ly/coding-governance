@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-36 — BUILD-METHOD M6 names the refusals `--dispatch` gained, and stops saying it refuses "on nothing else"
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 5 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
+**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 5 · advances TOOL-dIndexedDesign-17 · ratified 2026-10-28
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
+| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 |
+| [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,8 @@ one step after it, at order 5.
 
 - **consumes-from** `TOOL-dIndexedDesign-1` — the `design.handoff` refusals of its S2 at `--dispatch`, FORKED, UNCARRIED and an unaudited Tier-2 unit, which S1's sentence names (id 33)
 - **consumes-from** `TOOL-dIndexedDesign-16` — the `design.coverage` refusal its S7 adds at `--dispatch`, which S1's sentence names beside the hand-off (id 33)
+- **hands-off** `TOOL-dIndexedDesign-45` — S1's pointer to the verbs guide, which that unit gives the unattended protocol's refusal sentence (id 27)
+- **hands-off** `TOOL-dIndexedDesign-46` — AC1 and AC2, which that unit re-observes over the joined paragraph (id 40)
 
 ## 4. Design
 
@@ -140,6 +143,9 @@ no method carrier. Units 8 and 20 then add their M2 sentences against the headro
 
 - rev-1 · 2026-10-28 · initial draft, promoted from the round-1 spec audit of this build, id 33
   (HIGH, item H3), repairing TOOL-dIndexedDesign-1 S6 and its Files touched.
+- rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
+  edges of TOOL-dIndexedDesign-45 and TOOL-dIndexedDesign-46, promoted by the round-1 spec audit of
+  units 31 to 38; nothing else moved.
 
 ## 10. Reuse audit
 

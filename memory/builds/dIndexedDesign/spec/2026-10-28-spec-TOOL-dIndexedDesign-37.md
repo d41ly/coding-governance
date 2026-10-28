@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-37 — one write-set path predicate, `check_meet_path`, that keeps root files, so the stream plan and the build order refuse two writers of one root file
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 16 · advances TOOL-dIndexedDesign-17
+**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 16 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-38 |
+| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 |
 | [2026-10-28-build-TOOL-dIndexedDesign-31-promoted-fix-return.md](../build/2026-10-28-build-TOOL-dIndexedDesign-31-promoted-fix-return.md) | research | TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-38 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-31-promoted-fix-brief.md) | research | TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-38 |
 | [2026-10-28-prompt-TOOL-dIndexedDesign-37-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dIndexedDesign-37-1-spec-writer.md) | journal | — |
+| [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-32 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-38 |
 
 <!-- /gen:spec-records -->
 
@@ -74,6 +75,7 @@ builds one step after it, at order 16.
 
 - **consumes-from** `TOOL-dIndexedDesign-15` — `derive_write_meet`, arm (c) of `check_stream_pairing`, the `plan_streams.py --fixture` plants and AC8, whose two-segment filter S2 replaces with `check_meet_path` and whose "verdicts unchanged" S3 supersedes (id 39)
 - **hands-off** `TOOL-dIndexedDesign-38` — `check_meet_path`, the one write-set path predicate that unit's id-23 item points unit 2's `--overlaps` filter at, so the three joins give one answer on a root file
+- **hands-off** `TOOL-dIndexedDesign-46` — S1's `check_meet_path`, which that unit gives an optional tracked-file set so the spec-token join calls it too (id 21)
 
 ## 4. Design
 
@@ -177,6 +179,9 @@ none
 - rev-1 · 2026-10-28 · initial draft, promoted from the round-1 spec audit of this build, id 39
   (HIGH, item H4), on the skeptic's corrected fix, repairing TOOL-dIndexedDesign-15 S1, S3 (c) and
   AC8.
+- rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
+  edge of TOOL-dIndexedDesign-46, promoted by the round-1 spec audit of units 31 to 38; nothing else
+  moved.
 
 ## 10. Reuse audit
 

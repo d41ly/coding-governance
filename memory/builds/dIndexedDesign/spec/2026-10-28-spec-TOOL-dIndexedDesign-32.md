@@ -1,6 +1,6 @@
 # TOOL-dIndexedDesign-32 — the feature level's Serves kinds bind: `fork` a typed kind, `feature-design` an untyped one, and `roster` a region that binds nothing
 
-**Status:** OPEN · rev-1 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
+**Status:** OPEN · rev-2 · 2026-10-28 · node d · Tier-2 · base 57bc3b91 · streams tooling · order 9 · advances TOOL-dIndexedDesign-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
+| [2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dIndexedDesign-1-agent-ledger.md) | journal | TOOL-dIndexedDesign-1 TOOL-dIndexedDesign-2 TOOL-dIndexedDesign-3 TOOL-dIndexedDesign-4 TOOL-dIndexedDesign-5 TOOL-dIndexedDesign-6 TOOL-dIndexedDesign-7 TOOL-dIndexedDesign-8 TOOL-dIndexedDesign-9 TOOL-dIndexedDesign-10 TOOL-dIndexedDesign-11 TOOL-dIndexedDesign-12 TOOL-dIndexedDesign-13 TOOL-dIndexedDesign-14 TOOL-dIndexedDesign-15 TOOL-dIndexedDesign-16 TOOL-dIndexedDesign-20 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 TOOL-dIndexedDesign-39 TOOL-dIndexedDesign-40 TOOL-dIndexedDesign-41 TOOL-dIndexedDesign-42 TOOL-dIndexedDesign-43 TOOL-dIndexedDesign-44 TOOL-dIndexedDesign-45 TOOL-dIndexedDesign-46 |
+| [2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dIndexedDesign-35-spec-audit-round1.md) | spec-audit | TOOL-dIndexedDesign-35 TOOL-dIndexedDesign-36 TOOL-dIndexedDesign-33 TOOL-dIndexedDesign-34 TOOL-dIndexedDesign-31 TOOL-dIndexedDesign-37 TOOL-dIndexedDesign-38 |
 
 <!-- /gen:spec-records -->
 
@@ -73,6 +74,8 @@ S4 and S6 write through `record_kinds.py new` (TOOL-dTotalRecall-1 S9).
 
 - **consumes-from** `TOOL-dIndexedDesign-8` — the `feature-design` and `fork` kinds of its S1 and S6, their `-feature-<seg>.md` and `-fork-<n>.md` homes, and `read_feature_designs` and `check_fork_records`, which read through `read_bindings` and see nothing until S1 and S2 bind (id 19)
 - **consumes-from** external — PLAY-dOrderedCharter-42 S1 to S4's `TYPED_RECORD_KINDS`, untyped head, file-name join and `typed-kinds` plant, and PLAY-dOrderedCharter-7 S7's `build_records.py`, each DEFERRED at base and an ancestor's
+- **hands-off** `TOOL-dIndexedDesign-42` — S1's typed `fork` kind, under whose per-build collision that unit numbers fork files within the build (id 12)
+- **hands-off** `TOOL-dIndexedDesign-46` — S1's closed sets in the per-kind table, which that unit makes the fork join's one source (id 8)
 
 ## 4. Design
 
@@ -168,6 +171,9 @@ none
 - rev-1 · 2026-10-28 · initial draft, promoted from the round-1 spec audit of this build, id 19
   (HIGH, item H1, shared with ids 20 and 21), on the skeptic's corrected fix, repairing
   TOOL-dIndexedDesign-8 S1, S2 and S6.
+- rev-2 · 2026-10-28 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
+  edges of TOOL-dIndexedDesign-42 and TOOL-dIndexedDesign-46, promoted by the round-1 spec audit of
+  units 31 to 38; nothing else moved.
 
 ## 10. Reuse audit
 
