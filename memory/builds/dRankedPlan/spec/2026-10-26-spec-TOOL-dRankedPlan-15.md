@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-15 — the plan revision record: a fork the goal cannot survive moves the build back to planning, and Design re-enters on the ratified revision
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 13 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 13 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0497@2b8de50e whole
 
@@ -12,8 +12,12 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 |
 | [2026-10-27-build-TOOL-dRankedPlan-15-deviation-151.md](../build/2026-10-27-build-TOOL-dRankedPlan-15-deviation-151.md) | deviation | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-15-deviation-152.md](../build/2026-10-28-build-TOOL-dRankedPlan-15-deviation-152.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -37,9 +41,11 @@ plan is, and Design re-enters on the ratified revision, which a reader prints fo
   `revised` is the plan revision's outcome that TOOL-dDeclaredLoop-15 §8 F2 names and its parent row
   P1 fires on, so TOOL-dDeclaredLoop-13 S6 grades P1's outcome against a declared value. Where the
   row at the build run's base already declares it, S1 changes nothing. Observed by AC6.
-- **S2** — The entry grammar, I20. The build's one plan record (`record-kind.plan`, I3), found by
-  `find_plan_record(root, slug)` (unit 16 S4), gains a `## Revisions` region at its end, holding one
-  line per revision:
+- **S2** — The entry grammar, I20. The build's one plan record (`record-kind.plan`, I3), the file unit
+  16 S4's `find_plan_record` returns, reached from the loop kit by the memory-tree verb
+  TOOL-dRankedPlan-9 §8 F6 settles, run as a subprocess through the inline `resolve_kit_dir` block
+  since a kit imports no sibling kit (PLAY-dOrderedCharter-7 §4), gains a `## Revisions` region at its
+  end, holding one line per revision:
   `- **Revision <n>:** <what changed in the ratified plan> · <why> · from <sha8>`. `<n>` runs from 1
   with no gap; `<what>` and `<why>` are each one non-empty line holding no ` · `; `from` is the `sha`
   field of the build's newest `planning -> designing` transition, the commit at which the ratified
@@ -74,9 +80,10 @@ plan is, and Design re-enters on the ratified revision, which a reader prints fo
   `revision — none`; `revision — <n> · awaiting ratification · <what>` while no re-entry follows the
   B6; or `revision — <n> · ratified · <value> · <witness> · design re-entered at <sha8>`. Two
   re-entries exit 1 instead: one that `read_plan_ratification` answers with no witness prints
-  `revision — <n> · design re-entered without ratification`, and one at whose commit every field
-  line of the plan record outside `## Revisions` equals the same field at `from`, read by
-  `git show <from>:<path>` in the factory's `FIELD` form, prints
+  `revision — <n> · design re-entered without ratification`, and one at whose commit every line of
+  the plan record above `## Revisions` equals the same line at `from`, both read by `git show
+  <rev>:<path>` and compared line by line with no field parse, each field holding one line (unit 16
+  S3) and the factory's `FIELD` being memory-tree's, prints
   `revision — <n> · no field changed since <sha8>`, since a revision records what it changes in the
   ratified plan. This line is what Design receives: the stand-in for dIndexedDesign's
   `design.input` reading "a ratified plan revision" (flow-steps.md:223, :235) until that build
@@ -85,8 +92,15 @@ plan is, and Design re-enters on the ratified revision, which a reader prints fo
   `bad-entries`, `wrong-state`, `bad-text`, `unratified-reentry` and `second-revision`, in a scratch
   repository under the system temp directory, with the loop kit's own `write_transition` and
   `read_transitions` and a stub `read_plan_ratification` answering the planted value and witness.
-  The leg `loop plan revision` runs it, with the rows a new leg owes, as TOOL-dDeclaredLoop-3 S8 adds
-  its own. Observed by AC1 to AC5, AC7 and AC8, through the `New arm:` line.
+  The leg `loop plan revision` runs it, declared once as a `[[gate_leg]]` row of `tools/loop/kit.toml`
+  holding every manifest key, `chunk`, `ceiling` and `enforces` among them, made by `python
+  tools/run-gates/leg_factory.py new` and rendered into `tools/gate-legs.json` by `leg_factory.py
+  --write` (TOOL-dWitnessedBar-11 S1 to S3). Its `enforces` is §8 F8's, since PLAY-dOrderedCharter-7 S3
+  reds a leg carrying none; the other rows a new leg owes follow, as TOOL-dDeclaredLoop-3 S8 adds its
+  own. `tools/run-gates/leg_factory.py` is not in the tree at `d1721ef20`, so until
+  TOOL-dWitnessedBar-11 lands the pass writes the declaration and its manifest row by hand as the
+  factory's stand-in, and its return says so. Observed by AC1 to AC5, AC7 and AC8, through the `New
+  arm:` line, and by AC10.
 - **S7** — The page `help/loop.md` (TOOL-dDeclaredLoop-1's) gains a section on the plan revision:
   when a build moves back to planning, the `revise` and `show` verbs, the entry grammar, and that the
   revision is ratified as the plan is. Observed by AC9.
@@ -116,6 +130,7 @@ plan is, and Design re-enters on the ratified revision, which a reader prints fo
 - **consumes-from** `TOOL-dRankedPlan-14` — `Scenario reason`, the field a planner rewrites with `Scenario` in the `planning` a revision reopens, the one route to a re-pick after Plan
 - **hands-off** `TOOL-dRankedPlan-6` — `## Revisions`, the region whose newest entry a Plan Review of a revision reads at its pinned blob
 - **consumes-from** external — dDeclaredLoop, built before this build run: `write_transition`, `read_transitions` and `TRANSITION_FIELDS` (TOOL-dDeclaredLoop-3 S5, S7, §4), rows B4 and B6 (TOOL-dDeclaredLoop-13), the backward move recorded like any other (TOOL-dDeclaredLoop-10 S2, S5), and P1 with its §8 F2 (TOOL-dDeclaredLoop-15)
+- **consumes-from** external — dWitnessedBar and dOrderedCharter: the leg's one declaration, `leg_factory.py new` and `--write` (TOOL-dWitnessedBar-11 S1 to S3), and the meta-check that reds a leg with no `enforces` (PLAY-dOrderedCharter-7 S3)
 - **hands-off** external — dIndexedDesign: its `design.decompose` runs `revise` on a fork the goal cannot survive, and its `design.input` reads the ratified revision `show` prints
 - **hands-off** `TOOL-dRankedPlan-23` — `derive_revision_state` and `show`, whose ratification read that unit re-points to the recorded re-entry (round-1 spec audit, id 4)
 - **hands-off** `TOOL-dRankedPlan-29` — `revise`, `show` and the `loop plan revision` leg, which that unit's S26 and S36 correct (round-1 spec audit, ids 31, 46)
@@ -180,7 +195,7 @@ REVISION_RE = ^- \*\*Revision ([1-9][0-9]*):\*\* ([^\n]+?) · ([^\n]+?) · from 
 | `revision` | `Gov-Transition` field | none |
 | `## Revisions` | plan-record region | none |
 | `revised` | outcome word of `item.plan.record` | none |
-| `loop plan revision` | gate leg | none |
+| `loop plan revision` | gate leg, a `[[gate_leg]]` of `tools/loop/kit.toml` | none |
 
 ### Migration
 
@@ -195,8 +210,8 @@ Live at landing. Nothing runs `revise` but a planner meeting a fork the goal can
 - `tools/loop/plan_revision.py`: S2, S3, S5, S6
 - `tools/loop/loop_transition.py`: `TRANSITION_FIELDS` gains `revision`
 - `tools/loop/loop.toml`: `revised` on `item.plan.record`
-- `tools/loop/kit.toml`: the module shipped
-- `tools/gate-legs.json`: the leg `loop plan revision`
+- `tools/loop/kit.toml`: the module shipped, and the `[[gate_leg]]` declaration of `loop plan revision`
+- `tools/gate-legs.json`: rendered from that declaration by `leg_factory.py --write`, not edited
 - `tools/govkit/registry.toml`: the rows the new leg owes
 - `tools/govkit/subject-pins.tsv`: the rows the new leg owes
 - `tools/run-gates/selftest-budgets.txt`: the leg's budget row
@@ -218,7 +233,7 @@ Live at landing. Nothing runs `revise` but a planner meeting a fork the goal can
 - security — one new write path: `revise` writes the build's own plan record and one commit in the
   session's tree. `--what` and `--why` are validated at that boundary (S3); `--build` is held to
   `^[A-Za-z0-9]+$` before it reaches a path. A staged foreign path refuses the commit.
-- perf / scale — one `read_transitions` and one commit per revision; `show` adds one `git show`.
+- perf / scale — one `read_transitions` and one commit per revision; `show` adds two `git show` reads.
 - error / empty / loading states — every refusal names its cause and writes nothing; a malformed
   region exits 2 naming the line; a build with no plan record exits 2 naming the build.
 - observability — the printed line, the `revision=<n>` field on B6, and the `show` line.
@@ -271,6 +286,12 @@ Live at landing. Nothing runs `revise` but a planner meeting a fork the goal can
 - **AC9** — When `grep -n "plan revision" loop.md` runs over the help page, it finds S7's section
   naming `revise`, `show` and the `## Revisions` region.
   Red when: the page does not describe the revision.
+- **AC10** — When `python tools/run-gates/leg_factory.py --check` runs at the pass tip, it exits 0, and
+  a `tomllib` read of `tools/loop/kit.toml` finds a `[[gate_leg]]` named `loop plan revision` whose
+  `enforces` holds §8 F8's tag.
+  Red when: the manifest row differs from the declaration, or the leg carries no `enforces`.
+  fixture: `leg_factory.py` is TOOL-dWitnessedBar-11's and absent at `d1721ef20`; until it lands the
+  `tomllib` read alone observes the declaration.
 
 ## 7. Gates
 
@@ -315,6 +336,14 @@ New arm: tools/loop/plan_revision.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 · th
   changes in the ratified plan" is a claim no reader can check, and with it S3 refuses a revision
   that changes nothing. The refinement is the owner unit's, I20's, and is returned to the main loop.
   widens: none · relaxes: none
+- **F8 — Which principle does `loop plan revision` enforce?** No v2 `[enforcement]` row names this
+  unit's clause `cl-dClosedLoop-0497` (architecture-v2:1813-1863), so the tag cannot be read off the
+  clause. Options: (a) `principle.p20`, whose text says "the build carries each step's records", which
+  the revision and its B6 record are; (b) `principle.p2`, "a stage exit is computed from committed
+  history", which `show`'s derived re-entry is; (c) `principle.p35`, "every record names its cause",
+  which the entry's `<why>` and `from` are. The leg's plants grade the entry, B6's `revision=` and
+  `show`'s states, so (a) is what the leg checks. Recommendation: (a), as TOOL-dDeclaredLoop-3 §8 F7
+  recommends for that unit's record leg. Open for the owner, who owns the `[enforcement]` table.
 
 ## 9. Revision log
 
@@ -323,13 +352,19 @@ New arm: tools/loop/plan_revision.py · covers AC1 AC2 AC3 AC4 AC5 AC7 AC8 · th
   and scout B's row for this unit.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-23`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 - rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
+- rev-4 · 2026-10-28 · S2 · S5 · S6 · AC10 · §3 · §4 · §8 · §10 · re-grounded on the parents at `d1721ef20`
+  by the cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, rows 34
+  and 38: the leg is declared once in `tools/loop/kit.toml` with its `enforces`, F8 open for the owner,
+  and the manifest is rendered; the plan record is reached by TOOL-dRankedPlan-9 §8 F6's verb and the
+  `from` comparison reads lines, not memory-tree's `FIELD`, in process.
 
 ## 10. Reuse audit
 
 The seams extended are TOOL-dDeclaredLoop-3's transition writer and reader (`write_transition`,
 `read_transitions`) and its `TRANSITION_FIELDS` tuple, which that spec ships for later units to
-extend; TOOL-dDeclaredLoop-13's row B6 and TOOL-dDeclaredLoop-15's `revised` outcome; and unit 16's
-plan record. `python tools/codebase-map/reuse_lookup.py "record a plan revision moving a build from
+extend; TOOL-dDeclaredLoop-13's row B6 and TOOL-dDeclaredLoop-15's `revised` outcome; unit 16's plan
+record, reached through TOOL-dRankedPlan-9 §8 F6's verb; and TOOL-dWitnessedBar-11's leg declaration
+and factory, the one way a new leg is made. `python tools/codebase-map/reuse_lookup.py "record a plan revision moving a build from
 designing back to planning"` ranked name stems only (`build`, `records`, `plan` in
 `tools/memory-tree/gen_build_index.py:2674`, `plan_state` at `tools/unattended/unattended.sh:4458`,
 `DesignRefusal`); each was opened and none records a revision or a backward move, so no existing

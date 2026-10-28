@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-2 — the planner and triager role, the Plan workflow, and the plan's order as `plan.authority` says
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 5 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 5 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0370@23b0ac8f whole
 **Carries:** node:policy-key.plan.authority
@@ -17,8 +17,12 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-fix-return.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-fix-return.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-2-deviation-21.md](../build/2026-10-28-build-TOOL-dRankedPlan-2-deviation-21.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -38,12 +42,19 @@ its planted case.
 
 ## 2. Scope (IN)
 
-- **S1** — The planner's body. `tools/roles/agents/gov-planner.agent.md`, which TOOL-dBoundRoles-1 S2
-  creates under its 3072-byte `BODY_CEILINGS` row, gains two paragraphs: the triager's job, judging
-  what no declared rule decides at `plan.triage-judge` in the same slot (flow-steps.md:183-184), and
-  the order's authority, one sentence per value of `plan.authority`, ending with the rule that a
-  reorder the planner may not commit is proposed, never written. The render `.claude/agents/gov-planner.md`
-  is its copy, by `render_agents.py --write`. Observed by AC1.
+- **S1** — The planner's job and its limits. `tools/roles/agents/gov-planner.agent.md`, which
+  TOOL-dBoundRoles-1 S2 creates under its 3072-byte `BODY_CEILINGS` row with its `never` and `return`
+  fields, gains one body paragraph stating the job: the triager's, judging what no declared rule
+  decides at `plan.triage-judge` in the same slot (flow-steps.md:183-184), and the order's drafter,
+  who proposes to the owner each reorder its `plan.authority` value does not grant. Its `never` field
+  gains three `<limit> — <enforcer>` entries (TOOL-dBoundRoles-2 S2), one per value of
+  `plan.authority`, each the commit §4 "### The authority" refuses under that value, its enforcer
+  `gen_build_index.py --ratified-order`, S4's block, in the script form TOOL-dBoundRoles-2 §4 "The
+  never list" grades. The body holds no limit: each new body keeps every limit in `never`
+  (TOOL-dBoundRoles-1 §4 "The roster"), and R5 reds a body line carrying a prohibition word
+  (TOOL-dBoundRoles-2 S3). The render `.claude/agents/gov-planner.md` is its copy, by
+  `render_agents.py --write`, the entries under its `## Never` (TOOL-dBoundRoles-2 S6). Observed by
+  AC1.
 - **S2** — The Plan workflow in the loop: the row `[[workflow]] name = "plan" order = 0 step =
   "step.plan"` in `tools/loop/loop.toml`, written only where the definition at the build run's base
   lacks it, so `read_workflow_order` (TOOL-dDeclaredLoop-1 S3) and the roles check's join of every
@@ -53,8 +64,9 @@ its planted case.
   ratified)` in `tools/memory-tree/gen_build_index.py`, run as `gen_build_index.py --ratified-order
   --staged`, compares `derive_plan_order` (TOOL-dRankedPlan-1 S2), the order `PLAN.md` renders, over
   the build READMEs at HEAD with the same order over the staged READMEs, each parsed by
-  `parse_front_matter`, under the value of `plan.authority` read once
-  through the policy kit's `resolve` (I14), as `read_slot_mode` reads its cap. A row is ratified when
+  `parse_front_matter`, under the value of `plan.authority` read once by the memory-tree kit's adapter
+  `read_policy_value("plan.authority", root)` (TOOL-dTotalRecall-8 S10, `tools/memory-tree/policy_value.py`),
+  a `policy.py get` subprocess (I14), whose `PolicyRefused` is the refused read. A row is ratified when
   TOOL-dRankedPlan-9's `read_plan_ratification` answers a witness for its build. The rule per value is
   §4 "### The authority"; a refusal names both builds, the value and the remedy. Exit 0 admitted, 1
   refused, 2 when git cannot say what is staged or the policy read refuses. Observed by AC3, AC4, AC5.
@@ -91,7 +103,7 @@ its planted case.
 ## 3. Non-goals (OUT)
 
 - The planner's file, its slot, the `plan` entry in `tools/roles/workflows.toml` and
-  `WORKFLOW_NAMES`: TOOL-dBoundRoles-1 S2 and S4's. This unit writes the body's two paragraphs only.
+  `WORKFLOW_NAMES`: TOOL-dBoundRoles-1 S2 and S4's. This unit writes the body's paragraph and the `never` entries only.
 - The Plan item rows themselves: TOOL-dDeclaredLoop-12 S2 declares all eleven, owner dRankedPlan.
   This unit arms five and adds no row.
 - `plan.record`, `plan.triage-rule`, `plan.triage-judge` and `plan.exit`: TOOL-dRankedPlan-16, -3 and
@@ -111,7 +123,7 @@ its planted case.
 - **hands-off** `TOOL-dRankedPlan-3` — `check_plan_dupes`, the dedupe finding that unit records as the dupes record, arming `item.plan.dedupe` with its witness reader and deleting its stand-in row
 - **hands-off** `TOOL-dRankedPlan-15` — `gov-planner`, the slot that records a plan revision with `revise`, ratified as the plan is
 - **hands-off** `TOOL-dRankedPlan-6` — `gov-planner`, the author whose plan record and revision Plan Review reviews
-- **consumes-from** external — dBoundRoles' `gov-planner.agent.md` and `plan` workflow entry (TOOL-dBoundRoles-1 S2, S4); dDeclaredLoop's `loop.toml`, `read_workflow_order` and stand-in rows (TOOL-dDeclaredLoop-1, -12, -13); dPlacedRequest's claim, request record, content key and `--claims` lease rows (TOOL-dPlacedRequest-1, -19, -21)
+- **consumes-from** external — dBoundRoles' `gov-planner.agent.md` and `plan` workflow entry (TOOL-dBoundRoles-1 S2, S4), the `never` field and R5 (TOOL-dBoundRoles-2 S2, S3); dTotalRecall's `read_policy_value` adapter (TOOL-dTotalRecall-8 S10); dDeclaredLoop's `loop.toml`, `read_workflow_order` and stand-in rows (TOOL-dDeclaredLoop-1, -12, -13); dPlacedRequest's claim, request record, content key and `--claims` lease rows (TOOL-dPlacedRequest-1, -19, -21)
 - **hands-off** `TOOL-dRankedPlan-21` — `check_ratified_order`'s `ratified` input, which that unit re-points to the recorded `plan.exit` crossing (round-1 spec audit, id 3)
 - **hands-off** `TOOL-dRankedPlan-29` — the plan-order hook arm and §3's armed-item count, which that unit's S11 and S12 correct (round-1 spec audit, ids 12, 13)
 
@@ -124,9 +136,15 @@ its planted case.
   the default, `owner-orders` and `planner-within-themes` (v2:1600).
 - The owner's terminal proof is the policy guard block's: `[ -t 2 ]` in a hook reads whether a person
   sits at a terminal, since git leaves a hook's stderr as the committer's (`.githooks/pre-commit:186-224`).
-- The generator already imports a policy-kit module through `backlog.resolve_kit_dir`, asked once per
-  run (`read_slot_mode`, `tools/memory-tree/gen_build_index.py:2283-2306`), and parses front matter in
-  one place (`parse_front_matter`, :405).
+- The generator parses front matter in one place (`parse_front_matter`,
+  `tools/memory-tree/gen_build_index.py:405`). Its one policy read today, `read_slot_mode` (:2283-2306),
+  inserts the policy kit into `sys.path` and imports `budgets` (:2293-2296), the sibling-kit import
+  PLAY-dOrderedCharter-7 §4 "The policy reads" rules out, so S3 reads through TOOL-dTotalRecall-8
+  S10's adapter, a `policy.py get` subprocess.
+- `--print-bindings` prints one `S<TAB><path><TAB><kind><TAB><ids>` row per bound record
+  (`cmd_print_bindings`, `tools/memory-tree/gen_build_index.py:690`, the row at :770), the read
+  `item.plan.research` takes from the loop kit, since a kit imports no sibling kit
+  (PLAY-dOrderedCharter-7 §4).
 - TOOL-dDeclaredLoop-12 S2 declares one `[[item]]` row per flow-steps item, the Plan program's eleven
   among them with owner dRankedPlan; TOOL-dDeclaredLoop-13 S8 lists each as a stand-in until this
   build arms it.
@@ -148,6 +166,12 @@ a row is ratified when its build's plan ratification holds (I6).
 | `planner-within-themes` | change `parents:`, reordering rows within one `priority:` value | adds, changes or removes a `priority:` line, or moves a row across another priority's rows |
 | `owner-orders` | change `parents:` where no row moves | adds, changes or removes a `priority:` line, or changes the relative order of any two rows |
 
+The planner's `never` entries, one per row of the table, each enforced by S4's block:
+
+```
+never: under planner-drafts-owner-ratifies, commits a change to the relative order of two ratified rows — gen_build_index.py --ratified-order; under planner-within-themes, commits a priority line or a move across another priority's rows — gen_build_index.py --ratified-order; under owner-orders, commits a priority line or a change to the relative order of any two rows — gen_build_index.py --ratified-order
+```
+
 The owner's terminal commit is admitted under every value, and is how a drafted reorder of ratified
 rows becomes binding. The refusal reads `plan order — refused · <a> before <b> at HEAD, after it
 staged · <value>: <remedy>`, the remedy `the planner proposes, the owner commits from a terminal`.
@@ -159,7 +183,7 @@ any record, and the priority band is the unit the owner sets (§8 F8).
 | Item | Witnessed when | Evidence printed |
 |---|---|---|
 | `item.plan.input` | the build's claim `refs/gov/claims/<slug>` resolves and carries a `content-key` | the key, and the request record `refs/gov/requests/<key>`'s sha where one exists |
-| `item.plan.research` | a record of kind `research` under the build's folder serves one of its ids, read by `read_bindings` (`tools/memory-tree/tree_lib.py:471`) | its path |
+| `item.plan.research` | `gen_build_index.py --print-bindings`, run as a subprocess with the memory-tree kit found through the loop kit's inline `resolve_kit_dir` block, prints an `S` row of kind `research` whose path is under the build's folder and whose ids name one of the build's; its exit 2 is `unwitnessed` naming the refusal | its path |
 | `item.plan.place` | `PLAN.md` lists the build | `placed · priority <n>`, or `unplaced`, the outcome `plan.unplaced` routes |
 | `item.plan.lease` | `unattended.sh --claims` prints a live row for the build held by this node | the row; `unarmed` while it prints `claims: off` (`tools/unattended/unattended.sh:2082`) |
 
@@ -190,7 +214,7 @@ repository whose plan view lists no row admits every commit.
 
 ### Files touched (estimate)
 
-- `tools/roles/agents/gov-planner.agent.md`: S1's two paragraphs
+- `tools/roles/agents/gov-planner.agent.md`: S1's body paragraph and `never` entries
 - `.claude/agents/gov-planner.md`: its render, by `render_agents.py --write`
 - `tools/loop/loop.toml`: the `plan` workflow row where absent; four stand-in rows deleted
 - `tools/loop/plan_items.py` (new): S5, S6 and their plants
@@ -229,10 +253,13 @@ repository whose plan view lists no row admits every commit.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `grep -oE "planner-drafts-owner-ratifies|planner-within-themes|owner-orders|plan.triage-judge"`
-  runs over the rendered `gov-planner.md` and the output is sorted unique, it prints the four names,
-  and `python tools/roles/check_roles.py` exits 0 with the body under its ceiling.
-  Red when: the body omits a value or the triager's job, or grows past `BODY_CEILINGS`.
+- **AC1** — When `grep -oE "planner-drafts-owner-ratifies|planner-within-themes|owner-orders"` runs over
+  the `## Never` section of the rendered `gov-planner.md` and the output is sorted unique, it prints
+  the three values; `grep -c "plan.triage-judge"` over the body prints at least 1; and `python
+  tools/roles/check_roles.py` exits 0, naming no R5 or R13 line for `gov-planner`, with the body under
+  its ceiling.
+  Red when: a limit sits in the body, where R5 reds it, the `never` field omits a value or names an
+  enforcer R13 refuses, the body omits the triager's job, or it grows past `BODY_CEILINGS`.
 - **AC2** — When `python loop_lib.py --check` and `python tools/roles/check_roles.py` run at the pass
   tip, both exit 0 and `read_workflow_order` lists `plan` with order 0 and step `step.plan`.
   Red when: the roles kit lists a `plan` workflow the loop definition holds no row for.
@@ -336,14 +363,20 @@ New arm: tools/loop/plan_items.py · covers AC7 AC8 · the `--fixture` plants, t
   .md:164-206, the walkthrough's P1 to P4, TOOL-dBoundRoles-1, TOOL-dDeclaredLoop-1, -12 and -13,
   TOOL-dPlacedRequest-1, -19 and -21 at base, and scout B's row -2.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-21`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-28 · S1 · S3 · AC1 · §3 · §4 · §10 · re-grounded on the parents at `d1721ef20` by the
+  cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, rows 6, 7 and
+  8: the planner's limits move from the body to its `never` entries, enforced by S4's block, and AC1
+  reads them there; `plan.authority` is read through TOOL-dTotalRecall-8 S10's `read_policy_value`;
+  `item.plan.research` reads `gen_build_index.py --print-bindings` by subprocess, not `read_bindings`.
 
 ## 10. Reuse audit
 
 The seams: the policy guard block's terminal proof (`.githooks/pre-commit:186-224`), which S4 copies
-in shape and does not widen; the generator's front-matter parser and its policy-kit import
-(`parse_front_matter` :405, `read_slot_mode` :2283), beside which S3 sits so the order is computed
-once; TOOL-dBoundRoles-1's planner file and entry; TOOL-dDeclaredLoop-12's rows and -13's stand-in
-list; dPlacedRequest's claim, request record and content key; `read_bindings`; and `unattended.sh
+in shape and does not widen; the generator's front-matter parser
+(`parse_front_matter` :405), beside which S3 sits so the order is computed once, and
+TOOL-dTotalRecall-8 S10's `read_policy_value` for its policy read, `read_slot_mode` (:2283) being an
+in-process import and no precedent; TOOL-dBoundRoles-1's planner file and entry; TOOL-dDeclaredLoop-12's rows and -13's stand-in
+list; dPlacedRequest's claim, request record and content key; `gen_build_index.py --print-bindings`; and `unattended.sh
 --claims`. `python tools/codebase-map/reuse_lookup.py "refuse an agent commit that reorders the
 ratified build priority order unless the owner commits from a terminal"` ranked name stems (`build`,
 `build_commit`, `CensusRefused`, `owners_of`); none judges an order, so no existing seam fits the

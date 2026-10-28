@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-3 — triage as `plan.triage` says: declared rules, the planner judging the rest
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 10 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0371@3ec4f25f whole
 **Carries:** node:policy-key.plan.triage
@@ -15,7 +15,11 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-3-deviation-31.md](../build/2026-10-28-build-TOOL-dRankedPlan-3-deviation-31.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -69,22 +73,33 @@ by its labels (walkthrough:380-383).
   Observed by AC1, AC3, AC4.
 - **S5** — The triage record, `record-kind.triage`, I12. Registered by `python
   tools/memory-tree/record_kinds.py new triage` (TOOL-dTotalRecall-1 S9) with the fields `Value`,
-  `Rules`, `Asks`, `Rows`, `Judged`, `Batch` and `Ratified`, and written through `gov_record.py new
-  triage` (TOOL-dTotalRecall-2), one record per pass per home build that the pass decided an ask in.
-  `Rows` is `<n> rows · <key>`, the key `derive_section_sha` (`tools/roles/handoff.py:307`) over the
-  rendered rows joined by LF. Observed by AC3, AC7.
+  `Rules`, `Asks`, `Rows`, `Judged`, `Batch` and `Ratified`, its `writer` the factory and its flags,
+  `build_records.py --build <slug> --unit <id> <triage's field flags>`, in the form of the `deviation`
+  row's writer (TOOL-dTotalRecall-1 §4), as that section spells a typed kind's
+  writer whose owning spec names no command of its own. The door `gov_record.py new triage`
+  (TOOL-dTotalRecall-2 S1) is that factory's adapter, which its S2 admits, and `triage.py` writes
+  through it, one record per pass per home build that the pass decided an ask in. `Rows` is `<n> rows
+  · <key>`, the key memory-tree's own `derive_content_key` (TOOL-dTotalRecall-2 S5,
+  `tools/memory-tree/build_records.py`, the shape of `derive_section_sha`) over the kind name `triage`
+  and the rendered rows in order. Observed by AC3, AC7.
 - **S6** — The batch ratification, the owner breakpoint of `owner-batches`. `triage.py ratify
-  <record>` calls `read_plan_ratification(<home>)` (TOOL-dRankedPlan-9, I6), the home being the build
-  whose folder holds the record. With no witness it exits 1, `triage — <home> batch held: <why>`, the
-  predicate's own reason, and writes nothing. With one it
+  <record>` asks `read_plan_ratification` (TOOL-dRankedPlan-9, I6) by running its CLI form `ratify.py
+  <home>` as a subprocess argv list, the loop kit found through `backlog.resolve_kit_dir`, since a kit
+  imports no sibling kit (PLAY-dOrderedCharter-7 §4; TOOL-dRankedPlan-22 S1), the home being the
+  build whose folder holds the record. Exit 0 is a witness, its `ratified —` line read for the value
+  and witness. On exit 1 it exits 1, `triage — <home> batch held: <why>`, the predicate's own
+  `unratified —` reason, and writes nothing; on exit 2 it exits 2 naming the refusal. With one it
   re-derives the batch's rows at HEAD from the record's `Rules` blob and `Judged` field, refuses with
   exit 1 when their key differs from `Rows` (`triage — batch moved; run pass again`), and otherwise
   writes the rows and a second triage record of the same home with `Batch` `ratified` and `Ratified`
   the value and witness. Observed by AC3.
 - **S7** — The dupes record, `record-kind.dupes`. Registered by `python
   tools/memory-tree/record_kinds.py new dupes` with the fields `Input`, `Matched`, `Finding` and
-  `Overlap`, its writer `gov_record.py new dupes`. `python tools/loop/plan_items.py dedupe --build
-  <slug> --record` writes one from TOOL-dRankedPlan-2's `check_plan_dupes` finding: `Input` the
+  `Overlap`, its `writer` the factory and its flags, `build_records.py --build <slug> --unit <id>
+  <dupes's field flags>`, as S5's. `python tools/loop/plan_items.py dedupe --build <slug> --record` writes one
+  through the door, running `gov_record.py new dupes` as a subprocess with the memory-tree kit found
+  through the loop kit's inline `resolve_kit_dir` block, since a kit imports no sibling kit
+  (PLAY-dOrderedCharter-7 §4), from TOOL-dRankedPlan-2's `check_plan_dupes` finding: `Input` the
   claim's content key, `Matched` `none` or each `<build|ask> <id>` matched, `Finding` `none` or
   `duplicate`, and `Overlap` `unmeasured` until dIndexedDesign's design index lands. Observed by AC7,
   AC12.
@@ -130,7 +145,7 @@ by its labels (walkthrough:380-383).
 - **consumes-from** `TOOL-dRankedPlan-2` — `gov-planner`, the slot whose return S3 schema-checks as `plan.triage-judge`
 - **consumes-from** `TOOL-dRankedPlan-2` — `check_plan_dupes`, the dedupe finding S7 records as the dupes record, and `read_plan_item_witness` in `tools/loop/plan_items.py`, which S11 extends to arm `item.plan.dedupe`, `item.plan.triage-rule` and `item.plan.triage-judge`
 - **consumes-from** external — dDeclaredLoop: the eleven Plan item rows (TOOL-dDeclaredLoop-12 S2) and the `[[stand-in]]` rule (TOOL-dDeclaredLoop-13 §4, S8) S11 follows
-- **consumes-from** external — dTotalRecall, built before this build run: `record_kinds.py new` (TOOL-dTotalRecall-1 S9) and `gov_record.py new` with `write_new_record` (TOOL-dTotalRecall-2 S1)
+- **consumes-from** external — dTotalRecall, built before this build run: `record_kinds.py new` and the typed kind's writer cell (TOOL-dTotalRecall-1 S9, §4), and `gov_record.py new` with `write_new_record` and `derive_content_key` (TOOL-dTotalRecall-2 S1, S2, S5)
 - **consumes-from** external — dGroundRules, landed: `policy.py get` and `policy.py lists --write`
 - **hands-off** `TOOL-dRankedPlan-28` — the `triage` and `dupes` rows of `record-kinds.toml`, which that unit registers in the binding reader, the factory table and the HYGIENE kind list (round-1 spec audit, id 28)
 - **hands-off** `TOOL-dRankedPlan-29` — `triage.py`'s policy read and its row writer, which that unit's S6 to S8 and S17 correct (round-1 spec audit, ids 9, 17, 20, 44)
@@ -429,6 +444,14 @@ New arm: tools/loop/plan_items.py · covers AC12 · the `triage-witness` plant b
   (:350-353, :380-383), flow-steps.md:164-190, TOOL-dDeclaredLoop-15 T4 to T6, scout B's row -3, and
   TOOL-dRankedPlan-2's hand-off of `check_plan_dupes` and the three items to arm (its §8 F7).
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-28`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-28 · S5 · S6 · S7 · §3 · §10 · re-grounded on the parents at `d1721ef20` by the cross-check
+  record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, rows 12 and 15: the
+  `triage` and `dupes` rows' writer is the factory and its flags, `gov_record.py new <kind>` staying
+  the door's adapter call, and the loop kit runs that door by subprocess; the `Rows` key is
+  memory-tree's `derive_content_key`, not the roles kit's `derive_section_sha`. S6 asks the predicate
+  by running `ratify.py <home>` as a subprocess, matching TOOL-dRankedPlan-22 S1 (writer-found, not a
+  record row). S5 and S7 spell the writer cell in the `deviation` row's form, with no `new`, since no
+  parent claims a generic `new` verb on the factory (TOOL-dTotalRecall-1 §4).
 
 ## 10. Reuse audit
 
@@ -436,8 +459,9 @@ The seams extended are the backlog grammar's renderers and fold (`render_sev_row
 `render_status_row` and `render_scope_row` at `tools/memory-tree/backlog.py:1528-1540`,
 `derive_statuses` and `derive_evidence`), the grade `--asks` prints (`build_grade_row` at
 `tools/memory-tree/gen_build_index.py:3599`), the declared `ASK_CUTOFF`, the record-kind factory and
-door (TOOL-dTotalRecall-1 S9, TOOL-dTotalRecall-2 S1), and `derive_section_sha`
-(`tools/roles/handoff.py:307`) for the batch key. `python tools/codebase-map/reuse_lookup.py "apply
+door (TOOL-dTotalRecall-1 S9, TOOL-dTotalRecall-2 S1), and memory-tree's own `derive_content_key`
+(TOOL-dTotalRecall-2 S5), the shape of the roles kit's `derive_section_sha`
+(`tools/roles/handoff.py:307`), for the batch key, since a kit imports no sibling kit. `python tools/codebase-map/reuse_lookup.py "apply
 declared rules to label backlog asks with a severity and record the rule"` ranked name stems
 (`records`, `declares`, `render_ask_row`, `derive_ask_locators`); none applies a rule to an ask, so no
 existing seam fits the rule engine and S1 adds it beside the renderers. The driver's

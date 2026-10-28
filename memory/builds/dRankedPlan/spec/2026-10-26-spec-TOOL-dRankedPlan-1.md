@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-1 — `priority:` beside `parents:`, and the generated plan view `PLAN.md`
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 2 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0369@9f2afd12 whole
 **Carries:** node:policy-key.plan.unplaced
@@ -15,7 +15,12 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-reuse-scout-b.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-15 |
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-27-build-TOOL-dRankedPlan-1-departures-spec.md](../build/2026-10-27-build-TOOL-dRankedPlan-1-departures-spec.md) | journal | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-1-crosscheck-returns.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-crosscheck-returns.md) | research | — |
 | [2026-10-28-build-TOOL-dRankedPlan-1-departures-spec.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-departures-spec.md) | journal | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-deviation-11.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-deviation-11.md) | deviation | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-reground-returns.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-reground-returns.md) | research | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-1-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-1-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-2-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-2-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-3-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-3-spec-writer.md) | journal | — |
@@ -24,6 +29,10 @@
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md) | research | TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-9 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md) | research | — |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-1-spec-reviewer.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-1-spec-reviewer.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-2-spec-writer.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -72,10 +81,11 @@ is generated from those declarations. This unit adds the `priority:` key, render
   selector (:1036) name `PLAN.md` beside `LIVE.md`; the structure tree of
   `tools/memory-tree/HYGIENE.template.md` (:20) gains its line, rendered to `memory/HYGIENE.md`; and
   `.gitattributes` gains `memory/PLAN.md merge=ours` beside `LIVE.md`'s (:90). Observed by AC8.
-- **S6** — `plan.unplaced`, read once per run by `read_plan_unplaced(root)` through the policy reader,
-  `resolve("plan.unplaced", root)` (`tools/policy/policy.py:752`), the kit found by
-  `backlog.resolve_kit_dir("policy", "budgets.py", …)` as `read_slot_mode` (:2283) finds it. No kit, or
-  a refusal, reads the default `warn` and prints its reason once. Under `warn`, every `plan()` run prints
+- **S6** — `plan.unplaced`, read once per run by `read_plan_unplaced(root)` through the memory-tree
+  kit's policy adapter, `read_policy_value("plan.unplaced", root)` in `tools/memory-tree/policy_value.py`
+  (TOOL-dTotalRecall-8 S10), which runs `policy.py get` as a subprocess (PLAY-dOrderedCharter-7 §4 "The
+  policy reads"). Its `PolicyRefused`, raised on the reader's exit 2 or with no policy kit found, reads
+  the default `warn` and prints the refusal's line once. Under `warn`, every `plan()` run prints
   `build-index: plan.unplaced warn — <n> live build(s) carry no priority: <slugs>`; under `review-only`
   it prints nothing, the view's `## Unplaced` list being what Plan Review reads; under `refuse-new` it
   prints nothing and S7 refuses. The view's bytes are the same under every value. Observed by AC5, AC6
@@ -113,7 +123,7 @@ is generated from those declarations. This unit adds the `priority:` key, render
 - **hands-off** `TOOL-dRankedPlan-5` — `PLAN.md`, the view the live-build mapping's dispositions show in
 - **hands-off** `TOOL-dRankedPlan-7` — `PLAN.md`, whose first placed row is the plan's next item and whose `## Unplaced` heading ends the placed rows
 - **consumes-from** external — dTotalRecall: `FRONT_MATTER_KEYS` and its value types (TOOL-dTotalRecall-4 S1, S2), the `build-readme` row (TOOL-dTotalRecall-1 S3)
-- **consumes-from** external — dGroundRules: the policy reader `resolve` and the catalogue row of `plan.unplaced`
+- **consumes-from** external — dTotalRecall: `read_policy_value`, the memory-tree kit's policy adapter (TOOL-dTotalRecall-8 S10); dGroundRules: `policy.py get` and the catalogue row of `plan.unplaced`
 - **hands-off** `TOOL-dRankedPlan-29` — `read_new_build_args`, `cmd_new_build` and the plan view's generated row and docs, which that unit's S13, S24, S28, S31, S35 and S37 correct (round-1 spec audit, ids 15, 29, 34, 36, 45, 47)
 
 ## 4. Design
@@ -128,8 +138,10 @@ is generated from those declarations. This unit adds the `priority:` key, render
   and keeps ONE table "because the kickoff card counts rows under one header" (:2100): the card's `live
   —` cell counts every table row of `LIVE.md` but its header (`skills/session-kickoff/manifest-check.sh:529`),
   46 at base.
-- `read_slot_mode` (:2283-2307) is the generator's one policy read today, through the policy kit's
-  `budgets` module and the kit lookup in `backlog.py`.
+- `read_slot_mode` (:2283-2307), the generator's one policy read today, inserts the policy kit into
+  `sys.path` and imports `budgets` (:2293-2296), an in-process import of a sibling kit, which
+  PLAY-dOrderedCharter-7 §4 rules out ("A kit may not import a sibling kit"), so S6 does not copy it and
+  reads through TOOL-dTotalRecall-8 S10's adapter instead.
 
 ### The view
 
@@ -293,14 +305,19 @@ New arm: tools/memory-tree/check-memory-hygiene.sh · covers AC8 · the memory-h
 - rev-1 · 2026-10-26 · initial draft, from the packet's Items 1, the brief's I1 and I2, scout A's row 1,
   walkthrough P1 and P2, flow-steps.md:186, and the probe of §8 F2.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-28 · S6 · §3 · §4 · §10 · re-grounded on the parents at `d1721ef20` by the cross-check
+  record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, row 3: `plan.unplaced` is read
+  through TOOL-dTotalRecall-8 S10's `read_policy_value`, a `policy.py get` subprocess, and no longer
+  by an in-process `resolve` copied from `read_slot_mode`.
 
 ## 10. Reuse audit
 
 The seams extended are `parse_front_matter` (`tools/memory-tree/gen_build_index.py:405`) with the strict
 parse of `_parse_order` (:458) as its model, the build dict's `parents` (:1212) and `plan()`'s edge
 inversion (:2686-2698), `render_live` (:2079) whose dormancy derivation S3 extracts and shares,
-`plan()`'s artifact map (:2807), `check_index_input` (:894), and `read_slot_mode` (:2283) as the one
-policy-read pattern of the generator. `python tools/codebase-map/reuse_lookup.py "render a generated
+`plan()`'s artifact map (:2807), `check_index_input` (:894), and TOOL-dTotalRecall-8 S10's
+`read_policy_value` adapter for the policy read, `read_slot_mode` (:2283) being an in-process import
+and no precedent. `python tools/codebase-map/reuse_lookup.py "render a generated
 view file of live builds ordered by a front matter key"` ranked name stems (`key`, `live`, `build`,
 `render`); none renders an ordered view of builds, so no existing seam fits the view itself and S3 adds
 it beside `render_live`. Scout A's cites (`:405`, `:458`, `:213`, `:1212`, `:2079`, `:2807`, `:894`,

@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-22 — the session-scoped ratification predicate is asked only at the act it ratifies, gated over the tree
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 6 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,11 @@
 |---|---|---|
 | [2026-10-26-build-TOOL-dRankedPlan-22-deviation-221.md](../build/2026-10-26-build-TOOL-dRankedPlan-22-deviation-221.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md](../build/2026-10-27-build-TOOL-dRankedPlan-19-promoted-fix-return.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-22-deviation-222.md](../build/2026-10-28-build-TOOL-dRankedPlan-22-deviation-222.md) | deviation | — |
 | [2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md](../prompts/2026-10-27-prompt-TOOL-dRankedPlan-19-promoted-fix-brief.md) | research | TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
 | [2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md) | spec-audit | TOOL-dRankedPlan-27 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-21 TOOL-dRankedPlan-20 TOOL-dRankedPlan-19 TOOL-dRankedPlan-28 TOOL-dRankedPlan-23 TOOL-dRankedPlan-29 |
 
 <!-- /gen:spec-records -->
@@ -35,20 +39,25 @@ tree refuses every other caller, so neither instance nor a later one can ship.
   repository-relative files whose call of the predicate is the act it ratifies:
   `tools/loop/ratify.py`, where `TOOL-dRankedPlan-10`'s `derive_plan_exit_ratification` answers at the
   `plan.exit` move, and `tools/memory-tree/triage.py`, where `TOOL-dRankedPlan-3` S6 asks at the
-  owner-batches write. Each entry carries its reason in a comment beside it. Observed by AC2.
+  owner-batches write. A kit imports no sibling kit (PLAY-dOrderedCharter-7 §4), so `triage.py` asks
+  by running `ratify.py <home>`, the predicate's CLI form, as a subprocess argv list, the loop kit found
+  through `backlog.resolve_kit_dir`. Each entry carries its reason in a comment beside it. Observed by
+  AC2.
 - **S2** — The check. `check_predicate_callers(root)` in `ratify.py`, run as `python
   tools/loop/ratify.py --check-callers [--root <dir>]`, reads every tracked `*.py`, `*.sh` and `*.js`
   file and every file under `.githooks/` through `git ls-files`. A caller is a code line, one whose
   first non-blank characters are not `#` or `//`, that matches `\bread_plan_ratification\s*\(`, or a
   shell line invoking `ratify.py` with no argument that begins `--`, the predicate's own CLI form
-  (`TOOL-dRankedPlan-9` S1). A caller outside S1's set prints `ratify — <path>:<line> asks the
+  (`TOOL-dRankedPlan-9` S1), or a Python argv list naming `ratify.py` with no element that begins
+  `--`, the subprocess form a sibling kit's call takes. A caller outside S1's set prints `ratify — <path>:<line> asks the
   session-scoped predicate after its act; read the crossing record instead` and the check exits 1;
   otherwise it prints `ratify — callers: <n> file(s), each at the act` and exits 0. Exit 2 when git
   cannot list the tree. Observed by AC1 and AC3.
 - **S3** — The arm. `tools/loop/selftest.py` runs S2 over the repository it runs in, and the plant
   `caller-guard` of `ratify.py --fixture`: a scratch repository whose `.githooks/pre-commit` calls
-  `read_plan_ratification(` is refused naming that file, and the same line in a planted
-  `tools/memory-tree/triage.py` is admitted. Observed by AC1 and AC3.
+  `read_plan_ratification(` is refused naming that file; a planted `tools/memory-tree/triage.py`
+  running `[sys.executable, str(kit / "ratify.py"), home]` is admitted; and the same argv list in a
+  planted `tools/memory-tree/gen_build_index.py` is refused naming that file. Observed by AC1 and AC3.
 - **S4** — `tools/loop/README.md`'s paragraph on `ratify.py` (`TOOL-dRankedPlan-9` S9) names the rule
   and `--check-callers`. Observed by AC4.
 
@@ -80,6 +89,8 @@ tree refuses every other caller, so neither instance nor a later one can ship.
   batch write), `TOOL-dRankedPlan-2` S3 (at commit, after the act) and `TOOL-dRankedPlan-15` S5 (at
   Design's read, after the act); `TOOL-dRankedPlan-5` S4 runs the CLI by hand in its pass, a session
   act and no tracked caller.
+- PLAY-dOrderedCharter-7 §4 (its spec :202-205): a kit may not import a sibling kit, and reaches it by
+  running its CLI; so a caller outside the loop kit is an argv list naming `ratify.py`, and S2 counts it.
 - The repository's precedent for a banned construct gated over the tracked tree is
   `tools/workflows/check-review-join.sh`, which judges code lines only so its own documentation of
   the ban does not red it (its header, lines 25-28).
@@ -141,8 +152,10 @@ close's bar reads only after that unit has landed.
 
 - **AC1** — When `python ratify.py --fixture --plant caller-guard` runs, the planted
   `.githooks/pre-commit` caller is refused with exit 1 naming `.githooks/pre-commit` and its line, and
-  the planted caller at the memory-tree kit's `triage.py` is admitted.
-  Red when: a commit-time hook may ask the predicate, or a declared act is refused.
+  the planted argv-list caller at the memory-tree kit's `triage.py` is admitted, and the same argv list
+  in its `gen_build_index.py` is refused naming that file.
+  Red when: a commit-time hook may ask the predicate, the subprocess form escapes the check, or a
+  declared act is refused.
 - **AC2** — When a probe imports `ratify.py` and prints `SESSION_PREDICATE_CALLERS`, it lists exactly
   two paths, the loop kit's `ratify.py` and the memory-tree kit's `triage.py`, as S1 spells them.
   Red when: a later reader is declared as an act.
@@ -175,6 +188,7 @@ New arm: tools/loop/selftest.py · covers AC1 AC3 · the `caller-guard` plant an
 - rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit's finding 37 (HIGH, item
   H2, shared with finding 3), repairing `TOOL-dRankedPlan-2`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-30`, the hands-off edge to `TOOL-dRankedPlan-31`, the hands-off edge to `TOOL-dRankedPlan-32`, the hands-off edge to `TOOL-dRankedPlan-37`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
+- rev-3 · 2026-10-28 · §2 S1, S2, S3 · §4 Evidence · §6 AC1 · re-grounded by the cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, row 47: the memory-tree kit's `triage.py` asks by running `ratify.py <home>` as a subprocess, never in process (PLAY-dOrderedCharter-7 §4), and S2 counts that argv-list form as a caller.
 
 ## 10. Reuse audit
 

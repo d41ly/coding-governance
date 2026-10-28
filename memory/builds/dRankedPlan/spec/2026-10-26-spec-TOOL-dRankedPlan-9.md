@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-9 — the ratification predicate: the session's owner-origin intake read as the plan's ratification by `plan.ratification`
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0377@a78b3ac9 whole
 **Carries:** node:policy-key.plan.ratification
@@ -14,8 +14,12 @@
 | [2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dRankedPlan-1-spec-stage-returns.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-26-build-TOOL-dRankedPlan-9-deviation-91.md](../build/2026-10-26-build-TOOL-dRankedPlan-9-deviation-91.md) | deviation | — |
 | [2026-10-27-build-TOOL-dRankedPlan-9-deviation-92.md](../build/2026-10-27-build-TOOL-dRankedPlan-9-deviation-92.md) | deviation | — |
+| [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
+| [2026-10-28-build-TOOL-dRankedPlan-9-deviation-93.md](../build/2026-10-28-build-TOOL-dRankedPlan-9-deviation-93.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
+| [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -34,8 +38,12 @@ request record stands in, and every witness says so.
 ## 2. Scope (IN)
 
 - **S1** — The predicate, I6. `read_plan_ratification(slug, root=".", why=None) -> (value, witness)` in
-  the new module `tools/loop/ratify.py`. `value` is `plan.ratification`, read once through the policy
-  reader, `resolve("plan.ratification", root)` (`tools/policy/policy.py:752`); `witness` is the line
+  the new module `tools/loop/ratify.py`. `value` is `plan.ratification`, read once by
+  `read_policy_value("plan.ratification", root)`, a function of `ratify.py` built to
+  PLAY-dOrderedCharter-7 §4 "The policy reads": it runs `<sys.executable> <policy kit>/policy.py get
+  <key>` as a bounded subprocess with `root` as its working directory, the policy kit found through
+  the loop kit's inline `resolve_kit_dir` block, and raises `PolicyRefused` on exit 2 or with no kit
+  found, since a kit imports no sibling kit; `witness` is the line
   naming the evidence that ratifies the build's plan, or `None` when nothing does, the reason then
   appended to `why` when a list is given, as `render_handoff` appends its notes. A refused policy read
   raises, so no reader takes a refusal for a value. The CLI `python tools/loop/ratify.py <slug>` prints
@@ -55,11 +63,15 @@ request record stands in, and every witness says so.
   each file's stem its key. Witness `hook-keyword <key> · ratify <slug> · log stand-in`. Observed by AC3.
 - **S4** — `terminal-command`. The plan is ratified when the build's `build/` folder holds a
   disposition record (TOOL-dDeclaredLoop-16 S4) whose `Item` is `item.plan.exit` and whose `Channel` is
-  `terminal`, read by the record factory's `read_record` (PLAY-dOrderedCharter-7 S7) and admitted by
+  `terminal`, found with `gov_record.py find --kind disposition --build <slug>` and read with
+  `gov_record.py show` (TOOL-dTotalRecall-9 S3, S5), run as subprocesses through the inline
+  `resolve_kit_dir` block as TOOL-dRankedPlan-24 S1's reader runs them, and admitted by
   `check_disposition_record` (TOOL-dDeclaredLoop-16 S5). Witness `terminal-command <record path>`.
   Observed by AC4.
 - **S5** — `signed-commit`. The plan is ratified when the newest commit that touched the build's plan
-  record, the file `find_plan_record` returns (TOOL-dRankedPlan-16 S4), passes `git verify-commit`,
+  record, the file `find_plan_record` returns (TOOL-dRankedPlan-16 S4), reached from the loop kit by
+  the memory-tree verb §8 F6 settles, run as a subprocess through the inline `resolve_kit_dir` block,
+  passes `git verify-commit`,
   whose trust is the repository's configured signers. Witness `signed-commit <sha8>`; no plan record,
   or a commit git does not verify, is unratified with the first line git printed. Observed by AC5.
 - **S6** — The stand-in and its hand-over. `INTAKE_STAND_IN` in `ratify.py` names the log the `request`
@@ -99,8 +111,8 @@ request record stands in, and every witness says so.
 - **hands-off** `TOOL-dRankedPlan-15` — `read_plan_ratification`, which says whether a plan revision was ratified as the plan is
 - **hands-off** `TOOL-dRankedPlan-5` — `read_plan_ratification`, the witness a live-build mapping record needs before it is written
 - **consumes-from** external — dPlacedRequest: `read_claim_body` (TOOL-dPlacedRequest-21 S2), `--request-consent` (TOOL-dPlacedRequest-5 S3), the request files (TOOL-dPlacedRequest-19 S2, S5; TOOL-dPlacedRequest-31 S2)
-- **consumes-from** external — dDeclaredLoop and dOrderedCharter: the disposition record and `check_disposition_record` (TOOL-dDeclaredLoop-16 S4, S5), the factory's `read_record` (PLAY-dOrderedCharter-7 S7)
-- **consumes-from** external — dGroundRules: the policy reader `resolve` and `plan.ratification`'s catalogue row
+- **consumes-from** external — dDeclaredLoop and dTotalRecall: the disposition record and `check_disposition_record` (TOOL-dDeclaredLoop-16 S4, S5), `gov_record.py find` and `show` (TOOL-dTotalRecall-9 S3, S5)
+- **consumes-from** external — dGroundRules and dOrderedCharter: `policy.py get` and `plan.ratification`'s catalogue row, read by subprocess to PLAY-dOrderedCharter-7 §4's contract
 - **hands-off** `TOOL-dRankedPlan-22` — `read_plan_ratification` and its CLI form, whose callers that unit bounds to the act they ratify (round-1 spec audit, id 37)
 - **hands-off** `TOOL-dRankedPlan-24` — the `terminal-command` arm and `ratify.py --fixture`, which that unit re-points to the bounded `read_item_disposition` (round-1 spec audit, id 21)
 - **hands-off** `TOOL-dRankedPlan-26` — the `terminal-command` arm, which that unit holds on a disposition of `ask` or `none` (round-1 spec audit, id 39)
@@ -116,8 +128,10 @@ request record stands in, and every witness says so.
   dRankedPlan, and no code reads it.
 - No prompt-submit hook exists: `.claude/settings.json` registers no `UserPromptSubmit`, and no file
   under `tools/` or `skills/` names one (scout B, verified at base by `git grep`).
-- The policy kit's reader coverage counts a key as read only by a call whose first argument is the key
-  in quotes (`help/policy.md:132-137`), so S1 spells `resolve("plan.ratification", root)`.
+- The policy kit's reader coverage counts a Python read only as a call whose first argument is the key
+  in quotes (`help/policy.md:132-137`; the first row of `READER_SHAPES`,
+  `tools/policy/check_policy.py:423-427`), so S1 spells `read_policy_value("plan.ratification", root)`;
+  an argv list naming the key is no call of that shape, and its shell row reads `.sh` files only.
 - The consent predicate refuses a session that only received a key: "a relayed request is data with
   provenance and never consent" (TOOL-dPlacedRequest-19 S5), the rule FR-1's "never relayed by an
   agent" asks for.
@@ -146,7 +160,8 @@ request record stands in, and every witness says so.
 | Minted | Kind | Lexicon cell |
 |---|---|---|
 | `tools/loop/ratify.py` | module | none |
-| `read_plan_ratification` | function | `py.function`, asked at the pass |
+| `read_plan_ratification`, `read_policy_value` | functions | `py.function`, asked at the pass |
+| `PolicyRefused` | exception class | none declared |
 | `RATIFY_KEYWORD`, `INTAKE_STAND_IN` | constants | none declared |
 | `--fixture`, `--plant` | flags of `ratify.py` | none |
 | the five plants of §4 | fixture cases | none |
@@ -257,6 +272,20 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · `ratify.py 
   catalogue default `request`. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3: the charter's
   `[security]` rule denies by default, and a ratification is the mandate for every later step.
   widens: none · relaxes: none
+- **F6 — By which memory-tree verb does `ratify.py` find the build's plan record?** The loop kit
+  imports no sibling kit (PLAY-dOrderedCharter-7 §4), and `plan_record.py` holds only `check` and
+  `field` (TOOL-dRankedPlan-16 S3, S4), neither printing the path `find_plan_record` returns. Options:
+  (a) an ask of this build's TOOL-dRankedPlan-16 for `plan_record.py path <slug>`, printing
+  `find_plan_record`'s answer, exit 1 for no record and 2 for two, as `field` exits; (b)
+  `gov_record.py find --kind plan --build <slug>` (TOOL-dTotalRecall-9 S3), taking its one row's path,
+  which reads the record index rather than the row's home, so its answer can differ from
+  `find_plan_record`'s; (c) a `requires_if` row for `memory-tree` on `tools/loop/kit.toml`, a
+  declaration `govkit selfcheck` grades and that installs nothing (`tools/memory-tree/kit.toml:8`), so
+  `ratify.py` would still load memory-tree code in process. (a) keeps one locator for every reader of
+  the plan record; (b) adds a second. Recommendation: (a). The ask the build run files against
+  TOOL-dRankedPlan-16: accept `python tools/memory-tree/plan_record.py path tFix` prints the record's
+  path and exits 0, 1 with none and 2 with two, seen on its AC7 fixture. TOOL-dRankedPlan-15 S2 reads
+  the record through the same verb. Open for the owner.
 
 ## 9. Revision log
 
@@ -264,14 +293,21 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · `ratify.py 
   FR-1, v2:401 and v2:1224, and TOOL-dPlacedRequest-5, -19, -21 and -31.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-22`, the hands-off edge to `TOOL-dRankedPlan-24`, the hands-off edge to `TOOL-dRankedPlan-26`, the hands-off edge to `TOOL-dRankedPlan-29`, each the reciprocal of that promoted unit's own edge (round-1 spec audit, `reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md`); no other section moves.
 - rev-3 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-33`, each the reciprocal of that promoted unit's own edge (spec audit of units 19 to 29, `reviews/2026-10-27-review-TOOL-dRankedPlan-19-spec-audit.md`); no other section moves.
+- rev-4 · 2026-10-28 · S1 · S4 · S5 · §3 · §4 · §8 · §10 · re-grounded on the parents at `d1721ef20` by the
+  cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, rows 21 and 22:
+  `plan.ratification` is read by a `policy.py get` subprocess, not an in-process `resolve`; the
+  disposition records are read through `gov_record.py find` and `show` by subprocess, not `read_record`;
+  the plan record is reached by the verb F6, opened for the owner, settles.
 
 ## 10. Reuse audit
 
 The seams extended are dPlacedRequest's consent predicate, through the read-only verb
 `--request-consent` (TOOL-dPlacedRequest-5 S3) over the request files (TOOL-dPlacedRequest-19 S2, S5),
 its claim reader `read_claim_body` (TOOL-dPlacedRequest-21 S2), dDeclaredLoop's disposition record and
-`check_disposition_record` (TOOL-dDeclaredLoop-16 S4, S5), TOOL-dRankedPlan-16's `find_plan_record`, and
-the policy reader `resolve` (`tools/policy/policy.py:752`). `python tools/codebase-map/reuse_lookup.py
+`check_disposition_record` (TOOL-dDeclaredLoop-16 S4, S5) read through `gov_record.py find` and `show`
+(TOOL-dTotalRecall-9 S3, S5), TOOL-dRankedPlan-16's `find_plan_record` through §8 F6's verb, and the
+policy reader's `get` verb by subprocess (PLAY-dOrderedCharter-7 §4), since a kit imports no sibling
+kit. `python tools/codebase-map/reuse_lookup.py
 "decide whether a plan is ratified by the owner from a typed request record"` ranked name stems
 (`records`, `plan`, `read_records`, `plan_state`); none reads a ratification, so no existing seam fits
 the predicate and S1 adds it in the loop kit beside `claim.py`. Scout B's row named
