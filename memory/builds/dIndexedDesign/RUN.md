@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 57bc3b91861a061dc9f37529bfe41db756c24fcd · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: c20c29685a6f3efafb7dc0bee67eefa6fe63a564
 phase: REVIEWING
@@ -50,3 +51,5 @@ base: 57bc3b91861a061dc9f37529bfe41db756c24fcd
 2026-10-28T03:41:35Z rescope · item add TOOL-dIndexedDesign-37 · reason closes report id 39 at HIGH (item H4) of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md: one write-set path predicate that keeps root files, repairing TOOL-dIndexedDesign-15
 
 2026-10-28T03:41:36Z rescope · item add TOOL-dIndexedDesign-38 · reason closes the 42 MEDIUM and LOW findings of memory/builds/dIndexedDesign/reviews/2026-10-28-review-TOOL-dIndexedDesign-9-spec-audit-round1.md batched in one unit, report ids 1 2 3 4 6 7 8 9 10 11 12 13 14 15 16 17 18 22 23 24 25 26 27 29 30 31 32 34 35 36 38 40 41 42 43 44 45 46 47 48 50 51
+
+2026-10-28T04:40:31Z decision · item TOOL-dIndexedDesign-38 §8 F1: how does the build run pass the window between unit 16's pass and its first coverage-lens reading, when --dispatch refuses every unit under design.coverage refuse and design.coverage.semantic every-exit and no lens reading exists until unit 35 lands? · reason options (a) the owner commits design.coverage = warn on the run branch at unit 16's pass and restores refuse once the first lens record lands; (b) a grace in check_design_exit reading an audit record with no coverage field as WARN, which relaxes the gate for every unit audited before the lens; (c) move unit 16's S8 and S9 to the last order, a re-scope of unit 16 no repair unit may make. Refused to pick: (a) is an owner turn on a guarded policy file, (b) widens what the gate admits beyond the tier priced (veto 3), (c) amends another unit's scope; M3 parks a fork whose survivors are owner turns. Surfaced at the build run's M3 sweep before its first unit
