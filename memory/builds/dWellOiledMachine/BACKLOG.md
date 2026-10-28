@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · TOOL-dWellOiledMachine-62 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dWellOiledMachine-62 · until TOOL-dWellOiledMachine-126 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dWellOiledMachine-126 at order 76 today, closes it (README rule 1)

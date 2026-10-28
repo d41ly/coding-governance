@@ -37,6 +37,7 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-35](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | GENERATED TEXT STOPS THE LANDER ON A CONFLICT. dKeptSession's --prepare… |
 | [PLAY-dClosedLoop-36](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SURFACED-DECISIONS ATTESTATION IS A TYPED COUNT. --attest… |
 | [PLAY-dClosedLoop-37](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A SPEC RUN'S CLOSE OWES TWO STEPS THE CLOSE SECTION DOES NOT STATE. A… |
+| [PLAY-dClosedLoop-38](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PACKET OWNS NO TRANSPORT POINT. cl-dClosedLoop-0333 names a lease… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dOrderedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-56](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SLOTS NAME dBoundRoles AS THEIR RENDERER. PLAY-dOrderedCharter-17's… |
