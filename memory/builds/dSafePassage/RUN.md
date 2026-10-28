@@ -367,3 +367,11 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T10:45:00Z dispatch · item a2a7334b TOOL-dSafePassage-52 · reason memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-52.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-52-ledger.md
 
 2026-10-28T10:45:08Z brief · item TOOL-dSafePassage-52 · reason 5f27de14534a memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-52-build-brief.md
+
+2026-10-28T11:18:31Z dispatch · item e7febbd9 TOOL-dSafePassage-51 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-51.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T11:18:38Z brief · item TOOL-dSafePassage-51 · reason e693225edf56 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-51-build-brief.md
+
+2026-10-28T11:32:02Z dispatch · item e7febbd9 TOOL-dSafePassage-51 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-51.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-51-deviation-182.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T11:39:52Z dispatch · item e7febbd9 TOOL-dSafePassage-51 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-51.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-51-deviation-182.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

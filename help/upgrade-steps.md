@@ -61,8 +61,11 @@ starts it:
   too, is read the same way, and a refusal names the submodule's path beside the key. A directory
   under `modules/` counts as a submodule's repository by its shape (a `HEAD` file beside `objects/`
   and `refs/`), so a branch named `config` is never mistaken for one; a submodule repository whose
-  config git cannot read refuses the step, naming that config file, and so does a `.gitmodules`
-  that does not parse, or that is no regular file, a directory say, naming it. A submodule
+  config git cannot read refuses the step, naming that config file "or a file it includes" and
+  git's exit code, and so does a `.gitmodules` that does not parse, or that is no regular file, a
+  directory, a FIFO or a dangling link say, naming it. The walk never follows a link under
+  `modules/`, a Windows junction included: a link there, or a directory there that will not list,
+  refuses the step naming its path. A submodule
   repository git will not open, such as one of a newer repository format than the installed git
   knows, refuses the step naming its git directory, though git reads its config with only a
   warning: no step reaches its keys through git. A nested submodule's path is mapped through its parent's

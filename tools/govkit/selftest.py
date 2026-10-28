@@ -3672,7 +3672,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     for plant, want, needles in (
             ("submodule-ref-named-config", 0, ("isolation: population · ", "/.git/modules/sub · reached by sub",
                                                "fixture/status · up · ok")),
-            ("submodule-config-malformed", 1, (".git/modules/sub/config does not read",)),
+            ("submodule-config-malformed", 1, (".git/modules/sub/config or a file it includes does not read",)),
             ("gitmodules-malformed", 1, ("/.gitmodules does not read",)),
             ("submodule-nested-name-differs", 1, ("filter.canary.clean in .git/modules/nm/modules/in/config (submodule lib/p/q)",
                                                   "filter.canary.clean in .git/modules/nm/modules/in/config "
@@ -3931,11 +3931,15 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
           and "sendemail canary: absent" in out, out)
 
     # TOOL-dSafePassage-49 S8, AC10: the class arm widened to identity forms. Each kept key, and each
-    # of UNLISTED_EXECUTOR_KEYS, in a section `git help --config` lists as `<section>.<placeholder>.*`
+    # expected unlisted executor key, in a section `git help --config` lists as `<section>.<placeholder>.*`
     # also stands as `<section>.dsp49.<rest>`, and every key of both matches a row; table copies
     # without `sendemail.<x>.ccCmd` or `sendemail.sendmailCmd` name exactly that key.
+    # TOOL-dSafePassage-51 S9: the expected unlisted executor keys live here, never in the module
+    # they guard: git-send-email declares `sendmailcmd` in its option table (`:394`) and runs it
+    # through `sh -c` (`:1787`), and `git help --config` does not list it.
+    unlisted = {"sendemail.sendmailCmd"}
     placed = {m.group(1) for m in (_re.match(r"^([a-z]+)\.<[a-z]+>\.\*$", ln.strip()) for ln in hp.stdout.splitlines()) if m}
-    kept49 = [*kept, *us.UNLISTED_EXECUTOR_KEYS]
+    kept49 = [*kept, *sorted(unlisted)]
     widened = [k.split(".", 1)[0] + ".dsp49." + k.split(".", 1)[1] for k in kept49 if k.split(".", 1)[0].lower() in placed]
 
     def read_unrowed49(table) -> list:
@@ -3957,14 +3961,65 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
              "a walk copy without the rev-parse refusal", "                    if opened.returncode:",
              "                    if False:"),
             ("gitmodules-unreadable", "/.gitmodules does not read: it is no regular file",
-             "a .gitmodules read with no file test", "            if gm is None or not os.path.lexists(gm):",
-             "            if gm is None or not gm.is_file():")):
+             "a .gitmodules read with no file test", "                if not stat.S_ISREG(mode := os.stat(gm).st_mode):",
+             "                if False:")):
         rc, out = fixture(us_py, plant)
         check(f"[dSP-49] AC9 AC13 fixture isolation {plant} exits 1, refused before any spawn naming {needle}",
               rc == 1 and "isolation: FAILED" not in out and needle in out and "fixture/status · up ·" not in out, out)
         rc, out = fixture(build_staged_copy(tmp / f"dsp49-{plant}", src49.replace(old, new)), plant)
         check(f"[dSP-49] AC9 AC13 {label} reds fixture isolation {plant}",
               src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # TOOL-dSafePassage-51 AC3 to AC6, AC9: the walk's config read before its rev-parse, no link
+    # followed under modules/, the rolled-back row rule reached by move 3, the arm's unlisted key
+    # held here, and a `.gitmodules` typed by `stat` before any open. Failing cases are staged
+    # copies: a walk running rev-parse first, a walk following links, a reverse walk keeping s2
+    # rolled-back with its failure, and a read spawning `config -f` before its stat. Not run: that
+    # copy's FIFO plant on POSIX, whose blocked git would outlive the bound.
+    first51 = "                if not read_config(d, label) and work is not None:"
+    revparse51 = ('                if work is None and subprocess.run(["git", f"--git-dir={d}", "rev-parse", "--git-dir"], '
+                  "cwd=str(d), env=env, capture_output=True).returncode:\n"
+                  '                    raise Refusal(f"{d.as_posix()}: git will not open this repository")\n' + first51)
+    link51 = "if os.path.islink(c) or os.path.isjunction(c):"
+    for plant, needle, label, old, new in (
+            ("submodule-config-malformed", " exits 128, so .git/modules/sub/config or a file it includes does not read",
+             "a walk copy running rev-parse before the config read", first51, revparse51),
+            ("submodule-modules-link-loop", "/.git/modules/a/loop is a link under modules/",
+             "a walk copy following links", link51, "if False:")):
+        t51 = time.monotonic()
+        rc, out = fixture(us_py, plant)
+        check(f"[dSP-51] AC3 AC4 fixture isolation {plant} exits 1 within 60 seconds, refused naming {needle}",
+              rc == 1 and time.monotonic() - t51 < 60 and "isolation: FAILED" not in out and "Traceback" not in out
+              and needle in out, out)
+        rc, out = fixture(build_staged_copy(tmp / f"dsp51-{plant}", src49.replace(old, new)), plant)
+        check(f"[dSP-51] AC3 AC4 {label} reds fixture isolation {plant}",
+              src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+    back51 = '            state = "applied"\n'
+    p51 = subprocess.run([sys.executable, str(build_staged_copy(tmp / "dsp51-rolled-back", src49.replace(
+        back51, '            state = state or "applied"\n'))), "fixture", "rollback", "--plant", "rolled-back-witness-holds"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+    out = p51.stdout + p51.stderr
+    check("[dSP-51] AC5 a reverse-walk copy whose move 3 keeps s2 rolled-back with its failure raises Refusal naming "
+          "fx/s2 and exits non-zero", src49.count(back51) == 1 and p51.returncode != 0
+          and "Refusal: 'fx/s2': a rolled-back row carries no `failure`" in out, out[-3000:])
+    check("[dSP-51] AC6 upgrade_steps.py holds no list of the unlisted executor keys the class arm expects",
+          "UNLISTED_EXECUTOR_KEYS" not in src49, "")
+    fifo = hasattr(os, "mkfifo")
+    rc, out = fixture(us_py, "gitmodules-fifo")
+    check("[dSP-51] AC9 fixture isolation gitmodules-fifo " + ("exits 1 refused naming .gitmodules" if fifo
+                                                              else "prints its skip line and exits 0"),
+          (rc == 1 and "/.gitmodules does not read" in out and "isolation: FAILED" not in out) if fifo
+          else (rc == 0 and "isolation: skip — gitmodules-fifo" in out), out)
+    typed51 = "            try:\n                os.lstat(gm)\n"
+    for label, text, want in (("the module", src49, True), ("a read copy spawning config -f before its stat", src49.replace(
+            typed51, '            git(work, "config", "-f", ".gitmodules", "--list", ok=(0, 1))\n' + typed51), False)):
+        fn = next((n for n in _ast.walk(_ast.parse(text)) if isinstance(n, _ast.FunctionDef) and n.name == "submodule_paths"), None)
+        calls = [(n.lineno, _ast.unparse(n.func)) for n in _ast.walk(fn) if isinstance(n, _ast.Call)] if fn else []
+        typed = [ln for ln, f in calls if f in ("os.lstat", "os.stat")]
+        opened = [ln for ln, f in calls if f == "git" or f.endswith("open")]
+        got = {"os.lstat", "os.stat"} <= {f for _, f in calls} and bool(opened) and max(typed) < min(opened)
+        check(f"[dSP-51] AC9 {label}: submodule_paths types .gitmodules by lstat and stat before any spawn or open"
+              + ("" if want else " — reds"), src49.count(typed51) == 1 and got == want, f"calls: {calls}")
 
     # AC14: a key's tested subsection is redacted to its last `@`, a space or a `/` in the password
     # included; the plant is graded over the refusal's named entries, the text between
