@@ -455,3 +455,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T23:10:56Z dispatch · item 460ffb58 TOOL-dSafePassage-80 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/run-gates/selftest-budgets.txt tools/govkit/upgrade_walk.py memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-80.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-80-ledger.md
 
 2026-10-28T23:11:04Z brief · item TOOL-dSafePassage-80 · reason 61b7fee70882 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-80-build-brief.md
+
+2026-10-28T23:40:52Z rescope · item add TOOL-dSafePassage-84 · reason a red of this build's own found by TOOL-dSafePassage-78's builder (the preview and the write run answer one question two ways), adopted at once by M10
