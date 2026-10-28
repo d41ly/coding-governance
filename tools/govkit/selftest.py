@@ -3897,6 +3897,39 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         found = us.check_target_local_config(v45)
         check(f"[dSP-45] AC3 {k} = {v}: the check names {want} key(s)", len(found) == want, str(found))
 
+    # TOOL-dSafePassage-48 AC1, AC2: every send-email executor key is refused in its identity form,
+    # `sendemail.sendmailCmd` too, and a key that runs nothing is not; the eight cases are graded by
+    # the check's own predicate over one config row each, and table copies without the
+    # `sendemail.<x>.ccCmd` form or the `sendemail.sendmailCmd` row red on exactly that key.
+    cases48 = ((("sendemail.sendmailcmd", "x"), True), (("sendemail.work.sendmailcmd", "x"), True),
+               (("sendemail.work.cccmd", "x"), True), (("sendemail.work.tocmd", "x"), True),
+               (("sendemail.work.headercmd", "x"), True), (("sendemail.work.smtpserver", "/usr/bin/x"), True),
+               (("sendemail.work.to", "a@example.com"), False), (("sendemail.work.smtpserver", "smtp.example.com"), False))
+    full48, read48 = us.STEP_REFUSED_KEYS, us.read_target_local_config
+
+    def wrong48(table) -> list:
+        us.STEP_REFUSED_KEYS = table
+        try:
+            out = []
+            for (k, v), want in cases48:
+                us.read_target_local_config = lambda _t, _r, k=k, v=v: [(".git/config", k, v, "")]
+                if bool(us.check_target_local_config(tmp)) != want:
+                    out.append(k)
+            return out
+        finally:
+            us.STEP_REFUSED_KEYS, us.read_target_local_config = full48, read48
+    got48 = wrong48(full48)
+    check("[dSP-48] AC1 the check refuses sendmailCmd and the identity forms of the send-email keys, "
+          "and neither sendemail.work.to nor a host-name smtpServer", not got48, f"wrong: {got48}")
+    for drop, key in (("sendemail.<x>.ccCmd", "sendemail.work.cccmd"), ("sendemail.sendmailCmd", "sendemail.sendmailcmd")):
+        got48 = wrong48(tuple(r for r in full48 if r[0] != drop))
+        check(f"[dSP-48] AC1 a table copy without the {drop} row passes {key}", got48 == [key], f"wrong: {got48}")
+    rc, out = fixture(us_py, "sendemail-identity-cmd")
+    check("[dSP-48] AC2 fixture isolation sendemail-identity-cmd exits 1, refused naming sendemail.work.cccmd "
+          "in .git/config, its canary absent",
+          rc == 1 and "isolation: FAILED" not in out and "sendemail.work.cccmd in .git/config, so nothing was spawned" in out
+          and "sendemail canary: absent" in out, out)
+
     # TOOL-dSafePassage-45 AC7, the credential-key arm: every key `git help --config` lists whose last
     # segment ends in a CREDENTIAL_KEY_SUFFIXES entry matches a STEP_CREDENTIAL_KEYS or a
     # STEP_REFUSED_KEYS row, re-derived on every run; an empty listing reds, and a table copy

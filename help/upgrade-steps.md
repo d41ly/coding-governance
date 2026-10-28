@@ -79,10 +79,14 @@ starts it:
   `hook.<x>.command`, `gc.recentObjectsHook` (run by `gc` and the auto-gc a commit or fetch
   starts), a `submodule.<x>.update` or `alias.<x>` beginning with `!`, and the trailer,
   difftool, mergetool, browser, man, guitool and send-email commands, `imap.tunnel` (run by
-  `imap-send`), `instaweb.httpd`, and a `sendemail.smtpServer` or `sendemail.<identity>.smtpServer`
-  that is an absolute path (one starting with `/` or a drive letter such as `C:`), which
-  `send-email` runs as a program rather than reading as a host name. Credentials are refused
-  too, as a class rather than a list: a `<scheme>://` URL carrying userinfo (a user or password
+  `imap-send`), `instaweb.httpd`, and a `sendemail.smtpServer` that is an absolute path (one
+  starting with `/` or a drive letter such as `C:`), which `send-email` runs as a program rather
+  than reading as a host name. The send-email keys are `sendemail.ccCmd`, `toCmd`, `headerCmd`,
+  `smtpServer` and `sendemail.sendmailCmd`, which `send-email` runs through `sh -c` although
+  `git help --config` does not list it, so no listing of git's keys is the whole set.
+  Each is refused in its identity form `sendemail.<identity>.<key>` too, such as
+  `sendemail.work.ccCmd`, because `send-email` reads a key under the identity before the bare one.
+  Credentials are refused too, as a class rather than a list: a `<scheme>://` URL carrying userinfo (a user or password
   before its host) is refused wherever it appears, in any key's value (`remote.<x>.url`,
   `submodule.<name>.url`, `url.<base>.insteadOf`, `http.proxy` and every other) or in a key's own
   name (`url.<base>.insteadOf`, `http.<url>.sslVerify`, `credential.<url>.username`), a dotted

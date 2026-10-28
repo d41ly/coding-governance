@@ -191,7 +191,7 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-fsmonitor", "submodule-name-differs", "ssh-scheme-bare-user",
                   "proxy-schemeless-userinfo", "insteadof-dotted-userinfo", "submodule-ref-named-config",
                   "submodule-config-malformed", "gitmodules-malformed", "submodule-nested-name-differs",
-                  "submodule-name-slashed")
+                  "submodule-name-slashed", "sendemail-identity-cmd")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -240,14 +240,20 @@ STEP_REFUSED_KEYS = (
     ("sendemail.ccCmd", "any", "send-email"),
     ("sendemail.toCmd", "any", "send-email"),
     ("sendemail.headerCmd", "any", "send-email"),
+    # TOOL-dSafePassage-48 S2: `git help --config` does not list it; git-send-email's option table
+    # does (`sendmailcmd`), and send-email runs it through `sh -c`.
+    ("sendemail.sendmailCmd", "any", "send-email, through sh -c, by git-send-email's option table"),
     ("gc.recentObjectsHook", "any", "gc, repack --cruft, and the auto-gc of commit and fetch"),
     # TOOL-dSafePassage-42 S7: the last segments `tunnel`, `httpd` and `smtpserver`; an absolute
-    # `smtpServer` is a program git runs, a host name is not; git-send-email reads it per identity
-    # too (TOOL-dSafePassage-45 S6).
+    # `smtpServer` is a program git runs, a host name is not.
     ("imap.tunnel", "any", "imap-send"),
     ("instaweb.httpd", "any", "instaweb"),
-    ("sendemail.smtpServer", "an absolute path", "send-email"),
-    ("sendemail.<x>.smtpServer", "an absolute path", "send-email"))
+    ("sendemail.smtpServer", "an absolute path", "send-email"))
+# TOOL-dSafePassage-48 S1, the class: git-send-email reads each of its keys under
+# `sendemail.<identity>` before the bare section, so every `sendemail.<key>` row above stands in its
+# identity form too (`sendemail.<x>.ccCmd` and the like), stated once here rather than typed per row.
+STEP_REFUSED_KEYS += tuple((p.replace("sendemail.", "sendemail.<x>.", 1), rule, runs)
+                           for p, rule, runs in STEP_REFUSED_KEYS if p.startswith("sendemail."))
 # The executor-shaped keys the check does not refuse (TOOL-dSafePassage-29 S2), as (key pattern, why).
 STEP_UNREFUSED_KEYS = (
     ("merge.<driver>.driver", "a step does not merge, and gov's own checkout declares two (TOOL-dSafePassage-24 §3)"),
@@ -2857,6 +2863,26 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             expect(rep.get("add") == 0, "the ssh-scheme bare-user remote: clean's git add did not run")
         except Refusal as e:
             expect(False, f"an ssh-scheme remote with a bare user was refused: {e}")
+    elif plant == "sendemail-identity-cmd":
+        # TOOL-dSafePassage-48 S3: a send-email executor key in its identity form refuses the step
+        # before any spawn, naming the key as git prints it and its file.
+        canaries.mkdir()
+        cfg = target / ".git" / "config"
+        cfg.write_text(cfg.read_text(encoding="utf-8") + "[sendemail]\n\tidentity = work\n[sendemail \"work\"]\n"
+                       f"\tccCmd = \": > '{(canaries / 'sendemail-cccmd').as_posix()}'\"\n",
+                       encoding="utf-8", newline="\n")
+        try:
+            run_clean()
+            refused = ""
+        except Refusal as e:
+            refused = str(e)
+            print(f"isolation: {clean.id} · refused · {e}")
+        hit = read_plant_canaries(canaries)
+        print(f"isolation: sendemail canary: {'present · ' + ', '.join(hit) if hit else 'absent'}")
+        expect("sendemail.work.cccmd in .git/config" in refused,
+               "the step was not refused naming sendemail.work.cccmd in .git/config")
+        expect(not report.exists() and not hit, "the refused step spawned, or its executor ran")
+        rc = 1
     elif plant in ("submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo",
                    "proxy-schemeless-userinfo", "insteadof-dotted-userinfo"):
         # TOOL-dSafePassage-38 S3: a URL credential in a value or a key segment that no instance row
