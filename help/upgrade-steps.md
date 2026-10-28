@@ -65,7 +65,9 @@ starts it:
   git's exit code, and so does a `.gitmodules` that does not parse, or that is no regular file, a
   directory, a FIFO or a dangling link say, naming it. The walk never follows a link under
   `modules/`, a Windows junction included: a link there, or a directory there that will not list,
-  refuses the step naming its path. A submodule
+  refuses the step naming its path. A `modules/` git never created, in your git directory or in a
+  submodule's, is an empty listing, never a refusal:
+  a target with no submodules, or whose submodules have none nested, passes with no refusal. A submodule
   repository git will not open, such as one of a newer repository format than the installed git
   knows, refuses the step naming its git directory, though git reads its config with only a
   warning: no step reaches its keys through git. A nested submodule's path is mapped through its parent's

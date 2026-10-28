@@ -97,7 +97,8 @@ refuses a declared id the receipt does not list and an `applied` step whose witn
 
 Exit 0 clean, 1 a frozen-row finding or no base to compare against, 2 a refused row, an unreadable
 revision or a usage error. `fixture isolation` exits 0 green and 1 on a red, a `-stub` plant's,
-`needs-target`'s, `breach`'s, `token`'s and every `local-*` and `submodule-*` plant's by design; `fixture walk|lock|update|rollback|
+`needs-target`'s, `breach`'s, `token`'s and every `local-*` and `submodule-*` plant's by design but
+`submodule-main-only`, `-ref-named-config` and `-sound-no-nested`, which exit 0; `fixture walk|lock|update|rollback|
 rollback-update` exit as the walk, the take, the reverse walk or `update` exits (a refusing
 `rollback-update` plant 1), and 1 with `<family>: FAILED` on an unmet expectation.
 """
@@ -194,7 +195,7 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-config-malformed", "gitmodules-malformed", "submodule-nested-name-differs",
                   "submodule-name-slashed", "sendemail-identity-cmd", "submodule-format-unknown",
                   "gitmodules-unreadable", "subsection-password-space", "submodule-modules-link-loop",
-                  "gitmodules-fifo", "submodule-modules-not-a-directory")
+                  "gitmodules-fifo", "submodule-modules-not-a-directory", "submodule-sound-no-nested")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -3096,8 +3097,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         # TOOL-dSafePassage-51 S6: `modules-link-loop` links `.git/modules/a/loop` back to
         # `.git/modules`; S15: `gitmodules-fifo` makes the target's `.gitmodules` a FIFO, where one can be.
         # TOOL-dSafePassage-53 S2: `modules-not-a-directory` makes `.git/modules/a` a sound repository
-        # whose `modules` is a regular file.
-        kind = plant.removeprefix("submodule-").removesuffix("-stub")
+        # whose `modules` is a regular file. TOOL-dSafePassage-54 S1: `sound-no-nested` is the tree
+        # git's own `submodule add` writes, no key set and no `modules/` under `.git/modules/sub`.
+        kind =plant.removeprefix("submodule-").removesuffix("-stub")
         linked = kind in ("unpopulated-worktree", "main-only")
         if kind == "gitmodules-fifo" and not hasattr(os, "mkfifo"):
             print("isolation: skip — gitmodules-fifo needs os.mkfifo, which this host lacks")
@@ -3137,7 +3139,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                 "name-differs": target / "lib" / "p", "name-slashed": target / "lib" / "x", "nested-name-differs": target / "lib" / "p" / "q"}.get(kind, target / "sub")
         key = "core.fsmonitor" if kind == "fsmonitor" else "filter.canary.clean"
         unkeyed = kind in ("ref-named-config", "config-malformed", "gitmodules-malformed", "format-unknown",
-                           "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo", "modules-not-a-directory")
+                           "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo", "modules-not-a-directory",
+                           "sound-no-nested")
+        sound = kind in ("ref-named-config", "sound-no-nested")  # the step is not refused, exit 0
         if kind == "ref-named-config":
             fx_git(deep, "branch", "config")  # refs/heads/config and logs/refs/heads/config, two files named config
         elif not unkeyed:
@@ -3176,15 +3180,20 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         elif kind == "modules-not-a-directory":
             fx_git(target, "init", "-q", "--bare", ".git/modules/a")
             (target / ".git" / "modules" / "a" / "modules").write_text("", encoding="utf-8")
-        elif kind == "ref-named-config":
+        elif sound:
             rows = read_target_repositories(target, lambda d, label: False)
             for r in rows if isinstance(rows, list) else ():
                 print(f"isolation: population · {r['git_dir']} · reached by {r['reached_by'] or 'the target'}")
-            expect(isinstance(rows, list) and len(rows) == 2
-                   and not any(x in r["git_dir"] for r in rows for x in ("/refs/", "/logs/")),
+            sub_dir = (target / ".git" / "modules" / "sub").resolve()
+            expect(isinstance(rows, list) and [r["git_dir"] for r in rows]
+                   == [(target / ".git").resolve().as_posix(), sub_dir.as_posix()],
                    f"the population is not one row per real repository, the target and sub: {rows}")
-            expect((target / ".git" / "modules" / "sub" / "refs" / "heads" / "config").is_file(),
-                   "LIVENESS: no ref named config was planted, so the walk grades nothing")
+            if kind == "ref-named-config":
+                expect((sub_dir / "refs" / "heads" / "config").is_file(),
+                       "LIVENESS: no ref named config was planted, so the walk grades nothing")
+            else:
+                expect((sub_dir / "HEAD").is_file() and not (sub_dir / "modules").exists(),
+                       "LIVENESS: git's submodule add wrote no .git/modules/sub, or one holding modules/")
         where = {"filter": ".git/modules/sub/config (submodule sub)",
                  "nested": ".git/modules/sub/modules/inner/config (submodule sub/inner)",
                  "unpopulated": ".git/modules/sub/config (submodule sub)",
@@ -3211,8 +3220,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         if kind == "main-only":
             expect(not refused and done.exists() and not hit,
                    "the main worktree's submodule config refused the linked worktree's step, or its filter ran")
-        elif kind == "ref-named-config":
-            expect(not refused and done.exists(), "a submodule holding a ref named config refused the step")
+        elif sound:
+            expect(not refused and done.exists(), f"the {kind} submodule refused the step")
         elif unkeyed:
             name = {"config-malformed": ".git/modules/sub/config or a file it includes does not read",
                     "format-unknown": "/.git/modules/sub: git will not open this repository",
@@ -3250,7 +3259,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                 print(f"isolation: {status.id} · the outer submodule unpopulated · refused · {e}")
             expect(f"{key} in .git/modules/nm/modules/in/config (submodule lib/p/in, by name)" in refused,
                    "with the outer submodule unpopulated the refusal does not name the inner `in, by name`")
-        rc = 0 if kind in ("main-only", "ref-named-config") else 1
+        rc = 0 if kind == "main-only" or sound else 1
     for f in fails:
         print(f"isolation: FAILED · {f}")
     return 1 if fails else rc

@@ -4055,6 +4055,29 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     check("[dSP-53] AC2 a walk copy passing every OSError reds fixture isolation submodule-modules-not-a-directory",
           src49.count(refuse53) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
+    # TOOL-dSafePassage-54 AC1, AC2: the sound baseline, the tree git's own `submodule add` writes
+    # (the `submodule-sound-no-nested` plant) and gov's own tree, whose git dir holds no `modules/`,
+    # each walked with no refusal. The failing case is `lone53`, TOOL-dSafePassage-51's single
+    # `except OSError`, under which both are refused. Not covered: another git version's layout.
+    lone54 = build_staged_copy(tmp / "dsp54-lone", lone53)
+    spec54 = importlib.util.spec_from_file_location("us54_lone", lone54)
+    mod54 = importlib.util.module_from_spec(spec54)
+    spec54.loader.exec_module(mod54)
+    gd54 = run_gov_git(GOV_ROOT, "rev-parse", "--absolute-git-dir")
+    for n, (label, py, mod) in enumerate((("the module", us_py, us),
+                                          ("a walk copy with TOOL-dSafePassage-51's single except OSError", lone54, mod54))):
+        rc, out = fixture(py, "submodule-sound-no-nested")
+        green = (rc == 0 and out.count("isolation: population · ") == 2 and "/.git/modules/sub · reached by sub" in out
+                 and not any(x in out for x in ("isolation: FAILED", " · refused · ", "Traceback")))
+        check(f"[dSP-54] AC1 {label}: fixture isolation submodule-sound-no-nested "
+              + ("exits 0, the target and .git/modules/sub listed, no refusal" if not n else "— reds"),
+              green == (not n) and (not n or rc == 1), out)
+        rows = mod.read_target_repositories(GOV_ROOT, lambda d, label: False)
+        green = isinstance(rows, list) and [r["git_dir"] for r in rows] == [pathlib.Path(gd54).resolve().as_posix()]
+        check(f"[dSP-54] AC2 {label}: read_target_repositories over gov's own tree "
+              + ("returns its one git directory, no Refusal" if not n else "— reds"),
+              bool(gd54) and not (pathlib.Path(gd54) / "modules").exists() and green == (not n), str(rows))
+
     # AC14: a key's tested subsection is redacted to its last `@`, a space or a `/` in the password
     # included; the plant is graded over the refusal's named entries, the text between
     # TOOL-dSafePassage-24's fixed lead and tail, for 3-character pieces, and over the whole output
