@@ -203,7 +203,7 @@ ids TOOL-dSafePassage-71
 | [TOOL-dSafePassage-51 — the step module's 15 audit minors from units 47 to 50: build order in commit order, the walk's checks in one sequence, the guard's keys, one section probe](spec/2026-10-23-spec-TOOL-dSafePassage-51.md) | 14 | 2 | CLOSED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-57 — TOOL-52 AC1 reads the arm: its guard taken from the suite by content, evaluated after the scan and alone under `set -u`](spec/2026-10-23-spec-TOOL-dSafePassage-57.md) | 14 | 2 | CLOSED | rev-2 | 2026-10-28 |
 | [TOOL-dSafePassage-58 — the spec audit of units 51 and 52, its ten minors on TOOL-52: the arm probe staged, the placement anchored on the block's `fi`, the abort's real exit, and the render's four outputs](spec/2026-10-23-spec-TOOL-dSafePassage-58.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-28 |
-| [TOOL-dSafePassage-53 — the walk's listing handler: an absent directory is the empty population, and only an existing one that cannot be listed is refused](spec/2026-10-23-spec-TOOL-dSafePassage-53.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-26 |
+| [TOOL-dSafePassage-53 — the walk's listing handler: an absent directory is the empty population, and only an existing one that cannot be listed is refused](spec/2026-10-23-spec-TOOL-dSafePassage-53.md) | 15 | 2 | CLOSED | rev-2 | 2026-10-28 |
 | [TOOL-dSafePassage-54 — the walk's sound baseline: a plain submodule git built and gov's own tree, each walked to exit 0 with no refusal](spec/2026-10-23-spec-TOOL-dSafePassage-54.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-55 — the roster hand-out refuses on TOOL-49 AC2's whole order predicate, written once as one probe](spec/2026-10-23-spec-TOOL-dSafePassage-55.md) | 15 | 2 | WONTDO | rev-2 | 2026-10-28 |
 | [TOOL-dSafePassage-56 — the walk tests for a link on every path it enters, the root and each `modules/` it recurses into, before listing it](spec/2026-10-23-spec-TOOL-dSafePassage-56.md) | 15 | 2 | DEFERRED | rev-3 | 2026-10-28 |
@@ -211,7 +211,7 @@ ids TOOL-dSafePassage-71
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 356 bound to this build, across 4 record folder(s).
+Records: 358 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

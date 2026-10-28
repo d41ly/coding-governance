@@ -4021,6 +4021,40 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         check(f"[dSP-51] AC9 {label}: submodule_paths types .gitmodules by lstat and stat before any spawn or open"
               + ("" if want else " — reds"), src49.count(typed51) == 1 and got == want, f"calls: {calls}")
 
+    # TOOL-dSafePassage-53 AC2, AC3: a path git never created is the walk's empty population, and an
+    # existing one that will not list is refused naming it and its error class. Failing cases are
+    # staged copies: TOOL-dSafePassage-51's single `except OSError`, under which a `git init`
+    # repository is refused, and a handler passing every OSError, under which the plant is not refused.
+    # Not covered: a PermissionError listing, which this host cannot stage without changing an ACL.
+    absent53 = "                    except FileNotFoundError:\n                        continue\n"
+    refuse53 = "                    except OSError as e:\n"
+    lone53 = src49.replace(absent53, "")
+    for n, (label, text) in enumerate((("the module", src49),
+                                       ("a walk copy with TOOL-dSafePassage-51's single except OSError", lone53))):
+        mod = us
+        if n:
+            spec53 = importlib.util.spec_from_file_location("us53_lone", build_staged_copy(tmp / "dsp53-lone", text))
+            mod = importlib.util.module_from_spec(spec53)
+            spec53.loader.exec_module(mod)
+        repo53 = tmp / f"dsp53-empty-{n}"
+        subprocess.run(["git", "init", "-q", str(repo53)], capture_output=True, check=True)
+        rows = mod.read_target_repositories(repo53, lambda d, label: False)
+        green = isinstance(rows, list) and [r["git_dir"] for r in rows] == [(repo53 / ".git").resolve().as_posix()]
+        check(f"[dSP-53] AC3 {label}: read_target_repositories over a git init repository with no .git/modules "
+              + ("returns its one git directory" if not n else "— reds"),
+              not (repo53 / ".git" / "modules").exists() and green == (not n)
+              and (not n or src49.count(absent53) == 1), str(rows))
+    every53 = src49.replace(refuse53 + "                        raise Refusal(",
+                            "                    except OSError:\n                        continue\n"
+                            "                        raise Refusal(")
+    needle53 = "/.git/modules/a/modules does not list (NotADirectoryError"
+    rc, out = fixture(us_py, "submodule-modules-not-a-directory")
+    check(f"[dSP-53] AC2 fixture isolation submodule-modules-not-a-directory exits 1, refused naming {needle53}",
+          rc == 1 and needle53 in out and "isolation: FAILED" not in out and "Traceback" not in out, out)
+    rc, out = fixture(build_staged_copy(tmp / "dsp53-every", every53), "submodule-modules-not-a-directory")
+    check("[dSP-53] AC2 a walk copy passing every OSError reds fixture isolation submodule-modules-not-a-directory",
+          src49.count(refuse53) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
     # AC14: a key's tested subsection is redacted to its last `@`, a space or a `/` in the password
     # included; the plant is graded over the refusal's named entries, the text between
     # TOOL-dSafePassage-24's fixed lead and tail, for 3-character pieces, and over the whole output

@@ -194,7 +194,7 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-config-malformed", "gitmodules-malformed", "submodule-nested-name-differs",
                   "submodule-name-slashed", "sendemail-identity-cmd", "submodule-format-unknown",
                   "gitmodules-unreadable", "subsection-password-space", "submodule-modules-link-loop",
-                  "gitmodules-fifo")
+                  "gitmodules-fifo", "submodule-modules-not-a-directory")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -1507,14 +1507,19 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
                 # `.gitmodules` declares it, or the name stands, marked `by name` (S13).
                 # TOOL-dSafePassage-51 S6: no link is followed, a junction included, which
                 # `islink` reads False on; a link, or a directory that will not list, refuses.
+                # TOOL-dSafePassage-53: a path git never created is the empty population, the
+                # worklist's `continue` being one walk's return; any other listing error refuses.
                 walks = [(mods, mods, work, [], "")]
                 while walks:
                     base, cur, w, parts, mark = walks.pop(0)
                     try:
-                        listed = sorted(cur.iterdir()) if cur.is_dir() else []
+                        with os.scandir(cur) as it:
+                            listed = sorted(cur / e.name for e in it)
+                    except FileNotFoundError:
+                        continue
                     except OSError as e:
-                        raise Refusal(f"{cur.as_posix()} does not list ({e}), so the repositories under it "
-                                      f"are unknown") from None
+                        raise Refusal(f"{cur.as_posix()} does not list ({type(e).__name__}: {e}), so the "
+                                      f"repositories under it are unknown") from None
                     for c in listed:
                         if os.path.islink(c) or os.path.isjunction(c):
                             raise Refusal(f"{c.as_posix()} is a link under modules/, which the walk never "
@@ -3090,6 +3095,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         # git does not know; S18: `gitmodules-unreadable` makes the target's `.gitmodules` a directory.
         # TOOL-dSafePassage-51 S6: `modules-link-loop` links `.git/modules/a/loop` back to
         # `.git/modules`; S15: `gitmodules-fifo` makes the target's `.gitmodules` a FIFO, where one can be.
+        # TOOL-dSafePassage-53 S2: `modules-not-a-directory` makes `.git/modules/a` a sound repository
+        # whose `modules` is a regular file.
         kind = plant.removeprefix("submodule-").removesuffix("-stub")
         linked = kind in ("unpopulated-worktree", "main-only")
         if kind == "gitmodules-fifo" and not hasattr(os, "mkfifo"):
@@ -3130,14 +3137,14 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                 "name-differs": target / "lib" / "p", "name-slashed": target / "lib" / "x", "nested-name-differs": target / "lib" / "p" / "q"}.get(kind, target / "sub")
         key = "core.fsmonitor" if kind == "fsmonitor" else "filter.canary.clean"
         unkeyed = kind in ("ref-named-config", "config-malformed", "gitmodules-malformed", "format-unknown",
-                           "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo")
+                           "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo", "modules-not-a-directory")
         if kind == "ref-named-config":
             fx_git(deep, "branch", "config")  # refs/heads/config and logs/refs/heads/config, two files named config
         elif not unkeyed:
             fx_git(deep, "config", key, f": > '{(canaries / 'fsmonitor').as_posix()}'" if kind == "fsmonitor"
                    else f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
         if kind in ("unpopulated", "name-differs", "name-slashed", "config-malformed", "format-unknown",
-                    "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo") or linked:
+                    "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo", "modules-not-a-directory") or linked:
             fx_git(stepped, "submodule", "deinit", "-q", "-f", {"name-differs": "lib/p", "name-slashed": "lib/x"}.get(kind, "sub"))
         else:
             # same size, new mtime: git cannot tell it changed without the clean filter
@@ -3166,6 +3173,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                                capture_output=True, check=True)
             else:
                 os.symlink(loop.parent.parent, loop, target_is_directory=True)
+        elif kind == "modules-not-a-directory":
+            fx_git(target, "init", "-q", "--bare", ".git/modules/a")
+            (target / ".git" / "modules" / "a" / "modules").write_text("", encoding="utf-8")
         elif kind == "ref-named-config":
             rows = read_target_repositories(target, lambda d, label: False)
             for r in rows if isinstance(rows, list) else ():
@@ -3206,7 +3216,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         elif unkeyed:
             name = {"config-malformed": ".git/modules/sub/config or a file it includes does not read",
                     "format-unknown": "/.git/modules/sub: git will not open this repository",
-                    "modules-link-loop": "/.git/modules/a/loop is a link under modules/"}.get(kind, "/.gitmodules does not read")
+                    "modules-link-loop": "/.git/modules/a/loop is a link under modules/",
+                    "modules-not-a-directory": "/.git/modules/a/modules does not list (NotADirectoryError"}.get(
+                        kind, "/.gitmodules does not read")
             expect(name in refused and not done.exists(), f"the step was not refused naming `{name}`, or it spawned")
         elif plant.endswith("-stub"):
             expect(not refused and done.exists(), "the stubbed check still refused, so nothing spawned")
