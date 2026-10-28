@@ -9,7 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179312353485620824614-1561043 4146b83d
+gates-run: unattended-179314501149121125360-1819053 9c135e17
 parked-surfaced: yes
 keepalive-reaped: yes
 asks-at-landing: TOOL-dRankedPlan-17=DEFERRED TOOL-dRankedPlan-18=DEFERRED
@@ -22,7 +22,7 @@ hold-reason: the spec run is complete and closed in substance — 79 units specc
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-refreshed-at: 1a61f21a238c5d9364dd5c6e91ab0d8b805fcfa3 · handoff · 0 touching
+refreshed-at: 57bc3b91861a061dc9f37529bfe41db756c24fcd · park · unlisted
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 448fb3dfca403eb3002f94d334ffa525e083eba9
 phase: VERIFYING
@@ -368,3 +368,5 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T21:13:52Z brief · item TOOL-dRankedPlan-82 · reason 35dc3e181a21 memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-82-spec-brief.md
 
 2026-10-27T21:23:46Z dispatch · item 63350171 TOOL-dRankedPlan-82 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md memory/builds/dRankedPlan/spec/2026-10-27-spec-TOOL-dRankedPlan-82.md memory/builds/dRankedPlan/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-28T00:54:21Z decision · item the close's bar cannot pass the routed commits leg at its 300 s ceiling · reason with spec tokens green at its new 830 s ceiling (TOOL-dRankedPlan-82), the close's bar at 9c135e17 redded only 'routed commits name a specced unit', timed out at 300 s in the pool and on its serial retry, attributed CONTENDED; alone after the close it ran 354 s, exit 0, over 37 commits past 1a61f21a, its deviation arm joining every chain build's records (dWellOiledMachine's close measured 358 s). Options: (a) the owner authorizes a second ceiling unit, sized like TOOL-dRankedPlan-82 from that reading (C = 10 x ceil(R/5) at or above 2R, 710 s at R 354.0); (b) the owner lands the prepared merge by hand. Raising a gate ceiling the owner's answer did not name is not the run's to decide
