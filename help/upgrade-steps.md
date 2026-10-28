@@ -162,8 +162,10 @@ text) or `rolled-back` (with none). An `applied` row carries a `failure` only wh
 down stopped on it, and that text opens with `down interrupted:`, `down exit `, `witness still holds
 after down` or `reverted check exits `. An `applied` row the walk recorded because the step's witness
 already held, its up never run, carries `"via": "witness"`, set only when the receipt held no record
-of the step as the walk began and no before-image of it existed; a row with any earlier record, or
-with an image on disk, carries none, since either says an up ran. A row whose up ran carries no
+of the step, or a `rolled-back` one, as the walk began and no before-image of it existed; a row with
+a `failed` or `applied` record, or with an image on disk, carries none, since either says an up may
+have run. A `rolled-back` record says the last down completed, so any up before it was undone. The
+reverse walk asks the same question before a down. A row whose up ran carries no
 `via`, and `via` is legal on no other state. The last `applied` row is the last step completed.
 A `failure` is absent, `null` (read as absent) or a non-empty text; any other value, `5` or `""`
 say, is malformed in every state. `govkit.py check` reports a malformed `steps` field as a problem
@@ -198,8 +200,9 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
   receipt's `steps` records `applied`. A step landed after `--to` is not walked.
 - **The skip.** Each step's witness runs first. Where it holds, the step is recorded `applied` and
   its up never runs: `step <id> · skipped (witness holds)`. It carries `"via": "witness"` only where
-  the receipt held no record of it and no before-image of it exists, so a walk killed after an up
-  wrote leaves a re-run that records the row with no `via`.
+  the receipt held no record of it, or a `rolled-back` one, and no before-image of it exists, so a
+  walk killed after an up wrote leaves a re-run that records the row with no `via`, and a step
+  rolled back and walked again keeps its mark.
 - **A step that runs** is recorded `failed`, `interrupted: started <utc>, no exit recorded`, before
   its up starts, and `applied` once the up exits 0 and the witness holds. Its writes and its
   before-image under `.governance/steps/` are staged, never committed. The image is written

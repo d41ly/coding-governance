@@ -1970,8 +1970,9 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
                   to_commit: str) -> dict:
     """Walk `rows`, the pending steps in order, over `target` (TOOL-dSafePassage-2 S2), every spawn
     through `run_step_isolated`. Per step: (1) its witness; exit 0 records `applied`, with `"via":
-    "witness"` (TOOL-dSafePassage-33) only where the receipt held no record of the step when this
-    walk began and no before-image exists (TOOL-dSafePassage-40), its up never spawned; (2) a row needing target code records `failed` (`attended: ...`), writes the attended
+    "witness"` (TOOL-dSafePassage-33) only where the receipt held no record of the step, or a
+    `rolled-back` one, when this walk began and no before-image exists (TOOL-dSafePassage-40, -73's
+    `test_up_unrecorded`), its up never spawned; (2) a row needing target code records `failed` (`attended: ...`), writes the attended
     order and stops; (3) records `failed` (`interrupted: started <utc>, no exit recorded`) BEFORE
     the spawn, so a walk killed with its step leaves that failure; (4) runs the row's `resume` argv
     where the receipt held a `failed` row for it when this walk began and `resume` is an argv, else
@@ -2018,8 +2019,8 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
         if spawn(seen, "witness")["verdict"] == "ok":
             # TOOL-dSafePassage-33 S2: the mark that lets the reverse walk read a missing image as
             # "never ran"; move 5 below, after an up, passes none. TOOL-dSafePassage-40 S1: only
-            # where nothing says an up spawned, no walk-start record and no before-image.
-            fresh = row.id not in began and not derive_image_path(target, row.id).exists()
+            # where nothing says an up spawned; TOOL-dSafePassage-73 S2: the reverse walk's question.
+            fresh = test_up_unrecorded(began.get(row.id), derive_image_path(target, row.id).exists())
             unrecorded = persist(row, "applied", via="witness" if fresh else None)
             print(f"step {row.id} · skipped (witness holds){unrecorded}")
             out["skipped"] += 1
@@ -2087,6 +2088,15 @@ def derive_reverse_steps(gov_root, receipt: dict, to_commit: str) -> list[StepRo
         or run_git(gov_root, "merge-base", "--is-ancestor", r.introduced, to_commit) is None)]
 
 
+def test_up_unrecorded(state: str | None, image_present: bool) -> bool:
+    """Whether no up of a step is on record (TOOL-dSafePassage-73), the one question move 1 of
+    `run_step_walk` and move 3 of `run_reverse_walk` ask before marking a row `"via": "witness"`:
+    its record, `state`, is None or `rolled-back` (a completed down undid any up before it), and no
+    before-image exists, which an up since would have written. A `failed` record says an up may
+    have spawned, so it is never read as unrecorded."""
+    return state in (None, "rolled-back") and not image_present
+
+
 def derive_down_verdict(row: StepRow, image_present: bool, down_rc,
                         record: dict | None) -> tuple[bool | None, str]:
     """Move 5 of `run_reverse_walk` (TOOL-dSafePassage-17 S2): `(reverted, phase)`. Where the down's
@@ -2110,7 +2120,8 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
     witness first and is skipped where it does not hold, nothing of it applied; (2) a row needing
     target code stops the walk with `write_attended_order`'s order naming its down; (3) its state
     kept, `failure` `down interrupted: ...` is persisted BEFORE the spawn, a row recorded nowhere
-    with no before-image marked `"via": "witness"` (TOOL-dSafePassage-39); (4) its down, a non-zero
+    or `rolled-back` with no before-image marked `"via": "witness"` (TOOL-dSafePassage-39, -73's
+    `test_up_unrecorded`); (4) its down, a non-zero
     exit stopping with `down exit <rc>: <last stderr line>`; (5) `derive_down_verdict`'s judge
     (TOOL-dSafePassage-17): the down's own exit under `reverted = "down-exit"`, or with no
     before-image at the spawn on a row recorded nowhere or `applied` via its witness
@@ -2168,8 +2179,8 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
         if held:
             write_step_record(receipt_path, receipt, row, state, f"{DOWN_STOP_PREFIXES[0]} started "
                               f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded",
-                              "witness" if (record is None or record["state"] == "rolled-back") and not paths
-                              else None)
+                              "witness" if test_up_unrecorded(None if record is None else record["state"],
+                                                              bool(paths)) else None)
         got = run_step_reread(row, "down", target, gov_root, receipt_path, receipt, to)
         recordable = test_steps_recordable(receipt)  # TOOL-dSafePassage-18 S1: below 4, no row
         if got["verdict"] != "ok":
@@ -3532,7 +3543,7 @@ NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePass
 DOWN_KILLED_PLANTS = ("witness-only-down-killed", "unrecorded-witness-down-killed")  # TOOL-dSafePassage-39
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
                    "callers", "witness-only", "image-lost", "kill-after-up-image-lost",
-                   "rolled-back-witness-holds") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
+                   "rolled-back-witness-holds", "witness-only-reup") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
 ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp",  # TOOL-dSafePassage-19
                                  "schema-step-kill-shipped-rows")  # TOOL-dSafePassage-70
 ROLLBACK_UPDATE_PLANTS = (("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
@@ -4449,7 +4460,9 @@ def run_rollback_fixture(plant: str | None) -> int:
     records it `applied` via its witness alone and writes it no before-image; `image-lost`
     (TOOL-dSafePassage-33) deletes the image s4's up wrote, so its down stops naming the image. The
     DOWN_KILLED_PLANTS (TOOL-dSafePassage-39) kill the first reverse walk in `witness-only`'s s2's
-    down, the second after taking s2's row out of the receipt, and the re-run must down s2 by its exit."""
+    down, the second after taking s2's row out of the receipt, and the re-run must down s2 by its exit.
+    `witness-only-reup` (TOOL-dSafePassage-73) runs `witness-only`'s walk and reverse walk, then a
+    second walk, which must mark s2 `via` its witness again, before the reverse walk below."""
     if plant == "callers":
         texts = {p.name: p.read_text(encoding="utf-8") for p in (pathlib.Path(__file__).resolve(), HERE / "govkit.py")}
         rc = run_callers_probe(texts)
@@ -4522,13 +4535,13 @@ def run_rollback_fixture(plant: str | None) -> int:
         else:
             if plant == "after-fail":
                 (fx / "s3.fail").touch()
-            elif plant in ("witness-only",) + DOWN_KILLED_PLANTS:
+            elif plant in ("witness-only", "witness-only-reup") + DOWN_KILLED_PLANTS:
                 (fx / "s2.witness-absent").touch()
             elif plant in NODE_WITNESS_PLANTS:
                 (fx / "s2.witness-always").touch()
             rc_w, _out = run_fixture_child(FIXTURE_WALK_CHILD, gov, t, sha["C"], env)
             expect(rc_w == (1 if plant == "after-fail" else 0), f"the walk exited {rc_w}")
-            if plant in ("witness-only",) + NODE_WITNESS_PLANTS + DOWN_KILLED_PLANTS:
+            if plant in ("witness-only", "witness-only-reup") + NODE_WITNESS_PLANTS + DOWN_KILLED_PLANTS:
                 bare = (rows().get("fx/s2", ("",))[0] == "applied" and not (fx / "s2.up").exists()
                         and not derive_image_path(t, "fx/s2").exists())
                 print("rollback: fx/s2 " + ("applied by witness alone, no before-image" if bare
@@ -4544,6 +4557,15 @@ def run_rollback_fixture(plant: str | None) -> int:
             receipt["steps"] = [r for r in receipt["steps"] if r["id"] != "fx/s2"]
             rp.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
             expect((t / "s2.txt").is_file(), "s2's file is not present for the unrecorded plant")
+        elif plant == "witness-only-reup":
+            # TOOL-dSafePassage-73 S5: down to A and up to C again; s2, recorded rolled-back as the
+            # second walk begins, its witness holding with no up and no image, keeps its mark.
+            rc_r, got_r, _o = reverse()
+            expect(rc_r == 0 and got_r == rolled("s4", "s3", "s2", "s1"), f"the first reverse walk exited {rc_r}")
+            rc_w, _out = run_fixture_child(FIXTURE_WALK_CHILD, gov, t, sha["C"], env)
+            via = next((r.get("via") for r in read_receipt_steps(t) if r["id"] == "fx/s2"), None)
+            print(f"rollback: fx/s2 recorded via {via} after a rollback")
+            expect(rc_w == 0 and via == "witness", f"the second walk exited {rc_w}, or s2 is not recorded `via` `witness`")
         elif plant == "image-lost":
             # TOOL-dSafePassage-33 AC2: s4's up wrote s4.txt and its image; the image is then lost.
             s4 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s4"), {})
@@ -4601,7 +4623,7 @@ def run_rollback_fixture(plant: str | None) -> int:
         rc, got, out = reverse()
         state = rows()
         if plant in (None, "unrecorded", "after-kill", "after-fail", "witness-only", "node-witness",
-                     "rolled-back-witness-holds"):
+                     "rolled-back-witness-holds", "witness-only-reup"):
             want = (rolled("s4", "s3", "s2", "s1") if plant not in ("after-kill", "after-fail")
                     else ["step fx/s4 · skipped (nothing applied)"] + rolled("s3", "s2", "s1"))
             if plant == "rolled-back-witness-holds":

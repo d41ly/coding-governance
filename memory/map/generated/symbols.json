@@ -26258,6 +26258,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_up_unrecorded",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "test_used_attributes_a_removed_worktree_by_head",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"

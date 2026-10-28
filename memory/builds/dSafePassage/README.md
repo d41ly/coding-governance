@@ -221,7 +221,7 @@ ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePas
 | [TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the commit-order criterion's attribution and form, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-59.md) | 15 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-72 — a before-image path is contained by one predicate govkit's destinations share, and refused where any segment on it is a link](spec/2026-10-28-spec-TOOL-dSafePassage-72.md) | 16 | 2 | CLOSED | rev-4 | 2026-10-28 |
-| [TOOL-dSafePassage-73 — the forward and reverse walks read "no up on record" through one predicate, so a step re-applied by its witness after a rollback keeps its `via` mark](spec/2026-10-28-spec-TOOL-dSafePassage-73.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dSafePassage-73 — the forward and reverse walks read "no up on record" through one predicate, so a step re-applied by its witness after a rollback keeps its `via` mark](spec/2026-10-28-spec-TOOL-dSafePassage-73.md) | 16 | 2 | CLOSED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-74 — the introducing commit is found by the TOML parse alone, so a row id in any string spelling the reader accepts is found](spec/2026-10-28-spec-TOOL-dSafePassage-74.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-75 — the step environment keeps `GOV_PYTHON`, so the floor step resolves the interpreter every gate and hook resolves](spec/2026-10-28-spec-TOOL-dSafePassage-75.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-76 — the closing review's nine engine-side minors, from a before-image restoring into the git directory to a walk refusal blamed on the config](spec/2026-10-28-spec-TOOL-dSafePassage-76.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
@@ -233,7 +233,7 @@ ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePas
 | [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 394 bound to this build, across 4 record folder(s).
+Records: 395 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

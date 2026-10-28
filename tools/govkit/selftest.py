@@ -4558,7 +4558,8 @@ def check_step_rollback() -> None:
     `kill-after-up-image-lost` row: a row whose up ran before a kill, its image lost, stops.
     TOOL-dSafePassage-70's AC1 is the `schema-step-kill-shipped-rows` row: a rollback killed past the
     schema step's down, over rows whose witnesses still hold, downs them again on the re-run,
-    records nothing and stamps; its AC2 is the `schema-step-early` row."""
+    records nothing and stamps; its AC2 is the `schema-step-early` row. TOOL-dSafePassage-73's AC3 is
+    the `witness-only-reup` row: s2, up by its witness again after a rollback, keeps its `via` mark."""
     us_py = HERE / "upgrade_steps.py"
     rolled = "\n".join(f"step fx/{s} · rolled-back" for s in ("s4", "s3", "s2", "s1"))
     same = "rollback: the target's bytes equal their bytes before the walk"
@@ -4603,6 +4604,9 @@ def check_step_rollback() -> None:
             ("rollback", "rolled-back-witness-holds", 0, (
                 "rollback: rows derived ['fx/s4', 'fx/s3', 'fx/s2', 'fx/s1'] · then fx/s2 recorded rolled-back",
                 rolled, same)),
+            # TOOL-dSafePassage-73 AC3: up, down, up again over s2's witness alone, and down again.
+            ("rollback", "witness-only-reup", 0, ("rollback: fx/s2 recorded via witness after a rollback",
+                                                  rolled + "\nrollback: 4 reached · stopped at none", same)),
             ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
                                         "in planted_caller\n")),
             ("rollback", "schema-step", 0, ("step fx/s1 · rolled-back\nstep govkit/receipt-schema-4 · rolled-back",
@@ -4653,6 +4657,7 @@ def check_step_rollback() -> None:
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
         tag = ("dSP-49" if plant == "rolled-back-witness-holds"
+               else "dSP-73" if plant == "witness-only-reup"
                else "dSP-62" if plant == "schema-up-kill"
                else "dSP-70" if plant == "schema-step-kill-shipped-rows"
                else "dSP-39" if plant in ("witness-only-down-killed", "unrecorded-witness-down-killed")
@@ -4699,6 +4704,11 @@ def check_step_rollback() -> None:
         got33 = us.derive_down_verdict(row33, image33, 0, record33)
         check(f"[dSP-33 S3] derive_down_verdict, image {'present' if image33 else 'absent'}, last record "
               f"{record33 and (record33['state'], record33.get('via'))}, reads {want33}", got33 == want33, str(got33))
+    # TOOL-dSafePassage-73 AC1: both walks' "no up on record" question; the base read the
+    # `rolled-back`, no-image cell False in the forward walk.
+    got73 = [us.test_up_unrecorded(s, i) for s in (None, "rolled-back", "failed", "applied") for i in (False, True)]
+    check("[dSP-73] test_up_unrecorded reads no record or `rolled-back`, with no image, as no up on record",
+          got73 == [True, False, True, False, False, False, False, False], str(got73))
     try:
         us.derive_reverse_steps(HERE.parent.parent, {"schema": 4, "steps": [
             {"id": "gone/step", "introduced": None, "state": "applied"}]}, "HEAD")
