@@ -22,3 +22,5 @@ resolve)` run at the close's bar.
 - AC1 — `ok-branch` — the probe over `tools/push-main.test.sh` found the guard `if [ -n "$_mt_rc" ] && [ -f "$HERE/$_mt_rc/check-arms.py" ]; then`, holding `"$_mt_rc"` and no `${_mt_rc:-`, and its first half printed `ok-branch`.
 - AC2 — `alone rc=127` — the probe's last two lines were `_: line 1: _mt_rc: unbound variable` and `alone rc=127`; no line read `after`; the probe exited 0.
 - AC3 — `no arm` — with `f` set to the output of `git show "3708a705:tools/push-main.test.sh"`, the probe printed `no arm` and exited 1.
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Observed by a researcher in scratch clones of `83817478f` (batch a, `2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-researcher.md`), each break staged alone and restored: One `New arm:` line, `tools/push-main.test.sh`. The same copy, run under `env -u _mt_rc`, printed `_mt_rc: unbound variable` and exited 1 with no `push-main.test: all cases ok` line. Restored as in unit 50.

@@ -27,3 +27,5 @@ Regression probes of the touched plants on node d: `guard-dead` exit 0, `lock-fo
 OWED AT THE CLOSE: the bar's legs §7 names, and the New arm's RED-first observation (the two
 `[dSP-31]` rows of `tools/govkit/selftest.py`, red on a judge copy that skips the `pid_ns` row,
 green restored).
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Observed by a researcher in scratch clones of `83817478f` (batch b, `2026-10-28-prompt-TOOL-dSafePassage-1-close-arms-b-researcher.md`), each break staged alone and restored: `check_step_walk`, cut to `lock-foreign-pidns` and `lock-no-pidns`. Break: the judge skips the `pid_ns` row. RED on both: `FAIL [dSP-31] fixture lock lock-foreign-pidns exits 1 and names refusing rather than joining in: unknown, it was taken under pid_ns 'pid:[4026532244]', …` with `lock: FAILED · a refusing take changed the lock`. GREEN restored: both ok.

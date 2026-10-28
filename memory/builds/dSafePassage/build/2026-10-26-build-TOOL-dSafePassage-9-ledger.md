@@ -35,3 +35,5 @@ node d (Windows, Python 3.15.2) by the fixture CLI or a `python` probe of the ch
 
 OWED AT THE CLOSE: the bar's legs §7 names, and the New arm's RED-first observation (the
 `[dSafePassage-9]` rows of `tools/govkit/selftest.py`, red on a staged break, green restored).
+
+The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Observed by a researcher in scratch clones of `83817478f` (batch b, `2026-10-28-prompt-TOOL-dSafePassage-1-close-arms-b-researcher.md`), each break staged alone and restored: the `TOOL-dSafePassage-9` block in `main()`, run unchanged (22 cases). Break: `govkit.py` `check_render_edited` starts with `return False` (the fixture's own `today` stub, applied to the module itself). RED: `FAIL [dSafePassage-9] plant render-edited matches its case — exit 1, expected 0` with `verdict docs/out.md: 're-rendered' · expects 'render-edited' · MISS`. The dSafePassage-63 and -66 plants also go red. GREEN restored: FAILURES=0, 22 ok.
