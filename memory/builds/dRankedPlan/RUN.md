@@ -9,11 +9,11 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179317721965015227499-2485387 c3292622
+gates-run: unattended-179318095086811615730-2574723 0b3a27d7
 parked-surfaced: yes
 keepalive-reaped: yes
 asks-at-landing: TOOL-dRankedPlan-17=DEFERRED TOOL-dRankedPlan-18=DEFERRED
-units-at-landing: TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-27 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-24 TOOL-dRankedPlan-2 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-34 TOOL-dRankedPlan-14 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-35 TOOL-dRankedPlan-43 TOOL-dRankedPlan-13 TOOL-dRankedPlan-20 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-11 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-12 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-19 TOOL-dRankedPlan-3 TOOL-dRankedPlan-59 TOOL-dRankedPlan-28 TOOL-dRankedPlan-33 TOOL-dRankedPlan-4 TOOL-dRankedPlan-44 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-23 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-62 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-67 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82
+units-at-landing: TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-27 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-24 TOOL-dRankedPlan-2 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-34 TOOL-dRankedPlan-14 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-35 TOOL-dRankedPlan-43 TOOL-dRankedPlan-13 TOOL-dRankedPlan-20 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-11 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-12 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-19 TOOL-dRankedPlan-3 TOOL-dRankedPlan-59 TOOL-dRankedPlan-28 TOOL-dRankedPlan-33 TOOL-dRankedPlan-4 TOOL-dRankedPlan-44 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-23 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-62 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-67 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83
 hold-run: 
 hold-streak: 1 · at 5232949c
 resume-owed: none · owner
@@ -25,7 +25,7 @@ held-from: VERIFYING
 refreshed-at: 57bc3b91861a061dc9f37529bfe41db756c24fcd · handoff · 3 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 3dbf730d02d3df2d5c0d3e6c555f5ca0e01c266c
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -382,3 +382,7 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-28T02:28:10Z brief · item TOOL-dRankedPlan-83 · reason 468defa546d0 memory/builds/dRankedPlan/prompts/2026-10-28-prompt-TOOL-dRankedPlan-83-spec-brief.md
 
 2026-10-28T03:07:00Z dispatch · item 5d724133 TOOL-dRankedPlan-83 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md memory/builds/dRankedPlan/spec/2026-10-28-spec-TOOL-dRankedPlan-83.md memory/builds/dRankedPlan/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-28T10:44:47Z override · item specs-audited · reason the owner capped the spec-audit chain at round 8 (memory/builds/dRankedPlan/prompts/2026-10-27-prompt-TOOL-dRankedPlan-1-owner-review-until-no-high.md): round 8's promotions TOOL-dRankedPlan-78 to -81 close unaudited under that ruling, and TOOL-dRankedPlan-82 and -83, the owner-ordered ceiling units added at the two hand-offs, are Tier-1 micro-units built in this run
+
+2026-10-28T10:44:48Z override · item closing-review-recorded · reason a spec run writes no product code but TOOL-dRankedPlan-82's and -83's one-line ceiling raises and their evidence rows, Tier-1 mechanical changes the owner ordered at the hand-offs, each observed by AC1 red and green and AC3/AC4 on its staged change, since reconciled onto dWellOiledMachine's higher values; the 79 deferred units are reviewed by the build run's closing review
