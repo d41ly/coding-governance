@@ -166,8 +166,7 @@ file. `harness arms (fail branches armed or pinned)` reads green at every tip fr
   after the unit it repairs?** Options: (a) each item is an act in the pass that adds its refusal, named
   in that unit's Edges and this Rollout, with AC1 reading each pass tip. (b) Every item at this unit's
   pass. (c) Raise the ceiling. (b) leaves the census at 324 or more from order 3 to 17. (c) is an owner
-  turn (veto 2). RESOLVED (agent, 2026-10-28, delegated): (a), rung 3, the one survivor. widens: none ·
-  relaxes: none
+  turn (veto 2). RESOLVED (agent, 2026-10-28, delegated): (a), rung 3, the one survivor. widens: none · relaxes: none
 
 ## 9. Revision log
 

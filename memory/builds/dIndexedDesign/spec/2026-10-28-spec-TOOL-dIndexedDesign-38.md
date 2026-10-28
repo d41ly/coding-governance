@@ -462,8 +462,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC8 · an `**o
   M3 sweep before the build run's first unit is where the owner sees it.
 - **F2 — Raise `REFUSAL_CEILINGS` or fold the sites (ids 13 to 15)?** Options: (a) raise by a dated
   decision; (b) fold into existing sites. (a) moves a declared ceiling the conf gives no run the terms to
-  move (M3). RESOLVED (agent, 2026-10-28, delegated): (b), rung 3, the one survivor. widens: none ·
-  relaxes: none
+  move (M3). RESOLVED (agent, 2026-10-28, delegated): (b), rung 3, the one survivor. widens: none · relaxes: none
 - **F3 — Raise `cutoff_keys_armed` or ship the three keys blank (ids 30 to 32)?** Options: (a) raise 36 to
   39 with a reason; (b) ship blank and arm at an owner-attended landing. Every past raise was an owner
   ruling, so (a) is an owner turn. RESOLVED (agent, 2026-10-28, delegated): (b), rung 3; the arming is
@@ -473,8 +472,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC8 · an `**o
   Options: (a) S18 here, as unit 5 changes the `research` entry; (b) make the ask a build-run
   precondition. (b) leaves the harness denied if the parent does not move. RESOLVED (agent, 2026-10-28,
   delegated): (a), rung 3, the most feature-rich survivor; it meets that ask's accept line.
-  grants: PLAY-dClosedLoop-3 the `plan` entry's `driver`, `harness` and `stages`. widens: none ·
-  relaxes: none
+  grants: PLAY-dClosedLoop-3 the `plan` entry's `driver`, `harness` and `stages`. widens: none · relaxes: none
 
 ## 9. Revision log
 
