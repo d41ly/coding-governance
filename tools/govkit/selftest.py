@@ -3515,7 +3515,8 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     TOOL-dSafePassage-37 AC1 to AC3 add `local-recent-objects-hook`, `local-ext-transport`, their
     `-stub` twins, the step environment's third pair and the class arm's `hook` suffix.
     TOOL-dSafePassage-45 AC1 to AC11 add the derived pair count under two parent configs, its six
-    plants, the credential-key arm and four staged copies."""
+    plants, the credential-key arm and four staged copies. TOOL-dSafePassage-47 AC1 to AC3 add
+    `submodule-name-slashed` and two walk copies."""
     us_py = HERE / "upgrade_steps.py"
 
     def fixture(py: pathlib.Path, *plant: str, env: dict | None = None) -> tuple[int, str]:
@@ -3685,6 +3686,23 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
                                         .replace(into, "walks.append((c, c,")), "submodule-ref-named-config")
     check("[dSP-45] AC9 a walk copy listing any directory holding a config reds fixture isolation submodule-ref-named-config",
           src.count(shape) == 1 and src.count(into) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # TOOL-dSafePassage-47 AC1 to AC3: the walk's shape test, its read's refusal and its descent
+    # through a name segment. AC1 and AC2 ride the dSP-45 rows above; `submodule-name-slashed` is
+    # refused through `lib/`. A walk copy classifying by the `rev-parse --git-dir` exit skips the
+    # malformed repository, and one that never descends a non-candidate misses `lib/x`.
+    rc, out = fixture(us_py, "submodule-name-slashed")
+    check("[dSP-47] AC3 fixture isolation submodule-name-slashed exits 1 naming filter.canary.clean in "
+          ".git/modules/lib/x/config", rc == 1 and "isolation: FAILED" not in out
+          and "filter.canary.clean in .git/modules/lib/x/config (submodule lib/x)" in out, out)
+    segment = "walks.append((base, c, w, parts, mark))"
+    for name, text, plant in (
+            ("rev-parse", src.replace(shape, 'if subprocess.run(["git", f"--git-dir={c}", "rev-parse", "--git-dir"], '
+                                             "env=env, capture_output=True).returncode:"), "submodule-config-malformed"),
+            ("no-descent", src.replace(segment, "pass"), "submodule-name-slashed")):
+        rc, out = fixture(build_staged_copy(tmp / f"dsp47-{name}", text), plant)
+        check(f"[dSP-47] AC2 AC3 a {name} walk copy reds fixture isolation {plant}",
+              src.count(shape) == 1 and src.count(segment) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
     # AC11: the credential class has one source, so the refused table carries none of its rows.
     dup = [r[0] for r in us45.STEP_REFUSED_KEYS if r[0] in ("remote.<x>.url", "remote.<x>.pushurl", "http.proxy",

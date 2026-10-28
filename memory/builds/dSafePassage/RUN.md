@@ -341,3 +341,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T06:10:31Z dispatch · item c0952b6f TOOL-dSafePassage-46 · reason tools/push-main.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/.memory-tree.conf.example
 
 2026-10-28T06:38:10Z dispatch · item c0952b6f TOOL-dSafePassage-46 · reason tools/push-main.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/.memory-tree.conf.example memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-46-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-46.md
+
+2026-10-28T07:05:11Z dispatch · item 8c69f3e4 TOOL-dSafePassage-47 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-47.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-47-ledger.md
+
+2026-10-28T07:05:16Z brief · item TOOL-dSafePassage-47 · reason c2907ef8e480 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-47-build-brief.md
+
+2026-10-28T07:14:53Z dispatch · item 8c69f3e4 TOOL-dSafePassage-47 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-47.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-47-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md

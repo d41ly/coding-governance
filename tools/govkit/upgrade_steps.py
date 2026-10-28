@@ -190,7 +190,8 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo",
                   "submodule-fsmonitor", "submodule-name-differs", "ssh-scheme-bare-user",
                   "proxy-schemeless-userinfo", "insteadof-dotted-userinfo", "submodule-ref-named-config",
-                  "submodule-config-malformed", "gitmodules-malformed", "submodule-nested-name-differs")
+                  "submodule-config-malformed", "gitmodules-malformed", "submodule-nested-name-differs",
+                  "submodule-name-slashed")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -2974,6 +2975,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         # `config`, `config-malformed` a de-initialised one a config ending `[core`; S13:
         # `gitmodules-malformed` leaves the target's `.gitmodules` unparseable, and
         # `nested-name-differs` nests `in` at `q` inside `nm` at `lib/p`, then de-initialises `nm`.
+        # TOOL-dSafePassage-47 S4: `name-slashed` sets it in a de-initialised submodule named `lib/x`,
+        # whose repository the walk reaches only through the `lib/` name segment.
         kind = plant.removeprefix("submodule-").removesuffix("-stub")
         linked = kind in ("unpopulated-worktree", "main-only")
         fx = ["git", "-c", "protocol.file.allow=always", "-c", "user.name=gk-fx", "-c", "user.email=gk-fx@invalid"]
@@ -2998,7 +3001,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         sub = src("sub", *((src("inner"),) if nested else ()))
         fx_git(target, "submodule", "add", "-q", *(("--name", "nm", sub.as_posix(), "lib/p")
                                                    if kind in ("name-differs", "nested-name-differs")
-                                                   else (sub.as_posix(), "sub")))
+                                                   else (sub.as_posix(), "lib/x" if kind == "name-slashed" else "sub")))
         if nested:
             fx_git(target, "submodule", "update", "-q", "--init", "--recursive")
         stepped = target
@@ -3008,7 +3011,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             fx_git(target, "worktree", "add", "-q", stepped.as_posix())
             fx_git(stepped, "-c", "protocol.file.allow=always", "submodule", "update", "-q", "--init")
         deep = {"nested": target / "sub" / "inner", "unpopulated-worktree": stepped / "sub",
-                "name-differs": target / "lib" / "p", "nested-name-differs": target / "lib" / "p" / "q"}.get(kind, target / "sub")
+                "name-differs": target / "lib" / "p", "name-slashed": target / "lib" / "x", "nested-name-differs": target / "lib" / "p" / "q"}.get(kind, target / "sub")
         key = "core.fsmonitor" if kind == "fsmonitor" else "filter.canary.clean"
         unkeyed = kind in ("ref-named-config", "config-malformed", "gitmodules-malformed")
         if kind == "ref-named-config":
@@ -3016,8 +3019,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         elif not unkeyed:
             fx_git(deep, "config", key, f": > '{(canaries / 'fsmonitor').as_posix()}'" if kind == "fsmonitor"
                    else f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
-        if kind in ("unpopulated", "name-differs", "config-malformed") or linked:
-            fx_git(stepped, "submodule", "deinit", "-q", "-f", "lib/p" if kind == "name-differs" else "sub")
+        if kind in ("unpopulated", "name-differs", "name-slashed", "config-malformed") or linked:
+            fx_git(stepped, "submodule", "deinit", "-q", "-f", {"name-differs": "lib/p", "name-slashed": "lib/x"}.get(kind, "sub"))
         else:
             # same size, new mtime: git cannot tell it changed without the clean filter
             (deep / "a.txt").write_text("b\n", encoding="utf-8", newline="\n")
@@ -3044,6 +3047,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                  + "/config (submodule sub)",
                  "fsmonitor": ".git/modules/sub/config (submodule sub)",
                  "name-differs": ".git/modules/nm/config (submodule lib/p)",
+                 "name-slashed": ".git/modules/lib/x/config (submodule lib/x)",
                  "nested-name-differs": ".git/modules/nm/modules/in/config (submodule lib/p/q)"}.get(kind, "")
         done = reports / "status.rc"
         status = (row("update", ["python", "{gov}/steps/update.py", "{target}", done.as_posix()]) if linked
