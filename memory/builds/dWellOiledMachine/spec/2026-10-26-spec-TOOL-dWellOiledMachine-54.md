@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-54 — discovery and the pick: one read of a project's claimable ready set, a pure replaceable pick filtered by the node profile, and the preset check refusing a harness with no model
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 51 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 51 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0332@aef236e5 whole
 
@@ -11,7 +11,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-reuse-scout-c.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-reuse-scout-c.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 |
 | [2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-59 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
+| [2026-10-28-build-TOOL-dWellOiledMachine-54-deviation-541.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-54-deviation-541.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -30,21 +33,27 @@ no model for it (P40; the owner's CL-3 and FK-3-2; cloud-and-scale items 8 and 1
 
 - **S1** — Discovery, `derive_claimable_set(repo)` in the new `tools/runtime/discover.py`, one read
   per call: the repository's own leases through the one lease reader, `unattended.sh --claims`
-  (`read_claims`, `tools/unattended/unattended.sh:2118`, one bounded fetch), and its builds' units
-  through the build index's `collect` (`tools/memory-tree/gen_build_index.py:1106`). A row is
-  claimable when it is (a) a unit whose spec status is `SPECCED` or `INPROGRESS`, with no live,
-  held or offered lease, whose build's every parent the dependency gate of KICK-dKeptSession-7 reads
+  (`read_claims`, `tools/unattended/unattended.sh:2118`, one bounded fetch), whose rows carry fields 1
+  to 5 only, name, fleet tag, `status`, beat-age and verdict (TOOL-dPlacedRequest-1:206-208, `:2204`),
+  a lease's `offer` (field 17) read through the verb TOOL-dWellOiledMachine-52 §8 F3 asks
+  dPlacedRequest for; and its builds' units with their derived status, the build index's `collect`
+  (`tools/memory-tree/gen_build_index.py:1106`) reached as §8 F5 picks, since a kit imports no sibling
+  kit (PLAY-dOrderedCharter-7 §4). A row is claimable when it is (a) a unit whose spec status is
+  `SPECCED` or `INPROGRESS`, with no live, held or offered lease, whose build's every parent the dependency gate of KICK-dKeptSession-7 reads
   `confirmed` or `landed`; or (b) a lease released as a hand-over, or expired by
   TOOL-dPlacedRequest-17's observer rule, whose build has an (a) row. Never a lease whose `status` is
   `landed`, `aborted` or `withdrawn`, and never a build whose state TOOL-dDeclaredLoop-31 S7 reads
   `parked`. It reads no other project's leases: the remote is this repository's own, through its
   remote ladder. Observed by AC1, AC4.
-- **S2** — What a row's work needs, `read_unit_needs(row)` in `discover.py`: the roles of every
+- **S2** — What a row's work needs, `read_unit_needs(row)` in `discover.py`, each read a bounded
+  subprocess of a roles verb found through the inline `resolve_kit_dir`: the roles of every
   `[[workflow]]` row of `tools/roles/workflows.toml` whose `driver` is `workflow` and whose `stage` is
-  at or after `build`'s, read through `load_workflows` (`tools/roles/roles_lib.py:364`); for each role,
-  its harnesses from `resolve_role_harness` (TOOL-dWellOiledMachine-56 S1), its model on each harness
-  from `resolve_role_model` (TOOL-dBoundRoles-21 S5) reading `roles.model.<role>.<harness>`, and its
-  `hardware` field (S5). Observed by AC2.
+  at or after `build`'s, rows read only through `load_workflows` (`tools/roles/roles_lib.py:364`,
+  TOOL-dBoundRoles-22:38-44), so through the read-only roles verb TOOL-dWellOiledMachine-43 §8 F3 asks
+  dBoundRoles for, with no second ask; for each role, its harnesses from `roles_lib.py act <role>`
+  (TOOL-dWellOiledMachine-56 S4), its model on each harness from S6's `roles_lib.py model <role>
+  <harness>` over `resolve_role_model` (TOOL-dBoundRoles-21 S5), and its `hardware` field (S5) from
+  `roles_lib.py hardware <role>`, printing `cpus=<n>, memory-gb=<n>` or `none`. Observed by AC2.
 - **S3** — The pick, `derive_pick(rows, needs, profile, plans, fleet_tag)` in the new
   `tools/runtime/pick.py`: pure, reading nothing and writing nothing, the function the built-in
   `node-pick` adapter at `point.offer-sources` names (TOOL-dWellOiledMachine-55 S2), so another adapter
@@ -77,10 +86,12 @@ no model for it (P40; the owner's CL-3 and FK-3-2; cloud-and-scale items 8 and 1
   run beside `check_repo_presets` (KICK-dKeptSession-1 S3) over the effective assignment, refuses a
   role whose `roles.harness.<role>` set names a harness with neither a `roles.model.<role>.<harness>`
   value nor an adapter equivalent: `roles.harness.<role> names <harness>, which has no model for
-  <role>; set roles.model.<role>.<harness>`, at the line `derive_key_line` finds. The equivalent is
-  asked of `python roles_lib.py model <role> <harness>`, a CLI this unit adds over
-  `resolve_role_model`, exit 2 on its `RolesError`, found through `resolve_kit_dir` since a kit
-  imports no sibling kit. Observed by AC6.
+  <role>; set roles.model.<role>.<harness>`, at the line `derive_key_line` finds. The key is read from
+  the assignment being checked, never through `get`, which reads the landed revision
+  (TOOL-dBoundRoles-21:41-44), so a value the file adds counts before it lands. The equivalent alone is
+  asked of `python roles_lib.py model <role> <harness> --equivalent`, which reads no policy; `model`
+  without the flag answers `resolve_role_model`. Both are a CLI this unit adds, exit 2 on its
+  `RolesError`, found through `resolve_kit_dir` since a kit imports no sibling kit. Observed by AC6.
 - **S7** — The page `help/runtime.md` gains discovery and the pick: what is claimable, the three
   filters, the order, the spread start and what an offer may do; `help/policy.md` gains S6's refusal.
   Observed by AC7.
@@ -101,8 +112,8 @@ no model for it (P40; the owner's CL-3 and FK-3-2; cloud-and-scale items 8 and 1
 - **consumes-from** `TOOL-dWellOiledMachine-61` — `resolve_node_home` and `read_node_profile`, the profile whose harnesses and hardware the pick filters on
 - **consumes-from** `TOOL-dWellOiledMachine-41` — `offer`, the lease record's offer the pick only reorders by
 - **consumes-from** `TOOL-dWellOiledMachine-55` — `point.offer-sources`, the point whose built-in `node-pick` row names this unit's pick
-- **consumes-from** `TOOL-dWellOiledMachine-56` — `resolve_role_harness`, the harnesses a role's work needs, which the pick and the preset check read
-- **consumes-from** external — TOOL-dPlacedRequest-1, -17 and -20's lease reader, verbs and classes; KICK-dKeptSession-7's dependency gate; KICK-dKeptSession-1's `check_repo_presets`; TOOL-dBoundRoles-21's `resolve_role_model`; TOOL-dTotalRecall-25's stream plan
+- **consumes-from** `TOOL-dWellOiledMachine-56` — `roles_lib.py act`, the harnesses a role's work needs, which the pick reads
+- **consumes-from** external — TOOL-dPlacedRequest-1, -17 and -20's lease reader, verbs and classes; KICK-dKeptSession-7's dependency gate; KICK-dKeptSession-1's `check_repo_presets`; TOOL-dBoundRoles-21's `resolve_role_model`; the dPlacedRequest lease-field verb TOOL-dWellOiledMachine-52 §8 F3 asks for and the dBoundRoles stage-row verb TOOL-dWellOiledMachine-43 §8 F3 asks for; TOOL-dTotalRecall-25's stream plan
 
 ## 4. Design
 
@@ -111,8 +122,8 @@ no model for it (P40; the owner's CL-3 and FK-3-2; cloud-and-scale items 8 and 1
 - The tick skips a lease another node hosts: `case "$host" in ""|absent|"$me") ;; *) … skip · leased on
   $host` (`tools/unattended/resume-tick.sh:285`).
 - `--claims` prints one row per claim on the remote (`print_claims`, `tools/unattended/unattended.sh:2200`),
-  over `read_claims`; TOOL-dPlacedRequest-1 widens its rows to eighteen fields with `kind`, `epoch` and
-  `offer`.
+  over `read_claims`; TOOL-dPlacedRequest-1 widens `CLAIM_ROWS` to eighteen fields with `kind`, `epoch`
+  and `offer`, while `--claims` still prints fields 1 to 5 (its :206-208).
 - `roles.harness.<role>` is a set of harness names, never set by a preset
   (`tools/policy/catalogue.toml:319-324`, v2:1191); `roles.model.<role>.<harness>` derives from the
   adapter's equivalent (`:313-317`), and `HARNESS_MODEL_EQUIVALENT` holds `claude-code` alone
@@ -140,7 +151,7 @@ pick:             fx/TOOL-fx-2, gy/build
 | `derive_pick`, `derive_spread_start` | Python functions in `pick.py` | `derive`, OK |
 | `PLAN_PRIORITY_STAND_IN` | constant in `pick.py` | none |
 | `check_role_models` | Python function in `presets.py` | `check`, OK |
-| `model` | `roles_lib.py` CLI verb | none |
+| `model` (with `--equivalent`), `hardware` | `roles_lib.py` CLI verbs | none |
 | `hardware` | role-schema field | none |
 | `pick — set aside`, `pick — refused`, `pick — plan priority: stand-in` | output lines | none |
 
@@ -248,16 +259,34 @@ New arm: tools/policy/check_policy.py · covers AC6 · the planted two-harness r
   over the whole ordered list. (b) breaks the clause's "then the oldest released" for released work.
   Rung 1, the clause's order of its terms. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 
+- **F5 — How does `discover.py` read the builds' units and their derived status?** `collect`
+  (`tools/memory-tree/gen_build_index.py:1106`) is a memory-tree function, and the index's CLI prints
+  no unit rows: its modes are `--check`, `--write`, `--asks`, `--survey`, `--report` and their kin
+  (`:8737-8739`). Options: (a) a read mode this unit adds to `gen_build_index.py`, `--units`, printing
+  one `<slug> · <unit id> · <status> · <order>` line per unit over `collect`, run as a bounded
+  subprocess, as S6 adds `model` to the roles kit; (b) a declared `requires_if` row on
+  `tools/runtime/kit.toml` naming `memory-tree`, `discover.py` loading `collect` by file; (c) parse the
+  committed `gen:build-units` region of each build README. (c) is a second parser of a render whose
+  shape no contract fixes; (b) makes the runtime kit an in-process consumer of an 8,841-line module.
+  Recommendation: (a), one verb over the function that already derives the status. Open for the
+  owner; the pass builds no discovery read before the pick.
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
+- rev-2 · 2026-10-28 · §2 S1, S2, S6, §3 Edges, §4 Evidence and Inventory, §8 F5, §10 · `--claims`
+  read as its five fields with `offer` through TOOL-dWellOiledMachine-52 §8 F3, the units through F5
+  (open), the roles through verbs, and the preset check reading the model key from the assignment with
+  only the equivalent asked of the roles kit, per the parents' cross-check
+  `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 140, 142 and 143. Fork dedupe:
+  §2 S2 · §3 Edges: the stage-row cite moves to TOOL-dWellOiledMachine-43 §8 F3, the fork that owns it.
 
 ## 10. Reuse audit
 
 The seams extended are the one lease reader `read_claims` and its verb `--claims`
 (`tools/unattended/unattended.sh:2118,2200`), the build index's `collect`
-(`tools/memory-tree/gen_build_index.py:1106`), the roles kit's `load_workflows`
-(`tools/roles/roles_lib.py:364`) and resolvers, the node profile reader (TOOL-dWellOiledMachine-61
+(`tools/memory-tree/gen_build_index.py:1106`) through §8 F5's read, the roles kit's `load_workflows`
+(`tools/roles/roles_lib.py:364`) and resolvers, each reached by a verb, the node profile reader (TOOL-dWellOiledMachine-61
 S3), the `node-pick` row at `point.offer-sources` (TOOL-dWellOiledMachine-55 S2) and the repository
 preset rule `check_repo_presets` (KICK-dKeptSession-1 S3). The probe
 `python tools/codebase-map/reuse_lookup.py "find claimable ready units across builds and pick what

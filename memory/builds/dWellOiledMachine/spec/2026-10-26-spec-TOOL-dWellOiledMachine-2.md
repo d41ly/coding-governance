@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-2 — the `next` verb over the position function, the `next —` micro-format, and every declared command ending with one
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 14 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 14 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0280@62ada92d whole
 
@@ -12,7 +12,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-2-deviation-21.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-2-deviation-21.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-2-deviation-22.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-2-deviation-22.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -25,19 +28,22 @@ every gov command ends with a `next —` line and a `next` verb answers "what no
 (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:963-966`); the
 layer splits it, the position function dDeclaredLoop's and the verb, the micro-format and the check
 Runtime's (layer-runtime `[decide]`, :315-330). This unit builds the `next` verb over TOOL-dDeclaredLoop-7's
-`derive_position`, the `next —` micro-format, the check that every declared command ends with one or
+`position.py`, the `next —` micro-format, the check that every declared command ends with one or
 declares itself terminal, its laggard list drained to empty before the unit closes (M3), and re-points
 the readers of `--plan` and `--status` that ask what comes next.
 
 ## 2. Scope (IN)
 
-- **S1** — The verb (I13), `python tools/runtime/next.py <slug> [--json]`: it calls `derive_position(repo,
-  slug)` (TOOL-dDeclaredLoop-7 S1) and prints the engine's line output (TOOL-dDeclaredLoop-7 §4 "Line
-  output") unchanged, ending with exactly one `next —` line. For the answer `act` that last line is the
+- **S1** — The verb (I13), `python tools/runtime/next.py <slug> [--json]`: it runs the loop kit's verb
+  `<sys.executable> <loop kit>/position.py <slug>` (TOOL-dDeclaredLoop-7 S7) as a bounded subprocess,
+  the loop kit found through the inlined `resolve_kit_dir` block, since a kit imports no sibling kit
+  (PLAY-dOrderedCharter-7, oc7:202-205), and prints the engine's line output (TOOL-dDeclaredLoop-7 §4
+  "Line output") unchanged, taking the answer and reason from its `position —` line, ending with
+  exactly one `next —` line. For the answer `act` that last line is the
   engine's own `next — <item tag> · actor <actor> · key <instance key>`, the key the item instance key
   (I14, TOOL-dDeclaredLoop-7 S3); for any other answer the engine prints no `next —` line and the verb
-  appends the terminal `next — none · <answer> · <reason>`. `--json` prints the engine's JSON object with
-  one more field, `next`, holding that line. Exit 0 for every answer but `invalid-input`, which exits 2,
+  appends the terminal `next — none · <answer> · <reason>`. `--json` runs `position.py <slug> --json` and
+  prints the engine's JSON object with one more field, `next`, holding that line. Exit 0 for every answer but `invalid-input`, which exits 2,
   as the engine does. Observed by AC1.
 - **S2** — The tail, `python tools/runtime/next.py --tail [<slug>]`, which prints only S1's last line,
   for a command to end with. With no slug and no `GOV_BUILD` in the environment it prints
@@ -58,8 +64,10 @@ the readers of `--plan` and `--status` that ask what comes next.
   `<n> command(s) · <t> terminal · <l> laggard(s)`, and a population of zero is `unarmed`, never green.
   Observed by AC4.
 - **S6** — The laggard list, `tools/runtime/next-laggards.txt`, held through KICK-dKeptSession-19 S1's
-  factory: `check_shrink_list("runtime", "next-laggards.txt", derived, compare)` for `--check-commands`
-  and `write_shrink_list` for `--check-commands --write`. A derived laggard the list lacks, a listed
+  factory, `check_shrink_list` for `--check-commands` and `write_shrink_list` for `--check-commands
+  --write`, reached as §8 F4 picks: the factory is a function of `tools/policy/policy.py` with no verb
+  over a named kit's list (ks19:30-36; `policy.py lists` serves only the policy kit's own two lists),
+  and the runtime kit loads no policy module in process (oc7:202-205). A derived laggard the list lacks, a listed
   name that is no longer a laggard, and a name the compare base's list lacks are each red. Observed by
   AC5.
 - **S7** — The drain (M3). The build pass seeds the list with `--write` over the rows at the pass,
@@ -67,9 +75,13 @@ the readers of `--plan` and `--status` that ask what comes next.
   its `run` file ends with the tail, or its row gains `terminal = true` where the command's last act is
   a hand-back with no next step (a lander's exit, a hook). The unit closes only with the list holding
   no name, which keeps it as the shrink-only list no later laggard may join. Observed by AC5.
-- **S8** — The leg `runtime next tails` in `tools/gate-legs.json`, running
-  `python tools/runtime/next.py --check-commands` and `python tools/runtime/next.py --fixture`.
-  Observed by AC4, AC5.
+- **S8** — The leg `runtime next tails`, declared once as a `[[gate_leg]]` row of
+  `tools/runtime/kit.toml` holding every manifest key (TOOL-dWitnessedBar-11 S1, wb11:36-49), made with
+  `leg_factory.py new` and rendered into the manifest by `leg_factory.py --write`, running
+  `python tools/runtime/next.py --check-commands` and `python tools/runtime/next.py --fixture`. Its
+  `enforces` is `["principle.p15"]`: v2's `[enforcement]` row for P15 names this unit's clause
+  `cl-dClosedLoop-0280` (v2:1837), and PLAY-dOrderedCharter-7 S3 reds a leg with no `enforces`
+  (oc7:58-63). Observed by AC4, AC5.
 - **S9** — The readers of `--plan` and `--status` that ask what comes next, re-pointed onto `next`:
   the build skill's stage-5 loop condition (`tools/roles/SKILL.template.md:59`, rendered to
   `.claude/skills/build/SKILL.md`), which loops until `next.py <slug>` prints `next — none ·
@@ -101,7 +113,7 @@ the readers of `--plan` and `--status` that ask what comes next.
 - **hands-off** `TOOL-dWellOiledMachine-40` — `next —`, the line each committed role return's queue step ends with
 - **hands-off** `TOOL-dWellOiledMachine-26` — `next —`, the answer the `step —` line is rendered from
 - **hands-off** `TOOL-dWellOiledMachine-25` — `next —`, the answer the supervisor acts on as the only driver
-- **consumes-from** external — TOOL-dDeclaredLoop-7's `derive_position` and line output, -18's `[[command]]` rows and `command` tag form, -6's command factory, and KICK-dKeptSession-19's `check_shrink_list` and `write_shrink_list`, each specced and unbuilt at base `0689e7fa`
+- **consumes-from** external — TOOL-dDeclaredLoop-7's `position.py <slug> [--json]` verb and line output, -18's `[[command]]` rows and `command` tag form, -6's command factory, and KICK-dKeptSession-19's `check_shrink_list` and `write_shrink_list`, each specced and unbuilt at base `0689e7fa`
 - **hands-off** `TOOL-dWellOiledMachine-79` — the unattended Skill's `next.py` read and its leg (findings 55, 58), which the spec audit's minors batch repairs
 
 ## 4. Design
@@ -146,7 +158,7 @@ declared command, the lander among them, in a fixture. Each command's own suite 
 | `next-laggards.txt` | shrink-only list | `tools/runtime/` |
 | `terminal` | optional `[[command]]` key | every `tools/*/kit.toml` |
 | `GOV_BUILD` | environment read | `tools/runtime/next.py` |
-| `runtime next tails` | gate leg | `tools/gate-legs.json` |
+| `runtime next tails` | gate leg | a `[[gate_leg]]` row of `tools/runtime/kit.toml` |
 | `next —` | micro-format | the charter template's fence |
 
 Naming cells: each function is asked of `python tools/lexicon/lexicon.py --suggest <name> --as
@@ -162,8 +174,9 @@ the tail or `terminal = true`.
 
 - `tools/runtime/next.py`
 - `tools/runtime/next-laggards.txt`
-- `tools/runtime/kit.toml`
-- `tools/gate-legs.json`
+- `tools/runtime/kit.toml` — the `[[command]]` row and the leg's `[[gate_leg]]` row; the manifest is
+  `leg_factory.py --write`'s render, and since `leg_factory.py` is not in the tree today the pass
+  records that a hand edit of the manifest row stands in until TOOL-dWitnessedBar-11 lands
 - `coding-governance-agents.template.md`
 - `AGENTS.md`
 - `tools/roles/SKILL.template.md`
@@ -240,7 +253,7 @@ the population is empty.
 
 `unattended kit gate` · `micro-format definitions` · `micro-format gate selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy fixtures` · `check-wiring self-test` · `unattended skill wiring` · `roles render wiring` · `playbook render wiring` · `template size <=48KiB` · `lexicon naming predicates` · `memory hygiene`
 
-The leg `runtime next tails` joins the manifest in this unit (S8); the micro-format checker's leg
+The leg `runtime next tails` is declared in this unit (S8); the micro-format checker's leg
 grades S3 as it grades every definition.
 
 New arm: tools/runtime/next.py · covers AC1 AC2 AC4 AC5 · the engine's plants, a bare command row and a stale and a new laggard, staged against a verb that prints the engine's lines alone · none
@@ -262,20 +275,37 @@ New arm: tools/check-microformats.test.sh · covers AC3 · a second `next —` d
   the clause names "the `next —` micro-format". Rung 3, the grant lifting veto 2 for what the clause
   names. RESOLVED (agent, 2026-10-26, delegated): one definition in the fence. widens: none · relaxes:
   none · grants: PLAY-dClosedLoop-3 the `next —` micro-format in the charter template's fence
+- **F4 — How does `next.py` reach the shrink-only list factory?** KICK-dKeptSession-19 S1 puts
+  `check_shrink_list` and `write_shrink_list` in `tools/policy/policy.py` as functions (ks19:30-36),
+  its only verb, `policy.py lists`, reads the policy kit's own lists (ks19:47), and a kit imports no
+  sibling kit (oc7:202-205). Options: (a) an ask to dKeptSession for a verb over a named kit's list,
+  such as `policy.py shrink-list --check|--write <kit> <name> --derived <file>`, which `next.py` runs
+  as a subprocess; (b) a declared `requires_if` row on `tools/runtime/kit.toml` naming `policy`,
+  admitting the in-process load as the descriptors' existing rows admit theirs, on the ground that
+  the runtime kit already requires the policy kit; (c) a copy of the factory in the runtime kit,
+  which KICK-dKeptSession-19 exists to stop. Recommendation: (a), the ask the build run would file to
+  dKeptSession: the factory stays one implementation and the rule's one seam, a verb, carries it,
+  where (b) widens the import surface for one list. Open for the owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-28 · §1 · §2 S1, S6, S8 · §3 Edges · §4 Inventory, Files touched · §7 · §8 F4 · §10 ·
+  re-grounded on the parents at `d1721ef20` by the cross-check record
+  `build/2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck.md`, rows 4 and 5: the engine
+  is read through `position.py` as a subprocess, the shrink-list factory waits on F4, and the leg is
+  a `[[gate_leg]]` row carrying `enforces`.
 
 ## 10. Reuse audit
 
-The seams extended are TOOL-dDeclaredLoop-7's position engine and its line output, the charter
+The seams extended are TOOL-dDeclaredLoop-7's position engine, run through its verb `position.py`
+(dl7:61-63), and its line output, the charter
 template's micro-format fence and its checker (`coding-governance-agents.template.md:57-74`,
 `tools/check-microformats.sh`), TOOL-dDeclaredLoop-18's `[[command]]` rows and tag form, and
-KICK-dKeptSession-19's shrink-only list factory, the brief's proposed dead-path-waiver shape refined to
-it because the factory is that list's one implementation. The probe
+KICK-dKeptSession-19's shrink-only list factory, reached as §8 F4 picks, the brief's proposed
+dead-path-waiver shape refined to it because the factory is that list's one implementation. The probe
 `python tools/codebase-map/reuse_lookup.py "print the next step a caller should run after a command"`
 ranked `run`, `step` (`tools/govkit/govkit.py`) and `run_git` by name stem; none prints a next step, so
 no code seam fits the verb beyond the engine. Scout C's line cites `unattended.sh:5882-5920`, `:6131`

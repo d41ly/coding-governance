@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-43 — the in-flight ledger: a slot per agent at SubagentStart and SubagentStop, Workflow reservations converted by run, a sweep keyed to the session's liveness, and its split fallback
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 36 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 36 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0321@f02a952d whole
 
@@ -12,7 +12,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-59 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-43-deviation-431.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-43-deviation-431.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-43-deviation-432.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-43-deviation-432.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -26,7 +29,7 @@ harness's two concurrency settings are the only in-flight counters today (`tools
 agent-cap's claim window retired with TOOL-dGroundRules-10, so gap-rt-05's 45-minute window no longer
 exists at this base). This unit adds the hook pack that bounds the session's total: a direct or
 Workflow spawn admitted only while agents in flight and reservations stay under the limit, a Workflow
-call reserving its harness's declared fan, each agent's SubagentStart claim converting one slot of its
+call reserving its harness's declared cap, each agent's SubagentStart claim converting one slot of its
 run's reservation, release at SubagentStop and at the run's saved result, and a sweep keyed to the
 session's liveness. It arms only on the spike's four SubagentStop facts, and otherwise splits the limit
 (night pass two `[p7-agent-cap]`; layer-runtime `[supervise]`, "Agents in flight").
@@ -44,10 +47,14 @@ session's liveness. It arms only on the spike's four SubagentStop facts, and oth
   `PreToolUse`, matcher `Agent|Workflow`, class `refuse`, failure `open`, `budget-ms` 600000, key
   `runtime.agents-in-flight`) runs `inflight.py admit` through `pyrun.sh` (TOOL-dWellOiledMachine-8
   S3). An `Agent` call asks `add_reservation` (TOOL-dWellOiledMachine-9 S3) for one slot, run
-  `call:<tool_use_id>`; a `Workflow` call asks for its harness's declared fan, the largest stage `fan`
-  of the workflow whose `harness` is its `scriptPath` (TOOL-dBoundRoles-22 S1), except in an act
-  session whose act already holds a supervisor reservation, which `set_reservation_run` re-keys to the
-  call instead of reserving twice. Each slot's `owner` is `session:<session id>`. Observed by AC2, AC5.
+  `call:<tool_use_id>`; a `Workflow` call asks for its harness's declared cap, the largest stage `cap`
+  of the workflows whose harness is its `scriptPath`, since a stage's `cap` is the most of its agents
+  in flight at once and its `fan` the most it spawns in one call (TOOL-dBoundRoles-22:108-109). The
+  stage rows are read only through the roles kit's `load_workflows` (TOOL-dBoundRoles-22:38-44), and no
+  roles verb prints `cap` (`handoff.py harness-args` prints `{key: role}`), so the read is §8 F3's
+  verb, run as a bounded subprocess through the inline `resolve_kit_dir`. In an act session whose act
+  already holds a supervisor reservation, `set_reservation_run` re-keys that reservation to the call
+  instead of reserving twice. Each slot's `owner` is `session:<session id>`. Observed by AC2, AC5.
 - **S3** — The hold. A reservation refused by `SlotsShort`, or in `split` mode a `Workflow` call while
   the session's previous run has no saved result (S7), is held inside the entry: `run_spawn_hold`
   re-asks every 2 s and admits the call when it fits, for at most the `hook-hold-seconds` row
@@ -64,7 +71,10 @@ session's liveness. It arms only on the spike's four SubagentStop facts, and oth
   converts one unconverted slot of the agent's run's reservation by writing its `agent` id, so the
   agent is counted once. The run is the directory the agent's transcript sits in under
   `subagents/workflows/`, read from the payload where it names the path, else from the session's run
-  journals' `started` line naming `agent_id` (`load_run_journal`, `tools/roles/handoff.py:686`); a
+  journals' `started` line naming `agent_id`, read over the runs §8 F4's verb lists through the verb
+  TOOL-dWellOiledMachine-30 §8 F3 asks for, `handoff.py agents --run <run-id> --session <file>
+  --json`, by subprocess, since the parser `load_run_journal` (`tools/roles/handoff.py:686`) is a
+  sibling kit's function; a
   direct agent converts its `Agent` call's slot, matched by `agent_type`; an agent matched to no
   reservation claims a fresh slot at the first free index, past the limit if it must, since a
   SubagentStart cannot refuse a start. Observed by AC3, AC5.
@@ -73,14 +83,16 @@ session's liveness. It arms only on the spike's four SubagentStop facts, and oth
   `remove_agent_slot` clears a direct or fresh slot, and returns a converted slot to its reservation by
   writing `agent` back to `-`, since a run may start more agents. Observed by AC5.
 - **S7** — Released at the run's saved result. A run's saved result is the task notification its
-  `Workflow` call receives in the session's transcript, read through `load_session_calls` and
-  `NOTIFICATION_RE` (`tools/roles/handoff.py:576`, `:125`) from a byte cursor kept per session in the
-  ledger, by `read_saved_result(transcript, run_id)`. Every pack run clears, nonce-guarded, the
+  `Workflow` call receives in the session's transcript, read by `read_saved_result(transcript, run_id)`
+  from a byte cursor kept per session in the ledger, through §8 F4's roles verb by subprocess, since
+  the parsers `load_session_calls` and `NOTIFICATION_RE` (`tools/roles/handoff.py:576`, `:125`) are a
+  sibling kit's. Every pack run clears, nonce-guarded, the
   reservation of each run of its session whose result is saved. Observed by AC4, AC5.
 - **S8** — The sweep keyed to the session's liveness, in place of a claim's expiry. Slots this unit
   writes carry `ttl` 0, which TOOL-dWellOiledMachine-9's `remove_stale_slots` never judges.
-  `derive_harness_pid` walks the hook's ancestors through `scan_processes` and `build_self_chain`
-  (`tools/process-monitor/census.py:260`, `scope.py:254`) to the first harness binary and caches its
+  `derive_harness_pid` walks the hook's ancestors, read through §8 F5's process-monitor verb by
+  subprocess, since `scan_processes` and `build_self_chain` (`tools/process-monitor/census.py:260`,
+  `scope.py:254`) are a sibling kit's functions, to the first harness binary and caches its
   pid and image once per session under the ledger's `sessions/`; `remove_dead_session_slots`, run at
   most once a minute by any pack, clears every slot of a session whose cached pid no longer runs that
   image. Observed by AC6.
@@ -116,7 +128,7 @@ session's liveness. It arms only on the spike's four SubagentStop facts, and oth
 - **consumes-from** `TOOL-dWellOiledMachine-9` — `slots.py`, the ledger whose slots the packs reserve, convert, return and clear
 - **consumes-from** `TOOL-dWellOiledMachine-8` — `pyrun.sh`, through which every pack runs `inflight.py`
 - **hands-off** `TOOL-dWellOiledMachine-45` — `admit`, which takes a held call past the hook's hold where S3 now answers with the admission notice, and `derive_inflight_mode`, whose mode decides the room `admit` asks for
-- **consumes-from** external — TOOL-dBoundRoles-22's stage `fan`; TOOL-dBoundRoles-25's spawn guard and its settings rule; TOOL-dGroundRules-10's settings render
+- **consumes-from** external — TOOL-dBoundRoles-22's stage `cap`, through §8 F3's verb; TOOL-dBoundRoles-25's spawn guard and its settings rule; TOOL-dGroundRules-10's settings render
 - **hands-off** `TOOL-dWellOiledMachine-66` — the in-flight admission pack and its deny past the hold, which that unit gives a refusal row and a `rule —` line (finding 5)
 - **hands-off** `TOOL-dWellOiledMachine-79` — `inflight.py admit` and its hold (finding 70), which the spec audit's minors batch repairs
 
@@ -143,7 +155,7 @@ session's liveness. It arms only on the spike's four SubagentStop facts, and oth
 | | `ledger` | `split` |
 |---|---|---|
 | direct spawn | admitted while total + 1 ≤ `L` | admitted while direct ≤ `ceil(L/2)` - 1 |
-| Workflow call | admitted while total + fan ≤ `L` | one live run per session, held while the last has no saved result |
+| Workflow call | admitted while total + cap ≤ `L` | one live run per session, held while the last has no saved result |
 | harness settings | `L` and `L` | `ceil(L/2)` and `L - ceil(L/2)` |
 | agent slot | claimed at start, returned at stop | none: the harness's per-run setting bounds the run |
 
@@ -181,8 +193,9 @@ session's liveness. It arms only on the spike's four SubagentStop facts, and oth
 
 - security — no new write surface beyond the node-local ledger; a held call never starts over the
   limit, and a call outliving the hold is denied with its reason, never run.
-- perf / scale — one bash and one Python start per spawn and per agent start and stop; the census for
-  the sweep at most once a minute; the hold polls every 2 s.
+- perf / scale — one bash and one Python start per spawn and per agent start and stop, plus the
+  verbs' subprocesses of §8 F3 and F4; the census for the sweep at most once a minute; the hold polls
+  every 2 s.
 - error / empty / loading states — an unreadable capability row arms `split`; an unknown run claims a
   fresh slot, so the total is never undercounted.
 - observability — `inflight.py status`, the held call's notice, and the mode line.
@@ -218,7 +231,7 @@ directory with run journals and a transcript, and hook payloads piped through ea
   notification it is admitted within one poll; with `hook-hold-seconds` planted at 20 and no
   notification, it is denied after 10 s with the `admission — waiting` notice.
   Red when: the second call is refused while the hold lasts, or starts beside a live run.
-- **AC5** — When `--plant convert` reserves a Workflow call of fan 3, re-keys it at `PostToolUse` and
+- **AC5** — When `--plant convert` reserves a Workflow call of cap 3, re-keys it at `PostToolUse` and
   starts three of its agents, `status` reads `3 in flight · 0 reserved`, never 6; stopping one reads
   `2 in flight · 1 reserved`; appending the run's notification reads `0 in flight · 0 reserved`.
   Red when: an agent is counted twice, or the reservation outlives its run's result.
@@ -255,20 +268,73 @@ New arm: tools/policy/check_policy.py · covers AC7 · the split plant staged ag
   past the measured bound, where the spike records what the harness does to a timed-out hold. (b) is
   undefined behaviour by the spike's own row, `hook-hold-timeout`. Rung 3. RESOLVED (agent,
   2026-10-26, delegated): (a). widens: none · relaxes: none
+- **F3 — Through which surface does the runtime kit read a harness's stage rows?** The stage rows are
+  read only by `load_workflows` in `tools/roles/roles_lib.py` (TOOL-dBoundRoles-22:38-44), and
+  `handoff.py harness-args` prints the `{key: role}` map alone (`tools/roles/handoff.py:453-471`).
+  Options: (a) an ask to dBoundRoles for `handoff.py stage-rows <harness>`, keyed as `harness-args`
+  is, printing one line of sorted JSON `{workflow: {key: {"role": r, "fan": n, "cap": n}}}` over the
+  stage rows of the workflows whose harness is that script (br22:34-45, :108-109) and exiting 1 as
+  `harness-args` does for none, run by S2 as a bounded subprocess, S2 reserving the largest `cap`; (b) a declared `requires_if` row on `tools/runtime/kit.toml` naming `roles`, S2
+  importing `load_workflows` in process, a declaration `govkit selfcheck` grades and that installs
+  nothing (`tools/memory-tree/kit.toml:8`); (c) reserve the limit `L` for every `Workflow` call until
+  a verb exists. (c) serialises every Workflow run behind any direct spawn; (b) makes the runtime kit
+  the in-process consumer of a reader the parent keeps single (TOOL-dBoundRoles-22 S2). (a) is one
+  verb over the function that already returns the rows, the shape TOOL-dBoundRoles-3 F5 recommends for
+  the same gap; its cost is a wait, since AC2, AC3 and AC5 cannot pass until it lands.
+  Recommendation (a). Open for the owner: the ask the build run files is "TOOL-dBoundRoles-22:
+  `handoff.py stage-rows <harness>` prints each workflow's stage keys with their `role`, `fan` and
+  `cap` as one line of sorted JSON, keyed by harness as `harness-args` is". This fork owns the
+  stage-row read for the build: TOOL-dWellOiledMachine-1 S2, -7 S1 and S6, -9 S5, -19 S3, -45 S3 and
+  -54 S2 read the same verb.
+- **F4 — Through which surface does `inflight.py` read a session's Workflow runs and task
+  notifications?** The parsers are `load_run_journal`, `load_session_calls` and
+  `NOTIFICATION_RE` (`tools/roles/handoff.py:686`, `:576`, `:125`); the one verb over them,
+  `handoff.py agents`, prints the governing doc's `agent` lines and needs its micro-format fence
+  (`:808-820`). A run's started agents are TOOL-dWellOiledMachine-30 §8 F3's ask, which this fork
+  does not repeat. Options: (a) an ask to dBoundRoles for `handoff.py run-state --session <file>
+  [--from <byte>]`, printing as JSON lines each `Workflow` call's run id and notification status and
+  the byte offset read to, run by S5 and S7 as a bounded subprocess;
+  (b) a declared `requires_if` row on `tools/runtime/kit.toml` naming `roles`, importing the three in
+  process, as F3 (b); (c) the runtime kit parses the harness's journal and transcript itself, a second
+  parser beside the roles kit's (charter `[reuse]`). (a) keeps one parser and one seam; its cost is a
+  Python start per pack run. Recommendation (a). Open for the owner: the ask the build run files is
+  "the roles kit: `handoff.py run-state` prints a session's Workflow runs and their notification
+  status from a byte offset".
+- **F5 — Through which surface does `derive_harness_pid` read the hook's ancestors?** `census.py
+  --print` prints the rows (`tools/process-monitor/census.py:317-327`) and no verb prints the self
+  chain, whose walk translates MSYS parents through `build_edges` (`scope.py:129-141`, `:254-276`).
+  Options: (a) this unit adds `python scope.py --self-chain` to process-monitor, printing the calling
+  process's chain over `build_self_chain`, one `<winpid>` TAB `<command>` line per ancestor, which
+  `derive_harness_pid` runs by subprocess, the verb's own chain passing through `inflight.py` to the
+  harness; (b) a declared `requires_if` row naming `process-monitor`, importing both in process;
+  (c) `census.py --print` and a walk carried in the runtime kit, a copy of `build_edges`. No parent
+  build owns process-monitor, so (a) edits that kit's own CLI and adds no import. Recommendation (a),
+  `tools/process-monitor/scope.py` joining Files touched at the pick. Open for the owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-66, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-28 · §1 · S2 · S5 · S7 · S8 · §3 · §4 · §5 · AC5 · §8 F3, F4, F5 · §10 · re-grounded
+  on the cross-check record `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 103,
+  104 and 106: a Workflow call reserves the largest stage `cap`, not `fan`; the stage rows, the run
+  journal, the task notifications and the self chain are read through verbs by subprocess, each an
+  open fork, since a kit imports no sibling kit. Fork dedupe: §2 S5 · §8 F3, F4 moved; F3 owns the
+  stage-row read for the build, its verb widened to `handoff.py stage-rows` printing each stage's
+  `role`, `fan` and `cap`, and F4 narrows to the runs and notifications, citing
+  TOOL-dWellOiledMachine-30 §8 F3 for the started agents.
 
 ## 10. Reuse audit
 
 The seams extended: TOOL-dWellOiledMachine-9's slot ledger, its grammar the run-gates turnstile's;
 TOOL-dGroundRules-10's settings render (`tools/policy/policy.py:912-990`), given the split; the spawn
 guard's settings rule, compared against that render; the platform's run journal and the session's
-task notifications through `load_run_journal` and `load_session_calls` (`tools/roles/handoff.py:686`,
-`:576`); and process-monitor's census for a session's liveness (`census.py:260`, `scope.py:254`).
+task notifications, parsed by the roles kit's `load_run_journal` and `load_session_calls`
+(`tools/roles/handoff.py:686`, `:576`) and reached through §8 F4's verb; and process-monitor's census
+for a session's liveness (`census.py:260`, `scope.py:254`), reached through §8 F5's verb. A kit
+imports no sibling kit (TOOL-dGroundRules-1 §4; PLAY-dOrderedCharter-7:202-205), so each is a
+subprocess.
 Scout A's correction holds: GR:270 and GR:301 describe agent-cap's claim window, which is gone at this
 base, and this spec cites the render instead. The probe `python tools/codebase-map/reuse_lookup.py
 "claim a slot at SubagentStart and release it at SubagentStop"` ranked `claims`, `derive_run_starts`,

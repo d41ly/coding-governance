@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-79 — the spec audit's 49 medium and low findings, batched: capability rows, pack shapes, launch environment, registries, renders and the records that miscount
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 63 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 63 · advances TOOL-dWellOiledMachine-62
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,9 @@
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-79-deviation-791.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-79-deviation-791.md) | deviation | — |
 | [2026-10-27-build-TOOL-dWellOiledMachine-79-deviation-792.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-79-deviation-792.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-79-deviation-793.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-79-deviation-793.md) | deviation | — |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-63-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-64 |
 
 <!-- /gen:spec-records -->
@@ -30,7 +33,7 @@ batched into ONE unit, and this is that unit. It closes, by report id:
 Each finding takes the fix its skeptic judged SOUND, or the skeptic's corrected fix where the report
 marks the finder's UNSOUND (findings 12, 37, 39, 67). The findings land on many units, so this unit
 repairs none in particular and sits after every unit of the build. One unit, not two: the write sets
-of the 49 fixes meet in `tools/gate-legs.json`, `tools/runtime/kit.toml`, `tools/runtime/harness.py`
+of the 49 fixes meet in `tools/runtime/kit.toml`, `tools/runtime/harness.py`
 and the claude-code capability table, so no split into two disjoint halves exists under M6.
 
 ## 2. Scope (IN)
@@ -96,8 +99,10 @@ is amended at this unit's pass, its §9 line naming this unit and the finding.
 - **S13** — Finding 19 (M13), on TOOL-dWellOiledMachine-1's `runtime selftest` leg.
   `tools/runtime/selftest.py --modules` runs `python <m> --fixture` for every tracked
   `tools/runtime/*.py` whose source defines a `--fixture` flag, prints one line per module and refuses
-  an empty population, and `--modules --list` prints that population without running it; the `runtime selftest` leg runs it, and `tools/run-gates/selftest-budgets.txt`
-  gains its row. Observed by AC13.
+  an empty population, and `--modules --list` prints that population without running it; the
+  `runtime selftest` leg runs it, its argv edited in the leg's one declaration, its `[[gate_leg]]` row
+  of `tools/runtime/kit.toml`, and rendered by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1,
+  S2), and `tools/run-gates/selftest-budgets.txt` gains its row. Observed by AC13.
 - **S14** — Finding 20 (M14), on TOOL-dWellOiledMachine-37 S4. `launch_act` adds, after
   `derive_launch_env`'s filter, `GOV_ACT` (the act it minted), `GOV_SESSION_KIND`, `GOV_RETURN_KEY`
   where the work order carries one, and `GIT_COMMITTER_NAME` and `GIT_COMMITTER_EMAIL` from
@@ -156,8 +161,9 @@ is amended at this unit's pass, its §9 line naming this unit and the finding.
   (`tools/lib/resolve-python.test.sh:167-186`) gains the row
   `gov_returns_js|$ROOT/<runtime>/returns-block.js|<runtime>/returns-block`, and `blk()` and the copy
   glob widen to a `// >>>` marker and `*.js`. `returns.py --check-block` and the leg
-  `runtime returns block parity` are deleted. Observed by AC29.
-  **Readers:** by name: `tools/gate-legs.json` (the leg's row) and READER NOT IN TREE for `returns.py`
+  `runtime returns block parity`, its `[[gate_leg]]` row of `tools/runtime/kit.toml`, are deleted and
+  the manifest re-rendered by `leg_factory.py --write`. Observed by AC29.
+  **Readers:** by name: the leg's declaration and its render in `tools/gate-legs.json`, and READER NOT IN TREE for `returns.py`
   (`--check-block`), TOOL-dWellOiledMachine-8's, unbuilt at HEAD, each removed here. by value: NO VALUE READERS — the leg's verdict is read only by
   the runner.
 - **S30** — Finding 41 (M21), on TOOL-dWellOiledMachine-23 S6. `derive_conformance_rows` gains a
@@ -202,7 +208,12 @@ is amended at this unit's pass, its §9 line naming this unit and the finding.
 - **S39** — Finding 54 (M28), on TOOL-dWellOiledMachine-1 S1. `WIRE-INTO-PROJECT.md` gains a runtime-kit
   adoption section naming `<prefix>/runtime/`, its adopter and the packs it wires. Observed by AC39.
 - **S40** — Finding 55 (M29), on the legs specs 1, 2, 8, 11, 12, 20, 23 and 39 add.
-  `tools/runtime/kit.toml` carries a `[[gate_leg]]` row per runtime leg in `tools/gate-legs.json`,
+  Each is declared once, the `[[gate_leg]]` row of `tools/runtime/kit.toml` its spec adds, holding
+  every manifest key and the `enforces` that spec names (TOOL-dWitnessedBar-11 S1;
+  PLAY-dOrderedCharter-7 S3 reds a leg with none); this pass declares any still missing with its
+  spec's tag, a spec naming none being that spec's open question, and renders `tools/gate-legs.json`
+  by `leg_factory.py --write`. `leg_factory.py` is not in the tree at this base, so until
+  TOOL-dWitnessedBar-11 lands a hand edit of the manifest stands in, and the pass records it.
   `tools/govkit/subject-pins.tsv` is re-written by `govkit.py selfcheck --write`, and
   `memory/map/features/runtime.md` claims each leg under `gate-legs`. Observed by AC40.
 - **S41** — Finding 56 (M30), on the catalogue edits of specs 1, 37, 44, 55 and 56.
@@ -261,7 +272,7 @@ is amended at this unit's pass, its §9 line naming this unit and the finding.
 - **consumes-from** `TOOL-dWellOiledMachine-14` — `harness.py`, `CAPABILITY_NAMES` and the govkit fixture (S2, S3, S15)
 - **consumes-from** `TOOL-dWellOiledMachine-16` — `journal.py`'s `JOURNAL_CLASSES` and its writer (S12, S31, S35)
 - **consumes-from** `TOOL-dWellOiledMachine-17` — `secret_scan.py`'s `read_secret_ref` (S7)
-- **consumes-from** `TOOL-dWellOiledMachine-20` — the leg it adds to `tools/gate-legs.json` (S40)
+- **consumes-from** `TOOL-dWellOiledMachine-20` — the leg it declares in `tools/runtime/kit.toml` (S40)
 - **consumes-from** `TOOL-dWellOiledMachine-23` — the session-start fallback and `measure_hook_cap.py` (S17, S30, S42)
 - **consumes-from** `TOOL-dWellOiledMachine-24` — `map-reads.js` (S31)
 - **consumes-from** `TOOL-dWellOiledMachine-28` — the moved hooks, tick and suites (S35, S36, S37)
@@ -340,7 +351,7 @@ the items cite the clause they correct. Probes re-run for this spec at base `068
   `tools/runtime/resume-tick.test.sh`
 - `tools/memory-tree/record-kinds.toml`, `tools/memory-tree/gov_record.py`,
   `tools/memory-tree/door_fixture.py`
-- `tools/lib/resolve-python.test.sh`, `tools/gate-legs.json`, `tools/run-gates/selftest-budgets.txt`
+- `tools/lib/resolve-python.test.sh`, `tools/run-gates/selftest-budgets.txt`
 - `tools/govkit/selftest.py`, `tools/govkit/subject-pins.tsv`
 - `tools/codebase-map/map_extractors.py`, `memory/map/features/runtime.md`,
   `memory/map/features/agent-cap.md`, `memory/map/generated/inventories.json`
@@ -356,7 +367,7 @@ the items cite the clause they correct. Probes re-run for this spec at base `068
 
 ### Alternatives rejected
 
-- **Two batches split by kit.** The fixes meet in `tools/gate-legs.json`, `tools/runtime/kit.toml`,
+- **Two batches split by kit.** The fixes meet in `tools/runtime/kit.toml`,
   `tools/runtime/harness.py` and the claude-code table (S2, S13, S29, S40), so the halves would share
   write paths and M6 forbids running them together.
 - **Dropping the returns pack's hold (S8).** The skeptic's other option; it loses the retries
@@ -470,8 +481,9 @@ the items cite the clause they correct. Probes re-run for this spec at base `068
   runs, §7 names it. Red when: the leg is absent.
 - **AC39** — When `bash tools/check-playbook-parity.sh` runs, it does not fail 4 for `runtime`.
   Red when: the runbook never names the kit.
-- **AC40** — When `python tools/govkit/govkit.py selfcheck` runs, every runtime leg is claimed.
-  Red when: a leg is claimed by no descriptor.
+- **AC40** — When `python tools/run-gates/leg_factory.py --conform` runs, it exits 0, and each runtime
+  leg's `[[gate_leg]]` row in `tools/runtime/kit.toml` carries a non-empty `enforces`.
+  Red when: a runtime leg has no declaration, or one carries no `enforces`.
 - **AC41** — When `python tools/policy/policy.py mirror --write` runs, `git diff --stat
   .governance/policy.json` prints nothing afterwards. Red when: the mirror differs from its render.
 - **AC42** — When `wc -c skills/session-kickoff/SKILL.md` runs, it prints 18432 or less. Red when:
@@ -513,6 +525,10 @@ none
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-84, TOOL-dWellOiledMachine-85, TOOL-dWellOiledMachine-90.
 - rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
+- rev-4 · 2026-10-28 · §1, §2 S13, S29, S40, §3 Edges, §4 Files touched and Alternatives, §6 AC40 ·
+  each runtime leg edited in its `[[gate_leg]]` declaration with `enforces` and rendered by
+  `leg_factory.py --write`, per the parents' cross-check
+  `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, row 163.
 
 ## 10. Reuse audit
 

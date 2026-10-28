@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-33 — the `Gov-*` trailers written from the binding at every commit site, and the commit-key check at the push and in `commit-msg`
 
-**Status:** DEFERRED · rev-4 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 21 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0311@d9f33c79 whole
 **Carries:** node:policy-key.commits.edge-check
@@ -15,7 +15,10 @@
 | [2026-10-27-build-TOOL-dWellOiledMachine-33-deviation-331.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-33-deviation-331.md) | deviation | — |
 | [2026-10-27-build-TOOL-dWellOiledMachine-33-deviation-332.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-33-deviation-332.md) | deviation | — |
 | [2026-10-27-build-TOOL-dWellOiledMachine-33-deviation-333.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-33-deviation-333.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-33-deviation-334.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-33-deviation-334.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -86,9 +89,15 @@ SA-4; memory-plan `[doors]`).
   the commits of the range TOOL-dWellOiledMachine-39's `derive_act_range` gives every binding
   reader, `<current default>..HEAD` with `--no-merges`, its `Gov-Session` trailers through
   `read_commits(repo, revs, keys)` (TOOL-dDeclaredLoop-23 S3), and runs S7; exit 1 on a finding, 0
-  clean, 2 on a refusal. It is a new manifest leg, `commit keys name their act`, in
-  `tools/gate-legs.json` and as a `[[gate_leg]]` row of `tools/runtime/kit.toml`, with its row in
-  `tools/govkit/subject-pins.tsv`. Observed by AC4.
+  clean, 2 on a refusal. It is a new leg, `commit keys name their act`, declared once as a
+  `[[gate_leg]]` row of `tools/runtime/kit.toml` holding every manifest key, `enforces` among them (§8
+  F4), and made with `python tools/run-gates/leg_factory.py new`. `leg_factory.py --write` renders it
+  into `tools/gate-legs.json` (TOOL-dWitnessedBar-11 S1 to S3), and `--check` reds a manifest that
+  differs. PLAY-dOrderedCharter-7 S3 reds a leg with no `enforces`. `commit-keys selftest` is declared the
+  same way. `tools/run-gates/leg_factory.py` is not in the tree at this base, so until
+  TOOL-dWitnessedBar-11 lands the pass records that a hand edit of the manifest, equal to the
+  declaration, stands in for `--write`. The leg's row is in `tools/govkit/subject-pins.tsv`. Observed
+  by AC4.
 - **S9** — `commits.edge-check` (`push-leg`, `commit-msg`, `off`; default `push-leg`; strict's cell
   `commit-msg`, v2:1474-1722): `push-leg` runs S8 only; `commit-msg` runs S8 and arms
   `.githooks/commit-msg` to run `commit_keys.py --message "$1"`, S7 over the one commit being made,
@@ -190,7 +199,7 @@ ref` pass, `no act`, `unmarked` and `malformed` red, `not-local` counted and nev
 | `read_trace_identity` | Python function | `read`, OK |
 | `check_commit_keys` | Python function | `check`, OK |
 | `.githooks/prepare-commit-msg` | git hook | none |
-| `commit keys name their act`, `commit-keys selftest` | manifest legs | none |
+| `commit keys name their act`, `commit-keys selftest` | legs, `[[gate_leg]]` rows of `tools/runtime/kit.toml` | none |
 | `gov-node-salt` | credential-store target | none |
 | `GOV_NODE_SALT` | environment variable, `env-injected` only | none |
 
@@ -212,12 +221,12 @@ names strict or sets the key.
 - `tools/runtime/commit_keys.py`
 - `tools/runtime/commit_queue.py`
 - `tools/runtime/act.py`
-- `tools/runtime/kit.toml`
+- `tools/runtime/kit.toml`: the two legs' `[[gate_leg]]` rows
 - `tools/push-main.sh`
 - `tools/push-main.test.sh`
 - `.githooks/prepare-commit-msg`
 - `.githooks/commit-msg`
-- `tools/gate-legs.json`
+- `tools/gate-legs.json`: rendered by `leg_factory.py --write`, never hand-edited once that factory lands
 - `tools/govkit/subject-pins.tsv`
 - `help/runtime.md`
 
@@ -267,8 +276,11 @@ for `CLAUDE_CODE_SESSION_ID`, and a stub credential store reached through `GOV_N
   Red when: the filler is absent, or it edits a message that already carries a `Gov-*` trailer.
 - **AC4** — When `python commit_keys.py --check` runs over a range holding a planted act commit
   under the act committer identity with no `Gov-Act:`, it exits 1 naming that sha and `unmarked`;
-  over the lander's commits of AC2 and the queue's of AC1 it exits 0.
-  Red when: the planted commit passes, or the clean range reds.
+  over the lander's commits of AC2 and the queue's of AC1 it exits 0. `grep -n -A16 'commit keys name
+  their act' kit.toml` over the runtime kit's descriptor prints the leg's `[[gate_leg]]` row with a
+  non-empty `enforces`, and `python leg_factory.py --check` exits 0 once that factory is in the tree.
+  Red when: the planted commit passes, the clean range reds, or the leg is declared outside its kit row
+  or with no `enforces`.
 - **AC5** — When the policy file names `preset = "strict"` and a planted act commit with no
   `Gov-Act:` is made, `.githooks/commit-msg` refuses it, exit 1, and `git rev-parse HEAD` is
   unmoved; under the default preset the same commit is made and AC4's leg reds it at the push.
@@ -301,7 +313,7 @@ for `CLAUDE_CODE_SESSION_ID`, and a stub credential store reached through `GOV_N
 
 `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `policy fixtures` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `push-main self-test` · `lexicon naming predicates` · `memory hygiene`
 
-The new legs `commit keys name their act` and `commit-keys selftest` join the manifest in this unit.
+The new legs `commit keys name their act` and `commit-keys selftest` are declared as `[[gate_leg]]` rows of `tools/runtime/kit.toml` in this unit and rendered into the manifest (S8).
 
 New arm: tools/runtime/commit_keys.py · covers AC1 AC4 AC6 AC7 AC8 AC9 AC11 · the `--selftest` fixture's planted commits, staged against a checker that reads no `Gov-*` key · none
 New arm: tools/push-main.test.sh · covers AC2 · the four lander commits, staged against the base lander that writes `Pass: none` alone · none
@@ -325,6 +337,14 @@ New arm: tools/runtime/commit_keys.py · covers AC3 AC5 · the filler and the st
   states an owner's own commit carries neither mark, so (b) reds every owner commit at the push. Rung
   1, that unit's act-made rule, which this unit calls. RESOLVED (agent, 2026-10-26, delegated): (a).
   widens: none · relaxes: none
+- **F4 — Which tag do `commit keys name their act` and `commit-keys selftest` carry in `enforces`?** No
+  v2 `[enforcement]` row names `cl-dClosedLoop-0311`, so the tag cannot be read off the clause
+  (architecture-v2 :1813 onward). Options: (a) `principle.p35`, "Every record names its cause", which a
+  commit naming the act that made it is; (b) `principle.p33`, since the act id is a key `gov trace`
+  addresses; (c) `principle.p36`, since the trailers come from the binding the harness adapter runs
+  under. (b) and (c) describe what the trailer feeds or comes from, while (a) is what the leg reds: an
+  act-made commit that does not name its act. Recommendation: (a). Open for the owner, who owns the
+  `[enforcement]` table.
 
 ## 9. Revision log
 
@@ -335,6 +355,7 @@ New arm: tools/runtime/commit_keys.py · covers AC3 AC5 · the filler and the st
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-85, TOOL-dWellOiledMachine-90.
 - rev-4 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-2
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-94.
+- rev-5 · 2026-10-28 · S8, §4 Inventory and Files touched, AC4, §7 and §8 (F4 added) moved. The two legs are each declared once, as a `[[gate_leg]]` row of the runtime kit's descriptor with `enforces`, and rendered into `tools/gate-legs.json` by `leg_factory.py --write` instead of a hand edit beside the row (TOOL-dWitnessedBar-11 S1 to S3; PLAY-dOrderedCharter-7 S3). F4 leaves the tag open. Source: the parents cross-check record `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, row 77.
 
 ## 10. Reuse audit
 
