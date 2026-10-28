@@ -2041,6 +2041,7 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
     target, receipt_path = pathlib.Path(target).resolve(), pathlib.Path(receipt_path)
     began = {r["id"]: r["state"] for r in read_step_states(receipt)}  # the walk-start receipt
     began_failed = {sid for sid, state in began.items() if state == "failed"}
+    then = "the step stays recorded interrupted and the next walk runs it again"  # moves 1 and 5 stage
     out = {"pending": len(rows), "applied": 0, "skipped": 0, "stopped": None, "failure": None,
            "order": None}
 
@@ -2076,8 +2077,7 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
             if image:
                 # TOOL-dSafePassage-76 S2: an up killed after its second witness left its writes and
                 # its image unstaged; they are staged here, as move 5 would have.
-                write_step_staged(target, row.id, read_image_paths(target, row.id),
-                                  "the step stays recorded interrupted and the next walk runs it again")
+                write_step_staged(target, row.id, read_image_paths(target, row.id), then)
             unrecorded = persist(row, "applied", via="witness" if fresh else None)
             print(f"step {row.id} · skipped (witness holds){unrecorded}")
             out["skipped"] += 1
@@ -2095,8 +2095,7 @@ def run_step_walk(gov_root, target, receipt_path, receipt: dict, rows: list[Step
             return stop(row, "witness does not hold after up")
         # S11. `update` stages what it writes and never commits, a step's writes included: each
         # path the before-image lists, and the image, journaled first (S8).
-        write_step_staged(target, row.id, read_image_paths(target, row.id),
-                          "the step stays recorded interrupted and the next walk runs it again")
+        write_step_staged(target, row.id, read_image_paths(target, row.id), then)
         unrecorded = persist(row, "applied")
         print(f"step {row.id} · applied" + (" · by its resume" if phase == "resume" else "") + unrecorded)
         out["applied"] += 1
