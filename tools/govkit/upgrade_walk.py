@@ -931,13 +931,18 @@ def main(argv: list[str]) -> int:
         ctx["pin_modes"] = {ln.split("\t", 1)[1]: ln.split()[0] for ln in ls.splitlines() if "\t" in ln}
         ctx["d_r0"] = derive_tree_digest(ctx["r0"], ctx["pin_modes"])
         reds, per_case = [], {}
+        probe = os.environ.get("FOREIGN_PREFIX_PROBE") == "1"
         for c in ([case] if case else CASES):
             pool = [r for r in ctx["rows"] + [ctx["arm_rows"][n] for n in inject if n in ctx["arm_rows"]]
                     if step is None or r.id == step] if c in PER_STEP else None
             got = run_walk_case(ctx, c, pool, tuple(inject))
             per_case[c] = (len(pool) if pool is not None else len(plants) if c == "plants" else 1, len(got))
             reds += got
-        if not case and not inject:
+            # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the case above walked the subject, and a probe stops here.
+            if probe:
+                print("foreign-prefix-probe: stopped after 1 arm", flush=True)
+                break
+        if not case and not inject and not probe:
             reds += run_case_arms(ctx)
         forced = "; ".join(f"{c} {', '.join(sorted(s))}" for c, s in ctx["forced"].items()) or "none"
         print_line(f"summary · pin {pin[:8]} · tip {ctx['tip'][:8]} · {len(ctx['rows'])} step(s) · "

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-80 — five leg ceilings clear their evidence by the declared margin, and upgrade-walk is budgeted
 
-**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-5 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-5
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-28-build-TOOL-dSafePassage-80-ledger.md](../build/2026-10-28-build-TOOL-dSafePassage-80-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-80-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-80-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-80-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-80-build-brief.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-80-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-80-spec-brief.md) | research | — |

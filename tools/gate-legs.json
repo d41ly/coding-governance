@@ -1101,7 +1101,7 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 300
+    "ceiling": 510
   },
   {
     "name": "brief-recorded",
@@ -1457,7 +1457,7 @@
     "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through govkit's resolve_landing_base, the base kit epoch reads (TOOL-dSafePassage-10).", "history": "it checks the base out in a detached sparse worktree and reads the adopter-visible population there with the tip's readers (TOOL-dSafePassage-10)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60
+    "ceiling": 130
   },
   {
     "name": "docs",
@@ -1468,7 +1468,7 @@
     "reads": {"history": "it reads help.enforce at the landed revision through govkit's read_policy_value, and walks the first-parent history of memory/project/docs-undocumented.txt through drift-audit's derive_low_waters for the list's low-water (TOOL-dSafePassage-13)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 60,
+    "ceiling": 130,
     "doc_reads": ["help/", "memory/project/docs-undocumented.txt"]
   },
   {
@@ -1480,7 +1480,7 @@
     "reads": {"history": "it clones gov with no tags, checks out the pinned commit in tools/govkit/fixtures/release-0/pin.txt to apply release-0, and reads each step's introducing commit along the landed ref gov's own resolve_landed_ref names (TOOL-dSafePassage-5)."},
     "chunk": "e2e",
     "subject": "kit",
-    "ceiling": 7200,
+    "ceiling": 14360,
     "doc_reads": []
   },
   {
@@ -1746,7 +1746,7 @@
     "reads": {"history": "it dates a token by `git log -1 --pickaxe-regex` (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 390
+    "ceiling": 740
   },
   {
     "name": "kit placeholders (a declared token its adopter substitutes)",

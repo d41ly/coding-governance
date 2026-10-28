@@ -112,6 +112,7 @@ receipt sync (installed files match the receipt)	1.0	2	a	2026-09-24	runner
 review-join ban (no ref-keyed join)	10.8	2	a	2026-09-24	runner
 review-join self-test	110.3	2	a	2026-09-24	runner
 review-protocol parity (kit vs dogfood)	7.0	2	a	2026-09-24	runner
+routed commits name a specced unit	253.0	1	a	2026-10-28	python3 tools/memory-tree/routed_commits.py alone on a frozen clone of 83817478f, timed by date, 253s wall, rc 0; it timed out at its 300s ceiling twice in the discovery bar pool, close of dSafePassage
 row-grammar selftest	42.7	2	a	2026-09-24	runner
 row-keyed merge driver replay	269.1	2	a	2026-09-24	runner
 run-gates adopter e2e	49.4	2	a	2026-09-24	runner
@@ -130,7 +131,7 @@ selftest harness self-test	26.8	2	a	2026-09-24	runner
 settings-merge selftest	6.8	2	a	2026-09-24	runner
 shell hygiene (a loop fed by a command substitution)	1.1	1	a	2026-09-24	runner
 shell-hygiene selftest	0.9	2	a	2026-09-24	runner
-spec tokens (a spec's own names resolve)	195.0	1	a	2026-10-26	the leg alone in the worktree at 0d9b531f on a host running no other gate suite, its packet join over 1 live chain run, real 195.0s; killed at its 180 s ceiling twice under the close's bar at 263d31d5, in the pool and on its serial retry
+spec tokens (a spec's own names resolve)	366.0	1	a	2026-10-28	python tools/check-spec-tokens.py alone on a frozen clone of 83817478f, timed by date, 366s wall, rc 0; it timed out at its 390s ceiling twice in the discovery bar pool, close of dSafePassage
 spec-tokens self-test	156.8	1	a	2026-09-24	runner
 step-gate	4.4	1	d	2026-10-26	step_gate.py --base HEAD timed by bash time over a scratch clone of the branch carrying a source receipt, 4.4s wall, build pass of TOOL-dSafePassage-10
 template size <=48KiB	5.1	1	a	2026-09-06	runner
@@ -142,6 +143,7 @@ unattended kit gate	1922.0	2	a	2026-09-24	runner
 unattended protocol size	3.5	2	a	2026-09-24	runner
 unattended skill wiring	10.8	2	a	2026-09-24	runner
 unattended-build self-test	332.0	1	a	2026-09-24	alone in the worktree at 386f168b beside three concurrent suites (govkit selftest, memory-hygiene self-test, check-unattended self-test), real 332s; killed at its 300 s ceiling under the width-8 full bar
+upgrade-walk	7177.0	1	a	2026-10-28	python tools/govkit/upgrade_walk.py, whole leg, timed by date over this worktree at 83817478f, 7177s wall, rc 0 GREEN, under load from a closing review and three suite researchers, close of dSafePassage
 verdict epoch (kit version dates the engine)	4.9	1	a	2026-09-06	runner
 verdict-epoch self-test	112.0	2	a	2026-09-24	runner
 verifier fan-out	7.1	1	a	2026-09-06	runner
