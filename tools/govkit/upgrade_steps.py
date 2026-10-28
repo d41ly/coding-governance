@@ -195,7 +195,8 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-config-malformed", "gitmodules-malformed", "submodule-nested-name-differs",
                   "submodule-name-slashed", "sendemail-identity-cmd", "submodule-format-unknown",
                   "gitmodules-unreadable", "subsection-password-space", "submodule-modules-link-loop",
-                  "gitmodules-fifo", "submodule-modules-not-a-directory", "submodule-sound-no-nested")
+                  "gitmodules-fifo", "submodule-modules-not-a-directory", "submodule-sound-no-nested",
+                  "submodule-modules-link-nested", "submodule-modules-link-outside")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -1412,6 +1413,12 @@ def derive_step_mode(row: StepRow) -> str:
     return "attended" if row.needs_target else "isolated"
 
 
+def test_path_linked(path) -> bool:
+    """True when `path` is a symlink or a junction (TOOL-dSafePassage-56 S1), which `islink` alone
+    reads False on. Both read `lstat`, so no link is followed, and an absent path reads False."""
+    return os.path.islink(path) or os.path.isjunction(path)
+
+
 def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
     """Every repository a git command run in `target` can enter (TOOL-dSafePassage-30 S1), as
     `{"git_dir", "reached_by"}` rows, the target's own first with `reached_by` empty: each gitlink
@@ -1510,9 +1517,14 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
                 # `islink` reads False on; a link, or a directory that will not list, refuses.
                 # TOOL-dSafePassage-53: a path git never created is the empty population, the
                 # worklist's `continue` being one walk's return; any other listing error refuses.
+                # TOOL-dSafePassage-56 S2: every path entered, the root and each `<c>/modules`, is
+                # tested for a link before it is listed, so a dangling one is never read as absent.
                 walks = [(mods, mods, work, [], "")]
                 while walks:
                     base, cur, w, parts, mark = walks.pop(0)
+                    if test_path_linked(cur):
+                        raise Refusal(f"{cur.as_posix()} is a link the walk would enter, which it never "
+                                      f"follows, so where it leads is unknown")
                     try:
                         with os.scandir(cur) as it:
                             listed = sorted(cur / e.name for e in it)
@@ -1522,7 +1534,7 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
                         raise Refusal(f"{cur.as_posix()} does not list ({type(e).__name__}: {e}), so the "
                                       f"repositories under it are unknown") from None
                     for c in listed:
-                        if os.path.islink(c) or os.path.isjunction(c):
+                        if test_path_linked(c):
                             raise Refusal(f"{c.as_posix()} is a link under modules/, which the walk never "
                                           f"follows, so where it leads is unknown")
                         if not c.is_dir():
@@ -3099,6 +3111,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         # TOOL-dSafePassage-53 S2: `modules-not-a-directory` makes `.git/modules/a` a sound repository
         # whose `modules` is a regular file. TOOL-dSafePassage-54 S1: `sound-no-nested` is the tree
         # git's own `submodule add` writes, no key set and no `modules/` under `.git/modules/sub`.
+        # TOOL-dSafePassage-56 S3: `modules-link-nested` makes `.git/modules/a` a sound repository
+        # whose `modules` links back to `.git/modules`, `modules-link-outside` one whose `modules`
+        # links to a scratch directory holding a repository whose config sets the filter.
         kind =plant.removeprefix("submodule-").removesuffix("-stub")
         linked = kind in ("unpopulated-worktree", "main-only")
         if kind == "gitmodules-fifo" and not hasattr(os, "mkfifo"):
@@ -3140,7 +3155,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         key = "core.fsmonitor" if kind == "fsmonitor" else "filter.canary.clean"
         unkeyed = kind in ("ref-named-config", "config-malformed", "gitmodules-malformed", "format-unknown",
                            "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo", "modules-not-a-directory",
-                           "sound-no-nested")
+                           "sound-no-nested", "modules-link-nested", "modules-link-outside")
         sound = kind in ("ref-named-config", "sound-no-nested")  # the step is not refused, exit 0
         if kind == "ref-named-config":
             fx_git(deep, "branch", "config")  # refs/heads/config and logs/refs/heads/config, two files named config
@@ -3148,7 +3163,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             fx_git(deep, "config", key, f": > '{(canaries / 'fsmonitor').as_posix()}'" if kind == "fsmonitor"
                    else f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
         if kind in ("unpopulated", "name-differs", "name-slashed", "config-malformed", "format-unknown",
-                    "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo", "modules-not-a-directory") or linked:
+                    "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo", "modules-not-a-directory",
+                    "modules-link-nested", "modules-link-outside") or linked:
             fx_git(stepped, "submodule", "deinit", "-q", "-f", {"name-differs": "lib/p", "name-slashed": "lib/x"}.get(kind, "sub"))
         else:
             # same size, new mtime: git cannot tell it changed without the clean filter
@@ -3169,14 +3185,22 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         elif kind == "gitmodules-fifo":
             (target / ".gitmodules").unlink()
             os.mkfifo(target / ".gitmodules")  # an open blocks until a writer appears
-        elif kind == "modules-link-loop":
-            loop = target / ".git" / "modules" / "a" / "loop"
-            loop.parent.mkdir()
-            if os.name == "nt":
-                subprocess.run(["cmd", "/c", "mklink", "/J", str(loop), str(loop.parent.parent)],
-                               capture_output=True, check=True)
+        elif kind in ("modules-link-loop", "modules-link-nested", "modules-link-outside"):
+            mods = target / ".git" / "modules"
+            if kind == "modules-link-loop":
+                loop, to = mods / "a" / "loop", mods
+                loop.parent.mkdir()
             else:
-                os.symlink(loop.parent.parent, loop, target_is_directory=True)
+                fx_git(target, "init", "-q", "--bare", ".git/modules/a")
+                loop, to = mods / "a" / "modules", mods
+                if kind == "modules-link-outside":
+                    to = tmp / "outside"
+                    fx_git(tmp, "init", "-q", "--bare", "outside/x")
+                    fx_git(to / "x", "config", "filter.canary.clean", f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
+            if os.name == "nt":
+                subprocess.run(["cmd", "/c", "mklink", "/J", str(loop), str(to)], capture_output=True, check=True)
+            else:
+                os.symlink(to, loop, target_is_directory=True)
         elif kind == "modules-not-a-directory":
             fx_git(target, "init", "-q", "--bare", ".git/modules/a")
             (target / ".git" / "modules" / "a" / "modules").write_text("", encoding="utf-8")
@@ -3226,6 +3250,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             name = {"config-malformed": ".git/modules/sub/config or a file it includes does not read",
                     "format-unknown": "/.git/modules/sub: git will not open this repository",
                     "modules-link-loop": "/.git/modules/a/loop is a link under modules/",
+                    "modules-link-nested": "/.git/modules/a/modules is a link the walk would enter",
+                    "modules-link-outside": "/.git/modules/a/modules is a link the walk would enter",
                     "modules-not-a-directory": "/.git/modules/a/modules does not list (NotADirectoryError"}.get(
                         kind, "/.gitmodules does not read")
             expect(name in refused and not done.exists(), f"the step was not refused naming `{name}`, or it spawned")

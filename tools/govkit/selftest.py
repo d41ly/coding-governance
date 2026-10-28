@@ -3980,7 +3980,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     revparse51 = ('                if work is None and subprocess.run(["git", f"--git-dir={d}", "rev-parse", "--git-dir"], '
                   "cwd=str(d), env=env, capture_output=True).returncode:\n"
                   '                    raise Refusal(f"{d.as_posix()}: git will not open this repository")\n' + first51)
-    link51 = "if os.path.islink(c) or os.path.isjunction(c):"
+    link51 = "if test_path_linked(c):"  # TOOL-dSafePassage-56 S1: the child test is a call of it
     for plant, needle, label, old, new in (
             ("submodule-config-malformed", " exits 128, so .git/modules/sub/config or a file it includes does not read",
              "a walk copy running rev-parse before the config read", first51, revparse51),
@@ -4077,6 +4077,37 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         check(f"[dSP-54] AC2 {label}: read_target_repositories over gov's own tree "
               + ("returns its one git directory, no Refusal" if not n else "— reds"),
               bool(gd54) and not (pathlib.Path(gd54) / "modules").exists() and green == (not n), str(rows))
+
+    # TOOL-dSafePassage-56 AC1 to AC3: `test_path_linked` reads a junction or symlink True, a plain
+    # directory and an absent path False, and the walk tests every path it enters, so a `modules`
+    # linked back to `.git/modules` or outside it is refused naming it. The failing case is a walk
+    # copy testing only listed children: the nested plant loops to an OSError naming a deeper path,
+    # and the outside plant names `filter.canary.clean`. Not covered: another reparse point.
+    dir56 = tmp / "dsp56"
+    (dir56 / "plain").mkdir(parents=True)
+    if os.name == "nt":
+        subprocess.run(["cmd", "/c", "mklink", "/J", str(dir56 / "link"), str(dir56 / "plain")], capture_output=True)
+    else:
+        os.symlink(dir56 / "plain", dir56 / "link", target_is_directory=True)
+    got56 = [us.test_path_linked(dir56 / n) for n in ("link", "plain", "absent")]
+    check("[dSP-56] AC1 test_path_linked reads a junction or symlink, a plain directory and an absent path "
+          "True, False, False", got56 == [True, False, False], str(got56))
+    entry56 = "                    if test_path_linked(cur):\n"
+    only56 = build_staged_copy(tmp / "dsp56-children", src49.replace(entry56, "                    if False:\n"))
+    for plant, ac in (("submodule-modules-link-nested", "AC2"), ("submodule-modules-link-outside", "AC3")):
+        for py in (us_py, only56):
+            t56 = time.monotonic()
+            rc, out = fixture(py, plant)
+            if py == us_py:
+                check(f"[dSP-56] {ac} fixture isolation {plant} exits 1 within 60 seconds, refused naming "
+                      ".git/modules/a/modules, no Traceback and no filter.canary.clean",
+                      rc == 1 and time.monotonic() - t56 < 60 and "isolation: FAILED" not in out
+                      and "/.git/modules/a/modules is a link the walk would enter" in out
+                      and not any(x in out for x in ("Traceback", "filter.canary.clean")), out)
+            else:
+                check(f"[dSP-56] {ac} a walk copy testing only listed children reds fixture isolation {plant}",
+                      src49.count(entry56) == 1 and rc == 1 and "isolation: FAILED" in out
+                      and (ac == "AC2" or "filter.canary.clean" in out), out[-3000:])
 
     # AC14: a key's tested subsection is redacted to its last `@`, a space or a `/` in the password
     # included; the plant is graded over the refusal's named entries, the text between
