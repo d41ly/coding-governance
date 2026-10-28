@@ -169,8 +169,12 @@ THIS_HOST = socket.gethostname()
 # THE ISOLATION CONTRACT's allowlist (TOOL-dSafePassage-7): the names process creation and Python's
 # start-up need, none carrying a credential. Every other name, `GIT_ENV_LEAKS` and every token
 # variable included, falls out because nothing copies it in; a name joins by a reviewed edit.
+# `GOV_PYTHON` joins (TOOL-dSafePassage-75): it names the interpreter the resolver tries first, so
+# a step resolves the one gov's gates and hooks resolve; it carries no credential, and it is the
+# same class of name as `PATH`, which already decides what a step spawns.
 STEP_ENV_KEEP = ("PATH", "PATHEXT", "SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "COMSPEC", "OS",
-                 "PROCESSOR_ARCHITECTURE", "NUMBER_OF_PROCESSORS", "LANG", "LC_ALL", "TZ")
+                 "PROCESSOR_ARCHITECTURE", "NUMBER_OF_PROCESSORS", "LANG", "LC_ALL", "TZ",
+                 "GOV_PYTHON")
 STEP_PHASES = ("up", "down", "witness", "resume", "reverted")
 # Where `check_needs_target` gathers canaries: inside the scratch tree it is handed, so a target
 # module planted beside the plants can name its own canary by its own path.

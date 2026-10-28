@@ -4337,6 +4337,27 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
           and all(n in up["tail"] for n in ("fixture/x up", "nothing on stderr", "the reason"))
           and wit["tail"] == "", f"up {up}; witness {wit}")
 
+    # TOOL-dSafePassage-75 S3: launchers reporting 3.12 first on PATH and GOV_PYTHON at the floor; the
+    # floor row's witness, run under the contract on gov's own tree, resolves the override and holds.
+    floor_row = next(r for r in us.read_steps(GOV_ROOT, None, None) if r.id == "lib/python-floor-3.15")
+    fakes = tmp / "dsp75-below"
+    fakes.mkdir(exist_ok=True)
+    for nm in ("python3", "python", "py"):  # shaped as resolve-python.test.sh's write_fake_launcher
+        (fakes / nm).write_bytes(b'#!/usr/bin/env bash\necho "3.12 $0"\n')
+        (fakes / nm).chmod(0o755)
+    held = {k: os.environ.get(k) for k in ("PATH", "GOV_PYTHON")}
+    os.environ.update(PATH=str(fakes) + os.pathsep + os.environ.get("PATH", ""), GOV_PYTHON=sys.executable)
+    try:
+        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+    finally:
+        for k, v in held.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+    check("[dSP-75] the floor row's witness under the contract, 3.12 fakes on PATH and GOV_PYTHON at the floor, is ok",
+          got["verdict"] == "ok" and got["rc"] == 0, str(got))
+
 
 def check_step_gate_fixture() -> None:
     """TOOL-dSafePassage-10 AC2 to AC9 — `step_gate.py --fixture` over every class row's own plant,

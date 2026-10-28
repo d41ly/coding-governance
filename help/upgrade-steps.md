@@ -37,8 +37,9 @@ starts it:
 
 - **From gov's checkout**, never yours: a relative path in a step names gov's file.
 - **A clean environment.** Only the names a process needs to start (`PATH`, `SYSTEMROOT`, `LANG`
-  and the like) are copied in; everything else, every token and credential variable included, is
-  left out. Home and temp point at a fresh scratch directory that is removed after the step.
+  and the like) are copied in, plus `GOV_PYTHON`, the interpreter override the resolver reads, so a
+  step resolves the interpreter gov's gates and hooks resolve on the same node; everything else,
+  every token and credential variable included, is left out. Home and temp point at a fresh scratch directory that is removed after the step.
 - **No git config of yours or the machine's, no hooks, no credentials.** Git reads no system or
   global config and never prompts, and three settings passed through `GIT_CONFIG_COUNT`, which
   outrank your repository's own config, point `core.hooksPath` at an empty directory, set
