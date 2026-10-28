@@ -4605,8 +4605,9 @@ def check_step_rollback() -> None:
                 "rollback: rows derived ['fx/s4', 'fx/s3', 'fx/s2', 'fx/s1'] · then fx/s2 recorded rolled-back",
                 rolled, same)),
             # TOOL-dSafePassage-73 AC3: up, down, up again over s2's witness alone, and down again.
-            ("rollback", "witness-only-reup", 0, ("rollback: fx/s2 recorded via witness after a rollback",
-                                                  rolled + "\nrollback: 4 reached · stopped at none", same)),
+            # The four lines are anchored to the second walk's line, since the first reverse prints them too.
+            ("rollback", "witness-only-reup", 0, ("rollback: fx/s2 recorded via witness after a rollback\n" + rolled
+                                                  + "\nrollback: 4 reached · stopped at none", same)),
             ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
                                         "in planted_caller\n")),
             ("rollback", "schema-step", 0, ("step fx/s1 · rolled-back\nstep govkit/receipt-schema-4 · rolled-back",
