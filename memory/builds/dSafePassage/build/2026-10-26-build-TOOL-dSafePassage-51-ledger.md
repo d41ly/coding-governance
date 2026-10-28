@@ -23,8 +23,11 @@ Owed at the close: the `New arm:` line's RED-first observation of the dSP-51 che
 `govkit refusal join`, `govkit acceptance matrix`, `govkit selfcheck`, `recall floor arms`,
 `encoding posture`, `lexicon naming predicates`, `policy fixtures` and `spec tokens` at the bar.
 
+AC1 grades the build run's commit order, which no write of this pass moves, so its line sits in
+`2026-10-28-build-TOOL-dSafePassage-59-order-check.md`, committed with `Pass: none`
+(TOOL-dSafePassage-59 S1).
+
 **Evidences:** TOOL-dSafePassage-51
-- AC1 — `43 7 4 18 19` — `git log --reverse --format='%(trailers:key=Pass,valueonly)' 60d90cb7..HEAD`, empty lines dropped, put the first `TOOL-dSafePassage-43` at line 10, `-7` at 12, `-4` at 17, `-18` at 21 and `-19` at 22.
 - AC3 — `or a file it includes` — `fixture isolation --plant submodule-config-malformed` exited 1 printing `` `git config --list` over .git/modules/sub exits 128, so .git/modules/sub/config or a file it includes does not read ``, nothing spawned; a staged walk copy running `rev-parse` before the config read exited 1 with `isolation: FAILED`, its refusal naming `.git/modules/sub: git will not open this repository`.
 - AC4 — `is a link under modules/` — `fixture isolation --plant submodule-modules-link-loop` exited 1 in 5 s naming `.../t/.git/modules/a/loop is a link under modules/`, no `Traceback`; a staged copy with the link test replaced by `if False:` exited 1 with `isolation: FAILED`, the step run `up · ok`.
 - AC5 — `Refusal: 'fx/s2'` — the reverse-walk copy whose move 3 reads `state = state or "applied"` ran `fixture rollback --plant rolled-back-witness-holds`, exited 1 and printed `upgrade_steps.Refusal: 'fx/s2': a rolled-back row carries no `failure`, and this one carries 'down interrupted: started ...'`; over the module TOOL-dSafePassage-49's dSP-49 row stands for the exit 0.

@@ -211,7 +211,7 @@ ids TOOL-dSafePassage-71
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 361 bound to this build, across 4 record folder(s).
+Records: 362 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
