@@ -62,7 +62,10 @@ starts it:
   under `modules/` counts as a submodule's repository by its shape (a `HEAD` file beside `objects/`
   and `refs/`), so a branch named `config` is never mistaken for one; a submodule repository whose
   config git cannot read refuses the step, naming that config file, and so does a `.gitmodules`
-  that does not parse, naming it. A nested submodule's path is mapped through its parent's
+  that does not parse, or that is no regular file, a directory say, naming it. A submodule
+  repository git will not open, such as one of a newer repository format than the installed git
+  knows, refuses the step naming its git directory, though git reads its config with only a
+  warning: no step reaches its keys through git. A nested submodule's path is mapped through its parent's
   `.gitmodules` where the parent is checked out, and is its name, marked `by name`, where not. The check
   reads the submodules of the target's own worktree: in a linked worktree (`git worktree add`)
   that is `.git/worktrees/<name>/modules/`, never the main worktree's `.git/modules/`, which a step
@@ -101,13 +104,16 @@ starts it:
   self-test holds that list to every key `git help --config` names ending in `pass`, `key`, `cert`,
   `cookiefile` or `seed`, and keeps the rest by reason: `user.signingKey` and `http.pinnedPubkey`
   hold a public key, `interactive.singleKey` and `http.sslAutoClientCert` a boolean, and
-  `trailer.<x>.key` a trailer's name. An scp-form remote such as `git@host:repo` carries no credential and is not refused, and
-  neither is an ssh-scheme remote with a bare user, such as `ssh://git@host/repo` under `ssh`,
-  `git+ssh` or `ssh+git`, nor a `url.ssh://git@host/.insteadOf` key: ssh authenticates by key, so
-  the user name is no secret. A bare user under any other scheme, `https://user@host/` included, is
+  `trailer.<x>.key` a trailer's name. An scp-form remote such as `git@host:repo` carries no
+  credential and is not refused. An ssh-scheme remote with a bare user is not refused either:
+  `ssh://git@host/repo` is not refused under `ssh`, `git+ssh` or `ssh+git`, nor is a
+  `url.ssh://git@host/.insteadOf` key, since ssh authenticates by key, so the user name is no
+  secret. A bare user under any other scheme, `https://user@host/` included, is
   still refused, and so is a password under any scheme. The
   refusal names each key and the file declaring it, with any userinfo in either written as
-  `<redacted>`, and never prints a value: a refusal never prints the credential. A repository with a filter it relies on, Git LFS's say, in its own
+  `<redacted>`, and never prints a value: a refusal never prints the credential. In a key's own
+  name the userinfo is written `<redacted>` from its scheme to the name's last `@`, so a password
+  holding a space or a `/`, as in `[http "https://u:se cret@h/"]`, is hidden too. A repository with a filter it relies on, Git LFS's say, in its own
   config or a submodule's, or a local `core.editor` or difftool, has every step refused: remove
   the key for the run, or run the step attended. Nine keys of that shape are not refused: `merge.<driver>.driver`, since a step never
   merges and gov's own checkout declares two; `core.hooksPath`, since the setting gov passes
@@ -152,7 +158,9 @@ already held, its up never run, carries `"via": "witness"`, set only when the re
 of the step as the walk began and no before-image of it existed; a row with any earlier record, or
 with an image on disk, carries none, since either says an up ran. A row whose up ran carries no
 `via`, and `via` is legal on no other state. The last `applied` row is the last step completed.
-`govkit.py check` reports a malformed `steps` field as a problem naming the row.
+A `failure` is absent, `null` (read as absent) or a non-empty text; any other value, `5` or `""`
+say, is malformed in every state. `govkit.py check` reports a malformed `steps` field as a problem
+naming the row.
 
 A first install, by `apply` or `adopt`, is born at schema 4 with an empty `steps`. An existing
 receipt at schema 4 keeps its schema and its `steps` across a re-apply, an `adopt --re-adopt` or an
@@ -260,8 +268,9 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
 - **What runs, in what order.** Every step introduced after `<rev>` that the receipt records
   `applied` or `failed`, or records nowhere, runs its `down`, newest first, so
   `govkit/receipt-schema-4` comes last. A step recorded nowhere, or `rolled-back`, runs its witness
-  first and is skipped where the witness does not hold: `step <id> · skipped (nothing applied)`. A
-  step that runs its down is marked `down interrupted: started <utc>, no exit recorded` before it
+  first and is skipped where the witness does not hold: `step <id> · skipped (nothing applied)`.
+  One recorded `rolled-back` whose witness holds is downed again, recorded `applied` meanwhile,
+  never `rolled-back` with a failure. A step that runs its down is marked `down interrupted: started <utc>, no exit recorded` before it
   starts, where the receipt holds `steps`, and reads `rolled-back` once the down exits 0 and is judged to have taken effect; what
   the down restored is staged. All of this happens before any file moves; then the files return to
   `<rev>`'s bytes as any `update --to <rev>` moves them, and the receipt's `gov_commit` is set to

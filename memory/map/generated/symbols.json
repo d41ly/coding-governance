@@ -26098,6 +26098,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "test_step_row",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
       "id": "test_steps_recordable",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"

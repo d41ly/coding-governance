@@ -355,3 +355,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T07:52:01Z dispatch · item 33cc36e0 TOOL-dSafePassage-50 · reason memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-50.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-50-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md
 
 2026-10-28T07:52:08Z brief · item TOOL-dSafePassage-50 · reason 251f2e4b4eec memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-50-build-brief.md
+
+2026-10-28T08:48:34Z dispatch · item 5d4b43a7 TOOL-dSafePassage-49 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-49.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-49-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T08:48:42Z brief · item TOOL-dSafePassage-49 · reason ed32b2f498ea memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md
+
+2026-10-28T09:19:55Z dispatch · item 5d4b43a7 TOOL-dSafePassage-49 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-49.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-49-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-49-deviation-181.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json

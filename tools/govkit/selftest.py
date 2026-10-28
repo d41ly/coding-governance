@@ -3930,6 +3930,67 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
           rc == 1 and "isolation: FAILED" not in out and "sendemail.work.cccmd in .git/config, so nothing was spawned" in out
           and "sendemail canary: absent" in out, out)
 
+    # TOOL-dSafePassage-49 S8, AC10: the class arm widened to identity forms. Each kept key, and each
+    # of UNLISTED_EXECUTOR_KEYS, in a section `git help --config` lists as `<section>.<placeholder>.*`
+    # also stands as `<section>.dsp49.<rest>`, and every key of both matches a row; table copies
+    # without `sendemail.<x>.ccCmd` or `sendemail.sendmailCmd` name exactly that key.
+    placed = {m.group(1) for m in (_re.match(r"^([a-z]+)\.<[a-z]+>\.\*$", ln.strip()) for ln in hp.stdout.splitlines()) if m}
+    kept49 = [*kept, *us.UNLISTED_EXECUTOR_KEYS]
+    widened = [k.split(".", 1)[0] + ".dsp49." + k.split(".", 1)[1] for k in kept49 if k.split(".", 1)[0].lower() in placed]
+
+    def read_unrowed49(table) -> list:
+        return [k for k in kept49 + widened if not any(_re.fullmatch(_re.sub(r"<[^>]+>", ".+", _re.escape(r[0])), k, _re.I)
+                                                      for r in (*table, *us.STEP_UNREFUSED_KEYS))]
+    check(f"[dSP-49] AC10 the class arm widened: {len(placed)} placeholder section(s), {len(widened)} widened "
+          f"key(s), every kept and widened key matching a row", hp.returncode == 0 and bool(widened) and not read_unrowed49(us.STEP_REFUSED_KEYS),
+          f"placeholder sections {sorted(placed)}; widened {widened}; matching no row: {read_unrowed49(us.STEP_REFUSED_KEYS)}")
+    for drop, key in (("sendemail.<x>.ccCmd", "sendemail.dsp49.cccmd"), ("sendemail.sendmailCmd", "sendemail.sendmailcmd")):
+        got49 = [k.lower() for k in read_unrowed49(tuple(r for r in us.STEP_REFUSED_KEYS if r[0] != drop))]
+        check(f"[dSP-49] AC10 a table copy without the {drop} row names {key}", got49 == [key], f"named: {got49}")
+
+    # AC9, AC13: a submodule git will not open, and a `.gitmodules` that is no regular file, each refuse
+    # the step before any spawn, naming it; a walk copy without the `rev-parse` refusal, and a read
+    # with no file test, red.
+    src49 = us_py.read_text(encoding="utf-8")
+    for plant, needle, label, old, new in (
+            ("submodule-format-unknown", "/.git/modules/sub: git will not open this repository",
+             "a walk copy without the rev-parse refusal", "                    if opened.returncode:",
+             "                    if False:"),
+            ("gitmodules-unreadable", "/.gitmodules does not read: it is no regular file",
+             "a .gitmodules read with no file test", "            if gm is None or not os.path.lexists(gm):",
+             "            if gm is None or not gm.is_file():")):
+        rc, out = fixture(us_py, plant)
+        check(f"[dSP-49] AC9 AC13 fixture isolation {plant} exits 1, refused before any spawn naming {needle}",
+              rc == 1 and "isolation: FAILED" not in out and needle in out and "fixture/status · up ·" not in out, out)
+        rc, out = fixture(build_staged_copy(tmp / f"dsp49-{plant}", src49.replace(old, new)), plant)
+        check(f"[dSP-49] AC9 AC13 {label} reds fixture isolation {plant}",
+              src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # AC14: a key's tested subsection is redacted to its last `@`, a space or a `/` in the password
+    # included; the plant is graded over the refusal's named entries, the text between
+    # TOOL-dSafePassage-24's fixed lead and tail, for 3-character pieces, and over the whole output
+    # for the password and its halves of 3 or more characters; a redactor copy stopping at a space reds.
+    for text in ("http.https://u:se\x20cret@h/.sslkey", "http.https://u:se/cret@h/.sslkey"):
+        got = us.render_redacted_config(text)
+        check(f"[dSP-49] AC14 render_redacted_config({text!r}) is the subsection redacted to its last @",
+              got == "http.https://<redacted>@h/.sslkey", got)
+    pw49 = "se cret"
+    stop49 = "        if m and at >= m.end():"
+    for py, label in ((us_py, "fixture isolation subsection-password-space exits 1"),
+                      (build_staged_copy(tmp / "dsp49-space-redactor", src49.replace(stop49, "        if False:")),
+                       "a redactor copy stopping at a space: fixture isolation subsection-password-space")):
+        rc, out = fixture(py, "subsection-password-space")
+        line = next((ln for ln in out.splitlines() if " · refused · " in ln), "")
+        entries = line.partition("sends as a credential, ")[2].partition(", so nothing was spawned")[0]
+        pieces = sorted({pw49[i:i + 3] for i in range(len(pw49) - 2)} & {entries[i:i + 3] for i in range(len(entries) - 2)})
+        halves = [h for h in (pw49, *pw49.split(" ")) if len(h) >= 3 and h in out]
+        green = (rc == 1 and "isolation: FAILED" not in out
+                 and "http.https://<redacted>@h/.sslkey in .git/config" in entries and not pieces and not halves)
+        check(f"[dSP-49] AC14 {label}" + (", its named entries holding the redacted key and no 3-character piece of "
+                                          "the password, the output neither it nor a half" if py == us_py else " reds"),
+              green if py == us_py else src49.count(stop49) == 1 and not green and "isolation: FAILED" in out,
+              f"entries {entries!r}; pieces {pieces}; halves {halves}\n{out}")
+
     # TOOL-dSafePassage-45 AC7, the credential-key arm: every key `git help --config` lists whose last
     # segment ends in a CREDENTIAL_KEY_SUFFIXES entry matches a STEP_CREDENTIAL_KEYS or a
     # STEP_REFUSED_KEYS row, re-derived on every run; an empty listing reds, and a table copy
@@ -4257,6 +4318,11 @@ def check_step_rollback() -> None:
                 "rollback: after the kill · fx/s2 applied · via witness · down interrupted",
                 "step fx/s2 · rolled-back\nstep fx/s1 · rolled-back\nrollback: 2 reached · stopped at none",
                 "rollback: the re-run · fx/s2 rolled-back · bytes equal")),
+            # TOOL-dSafePassage-49 AC3: s2 recorded rolled-back once the rows are derived, its witness
+            # holding, is downed by move 3's `applied` record and ends rolled-back with no failure.
+            ("rollback", "rolled-back-witness-holds", 0, (
+                "rollback: rows derived ['fx/s4', 'fx/s3', 'fx/s2', 'fx/s1'] · then fx/s2 recorded rolled-back",
+                rolled, same)),
             ("rollback", "callers", 0, ("rollback: callers · one caller, update's _cmd_update",
                                         "in planted_caller\n")),
             ("rollback", "schema-step", 0, ("step fx/s1 · rolled-back\nstep govkit/receipt-schema-4 · rolled-back",
@@ -4306,7 +4372,8 @@ def check_step_rollback() -> None:
         p = subprocess.run([sys.executable, str(us_py), "fixture", family, *(("--plant", plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
         out = p.stdout + p.stderr
-        tag = ("dSP-62" if plant == "schema-up-kill"
+        tag = ("dSP-49" if plant == "rolled-back-witness-holds"
+               else "dSP-62" if plant == "schema-up-kill"
                else "dSP-70" if plant == "schema-step-kill-shipped-rows"
                else "dSP-39" if plant in ("witness-only-down-killed", "unrecorded-witness-down-killed")
                else "dSP-33" if plant == "image-lost"
@@ -4534,7 +4601,7 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
           r4["steps"] == [{"id": "a/one", "introduced": "0" * 40, "state": "applied"}], str(r4))
     for label, call, why in (
             ("`state` done", lambda: us.set_step_state(r4, "a/two", None, "done"), "is not one of"),
-            ("a failed row with no `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed"), "carries the keys"),
+            ("a failed row with no `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed"), "a failed row's `failure`"),
             ("a `failure` on an applied row that is no down stop", lambda: us.set_step_state(r4, "a/two", None, "applied", "x"), "opens with none of the down stops"),
             ("an empty `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed", ""), "non-empty string"),
             ("an id that is not a string", lambda: us.set_step_state(r4, 7, None, "applied"), "`id` is not"),
@@ -4565,6 +4632,88 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
                                                | ({"failure": text43} if text43 else {})]) if admit43
               else ("'a/one'" in got43 and (state43 != "applied" or repr(text43) in got43) and r43["steps"] == []),
               got43 or str(r43))
+    # ---- TOOL-dSafePassage-49 AC4, S16, S20: the row rule is one predicate, so `test_step_row`, the
+    # writer and a reader over a one-row receipt agree on every row of its table, a wrong-typed or
+    # empty `failure` refused in each state by a Refusal; a copy admitting any `failure` on an
+    # applied row reds the `interrupted:` and `exit 1: x` rows.
+    lost49 = "interrupted: started 2026-10-23T00:00:00Z, no exit recorded"
+    table49 = ([(s49, f49, "Refusal") for s49 in us.STEP_STATES for f49 in (5, "")]
+               + [("applied", None, "admitted")] + [("applied", t49, "admitted") for t49 in stops43]
+               + [("applied", lost49, "Refusal"), ("applied", "exit 1: x", "Refusal"),
+                  ("failed", "the up exited 1", "admitted"), ("failed", None, "Refusal"),
+                  ("rolled-back", None, "admitted"), ("rolled-back", "down exit 1: boom", "Refusal")])
+
+    def read_rule_wrong49(mod) -> list:
+        def read_verdict(fn) -> str:
+            try:
+                fn()
+            except mod.Refusal:
+                return "Refusal"
+            except Exception as e:  # noqa: BLE001 -- a traceback's class is the defect graded
+                return type(e).__name__
+            return "admitted"
+        wrong = []
+        for state, fail, want in table49:
+            row = {"id": "a/one", "introduced": None, "state": state} | ({} if fail is None else {"failure": fail})
+            got = (read_verdict(lambda: mod.test_step_row("a/one", state, fail)),  # noqa: B023 -- called at once
+                   read_verdict(lambda: mod.set_step_state({"schema": 4, "steps": []}, "a/one", None, state, fail)),  # noqa: B023
+                   read_verdict(lambda: mod.read_step_states({"schema": 4, "steps": [row]})))  # noqa: B023
+            if got != (want,) * 3:
+                wrong.append((state, fail, got))
+        return wrong
+    wrong49 = read_rule_wrong49(us)
+    check(f"[dSP-49 AC4] test_step_row, the writer and the reader agree on the row rule's {len(table49)} rows, "
+          "5 and \"\" refused by a Refusal in each state", not wrong49, f"wrong: {wrong49}")
+    src49 = (HERE / "upgrade_steps.py").read_text(encoding="utf-8")
+    opening49 = 'if state == "applied" and failure is not None and not failure.startswith(DOWN_STOP_PREFIXES):'
+    spec49 = importlib.util.spec_from_file_location(
+        "us49_any_failure", build_staged_copy(tmp / "dsp49-any-failure", src49.replace(opening49, "if False:")))
+    any49 = importlib.util.module_from_spec(spec49)
+    spec49.loader.exec_module(any49)
+    wrong49 = read_rule_wrong49(any49)
+    check("[dSP-49 AC4] a copy admitting any `failure` on an applied row reds exactly the `interrupted:` and "
+          "`exit 1: x` rows", src49.count(opening49) == 1
+          and [(st, f) for st, f, _g in wrong49] == [("applied", lost49), ("applied", "exit 1: x")], f"wrong: {wrong49}")
+
+    # AC5, AC6: the module's one opening test sits in `test_step_row`, the rollback fixture's
+    # included, and every string opening with a DOWN_STOP_PREFIXES entry sits in its assignment; a
+    # reader copy restating the rule, and a fixture copy retyping a stop text, red.
+    def read_openings49(text: str) -> list:
+        tree, parent = _ast.parse(text), {}
+        for n in _ast.walk(tree):
+            for c in _ast.iter_child_nodes(n):
+                parent[c] = n
+        out = []
+        for n in _ast.walk(tree):
+            if (isinstance(n, _ast.Call) and isinstance(n.func, _ast.Attribute) and n.func.attr == "startswith"
+                    and any(isinstance(a, _ast.Name) and a.id == "DOWN_STOP_PREFIXES" for a in n.args)):
+                f = parent.get(n)
+                while f is not None and not isinstance(f, _ast.FunctionDef):
+                    f = parent.get(f)
+                out.append(f.name if f is not None else "<module>")
+        return sorted(out)
+
+    def read_literals49(text: str) -> list:
+        tree, inside = _ast.parse(text), set()
+        for n in _ast.walk(tree):
+            if isinstance(n, _ast.Assign) and any(isinstance(t, _ast.Name) and t.id == "DOWN_STOP_PREFIXES" for t in n.targets):
+                inside |= {id(c) for c in _ast.walk(n)}
+        return [(n.lineno, n.value) for n in _ast.walk(tree) if isinstance(n, _ast.Constant)
+                and isinstance(n.value, str) and n.value.startswith(us.DOWN_STOP_PREFIXES) and id(n) not in inside]
+    reader49 = '        test_step_row(row["id"], state, row.get("failure"))'
+    restated = reader49 + ('\n        if state == "applied" and row.get("failure") and not row["failure"].startswith(DOWN_STOP_PREFIXES):'
+                           '\n            raise Refusal(f"{at}: a stopped down\'s `failure` only")')
+    check("[dSP-49 AC5] one opening test of DOWN_STOP_PREFIXES in the module, inside test_step_row; a reader "
+          "copy restating the rule finds two", read_openings49(src49) == ["test_step_row"] and src49.count(reader49) == 1
+          and read_openings49(src49.replace(reader49, restated)) == ["read_step_states", "test_step_row"],
+          f"over the module: {read_openings49(src49)}")
+    retyped = 'f"{DOWN_STOP_PREFIXES[1]}1: fx: s3 down fails by its plant"'
+    check("[dSP-49 AC6] no string opening with a DOWN_STOP_PREFIXES entry outside its assignment, f-string parts "
+          "included; a fixture copy retyping s3's `down exit 1:` text finds it", not read_literals49(src49)
+          and src49.count(retyped) == 1
+          and [v for _n, v in read_literals49(src49.replace(retyped, '"down exit 1: fx: s3 down fails by its plant"'))]
+          == ["down exit 1: fx: s3 down fails by its plant"], f"over the module: {read_literals49(src49)}")
+
     # ---- ...and the one reader's refusals.
     for label, rec, why in (
             ("a `steps` field below schema 4", {"schema": 3, "steps": []}, "the field is schema 4's"),
@@ -4584,16 +4733,23 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
                            ("rs-43a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
                                         "failure": "down exit 1: boom"}], None),
                            ("rs-43b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
-                                        "failure": "exit 1: boom"}], "'exit 1: boom'")):
+                                        "failure": "exit 1: boom"}], "'exit 1: boom'"),
+                           # TOOL-dSafePassage-49 AC5: a wrong-typed or empty `failure` is a counted
+                           # problem naming the row, never a traceback.
+                           ("rs-49a", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
+                                        "failure": 5}], "`failure` 5 is neither"),
+                           ("rs-49b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
+                                        "failure": ""}], "`failure` '' is neither")):
         t, _p = installed(tag)
         plant(t, lambda rec, _r=rows: rec.__setitem__("steps", _r))
         p = run("check", "--target", str(t))
         out = p.stdout + p.stderr
         hit = [ln for ln in out.splitlines() if "step record is malformed" in ln]
-        check(f"[{'dSP-43 AC2' if tag.startswith('rs-43') else 'dSP-3 AC8'}] `check` over a "
+        check(f"[{'dSP-43 AC2' if tag.startswith('rs-43') else 'dSP-49 AC5' if tag.startswith('rs-49') else 'dSP-3 AC8'}] `check` over a "
               f"{'malformed' if bad else 'valid'} `steps` ({tag}) "
               + ("counts a problem naming the row" if bad else "counts none for the field"),
-              (len(hit) == 1 and "'govkit/receipt-schema-4'" in hit[0] and bad in hit[0] and p.returncode == 1)
+              (len(hit) == 1 and "'govkit/receipt-schema-4'" in hit[0] and bad in hit[0] and p.returncode == 1
+               and "Traceback" not in out)
               if bad else not hit, out[-600:])
 
     # ---- AC14: a re-run keeps an existing receipt's schema and `steps`, by either verb.

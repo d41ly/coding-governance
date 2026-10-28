@@ -191,7 +191,8 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-fsmonitor", "submodule-name-differs", "ssh-scheme-bare-user",
                   "proxy-schemeless-userinfo", "insteadof-dotted-userinfo", "submodule-ref-named-config",
                   "submodule-config-malformed", "gitmodules-malformed", "submodule-nested-name-differs",
-                  "submodule-name-slashed", "sendemail-identity-cmd")
+                  "submodule-name-slashed", "sendemail-identity-cmd", "submodule-format-unknown",
+                  "gitmodules-unreadable", "subsection-password-space")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
@@ -254,6 +255,10 @@ STEP_REFUSED_KEYS = (
 # identity form too (`sendemail.<x>.ccCmd` and the like), stated once here rather than typed per row.
 STEP_REFUSED_KEYS += tuple((p.replace("sendemail.", "sendemail.<x>.", 1), rule, runs)
                            for p, rule, runs in STEP_REFUSED_KEYS if p.startswith("sendemail."))
+# TOOL-dSafePassage-49 S8: the executor keys git runs that `git help --config` does not list, which
+# selftest's class arm keeps beside the listing's and widens to identity forms like them:
+# `sendemail.sendmailCmd`, from git-send-email's option table (TOOL-dSafePassage-48 S2).
+UNLISTED_EXECUTOR_KEYS = ("sendemail.sendmailCmd",)
 # The executor-shaped keys the check does not refuse (TOOL-dSafePassage-29 S2), as (key pattern, why).
 STEP_UNREFUSED_KEYS = (
     ("merge.<driver>.driver", "a step does not merge, and gov's own checkout declares two (TOOL-dSafePassage-24 §3)"),
@@ -1149,9 +1154,8 @@ def read_step_states(receipt: dict) -> list[dict]:
     """The receipt's `steps` rows, validated: the field's one parser (TOOL-dSafePassage-3, S3).
 
     A receipt below schema 4 has no rows and may carry no field; one at schema 4 or above must carry
-    a list of `{"id", "introduced", "state"}` objects, `state` one of STEP_STATES, a `failed` row
-    adding a non-empty `failure`, an `applied` row a down stopped on adding one that opens with an
-    entry of DOWN_STOP_PREFIXES (TOOL-dSafePassage-43), a `rolled-back` row carrying none,
+    a list of `{"id", "introduced", "state"}` objects, `state` one of STEP_STATES, an optional
+    `failure` as `test_step_row` admits it (TOOL-dSafePassage-43, -49 S16), a null one read as absent,
     `introduced` a 40-hex commit or null, and an `applied` row optionally `"via": "witness"`, the
     walk having applied it by its witness alone (TOOL-dSafePassage-33). Anything else is a refusal
     naming the row, and nothing is repaired."""
@@ -1171,11 +1175,11 @@ def read_step_states(receipt: dict) -> list[dict]:
         if not isinstance(row, dict):
             raise Refusal(f"{at} is {type(row).__name__}, not an object")
         state = row.get("state")
-        stopped = state == "applied" and "failure" in row
         # TOOL-dSafePassage-33 S1: `via` is legal only as "witness" on an applied row, so a bad mark
-        # fails the key-set test below and joins its refusal rather than adding a branch.
+        # fails the key-set test below and joins its refusal rather than adding a branch. Whether a
+        # `failure` belongs on the row is `test_step_row`'s alone (TOOL-dSafePassage-49 S16).
         marked = state == "applied" and row.get("via") == "witness"
-        want = ({"id", "introduced", "state"} | ({"failure"} if state == "failed" or stopped else set())
+        want = ({"id", "introduced", "state"} | ({"failure"} if "failure" in row else set())
                 | ({"via"} if marked else set()))
         if set(row) != want:
             raise Refusal(f"{at} carries the keys {sorted(row)}, where a {state!r} row carries {sorted(want)}"
@@ -1185,16 +1189,30 @@ def read_step_states(receipt: dict) -> list[dict]:
             raise Refusal(f"{at}: `id` is not a non-empty string")
         if state not in STEP_STATES:
             raise Refusal(f"{at}: `state` {state!r} is not one of {', '.join(STEP_STATES)}")
-        fail = row.get("failure")
-        if (state == "failed" or stopped) and not (
-                isinstance(fail, str) and fail and (not stopped or fail.startswith(DOWN_STOP_PREFIXES))):
-            raise Refusal(f"{at}: an applied row's `failure` {fail!r} opens with none of the down stops "
-                          f"{', '.join(map(repr, DOWN_STOP_PREFIXES))}, and an applied row carries only "
-                          f"a stopped down's" if stopped else f"{at}: a failed row's `failure` is a non-empty string")
+        test_step_row(row["id"], state, row.get("failure"))
         intro = row["introduced"]
         if intro is not None and not (isinstance(intro, str) and SHA_RE.fullmatch(intro)):
             raise Refusal(f"{at}: `introduced` {intro!r} is neither a 40-hex commit nor null")
     return steps
+
+
+def test_step_row(step_id, state, failure) -> None:
+    """The row rule (TOOL-dSafePassage-49 S16, S9): None where a `state` row of `step_id` may carry
+    `failure`, else a `Refusal` naming the step, and the text where it is one. `failure` is None or
+    a non-empty string in every state; an `applied` row carries none or a stopped down's, opening
+    with an entry of DOWN_STOP_PREFIXES; a `failed` row carries one; a `rolled-back` row none.
+    `set_step_state` and `read_step_states` both call it, so the writer and the reader never
+    disagree; a state outside STEP_STATES is the reader's refusal, not this rule's."""
+    if failure is not None and not (isinstance(failure, str) and failure):
+        raise Refusal(f"{step_id!r}: `failure` {failure!r} is neither absent nor a non-empty string")
+    if state == "applied" and failure is not None and not failure.startswith(DOWN_STOP_PREFIXES):
+        raise Refusal(f"{step_id!r}: an applied row's `failure` {failure!r} opens with none of the down "
+                      f"stops {', '.join(map(repr, DOWN_STOP_PREFIXES))}, and an applied row carries "
+                      f"only a stopped down's")
+    if state == "failed" and failure is None:
+        raise Refusal(f"{step_id!r}: a failed row's `failure` is a non-empty string, and this row has none")
+    if state == "rolled-back" and failure is not None:
+        raise Refusal(f"{step_id!r}: a rolled-back row carries no `failure`, and this one carries {failure!r}")
 
 
 def test_steps_recordable(receipt: dict) -> bool:
@@ -1235,6 +1253,7 @@ def set_step_state(receipt: dict, step_id, introduced, state, failure=None, via=
     `introduced` is the reader's value as `read_steps` returns it: `resolve_recorded_introduced`
     maps it first, so the reader's `unlanded` records null (TOOL-dSafePassage-20)."""
     introduced = resolve_recorded_introduced(introduced)
+    test_step_row(step_id, state, failure)
     schema = receipt.get("schema", 1)
     if not test_steps_recordable(receipt):
         raise Refusal(f"a receipt at schema {schema!r} has no `steps` to record '{step_id}' in: a "
@@ -1421,9 +1440,19 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
 
         def submodule_paths(work) -> dict[str, str]:
             """name -> path of `work`'s `.gitmodules`; `config -f` reads that one file and runs nothing.
-            Exit 1 maps none; any other exit is a refusal naming the file (TOOL-dSafePassage-45 S13)."""
-            if work is None or not (work / ".gitmodules").is_file():
+            Exit 1 maps none; any other exit is a refusal naming the file (TOOL-dSafePassage-45 S13).
+            One that exists and is not a regular file that opens for reading is a refusal naming it
+            first, so exit 1 means only "missing, or maps none" (TOOL-dSafePassage-49 S18)."""
+            gm = None if work is None else work / ".gitmodules"
+            if gm is None or not os.path.lexists(gm):
                 return {}
+            try:
+                if not gm.is_file():
+                    raise OSError("not a regular file")
+                gm.open("rb").close()
+            except OSError as e:
+                raise Refusal(f"{gm.as_posix()} does not read: it is no regular file that opens for reading ({e}), "
+                              f"so which path each submodule name maps to is unknown") from None
             out = git(work, "config", "-z", "-f", ".gitmodules", "--get-regexp", r"^submodule\..*\.path$",
                       ok=(0, 1), reads=(work / ".gitmodules").as_posix())
             return {k[len("submodule."):-len(".path")]: v
@@ -1452,6 +1481,18 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
                         if meta.startswith("160000 ") and (work / path / ".git").exists():
                             add(git(work / path, "rev-parse", "--absolute-git-dir").strip(),
                                 f"{via}/{path}".lstrip("/"), work / path)
+                if work is None:
+                    # TOOL-dSafePassage-49 S7: a `modules/` candidate git will not open, a newer
+                    # format for one, reads its config with only a warning, so its keys would be
+                    # graded where no step can reach them; after a read that exited 0, any non-zero
+                    # exit here refuses, naming it, whatever git's stderr says.
+                    opened = subprocess.run(["git", f"--git-dir={d}", "rev-parse", "--git-dir"], cwd=str(d),
+                                            env=env, stdin=subprocess.DEVNULL, capture_output=True)
+                    if opened.returncode:
+                        raise Refusal(f"{d.as_posix()}: git will not open this repository, `git --git-dir="
+                                      f"{d.as_posix()} rev-parse --git-dir` exits {opened.returncode}, so the "
+                                      f"keys its config lists are none a step reaches through git: "
+                                      f"{opened.stderr.decode('utf-8', 'replace').strip()}")
                 mods = d / "modules"  # a linked worktree's submodules sit under its own git dir
                 # TOOL-dSafePassage-45 S12, read as TOOL-dSafePassage-47 S1 to S3: a repository by
                 # git's own directory shape, so no ref or object tree is taken for one. A candidate
@@ -1557,7 +1598,15 @@ def test_credential_bearing(key: str, value: str | None) -> bool:
 def render_redacted_config(text: str) -> str:
     """`text` with the userinfo of every `<scheme>://<userinfo>@` written as `<redacted>`, to the
     last `@` before the first `/` (TOOL-dSafePassage-45 S9), scheme and host kept
-    (TOOL-dSafePassage-38 S2)."""
+    (TOOL-dSafePassage-38 S2). `text` read as a key first: its tested subsection, the text between
+    its first and its last `.`, is redacted from its first `<scheme>://` to its last `@`, whatever
+    lies between, so a password holding a space or a `/` goes too (TOOL-dSafePassage-49 S19)."""
+    first, last = text.find("."), text.rfind(".")
+    if 0 <= first < last:
+        inner = text[first + 1:last]
+        m, at = re.search(r"(?i)\b[a-z][a-z0-9+.-]*://", inner), inner.rfind("@")
+        if m and at >= m.end():
+            text = text[:first + 1] + inner[:m.end()] + "<redacted>" + inner[at:] + text[last:]
     return REDACT_USERINFO_RE.sub(lambda m: m.group(0).partition("://")[0] + "://<redacted>@", text)
 
 
@@ -1582,7 +1631,7 @@ def check_target_local_config(target) -> list[str]:
     rows = read_target_local_config(target, refused)
     if isinstance(rows, str):
         return [render_redacted_config(rows)]
-    return [render_redacted_config(f"{key} in {origin}" + (f" (submodule {via})" if via else ""))
+    return [render_redacted_config(key) + render_redacted_config(f" in {origin}" + (f" (submodule {via})" if via else ""))
             for origin, key, value, via in rows if refused(origin, key, value, via)]
 
 
@@ -2035,10 +2084,13 @@ def run_reverse_walk(gov_root, target, receipt_path, receipt: dict, rows: list[S
         held = test_steps_recordable(receipt)
         # TOOL-dSafePassage-39 S3: a row recorded nowhere with no image had no up on record, so it
         # is marked as the forward walk's witness skip is; a recorded row's mark the writer carries.
+        # TOOL-dSafePassage-49 S5: a `rolled-back` row whose witness holds is recorded `applied`
+        # here, never `rolled-back` with a failure, and no up is on record since its down completed.
         if held:
             write_step_record(receipt_path, receipt, row, state, f"{DOWN_STOP_PREFIXES[0]} started "
                               f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}, no exit recorded",
-                              "witness" if record is None and not paths else None)
+                              "witness" if (record is None or record["state"] == "rolled-back") and not paths
+                              else None)
         got = run_step_reread(row, "down", target, gov_root, receipt_path, receipt, to)
         recordable = test_steps_recordable(receipt)  # TOOL-dSafePassage-18 S1: below 4, no row
         if got["verdict"] != "ok":
@@ -2884,7 +2936,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         expect(not report.exists() and not hit, "the refused step spawned, or its executor ran")
         rc = 1
     elif plant in ("submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo",
-                   "proxy-schemeless-userinfo", "insteadof-dotted-userinfo"):
+                   "proxy-schemeless-userinfo", "insteadof-dotted-userinfo", "subsection-password-space"):
         # TOOL-dSafePassage-38 S3: a URL credential in a value or a key segment that no instance row
         # names refuses the step, and the refusal prints the key redacted and never the credential.
         # TOOL-dSafePassage-45 S7, S8: a proxy's scheme-less userinfo, and a dotted user name in a key.
@@ -2896,9 +2948,12 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                                                   "http.https://<redacted>@example.invalid/.sslkey"),
                         "proxy-schemeless-userinfo": ("http]\n\tproxy = dspuser45:dsppass45@proxy:3128", "http.proxy"),
                         "insteadof-dotted-userinfo": ('url "https://first.last:dsppass45@host/"]\n\tinsteadOf = https://h/',
-                                                      "url.https://<redacted>@host/.insteadof")}[plant]
+                                                      "url.https://<redacted>@host/.insteadof"),
+                        # TOOL-dSafePassage-49 S19: a password holding a space, which S9's pattern stops at.
+                        "subsection-password-space": ('http "https://u:se cret@h/"]\n\tsslKey = x',
+                                                      "http.https://<redacted>@h/.sslkey")}[plant]
         tokens = (("dspuser45", "dsppass45", "first.last") if plant in ("proxy-schemeless-userinfo", "insteadof-dotted-userinfo")
-                  else ("dspuser38", "dsppass38"))
+                  else ("se cret", "cret") if plant == "subsection-password-space" else ("dspuser38", "dsppass38"))
         cfg = target / ".git" / "config"
         cfg.write_text(cfg.read_text(encoding="utf-8") + f"[{section}\n", encoding="utf-8", newline="\n")
         try:
@@ -2909,6 +2964,16 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             print(f"isolation: {clean.id} · refused · {e}")
         expect(f"{key} in .git/config" in refused, f"the step was not refused naming {key} in .git/config")
         expect(not any(t in refused for t in tokens), "the refusal prints the URL's user or password")
+        if plant == "subsection-password-space":
+            # AC14: the named entries, between TOOL-dSafePassage-24's fixed lead and tail, hold no
+            # 3-character piece of the password; the lead's own ` credential` spells `cre` and ` cr`.
+            entries = refused.partition("sends as a credential, ")[2].partition(", so nothing was spawned")[0]
+            pieces = sorted({tokens[0][i:i + 3] for i in range(len(tokens[0]) - 2)} & {
+                entries[i:i + 3] for i in range(len(entries) - 2)})
+            print(f"isolation: the refusal's named entries · {entries or 'NONE'} · password pieces in them: "
+                  f"{pieces or 'none'}")
+            expect(f"{key} in .git/config" in entries and not pieces,
+                   "the refusal's named entries are absent, or name the key otherwise, or print a piece of the password")
         expect(not report.exists(), "the refused step spawned")
         rc = 1
     elif plant.startswith("local-"):
@@ -2988,7 +3053,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             except Refusal as e:
                 expect(False, f"core.fsmonitor=false was refused: {e}")
         rc = 1
-    elif plant.startswith("submodule-") or plant == "gitmodules-malformed":
+    elif plant.startswith("submodule-") or plant in ("gitmodules-malformed", "gitmodules-unreadable"):
         # TOOL-dSafePassage-30 S4: the filter in a submodule's own config, which the superproject's
         # `git status` runs; `nested` sets it one submodule deeper, `unpopulated` in a submodule the
         # target does not check out. TOOL-dSafePassage-36 S3: `unpopulated-worktree` sets it in a
@@ -3003,6 +3068,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         # `nested-name-differs` nests `in` at `q` inside `nm` at `lib/p`, then de-initialises `nm`.
         # TOOL-dSafePassage-47 S4: `name-slashed` sets it in a de-initialised submodule named `lib/x`,
         # whose repository the walk reaches only through the `lib/` name segment.
+        # TOOL-dSafePassage-49 S7: `format-unknown` gives a de-initialised one a repository format
+        # git does not know; S18: `gitmodules-unreadable` makes the target's `.gitmodules` a directory.
         kind = plant.removeprefix("submodule-").removesuffix("-stub")
         linked = kind in ("unpopulated-worktree", "main-only")
         fx = ["git", "-c", "protocol.file.allow=always", "-c", "user.name=gk-fx", "-c", "user.email=gk-fx@invalid"]
@@ -3039,13 +3106,15 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         deep = {"nested": target / "sub" / "inner", "unpopulated-worktree": stepped / "sub",
                 "name-differs": target / "lib" / "p", "name-slashed": target / "lib" / "x", "nested-name-differs": target / "lib" / "p" / "q"}.get(kind, target / "sub")
         key = "core.fsmonitor" if kind == "fsmonitor" else "filter.canary.clean"
-        unkeyed = kind in ("ref-named-config", "config-malformed", "gitmodules-malformed")
+        unkeyed = kind in ("ref-named-config", "config-malformed", "gitmodules-malformed", "format-unknown",
+                           "gitmodules-unreadable")
         if kind == "ref-named-config":
             fx_git(deep, "branch", "config")  # refs/heads/config and logs/refs/heads/config, two files named config
         elif not unkeyed:
             fx_git(deep, "config", key, f": > '{(canaries / 'fsmonitor').as_posix()}'" if kind == "fsmonitor"
                    else f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
-        if kind in ("unpopulated", "name-differs", "name-slashed", "config-malformed") or linked:
+        if kind in ("unpopulated", "name-differs", "name-slashed", "config-malformed", "format-unknown",
+                    "gitmodules-unreadable") or linked:
             fx_git(stepped, "submodule", "deinit", "-q", "-f", {"name-differs": "lib/p", "name-slashed": "lib/x"}.get(kind, "sub"))
         else:
             # same size, new mtime: git cannot tell it changed without the clean filter
@@ -3057,6 +3126,12 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             broken = target / ".git" / "modules" / "sub" / "config" if kind == "config-malformed" else target / ".gitmodules"
             with broken.open("a", encoding="utf-8", newline="\n") as f:
                 f.write("[core\n")  # an unterminated section: git exits 128, `bad config line`
+        elif kind == "format-unknown":
+            # `config --list` exits 0 here with only a warning; `rev-parse` exits 128
+            fx_git(target, "config", "-f", ".git/modules/sub/config", "core.repositoryformatversion", "99")
+        elif kind == "gitmodules-unreadable":
+            (target / ".gitmodules").unlink()
+            (target / ".gitmodules").mkdir()  # `config -f` exits 1 on it, as on a missing file
         elif kind == "ref-named-config":
             rows = read_target_repositories(target, lambda d, label: False)
             for r in rows if isinstance(rows, list) else ():
@@ -3095,9 +3170,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         elif kind == "ref-named-config":
             expect(not refused and done.exists(), "a submodule holding a ref named config refused the step")
         elif unkeyed:
-            name = ".git/modules/sub/config" if kind == "config-malformed" else ".gitmodules"
-            expect(f"{name} does not read" in refused and not done.exists(),
-                   f"the step was not refused naming {name} as a file git cannot read, or it spawned")
+            name = {"config-malformed": ".git/modules/sub/config does not read",
+                    "format-unknown": "/.git/modules/sub: git will not open this repository"}.get(kind, "/.gitmodules does not read")
+            expect(name in refused and not done.exists(), f"the step was not refused naming `{name}`, or it spawned")
         elif plant.endswith("-stub"):
             expect(not refused and done.exists(), "the stubbed check still refused, so nothing spawned")
             if kind != "unpopulated":
@@ -3213,7 +3288,9 @@ out = us.run_step_walk(gov, target, rp, receipt, us.derive_pending_steps(gov, re
 print(f"walk: {out['pending']} pending · {out['applied']} applied · {out['skipped']} skipped · stopped at {out['stopped'] or 'none'}")
 sys.exit(1 if out["stopped"] else 0)
 '''
-# One reverse walk toward `to`, as `update --rollback` runs it (TOOL-dSafePassage-4).
+# One reverse walk toward `to`, as `update --rollback` runs it (TOOL-dSafePassage-4). A fifth
+# argument, a step id, is recorded `rolled-back` after the rows are derived and before the walk
+# reads the receipt (TOOL-dSafePassage-49 S5), as a concurrent down would leave it.
 FIXTURE_REVERSE_CHILD = r'''import importlib.util, json, pathlib, sys
 sys.stdout.reconfigure(encoding="utf-8")
 spec = importlib.util.spec_from_file_location("upgrade_steps", sys.argv[1])
@@ -3223,7 +3300,13 @@ spec.loader.exec_module(us)
 gov, target, to = pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3]), sys.argv[4]
 rp = target / ".governance" / "install.json"
 receipt = json.loads(rp.read_text(encoding="utf-8"))
-out = us.run_reverse_walk(gov, target, rp, receipt, us.derive_reverse_steps(gov, receipt, to), to)
+rows = us.derive_reverse_steps(gov, receipt, to)
+if len(sys.argv) > 5:
+    us.set_step_state(receipt, sys.argv[5], None, "rolled-back")
+    rp.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+    print(f"rollback: rows derived {[r.id for r in rows]} · then {sys.argv[5]} recorded "
+          f"{next(r['state'] for r in us.read_step_states(receipt) if r['id'] == sys.argv[5])}")
+out = us.run_reverse_walk(gov, target, rp, receipt, rows, to)
 print(f"rollback: {len(out['downs'])} reached · stopped at {out['stopped'] or 'none'}")
 print(f"rollback: verdicts {out['downs']}")
 sys.exit(1 if out["stopped"] else 0)
@@ -3296,7 +3379,8 @@ ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early"
 NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePassage-17: s2 is the floor row's shape
 DOWN_KILLED_PLANTS = ("witness-only-down-killed", "unrecorded-witness-down-killed")  # TOOL-dSafePassage-39
 ROLLBACK_PLANTS = ("after-kill", "after-fail", "down-fails", "witness-stays", "unrecorded", "partial-to",
-                   "callers", "witness-only", "image-lost", "kill-after-up-image-lost") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
+                   "callers", "witness-only", "image-lost", "kill-after-up-image-lost",
+                   "rolled-back-witness-holds") + NODE_WITNESS_PLANTS + ROLLBACK_SCHEMA_PLANTS + DOWN_KILLED_PLANTS
 ROLLBACK_UPDATE_SCHEMA_PLANTS = ("schema-step", "schema-step-kill-before-stamp",  # TOOL-dSafePassage-19
                                  "schema-step-kill-shipped-rows")  # TOOL-dSafePassage-70
 ROLLBACK_UPDATE_PLANTS = (("refused", "read-only", "descendant", "scoped", "no-base") + ROLLBACK_UPDATE_SCHEMA_PLANTS
@@ -3442,10 +3526,11 @@ def build_walk_target(tmp: pathlib.Path, sha_a: str, name: str, steps: list | No
         tmp, None, name, {**(files or {}), ".governance/install.json": json.dumps(receipt, indent=2) + "\n"})
 
 
-def run_fixture_child(child: str, gov: pathlib.Path, t: pathlib.Path, to: str, env: dict) -> tuple[int, str]:
+def run_fixture_child(child: str, gov: pathlib.Path, t: pathlib.Path, to: str, env: dict,
+                      *extra: str) -> tuple[int, str]:
     """Run the fixture program `child` (`FIXTURE_WALK_CHILD` or `FIXTURE_REVERSE_CHILD`) over `t`
-    toward `to`, echo its output and return (exit, output)."""
-    p = subprocess.run([sys.executable, "-c", child, str(HERE / "upgrade_steps.py"), str(gov), str(t), to],
+    toward `to`, `extra` after its argv, echo its output and return (exit, output)."""
+    p = subprocess.run([sys.executable, "-c", child, str(HERE / "upgrade_steps.py"), str(gov), str(t), to, *extra],
                        capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, timeout=600)
     print(p.stdout + p.stderr, end="")
     return p.returncode, p.stdout + p.stderr
@@ -4248,7 +4333,8 @@ def run_rollback_fixture(plant: str | None) -> int:
             return {r["id"]: (r["state"], r.get("failure")) for r in read_receipt_steps(t)}
 
         def reverse() -> tuple[int, list[str], str]:
-            rc, out = run_fixture_child(FIXTURE_REVERSE_CHILD, gov, t, sha["B" if plant == "partial-to" else "A"], env)
+            rc, out = run_fixture_child(FIXTURE_REVERSE_CHILD, gov, t, sha["B" if plant == "partial-to" else "A"], env,
+                                        *(("fx/s2",) if plant == "rolled-back-witness-holds" else ()))
             print(f"rollback: rows {rows()}")
             return rc, [ln for ln in out.splitlines() if ln.startswith("step fx/")], out
 
@@ -4362,9 +4448,17 @@ def run_rollback_fixture(plant: str | None) -> int:
             expect(held, "the kill did not leave s2 applied `via` `witness` with its `down interrupted:` failure")
         rc, got, out = reverse()
         state = rows()
-        if plant in (None, "unrecorded", "after-kill", "after-fail", "witness-only", "node-witness"):
-            want = (rolled("s4", "s3", "s2", "s1") if plant in (None, "unrecorded", "witness-only", "node-witness")
+        if plant in (None, "unrecorded", "after-kill", "after-fail", "witness-only", "node-witness",
+                     "rolled-back-witness-holds"):
+            want = (rolled("s4", "s3", "s2", "s1") if plant not in ("after-kill", "after-fail")
                     else ["step fx/s4 · skipped (nothing applied)"] + rolled("s3", "s2", "s1"))
+            if plant == "rolled-back-witness-holds":
+                # TOOL-dSafePassage-49 S5, AC3: s2, recorded rolled-back once derived, its witness
+                # holding, is downed by move 3's `applied` record and ends rolled-back, no failure.
+                expect("', 'fx/s2', " in out and "· then fx/s2 recorded rolled-back" in out,
+                       "s2 was not recorded rolled-back after the rows were derived, s2 among them")
+                expect(state.get("fx/s2") == ("rolled-back", None) and "Refusal" not in out and "Traceback" not in out,
+                       "s2 does not end rolled-back with no failure, or a Refusal or traceback printed")
             same = tracked() == before
             print(f"rollback: the target's bytes {'equal' if same else 'DIFFER from'} their bytes before the walk")
             expect(got == want, f"the reverse walk's lines are not {want}")
@@ -4398,11 +4492,20 @@ def run_rollback_fixture(plant: str | None) -> int:
             expect(state.get("fx/s1", ("",))[0] == "applied" and (t / "s1.txt").is_file() and (t / "s2.txt").is_file()
                    and rc == 0, "a step introduced at or before B was downed")
         elif plant in ("down-fails", "witness-stays", "node-witness-refuses"):
-            sid, text = {"down-fails": ("fx/s3", "down exit 1: fx: s3 down fails by its plant"),
-                         "node-witness-refuses": ("fx/s2", "down exit 1: fx: s2 down fails by its plant")}.get(
+            # TOOL-dSafePassage-49 S13, S16: the stop texts built from the constant, and compared
+            # through the row rule, the module's one test of an opening.
+            sid, text = {"down-fails": ("fx/s3", f"{DOWN_STOP_PREFIXES[1]}1: fx: s3 down fails by its plant"),
+                         "node-witness-refuses": ("fx/s2", f"{DOWN_STOP_PREFIXES[1]}1: fx: s2 down fails by its plant")}.get(
                 plant, ("fx/s2", DOWN_STOP_PREFIXES[2]))
             stops = [state[sid][1]] if state.get(sid, ("", None))[1] else []
-            opens = all(s.startswith(DOWN_STOP_PREFIXES) for s in stops)
+
+            def test_stop_admitted(s: str) -> bool:
+                try:
+                    test_step_row(sid, "applied", s)
+                    return True
+                except Refusal:
+                    return False
+            opens = all(test_stop_admitted(s) for s in stops)
             print(f"rollback: {sid} {state.get(sid)} · stop text opens with an entry of DOWN_STOP_PREFIXES: "
                   f"{'yes' if stops and opens else 'NO'}")
             expect(got == (rolled("s4") if plant == "down-fails" else rolled("s4", "s3")) + [f"step {sid} · STOPPED · {text}"],
