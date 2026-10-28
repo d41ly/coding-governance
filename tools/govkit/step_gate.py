@@ -267,20 +267,10 @@ def read_shipped_survivors(root) -> tuple:
 
 
 def read_file_members(root) -> set[str]:
-    """Each `files` row's path in gov's source-mode receipt; where the tree carries no such receipt,
-    each destination gov's plan derives, the population that receipt's rows record (TOOL-dSafePassage-21)."""
-    p = pathlib.Path(root) / ".governance" / "install.json"
-    rec = None
-    if p.is_file():
-        try:
-            rec = json.loads(p.read_text(encoding="utf-8"))
-        except ValueError as e:
-            raise Refusal(f".governance/install.json is not JSON: {e}") from None
+    """Each destination gov's own plan derives (TOOL-dSafePassage-35 S3). A receipt is never the
+    class's source: on a branch it is the last landing's, and would hide a file the branch stops shipping."""
     tr = gk.derive_tool_root(root)
-    if not isinstance(rec, dict) or rec.get("mode") != "source":
-        return {derive_member_path(d, tr) for d in gk.read_plan_destinations(pathlib.Path(root))}
-    return {derive_member_path(r["path"], tr) for r in rec.get("files") or []
-            if isinstance(r, dict) and isinstance(r.get("path"), str) and r["path"]}
+    return {derive_member_path(d, tr) for d in gk.read_plan_destinations(pathlib.Path(root))}
 
 
 def read_installable_members(root) -> set[str]:
@@ -397,25 +387,15 @@ def run_git_staged(clone, *args: str) -> None:
 
 
 def write_file_plant(clone) -> str:
-    """Removes the first `.md` files row from the clone's source receipt. A clone carrying none gets
-    one whose rows are the `file` members its plan derives, so the base reads the plan and the tip
-    the receipt, one row short."""
+    """Stages `git rm` of the first `.md` destination gov's plan derives whose source is that same
+    path, as the installable plant moves a kit README, and writes no receipt (TOOL-dSafePassage-35 S3)."""
     clone = pathlib.Path(clone)
-    rel = ".governance/install.json"
-    tr = gk.derive_tool_root(clone)
-    rec = json.loads((clone / rel).read_text(encoding="utf-8")) if (clone / rel).is_file() else {}
-    if not isinstance(rec, dict) or rec.get("mode") != "source":
-        rec = {"mode": "source", "files": [{"path": gk.resolve_prefix_token(m, tr)}
-                                           for m in sorted(read_file_members(clone))]}
-        (clone / rel).parent.mkdir(parents=True, exist_ok=True)
-        (clone / rel).write_text("{}\n", encoding="utf-8", newline="\n")
-    rows = sorted(r["path"] for r in rec.get("files") or [] if isinstance(r, dict)
-                  and str(r.get("path", "")).endswith(".md"))
+    rows = [d for d, row in gk.read_plan_destinations(clone).items()
+            if d.endswith(".md") and row["source"] == d]
     if not rows:
-        raise Refusal("the file plant found no `.md` member of the file class")
-    rec["files"] = [r for r in rec["files"] if not (isinstance(r, dict) and r.get("path") == rows[0])]
-    write_plant_edit(clone, rel, lambda _t: json.dumps(rec, indent=2) + "\n")
-    return "file:" + derive_member_path(rows[0], tr)
+        raise Refusal("the file plant found no `.md` destination its plan lands where it sits")
+    run_git_staged(clone, "rm", "-q", "--", rows[0])
+    return "file:" + derive_member_path(rows[0], gk.derive_tool_root(clone))
 
 
 def write_installable_plant(clone) -> str:
@@ -643,11 +623,21 @@ def run_step_gate_fixture(root, case: str, with_row: bool) -> int:
             planted = classes[case]["plant"](clone)
         elif case == "content-edit":
             planted = write_content_plant(clone)
+        elif case == "stale-receipt":
+            # TOOL-dSafePassage-35 AC3: the branch carries the last landing's source receipt, every
+            # base destination among its rows, and stops shipping one file. A class reading that
+            # receipt would still hold the file and pass the branch green.
+            rec = {"mode": "source", "files": list(gk.read_plan_destinations(clone).values())}
+            (clone / ".governance").mkdir(exist_ok=True)
+            (clone / ".governance/install.json").write_text(json.dumps(rec, indent=2) + "\n",
+                                                            encoding="utf-8", newline="\n")
+            run_git_staged(clone, "add", "-f", "--", ".governance/install.json")
+            planted = write_file_plant(clone)
         elif case in REGISTRY_PLANTS:
             planted = write_class_row_plant(clone, case)
         else:
             raise Refusal(f"no fixture case '{case}': the cases are each class id "
-                          f"({', '.join(classes)}), content-edit, {', '.join(REGISTRY_PLANTS)}")
+                          f"({', '.join(classes)}), content-edit, stale-receipt, {', '.join(REGISTRY_PLANTS)}")
         write_fixture_commit(clone, hooks, f"step-gate fixture: plant {case}")
         rc, out = run_gate_subprocess(clone, sha)
         line = f"step-gate: fixture {case} · planted {planted or 'no member'}"

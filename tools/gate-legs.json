@@ -1493,7 +1493,8 @@
       "{prefix}/govkit/",
       "{prefix}/hooks/kit.toml",
       "{prefix}/settings-merge.py",
-      "{prefix}/codebase-map/kit.toml"
+      "{prefix}/codebase-map/kit.toml",
+      "{prefix}/process-monitor/census.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

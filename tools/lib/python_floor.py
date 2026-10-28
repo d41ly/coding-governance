@@ -2,7 +2,7 @@
 the copies' check, and the floor step's down (TOOL-dSafePassage-11).
 
     python <prefix>/lib/python_floor.py check [--rev <sha>]    # every floor statement and copy finding
-    python <prefix>/lib/python_floor.py down <prior> <target> <to>  # the step's down: grade, then restore
+    python <prefix>/lib/python_floor.py down <prior> <target> [<to>]  # the step's down: grade, then restore
 
 THE DECLARATION is `python-floor.txt` beside this file, one `<major>.<minor>` line. Every other
 spelling of the floor is one of two kinds. A GENERATED COPY is the resolver block's `_rp_floor`
@@ -404,10 +404,14 @@ def main(argv):
         for path, line, text in found:
             print(f"{path}:{line}: {text}")
         return 1 if found else 0
-    if argv[:1] == ["down"] and len(argv) == 4:
+    if argv[:1] == ["down"] and len(argv) in (3, 4):
         prior, target = argv[1], pathlib.Path(argv[2])
+        # TOOL-dSafePassage-35 S22: <to> defaults to the target's HEAD, so the down always grades
+        # bytes at a commit, never the working tree.
+        to = argv[3] if len(argv) == 4 else (run_git(target, "rev-parse", "--verify", "--quiet", "HEAD").strip()
+                                             or "HEAD")
         try:
-            mode, found = check_down_floor(target, prior, argv[3])
+            mode, found = check_down_floor(target, prior, to)
         except ValueError as exc:
             print(f"python-floor down: {exc}", file=sys.stderr)
             return 2

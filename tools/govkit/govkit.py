@@ -141,6 +141,17 @@ def load_upgrade_steps():
 
 upgrade_steps = load_upgrade_steps()
 Refusal = upgrade_steps.Refusal
+# TOOL-dSafePassage-35 S24: argv resolution's closure is the step module's own. govkit binds back
+# each moved name a reader still spells off govkit, as it binds `blob_at`. `_BASH`, the cache
+# `resolve_bash` reassigns, is the step module's alone: a copy here would be an alias no reset reaches.
+resolve_bash = upgrade_steps.resolve_bash
+resolve_shell_argv = upgrade_steps.resolve_shell_argv
+resolve_tokens = upgrade_steps.resolve_tokens
+demand_safe_token = upgrade_steps.demand_safe_token
+target_context = upgrade_steps.target_context
+OPT_IN_ALL = upgrade_steps.OPT_IN_ALL
+SEEDED_TOKENS = upgrade_steps.SEEDED_TOKENS
+TOKEN_RX = upgrade_steps.TOKEN_RX
 
 
 # ---------------------------------------------------------------------------- repo + git plumbing
@@ -570,11 +581,6 @@ def canonical_ctx(eid: str) -> dict[str, str]:
     tr = derive_tool_root(repo_root())
     return {"prefix": tr or ".", "kit_id": eid, "kit": f"{tr}/{eid}" if tr else eid,
             "memory_root": "memory", OPT_IN_ALL: "yes"}
-
-
-#: The canonical ctx's marker that every `opt_in` rule lands. Reserved: `target_context` refuses a
-#: target that spells it, because it would take every opt-in of that kit without naming one.
-OPT_IN_ALL = "opt_in_all"
 
 
 def derive_opted_out(rule: dict, ctx: dict[str, str]) -> bool:
@@ -1195,90 +1201,6 @@ def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
     return derive_install_order(sorted(dk), descs)
 
 
-# The negative lookbehind is load-bearing and was bought by a failing arm. A discharge probe is a
-# SHELL command, and shell parameter expansion is spelled `${name}` — so a bare `\{([a-z_]+)\}`
-# matched the `{k}` inside `${k}` in a probe's own loop variable and reported a missing answer named
-# `k`. Two syntaxes sharing a brace is the collision; refusing to match after a `$` is the fix.
-TOKEN_RX = re.compile(r"(?<!\$)\{([a-z_]+)\}")
-
-
-_BASH: str | None = None
-
-
-def resolve_bash() -> str:
-    """The bash that shares THIS filesystem, not whatever the NAME `bash` resolves to.
-
-    MEASURED on node d, 2026-08-20: a descriptor declares `argv = ["bash", ...]`, govkit is a
-    WINDOWS python, and subprocess resolving the bare name goes through the Windows loader —
-    which finds C:/Windows/System32/bash.exe, the WSL launcher, before git-bash. WSL then sees a
-    different filesystem (the target resolves under /mnt/c/) and a different interpreter: its
-    python3 is 3.10.12, so the playbook adopter died on `import tomllib`, which needs 3.11. The
-    whole `govkit acceptance matrix` leg was RED for that reason and for no other.
-
-    This is the documented class `memory/gotchas/subprocess-resolves-a-different-shell.md`, and
-    the remedy it names is this one: name the EXECUTABLE, never the command. corpus_ids.py
-    carries the same function for the memory-tree kit. It is duplicated rather than imported
-    because govkit is COPY-INSTALLED as a standalone directory and cannot reach that module.
-
-    A candidate is accepted only if it RUNS — existing on disk is not evidence, the same mistake
-    <prefix>/lib/resolve-python.sh documents for the Microsoft Store python3 stub.
-
-    WHAT THIS DOES NOT DO: it does not make a target's own scripts portable, and it does not
-    check the interpreter those scripts then pick. It fixes which SHELL runs them and nothing
-    else. GOV_BASH overrides, and an override that is set and unusable is a Refusal here rather
-    than a silent fall-through — the operator would believe they had chosen.
-    """
-    global _BASH
-    if _BASH:
-        return _BASH
-
-    def check_runs(cand: str) -> bool:
-        try:
-            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
-        except OSError:
-            return False
-
-    override = os.environ.get("GOV_BASH")
-    if override:
-        if check_runs(override):
-            _BASH = override
-            return _BASH
-        raise Refusal(f"govkit: GOV_BASH is set to {override!r} and does not run. An override "
-                      f"that is set and unusable is this failure, not a fall-through.")
-    for d in os.environ.get("PATH", "").split(os.pathsep):
-        for name in ("bash.exe", "bash"):
-            cand = os.path.join(d, name)
-            if not os.path.isfile(cand):
-                continue
-            low = cand.replace("\\", "/").lower()
-            if "/system32/" in low or "/windowsapps/" in low:
-                continue          # a launcher for a DIFFERENT filesystem
-            if not check_runs(cand):
-                continue          # on disk, cannot execute
-            _BASH = cand
-            return _BASH
-    raise Refusal("govkit: no usable bash on PATH that shares this filesystem — every candidate "
-                  "was either a System32/WindowsApps launcher or did not run. Set GOV_BASH.")
-
-
-def resolve_shell_argv(argv: list[str]) -> list[str]:
-    """Replace a LEADING bare `bash` with the resolved executable; every other argv is untouched.
-
-    Only position 0 and only the bash names. A `bash` appearing as an ARGUMENT is a value the
-    target chose and is none of govkit's business, and `sh` is left alone because substituting
-    bash for it would change the language a target asked for.
-
-    Falls back to the argv unchanged when no bash resolves, so a machine with none behaves
-    exactly as it does today instead of newly refusing on a path that never needed this.
-    """
-    if not argv or argv[0] not in ("bash", "bash.exe"):
-        return list(argv)
-    try:
-        return [resolve_bash()] + list(argv[1:])
-    except Refusal:
-        return list(argv)
-
-
 def run_target_argv(argv: list[str] | tuple[str, ...],
                     target: pathlib.Path) -> subprocess.CompletedProcess:
     """Run a kit's resolved target-side argv in `target`, its output captured and decoded as UTF-8
@@ -1292,77 +1214,6 @@ def run_target_argv(argv: list[str] | tuple[str, ...],
     """
     return subprocess.run(resolve_shell_argv(list(argv)), cwd=str(target), capture_output=True,
                           text=True, encoding="utf-8", errors="replace")
-
-
-def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
-    """Substitute `{token}`s from the target's answers. Unresolved tokens are RETURNED, not emitted.
-
-    A path with a brace still in it is not a path. Emitting one is how a deployer writes a literal
-    `{memory_root}` directory into somebody's repository, so the caller is handed the missing names
-    and decides — which for `plan` and `apply --unattended` is a refusal that names the key.
-    """
-    missing: list[str] = []
-
-    def sub(m: re.Match) -> str:
-        k = m.group(1)
-        if k in ctx:
-            return ctx[k]
-        missing.append(k)
-        return m.group(0)
-
-    return TOKEN_RX.sub(sub, s), missing
-
-
-# THE ONE PLACE TARGET-SUPPLIED TEXT BECOMES PART OF A COMMAND, so it is the one place to refuse.
-#
-# Every token value below comes out of the TARGET's `.governance/deploy.toml`, a file in a repository
-# gov does not own. Those values are interpolated by `resolve_tokens` into argv templates GOV wrote —
-# `[check].argv`, `[[hole]].discharge.command`, `[[gate_leg]].argv` — several of which are
-# `["bash", "-c", "... {kit} ..."]` or `["python", "-c", "... sys.path.insert(0, '{kit}') ..."]`.
-# A shell metacharacter or a quote break in a value therefore becomes CODE.
-#
-# REPRODUCED, twice, on this engine before this guard existed: a target whose `deploy.toml` carried
-# `prefix = "tools; touch PWNED-BY-CHECK ;"` made a READ-ONLY `govkit check` — no `--write`, no
-# `--run-discharge`, nothing printed — create that file in the target. A second reproduction broke
-# out of a `python -c` string the same way. `resolve_shell_argv` is no defence: it rewrites argv[0]
-# and nothing else.
-#
-# WHY IT WAS MISSED, stated because the miss is the interesting part. The fold before this one
-# labelled each spawn by WHO AUTHORED THE ARGV TEMPLATE and concluded these sites were gov's. That is
-# the wrong question. The template is gov's and the VALUES SUBSTITUTED INTO IT are the target's, so
-# the resulting command is target-influenced wherever a token appears — and the declaration asserting
-# otherwise was itself the artifact written to stop this class recurring.
-#
-# A CHARACTER CLASS, not an escaper. Escaping is per-consumer — a value safe in argv is not safe
-# inside `bash -c` — and this value reaches several. What every legitimate answer in this repo's
-# descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
-# to be correct.
-# `\Z` AND NOT `$`: Python's `$` matches BEFORE a final newline, so "tools\n" passed this class
-# for as long as it has existed. Round 4 measured it. A trailing newline in a value spliced into a
-# `bash -c` string ends the command and starts another one, which is the exact escape the class
-# was written to stop.
-TOKEN_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+-]*\Z")
-# THE ONE ADMITTED COLON, anchored, and nothing else. Round 3 measured that the class above refuses
-# `user_skills = "C:/Users/x/.claude/skills"` -- a correct answer on the platform this project's own
-# primary node runs on -- with a message about command injection naming nothing the operator did
-# wrong. `kickoff-manifest` is in the DEFAULT selection and its rule is `{user_skills}/session-kickoff`,
-# so that sat on the common path for every Windows adopter. No arm caught it: both fixtures spell the
-# answer in forms that pass (`~/.claude/skills`, `/tmp/gk-fake-skills`).
-#
-# WHY THIS IS A NARROW WIDENING AND NOT A HOLE. The threat the class exists for is a value leaving its
-# argument inside a `bash -c` or `python -c` template, which needs a shell metacharacter: `;` `|` `&`
-# `$` a backtick, a quote, a newline, a redirect. `:` is none of those -- it is bash's null command and
-# is inert as argument text. What a colon CAN do is make a path absolute on Windows, and that is a
-# containment question, answered one function down by `demand_contained_dest`, which reds a
-# drive-lettered DESTINATION. So the two guards keep their own jobs: this one grades characters, that
-# one grades escape.
-#
-# ANCHORED AT POSITION 1 AND REQUIRING A FORWARD SLASH. `C:/x` passes; `C:x`, `C:\x`, `a:b` and
-# `C:/a;b` do not -- the remainder after the drive is graded by the class above exactly as before, so
-# an interior colon or any metacharacter still refuses. Backslash stays refused deliberately: §11
-# pins forward slashes on this platform, and admitting both spellings would double the surface for
-# nothing.
-DRIVE_PREFIX_RE = re.compile(r"^[A-Za-z]:/")
 
 
 def demand_contained_dest(dest: str, where: str) -> str:
@@ -1400,180 +1251,6 @@ def demand_contained_dest(dest: str, where: str) -> str:
             f"{where}. This is almost always a `prefix` in the target's .governance/deploy.toml "
             f"carrying `..` or an absolute path")
     return dest
-
-
-# ---- TWO CLASSES, BECAUSE THERE ARE TWO KINDS OF VALUE AND ONE CLASS GRADED BOTH.
-# ---- The strict class above was written for `prefix` -- which becomes a PATH and is interpolated
-# ---- into `bash -c` and `python -c` argv templates -- and was then applied to every `answers.*`
-# ---- and every `kit.<eid>.*` value as well. Those are not all paths. The playbook charter's
-# ---- placeholders are rendered into a MARKDOWN DOCUMENT, and a legitimate override for one carries
-# ---- spaces by nature: `gate_runner = "bash <prefix>/run-gates/run-gates.sh"` is a command a reader
-# ---- runs, `id_families = "PLAY KICK TOOL DEPL"` is a list.
-# ----
-# ---- MEASURED, AND IT WAS NOT HYPOTHETICAL. The single class red the `govkit acceptance matrix`
-# ---- leg from the commit that introduced it, and it stayed red across two commits because no full
-# ---- bar ran in between. The live adopter's answers happen to be all path-shaped, so nothing else
-# ---- noticed. That is the same mistake as the drive letter, twice: writing one character class for
-# ---- `prefix` and applying it to every value that passes through the same function.
-# ----
-# ---- THE PROSE CLASS IS STILL AN ALLOWLIST, and it still refuses every injection vector this build
-# ---- reproduced. It adds space, comma, equals and colon -- none of which can end an argument or
-# ---- start a command -- and admits nothing that can: no `;` `|` `&` `$`, no backtick, no quote, no
-# ---- redirect, no parenthesis or brace, no glob, no backslash, no control character. `tools; touch
-# ---- PWNED ;` and `$(id)` are refused by it exactly as before.
-# ----
-# ---- WHAT THE PROSE CLASS DOES NOT PROMISE. An earlier version of this comment said a spaced value
-# ---- reaching a `bash -c` template merely WORD-SPLITS, that this is "a correctness bug for the
-# ---- operator who wrote it" and "not code execution". THAT WAS FALSE and round 4 proved it: for a
-# ---- `python {kit}/<script>` template the injected word becomes the script python runs. A comment
-# ---- asserting a guarantee the code does not hold is worse than no comment, because the next reader
-# ---- budgets against it.
-# ---- The prose class is sound ONLY for a value whose sole consumer is a rendered document, and
-# ---- nothing here establishes that per key. What makes it safe today is `SEEDED_TOKENS` above:
-# ---- every token that reaches an argv is gov's own and a target cannot supply one. The escape half
-# ---- is owned by `demand_contained_dest`, which grades destinations whichever class they came
-# ---- through.
-# ---- THE KEYS GOV COMPUTES FOR ITSELF, and which a TARGET may therefore never supply.
-# ---- ROUND 4's blocker, and it is round 2's blocker reopened by round 2's own fix. `target_context`
-# ---- seeds `prefix`, `kit_id` and `kit` from a `prefix` graded by the STRICT class, then walked the
-# ---- target's `[answers]` and `[kit.<eid>]` tables and assigned `ctx[k]` UNCONDITIONALLY through
-# ---- the PROSE class -- which admits a space. Nothing stopped a target routing a document-class
-# ---- value into a shell-class key.
-# ----
-# ---- REPRODUCED: `[answers] kit = "-m pwned "` makes `ctx["kit"]` that string, and drift-audit's
-# ---- shipped hole probe resolves to `python -m pwned /drift_report.py --check` with ZERO
-# ---- unresolved tokens. Six shipped descriptors interpolate `{kit}` inside a `-c` string, and
-# ---- `cmd_check` spawns every one of them from a READ-ONLY verb with no opt-in flag.
-# ----
-# ---- THE ENGINE ALREADY KNEW THE SET. `needed_answers` declares exactly these five and refuses to
-# ---- ask an operator for any of them, while `target_context` let a target supply all five: two
-# ---- functions, one set, opposite answers. That is what this constant ends -- it is READ by both.
-# ---- THE SET IS THE THREE KEYS SEEDED ABOVE THE LOOPS, and it is NOT `needed_answers`' five.
-# ---- Measured before narrowing, because widening a refusal without enumerating its population is
-# ---- the mistake this whole review round is about. `memory_root` is applied by `ctx.setdefault`
-# ---- AFTER the loops, so a target that supplies it legitimately wins -- and gov's OWN selftest
-# ---- fixtures supply it in `[answers]` at four sites, as does a live adopter. Refusing it would
-# ---- have broken the suite and every real install to close a hole it is not part of. `relpath` is
-# ---- never a ctx key at all: `resolve_dests` substitutes it per rule with `.replace`, so a target
-# ---- supplying it reaches nothing.
-# ---- `needed_answers` means "do not ASK for these five"; this means "do not READ these three".
-# ---- Different questions, and collapsing them was the first cut of this fix.
-SEEDED_TOKENS = ("prefix", "kit_id", "kit")
-# The subset a per-ENTRY `[kit.<eid>]` table may set, graded by the STRICT path class. See
-# `target_context` for why the split is per-table rather than a name ban.
-PER_KIT_PATH_TOKENS = ("prefix", "kit")
-
-
-ANSWER_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+:, =-]*\Z")
-
-
-def demand_safe_token(key: str, value: str, where: str, prose: bool = False) -> str:
-    """Refuse a target-supplied token value that could leave its argument and become code.
-
-    `prose=False` (the default) is the STRICT class, for a value that becomes a path or is
-    interpolated into an argv this engine runs. A leading `<letter>:/` is dropped before grading and
-    the REMAINDER graded normally, so a Windows drive letter is admitted and an interior colon is
-    not.
-
-    `prose=True` is for a value whose only consumer renders it into a document. See the block above
-    `ANSWER_VALUE_RE` for what it admits, what it still refuses, and what it deliberately does not
-    promise.
-    """
-    rx = ANSWER_VALUE_RE if prose else TOKEN_VALUE_RE
-    body = value if prose else (value[2:] if DRIVE_PREFIX_RE.match(value) else value)
-    if not rx.match(body):
-        bad = "".join(sorted({c for c in body if not rx.match(c)}))
-        raise Refusal(
-            f"the target descriptor's '{key}' is {value!r}, which carries {bad!r}. Token values are "
-            f"interpolated into argv this engine RUNS — several shipped probes are `bash -c` and "
-            f"`python -c` strings — so a value outside [A-Za-z0-9_./~@+-] can leave its argument and "
-            f"become code. Refusing to resolve it ({where}). "
-            + ("This value is rendered into a document, so spaces and commas are fine here and "
-               "shell metacharacters are not"
-               if prose else
-               "Every legitimate value here is a path fragment, optionally behind a `C:/` drive "
-               "letter")
-            + "; if you need one that is not, that is a change to this rule and not to a descriptor")
-    return value
-
-
-def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> dict[str, str]:
-    """The token values for one entry, from the target descriptor's answers.
-
-    EVERY VALUE IS VALIDATED HERE, at the boundary, rather than at the several places they are
-    consumed. See `demand_safe_token` for what was reproduced without it.
-    """
-    # WHERE A TARGET MAY SPEAK ABOUT A SEEDED TOKEN, per TABLE and per KEY rather than by name.
-    #
-    # `ce4ef9f3` closed a live injection: a target could put a PROSE-class value -- one that admits
-    # a space -- on a key this engine interpolates into a `bash -c` template, and a READ-ONLY
-    # `check` would run it. That fix refused `prefix`, `kit_id` and `kit` from both target tables.
-    #
-    # The refusal is a SUPERSET of the defect, and the surplus is load-bearing for an adopter. The
-    # top-level `prefix` below is target-supplied too, and it is safe for exactly one reason: it is
-    # graded by the STRICT class, which admits no space, quote, semicolon, backtick or pipe, so a
-    # value cannot leave its argument. The defect was the CLASS, not the key. So:
-    #
-    #   [answers]    refuses all three. It is GLOBAL: a `kit` there collapses every entry into one
-    #                home and a `kit_id` renames all of them, so no value is ever legitimate.
-    #   [kit.<eid>]  accepts `prefix` and `kit`, graded STRICTLY. A per-entry install home is a path
-    #                fragment the OPERATOR owns and this engine cannot derive -- an adopter whose
-    #                memory-tree lives at `scripts/` rather than `scripts/memory-tree/` has no other
-    #                way to say so, and before this it had none at all. `kit_id` stays refused
-    #                everywhere: that is the ENTRY's identity, joined to the receipt's `kit` field,
-    #                and not a path.
-    per_kit = (deploy.get("kit") or {}).get(eid) or {}
-    for _tbl, _label, _allowed in ((deploy.get("answers") or {}, "answers", ()),
-                                   (per_kit, f"kit.{eid}", PER_KIT_PATH_TOKENS)):
-        for k in _tbl:
-            if k in SEEDED_TOKENS and k not in _allowed:
-                raise Refusal(
-                    f"the target descriptor supplies '{_label}.{k}', which this engine derives "
-                    f"({', '.join(SEEDED_TOKENS)}). These are interpolated into argv this engine "
-                    f"RUNS -- a `{{{k}}}` inside a `bash -c` or `python -c` template becomes the "
-                    f"command. A per-ENTRY install home is settable as `kit.<entry>.prefix` or "
-                    f"`kit.<entry>.kit`, graded by the strict path class; the global `[answers]` "
-                    f"table and `kit_id` are not. Remove the key: {_label}.{k}")
-    prefix = demand_safe_token(
-        f"kit.{eid}.prefix" if per_kit.get("prefix") else "prefix",
-        (per_kit.get("prefix") or deploy.get("prefix") or "tools").strip("/"),
-        f"entry '{eid}'")
-    # DERIVED unless the target names it. `{kit}` follows a per-entry `prefix` when only that is
-    # given, so an adopter who moves a whole kit family says it once.
-    _kit = per_kit.get("kit")
-    kit = (demand_safe_token(f"kit.{eid}.kit", _kit.strip("/"), f"entry '{eid}'")
-           if isinstance(_kit, str) and _kit else f"{prefix}/{eid}")
-    ctx: dict[str, str] = {
-        "prefix": prefix,
-        "kit_id": eid,
-        "kit": kit,
-    }
-    # TOOL-dSafePassage-8 S3. An `[answers]` value is graded and entered only where THIS entry's own
-    # descriptor names its `{token}`: one no template of the entry names never reaches a substitution
-    # here, and gov's own charter answers carry `—`, `;` and `<` for the renderer alone. Every value
-    # that can reach an argv, a destination or a pattern of the entry is still graded by its class.
-    named: set[str] = set()
-    _todo: list = [desc]
-    while _todo:
-        _v = _todo.pop()
-        if isinstance(_v, dict):
-            _todo += _v.values()
-        elif isinstance(_v, list):
-            _todo += _v
-        elif isinstance(_v, str):
-            named.update(TOKEN_RX.findall(_v))
-    for k, v in (deploy.get("answers") or {}).items():
-        if isinstance(v, str) and k in named:
-            ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
-    for k, v in per_kit.items():
-        if k == OPT_IN_ALL:
-            raise Refusal(f"the target descriptor supplies 'kit.{eid}.{k}', which is reserved: it would "
-                          f"take every opt-in of that entry without naming one. Set each rule's own "
-                          f"`opt_in` key instead")
-        if isinstance(v, str) and k not in PER_KIT_PATH_TOKENS:
-            ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'", prose=True)
-    ctx.setdefault("memory_root", "memory")
-    return ctx
 
 
 def resolve_adopter_argv(target: pathlib.Path, deploy: dict, eid: str,
@@ -9519,7 +9196,7 @@ def write_conflict_candidate(outbox: pathlib.Path, row: dict, base: bytes, ours:
     text-mode reconstruction. The directory shares the order's slug, which `render_order_slug`
     keeps injective and contained. Returns `(directory, reproduction line)` for the order.
     """
-    rel = f".governance/outbox/update-conflict-{render_order_slug(row['path'])}"
+    rel = ".governance/outbox/" + render_row_order_key("conflict", row["path"])
     d = outbox / pathlib.Path(rel).name
     d.mkdir(parents=True, exist_ok=True)
     for name, data in (("base", base), ("ours", ours), ("theirs", theirs),
@@ -9610,13 +9287,21 @@ def read_retired_edits_mode(target: pathlib.Path) -> str:
     return value
 
 
+def render_row_order_key(kind: str, path: str) -> str:
+    """THE ONE SPELLING of a row-keyed order's name, `update-<kind>-<slug>`, the slug
+    `render_order_slug` of a row's path or a step's id (TOOL-dSafePassage-35 S39): `write_row_order`
+    names the order by it and `write_conflict_candidate` its candidate directory, so the two share
+    one key."""
+    return f"update-{kind}-{render_order_slug(path)}"
+
+
 def write_row_order(outbox: pathlib.Path, kind: str, key: str, text: str) -> pathlib.Path:
     """THE ONE WRITER of a row-keyed outbox order (TOOL-dSafePassage-9 S4, TOOL-dSafePassage-26
     S18): `update-<kind>-<slug>.md`, the slug `render_order_slug` of `key`, a row's path or a step's
     id, holding `text`. The conflict, withdrawn, retired-edited and render-edited arms and the
     attended step's order all write through it, so no two keys collide on a basename. Returns the
     path."""
-    order = outbox / f"update-{kind}-{render_order_slug(key)}.md"
+    order = outbox / (render_row_order_key(kind, key) + ".md")
     order.parent.mkdir(parents=True, exist_ok=True)
     order.write_text(text, encoding="utf-8", newline="\n")
     return order
@@ -9669,7 +9354,7 @@ def test_source_target(root: pathlib.Path, target: pathlib.Path) -> bool:
 
 
 def read_plan_destinations(root: pathlib.Path) -> dict[str, dict]:
-    """TOOL-dSafePassage-21 S1. Each destination `planned_writes` derives for gov's own deploy file
+    """TOOL-dSafePassage-21 S1. Each `write` destination `planned_writes` derives for gov's own deploy file
     and selection over gov's own tree `root`, keyed in plan order to the source receipt's `files` row
     for it, the first row per destination. The ONE derivation source mode's receipt writer and the
     step gate's `file` class both read. WRITES NOTHING; a plan with problems is a Refusal naming them."""
@@ -9684,7 +9369,9 @@ def read_plan_destinations(root: pathlib.Path) -> dict[str, dict]:
         raise Refusal("gov's plan over its own tree refuses: " + "; ".join(r.problems))
     out: dict[str, dict] = {}
     for pw in plan:
-        if not pw["missing"]:
+        # TOOL-dSafePassage-35 S1: the population `apply` lands, under its consumers' filter, so an
+        # `order` pin row (`.gitattributes:<pattern>`) or a `side-effect` row never joins.
+        if pw["kind"] == "write" and not pw["missing"]:
             out.setdefault(pw["dest"], {"path": pw["dest"], "kit": pw["kit"], "role": pw["role"],
                                         "source": pw["src"]})
     return out

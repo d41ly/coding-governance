@@ -3,7 +3,7 @@
 # (TOOL-dSafePassage-11). The floor is declared once, in python-floor.txt beside this file.
 #
 #   bash <prefix>/lib/python-floor.sh preflight              # the step's up and its witness
-#   bash <prefix>/lib/python-floor.sh down <prior> <target> <to>  # the step's down
+#   bash <prefix>/lib/python-floor.sh down <prior> <target> [<to>]  # the step's down, <to> the target's HEAD by default
 #   bash <prefix>/lib/python-floor.sh floor                  # the declared floor, checked
 #
 # `preflight` sources the one resolver and calls it, so it refuses exactly as every gate and hook
@@ -30,9 +30,9 @@ case "${1:-}:$#" in
     VER=$("$PY" -I -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])') || exit 1
     printf 'python-floor: %s runs Python %s, at the floor %s declares\n' "$PY" "${VER%$'\r'}" "$HERE/python-floor.txt"
     ;;
-  down:4)
+  down:3|down:4)
     PY=$(resolve_python) || exit 1
-    exec "$PY" -I "$HERE/python_floor.py" down "$2" "$3" "$4"
+    exec "$PY" -I "$HERE/python_floor.py" down "${@:2}"
     ;;
   floor:1)
     # Read whole, so a second line is seen; one trailing LF is the file's own and is dropped.
@@ -42,5 +42,5 @@ case "${1:-}:$#" in
       printf 'python-floor: %s must be one <major>.<minor> line, and it reads %q\n' "$HERE/python-floor.txt" "$v" >&2; exit 1
     fi
     ;;
-  *) echo "usage: bash <prefix>/lib/python-floor.sh preflight | down <prior> <target> <to> | floor" >&2; exit 2 ;;
+  *) echo "usage: bash <prefix>/lib/python-floor.sh preflight | down <prior> <target> [<to>] | floor" >&2; exit 2 ;;
 esac

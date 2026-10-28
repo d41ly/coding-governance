@@ -72,8 +72,12 @@ starts it:
   `core.editor`, `sequence.editor`, `core.gitProxy`, `remote.<x>.uploadpack` and `receivepack`,
   `hook.<x>.command`, `gc.recentObjectsHook` (run by `gc` and the auto-gc a commit or fetch
   starts), a `submodule.<x>.update` or `alias.<x>` beginning with `!`, and the trailer,
-  difftool, mergetool, browser, man, guitool and send-email commands. The refusal names each key
-  and the file declaring it. A repository with a filter it relies on, Git LFS's say, in its own
+  difftool, mergetool, browser, man, guitool and send-email commands. Credentials in a value are
+  refused too: a `remote.<x>.url`, `remote.<x>.pushurl`, `http.proxy` or `remote.<x>.proxy` that
+  is a `<scheme>://` URL carrying a user or password before its host, and any `http.sslKey`,
+  `http.sslCert` or `http.cookieFile`, or its `http.<url>.` form. An scp-form remote such as
+  `git@host:repo` carries no credential and is not refused. The refusal names each key
+  and the file declaring it, and never prints its value. A repository with a filter it relies on, Git LFS's say, in its own
   config or a submodule's, or a local `core.editor` or difftool, has every step refused: remove
   the key for the run, or run the step attended. Nine keys of that shape are not refused: `merge.<driver>.driver`, since a step never
   merges and gov's own checkout declares two; `core.hooksPath`, since the setting gov passes
@@ -128,7 +132,7 @@ a schema-3 receipt to 4 with an empty `steps` (a receipt below 3 is refused: run
 which lifts it to 3); its down takes the field out again and refuses while any other step reads
 `applied`.
 
-Before schema 4 no step row is written: a step's failure or interruption on such a receipt shows
+Below schema 4 no step row is persisted: a step's failure or interruption on such a receipt shows
 only in `update`'s output and findings. The `govkit/receipt-schema-4` row itself is written once
 that step's re-read of the receipt shows schema 4, like any other row. A row is recorded only on a
 receipt whose `schema` is a number of 4 or more and whose `steps` is a list; anything else is
@@ -179,8 +183,11 @@ gone from the process table, or names a process started after the lock, and prin
 lock from another host, one it cannot read, or one it cannot judge because the process census cannot
 run is not reclaimed: the refusal names the holder, and you delete the lock by hand once you know
 that run has ended. The lock also records the platform it was taken on and, on Linux, the kernel's
-boot id; a lock from another platform or boot is not reclaimed either, so a WSL run and a Windows
-run on one tree, which share a host name, never take each other's live lock. On Linux it records the
+boot id; a lock from another platform is not reclaimed either, so a WSL run and a Windows run on one
+tree, which share a host name, never take each other's live lock. A lock from this host and platform
+whose boot id differs from this kernel's is reclaimed, because the reboot ended its holder; where one
+of the two boot ids is missing it is not. Two kernels that share a host name and a tree are judged
+one host, so give each its own host name. On Linux it records the
 pid namespace too, `pid_ns`, because two WSL distros, or a distro and a Docker Desktop container,
 share one kernel boot id; a lock from another pid namespace is not reclaimed, and neither is a lock
 with no `pid_ns` judged on Linux, which a govkit older than this one leaves. A lock carrying the

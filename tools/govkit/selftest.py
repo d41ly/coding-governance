@@ -2092,6 +2092,35 @@ def check_update_safety(tmp: pathlib.Path) -> None:
         check(f"[aHI-4 {_ht}] ...and the run fails rather than re-stamping",
               p.returncode == 1 and "NOT re-stamped" in p.stdout, p.stdout[-800:])
 
+    # ---- TOOL-dSafePassage-35 AC1. A scratch gov whose kit plants an `lf_pin` and a `project-owned`
+    # ---- rule beside an engine file: gov's plan destinations, and so the step gate's `file` class,
+    # ---- hold the engine file and neither `order` row. The plan holding both rows, with nothing
+    # ---- missing, is the liveness: a filter on `missing` alone admits them.
+    kit_p1 = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+              '[[files]]\ninclude = ["eng.txt"]\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["own.md"]\nrole = "project-owned"\n\n'
+              '[[lf_pin]]\npattern = "{kit}/*.sh"\nwhy = "a fixture pin"\n\n'
+              '[adopt]\nargv = []\nmutates_index = false\n')
+    g, _p1a = build_gov17("p1", kit_p1, {"eng.txt": "e\n", "own.md": "o\n"})
+    (g / ".governance").mkdir(exist_ok=True)
+    (g / ".governance" / "deploy.toml").write_text(SAFE_DEPLOY, encoding="utf-8", newline="\n")
+    sys.path.insert(0, str(HERE))
+    import step_gate  # noqa: E402, PLC0415
+    _p1g = step_gate.gk
+    _p1r = _p1g.Report()
+    _p1reg = _p1g.load_registry(g)
+    _p1ds = _p1g.read_descriptors(g, _p1reg, _p1r)
+    _p1dp = _p1g.load_deploy(g)
+    _p1plan = _p1g.planned_writes(g, g, _p1dp, _p1ds, _p1g.resolve_selection(_p1reg, _p1ds, "default", [], _p1dp), _p1r)
+    _p1o = {p["dest"] for p in _p1plan if p["kind"] == "order" and not p["missing"]}
+    _p1d = set(_p1g.read_plan_destinations(g))
+    _p1m = step_gate.read_file_members(g)
+    check("[dSP-35] AC1 a planted lf_pin and project-owned rule are plan rows, and neither joins the "
+          "plan destinations or the file class, the engine file does",
+          {f"{PFX}demo/own.md", f".gitattributes:{PFX}demo/*.sh"} <= _p1o and _p1d == {f"{PFX}demo/eng.txt"}
+          and _p1m == {"{prefix}/demo/eng.txt"}, f"order rows {sorted(_p1o)}; destinations {sorted(_p1d)}; "
+          f"members {sorted(_p1m)}")
+
     # ---- DEPL-aHalvedInstall-5 AC1-AC3. The two refusal channels unit 4's held set missed: the
     # ---- classification walk (a receipt row whose role the dispatch refuses) and the landing loop (a
     # ---- source new this vintage whose destination the target occupies) — each with a changed clean
@@ -3475,6 +3504,19 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               f"{', '.join(needles)}", rc == want and "isolation: FAILED" not in out
               and all(n in out for n in needles), out)
 
+    # TOOL-dSafePassage-35 AC8, AC24: a credential in the target's remote URL refuses the step naming
+    # the key and its file and printing no part of it, an scp-form remote runs; and the target's local
+    # core.autocrlf=false wins over the parent's global true in the step's hash. Each failing case is
+    # the fixture's own expectation, printed as `isolation: FAILED`.
+    for plant, want, needles in (
+            ("local-url-userinfo", 1, ("remote.origin.url in .git/config, so nothing was spawned",
+                                       "scp-form remote · not refused · git add exits 0")),
+            ("autocrlf-local", 0, ("fixture/hash · up · ok · the step's oid ", " · equal"))):
+        rc, out = fixture(us_py, plant)
+        check(f"[dSP-35] fixture isolation {plant} exits {want} and names {', '.join(needles)}",
+              rc == want and "isolation: FAILED" not in out and all(n in out for n in needles)
+              and "gk-planted-user" not in out and "gk-planted-secret" not in out, out)
+
     # TOOL-dSafePassage-24 AC1 to AC4: an executor in the target's own config refuses the step before
     # any spawn, naming the key and its file ON the refusal line; each `-stub` twin skips the check and
     # its canary runs.
@@ -3673,7 +3715,10 @@ def check_step_gate_fixture() -> None:
         # TOOL-dSafePassage-26 AC37: a raising reader is a refusal naming class, side and error; a
         # class whose source the base lacks reads empty there and is counted as joining.
         ("reader-raises", 2, 2, r"^step-gate: REFUSED · class sg-fixture's reader raised on the tip side: RuntimeError: "),
-        ("base-without-source", 0, 0, r"^step-gate: \d+ classes · .* 0 vanished · 0 witnessed · 1 joining \(sg-fixture\)$")]
+        ("base-without-source", 0, 0, r"^step-gate: \d+ classes · .* 0 vanished · 0 witnessed · 1 joining \(sg-fixture\)$"),
+        # TOOL-dSafePassage-35 AC3: a branch carrying the last landing's source receipt that stops
+        # shipping a file still reds, because the file class reads the plan alone.
+        ("stale-receipt", 1, 0, r"^step-gate: RED file:\S")]
     for case, bare, rowed, needle in cases:
         for with_row, want in ((False, bare), (True, rowed)):
             p = subprocess.run([sys.executable, str(sg_py), "--fixture", "--plant", case,
@@ -3681,6 +3726,10 @@ def check_step_gate_fixture() -> None:
                                encoding="utf-8", errors="replace", timeout=900)
             out = p.stdout + p.stderr
             named = bool(_re.search(needle, out, _re.M)) if not with_row or want == 2 else True
+            if case in ("file", "stale-receipt") and not with_row:
+                # TOOL-dSafePassage-35 AC3: the red names the member the plant's `git rm` took out.
+                _pm = _re.search(r"· planted (file:\S+)", out)
+                named = named and bool(_pm) and f"RED {_pm[1]} vanished" in out
             check(f"[dSP-10] step-gate fixture {case}{' --with-row' if with_row else ''} exits {want}"
                   f"{'' if with_row and want != 2 else ' and names ' + needle}",
                   p.returncode == want and named, out[-3000:])
@@ -3770,6 +3819,14 @@ def check_step_walk() -> None:
             ("lock", "lock-no-pidns", 1, ("refusing rather than joining in: unknown, it was taken with no pid_ns",
                                           "lock: the planted lock unchanged",
                                           "lock: with no pid_ns here, the take exits 0")),
+            # TOOL-dSafePassage-35 AC23: a live pid's lock from another boot of this host and platform
+            # is reclaimed; one carrying no namespace key reads unknown under a Linux pid_ns, and the
+            # census judges it with none on either side.
+            ("lock", "lock-other-boot", 0, ("this host has booted since, as 'gk-boot-after', which ended its holder",
+                                            "lock: taken")),
+            ("lock", "lock-no-namespace", 1, ("refusing rather than joining in: unknown, it was taken with no pid_ns",
+                                              "lock: the planted lock unchanged",
+                                              "lock: with no pid_ns here, the take exits 0")),
             ("lock", "lock-race", 0, ("busy, ",)),
             ("lock", "guard-dead", 0, ("busy, cleared the guard .update.lock.reclaim",
                                        "lock: first take exits 1 · guard cleared · lock unchanged")),
@@ -3798,10 +3855,33 @@ def check_step_walk() -> None:
                else "dSP-33" if family == "walk" and plant in ("witness-holds", "fail-k")
                else "dSP-22" if plant == "lock-live-slow-census"
                else "dSP-31" if plant in ("lock-foreign-pidns", "lock-no-pidns")
+               else "dSP-35" if plant in ("lock-other-boot", "lock-no-namespace")
                else "dSP-26" if plant in ("truncated-image", "lock-foreign-namespace", "needs-target-source")
                else "dSP-32" if (plant or "").startswith("lock-wall-step") else "dSP-2")
         check(f"[{tag}] fixture {family} {plant or '(base)'} exits {want} and names {', '.join(needles)}",
               p.returncode == want and f"{family}: FAILED" not in out and all(n in out for n in needles), out[-3000:])
+
+    # TOOL-dSafePassage-35 AC4: the slow-census plant's delay is large enough to matter. A staged
+    # judge copy that reads the clock AFTER the census puts the live holder past REUSE_MARGIN_S, so
+    # the plant run against it reclaims, and its expectations print `lock: FAILED`.
+    clock = "        now, now_boot = time.time(), read_boot_clock()\n        rows, _counts = census.scan_processes()\n"
+    late = "        rows, _counts = census.scan_processes()\n        now, now_boot = time.time(), read_boot_clock()\n"
+    src = us_py.read_text(encoding="utf-8")
+    with tempfile.TemporaryDirectory(prefix="gk-judge-", ignore_cleanup_errors=True) as td:
+        jd = pathlib.Path(td) / HERE.name
+        jd.mkdir()
+        shutil.copy(HERE / "govkit.py", jd / "govkit.py")
+        (jd / "upgrade_steps.py").write_text(src.replace(clock, late), encoding="utf-8", newline="\n")
+        (pathlib.Path(td) / "process-monitor").mkdir()
+        shutil.copy(govkit_module().resolve_kit_dir("process-monitor", "census.py", HERE) / "census.py",
+                    pathlib.Path(td) / "process-monitor" / "census.py")
+        p = subprocess.run([sys.executable, str(jd / "upgrade_steps.py"), "fixture", "lock", "--plant",
+                            "lock-live-slow-census"], capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", timeout=600)
+    out = p.stdout + p.stderr
+    check("[dSP-35] AC4 lock-live-slow-census against a judge copy reading the clock after the census "
+          "reclaims the live holder and prints lock: FAILED",
+          src.count(clock) == 1 and "lock: taken" in out and "lock: FAILED" in out, out[-3000:])
 
     # The walk's two refusals, in process: a step that leaves the receipt unreadable, and a step's
     # writes git will not stage (the target here is no repository).
@@ -4344,15 +4424,16 @@ def check_source_mode(tmp: pathlib.Path) -> None:
     check("[dSP-8] AC9 check-wiring and check-install-prefix read the source receipt as no receipt",
           seen[0] == seen[1], f"{[s[0] for s in seen[0]]} vs {[s[0] for s in seen[1]]}")
 
-    # TOOL-dSafePassage-21 AC3 — the step gate's `file` class reads one member set from the source
-    # receipt `update --write` just wrote and, with it removed, from gov's plan on the same tree.
+    # TOOL-dSafePassage-21 AC3, as TOOL-dSafePassage-35 S3 reads it — the step gate's `file` class
+    # reads the plan alone, so the source receipt `update --write` just wrote is the comparand: its
+    # `files` paths, in member spelling, equal the class.
     sys.path.insert(0, str(HERE))
     import step_gate  # noqa: E402, PLC0415
-    from_receipt = step_gate.read_file_members(clone)
-    rp.replace(tmp / "gf-receipt.json")
+    _tr = step_gate.gk.derive_tool_root(clone)
+    from_receipt = {step_gate.derive_member_path(r["path"], _tr)
+                    for r in json.loads(rp.read_text(encoding="utf-8")).get("files") or []}
     from_plan = step_gate.read_file_members(clone)
-    (tmp / "gf-receipt.json").replace(rp)
-    check("[dSP-21] AC3 the file class reads the same members from the source receipt and from the plan",
+    check("[dSP-21] AC3 the source receipt's files rows, in member spelling, equal the file class (the plan)",
           bool(from_receipt) and from_receipt == from_plan,
           f"receipt only {sorted(from_receipt - from_plan)[:5]}, plan only {sorted(from_plan - from_receipt)[:5]}")
 
@@ -17326,8 +17407,8 @@ user_skills = "/tmp/gk-fake-skills"
     # An override that is SET and unusable must be THIS failure, never a quiet fall-through:
     # the operator would believe they had chosen. The memo is cleared around the arm so it
     # measures the resolver rather than the answer the arms above cached.
-    keep_bash, keep_env = govkit._BASH, os.environ.get("GOV_BASH")
-    govkit._BASH = None
+    keep_bash, keep_env = govkit.upgrade_steps._BASH, os.environ.get("GOV_BASH")
+    govkit.upgrade_steps._BASH = None
     os.environ["GOV_BASH"] = str(HERE / "no-such-bash-xyzzy")
     try:
         govkit.resolve_bash()
@@ -17335,7 +17416,7 @@ user_skills = "/tmp/gk-fake-skills"
     except govkit.Refusal:
         refused = True
     finally:
-        govkit._BASH = keep_bash
+        govkit.upgrade_steps._BASH = keep_bash
         if keep_env is None:
             os.environ.pop("GOV_BASH", None)
         else:

@@ -7040,7 +7040,7 @@
     {
       "id": "demand_safe_token",
       "kind": "function",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "demand_writable_target",
@@ -18173,6 +18173,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "render_row_order_key",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "render_rows",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -18695,7 +18700,7 @@
     {
       "id": "resolve_bash",
       "kind": "function",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "resolve_bash",
@@ -19226,6 +19231,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/govkit/steps/fanout_cap.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -20350,7 +20360,7 @@
     {
       "id": "resolve_shell_argv",
       "kind": "function",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "resolve_shim_landing",
@@ -20415,7 +20425,7 @@
     {
       "id": "resolve_tokens",
       "kind": "function",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "resolve_tool_path",
@@ -24075,7 +24085,7 @@
     {
       "id": "target_context",
       "kind": "function",
-      "file": "tools/govkit/govkit.py"
+      "file": "tools/govkit/upgrade_steps.py"
     },
     {
       "id": "terms",
@@ -27691,6 +27701,11 @@
       "id": "write_unit_spec",
       "kind": "function",
       "file": "tools/push-main.test.sh"
+    },
+    {
+      "id": "write_untracked_snapshot",
+      "kind": "function",
+      "file": "tools/push-main.sh"
     },
     {
       "id": "write_verb_plant",

@@ -186,11 +186,12 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "submodule-unpopulated-stub", "submodule-unpopulated-worktree",
                   "submodule-unpopulated-worktree-stub", "submodule-main-only",
                   "local-recent-objects-hook", "local-recent-objects-hook-stub", "local-ext-transport",
-                  "local-ext-transport-stub", "autocrlf")
+                  "local-ext-transport-stub", "autocrlf", "autocrlf-local", "local-url-userinfo")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
-# value rule is `any`, `not a git false` or `begins with !`. selftest's class arm holds it, with
+# value rule is `any`, `not a git false`, `begins with !` or `a URL carrying userinfo`, a
+# `<scheme>://` value with an `@` before its host. selftest's class arm holds it, with
 # `STEP_UNREFUSED_KEYS`, to every executor-shaped key `git help --config` lists.
 STEP_REFUSED_KEYS = (
     ("filter.<x>.clean", "any", "add, checkout, status"),
@@ -204,6 +205,18 @@ STEP_REFUSED_KEYS = (
     ("core.askPass", "any", "a fetch or a push"),
     ("http.extraHeader", "any", "sent as a credential"),
     ("http.<x>.extraHeader", "any", "sent as a credential"),
+    # TOOL-dSafePassage-35 S8: the credential-bearing values. An scp-form `user@host:path` is no URL
+    # and carries no credential.
+    ("remote.<x>.url", "a URL carrying userinfo", "sent as a credential"),
+    ("remote.<x>.pushurl", "a URL carrying userinfo", "sent as a credential"),
+    ("http.proxy", "a URL carrying userinfo", "sent as a credential"),
+    ("remote.<x>.proxy", "a URL carrying userinfo", "sent as a credential"),
+    ("http.sslKey", "any", "read as a client credential"),
+    ("http.<x>.sslKey", "any", "read as a client credential"),
+    ("http.sslCert", "any", "read as a client credential"),
+    ("http.<x>.sslCert", "any", "read as a client credential"),
+    ("http.cookieFile", "any", "read as a client credential"),
+    ("http.<x>.cookieFile", "any", "read as a client credential"),
     ("credential.<x>", "any", "a helper, or a credential setting"),
     ("gpg.program", "any", "a signed commit or tag, log --show-signature, verify-commit"),
     ("gpg.<x>.program", "any", "a signed commit or tag, log --show-signature, verify-commit"),
@@ -246,13 +259,394 @@ STEP_UNREFUSED_KEYS = (
     ("uploadpack.packObjectsHook", "honoured only from protected config, which the step environment does not set"))
 GIT_FALSE = ("false", "no", "off", "0", "")
 # How much later than a lock's `started` a census row of its pid may estimate its creation and still
-# be the holder (TOOL-dSafePassage-22 S3). It covers the census's rounding of `age_s` to whole
-# seconds and no latency: the clock is read before the census, so a slow census errs toward live.
+# be the holder (TOOL-dSafePassage-22 S3). It covers the census's whole-second `age_s`, per backend
+# (TOOL-dSafePassage-35 S7): `windows-join` rounds it with PowerShell's `[int]`, at most 0.5 s;
+# `posix-ps` takes `etimes`, which `ps` truncates, at most 1 s. The 2 s covers the larger, and no
+# latency: the clock is read before the census, so a slow census errs toward live.
 REUSE_MARGIN_S = 2.0
 
 
 class Refusal(RuntimeError):
     """A condition that stops govkit before it reads or writes anything further."""
+
+
+# ------------------------------------------------- argv resolution (TOOL-dSafePassage-35 S24)
+# The step module's argv resolution owns its closure: moved here from govkit.py, which binds each
+# moved name a reader spells off it back from this module. The sibling-kit resolver is an inline
+# copy, byte-identical to the canonical one named on its marker line and gated by the
+# resolve-python self-test's parity arm.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+#: The canonical ctx's marker that every `opt_in` rule lands. Reserved: `target_context` refuses a
+#: target that spells it, because it would take every opt-in of that kit without naming one.
+OPT_IN_ALL = "opt_in_all"
+
+
+# The negative lookbehind is load-bearing and was bought by a failing arm. A discharge probe is a
+# SHELL command, and shell parameter expansion is spelled `${name}` — so a bare `\{([a-z_]+)\}`
+# matched the `{k}` inside `${k}` in a probe's own loop variable and reported a missing answer named
+# `k`. Two syntaxes sharing a brace is the collision; refusing to match after a `$` is the fix.
+TOKEN_RX = re.compile(r"(?<!\$)\{([a-z_]+)\}")
+
+
+_BASH: str | None = None
+
+
+def resolve_bash() -> str:
+    """The bash that shares THIS filesystem, not whatever the NAME `bash` resolves to.
+
+    MEASURED on node d, 2026-08-20: a descriptor declares `argv = ["bash", ...]`, govkit is a
+    WINDOWS python, and subprocess resolving the bare name goes through the Windows loader —
+    which finds C:/Windows/System32/bash.exe, the WSL launcher, before git-bash. WSL then sees a
+    different filesystem (the target resolves under /mnt/c/) and a different interpreter: its
+    python3 is 3.10.12, so the playbook adopter died on `import tomllib`, which needs 3.11. The
+    whole `govkit acceptance matrix` leg was RED for that reason and for no other.
+
+    This is the documented class `memory/gotchas/subprocess-resolves-a-different-shell.md`, and
+    the remedy it names is this one: name the EXECUTABLE, never the command. corpus_ids.py
+    carries the same function for the memory-tree kit. It is duplicated rather than imported
+    because govkit is COPY-INSTALLED as a standalone directory and cannot reach that module.
+
+    A candidate is accepted only if it RUNS — existing on disk is not evidence, the same mistake
+    <prefix>/lib/resolve-python.sh documents for the Microsoft Store python3 stub.
+
+    WHAT THIS DOES NOT DO: it does not make a target's own scripts portable, and it does not
+    check the interpreter those scripts then pick. It fixes which SHELL runs them and nothing
+    else. GOV_BASH overrides, and an override that is set and unusable is a Refusal here rather
+    than a silent fall-through — the operator would believe they had chosen.
+    """
+    global _BASH
+    if _BASH:
+        return _BASH
+
+    def check_runs(cand: str) -> bool:
+        try:
+            return subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0
+        except OSError:
+            return False
+
+    override = os.environ.get("GOV_BASH")
+    if override:
+        if check_runs(override):
+            _BASH = override
+            return _BASH
+        raise Refusal(f"govkit: GOV_BASH is set to {override!r} and does not run. An override "
+                      f"that is set and unusable is this failure, not a fall-through.")
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        for name in ("bash.exe", "bash"):
+            cand = os.path.join(d, name)
+            if not os.path.isfile(cand):
+                continue
+            low = cand.replace("\\", "/").lower()
+            if "/system32/" in low or "/windowsapps/" in low:
+                continue          # a launcher for a DIFFERENT filesystem
+            if not check_runs(cand):
+                continue          # on disk, cannot execute
+            _BASH = cand
+            return _BASH
+    raise Refusal("govkit: no usable bash on PATH that shares this filesystem — every candidate "
+                  "was either a System32/WindowsApps launcher or did not run. Set GOV_BASH.")
+
+
+def resolve_shell_argv(argv: list[str]) -> list[str]:
+    """Replace a LEADING bare `bash` with the resolved executable; every other argv is untouched.
+
+    Only position 0 and only the bash names. A `bash` appearing as an ARGUMENT is a value the
+    target chose and is none of govkit's business, and `sh` is left alone because substituting
+    bash for it would change the language a target asked for.
+
+    Falls back to the argv unchanged when no bash resolves, so a machine with none behaves
+    exactly as it does today instead of newly refusing on a path that never needed this.
+    """
+    if not argv or argv[0] not in ("bash", "bash.exe"):
+        return list(argv)
+    try:
+        return [resolve_bash()] + list(argv[1:])
+    except Refusal:
+        return list(argv)
+
+
+def resolve_tokens(s: str, ctx: dict[str, str]) -> tuple[str, list[str]]:
+    """Substitute `{token}`s from the target's answers. Unresolved tokens are RETURNED, not emitted.
+
+    A path with a brace still in it is not a path. Emitting one is how a deployer writes a literal
+    `{memory_root}` directory into somebody's repository, so the caller is handed the missing names
+    and decides — which for `plan` and `apply --unattended` is a refusal that names the key.
+    """
+    missing: list[str] = []
+
+    def sub(m: re.Match) -> str:
+        k = m.group(1)
+        if k in ctx:
+            return ctx[k]
+        missing.append(k)
+        return m.group(0)
+
+    return TOKEN_RX.sub(sub, s), missing
+
+
+# THE ONE PLACE TARGET-SUPPLIED TEXT BECOMES PART OF A COMMAND, so it is the one place to refuse.
+#
+# Every token value below comes out of the TARGET's `.governance/deploy.toml`, a file in a repository
+# gov does not own. Those values are interpolated by `resolve_tokens` into argv templates GOV wrote —
+# `[check].argv`, `[[hole]].discharge.command`, `[[gate_leg]].argv` — several of which are
+# `["bash", "-c", "... {kit} ..."]` or `["python", "-c", "... sys.path.insert(0, '{kit}') ..."]`.
+# A shell metacharacter or a quote break in a value therefore becomes CODE.
+#
+# REPRODUCED, twice, on this engine before this guard existed: a target whose `deploy.toml` carried
+# `prefix = "tools; touch PWNED-BY-CHECK ;"` made a READ-ONLY `govkit check` — no `--write`, no
+# `--run-discharge`, nothing printed — create that file in the target. A second reproduction broke
+# out of a `python -c` string the same way. `resolve_shell_argv` is no defence: it rewrites argv[0]
+# and nothing else.
+#
+# WHY IT WAS MISSED, stated because the miss is the interesting part. The fold before this one
+# labelled each spawn by WHO AUTHORED THE ARGV TEMPLATE and concluded these sites were gov's. That is
+# the wrong question. The template is gov's and the VALUES SUBSTITUTED INTO IT are the target's, so
+# the resulting command is target-influenced wherever a token appears — and the declaration asserting
+# otherwise was itself the artifact written to stop this class recurring.
+#
+# A CHARACTER CLASS, not an escaper. Escaping is per-consumer — a value safe in argv is not safe
+# inside `bash -c` — and this value reaches several. What every legitimate answer in this repo's
+# descriptors actually is: a path fragment. So the refusal is narrow, total, and needs no consumer
+# to be correct.
+# `\Z` AND NOT `$`: Python's `$` matches BEFORE a final newline, so "tools\n" passed this class
+# for as long as it has existed. Round 4 measured it. A trailing newline in a value spliced into a
+# `bash -c` string ends the command and starts another one, which is the exact escape the class
+# was written to stop.
+TOKEN_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+-]*\Z")
+# THE ONE ADMITTED COLON, anchored, and nothing else. Round 3 measured that the class above refuses
+# `user_skills = "C:/Users/x/.claude/skills"` -- a correct answer on the platform this project's own
+# primary node runs on -- with a message about command injection naming nothing the operator did
+# wrong. `kickoff-manifest` is in the DEFAULT selection and its rule is `{user_skills}/session-kickoff`,
+# so that sat on the common path for every Windows adopter. No arm caught it: both fixtures spell the
+# answer in forms that pass (`~/.claude/skills`, `/tmp/gk-fake-skills`).
+#
+# WHY THIS IS A NARROW WIDENING AND NOT A HOLE. The threat the class exists for is a value leaving its
+# argument inside a `bash -c` or `python -c` template, which needs a shell metacharacter: `;` `|` `&`
+# `$` a backtick, a quote, a newline, a redirect. `:` is none of those -- it is bash's null command and
+# is inert as argument text. What a colon CAN do is make a path absolute on Windows, and that is a
+# containment question, answered one function down by `demand_contained_dest`, which reds a
+# drive-lettered DESTINATION. So the two guards keep their own jobs: this one grades characters, that
+# one grades escape.
+#
+# ANCHORED AT POSITION 1 AND REQUIRING A FORWARD SLASH. `C:/x` passes; `C:x`, `C:\x`, `a:b` and
+# `C:/a;b` do not -- the remainder after the drive is graded by the class above exactly as before, so
+# an interior colon or any metacharacter still refuses. Backslash stays refused deliberately: §11
+# pins forward slashes on this platform, and admitting both spellings would double the surface for
+# nothing.
+DRIVE_PREFIX_RE = re.compile(r"^[A-Za-z]:/")
+
+
+# ---- TWO CLASSES, BECAUSE THERE ARE TWO KINDS OF VALUE AND ONE CLASS GRADED BOTH.
+# ---- The strict class above was written for `prefix` -- which becomes a PATH and is interpolated
+# ---- into `bash -c` and `python -c` argv templates -- and was then applied to every `answers.*`
+# ---- and every `kit.<eid>.*` value as well. Those are not all paths. The playbook charter's
+# ---- placeholders are rendered into a MARKDOWN DOCUMENT, and a legitimate override for one carries
+# ---- spaces by nature: `gate_runner = "bash <prefix>/run-gates/run-gates.sh"` is a command a reader
+# ---- runs, `id_families = "PLAY KICK TOOL DEPL"` is a list.
+# ----
+# ---- MEASURED, AND IT WAS NOT HYPOTHETICAL. The single class red the `govkit acceptance matrix`
+# ---- leg from the commit that introduced it, and it stayed red across two commits because no full
+# ---- bar ran in between. The live adopter's answers happen to be all path-shaped, so nothing else
+# ---- noticed. That is the same mistake as the drive letter, twice: writing one character class for
+# ---- `prefix` and applying it to every value that passes through the same function.
+# ----
+# ---- THE PROSE CLASS IS STILL AN ALLOWLIST, and it still refuses every injection vector this build
+# ---- reproduced. It adds space, comma, equals and colon -- none of which can end an argument or
+# ---- start a command -- and admits nothing that can: no `;` `|` `&` `$`, no backtick, no quote, no
+# ---- redirect, no parenthesis or brace, no glob, no backslash, no control character. `tools; touch
+# ---- PWNED ;` and `$(id)` are refused by it exactly as before.
+# ----
+# ---- WHAT THE PROSE CLASS DOES NOT PROMISE. An earlier version of this comment said a spaced value
+# ---- reaching a `bash -c` template merely WORD-SPLITS, that this is "a correctness bug for the
+# ---- operator who wrote it" and "not code execution". THAT WAS FALSE and round 4 proved it: for a
+# ---- `python {kit}/<script>` template the injected word becomes the script python runs. A comment
+# ---- asserting a guarantee the code does not hold is worse than no comment, because the next reader
+# ---- budgets against it.
+# ---- The prose class is sound ONLY for a value whose sole consumer is a rendered document, and
+# ---- nothing here establishes that per key. What makes it safe today is `SEEDED_TOKENS` above:
+# ---- every token that reaches an argv is gov's own and a target cannot supply one. The escape half
+# ---- is owned by `demand_contained_dest`, which grades destinations whichever class they came
+# ---- through.
+# ---- THE KEYS GOV COMPUTES FOR ITSELF, and which a TARGET may therefore never supply.
+# ---- ROUND 4's blocker, and it is round 2's blocker reopened by round 2's own fix. `target_context`
+# ---- seeds `prefix`, `kit_id` and `kit` from a `prefix` graded by the STRICT class, then walked the
+# ---- target's `[answers]` and `[kit.<eid>]` tables and assigned `ctx[k]` UNCONDITIONALLY through
+# ---- the PROSE class -- which admits a space. Nothing stopped a target routing a document-class
+# ---- value into a shell-class key.
+# ----
+# ---- REPRODUCED: `[answers] kit = "-m pwned "` makes `ctx["kit"]` that string, and drift-audit's
+# ---- shipped hole probe resolves to `python -m pwned /drift_report.py --check` with ZERO
+# ---- unresolved tokens. Six shipped descriptors interpolate `{kit}` inside a `-c` string, and
+# ---- `cmd_check` spawns every one of them from a READ-ONLY verb with no opt-in flag.
+# ----
+# ---- THE ENGINE ALREADY KNEW THE SET. `needed_answers` declares exactly these five and refuses to
+# ---- ask an operator for any of them, while `target_context` let a target supply all five: two
+# ---- functions, one set, opposite answers. That is what this constant ends -- it is READ by both.
+# ---- THE SET IS THE THREE KEYS SEEDED ABOVE THE LOOPS, and it is NOT `needed_answers`' five.
+# ---- Measured before narrowing, because widening a refusal without enumerating its population is
+# ---- the mistake this whole review round is about. `memory_root` is applied by `ctx.setdefault`
+# ---- AFTER the loops, so a target that supplies it legitimately wins -- and gov's OWN selftest
+# ---- fixtures supply it in `[answers]` at four sites, as does a live adopter. Refusing it would
+# ---- have broken the suite and every real install to close a hole it is not part of. `relpath` is
+# ---- never a ctx key at all: `resolve_dests` substitutes it per rule with `.replace`, so a target
+# ---- supplying it reaches nothing.
+# ---- `needed_answers` means "do not ASK for these five"; this means "do not READ these three".
+# ---- Different questions, and collapsing them was the first cut of this fix.
+SEEDED_TOKENS = ("prefix", "kit_id", "kit")
+# The subset a per-ENTRY `[kit.<eid>]` table may set, graded by the STRICT path class. See
+# `target_context` for why the split is per-table rather than a name ban.
+PER_KIT_PATH_TOKENS = ("prefix", "kit")
+
+
+ANSWER_VALUE_RE = re.compile(r"\A[A-Za-z0-9_./~@+:, =-]*\Z")
+
+
+def demand_safe_token(key: str, value: str, where: str, prose: bool = False) -> str:
+    """Refuse a target-supplied token value that could leave its argument and become code.
+
+    `prose=False` (the default) is the STRICT class, for a value that becomes a path or is
+    interpolated into an argv this engine runs. A leading `<letter>:/` is dropped before grading and
+    the REMAINDER graded normally, so a Windows drive letter is admitted and an interior colon is
+    not.
+
+    `prose=True` is for a value whose only consumer renders it into a document. See the block above
+    `ANSWER_VALUE_RE` for what it admits, what it still refuses, and what it deliberately does not
+    promise.
+    """
+    rx = ANSWER_VALUE_RE if prose else TOKEN_VALUE_RE
+    body = value if prose else (value[2:] if DRIVE_PREFIX_RE.match(value) else value)
+    if not rx.match(body):
+        bad = "".join(sorted({c for c in body if not rx.match(c)}))
+        raise Refusal(
+            f"the target descriptor's '{key}' is {value!r}, which carries {bad!r}. Token values are "
+            f"interpolated into argv this engine RUNS — several shipped probes are `bash -c` and "
+            f"`python -c` strings — so a value outside [A-Za-z0-9_./~@+-] can leave its argument and "
+            f"become code. Refusing to resolve it ({where}). "
+            + ("This value is rendered into a document, so spaces and commas are fine here and "
+               "shell metacharacters are not"
+               if prose else
+               "Every legitimate value here is a path fragment, optionally behind a `C:/` drive "
+               "letter")
+            + "; if you need one that is not, that is a change to this rule and not to a descriptor")
+    return value
+
+
+def target_context(target: pathlib.Path, deploy: dict, eid: str, desc: dict) -> dict[str, str]:
+    """The token values for one entry, from the target descriptor's answers.
+
+    EVERY VALUE IS VALIDATED HERE, at the boundary, rather than at the several places they are
+    consumed. See `demand_safe_token` for what was reproduced without it.
+    """
+    # WHERE A TARGET MAY SPEAK ABOUT A SEEDED TOKEN, per TABLE and per KEY rather than by name.
+    #
+    # `ce4ef9f3` closed a live injection: a target could put a PROSE-class value -- one that admits
+    # a space -- on a key this engine interpolates into a `bash -c` template, and a READ-ONLY
+    # `check` would run it. That fix refused `prefix`, `kit_id` and `kit` from both target tables.
+    #
+    # The refusal is a SUPERSET of the defect, and the surplus is load-bearing for an adopter. The
+    # top-level `prefix` below is target-supplied too, and it is safe for exactly one reason: it is
+    # graded by the STRICT class, which admits no space, quote, semicolon, backtick or pipe, so a
+    # value cannot leave its argument. The defect was the CLASS, not the key. So:
+    #
+    #   [answers]    refuses all three. It is GLOBAL: a `kit` there collapses every entry into one
+    #                home and a `kit_id` renames all of them, so no value is ever legitimate.
+    #   [kit.<eid>]  accepts `prefix` and `kit`, graded STRICTLY. A per-entry install home is a path
+    #                fragment the OPERATOR owns and this engine cannot derive -- an adopter whose
+    #                memory-tree lives at `scripts/` rather than `scripts/memory-tree/` has no other
+    #                way to say so, and before this it had none at all. `kit_id` stays refused
+    #                everywhere: that is the ENTRY's identity, joined to the receipt's `kit` field,
+    #                and not a path.
+    per_kit = (deploy.get("kit") or {}).get(eid) or {}
+    for _tbl, _label, _allowed in ((deploy.get("answers") or {}, "answers", ()),
+                                   (per_kit, f"kit.{eid}", PER_KIT_PATH_TOKENS)):
+        for k in _tbl:
+            if k in SEEDED_TOKENS and k not in _allowed:
+                raise Refusal(
+                    f"the target descriptor supplies '{_label}.{k}', which this engine derives "
+                    f"({', '.join(SEEDED_TOKENS)}). These are interpolated into argv this engine "
+                    f"RUNS -- a `{{{k}}}` inside a `bash -c` or `python -c` template becomes the "
+                    f"command. A per-ENTRY install home is settable as `kit.<entry>.prefix` or "
+                    f"`kit.<entry>.kit`, graded by the strict path class; the global `[answers]` "
+                    f"table and `kit_id` are not. Remove the key: {_label}.{k}")
+    prefix = demand_safe_token(
+        f"kit.{eid}.prefix" if per_kit.get("prefix") else "prefix",
+        (per_kit.get("prefix") or deploy.get("prefix") or "tools").strip("/"),
+        f"entry '{eid}'")
+    # DERIVED unless the target names it. `{kit}` follows a per-entry `prefix` when only that is
+    # given, so an adopter who moves a whole kit family says it once.
+    _kit = per_kit.get("kit")
+    kit = (demand_safe_token(f"kit.{eid}.kit", _kit.strip("/"), f"entry '{eid}'")
+           if isinstance(_kit, str) and _kit else f"{prefix}/{eid}")
+    ctx: dict[str, str] = {
+        "prefix": prefix,
+        "kit_id": eid,
+        "kit": kit,
+    }
+    # TOOL-dSafePassage-8 S3. An `[answers]` value is graded and entered only where THIS entry's own
+    # descriptor names its `{token}`: one no template of the entry names never reaches a substitution
+    # here, and gov's own charter answers carry `—`, `;` and `<` for the renderer alone. Every value
+    # that can reach an argv, a destination or a pattern of the entry is still graded by its class.
+    named: set[str] = set()
+    _todo: list = [desc]
+    while _todo:
+        _v = _todo.pop()
+        if isinstance(_v, dict):
+            _todo += _v.values()
+        elif isinstance(_v, list):
+            _todo += _v
+        elif isinstance(_v, str):
+            named.update(TOKEN_RX.findall(_v))
+    for k, v in (deploy.get("answers") or {}).items():
+        if isinstance(v, str) and k in named:
+            ctx[k] = demand_safe_token(f"answers.{k}", v, f"entry '{eid}'", prose=True)
+    for k, v in per_kit.items():
+        if k == OPT_IN_ALL:
+            raise Refusal(f"the target descriptor supplies 'kit.{eid}.{k}', which is reserved: it would "
+                          f"take every opt-in of that entry without naming one. Set each rule's own "
+                          f"`opt_in` key instead")
+        if isinstance(v, str) and k not in PER_KIT_PATH_TOKENS:
+            ctx[k] = demand_safe_token(f"kit.{eid}.{k}", v, f"entry '{eid}'", prose=True)
+    ctx.setdefault("memory_root", "memory")
+    return ctx
 
 
 class StepRow(NamedTuple):
@@ -954,19 +1348,19 @@ def build_step_env(scratch, target=None) -> dict[str, str]:
 
 def resolve_step_argv(argv, ctx: dict[str, str], step_id: str = "a step") -> list[str]:
     """`argv` resolved for the contract (S2): `{gov}`, `{target}` and `{prefix}` from `ctx` through
-    govkit's `resolve_tokens`, a leading `python` as govkit's own interpreter and `-I`, a leading
+    `resolve_tokens`, a leading `python` as govkit's own interpreter and `-I`, a leading
     `bash` through `resolve_shell_argv`. A token `ctx` does not answer is a refusal naming the step
     and the token, before any spawn."""
-    gk, out = load_govkit(), []
+    out = []
     for tok in argv:
-        got, missing = gk.resolve_tokens(tok, ctx)
+        got, missing = resolve_tokens(tok, ctx)
         if missing:
             raise Refusal(f"{step_id}: '{tok}' holds {', '.join('{' + m + '}' for m in missing)}, which "
                           f"this run does not answer, so nothing was spawned")
         out.append(got)
     if out and out[0] == "python":
         return [sys.executable, "-I", *out[1:]]
-    return gk.resolve_shell_argv(out)
+    return resolve_shell_argv(out)
 
 
 def derive_step_context(row: StepRow, target, gov_root, to: str | None = None) -> dict[str, str]:
@@ -980,7 +1374,7 @@ def derive_step_context(row: StepRow, target, gov_root, to: str | None = None) -
     tr = gk.derive_tool_root(gov_root)
     ctx = {"gov": (gov_root / tr if tr else gov_root).as_posix(), "target": target.as_posix()}
     if (target / ".governance" / "deploy.toml").is_file():
-        ctx["prefix"] = gk.target_context(target, gk.load_deploy(target), row.id.split("/", 1)[0], {})["prefix"]
+        ctx["prefix"] = target_context(target, gk.load_deploy(target), row.id.split("/", 1)[0], {})["prefix"]
     if to:
         ctx["to"] = to
     return ctx
@@ -1089,7 +1483,9 @@ def check_target_local_config(target) -> list[str]:
             if any(re.fullmatch(re.sub(r"<[^>]+>", ".+", re.escape(pattern)), key, re.I)
                    and (rule == "any"
                         or (rule == "not a git false" and (value is None or value.strip().lower() not in GIT_FALSE))
-                        or (rule == "begins with !" and value is not None and value.startswith("!")))
+                        or (rule == "begins with !" and value is not None and value.startswith("!"))
+                        or (rule == "a URL carrying userinfo" and value is not None
+                            and re.match(r"[A-Za-z][A-Za-z0-9+.-]*://[^/?#@]*@", value.strip())))
                    for pattern, rule, _runs in STEP_REFUSED_KEYS)]
 
 
@@ -1650,8 +2046,10 @@ def check_holder_dead(record: dict | None) -> tuple[str, str]:
     """(`dead`, `live` or `unknown`, why) for a lock or guard holder (S7). `dead`: its `host` is this
     host or absent, and the process-monitor census holds no row with its pid, or one created more
     than `REUSE_MARGIN_S` after its `started`, a reused pid; `live`: a row with that pid created no
-    later than that; `unknown`: an unreadable record, another host, another `platform` or `boot_id`
-    where the record carries one (TOOL-dSafePassage-26 S33), a `pid_ns` other than this process's,
+    later than that, and `dead` too where the record's `platform` is this one and its non-empty
+    `boot_id` differs from this host's non-empty one, a reboot (TOOL-dSafePassage-35 S26);
+    `unknown`: an unreadable record, another host, another `platform`, a `boot_id` of which one side
+    is empty (TOOL-dSafePassage-26 S33), a `pid_ns` other than this process's,
     an absent one reading "" (TOOL-dSafePassage-31 S3), or a census that cannot run. The
     clock is read once BEFORE the census is spawned and no later reading enters the estimate, so a
     slow census makes a holder look older, toward `live` (TOOL-dSafePassage-22 S1).
@@ -1665,10 +2063,20 @@ def check_holder_dead(record: dict | None) -> tuple[str, str]:
     host = record.get("host")
     if host is not None and host != THIS_HOST:
         return "unknown", f"it was taken on host {host!r}, and this host's process table cannot speak for that one"
-    for key, here in (("platform", sys.platform), ("boot_id", read_boot_id())):
-        if key in record and record[key] != here:
-            return "unknown", (f"it was taken under {key} {record[key]!r}, not this process's {here!r}, so "
-                               f"its pid names a process in another namespace this table cannot speak for")
+    if "platform" in record and record["platform"] != sys.platform:
+        return "unknown", (f"it was taken under platform {record['platform']!r}, not this process's "
+                           f"{sys.platform!r}, so its pid names a process in another namespace this table "
+                           f"cannot speak for")
+    # TOOL-dSafePassage-35 S26: on this host and platform, two boot ids that differ mean a reboot
+    # ended the holder; one boot id missing proves nothing.
+    here_boot = read_boot_id()
+    if "boot_id" in record and record["boot_id"] != here_boot:
+        if record["boot_id"] and here_boot and "platform" in record:
+            return "dead", (f"it was taken under boot_id {record['boot_id']!r}, and this host has booted "
+                            f"since, as {here_boot!r}, which ended its holder")
+        return "unknown", (f"it was taken under boot_id {record['boot_id']!r}, not this process's "
+                           f"{here_boot!r}, so its pid names a process in another namespace this table "
+                           f"cannot speak for")
     # TOOL-dSafePassage-31 S3: an absent `pid_ns` is "", so a Linux judge never reads an older lock as its own.
     try:
         here_ns = read_pid_namespace()
@@ -1680,7 +2088,7 @@ def check_holder_dead(record: dict | None) -> tuple[str, str]:
                            f"process in another pid namespace this table cannot speak for")
     pid = record["pid"]
     try:
-        pm_dir = load_govkit().resolve_kit_dir("process-monitor", "census.py", HERE)
+        pm_dir = resolve_kit_dir("process-monitor", "census.py", HERE)
         spec = importlib.util.spec_from_file_location("gk_lock_census", pm_dir / "census.py")
         census = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(census)
@@ -1927,9 +2335,12 @@ def write_atomic(dest, text: str) -> None:
 
 def load_govkit():
     """The deployer beside this file: the running module where it is the program, else imported by
-    its path, for the readers this module borrows: the tool root, the `{prefix}` token, the kit-dir
-    resolver and the staging journal's name. The remote ladder, the landing base, the revision-blob
-    reader and the atomic writer are this module's own (TOOL-dSafePassage-26 S1, S4, S14, S15)."""
+    its path, for the ten names this module borrows, govkit's `update` state and deployer readers:
+    `derive_tool_root`, `resolve_prefix_token`, `load_deploy`, `git_pathspec`, `write_row_order`,
+    `ATTENDED_ORDER_PREFIX`, `STAGING_JOURNAL_REL`, `RECLAIM_GUARD_SUFFIX`, `WRITE_LOCK_REL` and
+    `take_write_lock` (TOOL-dSafePassage-35 S24). The remote ladder, the landing base, the
+    revision-blob reader, the atomic writer (TOOL-dSafePassage-26 S1, S4, S14, S15), argv
+    resolution and the kit-dir resolver are this module's own."""
     path = HERE / "govkit.py"
     for name in ("govkit", "__main__"):
         mod = sys.modules.get(name)
@@ -2280,6 +2691,53 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
               f"{mine} · {'equal' if got == mine else 'DIFFERENT'}")
         expect(r["verdict"] == "ok" and bool(got) and got == mine, "the step hashed the CRLF file otherwise than the parent")
         expect(mine != raw, "LIVENESS: core.autocrlf=true does not move this file's oid, so the plant grades nothing")
+    elif plant == "autocrlf-local":
+        # TOOL-dSafePassage-35 S27: the target's local core.autocrlf=false wins over the parent's
+        # global true, in the step as in the parent.
+        (target / "crlf.txt").write_bytes(b"one\r\ntwo\r\n")
+        glob = tmp / "global.gitconfig"
+        glob.write_text("[core]\n\tautocrlf = true\n", encoding="utf-8", newline="\n")
+        os.environ["GIT_CONFIG_GLOBAL"] = str(glob)
+        subprocess.run(["git", "-C", str(target), "config", "core.autocrlf", "false"], check=True)
+        out = reports / "hash.txt"
+        r = run_step_isolated(row("hash", ["python", "{gov}/steps/hash.py", "{target}", out.as_posix()]),
+                              "up", target, gov)
+        mine = subprocess.run(["git", "-C", str(target), "hash-object", "--path", "crlf.txt", "crlf.txt"],
+                              capture_output=True, text=True).stdout.strip()
+        crlf = subprocess.run(["git", "-C", str(target), "-c", "core.autocrlf=true", "hash-object",
+                               "--path", "crlf.txt", "crlf.txt"], capture_output=True, text=True).stdout.strip()
+        got = out.read_text(encoding="utf-8").strip() if out.is_file() else ""
+        print(f"isolation: fixture/hash · up · {r['verdict']} · the step's oid {got or 'none'} · the parent's "
+              f"{mine} · {'equal' if got == mine else 'DIFFERENT'}")
+        expect(r["verdict"] == "ok" and bool(got) and got == mine,
+               "the step hashed the CRLF file otherwise than the parent, whose target says autocrlf=false")
+        expect(mine != crlf, "LIVENESS: the parent's global autocrlf=true is not what the target's local value overrides")
+    elif plant == "local-url-userinfo":
+        # TOOL-dSafePassage-35 S8: a credential in the target's remote URL refuses the step, naming
+        # the key and its file and never the value; an scp-form remote carries none and runs.
+        cfg = target / ".git" / "config"
+        user, secret = "gk-planted-user", "gk-planted-secret"
+        base_cfg = cfg.read_text(encoding="utf-8")
+        cfg.write_text(base_cfg + f"[remote \"origin\"]\n\turl = https://{user}:{secret}@example.invalid/x.git\n",
+                       encoding="utf-8", newline="\n")
+        try:
+            run_clean()
+            refused = ""
+        except Refusal as e:
+            refused = str(e)
+            print(f"isolation: {clean.id} · refused · {e}")
+        expect("remote.origin.url in .git/config" in refused, "the step was not refused naming remote.origin.url in .git/config")
+        expect(user not in refused and secret not in refused, "the refusal prints the URL's user or password")
+        expect(not report.exists(), "the refused step spawned")
+        cfg.write_text(base_cfg + "[remote \"origin\"]\n\turl = git@example.invalid:x.git\n",
+                       encoding="utf-8", newline="\n")
+        try:
+            rep = run_clean()
+            print(f"isolation: scp-form remote · not refused · git add exits {rep.get('add')}")
+            expect(rep.get("add") == 0, "the scp-form remote: clean's git add did not run")
+        except Refusal as e:
+            expect(False, f"an scp-form remote with no credential was refused: {e}")
+        rc = 1
     elif plant.startswith("local-"):
         # TOOL-dSafePassage-24 S4 and TOOL-dSafePassage-29 S4: an executor in the target's own config,
         # each canary naming itself; clean.py commits what it stages, so a signing program and a
@@ -2538,12 +2996,14 @@ sys.exit(1 if out["stopped"] else 0)
 # makes the census one `posix-ps` row of <pid>, its age counted on `time.monotonic` from <born>,
 # stands `time.monotonic` in for the boot clock and steps `time.time` 10 s forward, in this process
 # only (TOOL-dSafePassage-32 S6). `pidns <value>` stands <value> in for this process's
-# `read_pid_namespace`, in this process only (TOOL-dSafePassage-31 S4).
+# `read_pid_namespace`, in this process only (TOOL-dSafePassage-31 S4). `bootid <value>` stands
+# <value> in for `read_boot_id` the same way (TOOL-dSafePassage-35 S26).
 FIXTURE_LOCK_CHILD = r'''import importlib.machinery, importlib.util, os, pathlib, sys, time
 sys.stdout.reconfigure(encoding="utf-8")
 wall_step = len(sys.argv) > 5 and sys.argv[5] == "wall-step"
 pidns = sys.argv[6] if len(sys.argv) > 5 and sys.argv[5] == "pidns" else None
-if len(sys.argv) > 5 and pidns is None:
+bootid = sys.argv[6] if len(sys.argv) > 5 and sys.argv[5] == "bootid" else None
+if len(sys.argv) > 5 and pidns is None and bootid is None:
     _exec = importlib.machinery.SourceFileLoader.exec_module
     def _slow_exec(self, module):
         _exec(self, module)
@@ -2566,6 +3026,8 @@ spec.loader.exec_module(us)
 gk = us.load_govkit()
 if pidns is not None:
     us.read_pid_namespace = lambda: pidns
+if bootid is not None:
+    us.read_boot_id = lambda: bootid
 if wall_step:
     us.read_boot_clock = time.monotonic
     _wall = time.time
@@ -2587,7 +3049,8 @@ WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSaf
 WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending",
                "truncated-image", "kill-after-up") + WALK_SCHEMA_PLANTS
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-foreign-namespace", "lock-unreadable",
-               "lock-foreign-pidns", "lock-no-pidns", "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot")
+               "lock-foreign-pidns", "lock-no-pidns", "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot",
+               "lock-other-boot", "lock-no-namespace")
 UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update",
                  "needs-target-source")
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
@@ -3063,10 +3526,11 @@ def run_lock_fixture(plant: str) -> int:
             return lock.read_bytes()
 
         def take(gate: str = "-", release: str = "-", out_file: pathlib.Path | None = None,
-                 pidns: str | None = None):
+                 pidns: str | None = None, bootid: str | None = None):
             argv = [sys.executable, "-c", FIXTURE_LOCK_CHILD, str(HERE / "upgrade_steps.py"), str(t), gate, release]
             argv += ["pidns", pidns] if pidns is not None else []
-            argv += ["3"] if plant == "lock-live-slow-census" else []
+            argv += ["bootid", bootid] if bootid is not None else []
+            argv += ["6"] if plant == "lock-live-slow-census" else []
             argv += ["wall-step", str(holder), str(born)] if plant.startswith("lock-wall-step") else []
             if out_file is None:
                 p = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8", errors="replace",
@@ -3086,7 +3550,7 @@ def run_lock_fixture(plant: str) -> int:
         try:
             rc = 0
             if plant in ("lock-dead", "lock-reused", "lock-live", "lock-foreign-host", "lock-foreign-namespace",
-                         "lock-unreadable", "lock-foreign-pidns", "lock-no-pidns",
+                         "lock-unreadable", "lock-foreign-pidns", "lock-no-pidns", "lock-other-boot", "lock-no-namespace",
                          "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot"):
                 if plant == "lock-dead":
                     holder = dead_pid()
@@ -3095,10 +3559,15 @@ def run_lock_fixture(plant: str) -> int:
                     sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)"])
                     holder = sleeper.pid
                     time.sleep(0.5)
-                    before = plant_lock(holder, time.time() - (600 if plant == "lock-reused" else 0))
+                    # TOOL-dSafePassage-35 S5: a reused lock is 600 s old on the boot clock too,
+                    # wherever there is one, so a `posix-ps` judge reads it reused at any latency.
+                    boot = read_boot_clock() if plant == "lock-reused" else None
+                    before = plant_lock(holder, time.time() - (600 if plant == "lock-reused" else 0),
+                                        started_boot=None if boot is None else boot - 600)
                 elif plant == "lock-live-slow-census":
                     # TOOL-dSafePassage-22: the lock taken at once, so a clock read after the
-                    # census's three seconds puts the live holder past REUSE_MARGIN_S.
+                    # census's six seconds puts the live holder near `started + 6`, past
+                    # REUSE_MARGIN_S by more than 3 s (TOOL-dSafePassage-35 S4).
                     sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)"])
                     holder = sleeper.pid
                     before = plant_lock(holder, time.time())
@@ -3128,12 +3597,26 @@ def run_lock_fixture(plant: str) -> int:
                     ns = {"platform": sys.platform, "boot_id": read_boot_id()}
                     before = plant_lock(holder, time.time() - 30, ns={**ns, "pid_ns": "pid:[4026532244]"}
                                         if plant == "lock-foreign-pidns" else ns)
+                elif plant == "lock-other-boot":
+                    # TOOL-dSafePassage-35 S26: this host and platform, a live pid, and a boot id the
+                    # judge's `bootid` stand-in differs from: the reboot ended the holder.
+                    sleeper = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(300)"])
+                    holder = sleeper.pid
+                    before = plant_lock(holder, time.time(), ns={"platform": sys.platform, "boot_id": "gk-boot-before",
+                                                                 "pid_ns": read_pid_namespace()})
+                elif plant == "lock-no-namespace":
+                    # TOOL-dSafePassage-35 S26: a dead pid's lock with none of the namespace keys.
+                    holder = dead_pid()
+                    before = plant_lock(holder, time.time() - 30, ns={})
                 else:
                     holder = None
                     lock.write_text("not a lock\n", encoding="utf-8", newline="\n")
                     before = lock.read_bytes()
-                rc, out = take(pidns="pid:[4026532221]" if plant.endswith("-pidns") else None)
-                if plant in ("lock-dead", "lock-reused"):
+                rc, out = take(pidns="pid:[4026532221]" if plant.endswith(("-pidns", "-namespace")) else None,
+                               bootid="gk-boot-after" if plant == "lock-other-boot" else None)
+                if plant == "lock-other-boot":
+                    expect("this host has booted since" in out, "the reclaim does not name the reboot")
+                if plant in ("lock-dead", "lock-reused", "lock-other-boot"):
                     rec = held()
                     print(f"lock: held by pid {rec.get('pid')} · host {rec.get('host')} · pid_ns {rec.get('pid_ns')!r}")
                     expect(rc == 0 and f"reclaimed {lock.as_posix()}" in out and f"pid {holder} " in out,
@@ -3152,9 +3635,10 @@ def run_lock_fixture(plant: str) -> int:
                             "lock-foreign-namespace": "unknown, it was taken under platform 'gk-elsewhere'",
                             "lock-unreadable": "no readable pid",
                             "lock-foreign-pidns": "unknown, it was taken under pid_ns 'pid:[4026532244]'",
-                            "lock-no-pidns": "unknown, it was taken with no pid_ns recorded"}[plant] in out,
+                            "lock-no-pidns": "unknown, it was taken with no pid_ns recorded",
+                            "lock-no-namespace": "unknown, it was taken with no pid_ns recorded"}[plant] in out,
                            "the refusal does not describe the holder")
-                    if plant == "lock-no-pidns":
+                    if plant in ("lock-no-pidns", "lock-no-namespace"):
                         # AC3: with this process's `pid_ns` "", as off Linux, the census judges it dead.
                         rc2, out2 = take(pidns="")
                         print(f"lock: with no pid_ns here, the take exits {rc2}")
@@ -3233,7 +3717,7 @@ def build_update_gov(tmp: pathlib.Path, names, slugs, fails: list[str],
         d.mkdir(parents=True)
     for name in ("govkit.py", "upgrade_steps.py", "adopters.toml"):
         shutil.copy2(HERE / name, gkd / name)
-    pm = load_govkit().resolve_kit_dir("process-monitor", "census.py", HERE)
+    pm = resolve_kit_dir("process-monitor", "census.py", HERE)
     shutil.copy2(pm / "census.py", gov / "tools" / "process-monitor" / "census.py")
     (gkd / REGISTRY_FILE).write_text(
         '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'

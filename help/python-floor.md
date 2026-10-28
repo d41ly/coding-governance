@@ -71,8 +71,9 @@ fails), the refusal reads the default, `name`, and says which.
 
 The raise is the upgrade step `lib/python-floor-3.15` in `tools/govkit/steps.toml`, after
 `govkit/receipt-schema-4` (see [upgrade steps](upgrade-steps.md)). Its up and its witness are the
-preflight. Its down, `python-floor.sh down 3.12 <target> <to>`, runs only in
-`govkit update --rollback`, whose `--to` commit is `<to>`. The prior floor is 3.12 because the code
+preflight. Its down, `python-floor.sh down 3.12 <target> [<to>]`, runs only in
+`govkit update --rollback`, whose `--to` commit is `<to>`; left out, `<to>` defaults to the target's
+`HEAD`, so the down always grades bytes at a commit. The prior floor is 3.12 because the code
 before the raise declared no floor but needs 3.12: it uses f-strings that only 3.12 accepts. The down
 grades, under that floor, the files the rollback restores, read at `<to>`. In an adopter those are the receipt's rows gov shipped that end
 `.py` or `.toml`, and every `.governance/*.toml` file of the target. The adopter's other files are

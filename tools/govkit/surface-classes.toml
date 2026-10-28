@@ -15,7 +15,7 @@
 id = "file"
 reader = "{prefix}/govkit/step_gate.py:read_file_members"
 plant = "{prefix}/govkit/step_gate.py:write_file_plant"
-summary = "each files row's path in gov's source-mode receipt, .governance/install.json, else each destination gov's own plan derives"
+summary = "each destination gov's own plan derives"
 
 [[class]]
 id = "installable"

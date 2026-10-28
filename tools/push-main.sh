@@ -917,12 +917,28 @@ run_regen() {  # -> 0 regenerated or announced-skipped · 1 a write failed or th
 }
 
 # `remove_new_untracked <snapshot>` cleans every untracked file the snapshot does not hold, the snapshot
-# being a sorted NUL-separated `git ls-files --others --exclude-standard -z` taken before `run_regen`.
-# The reset after a failed regeneration restores tracked files only, and a regeneration also CREATES
-# files (a new ledger shard, a render's temporary), which then dirtied the tree the next landing
-# requires clean (TOOL-aPrimedIndex-8). Both callers take the snapshot on a tree they required clean,
-# so every path cleaned is one the regeneration made. NUL-safe end to end; an unreadable state cleans
-# nothing.
+# being what the snapshot writer below wrote before the stage. The reset after a failed stage
+# restores tracked files only, and a stage also CREATES files (a new ledger shard, a render's
+# temporary, gov first's receipt, before-images and orders), which then dirtied the tree the next
+# landing requires clean (TOOL-aPrimedIndex-8). NUL-safe end to end; an unreadable state cleans nothing.
+#
+# The snapshot writer, given <file>, writes into it the sorted NUL-separated list of untracked,
+# not-ignored paths `git ls-files` prints, <file> being the caller's `mktemp`. It returns
+# non-zero when <file> is empty (the `mktemp` failed), or `git ls-files` or the sort fails, read
+# through PIPESTATUS, and each caller refuses on that before its stage runs, so a snapshot that
+# cannot be written never falls through to a walk or a regeneration (TOOL-dSafePassage-35 S10, S11).
+# Its three callers, each on a tree it required clean, so every path cleaned is one the stage made:
+# `cmd_prepare`'s one snapshot, before gov first and kept through the regeneration, its tree the
+# minted merge (TOOL-dSafePassage-27); the attended path's gov-first snapshot, its tree the mint
+# commit (TOOL-dSafePassage-25 S2); and the attended regeneration's, its tree gov first's commit.
+write_untracked_snapshot() {  # snapshot file -> nothing on stdout
+  local st
+  [ -n "${1:-}" ] && [ -f "$1" ] || return 1
+  git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$1"
+  st="${PIPESTATUS[0]}${PIPESTATUS[1]}"
+  [ "$st" = "00" ]
+}
+
 remove_new_untracked() {  # snapshot file -> nothing on stdout
   local now
   [ -f "${1:-}" ] || return 0
@@ -1087,7 +1103,14 @@ cmd_prepare() {  # -> 0 prepared (or already was) · 1 refused · 3 nothing coul
   # regeneration passes (TOOL-dSafePassage-27), so a refused walk (TOOL-dSafePassage-25) and a
   # refused regeneration below both clean the receipt, the before-images and the orders the walk
   # created, which the reset leaves untracked. A snapshot taken after the walk would hold them.
-  gfsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$gfsnap"
+  gfsnap=$(mktemp)
+  if ! write_untracked_snapshot "$gfsnap"; then
+    rm -f "$gfsnap"
+    git reset -q --hard "$t" >/dev/null 2>&1 || true
+    git checkout "$branch" >/dev/null 2>&1 || true
+    echo "push-main: gov first could not snapshot the untracked files before its walk, so the walk did not run. Nothing was changed: '$branch' is still ${oldb:0:8} and is checked out." >&2
+    return 1
+  fi
   if ! run_gov_first; then
     git reset -q --hard "$t" >/dev/null 2>&1 || true
     remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
@@ -1287,7 +1310,12 @@ while [ "$attempt" -le "$max" ]; do
   # GOV FIRST, on every attempt, after the mint (TOOL-dSafePassage-8 S4): its own commit, named and
   # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike. A
   # refusal cleans what the walk created against a snapshot taken before it (TOOL-dSafePassage-25).
-  gfsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$gfsnap"
+  gfsnap=$(mktemp)
+  if ! write_untracked_snapshot "$gfsnap"; then
+    rm -f "$gfsnap"
+    echo "push-main: gov first could not snapshot the untracked files before its walk, so the walk did not run. Aborted (no push)." >&2
+    exit 1
+  fi
   if ! run_gov_first; then
     git reset -q --hard HEAD >/dev/null 2>&1 || true
     remove_new_untracked "$gfsnap"; rm -f "$gfsnap"
@@ -1306,7 +1334,12 @@ while [ "$attempt" -le "$max" ]; do
 
   # REGENERATE, on every attempt, after the mint (TOOL-aPrimedIndex-4): its own commit, named and
   # trailered as the mint commit is, so the routed-commits leg and the pass reader read it alike.
-  rgsnap=$(mktemp) && git ls-files --others --exclude-standard -z 2>/dev/null | LC_ALL=C sort -z > "$rgsnap"
+  rgsnap=$(mktemp)
+  if ! write_untracked_snapshot "$rgsnap"; then
+    rm -f "$rgsnap"
+    echo "push-main: the regeneration could not snapshot the untracked files before it ran, so it did not run. Aborted (no push)." >&2
+    exit 1
+  fi
   if ! run_regen; then
     git reset -q --hard HEAD >/dev/null 2>&1 || true
     remove_new_untracked "$rgsnap"; rm -f "$rgsnap"

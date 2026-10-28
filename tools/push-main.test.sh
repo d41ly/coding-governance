@@ -1313,8 +1313,30 @@ PY
   else
     echo "  skip — 36 no run-gates kit holding regen.py beside this lander, so the walk-then-regeneration arm did not run"
   fi
+  # 39 — TOOL-dSafePassage-35 AC10: a snapshot that cannot be written refuses before the walk. With
+  #      TMPDIR naming a file, `mktemp` fails, so --prepare exits 1 with the gov-first stage's own
+  #      snapshot refusal, the branch unmoved, and the walk never ran: no receipt and no before-image
+  #      in the fixture. Staged red by a lander copy whose snapshot site keeps its inline line, which
+  #      falls through to the walk.
+  out39=$(
+    build_regen_fixture "$tmp/remote39.git" "$tmp/work39" || exit 1
+    git checkout -q -b feat
+    git commit -q --no-verify --allow-empty -m "TOOL-tFix-39: a unit"
+    B39=$(git rev-parse HEAD)
+    : > "$tmp/tmpdir39"
+    unset GATE_PUSH_BASE; TMPDIR="$tmp/tmpdir39" bash "$lander" --prepare --slug fx 2>&1 >/dev/null; echo "rc=$?"
+    [ "$(git rev-parse refs/heads/feat)" = "$B39" ] && echo unmoved=1
+    { [ -e .governance/install.json ] || [ -n "$(git ls-tree -r --name-only HEAD -- .governance/install.json)" ]; } \
+      && echo receipt=present || echo receipt=absent
+    [ -z "$(find .governance -name '*.before.json' 2>/dev/null)" ] && echo images=absent
+  )
+  case "$out39" in
+    *"gov first could not snapshot the untracked files"*"rc=1"*"unmoved=1"*"receipt=absent"*"images=absent"*)
+      ok "39 --prepare whose snapshot cannot be written refuses at gov first before the walk, leaving no receipt or before-image" ;;
+    *) bad "39 an unwritable snapshot fell through to the walk, or the refusal did not name gov first's snapshot: $out39" ;;
+  esac
 else
-  echo "  skip — 34 and 36 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
+  echo "  skip — 34, 36 and 39 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
 fi
 
 # 35 — TOOL-dSafePassage-8 AC6: `run_gov_first` cut from the lander. No deployer beside it, with or
@@ -1489,5 +1511,46 @@ s38=$(for f in run_post_merge check_merge_losses run_regen run_minter run_gov_fi
 { [ "$out38" = "$want38" ] && [ "$n38" = 1 ] && [ -z "$s38" ]; } \
   && ok "38 every lander stage resolves its kit through resolve_lander_kit and prints the lines it printed before" \
   || bad "38 resolve_kit_dir \"\$py\" runs $n38 time(s), stages without resolve_lander_kit: [${s38//$'\n'/ }], or a stage's lines moved: $out38"
+
+# 40 — TOOL-dSafePassage-35 AC11: the ATTENDED landing's gov-first refusal cleans what its walk made.
+#      A clone of this repository at its committed HEAD is the remote; a commit on main plants a step
+#      whose witness never holds, and the attended lander exits 1 with `git status --porcelain`
+#      empty. The retry without the plant exits 0, and its mint, steps and regeneration commits name
+#      no file of the refused run: no `.governance/steps` or `.governance/outbox` path of the planted
+#      step, and a receipt that records no row of it. Staged red by a lander copy whose attended
+#      gov-first refusal does not clean against its snapshot.
+_py40=$(resolve_python 2>/dev/null) || _py40=""
+if [ -n "$_mt_gk" ] && [ -n "$_py40" ]; then
+  out40=$(
+    build_regen_fixture "$tmp/remote40.git" "$tmp/work40" || exit 1
+    R40=$(git rev-parse HEAD)
+    printf '\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\ndown = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\nsurfaces = []\nneeds-target = false\n' >> "${KIT_REL}$_mt_gk/steps.toml"
+    git commit -q --no-verify -am "TOOL-tFix-40: a planted step whose witness never holds"
+    unset GATE_PUSH_BASE; e40=$(bash "$lander" 2>&1 >/dev/null); echo "plant-rc=$?"
+    case "$e40" in *"did not hold on gov first"*) echo stage=gov-first ;; *) echo "stage-missing=[$e40]" ;; esac
+    st40=$(git status --porcelain); [ -z "$st40" ] && echo plant-clean=1 || echo "plant-left=[$st40]"
+    git checkout -q "$R40" -- "${KIT_REL}$_mt_gk/steps.toml"
+    git commit -q --no-verify -m "TOOL-tFix-40: the planted step removed"
+    bash "$lander" >/dev/null 2>&1; echo "retry-rc=$?"
+    n40=0
+    for c40 in $(git log --format=%H -E --grep='^(mint: kit versions|steps: gov first|regen: generated outputs) onto' "$R40..HEAD"); do
+      n40=$((n40 + 1))
+      git show --name-only --format= "$c40" | grep -E '^\.governance/(steps|outbox)/' | grep -F 'planted-witness-fails' \
+        | sed 's/^/leftover=/'
+      git show "$c40:.governance/install.json" 2>/dev/null | grep -q 'planted-witness-fails' && echo "receipt-row=$c40"
+    done
+    echo "commits=$n40"
+  )
+  case "$out40" in
+    *"plant-rc=1"*"stage=gov-first"*"plant-clean=1"*"retry-rc=0"*)
+      case "$out40" in
+        *leftover=*|*receipt-row=*|*"commits=0"*) bad "40 the attended retry's commits carry the refused walk's files, or none was found to read: $out40" ;;
+        *) ok "40 the attended gov-first refusal leaves a clean tree, and the retry's mint, steps and regeneration commits hold no file of the refused run" ;;
+      esac ;;
+    *) bad "40 the attended landing with a failing witness did not refuse at gov first on a clean tree, or the retry did not land: $out40" ;;
+  esac
+else
+  echo "  skip — 40 no govkit deployer beside this lander or no python launcher, so the attended gov-first arm did not run"
+fi
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }
