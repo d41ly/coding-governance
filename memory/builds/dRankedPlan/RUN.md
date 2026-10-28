@@ -13,19 +13,19 @@ gates-run: unattended-179314501149121125360-1819053 9c135e17
 parked-surfaced: yes
 keepalive-reaped: yes
 asks-at-landing: TOOL-dRankedPlan-17=DEFERRED TOOL-dRankedPlan-18=DEFERRED
-units-at-landing: TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-27 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-24 TOOL-dRankedPlan-2 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-34 TOOL-dRankedPlan-14 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-35 TOOL-dRankedPlan-43 TOOL-dRankedPlan-13 TOOL-dRankedPlan-20 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-11 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-12 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-19 TOOL-dRankedPlan-3 TOOL-dRankedPlan-59 TOOL-dRankedPlan-28 TOOL-dRankedPlan-33 TOOL-dRankedPlan-4 TOOL-dRankedPlan-44 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-23 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-62 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-67 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81
+units-at-landing: TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-27 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-24 TOOL-dRankedPlan-2 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-34 TOOL-dRankedPlan-14 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-35 TOOL-dRankedPlan-43 TOOL-dRankedPlan-13 TOOL-dRankedPlan-20 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-11 TOOL-dRankedPlan-36 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-12 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-19 TOOL-dRankedPlan-3 TOOL-dRankedPlan-59 TOOL-dRankedPlan-28 TOOL-dRankedPlan-33 TOOL-dRankedPlan-4 TOOL-dRankedPlan-44 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-23 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-52 TOOL-dRankedPlan-55 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-60 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-56 TOOL-dRankedPlan-61 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-62 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-67 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82
 hold-run: 
-hold-streak: 1 · at be042d1e
+hold-streak: 1 · at 5232949c
 resume-owed: none · owner
-held-at: 2026-10-27T18:50:53Z
-hold-reason: the spec run is complete and closed in substance — 79 units specced, audited to the owner's round-8 cap and DEFERRED, the departures report at its fixed point with 0 findings, authorization met, every bar leg green but one — and the close's bar cannot pass the spec-tokens leg, whose packet join over the live chain's 954 specs outruns its 390 s ceiling; raising that ceiling or re-pinning carries.py is the owner's, as at dGroundRules' close
+held-at: 2026-10-28T00:55:10Z
+hold-reason: spec tokens is green at its new 830 s ceiling (TOOL-dRankedPlan-82, owner-ordered), but the close's bar at 9c135e17 redded 'routed commits name a specced unit', CONTENDED at its 300 s ceiling twice and 354 s alone; raising a second leg's ceiling is the owner's, as dWellOiledMachine's close found the same pair; origin/main has since moved to 57bc3b91 (dLinkedLibrary, dFurnishedOrders), so the landing merge must be re-prepared whichever way it goes
 hold-until: owner
 hold-code: owner-decision
 held-from: VERIFYING
-refreshed-at: 57bc3b91861a061dc9f37529bfe41db756c24fcd · park · unlisted
+refreshed-at: 57bc3b91861a061dc9f37529bfe41db756c24fcd · handoff · 3 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 448fb3dfca403eb3002f94d334ffa525e083eba9
-phase: VERIFYING
+witness: 5232949ca96452d710ca842e51f3fbc1e1679204
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -370,3 +370,7 @@ base: 0689e7fa12b553c712dd853eeba9e0085abdf6ff
 2026-10-27T21:23:46Z dispatch · item 63350171 TOOL-dRankedPlan-82 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/guides/SESSION-KICKOFF.md memory/builds/dRankedPlan/spec/2026-10-27-spec-TOOL-dRankedPlan-82.md memory/builds/dRankedPlan/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-10-28T00:54:21Z decision · item the close's bar cannot pass the routed commits leg at its 300 s ceiling · reason with spec tokens green at its new 830 s ceiling (TOOL-dRankedPlan-82), the close's bar at 9c135e17 redded only 'routed commits name a specced unit', timed out at 300 s in the pool and on its serial retry, attributed CONTENDED; alone after the close it ran 354 s, exit 0, over 37 commits past 1a61f21a, its deviation arm joining every chain build's records (dWellOiledMachine's close measured 358 s). Options: (a) the owner authorizes a second ceiling unit, sized like TOOL-dRankedPlan-82 from that reading (C = 10 x ceil(R/5) at or above 2R, 710 s at R 354.0); (b) the owner lands the prepared merge by hand. Raising a gate ceiling the owner's answer did not name is not the run's to decide
+
+2026-10-28T00:55:17Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dRankedPlan && bash tools/push-main.sh --land --slug dRankedPlan && bash tools/unattended/unattended.sh --settle dRankedPlan
+
+2026-10-28T00:55:17Z hold · item owner-decision · reason until owner · reaped b425cd37 · resume none(owner)
