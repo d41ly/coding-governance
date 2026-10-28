@@ -193,7 +193,7 @@ ids TOOL-dSafePassage-71
 | [TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-42.md) | 10 | 2 | CLOSED | rev-7 | 2026-10-28 |
 | [TOOL-dSafePassage-44 — the credential predicate keeps an ssh-scheme URL's bare user, so an `ssh://git@host` remote is never refused, and holds itself to the repo's redaction negatives](spec/2026-10-23-spec-TOOL-dSafePassage-44.md) | 10 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-71 — govkit selftest's staged-break copies of upgrade_steps.py take the whole govkit directory through one helper, and an arm reds a copy that hand-picks its files](spec/2026-10-28-spec-TOOL-dSafePassage-71.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-28 |
-| [TOOL-dSafePassage-45 — the spec audit of units 36 to 42, the step contract's 21 minors: a derived pair count, a credential class over keys and values, a walk by git's own test, declared exits, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-45.md) | 11 | 2 | DEFERRED | rev-3 | 2026-10-26 |
+| [TOOL-dSafePassage-45 — the spec audit of units 36 to 42, the step contract's 21 minors: a derived pair count, a credential class over keys and values, a walk by git's own test, declared exits, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-45.md) | 11 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-46 — the spec audit of units 36 to 42, its three minors off the step module: the drift pin raised in the pass that arms its key, a lander arm that finds its sibling kit, and the `ac-order` key documented](spec/2026-10-23-spec-TOOL-dSafePassage-46.md) | 11 | 2 | DEFERRED | rev-3 | 2026-10-27 |
 | [TOOL-dSafePassage-47 — the submodule walk lists a repository by git's own directory shape, and refuses one whose config git cannot read](spec/2026-10-23-spec-TOOL-dSafePassage-47.md) | 12 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-48 — the step contract refuses `sendemail.sendmailCmd` and every send-email executor key in its identity form](spec/2026-10-23-spec-TOOL-dSafePassage-48.md) | 12 | 2 | DEFERRED | rev-3 | 2026-10-26 |
@@ -211,7 +211,7 @@ ids TOOL-dSafePassage-71
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 340 bound to this build, across 4 record folder(s).
+Records: 341 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

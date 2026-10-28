@@ -188,12 +188,14 @@ FIXTURE_PLANTS = ("hook", "hook-stub", "module", "module-stub", "credential", "c
                   "local-recent-objects-hook", "local-recent-objects-hook-stub", "local-ext-transport",
                   "local-ext-transport-stub", "autocrlf", "autocrlf-local", "local-url-userinfo",
                   "submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo",
-                  "submodule-fsmonitor", "submodule-name-differs", "ssh-scheme-bare-user")
+                  "submodule-fsmonitor", "submodule-name-differs", "ssh-scheme-bare-user",
+                  "proxy-schemeless-userinfo", "insteadof-dotted-userinfo", "submodule-ref-named-config",
+                  "submodule-config-malformed", "gitmodules-malformed", "submodule-nested-name-differs")
 # The class a step is refused over (TOOL-dSafePassage-29 S1): every key of the target's own config
 # git runs as a program or sends as a credential, as (key pattern, value rule, what runs it). A
 # pattern matches case-insensitively on the key git prints, its `<x>` any one or more segments; a
-# value rule is `any`, `not a git false`, `begins with !`, `an absolute path` (`/`, `\` or a drive
-# letter) or `a URL carrying userinfo`, a `<scheme>://` value with an `@` before its host. selftest's class arm holds it, with
+# value rule is `any`, `not a git false`, `begins with !` or `an absolute path`, git-send-email's
+# own test (`/` or a drive letter, `C:` alone included), `\` too. selftest's class arm holds it, with
 # `STEP_UNREFUSED_KEYS`, to every executor-shaped key `git help --config` lists.
 STEP_REFUSED_KEYS = (
     ("filter.<x>.clean", "any", "add, checkout, status"),
@@ -207,17 +209,8 @@ STEP_REFUSED_KEYS = (
     ("core.askPass", "any", "a fetch or a push"),
     ("http.extraHeader", "any", "sent as a credential"),
     ("http.<x>.extraHeader", "any", "sent as a credential"),
-    # TOOL-dSafePassage-35 S8: the credential-bearing values. An scp-form `user@host:path` is no URL
-    # and carries no credential. A remote's `url` and `pushurl` are graded by `test_credential_bearing`
-    # alone, which keeps an ssh-scheme bare user (TOOL-dSafePassage-44).
-    ("http.proxy", "a URL carrying userinfo", "sent as a credential"),
-    ("remote.<x>.proxy", "a URL carrying userinfo", "sent as a credential"),
-    ("http.sslKey", "any", "read as a client credential"),
-    ("http.<x>.sslKey", "any", "read as a client credential"),
-    ("http.sslCert", "any", "read as a client credential"),
-    ("http.<x>.sslCert", "any", "read as a client credential"),
-    ("http.cookieFile", "any", "read as a client credential"),
-    ("http.<x>.cookieFile", "any", "read as a client credential"),
+    # A remote's `url`, a proxy and a credential-file key are graded by `test_credential_bearing`
+    # alone, the one source of the credential class (TOOL-dSafePassage-45 S19).
     ("credential.<x>", "any", "a helper, or a credential setting"),
     ("gpg.program", "any", "a signed commit or tag, log --show-signature, verify-commit"),
     ("gpg.<x>.program", "any", "a signed commit or tag, log --show-signature, verify-commit"),
@@ -248,10 +241,12 @@ STEP_REFUSED_KEYS = (
     ("sendemail.headerCmd", "any", "send-email"),
     ("gc.recentObjectsHook", "any", "gc, repack --cruft, and the auto-gc of commit and fetch"),
     # TOOL-dSafePassage-42 S7: the last segments `tunnel`, `httpd` and `smtpserver`; an absolute
-    # `smtpServer` is a program git runs, a host name is not.
+    # `smtpServer` is a program git runs, a host name is not; git-send-email reads it per identity
+    # too (TOOL-dSafePassage-45 S6).
     ("imap.tunnel", "any", "imap-send"),
     ("instaweb.httpd", "any", "instaweb"),
-    ("sendemail.smtpServer", "an absolute path", "send-email"))
+    ("sendemail.smtpServer", "an absolute path", "send-email"),
+    ("sendemail.<x>.smtpServer", "an absolute path", "send-email"))
 # The executor-shaped keys the check does not refuse (TOOL-dSafePassage-29 S2), as (key pattern, why).
 STEP_UNREFUSED_KEYS = (
     ("merge.<driver>.driver", "a step does not merge, and gov's own checkout declares two (TOOL-dSafePassage-24 §3)"),
@@ -1397,7 +1392,7 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
     `{"git_dir", "reached_by"}` rows, the target's own first with `reached_by` empty: each gitlink
     of a repository's index whose working directory holds a `.git` entry, walked again over that
     repository's index, and every directory under `<git dir>/modules/` (a submodule's own git
-    directory for one) holding a `config`, populated or not, the target's `<git dir>` its own
+    directory for one) shaped as git opens one, populated or not, the target's `<git dir>` its own
     worktree's (TOOL-dSafePassage-36 S1), never the common one. Each is listed once by its resolved
     path. `read_config(git_dir, reached_by)` reads and grades each repository's config before any
     index-reading command runs in it, and a repository it returns True for is refused, its index
@@ -1408,19 +1403,22 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
     with tempfile.TemporaryDirectory(prefix="gk-repos-", ignore_cleanup_errors=True) as td:
         env = build_step_env(td)
 
-        def git(cwd, *args, ok=(0,)) -> str:
+        def git(cwd, *args, ok=(0,), reads: str = "") -> str:
             p = subprocess.run(["git", "-C", str(cwd), *args], env=env, stdin=subprocess.DEVNULL,
                                capture_output=True)
             if p.returncode not in ok:
-                raise Refusal(f"`git -C {pathlib.Path(cwd).as_posix()} {' '.join(args)}` exits {p.returncode}: "
-                              f"{p.stderr.decode('utf-8', 'replace').strip()}")
+                raise Refusal(f"`git -C {pathlib.Path(cwd).as_posix()} {' '.join(args)}` exits {p.returncode}"
+                              + (f", so {reads} does not read" if reads else "")
+                              + f": {p.stderr.decode('utf-8', 'replace').strip()}")
             return p.stdout.decode("utf-8", "replace")
 
         def submodule_paths(work) -> dict[str, str]:
-            """name -> path of `work`'s `.gitmodules`; `config -f` reads that one file and runs nothing."""
+            """name -> path of `work`'s `.gitmodules`; `config -f` reads that one file and runs nothing.
+            Exit 1 maps none; any other exit is a refusal naming the file (TOOL-dSafePassage-45 S13)."""
             if work is None or not (work / ".gitmodules").is_file():
                 return {}
-            out = git(work, "config", "-z", "-f", ".gitmodules", "--get-regexp", r"^submodule\..*\.path$", ok=(0, 1))
+            out = git(work, "config", "-z", "-f", ".gitmodules", "--get-regexp", r"^submodule\..*\.path$",
+                      ok=(0, 1), reads=(work / ".gitmodules").as_posix())
             return {k[len("submodule."):-len(".path")]: v
                     for k, _, v in (e.partition("\n") for e in out.split("\0") if e)}
 
@@ -1448,17 +1446,23 @@ def read_target_repositories(target, read_config) -> list[dict[str, str]] | str:
                             add(git(work / path, "rev-parse", "--absolute-git-dir").strip(),
                                 f"{via}/{path}".lstrip("/"), work / path)
                 mods = d / "modules"  # a linked worktree's submodules sit under its own git dir
-                for root, dirs, files in os.walk(mods):
-                    if "config" in files:
-                        # ponytail: inside a submodule's git dir only its own `modules/` holds more
-                        dirs[:] = [x for x in dirs if x == "modules"]
-                        w, parts, mark = work, [], ""
-                        for name in pathlib.Path(root).relative_to(mods).as_posix().split("/modules/"):
-                            p = submodule_paths(w).get(name)
-                            parts.append(p or name)
-                            mark = mark if p else ", by name"
-                            w = w / p if p and (w / p / ".git").exists() else None
-                        add(root, f"{via}/{'/'.join(parts)}".lstrip("/"), None, mark)
+                # TOOL-dSafePassage-45 S12, read as TOOL-dSafePassage-47 S1 to S3: a repository by
+                # git's own directory shape, so no ref or object tree is taken for one. A candidate
+                # is listed and only its own `modules/` walked; any other directory is a segment of
+                # a name holding `/`. A name's path is mapped through the worktree `w` whose
+                # `.gitmodules` declares it, or the name stands, marked `by name` (S13).
+                walks = [(mods, mods, work, [], "")]
+                while walks:
+                    base, cur, w, parts, mark = walks.pop(0)
+                    for c in sorted(x for x in cur.iterdir() if x.is_dir()) if cur.is_dir() else ():
+                        if not ((c / "HEAD").is_file() and (c / "objects").is_dir() and (c / "refs").is_dir()):
+                            walks.append((base, c, w, parts, mark))
+                            continue
+                        p = submodule_paths(w).get(c.relative_to(base).as_posix())
+                        here, m = [*parts, p or c.relative_to(base).as_posix()], mark if p else ", by name"
+                        add(c, f"{via}/{'/'.join(here)}".lstrip("/"), None, m)
+                        walks.append((c / "modules", c / "modules",
+                                      w / p if p and (w / p / ".git").exists() else None, here, m))
         except Refusal as e:
             return str(e)
     return rows
@@ -1481,7 +1485,7 @@ def read_target_local_config(target, refused) -> list[tuple[str, str, str | None
                                 "--show-origin", "--includes", "-z"], env=build_step_env(td),
                                stdin=subprocess.DEVNULL, capture_output=True)
             if p.returncode != 0:
-                raise Refusal(f"`git config --list` over {gd} exits {p.returncode}: "
+                raise Refusal(f"`git config --list` over {gd} exits {p.returncode}, so {gd}/config does not read: "
                               f"{p.stderr.decode('utf-8', 'replace').strip()}")
             f, mine = p.stdout.decode("utf-8", "replace").split("\0"), []
             for scope, origin, kv in zip(f[0::3], f[1::3], f[2::3]):
@@ -1498,27 +1502,56 @@ def read_target_local_config(target, refused) -> list[tuple[str, str, str | None
 # TOOL-dSafePassage-38 §4: a `<scheme>://` URL carrying userinfo before its host, and the
 # credential-file keys, `<x>` any one or more segments.
 CONFIG_USERINFO_RE = re.compile(r"(?i)\b([a-z][a-z0-9+.-]*)://([^/\s@]+)@")
+# TOOL-dSafePassage-45 S7: a proxy value is `[protocol://][user[:password]@]proxyhost[:port]`, so its
+# userinfo needs no scheme; the keys it is tested on, `<x>` any one or more segments.
+PROXY_USERINFO_RE = re.compile(r"(?i)^(?:[a-z][a-z0-9+.-]*://)?[^/\s@]+@")
+PROXY_KEY_RE = re.compile(r"(?i)http\.(?:.+\.)?proxy|remote\..+\.proxy")
+# S9: the redactor runs to the LAST `@` before the first `/`, so a raw `@` in a password goes too.
+REDACT_USERINFO_RE = re.compile(r"(?i)\b([a-z][a-z0-9+.-]*)://[^/\s]*@")
 # TOOL-dSafePassage-44 S1: a bare user under these schemes is ssh's login name, not a credential.
 SSH_BARE_USER_SCHEMES = ("ssh", "git+ssh", "ssh+git")
-CREDENTIAL_FILE_KEY_RE = re.compile(r"(?i)http\.(?:.+\.)?(?:sslkey|sslcert|cookiefile|proxysslkey|proxysslcert)")
+# TOOL-dSafePassage-45 S10: the credential keys, held by selftest's credential arm to every key of
+# `git help --config` whose last segment, lowercased, ends in a suffix here: each matches one row,
+# refused or kept with its reason, or a `STEP_REFUSED_KEYS` row (`core.askPass`). As (key pattern,
+# row, why), `<x>` any one or more segments; derived over git 2.54.0.windows.1, node d, 2026-10-23.
+CREDENTIAL_KEY_SUFFIXES = ("pass", "key", "cert", "cookiefile", "seed")
+STEP_CREDENTIAL_KEYS = (
+    *((k, "refused", "read as a client credential") for k in (
+        "http.sslKey", "http.<x>.sslKey", "http.sslCert", "http.<x>.sslCert", "http.cookieFile",
+        "http.<x>.cookieFile", "http.proxySSLKey", "http.<x>.proxySSLKey", "http.proxySSLCert",
+        "http.<x>.proxySSLCert")),
+    *((k, "refused", "a stored secret") for k in (
+        "imap.pass", "gitcvs.dbPass", "receive.certNonceSeed", "sendemail.smtpPass",
+        "sendemail.<x>.smtpPass", "sendemail.smtpSSLClientKey", "sendemail.<x>.smtpSSLClientKey",
+        "sendemail.smtpSSLClientCert", "sendemail.<x>.smtpSSLClientCert")),
+    ("user.signingKey", "kept", "a public key or its id"),
+    ("http.pinnedPubkey", "kept", "a public key or its id"),
+    ("interactive.singleKey", "kept", "a boolean"),
+    ("http.sslAutoClientCert", "kept", "a boolean"),
+    ("trailer.<x>.key", "kept", "a trailer's name"))
+CREDENTIAL_FILE_KEY_RE = re.compile("|".join(re.sub(r"<[^>]+>", ".+", re.escape(k))
+                                             for k, row, _why in STEP_CREDENTIAL_KEYS if row == "refused"), re.I)
 
 
 def test_credential_bearing(key: str, value: str | None) -> bool:
-    """True when `value`, or the key's text between its first and last dot, holds a URL carrying
-    userinfo, or when `key` is a credential-file key (TOOL-dSafePassage-38 S1). An scp-form
-    `user@host:path` holds no `://` and is not credential-bearing, and neither is a bare user, no
-    `:` in it, under a scheme `SSH_BARE_USER_SCHEMES` names, read from the match inside the tested
-    text (TOOL-dSafePassage-44 S1)."""
+    """True when `value`, or the key's whole subsection, its text between the first and the last
+    dot, holds a URL carrying userinfo (TOOL-dSafePassage-38 S1, TOOL-dSafePassage-45 S8), when a
+    proxy key's value holds userinfo with or without a scheme (S7), or when `key` matches a refused
+    `STEP_CREDENTIAL_KEYS` row (S10). An scp-form `user@host:path` holds no `://` and is not
+    credential-bearing, and neither is a bare user, no `:` in it, under a scheme
+    `SSH_BARE_USER_SCHEMES` names, read from the match inside the tested text (TOOL-dSafePassage-44 S1)."""
     inner = key.split(".", 1)[1].rpartition(".")[0] if key.count(".") >= 2 else ""
     return bool(CREDENTIAL_FILE_KEY_RE.fullmatch(key) or any(
         not (m.group(1).lower() in SSH_BARE_USER_SCHEMES and ":" not in m.group(2))
-        for text in (inner, value or "") for m in CONFIG_USERINFO_RE.finditer(text)))
+        for text in (inner, value or "") for m in CONFIG_USERINFO_RE.finditer(text))
+        or (PROXY_KEY_RE.fullmatch(key) and PROXY_USERINFO_RE.match((value or "").strip())))
 
 
 def render_redacted_config(text: str) -> str:
-    """`text` with the userinfo of every `<scheme>://<userinfo>@` written as `<redacted>`, scheme
-    and host kept (TOOL-dSafePassage-38 S2)."""
-    return CONFIG_USERINFO_RE.sub(lambda m: m.group(0).partition("://")[0] + "://<redacted>@", text)
+    """`text` with the userinfo of every `<scheme>://<userinfo>@` written as `<redacted>`, to the
+    last `@` before the first `/` (TOOL-dSafePassage-45 S9), scheme and host kept
+    (TOOL-dSafePassage-38 S2)."""
+    return REDACT_USERINFO_RE.sub(lambda m: m.group(0).partition("://")[0] + "://<redacted>@", text)
 
 
 def check_target_local_config(target) -> list[str]:
@@ -1536,9 +1569,7 @@ def check_target_local_config(target) -> list[str]:
                  or (rule == "not a git false" and (value is None or value.strip().lower() not in GIT_FALSE))
                  or (rule == "begins with !" and value is not None and value.startswith("!"))
                  or (rule == "an absolute path" and value is not None
-                     and re.match(r"[/\\]|[A-Za-z]:[/\\]", value.strip()))
-                 or (rule == "a URL carrying userinfo" and value is not None
-                     and re.match(r"[A-Za-z][A-Za-z0-9+.-]*://[^/?#@]*@", value.strip())))
+                     and re.match(r"[/\\]|[A-Za-z]:", value.strip())))
             for pattern, rule, _runs in STEP_REFUSED_KEYS)
 
     rows = read_target_local_config(target, refused)
@@ -2522,7 +2553,9 @@ FIXTURE_STEPS = {
         "hooks = os.environ.get('GIT_CONFIG_VALUE_0', '')\n"
         "with open(os.path.join(reports, 'clean.json'), 'w', encoding='utf-8') as f:\n"
         "    json.dump({'env': sorted(os.environ), 'count': os.environ.get('GIT_CONFIG_COUNT'),\n"
+        "               'pairs': sum(k.startswith('GIT_CONFIG_KEY_') for k in os.environ),\n"
         "               'key0': os.environ.get('GIT_CONFIG_KEY_0'),\n"
+        "               'pair2': [os.environ.get('GIT_CONFIG_KEY_2'), os.environ.get('GIT_CONFIG_VALUE_2')],\n"
         "               'hooks': sorted(os.listdir(hooks)) if os.path.isdir(hooks) else None,\n"
         "               'isolated': sys.flags.isolated, 'cwd': os.getcwd(), 'prefix': prefix,\n"
         "               'add': add.returncode, 'commit': commit.returncode, 'cred': cred.returncode,\n"
@@ -2586,8 +2619,11 @@ def run_isolation_fixture(plant: str | None) -> int:
         return 1
     g, saved_env = globals(), dict(os.environ)
     saved = {k: g[k] for k in ("build_step_env", "resolve_step_argv", "check_target_local_config")}
-    for k in [k for k in os.environ if k.upper().startswith("GIT_")]:
-        del os.environ[k]  # a calling hook's GIT_DIR would point every fixture git call elsewhere
+    # A calling hook's GIT_DIR would point every fixture git call elsewhere; the caller's choice of
+    # global and system config stays, so the parent's line endings vary (TOOL-dSafePassage-45 S4).
+    for k in [k for k in os.environ if k.upper().startswith("GIT_")
+              and k.upper() not in ("GIT_CONFIG_GLOBAL", "GIT_CONFIG_NOSYSTEM")]:
+        del os.environ[k]
     try:
         with tempfile.TemporaryDirectory(prefix="gk-iso-", ignore_cleanup_errors=True) as td:
             return run_isolation_case(pathlib.Path(td), plant)
@@ -2661,13 +2697,16 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             os.environ.update(held)
         extra = sorted(set(rep.get("env", [])) - allowed)
         print(f"isolation: {clean.id} · env names outside the allowlist and the contract: {extra or 'none'}")
-        print(f"isolation: {clean.id} · GIT_CONFIG_COUNT {rep.get('count')} · {rep.get('key0')} holds "
+        print(f"isolation: {clean.id} · GIT_CONFIG_COUNT {rep.get('count')} · {rep.get('pairs')} "
+              f"GIT_CONFIG_KEY_<n> pair(s) · pair 2 {rep.get('pair2')} · {rep.get('key0')} holds "
               f"{rep.get('hooks')} · sys.flags.isolated {rep.get('isolated')} · cwd {rep.get('cwd')}")
         expect(bool(rep) and rep.get("add") == 0, "clean's report is missing, or its git add failed")
         expect(not extra, f"names outside the allowlist reached the step: {extra}")
-        expect(rep.get("count") == str(3 + len(eol)) and rep.get("key0") == "core.hooksPath" and rep.get("hooks") == [],
-               f"GIT_CONFIG_COUNT is not 3 plus the parent's {len(eol)} line-ending pair(s) with "
-               f"core.hooksPath naming an empty directory")
+        # TOOL-dSafePassage-45 S4: the count is the pairs present, never a total typed here.
+        expect(rep.get("count") == str(rep.get("pairs")) and rep.get("pair2") == ["protocol.ext.allow", "never"]
+               and rep.get("key0") == "core.hooksPath" and rep.get("hooks") == [],
+               "GIT_CONFIG_COUNT is not the GIT_CONFIG_KEY_<n> pairs present, with protocol.ext.allow = never "
+               "at index 2 and core.hooksPath naming an empty directory")
         expect(rep.get("isolated") == 1, "the leading python ran without -I")
         expect(bool(rep) and pathlib.Path(rep["cwd"]).resolve() == gov.resolve(), "the working directory is not gov's root")
         expect(rep.get("prefix") == "tools", "{prefix} did not resolve to the target's install prefix")
@@ -2817,15 +2856,22 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             expect(rep.get("add") == 0, "the ssh-scheme bare-user remote: clean's git add did not run")
         except Refusal as e:
             expect(False, f"an ssh-scheme remote with a bare user was refused: {e}")
-    elif plant in ("submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo"):
+    elif plant in ("submodule-url-userinfo", "insteadof-userinfo", "http-url-key-userinfo",
+                   "proxy-schemeless-userinfo", "insteadof-dotted-userinfo"):
         # TOOL-dSafePassage-38 S3: a URL credential in a value or a key segment that no instance row
         # names refuses the step, and the refusal prints the key redacted and never the credential.
+        # TOOL-dSafePassage-45 S7, S8: a proxy's scheme-less userinfo, and a dotted user name in a key.
         cred = "https://dspuser38:dsppass38@example.invalid/"
         section, key = {"submodule-url-userinfo": ('submodule "s"]\n\turl = ' + cred + "s.git", "submodule.s.url"),
                         "insteadof-userinfo": (f'url "{cred}"]\n\tinsteadOf = https://example.invalid/',
                                                "url.https://<redacted>@example.invalid/.insteadof"),
                         "http-url-key-userinfo": (f'http "{cred}"]\n\tsslKey = /k',
-                                                  "http.https://<redacted>@example.invalid/.sslkey")}[plant]
+                                                  "http.https://<redacted>@example.invalid/.sslkey"),
+                        "proxy-schemeless-userinfo": ("http]\n\tproxy = dspuser45:dsppass45@proxy:3128", "http.proxy"),
+                        "insteadof-dotted-userinfo": ('url "https://first.last:dsppass45@host/"]\n\tinsteadOf = https://h/',
+                                                      "url.https://<redacted>@host/.insteadof")}[plant]
+        tokens = (("dspuser45", "dsppass45", "first.last") if plant in ("proxy-schemeless-userinfo", "insteadof-dotted-userinfo")
+                  else ("dspuser38", "dsppass38"))
         cfg = target / ".git" / "config"
         cfg.write_text(cfg.read_text(encoding="utf-8") + f"[{section}\n", encoding="utf-8", newline="\n")
         try:
@@ -2835,7 +2881,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             refused = str(e)
             print(f"isolation: {clean.id} · refused · {e}")
         expect(f"{key} in .git/config" in refused, f"the step was not refused naming {key} in .git/config")
-        expect("dspuser38" not in refused and "dsppass38" not in refused, "the refusal prints the URL's user or password")
+        expect(not any(t in refused for t in tokens), "the refusal prints the URL's user or password")
         expect(not report.exists(), "the refused step spawned")
         rc = 1
     elif plant.startswith("local-"):
@@ -2915,7 +2961,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             except Refusal as e:
                 expect(False, f"core.fsmonitor=false was refused: {e}")
         rc = 1
-    elif plant.startswith("submodule-"):
+    elif plant.startswith("submodule-") or plant == "gitmodules-malformed":
         # TOOL-dSafePassage-30 S4: the filter in a submodule's own config, which the superproject's
         # `git status` runs; `nested` sets it one submodule deeper, `unpopulated` in a submodule the
         # target does not check out. TOOL-dSafePassage-36 S3: `unpopulated-worktree` sets it in a
@@ -2924,6 +2970,10 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         # TOOL-dSafePassage-42 S8: `fsmonitor` sets `core.fsmonitor` in a checked-out submodule, which
         # an index read there would run; S22: `name-differs` sets the filter in a de-initialised
         # submodule named `nm` at `lib/p`, reached only through `modules/`, then drops its mapping.
+        # TOOL-dSafePassage-45 S12: `ref-named-config` gives a checked-out submodule a branch named
+        # `config`, `config-malformed` a de-initialised one a config ending `[core`; S13:
+        # `gitmodules-malformed` leaves the target's `.gitmodules` unparseable, and
+        # `nested-name-differs` nests `in` at `q` inside `nm` at `lib/p`, then de-initialises `nm`.
         kind = plant.removeprefix("submodule-").removesuffix("-stub")
         linked = kind in ("unpopulated-worktree", "main-only")
         fx = ["git", "-c", "protocol.file.allow=always", "-c", "user.name=gk-fx", "-c", "user.email=gk-fx@invalid"]
@@ -2938,15 +2988,18 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             (d / ".gitattributes").write_text("*.txt filter=canary\n", encoding="utf-8", newline="\n")
             (d / "a.txt").write_text("a\n", encoding="utf-8", newline="\n")
             for s in subs:
-                fx_git(d, "submodule", "add", "-q", s.as_posix(), s.name)
+                fx_git(d, "submodule", "add", "-q", *(("--name", "in", s.as_posix(), "q") if kind == "nested-name-differs"
+                                                      else (s.as_posix(), s.name)))
             fx_git(d, "add", "-A")
             fx_git(d, "commit", "-q", "-m", "fx")
             return d
 
-        sub = src("sub", *((src("inner"),) if kind == "nested" else ()))
-        fx_git(target, "submodule", "add", "-q", *(("--name", "nm", sub.as_posix(), "lib/p") if kind == "name-differs"
+        nested = kind in ("nested", "nested-name-differs")
+        sub = src("sub", *((src("inner"),) if nested else ()))
+        fx_git(target, "submodule", "add", "-q", *(("--name", "nm", sub.as_posix(), "lib/p")
+                                                   if kind in ("name-differs", "nested-name-differs")
                                                    else (sub.as_posix(), "sub")))
-        if kind == "nested":
+        if nested:
             fx_git(target, "submodule", "update", "-q", "--init", "--recursive")
         stepped = target
         if linked:
@@ -2955,11 +3008,15 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             fx_git(target, "worktree", "add", "-q", stepped.as_posix())
             fx_git(stepped, "-c", "protocol.file.allow=always", "submodule", "update", "-q", "--init")
         deep = {"nested": target / "sub" / "inner", "unpopulated-worktree": stepped / "sub",
-                "name-differs": target / "lib" / "p"}.get(kind, target / "sub")
+                "name-differs": target / "lib" / "p", "nested-name-differs": target / "lib" / "p" / "q"}.get(kind, target / "sub")
         key = "core.fsmonitor" if kind == "fsmonitor" else "filter.canary.clean"
-        fx_git(deep, "config", key, f": > '{(canaries / 'fsmonitor').as_posix()}'" if kind == "fsmonitor"
-               else f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
-        if kind in ("unpopulated", "name-differs") or linked:
+        unkeyed = kind in ("ref-named-config", "config-malformed", "gitmodules-malformed")
+        if kind == "ref-named-config":
+            fx_git(deep, "branch", "config")  # refs/heads/config and logs/refs/heads/config, two files named config
+        elif not unkeyed:
+            fx_git(deep, "config", key, f": > '{(canaries / 'fsmonitor').as_posix()}'" if kind == "fsmonitor"
+                   else f": > '{(canaries / 'filter-clean').as_posix()}'; cat")
+        if kind in ("unpopulated", "name-differs", "config-malformed") or linked:
             fx_git(stepped, "submodule", "deinit", "-q", "-f", "lib/p" if kind == "name-differs" else "sub")
         else:
             # same size, new mtime: git cannot tell it changed without the clean filter
@@ -2967,13 +3024,27 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             os.utime(deep / "a.txt", (1, 1))
         shutil.rmtree(canaries, ignore_errors=True)
         canaries.mkdir()
+        if kind in ("config-malformed", "gitmodules-malformed"):
+            broken = target / ".git" / "modules" / "sub" / "config" if kind == "config-malformed" else target / ".gitmodules"
+            with broken.open("a", encoding="utf-8", newline="\n") as f:
+                f.write("[core\n")  # an unterminated section: git exits 128, `bad config line`
+        elif kind == "ref-named-config":
+            rows = read_target_repositories(target, lambda d, label: False)
+            for r in rows if isinstance(rows, list) else ():
+                print(f"isolation: population · {r['git_dir']} · reached by {r['reached_by'] or 'the target'}")
+            expect(isinstance(rows, list) and len(rows) == 2
+                   and not any(x in r["git_dir"] for r in rows for x in ("/refs/", "/logs/")),
+                   f"the population is not one row per real repository, the target and sub: {rows}")
+            expect((target / ".git" / "modules" / "sub" / "refs" / "heads" / "config").is_file(),
+                   "LIVENESS: no ref named config was planted, so the walk grades nothing")
         where = {"filter": ".git/modules/sub/config (submodule sub)",
                  "nested": ".git/modules/sub/modules/inner/config (submodule sub/inner)",
                  "unpopulated": ".git/modules/sub/config (submodule sub)",
                  "unpopulated-worktree": (target / ".git" / "worktrees" / "wt" / "modules" / "sub").resolve().as_posix()
                  + "/config (submodule sub)",
                  "fsmonitor": ".git/modules/sub/config (submodule sub)",
-                 "name-differs": ".git/modules/nm/config (submodule lib/p)"}.get(kind, "")
+                 "name-differs": ".git/modules/nm/config (submodule lib/p)",
+                 "nested-name-differs": ".git/modules/nm/modules/in/config (submodule lib/p/q)"}.get(kind, "")
         done = reports / "status.rc"
         status = (row("update", ["python", "{gov}/steps/update.py", "{target}", done.as_posix()]) if linked
                   else row("status", ["python", "{gov}/steps/status.py", "{target}", done.as_posix()]))
@@ -2991,6 +3062,12 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         if kind == "main-only":
             expect(not refused and done.exists() and not hit,
                    "the main worktree's submodule config refused the linked worktree's step, or its filter ran")
+        elif kind == "ref-named-config":
+            expect(not refused and done.exists(), "a submodule holding a ref named config refused the step")
+        elif unkeyed:
+            name = ".git/modules/sub/config" if kind == "config-malformed" else ".gitmodules"
+            expect(f"{name} does not read" in refused and not done.exists(),
+                   f"the step was not refused naming {name} as a file git cannot read, or it spawned")
         elif plant.endswith("-stub"):
             expect(not refused and done.exists(), "the stubbed check still refused, so nothing spawned")
             if kind != "unpopulated":
@@ -3008,7 +3085,20 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                 print(f"isolation: {status.id} · the .gitmodules mapping removed · refused · {e}")
             expect(f"{key} in .git/modules/nm/config (submodule nm, by name)" in refused,
                    "with no .gitmodules mapping the refusal does not name the submodule `nm, by name`")
-        rc = 0 if kind == "main-only" else 1
+        if kind == "nested-name-differs":
+            fx_git(target, "submodule", "deinit", "-q", "-f", "lib/p")
+            # ponytail: the deinit removes `lib/p/q`, the inner's core.worktree, and git then reads no
+            # config of it at all (a refusal naming it); the empty directory keeps the label graded.
+            (target / "lib" / "p" / "q").mkdir(parents=True, exist_ok=True)
+            try:
+                run_step_isolated(status, "up", stepped, gov)
+                refused = ""
+            except Refusal as e:
+                refused = str(e)
+                print(f"isolation: {status.id} · the outer submodule unpopulated · refused · {e}")
+            expect(f"{key} in .git/modules/nm/modules/in/config (submodule lib/p/in, by name)" in refused,
+                   "with the outer submodule unpopulated the refusal does not name the inner `in, by name`")
+        rc = 0 if kind in ("main-only", "ref-named-config") else 1
     for f in fails:
         print(f"isolation: FAILED · {f}")
     return 1 if fails else rc

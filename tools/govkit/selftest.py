@@ -3513,12 +3513,15 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     to AC3 add the three `submodule-*` plants and their `-stub` twins; TOOL-dSafePassage-36 AC1 and
     AC2 add the two linked-worktree plants and a walk copy rooted at the common dir;
     TOOL-dSafePassage-37 AC1 to AC3 add `local-recent-objects-hook`, `local-ext-transport`, their
-    `-stub` twins, the step environment's third pair and the class arm's `hook` suffix."""
+    `-stub` twins, the step environment's third pair and the class arm's `hook` suffix.
+    TOOL-dSafePassage-45 AC1 to AC11 add the derived pair count under two parent configs, its six
+    plants, the credential-key arm and four staged copies."""
     us_py = HERE / "upgrade_steps.py"
 
-    def fixture(py: pathlib.Path, *plant: str) -> tuple[int, str]:
+    def fixture(py: pathlib.Path, *plant: str, env: dict | None = None) -> tuple[int, str]:
         p = subprocess.run([sys.executable, str(py), "fixture", "isolation", *(("--plant", *plant) if plant else ())],
-                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600)
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600,
+                           env={**os.environ, **env} if env else None)
         return p.returncode, p.stdout + p.stderr
 
     for plant, want, needles in (
@@ -3590,6 +3593,104 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     rc, out = fixture(build_staged_copy(tmp / "no-ssh-exemption", src.replace(exempt, "True")), "ssh-scheme-bare-user")
     check("[dSP-44] AC1 a copy whose predicate has no ssh exemption refuses fixture isolation ssh-scheme-bare-user",
           src.count(exempt) == 1 and rc == 1 and "an ssh-scheme remote with a bare user was refused" in out, out)
+
+    # TOOL-dSafePassage-45 AC1, AC2, S4: the step environment's count is the GIT_CONFIG_KEY_<n> pairs
+    # present and protocol.ext.allow sits at index 2, under a parent with core.autocrlf set and one
+    # with it unset; a fixture copy asserting a bare 3 reds.
+    us45 = govkit_module().upgrade_steps
+    cfgs = {"set": tmp / "dsp45-crlf.gitconfig", "unset": tmp / "dsp45-empty.gitconfig"}
+    cfgs["set"].write_text("[core]\n\tautocrlf = true\n", encoding="utf-8", newline="\n")
+    cfgs["unset"].write_text("", encoding="utf-8", newline="\n")
+    (tmp / "dsp45-env").mkdir(exist_ok=True)
+    for name, cfg in cfgs.items():
+        parent = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": str(cfg)}
+        held = {k: os.environ.get(k) for k in parent}
+        os.environ.update(parent)
+        try:
+            env = us45.build_step_env(tmp / "dsp45-env", tmp / "dsp45-env")
+        finally:
+            for k, v in held.items():
+                if v is None:
+                    os.environ.pop(k)
+                else:
+                    os.environ[k] = v
+        present = sum(k.startswith("GIT_CONFIG_KEY_") for k in env)
+        check(f"[dSP-45] AC1 core.autocrlf {name}: GIT_CONFIG_COUNT is the {present} pair(s) present, index 2 "
+              f"protocol.ext.allow = never, index 3 core.autocrlf only where set",
+              env.get("GIT_CONFIG_COUNT") == str(present)
+              and (env.get("GIT_CONFIG_KEY_2"), env.get("GIT_CONFIG_VALUE_2")) == ("protocol.ext.allow", "never")
+              and env.get("GIT_CONFIG_KEY_3") == ("core.autocrlf" if name == "set" else None),
+              str({k: v for k, v in env.items() if k.startswith("GIT_CONFIG_")}))
+        rc, out = fixture(us_py, env=parent)
+        check(f"[dSP-45] AC2 fixture isolation (base) under core.autocrlf {name} exits 0 with clean ok",
+              rc == 0 and "isolation: FAILED" not in out and "fixture/clean · up · ok" in out, out)
+    derived = 'expect(rep.get("count") == str(rep.get("pairs"))'
+    src = us_py.read_text(encoding="utf-8")
+    rc, out = fixture(build_staged_copy(tmp / "dsp45-bare-count", src.replace(derived, 'expect(rep.get("count") == "3"')),
+                      env={"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": str(cfgs["set"])})
+    check("[dSP-45] AC1 a fixture copy asserting GIT_CONFIG_COUNT 3 reds under core.autocrlf set",
+          src.count(derived) == 1 and rc == 1 and "GIT_CONFIG_COUNT is not the GIT_CONFIG_KEY_<n> pairs present" in out, out)
+
+    # AC4, AC5, AC6: a proxy's scheme-less userinfo and a dotted user name in a key refuse the step,
+    # neither printing any 3-character piece of its planted password, nor do TOOL-dSafePassage-38's
+    # plants; the redactor runs to the last `@`; a predicate copy splitting the key on dots reds.
+    cb45 = us45.test_credential_bearing
+    for plant, needle, secret, plain in (
+            ("proxy-schemeless-userinfo", "http.proxy in .git/config, so nothing", "dsppass45", "dspuser45"),
+            ("insteadof-dotted-userinfo", "url.https://<redacted>@host/.insteadof in .git/config, so nothing",
+             "dsppass45", "first.last"),
+            ("submodule-url-userinfo", "submodule.s.url in .git/config", "dsppass38", "dspuser38"),
+            ("insteadof-userinfo", "url.https://<redacted>@example.invalid/.insteadof", "dsppass38", "dspuser38"),
+            ("http-url-key-userinfo", "http.https://<redacted>@example.invalid/.sslkey", "dsppass38", "dspuser38")):
+        rc, out = fixture(us_py, plant)
+        pieces = [secret[i:i + 3] for i in range(len(secret) - 2) if secret[i:i + 3] in out]
+        check(f"[dSP-45] AC4 AC5 AC6 fixture isolation {plant} exits 1, names {needle} and prints no "
+              f"3-character piece of {secret} nor {plain}",
+              rc == 1 and "isolation: FAILED" not in out and needle in out and not pieces and plain not in out,
+              f"pieces printed: {pieces}\n{out}")
+    cases45 = ((("http.proxy", "proxy:3128"), False), (("http.proxy", "dspuser45:dsppass45@proxy:3128"), True),
+               (("remote.origin.proxy", "u@proxy:1"), True), (("http.https://h/.proxy", "u:p@proxy"), True),
+               (("url.https://first.last:pw@host/.insteadof", "https://h/"), True),
+               (("url.ssh://git@github.com/.insteadof", "https://github.com/"), False))
+    wrong = [(a, want) for a, want in cases45 if cb45(*a) != want]
+    check("[dSP-45] AC4 AC5 test_credential_bearing refuses a scheme-less proxy credential and a dotted user, "
+          "and keeps a plain proxy host and TOOL-dSafePassage-44's ssh bare user", not wrong, f"wrong: {wrong}")
+    got = us45.render_redacted_config("http.https://u:p@ss@h/.sslkey")
+    check("[dSP-45] AC6 render_redacted_config redacts to the last @ before the host",
+          got == "http.https://<redacted>@h/.sslkey", got)
+    whole = 'for text in (inner, value or "")'
+    rc, out = fixture(build_staged_copy(tmp / "dsp45-dot-split", src.replace(whole, 'for text in (*key.split(".")[1:-1], value or "")')),
+                      "insteadof-dotted-userinfo")
+    check("[dSP-45] AC5 a predicate copy testing the key's dot-split segments reds fixture isolation insteadof-dotted-userinfo",
+          src.count(whole) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # AC9, AC10: the walk lists a repository by git's own shape, so a ref named config is no row, and
+    # a config or a .gitmodules git cannot read refuses naming it; a nested row is mapped through its
+    # parent's .gitmodules, or by name where the parent is unpopulated. A walk copy listing any
+    # directory holding a `config` and descending into it reds the ref plant.
+    for plant, want, needles in (
+            ("submodule-ref-named-config", 0, ("isolation: population · ", "/.git/modules/sub · reached by sub",
+                                               "fixture/status · up · ok")),
+            ("submodule-config-malformed", 1, (".git/modules/sub/config does not read",)),
+            ("gitmodules-malformed", 1, ("/.gitmodules does not read",)),
+            ("submodule-nested-name-differs", 1, ("filter.canary.clean in .git/modules/nm/modules/in/config (submodule lib/p/q)",
+                                                  "filter.canary.clean in .git/modules/nm/modules/in/config "
+                                                  "(submodule lib/p/in, by name)"))):
+        rc, out = fixture(us_py, plant)
+        check(f"[dSP-45] AC9 AC10 fixture isolation {plant} exits {want} and names {', '.join(needles)}",
+              rc == want and "isolation: FAILED" not in out and all(n in out for n in needles), out)
+    shape = 'if not ((c / "HEAD").is_file() and (c / "objects").is_dir() and (c / "refs").is_dir()):'
+    into = 'walks.append((c / "modules", c / "modules",'
+    rc, out = fixture(build_staged_copy(tmp / "dsp45-config-walk", src.replace(shape, 'if not (c / "config").is_file():')
+                                        .replace(into, "walks.append((c, c,")), "submodule-ref-named-config")
+    check("[dSP-45] AC9 a walk copy listing any directory holding a config reds fixture isolation submodule-ref-named-config",
+          src.count(shape) == 1 and src.count(into) == 1 and rc == 1 and "isolation: FAILED" in out, out)
+
+    # AC11: the credential class has one source, so the refused table carries none of its rows.
+    dup = [r[0] for r in us45.STEP_REFUSED_KEYS if r[0] in ("remote.<x>.url", "remote.<x>.pushurl", "http.proxy",
+                                                            "remote.<x>.proxy", "http.sslKey", "http.sslCert",
+                                                            "http.cookieFile")]
+    check("[dSP-45] AC11 STEP_REFUSED_KEYS holds no row test_credential_bearing grades", not dup, f"rows: {dup}")
 
     # TOOL-dSafePassage-24 AC1 to AC4: an executor in the target's own config refuses the step before
     # any spawn, naming the key and its file ON the refusal line; each `-stub` twin skips the check and
@@ -3683,11 +3784,11 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles)
               and (line is not None and all(n in line for n in on_refusal) if on_refusal else line is None), out)
     env = govkit_module().upgrade_steps.build_step_env(tmp)
-    # TOOL-dSafePassage-26 S13: 3 plus the parent's line-ending pairs, which this node may set.
-    _eol = len(govkit_module().upgrade_steps.read_line_ending_config())
-    check("[dSP-37] AC2 build_step_env carries GIT_CONFIG_COUNT 3 plus the parent's line-ending pairs "
-          "and the pair protocol.ext.allow = never",
-          env.get("GIT_CONFIG_COUNT") == str(3 + _eol) and (env.get("GIT_CONFIG_KEY_2"), env.get("GIT_CONFIG_VALUE_2"))
+    # TOOL-dSafePassage-45 S3, S4: the count is the pairs present, never a total typed here.
+    check("[dSP-37] AC2 build_step_env carries GIT_CONFIG_COUNT equal to the GIT_CONFIG_KEY_<n> pairs present "
+          "and the pair protocol.ext.allow = never at index 2",
+          env.get("GIT_CONFIG_COUNT") == str(sum(k.startswith("GIT_CONFIG_KEY_") for k in env))
+          and (env.get("GIT_CONFIG_KEY_2"), env.get("GIT_CONFIG_VALUE_2"))
           == ("protocol.ext.allow", "never"), str({k: v for k, v in env.items() if k.startswith("GIT_CONFIG_")}))
 
     walk = '                mods = d / "modules"'
@@ -3767,6 +3868,34 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
         found = us.check_target_local_config(v42)
         check(f"[dSP-42] AC4 sendemail.smtpServer = {host}: the check names {want} of the three keys",
               len(found) == want and all(any(k.lower() in e for e in found) for k in sorted(runs42)[:want]), str(found))
+
+    # TOOL-dSafePassage-45 AC3: git-send-email's own absoluteness test, in the identity form too.
+    for i, (k, v, want) in enumerate((("sendemail.smtpserver", "/usr/bin/x", 1), ("sendemail.smtpserver", "C:/x/sendmail.exe", 1),
+                                      ("sendemail.smtpserver", "c:evil", 1), ("sendemail.work.smtpserver", "/x", 1),
+                                      ("sendemail.smtpserver", "smtp.example.com", 0))):
+        v45 = tmp / f"dsp45-smtp-{i}"
+        subprocess.run(["git", "init", "-q", str(v45)], env=us.build_tree_git_env(), capture_output=True, check=True)
+        subprocess.run(["git", "-C", str(v45), "config", k, v], env=us.build_tree_git_env(), check=True)
+        found = us.check_target_local_config(v45)
+        check(f"[dSP-45] AC3 {k} = {v}: the check names {want} key(s)", len(found) == want, str(found))
+
+    # TOOL-dSafePassage-45 AC7, the credential-key arm: every key `git help --config` lists whose last
+    # segment ends in a CREDENTIAL_KEY_SUFFIXES entry matches a STEP_CREDENTIAL_KEYS or a
+    # STEP_REFUSED_KEYS row, re-derived on every run; an empty listing reds, and a table copy
+    # missing `imap.pass` names it.
+    secret = [k for k in (ln.strip() for ln in hp.stdout.splitlines())
+              if k and k.rsplit(".", 1)[-1].lower().endswith(us.CREDENTIAL_KEY_SUFFIXES)]
+    rows = lambda table, keys: [k for k in keys if any(  # noqa: E731
+        _re.fullmatch(_re.sub(r"<[^>]+>", ".+", _re.escape(r[0])), k, _re.I) for r in table)]
+    unrowed = [k for k in secret if k not in rows(us.STEP_CREDENTIAL_KEYS, secret) and k not in rows(us.STEP_REFUSED_KEYS, secret)]
+    check(f"[dSP-45] AC7 git help --config: {len(secret)} secret-suffixed key(s), each a STEP_CREDENTIAL_KEYS or "
+          f"STEP_REFUSED_KEYS row", hp.returncode == 0 and bool(secret) and not unrowed,
+          f"matching no row: {unrowed or 'none'}" + ("; the listing kept no key" if not secret else ""))
+    less = [r for r in us.STEP_CREDENTIAL_KEYS if r[0] != "imap.pass"]
+    check("[dSP-45] AC7 with the imap.pass row taken out of a copy of STEP_CREDENTIAL_KEYS, the arm names imap.pass",
+          [k for k in secret if k not in rows(less, secret) and k not in rows(us.STEP_REFUSED_KEYS, secret)] == ["imap.pass"])
+    check("[dSP-45] AC7 test_credential_bearing refuses sendemail.smtppass and keeps user.signingkey",
+          us.test_credential_bearing("sendemail.smtppass", "x") and not us.test_credential_bearing("user.signingkey", "ABCD"))
 
     # AC6's red: the kit copied whole, a direct spawn of `row["up"]` planted into the copy.
     text = us_py.read_text(encoding="utf-8") + '\n\ndef planted_spawn(row):\n    return subprocess.run(row["up"])\n'

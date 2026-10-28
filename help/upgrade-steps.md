@@ -47,7 +47,8 @@ starts it:
   URL is a command: whatever your `protocol.allow`, `url.<base>.insteadOf` or `remote.<x>.url`
   says, git itself refuses it inside the step with `transport 'ext' not allowed`. Two settings
   follow from gov's side, `core.autocrlf` and `core.eol`, where they are set where `update` runs:
-  so a step hashes and stages a file with the line endings `update` itself would.
+  so a step hashes and stages a file with the line endings `update` itself would. `GIT_CONFIG_COUNT`
+  is therefore 3 plus those that are set, and `protocol.ext.allow` is always the third pair.
 - **Python runs isolated (`-I`)**: it ignores `PYTHONPATH` and imports nothing from your tree or
   the working directory.
 - **Your repository's own config is read first, and can refuse the step.** Git has no switch that
@@ -57,7 +58,12 @@ starts it:
   every repository git can enter from yours, each submodule's included: a `git status` in your
   repository runs a submodule's own filters, so every directory under `modules/` in your
   worktree's own git directory, checked out or not, and every checked-out submodule, nested ones
-  too, is read the same way, and a refusal names the submodule's path beside the key. The check
+  too, is read the same way, and a refusal names the submodule's path beside the key. A directory
+  under `modules/` counts as a submodule's repository by its shape (a `HEAD` file beside `objects/`
+  and `refs/`), so a branch named `config` is never mistaken for one; a submodule repository whose
+  config git cannot read refuses the step, naming that config file, and so does a `.gitmodules`
+  that does not parse, naming it. A nested submodule's path is mapped through its parent's
+  `.gitmodules` where the parent is checked out, and is its name, marked `by name`, where not. The check
   reads the submodules of the target's own worktree: in a linked worktree (`git worktree add`)
   that is `.git/worktrees/<name>/modules/`, never the main worktree's `.git/modules/`, which a step
   run in the linked worktree never enters. The refused keys are the class the check names among
@@ -73,15 +79,25 @@ starts it:
   `hook.<x>.command`, `gc.recentObjectsHook` (run by `gc` and the auto-gc a commit or fetch
   starts), a `submodule.<x>.update` or `alias.<x>` beginning with `!`, and the trailer,
   difftool, mergetool, browser, man, guitool and send-email commands, `imap.tunnel` (run by
-  `imap-send`), `instaweb.httpd`, and a `sendemail.smtpServer` that is an absolute path, which
+  `imap-send`), `instaweb.httpd`, and a `sendemail.smtpServer` or `sendemail.<identity>.smtpServer`
+  that is an absolute path (one starting with `/` or a drive letter such as `C:`), which
   `send-email` runs as a program rather than reading as a host name. Credentials are refused
   too, as a class rather than a list: a `<scheme>://` URL carrying userinfo (a user or password
   before its host) is refused wherever it appears, in any key's value (`remote.<x>.url`,
   `submodule.<name>.url`, `url.<base>.insteadOf`, `http.proxy` and every other) or in a key's own
-  name (`url.<base>.insteadOf`, `http.<url>.sslVerify`, `credential.<url>.username`). The
-  credential-file keys are refused whatever they hold: `http.sslKey`, `http.sslCert`,
-  `http.cookieFile`, `http.proxySSLKey` and `http.proxySSLCert`, each in its `http.<url>.` form
-  too. An scp-form remote such as `git@host:repo` carries no credential and is not refused, and
+  name (`url.<base>.insteadOf`, `http.<url>.sslVerify`, `credential.<url>.username`), a dotted
+  user name such as `first.last` included. A proxy (`http.proxy`, `http.<url>.proxy`,
+  `remote.<x>.proxy`) is refused for a user or password even with no scheme, as in
+  `user:pass@proxy:3128`, since git reads one there too; a plain `proxy:3128` is not. The keys that
+  hold a secret or a client credential are refused whatever they hold: `http.sslKey`,
+  `http.sslCert`, `http.cookieFile`, `http.proxySSLKey` and `http.proxySSLCert`, each in its
+  `http.<url>.` form too, `imap.pass`, `gitcvs.dbPass`, `receive.certNonceSeed`, and
+  `sendemail.smtpPass`, `sendemail.smtpSSLClientKey` and `sendemail.smtpSSLClientCert`, each in its
+  `sendemail.<identity>.` form too; store such a secret in a credential helper instead. gov's
+  self-test holds that list to every key `git help --config` names ending in `pass`, `key`, `cert`,
+  `cookiefile` or `seed`, and keeps the rest by reason: `user.signingKey` and `http.pinnedPubkey`
+  hold a public key, `interactive.singleKey` and `http.sslAutoClientCert` a boolean, and
+  `trailer.<x>.key` a trailer's name. An scp-form remote such as `git@host:repo` carries no credential and is not refused, and
   neither is an ssh-scheme remote with a bare user, such as `ssh://git@host/repo` under `ssh`,
   `git+ssh` or `ssh+git`, nor a `url.ssh://git@host/.insteadOf` key: ssh authenticates by key, so
   the user name is no secret. A bare user under any other scheme, `https://user@host/` included, is
