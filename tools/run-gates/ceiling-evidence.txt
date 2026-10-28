@@ -111,6 +111,7 @@ receipt sync (installed files match the receipt)	1.0	2	a	2026-09-24	runner
 review-join ban (no ref-keyed join)	10.8	2	a	2026-09-24	runner
 review-join self-test	110.3	2	a	2026-09-24	runner
 review-protocol parity (kit vs dogfood)	7.0	2	a	2026-09-24	runner
+routed commits name a specced unit	354.0	1	a	2026-10-28	taken by the main loop, the leg alone on node a with GATE_PUSH_BASE=1a61f21a2, its deviation join armed, read twice with that base: at 9c135e17 after dRankedPlan's close, 37 commits past that base, rc 0, real 354.0s, another session's two staged hygiene checks running as it started; at 922d6b94, 39 commits past it, rc 0, real 295.5s, another worktree's dispatch running its check-spec-tokens.py across part of it; and a close-shaped reading at 922d6b94 with GATE_PUSH_BASE unset, rc 0, real 276.0s; all three censuses found the idle orphan run-gates.sh of unattended-dgroundrules-0e6f4a, pid 10907 from Oct 23; the largest governs; killed at its 300 s ceiling under dRankedPlan's close bar at 9c135e17, in the pool and on its serial retry
 row-grammar selftest	42.7	2	a	2026-09-24	runner
 row-keyed merge driver replay	269.1	2	a	2026-09-24	runner
 run-gates adopter e2e	49.4	2	a	2026-09-24	runner
@@ -129,7 +130,7 @@ selftest harness self-test	26.8	2	a	2026-09-24	runner
 settings-merge selftest	6.8	2	a	2026-09-24	runner
 shell hygiene (a loop fed by a command substitution)	1.1	1	a	2026-09-24	runner
 shell-hygiene selftest	0.9	2	a	2026-09-24	runner
-spec tokens (a spec's own names resolve)	195.0	1	a	2026-10-26	the leg alone in the worktree at 0d9b531f on a host running no other gate suite, its packet join over 1 live chain run, real 195.0s; killed at its 180 s ceiling twice under the close's bar at 263d31d5, in the pool and on its serial retry
+spec tokens (a spec's own names resolve)	411.0	1	a	2026-10-28	the leg alone in the worktree at cc8880ae on node a, its packet join over 1 live chain run, real 411.0s; the census held no gate suite but the idle orphan run-gates.sh of unattended-dgroundrules-0e6f4a, and another worktree's check-spec-tokens.py overlapped the reading's last 61s; killed at its 390 s ceiling twice under dRankedPlan's close bar, in the pool and on its serial retry
 spec-tokens self-test	156.8	1	a	2026-09-24	runner
 template size <=48KiB	5.1	1	a	2026-09-06	runner
 template size gate selftest	74.8	2	a	2026-09-24	runner

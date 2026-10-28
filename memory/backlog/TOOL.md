@@ -402,6 +402,7 @@ Cite ids, never line numbers.
 | [TOOL-dBoundRoles-71](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | ARM 2 OF THE ROLE MATRIX HAS NO SPEC IN ITS NAMED OWNER.… |
 | [TOOL-dBoundRoles-72](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE OWNER-QUESTION READER TAKES ATTENDANCE FROM ITS CALLER.… |
 | [TOOL-dBoundRoles-73](../builds/dBoundRoles/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE. TOOL-dBoundRoles-5… |
+| [TOOL-dBoundRoles-74](../builds/dBoundRoles/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE plan WORKFLOW HAS NO LOOP ROW. TOOL-dBoundRoles-1 S4 adds the plan… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCalibratedLens-18](../builds/dCalibratedLens/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
@@ -418,6 +419,7 @@ Cite ids, never line numbers.
 | [TOOL-dDeclaredLoop-105](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TRANSITION READER RETURNS NO COMMIT OR DATE. KICK-dKeptSession-9… |
 | [TOOL-dDeclaredLoop-106](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PER-ORDER RETURN SCHEMA IS HANDED IN A CIRCLE.… |
 | [TOOL-dDeclaredLoop-107](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A DROPPED, INVENTED OR DOUBLED ROW STANDS ON A RECORD EDGE.… |
+| [TOOL-dDeclaredLoop-108](../builds/dDeclaredLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | item.entry.intake'S FIXED ROW IS NEVER ARMED. TOOL-dDeclaredLoop-24 §4… |
 | [TOOL-dDerivedDocket-38](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | tools/run-gates/run-selftests.sh SELECTS SUITES ONLY BY A --kit <dir>… |
 | [TOOL-dDerivedDocket-39](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-14 | govkit's requires_if SELECTS NO KIT AT APPLY. Its one reader is… |
 | [TOOL-dDerivedDocket-40](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-16 | NO LEASE-MATRIX ROW NAMES WHO REACHES IT, AND NOTHING COUNTS ROWS… |
@@ -499,6 +501,7 @@ Cite ids, never line numbers.
 | [TOOL-dPlacedRequest-67](../builds/dPlacedRequest/BACKLOG.md) | OPEN | HIGH | — | 2026-10-26 | A DECLARED WAIT DOES NOT RENEW ITS LEASE. Under leases.renewal:… |
 | [TOOL-dPlacedRequest-68](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE PLACEMENT BLOCK CARRIES NO RE-ENTRY. TOOL-dFurnishedOrders-16… |
 | [TOOL-dPlacedRequest-69](../builds/dPlacedRequest/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TESTER'S ACTOR IS SPELLED TWO WAYS. TOOL-dPlacedRequest-7's item… |
+| [TOOL-dPlacedRequest-73](../builds/dPlacedRequest/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | A CARD KEY READ THROUGH read_card_policy HAS NO READER.… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |
@@ -508,7 +511,8 @@ Cite ids, never line numbers.
 | [TOOL-dPolishedVitrine-11](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | THE UNATTENDED ADOPTER DELETES FIXTURE RECORDS GOVKIT SHIPS AS ENGINE… |
 | [TOOL-dPolishedVitrine-15](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-13 | A FINISHED CLAIM THAT STANDS AT HEAD IS TRUSTED, AND THE KIT GATE WOULD… |
 | [TOOL-dPolishedVitrine-16](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-14 | THE TWO CONSUMERS HOLD AN unattended@1.20 THAT GOV NUMBERS TWICE. inCMS… |
-| [TOOL-dRankedPlan-17](../builds/dRankedPlan/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dRankedPlan-17](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dRankedPlan-18](../builds/dRankedPlan/BACKLOG.md) | DEFERRED | MED | TOOL-dRankedPlan-6 | 2026-10-26 | A PLAN REVIEW'S FINDINGS HAVE NO DISPOSAL ROUTE. review.dispose… |
 | [TOOL-dRemeasuredRender-2](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | LOW | — | 2026-10-11 | the location-probe scanner does not see a probe whose cd <dir> carries… |
 | [TOOL-dRemeasuredRender-3](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | inherited red: leg lexicon naming predicates red at 9b743831,… |
 | [TOOL-dRemeasuredRender-4](../builds/dRemeasuredRender/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | inherited red: leg playbook render wiring red at 9b743831, introduced… |
@@ -551,6 +555,7 @@ Cite ids, never line numbers.
 | [TOOL-dSweptBranches-22](../builds/dSweptBranches/BACKLOG.md) | OPEN | LOW | — | 2026-10-13 | two staged-set readers read a merge of the default branch as additions… |
 | [TOOL-dSweptBranches-25](../builds/dSweptBranches/BACKLOG.md) | OPEN | HIGH | — | 2026-10-13 | held red: suite process-monitor census selftest red at 37200355 on the… |
 | [TOOL-dTendedCadence-19](../builds/dTendedCadence/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dTendedCadence-20](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SAFE FIX defer dormant HAS ITS TWO HALVES IN dRankedPlan. v2:1321… |
 | [TOOL-dThriftyLanding-7](../builds/dThriftyLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | unattended kit gate costs 222 s standalone on node d and reads every… |
 | [TOOL-dTieredTribunal-4](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the args-must-be-an-object guard is not ported into the two drift-audit… |
 | [TOOL-dTieredTribunal-6](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | The RECLASSIFICATION that created this row was ratified 2026-08-26… |

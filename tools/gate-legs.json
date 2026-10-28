@@ -1101,7 +1101,7 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 300
+    "ceiling": 710
   },
   {
     "name": "brief-recorded",
@@ -1697,7 +1697,7 @@
     "reads": {"history": "it dates a token by `git log -1 --pickaxe-regex` (TOOL-aSparedSpawn-13 S3)."},
     "chunk": "declarations",
     "subject": "repo",
-    "ceiling": 390
+    "ceiling": 830
   },
   {
     "name": "kit placeholders (a declared token its adopter substitutes)",
