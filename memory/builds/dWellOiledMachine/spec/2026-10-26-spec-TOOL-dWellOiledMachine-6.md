@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-6 — the supervisor: `resume-tick.sh` grown into the executor's seam, one act session per role act, relaunch by policy, and a reconcile before the first beat
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 28 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 28 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0284@8ad94483 whole
 **Carries:** node:point.command-adapters
@@ -15,7 +15,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-6-deviation-61.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-6-deviation-61.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-6-deviation-62.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-6-deviation-62.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -39,7 +42,9 @@ restarted by the node tick leaves exactly one act session on the item (layer-run
   --epoch <n> [--adopt <act>…]`. It writes its pid, image and start stamp to
   `<git-common-dir>/gov/supervisors/<slug>.pid`, and beats every `SUPERVISOR_BEAT_SECONDS` (60).
   Each beat, in order: S7's fence read; the owner's controls, so a `HELD` run launches nothing; the
-  position engine's answer, `derive_position(repo, slug)` (TOOL-dDeclaredLoop-7 S1); a role act
+  position engine's answer, read by running the loop kit's verb `python position.py <slug> --json`
+  (TOOL-dDeclaredLoop-7 S7) as a bounded subprocess, found through the inlined `resolve_kit_dir`
+  block, since a kit imports no sibling kit (oc7:202-205); a role act
   launched through S4 or a command item run through S8; then `unattended.sh --beat <slug>`
   (`write_claim_beat`, `tools/unattended/unattended.sh:2469`), its liveness, which renews the lease
   only as TOOL-dPlacedRequest-1's `renews` rule says. Observed by AC1, AC3.
@@ -74,8 +79,12 @@ restarted by the node tick leaves exactly one act session on the item (layer-run
   S11), so that commit is never counted as its item's witness. A second launch on an instance key whose
   act session is alive is refused, journaled and not started. Observed by AC3, AC6.
 - **S5** — Relaunch. An act session that exits non-zero, ends on a limit, or exhausts `--max-turns` is
-  relaunched as `runtime.relaunch` (`policy-key.runtime.relaunch`, catalogue `:431`) says, read through
-  `resolve` (`tools/policy/policy.py:752`): `fresh`, the default, a new act with a fresh work order and
+  relaunched as `runtime.relaunch` (`policy-key.runtime.relaunch`, catalogue `:431`) says, read by
+  running `<sys.executable> <policy kit>/policy.py get runtime.relaunch` as a bounded subprocess, the
+  policy kit found through the inlined `resolve_kit_dir` block, since a kit imports no sibling kit
+  (PLAY-dOrderedCharter-7, oc7:202-205, :379-380); on `get`'s exit 2 the supervisor journals
+  `relaunch` with `refused · runtime.relaunch` and `get`'s stderr line and launches nothing on that
+  key. `fresh`, the default, a new act with a fresh work order and
   no `--resume`; `resume`, `launch_act` given the dead session's harness session id, adding `--resume
   <id>`. Relaunches of one instance key stop at `RESUME_ATTEMPTS`, read by `read_bound_key`
   (`tools/unattended/lib-unattended.sh:235`) as the tick reads it (`resume-tick.sh:151`), counted over
@@ -84,14 +93,16 @@ restarted by the node tick leaves exactly one act session on the item (layer-run
 - **S6** — The reconcile before the first beat, `run_reconcile <slug> <epoch>` in `resume-tick.sh`,
   run before S2 starts a supervisor. Every `act-launch` journal line of the slug with no `act-exit` after
   it names a candidate; each candidate whose ledger row and pid `check_pid_alive` reads `yes` and whose
-  `epoch` is the lease's current epoch is adopted, passed to S1 as `--adopt <act>`, its slot
+  `epoch` is the lease's current epoch, read as §8 F4 picks, is adopted, passed to S1 as `--adopt <act>`, its slot
   reservation rebuilt by the hook TOOL-dWellOiledMachine-9 fills, and journaled `act-adopt`; every
   other live candidate has its tree killed through `run_kill_tree` (`:182`) and is journaled
   `act-killed`. So a supervisor killed while an act runs, and restarted by the tick, finds exactly one
   act session on the item. Observed by AC6.
-- **S7** — Fencing epochs. Each beat re-reads the build lease from the remote through
-  `unattended.sh --claims`; a lease whose epoch moved past the one S1 was started with, or that names
-  another holder, makes the supervisor kill every act session it launched under the old epoch through
+- **S7** — Fencing epochs. Each beat re-reads the build lease from the remote: its fleet tag and
+  status through `unattended.sh --claims`, which prints fields 1 to 5 only (TOOL-dPlacedRequest-1,
+  pr1:206-208), and its epoch as §8 F4 picks, since `--claims` prints no epoch. A lease whose epoch
+  moved past the one S1 was started with, which every take-over writes (pr1:74-75), or whose fleet
+  tag names another node, makes the supervisor kill every act session it launched under the old epoch through
   `reap.py --kill <pid>` (`tools/process-monitor/reap.py:420-470`), journal `act-killed` with `reason=fenced`,
   clear its pid file and exit 3. Observed by AC5.
 - **S8** — Command adapters: the `[[point]]` row `name = "point.command-adapters"` in
@@ -160,7 +171,7 @@ restarted by the node tick leaves exactly one act session on the item (layer-run
 - **hands-off** `TOOL-dWellOiledMachine-25` — `supervise.py`, which that unit makes the only driver
 - **hands-off** `TOOL-dWellOiledMachine-28` — `supervise.py` and `resume-tick.sh`, the seam the unattended kit dissolves into
 - **hands-off** `TOOL-dWellOiledMachine-29` — `point.command-adapters`, where `visual.capture` registers
-- **consumes-from** external — TOOL-dDeclaredLoop-7's `derive_position`, TOOL-dPlacedRequest-1's lease record, `--claims` and `renews` rule, and dBoundRoles' work-order renderer
+- **consumes-from** external — TOOL-dDeclaredLoop-7's `position.py <slug> --json` verb, TOOL-dPlacedRequest-1's lease record, `--claims` and `renews` rule and the epoch read §8 F4 asks for, and dBoundRoles' work-order renderer
 
 - **hands-off** `TOOL-dWellOiledMachine-26` — `supervise.py`, whose launch S4 precedes with the announcement and whose beat S5 reads attendance at
 - **hands-off** `TOOL-dWellOiledMachine-45` — `supervise.py`, which gains the session executor and whose launches go through `admit`
@@ -314,14 +325,33 @@ New arm: tools/runtime/supervise.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 ·
   none · relaxes: none
 - **F3 — What does the supervisor ask each beat?** (a) The loop kit's `derive_position`
   (TOOL-dDeclaredLoop-7 S1) directly; (b) TOOL-dWellOiledMachine-2's `next.py --json`. Both answer the
-  same engine; (b) adds an edge to a verb whose job is the human-readable line. Rung 3, reuse of the
-  parent seam. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
+  same engine; (b) adds an edge to a verb whose job is the human-readable line. RESOLVED (agent,
+  2026-10-28, delegated): (a), the engine directly through its own verb `position.py <slug> --json`
+  run as a subprocess, rung 1, PLAY-dOrderedCharter-7 (oc7:202-205): a kit imports no sibling kit, so
+  the 2026-10-26 pick's in-process call of `derive_position` is ruled out, and the engine's verb is
+  still the parent seam. widens: none · relaxes: none
+- **F4 — Through which surface do the tick and the supervisor read the build lease's epoch?**
+  `--claims` prints fields 1 to 5, name, fleet tag, status, beat-age and verdict, and `epoch` is
+  field 12 of `CLAIM_ROWS` (pr1:203-208); the `--lease` verbs print `epoch <n>` (pr1:86) but each
+  writes. Options: (a) an ask to dPlacedRequest for a read-only verb over `read_claims` printing a
+  lease's `epoch`, best the same holder verb TOOL-dTotalRecall-2 §8 F6 asks dPlacedRequest for
+  (tr2:335-345), gaining the field; (b) `--lease renew` on each beat, read for its `epoch <n>` line, a
+  write every beat that the `renews` rule does not admit; (c) parsing the lease commit's `epoch:` key
+  here, a second parser of the record `read_claims` is the one parser of (pr1:71). Recommendation:
+  (a), the ask the build run would file to dPlacedRequest (TOOL-dPlacedRequest-1). Open for the owner;
+  S6 and S7 build no epoch read before the pick.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-63, TOOL-dWellOiledMachine-65, TOOL-dWellOiledMachine-78, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-28 · §2 S5, S6, S7 · §3 Edges · §8 F4 · re-grounded on the parents at `d1721ef20`
+  by the cross-check record `build/2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck.md`,
+  rows 19 and 20: `--claims` is read for fleet tag and status alone, the lease's epoch waits on F4's
+  read, and `runtime.relaunch` is read by a `policy.py get` subprocess with its refusal stated. Also
+  §2 S1 · §3 Edges · §8 F3, writer-found, not a record row: the engine is read through `position.py
+  --json` by subprocess, and F3 is re-resolved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-34 — `gov trace <key>` and `gov why <key>` over the one index, one timeline engine bounded by `trace.rows`, and the health and stall logs folded into the journal grammar
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 53 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 53 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0312@60d68fcb whole
 **Carries:** node:policy-key.trace.rows
@@ -14,7 +14,11 @@
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-34-deviation-341.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-34-deviation-341.md) | deviation | — |
 | [2026-10-27-build-TOOL-dWellOiledMachine-34-deviation-342.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-34-deviation-342.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-34-deviation-343.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-34-deviation-343.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-34-1-spec-reviewer.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-34-1-spec-reviewer.md) | journal | — |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -40,12 +44,21 @@ grammar, keyed (P35).
   is an act id (`act-<12 hex>`), a harness session id, a commit sha, a record id or an item instance
   key (I14). `read_trace_events(repo, key)` gathers, in one query: the records naming the key, the act
   records of kind `act` among them (TOOL-dWellOiledMachine-32 S7), through `record find` and
-  `record show` (TOOL-dTotalRecall-9 S3, S5); the commits whose `Gov-Act:` or `Gov-Session:` trailer
+  `record show` (TOOL-dTotalRecall-9 S3, S5), run as `gov_record.py` subprocesses. `find` prints at
+  most 40 rows of keys and no content, so each row's fields are read per key through `show`. A `find`
+  whose last line is the `<total> rows match` line keeps its 40 rows and prints `trace — record find
+  capped · <total> rows match`, so a short population is never shown as whole, until
+  TOOL-dWellOiledMachine-32 §8 F6 is picked. The commits whose `Gov-Act:` or `Gov-Session:` trailer
   names the key or its act (TOOL-dWellOiledMachine-33), through `read_commits`
   (TOOL-dDeclaredLoop-23 S3); the journal lines keyed `act=` or `session=` for it, through
   `read_journal` (TOOL-dWellOiledMachine-16 S1) over every producer file; and the act's transcript
   pointer `transcript=<harness>:<session>` (TOOL-dWellOiledMachine-32 S6), resolved on this node by
-  `resolve_session_tree` (`tools/runlog/extract.py:266`). The walk follows `made-by`, `runs-in` and
+  the inline block `session_glob_py` (§8 F4). That block is the shape check, the one glob of
+  `<projects_root>/*/<sid>.jsonl` and the inside-root refusal of `resolve_session_tree`
+  (`tools/runlog/extract.py:266-285`), with `resolve_projects_root` (`:185`). It is canonical in
+  `extract.py`, which `resolve_session_tree` calls, and carried byte-identical by `trace.py` under a
+  `session_glob_py` row of `tools/lib/resolve-python.test.sh`'s `PARITY_ROWS`, since the runtime kit
+  imports no sibling kit (TOOL-dGroundRules-1 §4; PLAY-dOrderedCharter-7 :202-205). The walk follows `made-by`, `runs-in` and
   `caused-by` (PLAY-dOrderedCharter-28 S1) one hop each way from the key and from the act it
   resolves to. Observed by AC1.
 - **S3** — Every row filled. `render_trace_row(event)` prints
@@ -56,7 +69,8 @@ grammar, keyed (P35).
   prints with a hole. Observed by AC1.
 - **S4** — One timeline engine. `derive_timeline(events, rows)` orders events by
   `(t, source, kind)`, the key `build_run_model` sorts by (`tools/runlog/model.py:1853,1872`), keeps
-  the newest `rows` under a number and every row under `all`, and prints
+  the newest `rows` under a number and every row S2 gathered under `all` (a capped `find` says so as S2
+  states), and prints
   `trace — <n> earlier row(s) beyond trace.rows <k>` when it cuts. It is the inline block
   `timeline_py`, canonical in `trace.py` and carried byte-identical by `tools/runlog/model.py` under a
   `timeline_py` row of `tools/lib/resolve-python.test.sh`'s `PARITY_ROWS`, since runlog is
@@ -175,6 +189,7 @@ they may be deleted.
 - `tools/runtime/journal.py`
 - `tools/runtime/kit.toml`
 - `tools/runlog/model.py`
+- `tools/runlog/extract.py`: the `session_glob_py` block, which `resolve_session_tree` calls
 - `tools/runlog/runlog_lib.py`
 - `tools/lib/health_log.py`
 - `tools/lib/health-log.sh`
@@ -237,8 +252,9 @@ act, an act whose record names node `b` and whose transcript lives there, and a 
   Red when: a health line carries no key, fails the grammar, or the card reads the old file.
 - **AC5** — When `build_run_model` rebuilds a run from the runlog fixture's planted history, the
   output of `render_model_json` is byte-identical to the copy recorded before the unit, and the parity
-  row `timeline_py` compares the block in `trace.py` with the one in `model.py`.
-  Red when: the re-pointed engine moves a field, or the two copies drift.
+  rows `timeline_py` and `session_glob_py` compare each block in `trace.py` with its copy in `model.py`
+  and `extract.py`.
+  Red when: the re-pointed engine moves a field, or any two copies drift.
 - **AC6** — When `grep -n "trace.rows"` runs over the runtime kit's page `runtime.md`, the section
   names both verbs, the three values, `not-local` and `pruned`.
   Red when: any of them is missing.
@@ -248,7 +264,7 @@ act, an act whose record names node `b` and whose transcript lives there, and a 
 `pre-push run-log line` · `runlog selftest` · `run-gates run-log line` · `policy fixtures` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates` · `transition-audit arms` · `straggler-guard arms` · `measure-legs selftest` · `routed-commits selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `memory hygiene`
 
 New arm: tools/runtime/trace.py · covers AC1 AC2 AC3 · the four replayed events and a planted stall, staged against a trace that walks no edge, renders an absent source as an empty cell and a liveness verb still reading the sidecar · none
-New arm: tools/lib/resolve-python.test.sh · covers AC4 AC5 · one byte changed in `model.py`'s `timeline_py` block, and a health line written without its key · none
+New arm: tools/lib/resolve-python.test.sh · covers AC4 AC5 · one byte changed in `model.py`'s `timeline_py` block, one in `extract.py`'s `session_glob_py` block, and a health line written without its key · none
 
 ## 8. Open questions
 
@@ -263,6 +279,12 @@ New arm: tools/lib/resolve-python.test.sh · covers AC4 AC5 · one byte changed 
 - **F3 — Is the fold at the writers or at the reader?** (a) The writers write grammar-v1 lines, keyed;
   (b) the reader maps the old formats. (b) adds no key, so gap-rt-27's join stays impossible. Rung 1,
   gap-rt-27. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
+- **F4 — How does `trace.py` find a transcript on this node?** (a) An inline block `session_glob_py`,
+  canonical in runlog's `extract.py` and carried by `trace.py` under a parity row, as F1 places
+  `timeline_py`; (b) a runlog verb that `trace.py` runs by subprocess; (c) `resolve_session_tree` called
+  in process. Rung 1: a kit imports no sibling kit (TOOL-dGroundRules-1 §4; PLAY-dOrderedCharter-7
+  :202-205), which rules out (c). (b) makes the core depend on an observability kit, which F1 refuses by
+  the layer rule. RESOLVED (agent, 2026-10-28, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -271,6 +293,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC4 AC5 · one byte changed 
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-65, TOOL-dWellOiledMachine-79.
 - rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-90.
+- rev-4 · 2026-10-28 · S2, S4, Files touched, AC5, the second `New arm:` line, §8 (F4 added) and §10 moved. `record find` is read within its 40-row cap, fields per key through `record show`, and a capped population is named, citing TOOL-dWellOiledMachine-32 §8 F6 (TOOL-dTotalRecall-9 S3). The transcript is found through an inline `session_glob_py` block under a parity row, not runlog's `resolve_session_tree` in process (TOOL-dGroundRules-1 §4; PLAY-dOrderedCharter-7 :202-205). Source: the parents cross-check record `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 80 and 82.
 
 ## 10. Reuse audit
 
@@ -278,7 +301,7 @@ The seams extended are runlog's timeline in `build_run_model` (`tools/runlog/mod
 sorts at `:1853,1872`), the journal grammar's `read_journal` and the writer CLI
 (TOOL-dWellOiledMachine-16 S1, S4), the health-log blocks (`tools/lib/health_log.py`,
 `tools/lib/health-log.sh`), the parity table `PARITY_ROWS` in `tools/lib/resolve-python.test.sh`,
-`resolve_session_tree` (`tools/runlog/extract.py:266`), and the index's `record find` and
+`resolve_session_tree`'s glob (`tools/runlog/extract.py:266`), carried as an inline block, and the index's `record find` and
 `record show` (TOOL-dTotalRecall-9). The probe `python tools/codebase-map/reuse_lookup.py "walk every
 record from a key to its cause and print a bounded timeline"` ranked `key`, `keys`, `records`, `walk`
 (`tools/memory-tree/corpus_ids.py`) and `extract_records` by name stem; `walk` walks the corpus for

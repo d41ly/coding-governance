@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-48 — owner items: a deadline on every question left to the owner, the silence rule past it, and the push to an absent owner
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 43 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 43 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0326@9cee3bd1 whole
 **Carries:** node:item.life.notify
@@ -17,7 +17,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-reuse-scout-b.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-44 |
 | [2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-59 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
+| [2026-10-28-build-TOOL-dWellOiledMachine-48-deviation-481.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-48-deviation-481.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -54,11 +57,16 @@ the stall-and-loop record's item 10, the owner's SL-4, SL-5, SL-6 and FK-4-1).
   runs `handoff.py owner-question --kind <kind> [--attended]` (TOOL-dBoundRoles-11 S5) and raises an
   item through S1 for every answer but `resolve`, so a question `run.on-owner-question` left open, and
   every question raised while the owner attends, is an item; under `best-effort-recorded` an away
-  `fork` is the role's to resolve and raises none. Observed by AC4.
+  `fork` is the role's to resolve and raises none. `owner-question` can also refuse: a `get` exit 2,
+  or no policy kit found, refuses naming the key and the reader's line or the kit
+  (TOOL-dBoundRoles-11:63-65). On its non-zero exit `ask` raises nothing, prints the refusal line it
+  read and exits 2. Observed by AC4.
 - **S3** — The loosening rule, `check_loosening(change, flow_change, repo)`: an `approval` loosens
-  when its `--change <key>=<value>` names a key whose catalogue row, read through
-  `read_catalogue_row` (`tools/policy/policy.py:219`), declares `direction = "raise-loosens"` and the
-  value exceeds the key's value through `resolve` (`:752`), or when it is raised with
+  when its `--change <key>=<value>` names a key whose catalogue row declares `direction =
+  "raise-loosens"`, read through §8 F4's pick, and the value exceeds the key's value, read by running
+  `<sys.executable> <policy kit>/policy.py get <key>` as a bounded subprocess, the policy kit found
+  through the inline `resolve_kit_dir` (PLAY-dOrderedCharter-7:202-205, :379-380); a refusal of either
+  read, exit 2, reads as a loosening, deny by default. Or it loosens when it is raised with
   `--flow-change`, a change to the build's own flow awaiting approval because `flow.adapt` reads
   `owner-approves`, as the presets `strict` and `guarded` set it (v2:1585). A loosening item's
   recommended option is `decline` whatever `--recommend` said, printed `recommendation — decline ·
@@ -68,7 +76,8 @@ the stall-and-loop record's item 10, the owner's SL-4, SL-5, SL-6 and FK-4-1).
   scan. For each `open` row of `--mail read project` whose subject opens `owner item`, it calls
   `check_deadline_passed <ref> <commit> <run.owner-deadline × 3600>` (TOOL-dPlacedRequest-17 S4): rc 1
   and rc 2 leave the item open, so an unsighted item is never decided; rc 0 applies §4 "The silence
-  table" under `run.on-owner-silence`, read through `resolve`. A decision posts `--mail answer`
+  table" under `run.on-owner-silence`, read by a `policy.py get` subprocess as S3 reads, whose refusal,
+  exit 2, decides nothing that tick and prints its line. A decision posts `--mail answer`
   (KICK-dKeptSession-25) with the body `decided <option> · witness deadline <utc> ·
   run.on-owner-silence <value>`. A park runs `unattended.sh --park <build>` (`verb_park`,
   `tools/unattended/unattended.sh:12872`), releases the build's lease as a hand-over through `--lease
@@ -89,8 +98,9 @@ the stall-and-loop record's item 10, the owner's SL-4, SL-5, SL-6 and FK-4-1).
   the raising verb runs, or a registered row. `push_owner_item(item, repo)` runs `secret_scan.py
   payload adapter` (TOOL-dWellOiledMachine-57 S1) over the text first; a refused scan pushes nothing
   and prints its refusal line. Observed by AC3, AC9.
-- **S8** — The push rule: `notify.owner-items` (`catalogue.toml:555`) read
-  through `resolve`. `push-when-away`, the default, pushes each owner item through the channel while
+- **S8** — The push rule: `notify.owner-items` (`catalogue.toml:555`) read by a `policy.py get`
+  subprocess as S3 reads, a refusal, exit 2, taking the catalogue default with its line printed.
+  `push-when-away`, the default, pushes each owner item through the channel while
   `check_owner_present(repo)` answers `no`; `turn-end-only` never pushes; `push-items-and-parks` also
   pushes each S4 park while away. `check_owner_present` answers `yes` when an I17 session binding
   (TOOL-dWellOiledMachine-12 S1) with `owner: yes` names a `transcript` file modified within
@@ -150,7 +160,9 @@ the stall-and-loop record's item 10, the owner's SL-4, SL-5, SL-6 and FK-4-1).
   `terminal` with `registry = "another registered channel"`), `notify.owner-items` (:555),
   `run.owner-deadline` (:561, `direction = "raise-loosens"`) and `run.on-owner-silence` (:568);
   `run.on-owner-question` (:574) is dBoundRoles'.
-- `read_catalogue_row` (`tools/policy/policy.py:219`) reads a row's `direction`, and `check_direction`
+- `read_catalogue_row` (`tools/policy/policy.py:219`) reads a row's `direction` inside the policy kit,
+  and `get`, its one seam to a sibling kit, prints only the value and, under `--explain`, the source and
+  reason (`:1330-1360`), so the row's `direction` reaches this unit through §8 F4; `check_direction`
   (:307) holds every loop bound and deadline to `raise-loosens` (TOOL-dGroundRules-11), so a raise of
   such a key is the loosening v2:1230 names.
 - `verb_park` (`unattended.sh:12872`) prints `already parked, unchanged` on a second park (:12904), so
@@ -256,7 +268,10 @@ repository's mailbox.
 - **AC4** — When `--case question-<value>` asks a `fork` under each value of `run.on-owner-question`,
   away, `best-effort-recorded` raises no item and the other three raise one; asked `--attended`, every
   value raises one, and `decide` before its deadline leaves it `open`.
-  Red when: an attended item is decided before its deadline, or `best-effort-recorded` raises one.
+  With the policy kit hidden from the roles kit's `resolve_kit_dir`, `ask` prints `owner-question`'s
+  refusal line, exits 2 and posts nothing.
+  Red when: an attended item is decided before its deadline, `best-effort-recorded` raises one, or a
+  refused `owner-question` raises an item.
 - **AC5** — When `--case guarded-approval` plants `preset = "guarded"`, whose `flow.adapt` cell is read
   from KICK-dKeptSession-1's preset store, and leaves an `owner-approves` `approval` raised with `--flow-change`
   unanswered past its deadline, the answer reads `decided decline`.
@@ -309,10 +324,27 @@ New arm: tools/runtime/owner_fixture.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC
 - **F3 — How is a park kept from repeating at every tick?** (a) An `ack` posted with the park, so the
   item reads `held` and stays unanswered; (b) a node-local reminder ledger. (b) lets a second node
   remind again. Rung 3. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
+- **F4 — Through which surface does `check_loosening` read a catalogue row's `direction`?** The one
+  matcher is `read_catalogue_row` (`tools/policy/policy.py:219-223`, "the module's one key-to-row
+  matcher"), and `get` prints the value and, under `--explain`, `policy: <key> · <source> · <reason>`
+  alone (`:1333-1336`, `:1358-1359`). Options: (a) this unit adds `--row` to `policy.py get`, printing
+  the matched catalogue row as one line of sorted JSON, run by S3 as a subprocess, as
+  TOOL-dWellOiledMachine-43 S9 edits the same file; (b) an ask to dGroundRules for that flag, a CLOSED
+  build whose `get` is TOOL-dGroundRules-2 S7's; (c) `owner_items.py` reads `catalogue.toml` as TOML
+  data through the inline `resolve_kit_dir`, matching a key's exact `name` and reading a key with no
+  exact row as a loosening, a second matcher beside the one the policy kit keeps; (d) a declared `requires_if` row on
+  `tools/runtime/kit.toml` naming `policy`, importing `read_catalogue_row`, against
+  PLAY-dOrderedCharter-7:379-380, which makes `get` "the one seam a sibling kit may reach". (a) keeps
+  one matcher behind the one seam and waits on no build. Recommendation (a), `tools/policy/policy.py`
+  joining Files touched at the pick. Open for the owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
+- rev-2 · 2026-10-28 · S2 · S3 · S4 · S8 · §4 Evidence · AC4 · §8 F4 · §10 · re-grounded on the
+  cross-check record `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 122 and 123:
+  a refused `owner-question` raises nothing and `ask` exits 2; the run keys are read by `policy.py get`
+  subprocesses, and the row's `direction` through F4.
 
 ## 10. Reuse audit
 
@@ -320,7 +352,8 @@ The seams extended are the mailbox (KICK-dKeptSession-5 S5 to S8, -22, -24, -25)
 item, its states and its duplicate check; TOOL-dBoundRoles-11 S5's `owner-question`, which decides
 which questions become items; `check_deadline_passed` (TOOL-dPlacedRequest-17 S4), the one deadline
 judgment; `verb_park` (`tools/unattended/unattended.sh:12872`) and the hand-over release
-(TOOL-dPlacedRequest-16 S1); `read_catalogue_row` (`tools/policy/policy.py:219`) for the loosening
+(TOOL-dPlacedRequest-16 S1); the policy kit's `get` and `read_catalogue_row`
+(`tools/policy/policy.py:219`), through §8 F4, for the loosening
 direction; and TOOL-dWellOiledMachine-57's `scan_payload`. The probe `python
 tools/codebase-map/reuse_lookup.py "raise an owner item with a deadline and push it to the owner when
 away"` ranked `owners_of`, `build_owner_positions` and `write_claim_push_lock` by name stem only; none

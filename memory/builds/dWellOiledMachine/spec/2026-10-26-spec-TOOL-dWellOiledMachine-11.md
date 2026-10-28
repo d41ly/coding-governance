@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-11 — workspaces by `build.worktree`: the allocator, the commit queue, integration before release, and a sweep that reaps only what it allocated
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 20 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 20 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0289@dc7da053 whole
 **Carries:** node:record-kind.workspace
@@ -14,7 +14,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-11-deviation-111.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-11-deviation-111.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-11-deviation-112.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-11-deviation-112.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -30,13 +33,21 @@ allocated (layer-runtime `[isolate]`).
 
 ## 2. Scope (IN)
 
-- **S1** — The key's reader. `allocate_workspace` reads `build.worktree` once per call through
-  `resolve("build.worktree")` (I31; `tools/policy/policy.py:752`; `tools/policy/catalogue.toml:992`,
-  values `per-unit`, `parallel-only`, `shared`, default `shared`). Observed by AC1.
+- **S1** — The key's reader. `allocate_workspace` reads `build.worktree` once per call by running
+  `<sys.executable> <policy kit>/policy.py get build.worktree` as a bounded subprocess, the policy kit
+  found through the inline `resolve_kit_dir` block, since a kit imports no sibling kit
+  (TOOL-dOrderedCharter-7, `:202-205`, `:379-380`; `tools/policy/catalogue.toml:992`, values `per-unit`,
+  `parallel-only`, `shared`, default `shared`). An exit 2, or no policy kit found, refuses the allocation
+  with `workspace — refused · build.worktree unread · <get's stderr line>`, so a value the owner set
+  wrong never becomes `shared` unseen. Observed by AC1.
 - **S2** — The gov-owned scratch root, `<worktree root>/gov/`, the worktree root being this node's
-  `worktree_root` override (`resolve_node_overrides`, `tools/playbook/render_playbook.py:399`) else
-  `derive_worktree_root` (`:560`), `<primary>/.claude/worktrees`. Nothing but this unit writes under
-  `gov/`, so a hand-made worktree beside it is never this unit's. Observed by AC6.
+  `worktree_root` override else `<primary>/.claude/worktrees`, as the playbook kit's node table derives
+  it (`tools/playbook/render_playbook.py:399`, `:463`, `:560`). The runtime kit reads it by subprocess
+  from the playbook kit's verb, found through `resolve_kit_dir`, and calls none of its functions; at this
+  base `render_playbook.py --target <primary> --answers worktree_root` prints `null`, the key being no
+  placeholder and the override unread there, so the verb is §8 F4's ask. An unreadable root refuses the
+  allocation, naming it. Nothing but this unit writes under `gov/`, so a hand-made worktree beside it is
+  never this unit's. Observed by AC6.
 - **S3** — The allocator, `allocate_workspace(repo, build, unit, lease, parallel)` in the new
   `tools/runtime/workspace.py`, returning the workspace's path. Under `shared`, the build's one worktree
   `<root>/gov/<build>/_build` on the build branch, made on first call. Under `per-unit`, a worktree
@@ -85,8 +96,13 @@ allocated (layer-runtime `[isolate]`).
   kit reads the records as files and imports nothing from the runtime kit. Observed by AC7.
 - **S10** — The fixture, `python tools/runtime/workspace.py --fixture --plant <case>`: a bare remote
   and two clones under `%TEMP%` with short names, a planted policy file, a stub lease reader and a stub
-  `derive_act_identity`, printing the case's observation, exit 0 when it holds; the leg
-  `runtime workspace fixtures` in `tools/gate-legs.json` runs every case. Observed by AC1 to AC6.
+  `derive_act_identity`, printing the case's observation, exit 0 when it holds. The leg
+  `runtime workspace fixtures` runs every case: one `[[gate_leg]]` row of `tools/runtime/kit.toml`
+  holding every manifest key, `enforces` §8 F5's tag, made by `python tools/run-gates/leg_factory.py
+  new`, whose `--write` renders it into `tools/gate-legs.json` (TOOL-dWitnessedBar-11 S1 to S3;
+  TOOL-dOrderedCharter-7 S3 reds a leg with no `enforces`). `leg_factory.py` is not in the tree at this
+  base, so until that unit lands the pass hand-edits the manifest row to equal the declaration and
+  records that it did. Observed by AC1 to AC6 and AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -161,7 +177,7 @@ which is what removes the index-lock collisions of gap-conc-03.
 | `workspace` | record kind row | `tools/memory-tree/record-kinds.toml` |
 | `keep (a leased workspace)` | branch-reconcile action | `branch_reconcile.py` |
 | `workspace —`, `release — refused`, `sweep —` | output lines | S4, S7, S8 |
-| `runtime workspace fixtures` | gate leg | `tools/gate-legs.json` |
+| `runtime workspace fixtures` | gate leg | `[[gate_leg]]` row of `tools/runtime/kit.toml` |
 
 ### Files touched (estimate)
 
@@ -171,7 +187,8 @@ which is what removes the index-lock collisions of gap-conc-03.
 - `tools/branch-reconcile/branch_reconcile.py`
 - `tools/branch-reconcile/selftest.py`
 - `tools/memory-tree/record-kinds.toml`
-- `tools/gate-legs.json`
+
+`tools/gate-legs.json` is the factory's render of the leg's declaration (S10).
 
 ### Alternatives rejected
 
@@ -241,6 +258,10 @@ lease reader.
   `gov/workspaces/` names, its action reads `keep (a leased workspace)`, and without the record it reads
   `remove worktree`.
   Red when: branch-reconcile reaps a leased workspace.
+- **AC8** — When `grep -n -A16 "runtime workspace fixtures"` runs over the runtime kit's `kit.toml`, it
+  prints a `[[gate_leg]]` row whose `enforces` holds §8 F5's tag; and `python leg_factory.py --check`
+  exits 0 with that row declared.
+  Red when: the leg is in the manifest with no declaration, or its declaration carries no `enforces`.
 
 ## 7. Gates
 
@@ -263,17 +284,38 @@ New arm: tools/branch-reconcile/selftest.py · covers AC7 · a merged worktree n
   runner's turnstile, a counting semaphore that TOOL-dWellOiledMachine-9 extracts. The queue needs one
   holder at a time in arrival order, which a waiting exclusive lock and a ticket file give; (b) would
   extract another unit's mechanism early. Rung 3, the charter's reuse rule. RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
+- **F4 — How does the runtime kit read this node's worktree root?** A kit imports no sibling kit
+  (TOOL-dOrderedCharter-7, `:202-205`), so `resolve_node_overrides` and `derive_worktree_root` cannot be
+  called by name, and the playbook kit's `--answers` verb (`render_playbook.py:1777`, `resolve_answers`
+  `:978`) answers `worktree_root` with `null` at this base. Options: (a) an ask to the playbook kit's
+  owner for `--answers worktree_root` to answer this node's `[nodes.<tag>]` override, else the probe,
+  as the node table does (`:463`), and S2 runs it; (b) a declared `requires_if` row on
+  `tools/runtime/kit.toml` admitting an in-process load of the two functions, as memory-tree's
+  drift-audit row admits one, with the reason that the root is the playbook's one fact; (c) the runtime
+  kit carries the derivation inline, reading `.governance/deploy.toml` itself. (c) types the
+  playbook's fact a second time; (b) couples the core to a render engine. Recommendation: (a), the ask
+  the build run would file. Open for the owner.
+- **F5 — Which principle does `runtime workspace fixtures` enforce?** No v2 `[enforcement]` row names
+  `cl-dClosedLoop-0289`, so the tag cannot be read off the clause. Options: (a) `principle.p5`,
+  concurrency by lease inside the flow, which the lease-bound sweep and integration before release are;
+  (b) `principle.p24`, since each allocation, commit and release is an item's act. (b) names what calls
+  the unit, while (a) is what the leg checks. Recommendation: (a). Open for the owner, who owns the
+  `[enforcement]` table.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-28 · §2 S1, S2, S10, §4 Inventory and Files touched, §6 AC8, §8 F4 and F5, §10 ·
+  `build.worktree` read by a `policy.py get` subprocess, the worktree root by the playbook kit's verb
+  (F4, open), and the leg declared once with `enforces` (F5, open), per the parents' cross-check
+  `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 37, 38 and 40.
 
 ## 10. Reuse audit
 
-The seams extended are the worktree root probe and its node override (`render_playbook.py:560`,
-`:399`), the ancestry test (`git merge-base --is-ancestor`, as `unattended.sh:2608` uses it), unit 12's
+The seams extended are the playbook kit's `--answers` verb for the worktree root
+(`render_playbook.py:1777`, extended by §8 F4's ask), the policy kit's `get` verb, the ancestry test (`git merge-base --is-ancestor`, as `unattended.sh:2608` uses it), unit 12's
 `hold_lock`, unit 39's `derive_act_identity`, and branch-reconcile's action table (`derive_action`,
 `branch_reconcile.py:903`) for the exclusion. No existing seam fits the allocator or the queue:
 `python tools/codebase-map/reuse_lookup.py "allocate a worktree per unit lease, merge it before release

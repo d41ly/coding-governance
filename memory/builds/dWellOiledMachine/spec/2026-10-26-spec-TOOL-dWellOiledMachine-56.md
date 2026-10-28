@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-56 — the act's harness and credential resolved per role through Roles' resolver, a harness row for how it reads the credential, and the launch pinned out of bare mode
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 30 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 30 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0334@4fe16106 whole
 **Carries:** node:policy-key.runtime.act-harness
@@ -16,7 +16,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-56-deviation-561.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-56-deviation-561.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-56-deviation-562.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-56-deviation-562.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -35,13 +38,17 @@ adapter how it reads a credential, and pins the act launch out of bare mode.
 
 - **S1** — The harness per role, `resolve_role_harness(slot, root)` in `tools/roles/roles_lib.py`:
   `read_policy_setting(f"roles.harness.{slot}", root)` (TOOL-dBoundRoles-21 S1), else
-  `read_policy_setting("runtime.act-harness", root)`, else the catalogue default `claude-code`
-  (`tools/policy/catalogue.toml:1602-1605`), as a list in the order written. A name with no adapter
+  `read_policy_setting("runtime.act-harness", root, with_default=True)`, the form a read with a
+  catalogue default takes (TOOL-dBoundRoles-21 S1, -43 S21), so the default `claude-code`
+  (`tools/policy/catalogue.toml:1602-1605`) comes from the catalogue and is never typed here; a `None`
+  from it means no policy kit and refuses with `RolesError` naming the key. A list in the order
+  written. A name with no adapter
   table under `tools/runtime/harnesses/` (TOOL-dWellOiledMachine-14 S1) refuses with `RolesError`
   naming the key and the name. Observed by AC1.
 - **S2** — The credential classes per role, `resolve_role_auth(slot, root)` in `roles_lib.py`:
-  `roles.auth.<slot>`, else `runtime.act-auth`, else its default `setup-token, oauth-shared`
-  (`catalogue.toml:1607-1611`). The `roles.auth.<role>` row (`:326-331`) gains `last = ["api-key"]`,
+  `roles.auth.<slot>`, read without `with_default` so S3's `own` keeps its source, else
+  `runtime.act-auth` read `with_default=True`, its catalogue default `setup-token, oauth-shared`
+  (`catalogue.toml:1607-1611`) coming from the catalogue, a `None` refusing as S1's does. The `roles.auth.<role>` row (`:326-331`) gains `last = ["api-key"]`,
   so the policy schema refuses api-key before another entry there as TOOL-dWellOiledMachine-37 S6
   refuses it on `runtime.act-auth`. Observed by AC2.
 - **S3** — The credential keyed to its role, `derive_credential_target(slot, cls, own)` in
@@ -50,10 +57,15 @@ adapter how it reads a credential, and pins the act launch out of bare mode.
   the shared `act_<cls>` otherwise, each with `-` folded to `_`; `oauth-shared` has no reference, the
   harness's own login being one per node. `check_credential_role(slot, ref)` refuses a reference keyed
   to another role's slot, `launch — refused · credential-role · <ref> is not <slot>'s`. Observed by AC3.
-- **S4** — The launch per role: `launch_act` (TOOL-dWellOiledMachine-1 S2) reads the act's role from
-  `work_order["role"]`, takes the first harness S1 returns, and hands TOOL-dWellOiledMachine-37's
-  `run_with_credentials` the classes S2 returns with the references S3 derives, each checked by
-  `check_credential_role` before any store is read. Observed by AC1, AC3.
+- **S4** — The launch per role, through a CLI, since a kit imports no sibling kit
+  (PLAY-dOrderedCharter-7 §4). `python roles_lib.py act <slot>` prints one `harness <name>` line per
+  S1 harness in order, then one `credential <class> · <reference or ->` line per S2 class with S3's
+  reference; `python roles_lib.py credential-check <slot> <ref>` runs `check_credential_role`; each
+  exits 2 printing the refusal or the `RolesError`. `launch_act` (TOOL-dWellOiledMachine-1 S2) reads
+  the act's role from `work_order["role"]`, runs `act <role>` as a bounded subprocess found through
+  the inline `resolve_kit_dir`, takes the first harness, runs `credential-check` on each reference
+  before any store is read, and hands TOOL-dWellOiledMachine-37's `run_with_credentials` the classes
+  and references printed; an exit 2 of either refuses the launch, naming the line. Observed by AC1, AC3.
 - **S5** — How each adapter reads a credential, the `credential-read` row of the capability table
   (I7, a name `CAPABILITY_NAMES` already holds): `claude-code.toml` records
   `setup-token=env:CLAUDE_CODE_OAUTH_TOKEN; oauth-shared=harness-store; api-key=env:ANTHROPIC_API_KEY`,
@@ -79,7 +91,7 @@ adapter how it reads a credential, and pins the act launch out of bare mode.
 ## 3. Non-goals (OUT)
 
 - Picking which node runs a role's work by the harnesses it has: TOOL-dWellOiledMachine-54, which reads
-  `resolve_role_harness`.
+  S4's `act` verb.
 - The credential order, the store reader and the transient class: TOOL-dWellOiledMachine-37 and -17.
 - A per-role OAuth login: `oauth-shared` is the node's one harness login; a role's own subscription
   comes by its own setup token.
@@ -91,7 +103,7 @@ adapter how it reads a credential, and pins the act launch out of bare mode.
 - **consumes-from** `TOOL-dWellOiledMachine-1` — `launch_act`, which takes the per-role harness and credential and gains the bare pin
 - **consumes-from** `TOOL-dWellOiledMachine-37` — `run_with_credentials`, which S4 calls with a role's classes and references, and the `last` field S2 puts on `roles.auth.<role>`
 - **consumes-from** `TOOL-dWellOiledMachine-14` — `[[capability]]`, the table holding S5's `credential-read` row and S6's `bare-default` row, read through `read_capability`
-- **hands-off** `TOOL-dWellOiledMachine-54` — `resolve_role_harness`, the harnesses a role's work needs, which the pick and the preset check read
+- **hands-off** `TOOL-dWellOiledMachine-54` — `roles_lib.py act`, the harnesses a role's work needs, which the pick reads
 - **consumes-from** external — TOOL-dBoundRoles-21's `read_policy_setting` and `RolesError`, the one policy read of the roles kit
 - **hands-off** `TOOL-dWellOiledMachine-79` — its catalogue edit (finding 56), which the spec audit's minors batch repairs
 
@@ -127,12 +139,13 @@ adapter how it reads a credential, and pins the act launch out of bare mode.
 | `derive_credential_target` | Python function | `derive`, OK |
 | `check_credential_role` | Python function | `check`, OK |
 | `derive_bare_pin` | Python function | `derive`, OK |
+| `act`, `credential-check` | `roles_lib.py` verbs | none |
 | `bare-default` | capability name | none |
 | `act_<class>`, `act_<class>_<slot>` | secret reference names | none |
 
 ### Files touched (estimate)
 
-- `tools/roles/roles_lib.py`: S1 to S3 and the fixture
+- `tools/roles/roles_lib.py`: S1 to S3, S4's two verbs and the fixture
 - `tools/runtime/launch.py`: the per-role call and `derive_bare_pin`
 - `tools/runtime/harness.py`: `bare-default` in `CAPABILITY_NAMES`
 - `tools/runtime/harnesses/claude-code.toml`, `tools/runtime/harnesses/codex.toml`: the two rows
@@ -151,7 +164,8 @@ adapter how it reads a credential, and pins the act launch out of bare mode.
 
 - security — a role's stored credential is keyed to its slot and refused for any other; api-key stays
   last by schema; bare mode, which reads no subscription login, cannot be launched.
-- perf / scale — two policy reads per launch, through the run's one resolution.
+- perf / scale — one `act` and one `credential-check` per reference per launch, each a short
+  Python run holding its policy reads.
 - error / empty / loading states — an unknown harness, an unmeasured bare row and an unmeasured
   credential read each answer by name.
 - observability — each refusal names the role, the key or the reference; each skipped class prints one
@@ -213,6 +227,10 @@ New arm: tools/runtime/launch.py · covers AC4 AC5 · an unmeasured credential r
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-28 · §2 S1, S2, S4, §3 Non-goals and Edges, §4 Inventory and Files touched, §5 · the two
+  `runtime.*` defaults read through `with_default` and no longer typed, and `launch_act` reaching S1
+  to S3 through the `roles_lib.py` verbs `act` and `credential-check` by subprocess, per the parents'
+  cross-check `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 148 and 149.
 
 ## 10. Reuse audit
 

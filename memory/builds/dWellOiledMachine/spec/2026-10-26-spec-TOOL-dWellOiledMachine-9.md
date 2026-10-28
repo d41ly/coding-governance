@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-9 — agent slots reserved under `runtime.agents-in-flight`: the slot ledger and the supervisor's reservations
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 35 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 35 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0287@1aa49fdd whole
 
@@ -12,7 +12,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-59 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-9-deviation-91.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-9-deviation-91.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-9-deviation-92.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-9-deviation-92.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 |
 
 <!-- /gen:spec-records -->
@@ -23,7 +26,7 @@ Fan-out is bounded per prompt, not in flight, and headless launches are outside 
 (gap-rt-05): the only bound at this base is the harness's own concurrency settings, rendered from
 `runtime.agents-in-flight` (`tools/policy/policy.py:912`), which see one session at a time. This unit
 builds the slot ledger, I22, a counting semaphore of nonce-named slots in the run-gates turnstile's
-grammar, and makes the supervisor reserve each act's declared fan against it before a launch, hold the
+grammar, and makes the supervisor reserve each act's declared in-flight bound against it before a launch, hold the
 launch when slots are short, beat its reservations while the act runs, release them when the act
 session exits or its tree is killed, and rebuild them when a restarted supervisor adopts an act
 (layer-runtime `[supervise]`, "Agents in flight").
@@ -38,8 +41,11 @@ session exits or its tree is killed, and rebuild them when a restarted superviso
   `agent` (`-` while reserved), `pid`, `heartbeat` (epoch seconds) and `ttl` (seconds). A slot
   directory with no `nonce` is an unfinished claim and is counted. Observed by AC1.
 - **S2** — The limit, `runtime.agents-in-flight` (`tools/policy/catalogue.toml:478`, an agent count, 6
-  by default, owned by dGroundRules), read once per call through `resolve` (`tools/policy/policy.py:752`,
-  I31); a refused read takes the catalogue default and prints why. Observed by AC1.
+  by default, owned by dGroundRules), read once per call by running `<sys.executable> <policy
+  kit>/policy.py get runtime.agents-in-flight` as a bounded subprocess, the policy kit found through the
+  inlined `resolve_kit_dir` block, since a kit imports no sibling kit (PLAY-dOrderedCharter-7,
+  oc7:202-205, :379-380); on `get`'s exit 2, or with no policy kit found, the read takes the catalogue
+  default and prints `get`'s stderr line. Observed by AC1.
 - **S3** — `add_reservation(ledger, owner, run, size, pid, ttl)` counts the slot directories present and,
   when that count plus `size` exceeds the limit, raises `SlotsShort(in_flight, reserved, limit)` and
   writes nothing. Otherwise it claims `size` free slots among `slot.1` to `slot.<limit>` under one new
@@ -52,9 +58,13 @@ session exits or its tree is killed, and rebuild them when a restarted superviso
   each slot's `heartbeat`. `remove_stale_slots(ledger)` clears, under the same guard, every slot whose `heartbeat`
   is older than its own `ttl`. Observed by AC3, AC4.
 - **S5** — The supervisor reserves (TOOL-dWellOiledMachine-6 S1, S4). Before each `launch_act`,
-  `supervise.py` runs `remove_stale_slots`, then `add_reservation` with owner and run `act:<act>`, the work order's `fan` as its size and
-  three `SUPERVISOR_BEAT_SECONDS` as its `ttl`, the work order's `fan` being its stage's declared `fan`
-  (TOOL-dBoundRoles-22 S1, TOOL-dWellOiledMachine-1 S2). On `SlotsShort` it launches nothing that beat
+  `supervise.py` runs `remove_stale_slots`, then `add_reservation` with owner and run `act:<act>`, its
+  stage's declared `cap` as its size and three `SUPERVISOR_BEAT_SECONDS` as its `ttl`. `cap` is the
+  most of a stage's agents in flight at once, `fan` the most it spawns in one call (TOOL-dBoundRoles-22,
+  br22:108-109), and the ledger counts agents in flight. The stage rows are read as
+  TOOL-dWellOiledMachine-43 §8 F3 picks, since dBoundRoles' work order carries neither (br3:48-61) and
+  the rows are read only through the roles kit's `load_workflows` (br22:38-44); an act whose item is
+  no stage's reserves 1, the headless form. On `SlotsShort` it launches nothing that beat
   and prints `slots — <slug> · short · <i> in flight · <r> reserved · need <n> · limit <k>`, and the
   act waits for a later beat. Once the session starts it writes the session's pid into each slot. Each
   beat calls `write_heartbeat` on every reservation it holds. Observed by AC5.
@@ -89,7 +99,7 @@ session exits or its tree is killed, and rebuild them when a restarted superviso
 - **hands-off** `TOOL-dWellOiledMachine-43` — `slots.py`, the ledger the in-flight pack claims agents' slots in and converts reservations of
 - **hands-off** `TOOL-dWellOiledMachine-47` — `slots.py`, the act's reservation a nested spawn is charged against
 - **hands-off** `TOOL-dWellOiledMachine-45` — `slots.py`, the ledger the admission queue admits a call against
-- **consumes-from** external — TOOL-dBoundRoles-22's stage `fan`, carried by the work order dBoundRoles renders
+- **consumes-from** external — TOOL-dBoundRoles-22's stage `cap`, read as TOOL-dWellOiledMachine-43 §8 F3 picks; dBoundRoles' work order carries no `fan` or `cap`
 - **hands-off** `TOOL-dWellOiledMachine-70` — `remove_reservation` and `remove_stale_slots`, whose reap that unit replaces with a rename into a graveyard (finding 38)
 
 ## 4. Design
@@ -172,11 +182,13 @@ short name whose policy file sets `runtime.agents-in-flight` as the case says.
   `slots.py reap` removes the first only.
   Red when: a fresh slot is reaped or a stale one kept.
 - **AC5** — When `python supervise.py --fixture --plant slots-short` runs at a limit of 2 over an act
-  of fan 3, the beat prints `slots — fx · short` and the stub records no launch; at fan 2 it launches
+  whose stage declares `cap` 3 and `fan` 5, the beat prints `slots — fx · short · … · need 3` and the
+  stub records no launch; at `cap` 2 it launches
   with 2 slots owned by the act, and after the act's exit `slots.py status` prints `0 in flight`.
-  Red when: an act launches over the limit, or its slots outlive its exit.
+  Red when: an act launches over the limit, reserves its `fan` rather than its `cap`, or its slots
+  outlive its exit.
 - **AC6** — When `python supervise.py --fixture --plant slots-adopt` kills the supervisor while an act
-  of fan 2 runs and the tick restarts it, the ledger again holds exactly 2 slots owned by the act, with
+  of `cap` 2 runs and the tick restarts it, the ledger again holds exactly 2 slots owned by the act, with
   their slots removed before the restart and present after it.
   Red when: the adopted act holds zero or four slots.
 - **AC7** — When `grep -n "runtime.agents-in-flight\|slots —" runtime.md` runs over the help page, both
@@ -206,22 +218,33 @@ New arm: tools/runtime/supervise.py · covers AC5 AC6 · the two plants staged a
   RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
 - **F2 — What is an act's reservation size?** (a) The work order's `fan`, its stage's declared `fan`;
   (b) the harness's agent cap, `cap`. (b) reserves for the worst case on every act and starves the
-  ledger; layer-runtime `[supervise]` names "the act's declared fan". Rung 1. RESOLVED (agent,
-  2026-10-26, delegated): (a). widens: none · relaxes: none
+  ledger; layer-runtime `[supervise]` names "the act's declared fan". RESOLVED (agent, 2026-10-28,
+  delegated): (b), as the stage row's declared `cap`, rung 1, TOOL-dBoundRoles-22 and -3: br22 splits
+  the harness literal into `fan`, the most a stage spawns in one call, and `cap`, the most in flight at
+  once (br22:108-109), so the act's declared bound on agents in flight, which this ledger counts, is
+  `cap`, and the worst case (b) feared is `fan`; br3's work order carries no `fan` (br3:48-61). The
+  2026-10-26 pick read `fan` off the work order. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-70.
+- rev-3 · 2026-10-28 · §1 · §2 S2, S5 · §3 Edges · §6 AC5, AC6 · §8 F2 · §10 · re-grounded on the
+  parents at `d1721ef20` by the cross-check record
+  `build/2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck.md`, rows 31 and 33: the size is
+  the stage row's `cap`, read as TOOL-dWellOiledMachine-43 §8 F3 picks and not off the work order, F2
+  re-resolved; the limit is read by a `policy.py get` subprocess. Fork dedupe: §2 S5 · §3 Edges: the
+  stage-row cite moves to TOOL-dWellOiledMachine-43 §8 F3, the fork that owns it.
 
 ## 10. Reuse audit
 
 The seam is the run-gates turnstile's grammar (`tools/run-gates/run-gates.sh:1474-1515`, `:1626`,
 `:1654`, `:1734`), adopted slot for slot, and the supervisor's launch, beat and reconcile
-(TOOL-dWellOiledMachine-6 S1, S4, S6), which call it. The limit is read through the one reader,
-`resolve` (`tools/policy/policy.py:752`); TOOL-dBoundRoles-22 S5's `read_agent_limit` reads the same
-key inside the roles kit, which the runtime kit does not require. The probe
+(TOOL-dWellOiledMachine-6 S1, S4, S6), which call it. The limit is read through the policy kit's
+`get` verb (`cmd_get`, `tools/policy/policy.py:1332`) as a subprocess, the one seam a sibling kit may
+reach (oc7:379-380); TOOL-dBoundRoles-22 S5's `read_agent_limit` reads the same key inside the roles
+kit through `read_policy_setting` (br22:53-58), which the runtime kit does not import. The probe
 `python tools/codebase-map/reuse_lookup.py "reserve agent slots against a counting semaphore with
 nonce beacons"` ranked `counts`, `measure_typed_counts`, `renderAgentLabel` and `beacon`
 (`tools/run-gates/run-gates.turnstile.test.sh`), the last the turnstile's own suite helper; scout A's

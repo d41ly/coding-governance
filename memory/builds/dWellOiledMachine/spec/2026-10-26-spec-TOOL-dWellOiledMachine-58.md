@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-58 — the record door: every coordination write bound to its writer's session binding, and the two closing items it admits
 
-**Status:** DEFERRED · rev-3 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 26 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 26 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0505@d65ddfae whole
 **Carries:** node:item.life.unlease
@@ -16,7 +16,10 @@
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-58-deviation-581.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-58-deviation-581.md) | deviation | — |
 | [2026-10-27-build-TOOL-dWellOiledMachine-58-deviation-582.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-58-deviation-582.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-58-deviation-583.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-58-deviation-583.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -70,14 +73,15 @@ git boundary is the floor (the owner's FK-5-3, the whole-design audit's A2-F10).
 - **S4** — The tombstone rule: a lease record whose `status` is `landed` or `withdrawn` is admitted
   only when (a) the tip read names the writer, its holder; (b) `GOV_DOOR_VERB` is `lease.take-over`;
   or (c) `GOV_DOOR_VERB` is one of `DOOR_CLOSING_VERBS` and the writer holds the build lease
-  `refs/gov/leases/<slug>/build` (live, naming the writer), and, for a unit lease whose tip names
+  `refs/gov/leases/<slug>/build` live, its holder read through the verb TOOL-dTotalRecall-2 §8 F6 asks
+  dPlacedRequest for, since `--claims` prints no session (§8 F5), and, for a unit lease whose tip names
   another holder, the build's newest `quiesce` record (S8) names that ref `ack` or `ceiling`. Any
   other tombstone is refused `forged-tombstone`. Observed by AC2, AC6.
 - **S5** — The prune rule, for a write with an empty `<src>`: pruning a ref under the build's own
   `refs/gov/mail/<slug>/` is admitted only when `GOV_DOOR_VERB` is one of `DOOR_CLOSING_VERBS`, every
   message id on that ref has a `mailbox-message` record under `memory/builds/<slug>/`
   (KICK-dKeptSession-5 S12), so the copy came first, and the writer holds that build's lease as its
-  holder, which a session that took the lease over through the take-over verb is, or acts as the
+  holder, read as S4 (c) reads it, which a session that took the lease over through the take-over verb is, or acts as the
   owner's guarded command: an I17 binding whose `owner` is `yes` with the door's stderr a terminal, the
   owner proof `.githooks/pre-commit:207` reads. Pruning any other `refs/gov/mail/` ref, a build or unit
   lease, or a request is refused; TOOL-dPlacedRequest-16 S7's `lease.prune` of a terminal
@@ -88,7 +92,9 @@ git boundary is the floor (the owner's FK-5-3, the whole-design audit's A2-F10).
   Maintain's prune the same way once it lands it. A name not in the tuple is no closing verb, so
   `deploy.unlease` set today is refused. Observed by AC4.
 - **S7** — `life.quiesce`, the verb `unattended.sh --quiesce <slug> [--request <id>]`, refused unless
-  the writer holds the build lease or acts as the owner's guarded command. Where the build has a
+  the writer holds the build lease, its class `mine` under `read_claims`' `lease` mode
+  (TOOL-dPlacedRequest-1 S6) inside the lease reader's own kit, or acts as the owner's guarded
+  command. Where the build has a
   run-state file it holds the run through `run_hold` (`tools/unattended/unattended.sh:6848`) under
   `host-owner-action`, so nothing new is dispatched. For each unit lease of the build whose holder is
   another session or node, it posts once a `question` with subject `quiesce <ref>` to `unit:<id>`
@@ -98,13 +104,22 @@ git boundary is the floor (the owner's FK-5-3, the whole-design audit's A2-F10).
   `waiting` otherwise. It is re-runnable: it prints `quiesce — waiting · <n> unit lease(s)` and exits
   3 while any waits, and once none does it writes the S8 record and prints `quiesce — done · <slug>`,
   exit 0. Observed by AC6.
-- **S8** — The record kind `record-kind.quiesce`, a `[[record-kind]]` row in
-  `tools/memory-tree/record-kinds.toml` (TOOL-dTotalRecall-1's registry) written by
-  `gov_record.py new quiesce`, fields `Build`, `Request`, `Unit-leases` (one `<ref> ack <message id>`
-  or `<ref> ceiling <utc>` per held unit lease, or `none`) and `Ceiling-hours`. Observed by AC6.
+- **S8** — The record kind `quiesce`, typed. Its `[[record-kind]]` row in
+  `tools/memory-tree/record-kinds.toml` (TOOL-dTotalRecall-1's registry), written through
+  `record_kinds.py new` (its S9), carries `tag = "record.quiesce"`, `layer = "layer.runtime"`, `home =
+  "memory/builds/*/build/*-quiesce-*.md"`, `id-rule = "<date>-build-<unit id>-quiesce-<n>.md"`,
+  `lifecycle = "append-only"`, `readers = []` with `readers-none = "read by the door's S4 rule, never
+  handed to a work order"`, a `purpose`, `writer = "gov_record.py new quiesce"` and schema `fields`
+  `Build`, `Request`, `Unit-leases` (one `<ref> ack <message id>` or `<ref> ceiling <utc>` per held
+  unit lease, or `none`) and `Ceiling-hours` (TOOL-dTotalRecall-1 §4, -18 S1). In the same pass
+  `quiesce` joins `TYPED_RECORD_KINDS` (`tools/memory-tree/tree_lib.py`), the factory's per-kind table
+  (`tools/memory-tree/build_records.py`) and HYGIENE's closed `<kind>` list, so its Serves line binds
+  (PLAY-dOrderedCharter-42 S1, S2, S5), as TOOL-dTotalRecall-25 S6 joins `stream-plan`. `<unit id>` is
+  the build's anchor, TOOL-dDeclaredLoop-3 §8 F2's rule, and `--caused-by` the same id, the kind being
+  no root (TOOL-dTotalRecall-19 S3). Observed by AC6.
 - **S9** — `life.unlease`, the verb `unattended.sh --unlease <slug>`, every write under
-  `GOV_DOOR_VERB=life.unlease`, in this order: refused unless the writer holds the build lease or acts
-  as the owner's guarded command; a build whose build lease is a `landed` tombstone prints
+  `GOV_DOOR_VERB=life.unlease`, in this order: refused unless the writer holds the build lease, read
+  as S7 reads it, or acts as the owner's guarded command; a build whose build lease is a `landed` tombstone prints
   `unlease — <slug> · landed: its close ends at the lander until deploy.unlease lands` and exits 0;
   each unit lease written `withdrawn` through `--lease release unit <slug> <id> --as withdrawn`
   (TOOL-dPlacedRequest-16 S2); the mailbox closed, each message on every ref under
@@ -147,7 +162,7 @@ git boundary is the floor (the owner's FK-5-3, the whole-design audit's A2-F10).
 - **hands-off** `TOOL-dWellOiledMachine-57` — `check_writer_binding`, the door that unit adds its token-shape refusal and its request-record proof to
 - **hands-off** `TOOL-dWellOiledMachine-3` — `check_writer_binding` and the `--quiesce` and `--unlease` verbs, which that unit's withdraw and supersede call and whose tombstones and mailbox close the door admits
 - **hands-off** `TOOL-dWellOiledMachine-41` — `check_writer_binding`, through which that unit's offers and holder writes on a unit lease pass
-- **consumes-from** external — TOOL-dTotalRecall-2's `gov_record.py` and TOOL-dTotalRecall-1's `record-kinds.toml`, the door and registry this unit grows
+- **consumes-from** external — TOOL-dTotalRecall-2's `gov_record.py` and §8 F6's holder verb, TOOL-dTotalRecall-1's `record-kinds.toml` and PLAY-dOrderedCharter-42's typed join, the door, registry and kind list this unit grows
 - **consumes-from** external — TOOL-dPlacedRequest-11's `write_gov_ref`, -12's `derive_ref_segment`, -1's lease record and `--lease` verb, -16's tombstone and `--as withdrawn`, -17's `check_deadline_passed`
 - **consumes-from** external — KICK-dKeptSession-5's `read_mailbox`, `--mail post`, `--mail ack` and `mailbox-message` kind, and KICK-dKeptSession-28's `unit:` recipient
 - **hands-off** external — dShippedRelease's `deploy.unlease` and dTendedCadence's Maintain's prune, each joining `DOOR_CLOSING_VERBS`
@@ -210,6 +225,8 @@ The op is read off the commit `<src>` names, through `git cat-file commit`; the 
 
 - `tools/memory-tree/gov_record.py`: `check_writer_binding`, the `door` verb, `DOOR_CLOSING_VERBS`
 - `tools/memory-tree/record-kinds.toml`: the `quiesce` row
+- `tools/memory-tree/tree_lib.py` and `tools/memory-tree/build_records.py`: `quiesce` typed
+- `tools/memory-tree/HYGIENE.template.md`, rendered to `memory/HYGIENE.md`: the closed kind list
 - `tools/memory-tree/door_fixture.py`: the fixture
 - `tools/lib/gov-ref.sh`: the door call in `write_gov_ref`, copied byte-identical into
   `tools/unattended/unattended.sh` and `tools/run-gates/post-merge.sh`
@@ -328,6 +345,12 @@ New arm: tools/memory-tree/door_fixture.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   KICK-dKeptSession-5 S3's closed set of twelve, a parent change. Rung 3. RESOLVED (agent,
   2026-10-26, delegated): (a). widens: none · relaxes: none
 
+- **F5 — Through which surface does the door read the build lease's holder?** `--claims` prints five
+  fields and no session (TOOL-dPlacedRequest-1:206-208), and TOOL-dTotalRecall-2 §8 F6 already asks
+  dPlacedRequest for a read-only holder verb over `read_claims`, its recommendation (a), rejecting a
+  door that parses the lease commit's `session:` key itself. S4 (c) and S5 read the holder through that
+  verb; this unit files no second ask and waits on F6's pick. Open for the owner, through F6.
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
@@ -335,6 +358,10 @@ New arm: tools/memory-tree/door_fixture.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-63, TOOL-dWellOiledMachine-79.
 - rev-3 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit of the round-1
   promotions' promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-84, TOOL-dWellOiledMachine-90.
+- rev-4 · 2026-10-28 · §2 S4, S5, S7, S8, S9, §3 Edges, §4 Files touched, §8 F5 · the door's
+  holder read waits on TOOL-dTotalRecall-2 §8 F6 (open), the verbs read `mine` in the lease reader's
+  kit, and `quiesce` joined as a typed kind with its registry cells, per the parents' cross-check
+  `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 153 and 154.
 
 ## 10. Reuse audit
 

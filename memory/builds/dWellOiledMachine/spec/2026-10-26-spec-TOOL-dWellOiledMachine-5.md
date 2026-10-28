@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-5 — Plan's ratification and the placement dispositions re-pointed to the intake record, RC-9's fallback drained per harness, and fallback witnesses kept readable
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 42 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 42 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0283@b08404fd whole
 
@@ -11,7 +11,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-reuse-scout-b.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-reuse-scout-b.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-48 |
 | [2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-59 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
+| [2026-10-28-build-TOOL-dWellOiledMachine-5-deviation-51.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-5-deviation-51.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -36,21 +39,31 @@ event, and from any other only before its own drain landed.
   value is `yes` (I7, TOOL-dWellOiledMachine-14 S1, read at that commit through `git show`). None
   when no commit does, which is every adapter whose table lacks the event. Observed by AC1, AC2.
 - **S2** — The adapter a witness was written under, `derive_witness_adapter(repo, rev)`:
-  `runtime.owner-harness` resolved at the witness's commit through `resolve(key, repo, rev)`
-  (`tools/policy/policy.py:752`, I31). Observed by AC1.
+  `runtime.owner-harness` at the witness's commit, read by running `<sys.executable> <policy
+  kit>/policy.py get runtime.owner-harness --rev <rev>` as a bounded subprocess, the policy kit found
+  through the inlined `resolve_kit_dir` block, since a kit imports no sibling kit
+  (PLAY-dOrderedCharter-7, oc7:202-205, :379-380). On `get`'s exit 2 the adapter is unknown and S3
+  refuses the fallback, `fallback refused · runtime.owner-harness unreadable at <C8>`, exit 1, the
+  deny-by-default side. Observed by AC1.
 - **S3** — The ratification witness, `check_ratification_witness(repo, build, key)`, and `python
   ratify.py check --build <slug> --request <key>`, in this order: `intake · <origin>` when
   `check_intake_ratifies` (TOOL-dWellOiledMachine-27 S3) admits a receipt of the request's intake
   record (`read_intake`, TOOL-dWellOiledMachine-4 S3); else, for the owner's disposition record that
-  releases the build's gate at `item.plan.exit` (TOOL-dDeclaredLoop-19 S3, read through
-  `check_owner_disposition`, TOOL-dDeclaredLoop-16 S4), whose first-parent commit is C, adapter A
+  releases the build's gate at `item.plan.exit` (TOOL-dDeclaredLoop-19 S3, S6), found by running the loop
+  kit's verb `python loop_lib.py disposition --hold <decision row>` as a bounded subprocess, the
+  entry point the unattended driver's bash function `check_owner_disposition` itself calls
+  (TOOL-dDeclaredLoop-31 S6, dl31:60-64; TOOL-dDeclaredLoop-56 S47), whose first-parent commit is C
+  as §8 F3 picks, adapter A
   per S2 and drain D per S1: `fallback · <A> undrained` when D is None, `fallback · before drain
   <D8>` when C is not a descendant of D, and `fallback refused · <A> drained at <D8>` when it is;
   else `none`. Exit 0 for `intake` and an accepted `fallback`, 1 otherwise. Observed by AC1, AC2,
   AC3, AC4.
 - **S4** — The ratification reader re-pointed. The plan gate's release in `tools/loop/breakpoints.py`
   (TOOL-dDeclaredLoop-19 §4, "The hold", which reads the disposition record through
-  `check_owner_disposition`) reads S3 for the gate at `item.plan.exit`: an `intake` witness releases
+  `check_owner_disposition`) runs `python ratify.py check --build <slug> --request <key>` as a bounded
+  subprocess for the gate at `item.plan.exit`, the runtime kit found through the loop kit's inlined
+  `resolve_kit_dir` block and never imported (oc7:202-205); with no runtime kit found the gate keeps
+  today's release. An `intake` witness releases
   it with no disposition record, an accepted `fallback` releases it as today, and a refused
   `fallback` or `none` holds it, printing S3's line. Every other owner gate keeps its own release.
   Observed by AC1, AC3, AC4.
@@ -59,9 +72,12 @@ event, and from any other only before its own drain landed.
   text, the receipts and the placements of one content key. `read_build_disposition(repo, build,
   key)` answers the newest passed placement from it, else the `disposition`, `build`, `playbook` and
   `reason` lines of the build's claim commit (TOOL-dPlacedRequest-21), the witness a build placed
-  under the fallback, or on another node, carries. `placement.py record` (TOOL-dPlacedRequest-4 S7)
-  and S8's route read the disposition through it, the lines `record` prints unchanged, so
-  `entry.claim` carries exactly what it carries today. Observed by AC5.
+  under the fallback, or on another node, carries. The verb `python ratify.py disposition --build
+  <slug> --request <key>` prints those four lines, exit 1 with `disposition — <slug> · none` where
+  neither source holds one. `placement.py record` (TOOL-dPlacedRequest-4 S7) and S8's route read the
+  disposition by running that verb as a bounded subprocess, found through the loop kit's inlined
+  `resolve_kit_dir` block, since a kit imports no sibling kit (oc7:202-205), the lines `record` prints
+  unchanged, so `entry.claim` carries exactly what it carries today. Observed by AC5.
 - **S6** — The stand-in and the later build. While the loop definition carries `[[stand-in]] item =
   "item.plan.exit"`, `owner = "dRankedPlan"` (TOOL-dDeclaredLoop-13 S8), S4 is Plan's exit's witness
   reader. dRankedPlan, landing second, arms `item.plan.exit` by reading S3 itself and deleting that
@@ -89,7 +105,7 @@ event, and from any other only before its own drain landed.
 - **consumes-from** `TOOL-dWellOiledMachine-4` — `requests/`, the record and `read_intake`, which S3 and S5 read
 - **consumes-from** `TOOL-dWellOiledMachine-14` — `[[capability]]`, whose `prompt-submit` row decides the fallback's drain per harness
 - **consumes-from** `TOOL-dWellOiledMachine-27` — `check_intake_ratifies`, the one judge of which receipt ratifies
-- **consumes-from** external — TOOL-dDeclaredLoop-19's plan gate and its release, -16's `check_owner_disposition`, -13's `[[stand-in]]` row, TOOL-dPlacedRequest-4's `placement.py record` and `.placement` blocks, -21's claim commit
+- **consumes-from** external — TOOL-dDeclaredLoop-19's plan gate and its release, -31's `check_owner_disposition` and -56 S47's `loop_lib.py disposition --hold` verb, -13's `[[stand-in]]` row, TOOL-dPlacedRequest-4's `placement.py record` and `.placement` blocks, -21's claim commit
 - **hands-off** external — dRankedPlan, which arms `item.plan.exit` by reading `check_ratification_witness` and deleting the stand-in row
 
 ## 4. Design
@@ -100,7 +116,8 @@ event, and from any other only before its own drain landed.
 check_ratification_witness(repo, build, key)
   any receipt of read_intake(key) passes check_intake_ratifies   -> intake · <origin>      (exit 0)
   owner disposition releasing item.plan.exit, committed at C:
-    A = runtime.owner-harness at C ; D = derive_drain_commit(repo, A)
+    A = policy.py get runtime.owner-harness --rev C (exit 2 -> fallback refused, exit 1)
+    D = derive_drain_commit(repo, A)
     D is None                                                    -> fallback · A undrained (exit 0)
     not (D ancestor-of C)                                        -> fallback · before drain (exit 0)
     otherwise                                                    -> fallback refused       (exit 1)
@@ -120,7 +137,7 @@ check_ratification_witness(repo, build, key)
 | Minted | Kind | Lexicon cell |
 |---|---|---|
 | `derive_drain_commit`, `derive_witness_adapter`, `check_ratification_witness`, `read_build_disposition` | functions, `tools/runtime/ratify.py` | `derive`, `check`, `read`, OK |
-| `check`, `fixture` | `ratify.py` verbs | none |
+| `check`, `disposition`, `fixture` | `ratify.py` verbs | none |
 
 ### Files touched (estimate)
 
@@ -177,9 +194,9 @@ scratch repository under `%TEMP%` whose first-parent history the case names.
   `check` prints `none` and the plan gate holds.
   Red when: the act's proposal passes Plan's exit.
 - **AC5** — When `--case dispositions` plants one build placed through the intake record and one whose
-  disposition exists only in its claim commit, `read_build_disposition` answers each, and `python
-  placement.py record --request <key>` prints the intake-placed build's `disposition` line read
-  through it.
+  disposition exists only in its claim commit, `python ratify.py disposition` answers each, and
+  `python placement.py record --request <key>` prints the intake-placed build's `disposition` line
+  read through that verb's subprocess.
   fixture: needs TOOL-dPlacedRequest-4's `placement.py` and -21's claim commit, specced and unbuilt
   at this base.
   Red when: the claim-commit-only build reads as unplaced.
@@ -205,19 +222,35 @@ New arm: tools/runtime/selftest.py · covers AC1 AC2 AC3 AC4 · each fixture rep
   resolved at the witness's commit; (b) the harness of the session that wrote it, from its binding.
   (b) reads a node-local file another node cannot see. RESOLVED (agent, 2026-10-26, delegated): (a),
   rung 3, read through the one policy reader at that revision. widens: none · relaxes: none
+- **F3 — Where does S3 learn the disposition record's commit C?** TOOL-dDeclaredLoop-56 S47 makes
+  `loop_lib.py disposition --hold <row>` the one reader that parses a disposition record and states no
+  output shape (dl56:236-238), and the runtime kit loads no loop module (oc7:202-205). Options: (a)
+  an ask to dDeclaredLoop for the verb to print the found record's path, from which S3 reads C as
+  `git log --first-parent --diff-filter=A -1 -- <path>`; (b) `ratify.py` globs and parses the build
+  folder's disposition records itself, a second parser S47 refuses; (c) a declared `requires_if` row
+  on `tools/runtime/kit.toml` naming `loop`, admitting an in-process call of the reader.
+  Recommendation: (a), the ask the build run would file to dDeclaredLoop (TOOL-dDeclaredLoop-56): one
+  parser, reached through its verb. Open for the owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
+- rev-2 · 2026-10-28 · §2 S2, S3, S4, S5 · §3 Edges · §4 The witness rule, Inventory · §6 AC5 · §8 F3 ·
+  §10 · re-grounded on the parents at `d1721ef20` by the cross-check record
+  `build/2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck.md`, rows 15 and 16: the
+  harness is read by a `policy.py get --rev` subprocess, the disposition through dDeclaredLoop's
+  `loop_lib.py disposition` verb with C waiting on F3, and the loop kit's readers run `ratify.py
+  check` and `ratify.py disposition` rather than calling the runtime kit's functions.
 
 ## 10. Reuse audit
 
 The seams extended: TOOL-dDeclaredLoop-19's plan gate and its release through
-`check_owner_disposition`; TOOL-dPlacedRequest-4's `placement.py record` and its node-local
+`check_owner_disposition`, whose reader `loop_lib.py disposition --hold` (TOOL-dDeclaredLoop-56 S47)
+S3 runs; TOOL-dPlacedRequest-4's `placement.py record` and its node-local
 `.placement` blocks; the intake record and its reader (TOOL-dWellOiledMachine-4) and its ratifying
 judge (TOOL-dWellOiledMachine-27); the capability table's `prompt-submit` row
-(TOOL-dWellOiledMachine-14); the policy reader at a revision (`tools/policy/policy.py:752`, whose
-`resolve(key, repo, rev)` already takes one). `python tools/codebase-map/reuse_lookup.py "accept a
+(TOOL-dWellOiledMachine-14); the policy reader at a revision, the `get` verb's `--rev`
+(`cmd_get`, `tools/policy/policy.py:1332`), run as a subprocess (oc7:379-380). `python tools/codebase-map/reuse_lookup.py "accept a
 fallback witness before a drain landed and refuse one after"` ranked `before`, `CensusRefused`,
 `ScopeRefused` and `check_landed_facts_due` by name stem, none a witness reader: no existing seam
 fits the drain rule. Scout B found no seam for the witness reader and judged only the "lands first"

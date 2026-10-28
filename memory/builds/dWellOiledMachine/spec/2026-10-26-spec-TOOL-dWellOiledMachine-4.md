@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-4 — the prompt-submit pack: each owner prompt written verbatim to the intake record, its secrets redacted and its size capped
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 40 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 40 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0282@328da93b whole
 **Carries:** node:item.entry.intake
@@ -14,7 +14,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-59 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-4-deviation-41.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-4-deviation-41.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-4-deviation-42.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-4-deviation-42.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -35,10 +38,12 @@ than lose it when it cannot write.
 - **S1** — The record (I27), node-local under `<git-common-dir>/requests/`, the directory
   TOOL-dPlacedRequest-19 S2 already keeps per content key, and never committed: `<key>.md`, the
   prompt's text, and `<key>.intake`, the receipts, one line per receipt, `origin=<origin>
-  session=<id> received-utc=<utc> redacted=<n> bytes=<n> capped=<yes|no>`. `<key>` is
-  `derive_request_content_key(text)` (TOOL-dPlacedRequest-19 S1) over the prompt as typed, reached
-  through `resolve_kit_dir` from the loop kit, so a prompt and a later `--request` of the same words
-  key alike. The `.md` is written once, the first copy kept as `--request` keeps it; a prompt typed
+  session=<id> received-utc=<utc> redacted=<n> bytes=<n> capped=<yes|no>`. `<key>` is what the
+  loop kit's verb `python request.py key` prints for the prompt as typed (TOOL-dPlacedRequest-19 S1,
+  pr19:33-36), run as a bounded subprocess and found through the inlined `resolve_kit_dir` block,
+  since a kit imports no sibling kit (PLAY-dOrderedCharter-7, oc7:202-205); how the prompt reaches
+  the verb is §8 F3's pick. A prompt and a later `--request` of the same words key alike, and any
+  failure of the verb is a write error (S5). The `.md` is written once, the first copy kept as `--request` keeps it; a prompt typed
   again appends a receipt. I27's fields are refined here, as its owner: the record is the two files,
   and `redacted`, `bytes` and `capped` sit on the receipt. Observed by AC1.
 - **S2** — The writer, `write_intake(text, origin, fields, root=None)` in `tools/runtime/intake.py`,
@@ -69,9 +74,13 @@ than lose it when it cannot write.
   fact the build pass records. Observed by AC5.
 - **S6** — The kind's registry row: `[[record-kind]]` `intake` in
   `tools/memory-tree/record-kinds.toml` (TOOL-dTotalRecall-1), `tag = "record.intake"`, `layer =
-  "runtime"`, `home = ""`, `id-rule = "<content key>.md and <content key>.intake under
-  <git-common-dir>/requests/"`, `schema = { form = "rows" }`, `writer = "intake.py"`, `check =
-  "runtime selftest"`. And the item: `item.entry.intake`'s witness is the receipt this pack writes,
+  "layer.runtime"`, `home = "<git-common-dir>/requests/*"`, `id-rule = "<content key>.md and <content
+  key>.intake under <git-common-dir>/requests/"`, `schema = { form = "rows" }`, `writer =
+  "intake.py"`, `readers = []` with `readers-none = "read by intake.py show and log and by the
+  placement readers' code, never through a role's work-order read key"`, `lifecycle =
+  "append-only"`, `check = "runtime selftest"`: the cells tr1 S1 and tr18 S1 require of every row,
+  `layer` a layer tag, `home` a `<git-common-dir>/<glob>` and `lifecycle` in the closed set
+  (tr1:62-66; tr18:45-49, :130-133). And the item: `item.entry.intake`'s witness is the receipt this pack writes,
   named in the pack's `witness` field as `{"record": "requests/<key>.intake", "reader":
   "intake.py show"}`. Observed by AC6.
 - **S7** — The page `help/runtime.md` gains the intake record, its two files, the cap, the owner
@@ -97,7 +106,7 @@ than lose it when it cannot write.
 - **consumes-from** `TOOL-dWellOiledMachine-8` — `pyrun.sh`, the shim the pack runs its Python through
 - **hands-off** `TOOL-dWellOiledMachine-27` — `requests/`, the record and `write_intake`, which that unit gives the mailbox and cadence origins
 - **hands-off** `TOOL-dWellOiledMachine-5` — `requests/`, the record and `read_intake`, which the re-pointed readers read the ratifying receipt from
-- **consumes-from** external — TOOL-dPlacedRequest-19's `derive_request_content_key` and the `requests/` directory, and TOOL-dTotalRecall-1's `record-kinds.toml`
+- **consumes-from** external — TOOL-dPlacedRequest-19's `request.py key` verb and the `requests/` directory, and TOOL-dTotalRecall-1's `record-kinds.toml` with TOOL-dTotalRecall-18's required cells
 - **hands-off** `TOOL-dWellOiledMachine-75` — `intake.py hook` and its pack, whose write-error exit that unit makes a failed pack (finding 60)
 - **hands-off** `TOOL-dWellOiledMachine-79` — `intake.py`'s writer, reader and hook (findings 31, 61), which the spec audit's minors batch repairs
 
@@ -119,7 +128,8 @@ UserPromptSubmit -> dispatch.js -> pyrun.sh intake.py hook
   binding = session_binding.py read <session_id>
   none            -> "intake — not written · no session binding for <id>", exit 0
   owner != yes    -> exit 0, nothing written
-  key = derive_request_content_key(prompt); empty -> exit 0
+  empty prompt -> exit 0
+  key = <request.py key, subprocess, the input as F3 picks>; non-zero -> exit 2
   write_intake(prompt, "hook", {session}) ; any error -> exit 2, the dispatcher refuses the prompt
 ```
 
@@ -171,7 +181,7 @@ Each case runs `python intake.py fixture --case <name>` from the runtime kit dir
 repository with a planted session binding, feeding the pack the payload the case names.
 
 - **AC1** — When `--case owner` submits the prompt `please land dFoo` from a binding reading `owner:
-  yes`, the record's `.md` file holds those bytes, `<key>` is `derive_request_content_key` of them, and
+  yes`, the record's `.md` file holds those bytes, `<key>` is what `python request.py key` prints for them, and
   `python intake.py show <key>` prints one receipt `origin=hook` with `redacted=0` and `capped=no`;
   submitting it again adds a second receipt and leaves the `.md` unchanged.
   Red when: the text is altered, the key differs, or a repeat rewrites the `.md`.
@@ -190,9 +200,11 @@ repository with a planted session binding, feeding the pack the payload the case
   pack intake failed`.
   fixture: needs TOOL-dWellOiledMachine-10's dispatcher, specced and unbuilt at this base.
   Red when: the prompt passes with no receipt written.
-- **AC6** — When `grep -n -A3 'name = "intake"' record-kinds.toml` runs over the registry, it prints
-  the row with `writer = "intake.py"`, and `grep -c '"witness"' intake.fragment.json` prints 1.
-  Red when: the kind has no row, or the pack declares no witness.
+- **AC6** — When `grep -n -A12 'name = "intake"' record-kinds.toml` runs over the registry, it
+  prints the row with `writer = "intake.py"`, `layer = "layer.runtime"` and `lifecycle =
+  "append-only"`, and `grep -c '"witness"' intake.fragment.json` prints 1.
+  Red when: the kind has no row, the row lacks a cell tr18 S1 requires, or the pack declares no
+  witness.
 - **AC7** — When `grep -n "INTAKE_CAP_BYTES\|65536" runtime.md` runs over the runtime help page, it
   names the cap, and the page names the owner scoping and the refused prompt.
   Red when: the page omits the cap or the failure behaviour.
@@ -217,17 +229,32 @@ New arm: tools/runtime/selftest.py · covers AC1 AC2 AC3 AC4 · each fixture cas
   prompt limit. (b) fails the clause's cap, and (c) is no number this tree holds. RESOLVED (agent,
   2026-10-26, delegated): (a), rung 3, `INTAKE_CAP_BYTES` declared once in `intake.py`, a KiB-round
   figure as this repository's caps are. widens: none · relaxes: none
+- **F3 — How does the prompt reach `request.py key`?** The verb keys a file (pr19:36), the hook holds
+  the prompt as typed only in memory, secrets unredacted, and the runtime kit loads no loop module
+  (oc7:202-205). Options: (a) the hook writes the raw prompt to a temp file under
+  `<git-common-dir>/requests/`, runs `request.py key <file>` and deletes it in a `finally`, so an
+  unredacted prompt sits on disk for the subprocess's life; (b) an ask to dPlacedRequest for the verb
+  to read its text from stdin, `request.py key -`, which the hook pipes the prompt into; (c) a
+  declared `requires_if` row on `tools/runtime/kit.toml` naming `loop`, admitting the in-process call.
+  (a) writes the very secret S2 exists to keep off disk, and (c) widens the import surface for one
+  hash. Recommendation: (b), the ask the build run would file to dPlacedRequest (TOOL-dPlacedRequest-19).
+  Open for the owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-75, TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-28 · §2 S1, S6 · §3 Edges · §4 The hook · §6 AC1, AC6 · §8 F3 · §10 · re-grounded on
+  the parents at `d1721ef20` by the cross-check record
+  `build/2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck.md`, rows 12 and 13: the
+  `intake` row carries tr1 and tr18's cells, and the content key comes from `request.py key` run as a
+  subprocess, its input F3's pick.
 
 ## 10. Reuse audit
 
-The seams extended: TOOL-dPlacedRequest-19's `requests/` directory and its content key, the request's
-existing node-local home; I12's `render_redacted` and `scan_secrets`, moved by
+The seams extended: TOOL-dPlacedRequest-19's `requests/` directory and its content key, read
+through its verb `request.py key` (pr19:36), the request's existing node-local home; I12's `render_redacted` and `scan_secrets`, moved by
 TOOL-dWellOiledMachine-16 into `tools/runtime/redaction.py` from `tools/runlog/runlog_lib.py:522,553`;
 the dispatcher and pack contract (TOOL-dWellOiledMachine-10); the hook pattern of
 `tools/memory-recall/recall-opened.js`, which appends under the git common dir and never writes the

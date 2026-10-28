@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-59 — a cadence run's own rework budget on its period lease, the cadence-items point, and the tick that runs them
 
-**Status:** DEFERRED · rev-1 · 2026-10-26 · node a · Tier-2 · base 0689e7fa · streams tooling · order 56 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-2 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 56 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0336@cd3fcb78 whole
 **Carries:** node:point.cadence-items
@@ -12,7 +12,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-reuse-scout-c.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-reuse-scout-c.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-60 |
 | [2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-8-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
+| [2026-10-28-build-TOOL-dWellOiledMachine-59-deviation-591.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-59-deviation-591.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -45,27 +48,35 @@ exhaustion ends the period as `flow.on-exhausted` says.
   row naming it, exits 1 on any, and prints `cadence — <n> item(s) registered`, `0 item(s) registered
   · unarmed` on an empty point. Observed by AC1.
 - **S3** — The tick, `run_cadence_tick(now)` in `cadence.py`, run as `python cadence.py tick [--now
-  <utc>] [--dry-run]`. For each registered row in file order: read the `host-key`'s value through
-  `resolve` (I31, `tools/policy/policy.py:752`); ask `python hosts.py ready <value>`
-  (TOOL-dWellOiledMachine-13 S4), printing `cadence — <name> · host <value> not ready` and running
-  nothing on exit 1 or 2; derive the period key with `derive_period(row.period, now)`; read S4's
-  budget; and while it is open run `run_cadence_period(name, period, run)` (TOOL-dWellOiledMachine-13
-  S6), which reads the period's witness, takes the period lease, runs the argv and releases. `--dry-run`
-  prints each row's decision and writes nothing. Observed by AC2, AC5.
+  <utc>] [--dry-run]`. For each registered row in file order: read the `host-key`'s value by running
+  `<sys.executable> <policy kit>/policy.py get <key>` as a bounded subprocess, the policy kit found
+  through the inline `resolve_kit_dir` since a kit imports no sibling kit (PLAY-dOrderedCharter-7 §4),
+  an exit 2 printing `cadence — <name> · <key> refused` and running nothing; ask `python hosts.py
+  ready <value>` (TOOL-dWellOiledMachine-13 S4), printing `cadence — <name> · host <value> not ready`
+  and running nothing on exit 1 or 2; derive the period key with `derive_period(row.period, now)`;
+  read S4's budget through its `state` verb; and while it is open run `run_cadence_period(name,
+  period, run)` (TOOL-dWellOiledMachine-13 S6), which reads the period's witness, takes the period
+  lease, runs the argv and releases. `--dry-run` prints each row's decision and writes nothing.
+  Observed by AC2, AC5.
 - **S4** — The period's budget, `derive_period_budget(cadence, period)` in `tools/loop/budget.py`
   (TOOL-dDeclaredLoop-30's module): its total is `flow.rework-budget`'s base, read through that
   unit's parser (its S1), a period having no units and so no per-unit share (its S2, "the base for a
   build with no units"); its spend is the number of `released` records (TOOL-dPlacedRequest-16 S1, the
   hand-over `run_cadence_period` writes on a failed run) on the first-parent chain of
   `refs/gov/leases/run/<cadence>/<period>`, read from the cache ref the lease read fetches
-  (TOOL-dPlacedRequest-13 S3). Each lap that ended without the period's witness is one draw, derived
-  from the lease and never typed beside it. `budget_state` gains the key form `run/<cadence>/<period>`,
-  answering `open` or `exhausted` with `<spent>/<total>`, as it answers for a build. Observed by AC2,
-  AC4.
+  (TOOL-dPlacedRequest-13 S3). Each lap that ran its program and ended without the period's witness
+  is one draw, derived from the lease and never typed beside it. Contention draws nothing
+  (TOOL-dDeclaredLoop-30 S5): a wake whose take is refused for a live holder, or whose remote does not
+  answer, runs nothing and writes no record (TOOL-dWellOiledMachine-13 S6 steps 1 and 2), so it is no
+  lap. `budget_state` gains the key form `run/<cadence>/<period>`, answering `open` or `exhausted` with
+  `<spent>/<total>`, as it answers for a build, and `python <prefix>/loop/budget.py state --key
+  <key>` prints that answer as one line, the verb `cadence.py` runs as a bounded subprocess found
+  through `resolve_kit_dir`. Observed by AC2, AC4, AC7.
 - **S5** — The ending. When S4 reads `exhausted`, the tick reads `flow.on-exhausted` (catalogue
-  `tools/policy/catalogue.toml:766-770`) through `resolve` and calls `derive_ending(value, [], state)`
-  (TOOL-dDeclaredLoop-31 S2) with no units: `best-effort-ending` and `close-incomplete` answer
-  `close-incomplete`, and the tick takes the period lease and releases it `--as aborted`
+  `tools/policy/catalogue.toml:766-770`) by the same `policy.py get` subprocess and runs `python
+  <prefix>/loop/endings.py derive --value <value> --state <state>` with an empty `--units`
+  (TOOL-dDeclaredLoop-31 S2, its §4), a bounded subprocess, as the driver runs it:
+  `best-effort-ending` and `close-incomplete` answer `close-incomplete`, and the tick takes the period lease and releases it `--as aborted`
   (TOOL-dPlacedRequest-1 S5), a terminal record, so no later wake runs the period, printing
   `cadence — <name> <period> · budget spent <s>/<t> · ending close-incomplete`; `park-for-owner` writes
   nothing and prints `cadence — <name> <period> · parked · budget spent <s>/<t>` at every wake while
@@ -96,7 +107,7 @@ exhaustion ends the period as `flow.on-exhausted` says.
 
 - **consumes-from** `TOOL-dWellOiledMachine-13` — `point.host-adapters`, whose `hosts.py ready` S3 asks for the host a row's key names, and `cadence.py`'s `derive_period` and `run_cadence_period`, which S3 runs
 - **consumes-from** `TOOL-dWellOiledMachine-20` — `points.toml`, where S1 adds the `point.cadence-items` row and its adapter rows register
-- **consumes-from** external — TOOL-dDeclaredLoop-30's `budget.py` (`budget_state`, the `flow.rework-budget` parser), TOOL-dDeclaredLoop-31's `derive_ending`, TOOL-dPlacedRequest-1's `--lease` verbs and `--as aborted`, TOOL-dPlacedRequest-16's `released` status and TOOL-dPlacedRequest-18's `check_cadence_segment`, each specced and unbuilt at base `0689e7fa`
+- **consumes-from** external — TOOL-dDeclaredLoop-30's `budget.py` (`budget_state`, the `flow.rework-budget` parser), TOOL-dDeclaredLoop-31's `endings.py derive`, the policy kit's `policy.py get`, TOOL-dPlacedRequest-1's `--lease` verbs and `--as aborted`, TOOL-dPlacedRequest-16's `released` status and TOOL-dPlacedRequest-18's `check_cadence_segment`, each specced and unbuilt at base `0689e7fa`
 
 ## 4. Design
 
@@ -155,13 +166,13 @@ The total of 4 is the catalogue default `4+2`'s base (DERIVED from `flow.rework-
 | `host-key`, `period`, `run`, `events` | `[[adapter]]` fields at that point | none |
 | `check_cadence_row`, `run_cadence_tick` | Python functions, `cadence.py` | `py.function`, OK |
 | `derive_period_budget` | Python function, `budget.py` | `py.function`, `derive`, OK |
-| `cadence.py tick`, `--check` | CLI forms | none |
+| `cadence.py tick`, `--check`, `budget.py state` | CLI forms | none |
 
 ### Files touched (estimate)
 
 - `tools/runtime/points.toml`: the `[[point]]` row
 - `tools/runtime/cadence.py`: the row check, the tick, `--fixture`
-- `tools/loop/budget.py`: `derive_period_budget` and the key form of `budget_state`
+- `tools/loop/budget.py`: `derive_period_budget`, the key form of `budget_state` and its `state` verb
 - `tools/unattended/resume-tick.sh`: the tick call
 - `help/runtime.md`
 
@@ -183,7 +194,8 @@ The total of 4 is the catalogue default `4+2`'s base (DERIVED from `flow.rework-
 - error / empty / loading states — an empty point prints `unarmed`; an unready host and an unreadable
   key each print their row and run nothing; a chain the cache lacks reads as no laps, never as spent.
 - observability — one `cadence —` line per row per tick, and the period lease's chain is the record.
-- risks — a program that fails fast exhausts its period in five wakes, about fifty minutes on the
+- risks — a program that fails for a contention cause its exit code does not name spends one draw;
+  the take and the remote, where contention is seen, spend none. A program that fails fast exhausts its period in five wakes, about fifty minutes on the
   ten-minute tick (DERIVED from the default budget and the tick's period); that is the bound working,
   and the next period runs again.
 - testing — the fixture plants under §6 and the arm in §7.
@@ -221,6 +233,9 @@ The fixture is `python cadence.py --fixture --plant <case>`: a bare remote and a
 - **AC6** — When `grep -n "point.cadence-items\|flow.on-exhausted" runtime.md` runs over the help page,
   both are named.
   Red when: the page omits the point or the ending.
+- **AC7** — When `--plant unreachable` points the clone's remote at a missing path and runs the tick
+  three times, then restores it, the next tick runs the program with its budget at `0/4`.
+  Red when: a wake with no answering remote spends a draw.
 
 ## 7. Gates
 
@@ -229,7 +244,7 @@ The fixture is `python cadence.py --fixture --plant <case>`: a bare remote and a
 The unattended kit's self-test suites are waived for this build's landing (README rule 8); S6's tick
 call is observed by AC5's dry run.
 
-New arm: tools/runtime/cadence.py · covers AC1 AC2 AC3 AC4 AC5 · each plant run by `--fixture`, staged against `derive_period_budget` stubbed open and `check_cadence_row` stubbed to admit every row · none
+New arm: tools/runtime/cadence.py · covers AC1 AC2 AC3 AC4 AC5 AC7 · each plant run by `--fixture`, staged against `derive_period_budget` stubbed open and `check_cadence_row` stubbed to admit every row · none
 
 ## 8. Open questions
 
@@ -251,13 +266,17 @@ New arm: tools/runtime/cadence.py · covers AC1 AC2 AC3 AC4 AC5 · each plant ru
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
+- rev-2 · 2026-10-28 · §2 S3, S4, S5, §3 Edges, §4 Inventory and Files touched, §5, §6 AC7, §7, §10 ·
+  the keys read through a `policy.py get` subprocess, the budget through a `budget.py state` verb and
+  the ending through `endings.py derive`, and contention drawing nothing, per the parents' cross-check
+  `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 156, 157 and 158.
 
 ## 10. Reuse audit
 
-The seams extended are TOOL-dDeclaredLoop-30's `budget.py`, whose `budget_state` gains a period key and
-whose `flow.rework-budget` parser gives the total, TOOL-dDeclaredLoop-31's `derive_ending`, called
-with no units, unit 13's `cadence.py`, whose `derive_period` and `run_cadence_period` the tick calls,
-and the point registry `points.toml`. None of `tools/loop/` or `cadence.py` exists at base: each is
+The seams extended are TOOL-dDeclaredLoop-30's `budget.py`, whose `budget_state` gains a period key
+and a `state` verb and whose `flow.rework-budget` parser gives the total, TOOL-dDeclaredLoop-31's
+`endings.py derive`, run with no units, unit 13's `cadence.py`, whose `derive_period` and
+`run_cadence_period` the tick calls, and the point registry `points.toml`. None of `tools/loop/` or `cadence.py` exists at base: each is
 cited by its spec. Scout C's row named `record_draw` keyed to the period lease; it writes rows to a
 build's transition record, which a period does not have, so the spend is derived from the lease chain
 instead (§8 F1). `python tools/codebase-map/reuse_lookup.py "bound a cadence run's repeated laps with

@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-39 — every act's minimal binding record pushed to `refs/gov/bindings`, and one reader over `<current default>..HEAD` that never passes a binding it cannot find
 
-**Status:** DEFERRED · rev-2 · 2026-10-27 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 16 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0317@9d62f0b1 whole
 
@@ -12,7 +12,10 @@
 | [2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md](../build/2026-10-26-build-TOOL-dWellOiledMachine-1-spec-stage-returns.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-1-agent-ledger.md) | journal | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-66 TOOL-dWellOiledMachine-67 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-69 TOOL-dWellOiledMachine-70 TOOL-dWellOiledMachine-71 TOOL-dWellOiledMachine-72 TOOL-dWellOiledMachine-73 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-75 TOOL-dWellOiledMachine-76 TOOL-dWellOiledMachine-77 TOOL-dWellOiledMachine-78 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-80 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-82 TOOL-dWellOiledMachine-83 TOOL-dWellOiledMachine-84 TOOL-dWellOiledMachine-85 TOOL-dWellOiledMachine-86 TOOL-dWellOiledMachine-87 TOOL-dWellOiledMachine-88 TOOL-dWellOiledMachine-89 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-98 TOOL-dWellOiledMachine-99 TOOL-dWellOiledMachine-100 TOOL-dWellOiledMachine-101 TOOL-dWellOiledMachine-102 TOOL-dWellOiledMachine-103 TOOL-dWellOiledMachine-104 TOOL-dWellOiledMachine-105 TOOL-dWellOiledMachine-106 TOOL-dWellOiledMachine-107 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-109 TOOL-dWellOiledMachine-110 TOOL-dWellOiledMachine-111 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-113 TOOL-dWellOiledMachine-114 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-116 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-118 TOOL-dWellOiledMachine-119 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-121 TOOL-dWellOiledMachine-122 TOOL-dWellOiledMachine-123 TOOL-dWellOiledMachine-124 TOOL-dWellOiledMachine-125 TOOL-dWellOiledMachine-126 TOOL-dWellOiledMachine-127 |
 | [2026-10-27-build-TOOL-dWellOiledMachine-39-deviation-391.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-39-deviation-391.md) | deviation | — |
+| [2026-10-28-build-TOOL-dWellOiledMachine-39-deviation-392.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-39-deviation-392.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
+| [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -80,8 +83,13 @@ locally is read from the ref, and one the ref lacks is counted `not-local` and n
   files. Observed by AC9.
 - **S10** — The fixture and its leg. `python tools/runtime/bindings.py --fixture --plant <case>` builds
   a bare remote and its clones under `%TEMP%` with short names and prints the case's observation, exit 0
-  when it holds; the leg `runtime bindings fixtures` in `tools/gate-legs.json` runs every case.
-  Observed by AC1 to AC8.
+  when it holds. The leg `runtime bindings fixtures` runs every case. It is declared once, as a
+  `[[gate_leg]]` row of `tools/runtime/kit.toml` holding every manifest key, `enforces` among them (§8
+  F6), made with `python tools/run-gates/leg_factory.py new`, and rendered into `tools/gate-legs.json`
+  by `leg_factory.py --write`, whose `--check` reds a manifest that differs (TOOL-dWitnessedBar-11 S1
+  to S3). PLAY-dOrderedCharter-7 S3 reds a leg with no `enforces`. `tools/run-gates/leg_factory.py` is
+  not in the tree at this base, so until TOOL-dWitnessedBar-11 lands the pass records that a hand edit
+  of the manifest, equal to the declaration, stands in for `--write`. Observed by AC1 to AC8 and AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -172,17 +180,17 @@ under the current range.
 | `derive_act_range`, `read_act_commits`, `read_binding`, `check_bindings` | python functions | `tools/runtime/bindings.py` |
 | `check_carry_bindings` | shell function | `tools/push-main.sh` |
 | `gov-act`, `<act>@gov-act.invalid` | committer identity | S3 |
-| `runtime bindings fixtures` | gate leg | `tools/gate-legs.json` |
+| `runtime bindings fixtures` | gate leg | a `[[gate_leg]]` row of `tools/runtime/kit.toml`, rendered into `tools/gate-legs.json` |
 
 ### Files touched (estimate)
 
 - `tools/runtime/bindings.sh` (new)
 - `tools/runtime/bindings.py` (new)
-- `tools/runtime/kit.toml` (the two files listed)
+- `tools/runtime/kit.toml` (the two files listed, and the leg's `[[gate_leg]]` row)
 - `tools/push-main.sh`
 - `tools/push-main.test.sh`
 - `tools/lib/resolve-python.test.sh`
-- `tools/gate-legs.json`
+- `tools/gate-legs.json`: rendered by `leg_factory.py --write`, never hand-edited once that factory lands
 
 ### Alternatives rejected
 
@@ -246,6 +254,10 @@ case, `write_gov_ref` and `read_commits` installed from their parents.
 - **AC9** — When `grep -n -A60 PARITY_ROWS` reads the resolver suite §4 names, its parity table holds rows for `bindings.sh`'s
   `gov_ref_sh` block and `bindings.py`'s `remote_ladder_py` and `commit_trailers_py` blocks.
   Red when: a block in either file drifts from its canonical copy and no row names it.
+- **AC10** — When `grep -n -A16 'runtime bindings fixtures' kit.toml` runs over the runtime kit's
+  descriptor, it prints the leg's `[[gate_leg]]` row with a non-empty `enforces`, and `python
+  leg_factory.py --check` exits 0 once that factory is in the tree.
+  Red when: the leg is declared only in the manifest, or with no `enforces`.
 
 ## 7. Gates
 
@@ -267,20 +279,35 @@ New arm: tools/lib/resolve-python.test.sh · covers AC9 · one byte changed in `
 - **F3 — Which reader is "the landing's `carries`"?** (a) `push-main.sh`'s carry grading, `check_carry_set`
   and its two call sites; (b) the chain's `carries.py` instrument. (b) is an instrument the packet's
   Non-goals freeze, and it reads specs, not commits. Rung 1, the clause's "the landing". RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
-- **F4 — How does the causes check read bindings?** An ask for dTotalRecall, target build dTotalRecall,
-  for TOOL-dTotalRecall-19 S8's `check_causes` to grade act-made commits through
-  `bindings.py --check` over its range; accept line: `check_causes` over a commit whose `Gov-Act:` the
-  ref lacks reports it `not-local` and never passes it. The main loop files it once. Rung 3: editing a
-  parent spec is refused by the brief. RESOLVED (agent, 2026-10-26, delegated): file the ask. widens: none · relaxes: none
+- **F4 — How does the causes check read bindings?** `check_causes` (TOOL-dTotalRecall-19 S8) grades
+  tracked records, not commits, and has no range: a record is red when it carries no `Caused-by` or one
+  that does not resolve. Its `Made-by` holds the stand-ins `owner` or a lease ref until this build's act
+  class replaces them (its S4). So the ask the build run would file with dTotalRecall is: over
+  `check_causes`' own population, a tracked record whose `Made-by` names an act id (`act-<12 hex>`)
+  resolves only when `bindings.py --read <act>` (S7), run as a subprocess found through the inline
+  `resolve_kit_dir` block, finds that act's binding locally or on `refs/gov/bindings`. One it reads
+  `not-local` is red and never passes. Accept line: `check_causes` over a tracked record whose `Made-by`
+  names an act the ref lacks reds it, naming `not-local`. Act-made commits stay graded by S7 and its
+  callers. Rung 1: TOOL-dTotalRecall-19 S8 grades records, which rules out the earlier ask for a commit
+  range. RESOLVED (agent, 2026-10-28, delegated): file the restated ask. widens: none · relaxes: none
 - **F5 — Does a commit need both marks?** (a) Both, naming the same act, else `unmarked`; (b) either one.
   (b) lets a hand-typed trailer mark an owner's commit act-made. Rung 1, the clause's "by its trailer and
   by the committer identity". RESOLVED (agent, 2026-10-26, delegated): (a). widens: none · relaxes: none
+- **F6 — Which tag does `runtime bindings fixtures` carry in `enforces`?** No v2 `[enforcement]` row
+  names `cl-dClosedLoop-0317`, so the tag cannot be read off the clause. Options: (a) `principle.p35`,
+  whose text "What lives on one node only renders `not-local` or `pruned`, never empty" is what the
+  leg's cases red; (b) `principle.p33`, since the binding is a node a key addresses; (c)
+  `principle.p36`, since the binding comes from the harness adapter's launch. (b) and (c) describe what
+  the binding is or where it comes from, while (a) is what the leg checks. TOOL-dWellOiledMachine-33 §8
+  F4 asks the same for its commit-key leg. Recommendation: (a). Open for the owner, who owns the
+  `[enforcement]` table.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-26 · initial draft.
 - rev-2 · 2026-10-27 · §3 · Edges: the reciprocal of each edge the spec audit round 1's
   promoted units declare on this unit, mirrored from TOOL-dWellOiledMachine-79.
+- rev-3 · 2026-10-28 · S10, §4 Inventory and Files touched, AC10 (added) and §8 (F4 re-resolved on rung 1, F6 added) moved. The leg `runtime bindings fixtures` is declared once, as a `[[gate_leg]]` row of the runtime kit's descriptor with `enforces`, and rendered by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1 to S3; PLAY-dOrderedCharter-7 S3). F4's ask is restated against `check_causes`' records, since TOOL-dTotalRecall-19 S8 grades records and has no commit range. Source: the parents cross-check record `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, rows 94 and 95.
 
 ## 10. Reuse audit
 
