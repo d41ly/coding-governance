@@ -185,7 +185,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-68 — the upgrade-walk child's stand-ins take and pass on every parameter of the functions they rebind, held by an arm that reads the live signature](spec/2026-10-27-spec-TOOL-dSafePassage-68.md) | 7 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-69 — the floor step's down grades a rollback to the pin under the floor the pin's code needs, and a refused down's reason reaches the step's tail](spec/2026-10-27-spec-TOOL-dSafePassage-69.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-27 |
 | [TOOL-dSafePassage-35 — the round-1 audit of units 15 to 26: its 39 minors, one filtered population, one plan source, pinned plants and the texts that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-35.md) | 8 | 2 | CLOSED | rev-7 | 2026-10-28 |
-| [TOOL-dSafePassage-41 — the `ac-order` join lands in the pass that arms it, so no commit carries the join without its cutoff key](spec/2026-10-23-spec-TOOL-dSafePassage-41.md) | 8 | 2 | DEFERRED | rev-4 | 2026-10-26 |
+| [TOOL-dSafePassage-41 — the `ac-order` join lands in the pass that arms it, so no commit carries the join without its cutoff key](spec/2026-10-23-spec-TOOL-dSafePassage-41.md) | 8 | 2 | DEFERRED | rev-5 | 2026-10-28 |
 | [TOOL-dSafePassage-70 — a rollback killed after the schema step's down resumes: the reverse walk persists nothing on a receipt already below schema 4, and stops only at the down that lowers it](spec/2026-10-28-spec-TOOL-dSafePassage-70.md) | 8 | 2 | CLOSED | rev-1 | 2026-10-28 |
 | [TOOL-dSafePassage-38 — a credential anywhere in a step target's config is refused by one predicate over keys and values, and no refusal line prints it](spec/2026-10-23-spec-TOOL-dSafePassage-38.md) | 9 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-42.md) | 10 | 2 | DEFERRED | rev-7 | 2026-10-28 |
@@ -208,7 +208,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 330 bound to this build, across 4 record folder(s).
+Records: 332 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

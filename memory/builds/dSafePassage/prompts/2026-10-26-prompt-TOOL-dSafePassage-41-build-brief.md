@@ -56,3 +56,8 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A deviation record's value is `report` or `author-recorded` (README, "Build-level rules"); write one per departure, in this build's `build/` folder, committed with the pass.
 - Never move a blob `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py --check dSafePassage` pins as an instrument; a pass that would is a DIVERGENCE hand-back.
 - Your spec header's `advances TOOL-dSafePassage-14` stays `advances` when you flip it to `CLOSED`, unless this brief says you are the last unit.
+
+## From the first dispatch (2026-10-28)
+
+- The first builder (`wf_9320419a-545`) built the join and its three arms, and its AC1 fixture went red and green as specced. Its patch is `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dsafepassage-567339/c5f50d22-89c6-41d7-84e5-2382dcd49faa/scratchpad/TOOL-dSafePassage-41-join.patch`. Start from it.
+- Rev-5 moves AC2's observation into your pass. Run `python tools/check-spec-tokens.py` while this spec is INPROGRESS, before the flip to CLOSED, and record the `ac-order` line, which grades at least 1 and finds 0 out of order. scratch-guard refused the builder `python tools/check-spec-tokens.py` as a leg. If it refuses you, record the predicate probe `scratchpad/ao41_pred.py` as the stand-in and name AC2 owed to the close.
