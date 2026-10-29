@@ -378,3 +378,87 @@ No new fork was opened.
 - Transcript tree: wm34 §8 F4, already resolved; no open fork.
 
 **Decision for you:** wm54 S2 needs the workflow entries' `roles` filtered by `driver` and `stage`. The verb asked in wm43 F3 works per harness and prints stage roles only, so it does not fully serve wm54. Either the wm43 F3 ask gains each entry's `driver` and `stage`, or wm54 needs a narrower read. I left the cite as instructed.
+
+## The owner's picks, 2026-10-29: Group A, specs 1, 2, 4, 5, 6, 7, 11, 12, 20 and 23
+
+All 10 Group A specs are revised, and the 13 forks the brief names for this group are marked `RESOLVED (owner, 2026-10-29)` in place. Each Status line still reads `DEFERRED`, dated 2026-10-29, and each spec has one new §9 line naming its forks, the brief `prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md`, and the sections moved.
+
+**Checks:**
+- **Size:** every file is under the 49152-byte cap (byte counts are in the table).
+- **Open marks:** `grep -c "Open for the owner"` finds none in any of the ten specs.
+- **Hygiene:** I ran `bash tools/memory-tree/check-memory-hygiene.sh --staged` over an index copy with only these ten specs staged. It exits 1 on a single finding, check 9: the build index is out of date, and a `gen_build_index.py --write` render clears it (`memory/LIVE.md` and the dRankedPlan and dWellOiledMachine `README.md` files). The brief leaves that to the main loop. No other finding names any of these specs.
+- **Naming lexicon:** not run, since no new names were added.
+
+| Spec | Rev now | Fork and pick | Sections moved | Bytes |
+|---|---|---|---|---|
+| wm1 | rev-4 | F4 (a) `principle.p36` | §4 Inventory, Files touched · §8 F4 | 44262 |
+| wm2 | rev-4 | F4 (a) ask dKeptSession for a verb over a named kit's list | §2 S6 · §3 Edges · §8 F4 · §10 | 33960 |
+| wm4 | rev-4 | F3 (b) ask dPlacedRequest for `request.py key -` (prompt on stdin) | §2 S1 · §3 Edges · §4 The hook · §8 F3 | 30318 |
+| wm5 | rev-3 | F3 (a) ask dDeclaredLoop for the verb to print the found record's path | §2 S3 · §8 F3 | 30055 |
+| wm6 | rev-4 | F4 (a) ask dPlacedRequest for a read-only epoch verb over `read_claims` | §2 S6, S7 · §8 F4 | 41326 |
+| wm7 | rev-4 | F5 (a) ask dBoundRoles for `script` and `allow` on the work order | §2 S1 · §8 F3, F4, F5 | 35733 |
+| wm11 | rev-4 | F4 (a) ask the playbook kit's owner for `--answers worktree_root`; F5 (a) `principle.p5` | §2 S2, S10 · §6 AC8 · §8 F4, F5 | 36176 |
+| wm12 | rev-5 | F5 (a) `principle.p22` | §2 S11 · §6 AC10 · §8 F5 | 38803 |
+| wm20 | rev-4 | F2 (a) `principle.p16` | §2 S4 · §6 AC7 · §8 F2 | 30893 |
+| wm23 | rev-5 | F4 (a) `principle.p27` | §2 S9 · §6 AC8 · §8 F4 | 30110 |
+
+**How the specs now read:**
+- **Tag forks:** each tag is written into the leg's `[[gate_leg]]` row as `enforces = ["principle.pN"]`, in the list form PLAY-dOrderedCharter-7 S2 gives. The criterion that checks `enforces` now names the tag literally (AC8, AC10, AC7 and AC8 in specs 11, 12, 20 and 23). Spec 1 has no such criterion.
+- **Ask forks:** every sentence that said "as §8 Fn picks" or "before the pick" now states the asked route. No backlog row was filed.
+
+**Edits outside the named forks:**
+- **wm7 F3** (agent-resolved earlier) used to say the list's carrier is "not the work order". Option (a) of F5 now makes the work order the carrier, so the sentence now says the carrier is the field asked of dBoundRoles' work order, not the work order as br3 renders it today.
+- **wm7 F4** said "the open picks are theirs", pointing at wm43 F3 and wm30 F3. Group B resolves both under this same brief, so it now says those forks' asks were each resolved by the owner on 2026-10-29. Neither fork was re-resolved.
+
+I did not add the template's `ratified <date>` header pointer: the corpus only adds it when a spec closes, and these stay `DEFERRED`. The revision lines written before rev-4 still say "(F4, open)" and similar, because they record history.
+
+The index copy and the edit script are in `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-elastic-lalande-a8b091/bd0d7692-8d65-44a9-bf88-d3f42e06b8de/scratchpad/wm-fA/`. Nothing was committed or staged into the real index.
+
+Files:
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-1.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-2.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-4.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-5.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-6.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-7.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-11.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-12.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-20.md`
+- `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/2026-10-26-spec-TOOL-dWellOiledMachine-23.md`
+
+## The owner's picks, 2026-10-29: Group B, specs 26, 30, 32, 33, 39, 43, 48, 52 and 54
+
+All nine Group B specs are revised and every named fork is resolved. Each spec is under the 49152-byte cap and dated 2026-10-29, still `DEFERRED`. None of them prints a named fork from `grep -n "Open for the owner"`.
+
+I ran the hygiene gate over a copy of the index with only these nine specs staged. It exited 1, but its only failure is check 9: the build index is out of date, curable only by a `gen_build_index.py --write` render. The specs are named only in that render-owed line, which is yours to clear. The real index is untouched.
+
+| Spec | Rev | Forks resolved (pick) | Sections moved | Bytes |
+|---|---|---|---|---|
+| 26 | rev-3 | F4 (a): ask dDeclaredLoop for the loop-kit read verb. F5 (a): ask dBoundRoles for `handoff.py shape-line` | S2, §8, §9 | 31215 |
+| 30 | rev-3 | F3 (b): ask dBoundRoles for a `--json` mode of `handoff.py agents` | S4, §8, §9 | 26731 |
+| 32 | rev-5 | F6 (b): ask dTotalRecall for an uncapped `record find --all` | S10, §8, §9 | 38501 |
+| 33 | rev-6 | F4 (a): `principle.p35` on both legs' `[[gate_leg]]` rows | S8, AC4, §8, §9 | 38450 |
+| 39 | rev-4 | F6 (a): `principle.p35` (F4 left alone) | S10, AC10, §8, §9 | 36292 |
+| 43 | rev-4 | F3 (a), widened: ask for `handoff.py stage-rows`. F4 (a): ask for `handoff.py run-state`. F5 (a): this build adds `scope.py --self-chain` | S2, S7, S8, §4 Inventory and Files touched, §8, §9 | 39104 |
+| 48 | rev-3 | F4 (a): this build adds `policy.py get --row` | S3, §4 Evidence, Inventory and Files touched, §8, §9 | 38448 |
+| 52 | rev-3 | F3 (a): ask dPlacedRequest for the `node-` columns and a read-only `read_claims` verb | S5, §8, §9 | 28097 |
+| 54 | rev-3 | F5 (a): this build adds `gen_build_index.py --units` | S1, S2, §4 Inventory and Files touched, §8, §9 | 32960 |
+
+A few changes go slightly past the literal brief, so check them before you commit:
+
+- **Spec 26, F4:** the verb's spelling now follows TOOL-dBoundRoles-3 §8 F5: `loop_lib.py declaration --item <tag> --json`, which exits 1 on an undeclared tag. Spec 26 had spelled it `declaration <item> --json` with exit 2. S2 still refuses on any non-zero exit, so its design is unchanged. The fork now says one ask, filed once, serves both, and this build files no second row.
+- **Spec 43, F3:** to fit `driver` and `stage` in, the JSON shape changed to `{workflow: {"driver": d, "stage": s, "keys": {key: {"role", "fan", "cap"}}}}`. The fork names spec 54 S2 among its readers, filtering by those two fields. Spec 54 S2 now says its filter reads them from that same verb.
+- **Specs 43, 48 and 54:** besides joining Files touched, each added verb also got a row in §4 Inventory (`--self-chain`, `--row`, `--units`).
+
+The probe index copy and the gate's output are in `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-elastic-lalande-a8b091/bd0d7692-8d65-44a9-bf88-d3f42e06b8de/scratchpad/wm-fB/`. The full output is `hyg.txt` there.
+
+Files are in `C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dWellOiledMachine/spec/`:
+- 2026-10-26-spec-TOOL-dWellOiledMachine-26.md
+- 2026-10-26-spec-TOOL-dWellOiledMachine-30.md
+- 2026-10-26-spec-TOOL-dWellOiledMachine-32.md
+- 2026-10-26-spec-TOOL-dWellOiledMachine-33.md
+- 2026-10-26-spec-TOOL-dWellOiledMachine-39.md
+- 2026-10-26-spec-TOOL-dWellOiledMachine-43.md
+- 2026-10-26-spec-TOOL-dWellOiledMachine-48.md
+- 2026-10-26-spec-TOOL-dWellOiledMachine-52.md
+- 2026-10-26-spec-TOOL-dWellOiledMachine-54.md

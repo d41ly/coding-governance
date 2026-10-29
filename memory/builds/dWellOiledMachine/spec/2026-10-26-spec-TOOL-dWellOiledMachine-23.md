@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-23 — the session-start hook loading the set `memory.default-load` names, ending with `next`'s line, held under the hook channel's measured cap
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 19 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-5 · 2026-10-29 · node a · Tier-2 · base 0689e7fa · streams tooling · order 19 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0301@29109ea6 whole
 **Carries:** node:policy-key.memory.default-load
@@ -15,9 +15,11 @@
 | [2026-10-27-build-TOOL-dWellOiledMachine-23-deviation-231.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-23-deviation-231.md) | deviation | — |
 | [2026-10-27-build-TOOL-dWellOiledMachine-23-deviation-232.md](../build/2026-10-27-build-TOOL-dWellOiledMachine-23-deviation-232.md) | deviation | — |
 | [2026-10-28-build-TOOL-dWellOiledMachine-23-deviation-233.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-23-deviation-233.md) | deviation | — |
+| [2026-10-29-build-TOOL-dWellOiledMachine-23-deviation-234.md](../build/2026-10-29-build-TOOL-dWellOiledMachine-23-deviation-234.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-spec-brief.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 |
 | [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
 | [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
+| [2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md](../prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md) | research | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-54 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-1 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -72,7 +74,7 @@ letting the harness cut it silently (night pass, point 5).
 - **S9** — The fixture arms live in `skills/session-kickoff/manifest-check.test.sh` with a planted
   policy file, a planted capability table and a stub `next` verb, and `measure_hook_cap.py --fixture`
   reads three recorded transcripts. The leg `runtime hook-cap fixtures` runs it: one `[[gate_leg]]`
-  row of `tools/runtime/kit.toml` holding every manifest key, `enforces` §8 F4's tag, made by `python
+  row of `tools/runtime/kit.toml` holding every manifest key, `enforces = ["principle.p27"]` (§8 F4), made by `python
   tools/run-gates/leg_factory.py new`, whose `--write` renders it into `tools/gate-legs.json`
   (TOOL-dWitnessedBar-11 S1 to S3; TOOL-dOrderedCharter-7 S3 reds a leg with no `enforces`).
   `leg_factory.py` is not in the tree at this base, so until that unit lands the pass hand-edits the
@@ -205,7 +207,7 @@ stub `next` verb printing `next — item.build.unit · actor builder · key k1`.
   exits 0; with the row at 400 it prints only the over-cap, `now —` and `next —` lines.
   Red when: output over the cap is printed, or the run exits non-zero.
 - **AC8** — When `grep -n -A16 "runtime hook-cap fixtures"` runs over the runtime kit's `kit.toml`, it
-  prints a `[[gate_leg]]` row whose `enforces` holds §8 F4's tag; and `python leg_factory.py --check`
+  prints a `[[gate_leg]]` row whose `enforces` holds `principle.p27`; and `python leg_factory.py --check`
   exits 0 with that row declared.
   Red when: the leg is in the manifest with no declaration, or its declaration carries no `enforces`.
 
@@ -231,8 +233,8 @@ New arm: tools/runtime/measure_hook_cap.py · covers AC4 · the cut and attachme
   `cl-dClosedLoop-0301`, so the tag cannot be read off the clause. Options: (a) `principle.p27`, every
   load point loading its reader's units within a declared budget, which the measured cap and the size
   check are; (b) `principle.p22`, position derived, which only S5's closing `next —` line is. (b)
-  covers one case of seven, (a) what the leg checks across them. Recommendation: (a). Open for the
-  owner, who owns the `[enforcement]` table.
+  covers one case of seven, (a) what the leg checks across them. Recommendation: (a). RESOLVED
+  (owner, 2026-10-29): (a) `principle.p27`.
 
 ## 9. Revision log
 
@@ -244,6 +246,9 @@ New arm: tools/runtime/measure_hook_cap.py · covers AC4 · the cut and attachme
 - rev-4 · 2026-10-28 · §2 S9, §4 Inventory and Files touched, §6 AC8, §8 F4 · the leg is declared
   once with `enforces` (F4, open) and the manifest rendered from it, per the parents' cross-check
   `2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck`, row 59.
+- rev-5 · 2026-10-29 · §2 S9 · §6 AC8 · §8 F4 · F4 resolved by the owner to (a), `principle.p27`, by the brief
+  `prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md`; the tag is written into the
+  leg's `[[gate_leg]]` row and AC8.
 
 ## 10. Reuse audit
 

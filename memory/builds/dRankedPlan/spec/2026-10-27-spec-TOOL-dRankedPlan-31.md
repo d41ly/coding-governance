@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-31 — the caller check over the tree runs on its own unguarded repo leg, on every bar
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-4 · 2026-10-29 · node a · Tier-2 · base 0689e7fa · streams tooling · order 7 · advances TOOL-dRankedPlan-17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,8 +11,10 @@
 | [2026-10-27-build-TOOL-dRankedPlan-31-deviation-311.md](../build/2026-10-27-build-TOOL-dRankedPlan-31-deviation-311.md) | deviation | — |
 | [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
 | [2026-10-28-build-TOOL-dRankedPlan-31-deviation-312.md](../build/2026-10-28-build-TOOL-dRankedPlan-31-deviation-312.md) | deviation | — |
+| [2026-10-29-build-TOOL-dRankedPlan-31-deviation-313.md](../build/2026-10-29-build-TOOL-dRankedPlan-31-deviation-313.md) | deviation | — |
 | [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
 | [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
+| [2026-10-29-prompt-TOOL-dRankedPlan-1-owner-forks.md](../prompts/2026-10-29-prompt-TOOL-dRankedPlan-1-owner-forks.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md](../reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md) | spec-audit | TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-30 TOOL-dRankedPlan-32 TOOL-dRankedPlan-36 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 |
 
 <!-- /gen:spec-records -->
@@ -39,8 +41,8 @@ sits one order above it.
   `tools/loop/kit.toml` named `session-predicate callers (asked only at the act)`, written by `python
   tools/run-gates/leg_factory.py new`, holding `subject = "repo"`, `argv = ["python3",
   "{kit}/ratify.py", "--check-callers"]`, `guard = []`, `chunk = "declarations"`, the `ceiling`
-  `TOOL-dRankedPlan-45` S6 sets and `enforces` naming §8 F1's tag (PLAY-dOrderedCharter-7 S3 reds a
-  leg with none). `leg_factory.py --write` renders its row of `tools/gate-legs.json`, argv with
+  `TOOL-dRankedPlan-45` S6 sets and `enforces = ["principle.p2"]` (§8 F1; PLAY-dOrderedCharter-7 S3
+  reds a leg with none). `leg_factory.py --write` renders its row of `tools/gate-legs.json`, argv with
   `{prefix}/loop/ratify.py` and no `guard` key, as the `review-join ban (no ref-keyed join)` row reads
   (`tools/gate-legs.json:717`). `leg_factory.py` is not in the tree at `d1721ef20`: until
   TOOL-dWitnessedBar-11 lands it, the pass hand-writes the row the render would write, and its
@@ -150,9 +152,9 @@ The close's bar reads it after both have landed.
 - **AC1** — When a probe reads `tools/gate-legs.json` and `tools/govkit/subject-pins.tsv`, the row
   named `session-predicate callers (asked only at the act)` has `subject` `repo`, a `chunk` other than
   `selftests` and no guard, and the pins row carries the same name, subject and chunk; the leg's row
-  in `tools/loop/kit.toml` carries that `chunk` and a non-empty `enforces`; and `python
+  in `tools/loop/kit.toml` carries that `chunk` and an `enforces` naming `principle.p2`; and `python
   tools/run-gates/leg_factory.py --check` exits 0.
-  Red when: the leg is guarded, kit-subject or in the `selftests` chunk, carries no `enforces`, or its
+  Red when: the leg is guarded, kit-subject or in the `selftests` chunk, carries no `enforces` or another tag, or its
   manifest row differs from its declaration.
   fixture: `leg_factory.py` lands with TOOL-dWitnessedBar-11; before it, the descriptor probe is read,
   and the manifest row is the stand-in the pass's deviation record names.
@@ -182,8 +184,8 @@ New arm: tools/loop/ratify.py · covers AC3 · the leg `session-predicate caller
   never remembered", read the same in any session and on any node (v2:929-932); (c)
   `principle.p23`, a claim trusted only when its weakest source is not agent-typed (v2:933-935). (b)
   and (c) describe what the crossing record gives a reader, while (a) is what the leg refuses: an
-  answer taken from session state after the act. Recommendation: (a). Open for the owner, who owns
-  the `[enforcement]` table, as TOOL-dDeclaredLoop-3 §8 F7 is.
+  answer taken from session state after the act. Recommendation: (a). RESOLVED (owner, 2026-10-29): (a)
+  `principle.p2`, the tag S1's declaration and AC1 name. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -191,6 +193,9 @@ New arm: tools/loop/ratify.py · covers AC3 · the leg `session-predicate caller
   item H2; finding 11 is the same class at medium), repairing `TOOL-dRankedPlan-22`.
 - rev-2 · 2026-10-27 · §3 · gains the hands-off edge to `TOOL-dRankedPlan-45`, each the reciprocal of that promoted unit's own edge (spec audit of units 30 to 37, `reviews/2026-10-27-review-TOOL-dRankedPlan-30-spec-audit.md`); no other section moves.
 - rev-3 · 2026-10-28 · §2 S1, S2 · §4 Evidence, Files touched · §6 AC1 · §8 F1 · §10 · re-grounded by the cross-check record `build/2026-10-28-build-TOOL-dRankedPlan-1-parents-crosscheck.md`, row 57: the leg is declared once, its `chunk`, `ceiling` and `enforces` on its `[[gate_leg]]` row, and its manifest row is rendered by `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1, S2), hand-written as the stand-in until that unit lands; F1 opens for the `enforces` tag.
+- rev-4 · 2026-10-29 · §2 S1 · §6 AC1 · §8 F1 · F1 resolved by the owner to (a), `principle.p2`, by the
+  owner-forks brief `prompts/2026-10-29-prompt-TOOL-dRankedPlan-9-1-spec-writer.md`; S1's declaration
+  and AC1 name the tag.
 
 ## 10. Reuse audit
 

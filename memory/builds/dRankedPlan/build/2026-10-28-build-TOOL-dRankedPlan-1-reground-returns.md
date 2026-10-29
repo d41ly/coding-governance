@@ -146,3 +146,28 @@ rp3:95 now runs past the ~100-column wrap, and rp16:36 already did before this c
 Files:
 - C:\projects\coding-governance\.claude\worktrees\elastic-lalande-a8b091\memory\builds\dRankedPlan\spec\2026-10-26-spec-TOOL-dRankedPlan-3.md
 - C:\projects\coding-governance\.claude\worktrees\elastic-lalande-a8b091\memory\builds\dRankedPlan\spec\2026-10-26-spec-TOOL-dRankedPlan-16.md
+
+## The owner's picks, 2026-10-29: specs 9, 15, 16 and 31
+
+I've revised all four specs (TOOL-dRankedPlan-9, -15, -16 and -31). Each of the three forks is now marked resolved by the owner to the option its spec recommended. Nothing is staged in the real index and nothing is committed.
+
+| Spec | Rev now | Fork resolved, and the pick | Sections moved | Bytes |
+|---|---|---|---|---|
+| `TOOL-dRankedPlan-9` | rev-5 · 2026-10-29 · DEFERRED | F6 (a): `plan_record.py path <slug>`, a step of unit 16's S4 rather than an ask across builds, with F6's acceptance line (unit 16's new AC10) | S5 · §3 edge to unit 16 · §8 F6 · §9 · §10 | 29243 |
+| `TOOL-dRankedPlan-15` | rev-5 · 2026-10-29 · DEFERRED | F8 (a): `principle.p20`. S2 and §10 also now name the `path` verb that rp9 F6 picked | S2 · S6 · AC10 · §8 F8 · §9 · §10 | 33915 |
+| `TOOL-dRankedPlan-16` | rev-6 · 2026-10-29 · DEFERRED | none of its own; it adds the `path` verb that rp9 F6 picked | S4 · §3 edges to units 9 and 15 · §4 Inventory · §6 new AC10 · §7 roles `New arm:` line · §9 | 36084 |
+| `TOOL-dRankedPlan-31` | rev-4 · 2026-10-29 · DEFERRED | F1 (a): `principle.p2` | §2 S1 · §6 AC1 · §8 F1 · §9 | 17299 |
+
+- **What each pick changed:**
+  - **rp16:** S4 now says `path` prints what `find_plan_record` returns and exits 0, 1 with no record, or 2 with two, like `field`. AC10 runs it on AC7's fixture, and the roles adopter `New arm:` line now covers AC6, AC7 and AC10.
+  - **rp15:** S6 writes `enforces` as `["principle.p20"]` on its `[[gate_leg]]` declaration, and AC10 reads that tag.
+  - **rp31:** S1 writes `enforces = ["principle.p2"]`, and AC1 reads it.
+- **Small additions:** in rp15 AC10 and rp31 AC1 I added "or another tag" to the "Red when" line, so each criterion fails on a wrong tag as well as a missing one. Each §9 line names its forks, this brief (`prompts/2026-10-29-prompt-TOOL-dRankedPlan-9-1-spec-writer.md`) and the sections moved. Older §9 entries are left as written.
+- **Size cap and "Open for the owner":** all four files are under 49152 bytes, and `grep "Open for the owner"` prints nothing in any of them.
+- **Hygiene gate:** I staged only these four specs into a copy of the index through `GIT_INDEX_FILE` and ran `check-memory-hygiene.sh --staged`. The one finding is check 9 (a fresh build-index render is owed), which `gen_build_index.py --write` fixes, so it is the main loop's. The stale files it lists are `memory/LIVE.md`, `memory/builds/dRankedPlan/README.md` and `memory/builds/dWellOiledMachine/README.md`. No other check names my specs. I deleted the index copy afterwards and nothing else in `rp-f/`. I did not run the naming lexicon.
+
+Files are in C:/projects/coding-governance/.claude/worktrees/elastic-lalande-a8b091/memory/builds/dRankedPlan/spec/:
+- 2026-10-26-spec-TOOL-dRankedPlan-9.md
+- 2026-10-26-spec-TOOL-dRankedPlan-15.md
+- 2026-10-26-spec-TOOL-dRankedPlan-16.md
+- 2026-10-27-spec-TOOL-dRankedPlan-31.md

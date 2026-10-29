@@ -221,3 +221,18 @@ crossing's verdict printed on `--exited`'s line, since memory-tree cannot import
 
 `tools/run-gates/leg_factory.py` is not in the tree: every leg spec records that a hand edit of the
 manifest stands in for the render until TOOL-dWitnessedBar-11 lands.
+
+## The owner's picks, 2026-10-29
+
+> take the recommendations on the forks
+
+— owner, 2026-10-29. One `gov-spec-writer` agent, by the brief
+[`2026-10-29-prompt-TOOL-dRankedPlan-1-owner-forks`](../prompts/2026-10-29-prompt-TOOL-dRankedPlan-1-owner-forks.md),
+marked the three open forks `RESOLVED (owner, 2026-10-29)` to the option each recommends. Its return
+is the last section of the re-ground returns record. Specs 9, 15, 16 and 31 each moved one rev and
+carry one deviation record.
+
+- rp9 F6 (a): `plan_record.py path <slug>`, a verb unit 16's S4 now adds with its own AC10, read by
+  rp9 S5 and rp15. Both units are this build's, so no ask is filed.
+- rp15 F8 (a): the `loop plan revision` leg enforces `principle.p20`.
+- rp31 F1 (a): the `session-predicate callers` leg enforces `principle.p2`.

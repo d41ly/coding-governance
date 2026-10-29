@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-9 — the ratification predicate: the session's owner-origin intake read as the plan's ratification by `plan.ratification`
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-5 · 2026-10-29 · node a · Tier-2 · base 0689e7fa · streams tooling · order 3 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0377@a78b3ac9 whole
 **Carries:** node:policy-key.plan.ratification
@@ -16,10 +16,13 @@
 | [2026-10-27-build-TOOL-dRankedPlan-9-deviation-92.md](../build/2026-10-27-build-TOOL-dRankedPlan-9-deviation-92.md) | deviation | — |
 | [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
 | [2026-10-28-build-TOOL-dRankedPlan-9-deviation-93.md](../build/2026-10-28-build-TOOL-dRankedPlan-9-deviation-93.md) | deviation | — |
+| [2026-10-29-build-TOOL-dRankedPlan-9-deviation-94.md](../build/2026-10-29-build-TOOL-dRankedPlan-9-deviation-94.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-repin-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 |
 | [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
 | [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
+| [2026-10-29-prompt-TOOL-dRankedPlan-1-owner-forks.md](../prompts/2026-10-29-prompt-TOOL-dRankedPlan-1-owner-forks.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-15 TOOL-dRankedPlan-16 TOOL-dRankedPlan-31 |
+| [2026-10-29-prompt-TOOL-dRankedPlan-9-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dRankedPlan-9-1-spec-writer.md) | journal | — |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-16 TOOL-dRankedPlan-1 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -70,8 +73,8 @@ request record stands in, and every witness says so.
   Observed by AC4.
 - **S5** — `signed-commit`. The plan is ratified when the newest commit that touched the build's plan
   record, the file `find_plan_record` returns (TOOL-dRankedPlan-16 S4), reached from the loop kit by
-  the memory-tree verb §8 F6 settles, run as a subprocess through the inline `resolve_kit_dir` block,
-  passes `git verify-commit`,
+  `python <memory-tree kit>/plan_record.py path <slug>` (TOOL-dRankedPlan-16 S4, §8 F6), run as a
+  subprocess through the inline `resolve_kit_dir` block, passes `git verify-commit`,
   whose trust is the repository's configured signers. Witness `signed-commit <sha8>`; no plan record,
   or a commit git does not verify, is unratified with the first line git printed. Observed by AC5.
 - **S6** — The stand-in and its hand-over. `INTAKE_STAND_IN` in `ratify.py` names the log the `request`
@@ -104,7 +107,7 @@ request record stands in, and every witness says so.
 
 ### Edges
 
-- **consumes-from** `TOOL-dRankedPlan-16` — `record-kind.plan`, whose one record per build `find_plan_record` returns and whose newest commit `signed-commit` verifies
+- **consumes-from** `TOOL-dRankedPlan-16` — `record-kind.plan`, whose one record per build `plan_record.py path` prints and whose newest commit `signed-commit` verifies
 - **hands-off** `TOOL-dRankedPlan-10` — `read_plan_ratification`, the predicate Plan's exit asks once and wraps in its fallback under `request`
 - **hands-off** `TOOL-dRankedPlan-2` — `read_plan_ratification`, whose witness marks the plan rows the owner has ratified
 - **hands-off** `TOOL-dRankedPlan-3` — `read_plan_ratification`, the witness a held `owner-batches` batch needs before it is written
@@ -282,10 +285,12 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · `ratify.py 
   `find_plan_record`'s; (c) a `requires_if` row for `memory-tree` on `tools/loop/kit.toml`, a
   declaration `govkit selfcheck` grades and that installs nothing (`tools/memory-tree/kit.toml:8`), so
   `ratify.py` would still load memory-tree code in process. (a) keeps one locator for every reader of
-  the plan record; (b) adds a second. Recommendation: (a). The ask the build run files against
-  TOOL-dRankedPlan-16: accept `python tools/memory-tree/plan_record.py path tFix` prints the record's
-  path and exits 0, 1 with none and 2 with two, seen on its AC7 fixture. TOOL-dRankedPlan-15 S2 reads
-  the record through the same verb. Open for the owner.
+  the plan record; (b) adds a second. Recommendation: (a). RESOLVED (owner, 2026-10-29): (a)
+  `plan_record.py path <slug>`, a verb of TOOL-dRankedPlan-16. Both units are this build's, so the
+  verb is a step of unit 16's S4, not an ask across builds, with the acceptance line `python
+  tools/memory-tree/plan_record.py path tFix` prints the record's path and exits 0, 1 with none and 2
+  with two, seen on its AC7 fixture (its AC10). S5 reaches the record through it, and
+  TOOL-dRankedPlan-15 S2 reads the record through the same verb. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -298,6 +303,9 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · `ratify.py 
   `plan.ratification` is read by a `policy.py get` subprocess, not an in-process `resolve`; the
   disposition records are read through `gov_record.py find` and `show` by subprocess, not `read_record`;
   the plan record is reached by the verb F6, opened for the owner, settles.
+- rev-5 · 2026-10-29 · S5 · §3 · §8 F6 · §10 · F6 resolved by the owner to (a), `plan_record.py path
+  <slug>` as a verb TOOL-dRankedPlan-16 S4 adds, by the owner-forks brief
+  `prompts/2026-10-29-prompt-TOOL-dRankedPlan-9-1-spec-writer.md`; S5 and §10 name the verb.
 
 ## 10. Reuse audit
 
@@ -305,7 +313,7 @@ The seams extended are dPlacedRequest's consent predicate, through the read-only
 `--request-consent` (TOOL-dPlacedRequest-5 S3) over the request files (TOOL-dPlacedRequest-19 S2, S5),
 its claim reader `read_claim_body` (TOOL-dPlacedRequest-21 S2), dDeclaredLoop's disposition record and
 `check_disposition_record` (TOOL-dDeclaredLoop-16 S4, S5) read through `gov_record.py find` and `show`
-(TOOL-dTotalRecall-9 S3, S5), TOOL-dRankedPlan-16's `find_plan_record` through §8 F6's verb, and the
+(TOOL-dTotalRecall-9 S3, S5), TOOL-dRankedPlan-16's `find_plan_record` through its `plan_record.py path` verb (§8 F6), and the
 policy reader's `get` verb by subprocess (PLAY-dOrderedCharter-7 §4), since a kit imports no sibling
 kit. `python tools/codebase-map/reuse_lookup.py
 "decide whether a plan is ratified by the owner from a typed request record"` ranked name stems

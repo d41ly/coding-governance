@@ -1,6 +1,6 @@
 # TOOL-dWellOiledMachine-1 — the platform spike, the runtime kit it founds, and the one act launcher
 
-**Status:** DEFERRED · rev-3 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dWellOiledMachine-62
+**Status:** DEFERRED · rev-4 · 2026-10-29 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dWellOiledMachine-62
 
 **Carries:** cl-dClosedLoop-0279@3b20f1d6 whole
 **Carries:** node:point.spawn-backends
@@ -23,6 +23,7 @@
 | [2026-10-28-build-TOOL-dWellOiledMachine-1-deviation-12.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-1-deviation-12.md) | deviation | — |
 | [2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | — |
 | [2026-10-28-build-TOOL-dWellOiledMachine-1-reground-returns.md](../build/2026-10-28-build-TOOL-dWellOiledMachine-1-reground-returns.md) | research | — |
+| [2026-10-29-build-TOOL-dWellOiledMachine-1-deviation-13.md](../build/2026-10-29-build-TOOL-dWellOiledMachine-1-deviation-13.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-1-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-1-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-2-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-2-reuse-scout.md) | journal | — |
 | [2026-10-26-prompt-TOOL-dWellOiledMachine-1-3-reuse-scout.md](../prompts/2026-10-26-prompt-TOOL-dWellOiledMachine-1-3-reuse-scout.md) | journal | — |
@@ -34,6 +35,8 @@
 | [2026-10-28-prompt-TOOL-dWellOiledMachine-1-2-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-2-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-crosscheck.md) | research | TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-63 TOOL-dWellOiledMachine-64 TOOL-dWellOiledMachine-65 TOOL-dWellOiledMachine-68 TOOL-dWellOiledMachine-74 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-81 TOOL-dWellOiledMachine-90 TOOL-dWellOiledMachine-91 TOOL-dWellOiledMachine-92 TOOL-dWellOiledMachine-93 TOOL-dWellOiledMachine-94 TOOL-dWellOiledMachine-95 TOOL-dWellOiledMachine-96 TOOL-dWellOiledMachine-97 TOOL-dWellOiledMachine-108 TOOL-dWellOiledMachine-112 TOOL-dWellOiledMachine-115 TOOL-dWellOiledMachine-117 TOOL-dWellOiledMachine-120 TOOL-dWellOiledMachine-126 |
 | [2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dWellOiledMachine-1-parents-reground.md) | research | TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-79 TOOL-dWellOiledMachine-90 |
+| [2026-10-29-prompt-TOOL-dWellOiledMachine-1-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-1-spec-writer.md) | journal | — |
+| [2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md](../prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md) | research | TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-54 |
 | [2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md](../reviews/2026-10-27-review-TOOL-dWellOiledMachine-1-spec-audit.md) | spec-audit | TOOL-dWellOiledMachine-10 TOOL-dWellOiledMachine-11 TOOL-dWellOiledMachine-12 TOOL-dWellOiledMachine-13 TOOL-dWellOiledMachine-14 TOOL-dWellOiledMachine-15 TOOL-dWellOiledMachine-16 TOOL-dWellOiledMachine-17 TOOL-dWellOiledMachine-18 TOOL-dWellOiledMachine-19 TOOL-dWellOiledMachine-2 TOOL-dWellOiledMachine-20 TOOL-dWellOiledMachine-21 TOOL-dWellOiledMachine-22 TOOL-dWellOiledMachine-23 TOOL-dWellOiledMachine-24 TOOL-dWellOiledMachine-25 TOOL-dWellOiledMachine-26 TOOL-dWellOiledMachine-27 TOOL-dWellOiledMachine-28 TOOL-dWellOiledMachine-29 TOOL-dWellOiledMachine-3 TOOL-dWellOiledMachine-30 TOOL-dWellOiledMachine-31 TOOL-dWellOiledMachine-32 TOOL-dWellOiledMachine-33 TOOL-dWellOiledMachine-34 TOOL-dWellOiledMachine-35 TOOL-dWellOiledMachine-36 TOOL-dWellOiledMachine-37 TOOL-dWellOiledMachine-38 TOOL-dWellOiledMachine-39 TOOL-dWellOiledMachine-4 TOOL-dWellOiledMachine-40 TOOL-dWellOiledMachine-41 TOOL-dWellOiledMachine-42 TOOL-dWellOiledMachine-43 TOOL-dWellOiledMachine-44 TOOL-dWellOiledMachine-45 TOOL-dWellOiledMachine-46 TOOL-dWellOiledMachine-47 TOOL-dWellOiledMachine-48 TOOL-dWellOiledMachine-49 TOOL-dWellOiledMachine-5 TOOL-dWellOiledMachine-50 TOOL-dWellOiledMachine-51 TOOL-dWellOiledMachine-52 TOOL-dWellOiledMachine-53 TOOL-dWellOiledMachine-54 TOOL-dWellOiledMachine-55 TOOL-dWellOiledMachine-56 TOOL-dWellOiledMachine-57 TOOL-dWellOiledMachine-58 TOOL-dWellOiledMachine-59 TOOL-dWellOiledMachine-6 TOOL-dWellOiledMachine-60 TOOL-dWellOiledMachine-61 TOOL-dWellOiledMachine-7 TOOL-dWellOiledMachine-8 TOOL-dWellOiledMachine-9 |
 
 <!-- /gen:spec-records -->
@@ -224,7 +227,7 @@ The decoder reads every case the same way under both arms, so the offline fixtur
 | `launch.py argv` | CLI | `tools/runtime/launch.py` |
 | `spike.py` verbs `--live`, `--transcript`, `--write`, `--check` | CLI | `tools/runtime/spike.py` |
 | the S5 row names | capability rows | `tools/runtime/harnesses/claude-code.toml` |
-| `runtime selftest` | gate leg | a `[[gate_leg]]` row of `tools/runtime/kit.toml`, `enforces` F4's tag |
+| `runtime selftest` | gate leg | a `[[gate_leg]]` row of `tools/runtime/kit.toml`, `enforces = ["principle.p36"]` (§8 F4) |
 
 `launch_act` is the interface's own spelling across five units, and `launch` is no verb of
 `.lexicon.conf`'s table, so it is one `VERB_OFFENDER_PIN` arrival, re-measured with the lexicon's
@@ -239,7 +242,7 @@ The live arm runs once, in this unit's build pass, on the node that holds the ru
 
 - `tools/runtime/kit.toml`, `tools/runtime/README.md`, `tools/runtime/adopt-runtime.sh` — S1 (new);
   the descriptor holds the `runtime selftest` leg's `[[gate_leg]]` row, every manifest key and
-  `enforces` among them, made with `leg_factory.py new` and rendered into the manifest by
+  `enforces = ["principle.p36"]` among them, made with `leg_factory.py new` and rendered into the manifest by
   `leg_factory.py --write` (TOOL-dWitnessedBar-11 S1-S3, wb11:36-49). `leg_factory.py` is not in
   the tree today, so the pass records that a hand edit of the manifest row stands in until wb11
   lands.
@@ -378,7 +381,8 @@ New arm: tools/runtime/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 AC1
   adapter registers and the one launcher that reads them (v2:1053); (b) `principle.p9`, "Measured
   weight", since the spike measures before a default is set; (c) `principle.p37`, since the argv
   factory is the one portable launch. (b) and (c) describe how the unit works, while (a) is what the
-  leg checks. Recommendation: (a). Open for the owner, who owns the `[enforcement]` table.
+  leg checks. Recommendation: (a). RESOLVED (owner, 2026-10-29): (a) `principle.p36`, the leg's
+  `enforces = ["principle.p36"]`.
 
 ## 9. Revision log
 
@@ -394,6 +398,9 @@ New arm: tools/runtime/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 AC1
   `script` (br3:48-61), so their sources are TOOL-dWellOiledMachine-43 §8 F3 and
   TOOL-dWellOiledMachine-7 §8 F5. Fork dedupe: §2 S2 · §3 non-goals: the stage-row cite moves to
   TOOL-dWellOiledMachine-43 §8 F3, the fork that owns it.
+- rev-4 · 2026-10-29 · §4 Inventory, Files touched · §8 F4 · F4 resolved by the owner to (a), `principle.p36`, by the
+  brief `prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md`, the tag written into the leg's
+  `[[gate_leg]]` row.
 
 ## 10. Reuse audit
 

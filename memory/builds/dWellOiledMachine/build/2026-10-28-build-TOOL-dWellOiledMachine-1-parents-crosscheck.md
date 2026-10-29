@@ -395,3 +395,27 @@ ask restated against tr19 S8's records; it could instead stay open, for the owne
 
 `tools/run-gates/leg_factory.py` is not in the tree: every leg spec records that a hand edit of the
 manifest stands in for the render until TOOL-dWitnessedBar-11 lands.
+
+## The owner's picks, 2026-10-29
+
+> take the recommendations on the forks
+
+— owner, 2026-10-29. Two `gov-spec-writer` agents, by the brief
+[`2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks`](../prompts/2026-10-29-prompt-TOOL-dWellOiledMachine-1-owner-forks.md),
+marked 23 of the 24 open forks `RESOLVED (owner, 2026-10-29)` to the option each recommends, and
+made each spec read as its fork now decides. Their returns are the last two sections of the
+re-ground returns record. Each of the 19 specs moved one rev and carries one deviation record.
+
+- The seven `enforces` forks name their tags in each leg's `[[gate_leg]]` row and criterion: wm1
+  `principle.p36`, wm11 `p5`, wm12 `p22`, wm20 `p16`, wm23 `p27`, wm33 and wm39 `p35`.
+- The asks are named in each fork and filed by the build run, not by this pass: dKeptSession (wm2
+  F4), dPlacedRequest (wm4 F3's `request.py key -`, wm6 F4, wm52 F3), dDeclaredLoop (wm5 F3; wm26 F4,
+  spelled as TOOL-dBoundRoles-3 §8 F5's `loop_lib.py declaration --item <tag> --json`, one ask for
+  both), dBoundRoles (wm7 F5, wm26 F5, wm30 F3, wm43 F3 and F4), dTotalRecall (wm32 F6) and the
+  playbook kit's owner (wm11 F4).
+- wm43 F3's asked `handoff.py stage-rows` widens to print each workflow's `driver` and `stage`,
+  which wm54 S2 now reads, so one fork still owns the verb.
+- This build adds three verbs itself, each now in Files touched and §4 Inventory: `scope.py
+  --self-chain` (wm43 F5), `policy.py get --row` (wm48 F4), `gen_build_index.py --units` (wm54 F5).
+- Left open: wm58 F5, which follows TOOL-dTotalRecall-2 §8 F6, dTotalRecall's own fork. wm6 F4's
+  epoch verb sits beside that same holder ask.

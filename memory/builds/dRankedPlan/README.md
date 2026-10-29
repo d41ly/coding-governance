@@ -87,10 +87,10 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dRankedPlan-16 — the artifact levels: one plan record per build, and a brief that renders it and never types it](spec/2026-10-26-spec-TOOL-dRankedPlan-16.md) | 1 | 2 | DEFERRED | rev-5 | 2026-10-28 |
+| [TOOL-dRankedPlan-16 — the artifact levels: one plan record per build, and a brief that renders it and never types it](spec/2026-10-26-spec-TOOL-dRankedPlan-16.md) | 1 | 2 | DEFERRED | rev-6 | 2026-10-29 |
 | [TOOL-dRankedPlan-1 — `priority:` beside `parents:`, and the generated plan view `PLAN.md`](spec/2026-10-26-spec-TOOL-dRankedPlan-1.md) | 2 | 2 | DEFERRED | rev-3 | 2026-10-28 |
 | [TOOL-dRankedPlan-27 — the roles vocabulary admits the `plan:` reads keys gov-spec-writer gains](spec/2026-10-26-spec-TOOL-dRankedPlan-27.md) | 2 | 2 | DEFERRED | rev-2 | 2026-10-27 |
-| [TOOL-dRankedPlan-9 — the ratification predicate: the session's owner-origin intake read as the plan's ratification by `plan.ratification`](spec/2026-10-26-spec-TOOL-dRankedPlan-9.md) | 3 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dRankedPlan-9 — the ratification predicate: the session's owner-origin intake read as the plan's ratification by `plan.ratification`](spec/2026-10-26-spec-TOOL-dRankedPlan-9.md) | 3 | 2 | DEFERRED | rev-5 | 2026-10-29 |
 | [TOOL-dRankedPlan-10 — `plan.exit` falls back to the owner gate while the intake is not installed for the harness](spec/2026-10-26-spec-TOOL-dRankedPlan-10.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-27 |
 | [TOOL-dRankedPlan-24 — one reader of a build's disposition records for an item, bounded to the current crossing](spec/2026-10-26-spec-TOOL-dRankedPlan-24.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-28 |
 | [TOOL-dRankedPlan-2 — the planner and triager role, the Plan workflow, and the plan's order as `plan.authority` says](spec/2026-10-26-spec-TOOL-dRankedPlan-2.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-28 |
@@ -105,7 +105,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-13 — the plan record's intent fields: affected systems derived from the `code` record and checked, open questions as fork tags](spec/2026-10-26-spec-TOOL-dRankedPlan-13.md) | 7 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dRankedPlan-20 — a plan record's `Scenario: none` reads as no re-pick, and a build that never enters `planning` pins on its first transition](spec/2026-10-26-spec-TOOL-dRankedPlan-20.md) | 7 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-30 — the declared callers of the session-scoped predicate are kit anchors, resolved at run time](spec/2026-10-27-spec-TOOL-dRankedPlan-30.md) | 7 | 2 | DEFERRED | rev-3 | 2026-10-27 |
-| [TOOL-dRankedPlan-31 — the caller check over the tree runs on its own unguarded repo leg, on every bar](spec/2026-10-27-spec-TOOL-dRankedPlan-31.md) | 7 | 2 | DEFERRED | rev-3 | 2026-10-28 |
+| [TOOL-dRankedPlan-31 — the caller check over the tree runs on its own unguarded repo leg, on every bar](spec/2026-10-27-spec-TOOL-dRankedPlan-31.md) | 7 | 2 | DEFERRED | rev-4 | 2026-10-29 |
 | [TOOL-dRankedPlan-32 — the caller predicate reads invocations by their structure, so an argv list counts and a resolver line does not](spec/2026-10-27-spec-TOOL-dRankedPlan-32.md) | 7 | 2 | DEFERRED | rev-3 | 2026-10-27 |
 | [TOOL-dRankedPlan-11 — each role item's memory read set sized at Plan, as `id#tag` keys](spec/2026-10-26-spec-TOOL-dRankedPlan-11.md) | 8 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-36 — a build's first transition is checked against the scenario it pins, and never meets the no-record exit](spec/2026-10-27-spec-TOOL-dRankedPlan-36.md) | 8 | 2 | DEFERRED | rev-2 | 2026-10-27 |
@@ -124,7 +124,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-4 — dormancy disposal: a dormant build moved by the owner's disposition, shown in the plan view](spec/2026-10-26-spec-TOOL-dRankedPlan-4.md) | 11 | 2 | DEFERRED | rev-5 | 2026-10-28 |
 | [TOOL-dRankedPlan-44 — dormancy disposal orders its kept dispositions across items by ancestry, and holds on a conflict](spec/2026-10-27-spec-TOOL-dRankedPlan-44.md) | 12 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-5 — the live-build mapping carried out: each live build kept or absorbed, recorded per build](spec/2026-10-26-spec-TOOL-dRankedPlan-5.md) | 12 | 2 | DEFERRED | rev-3 | 2026-10-27 |
-| [TOOL-dRankedPlan-15 — the plan revision record: a fork the goal cannot survive moves the build back to planning, and Design re-enters on the ratified revision](spec/2026-10-26-spec-TOOL-dRankedPlan-15.md) | 13 | 2 | DEFERRED | rev-4 | 2026-10-28 |
+| [TOOL-dRankedPlan-15 — the plan revision record: a fork the goal cannot survive moves the build back to planning, and Design re-enters on the ratified revision](spec/2026-10-26-spec-TOOL-dRankedPlan-15.md) | 13 | 2 | DEFERRED | rev-5 | 2026-10-29 |
 | [TOOL-dRankedPlan-23 — `show` reports a revision's ratification from the record of how the re-entering move was admitted](spec/2026-10-26-spec-TOOL-dRankedPlan-23.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-6 — Plan Review: the plan record a review subject, run with the lenses of the preset `review.pin` passes until dCalibratedLens's Plan lenses land](spec/2026-10-26-spec-TOOL-dRankedPlan-6.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-27 |
 | [TOOL-dRankedPlan-8 — the full kickoff only where `kickoff.runs` says: a `kickoff —` line beside the card](spec/2026-10-26-spec-TOOL-dRankedPlan-8.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-27 |
@@ -170,7 +170,7 @@ ids TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan
 | [TOOL-dRankedPlan-83 — the routed commits leg's ceiling covers this run's close, sized through `derive-ceilings.py --observed` from the main loop's reading of the leg alone](spec/2026-10-28-spec-TOOL-dRankedPlan-83.md) | — | 1 | CLOSED | rev-1 | 2026-10-28 |
 <!-- /gen:build-units -->
 
-Records: 173 bound to this build, across 4 record folder(s).
+Records: 179 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

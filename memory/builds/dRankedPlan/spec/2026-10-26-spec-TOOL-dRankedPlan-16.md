@@ -1,6 +1,6 @@
 # TOOL-dRankedPlan-16 — the artifact levels: one plan record per build, and a brief that renders it and never types it
 
-**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dRankedPlan-17
+**Status:** DEFERRED · rev-6 · 2026-10-29 · node a · Tier-2 · base 0689e7fa · streams tooling · order 1 · advances TOOL-dRankedPlan-17
 
 **Carries:** cl-dClosedLoop-0498@e9d43f26 whole
 **Carries:** node:record-kind.plan
@@ -16,10 +16,12 @@
 | [2026-10-27-build-TOOL-dRankedPlan-16-deviation-161.md](../build/2026-10-27-build-TOOL-dRankedPlan-16-deviation-161.md) | deviation | — |
 | [2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md](../build/2026-10-28-build-TOOL-dRankedPlan-1-agent-ledger.md) | journal | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-19 TOOL-dRankedPlan-20 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-34 TOOL-dRankedPlan-35 TOOL-dRankedPlan-36 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-39 TOOL-dRankedPlan-40 TOOL-dRankedPlan-41 TOOL-dRankedPlan-42 TOOL-dRankedPlan-43 TOOL-dRankedPlan-44 TOOL-dRankedPlan-45 TOOL-dRankedPlan-46 TOOL-dRankedPlan-47 TOOL-dRankedPlan-48 TOOL-dRankedPlan-49 TOOL-dRankedPlan-50 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-53 TOOL-dRankedPlan-54 TOOL-dRankedPlan-55 TOOL-dRankedPlan-56 TOOL-dRankedPlan-57 TOOL-dRankedPlan-58 TOOL-dRankedPlan-59 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-63 TOOL-dRankedPlan-64 TOOL-dRankedPlan-65 TOOL-dRankedPlan-66 TOOL-dRankedPlan-67 TOOL-dRankedPlan-68 TOOL-dRankedPlan-69 TOOL-dRankedPlan-70 TOOL-dRankedPlan-71 TOOL-dRankedPlan-72 TOOL-dRankedPlan-73 TOOL-dRankedPlan-74 TOOL-dRankedPlan-75 TOOL-dRankedPlan-76 TOOL-dRankedPlan-77 TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83 |
 | [2026-10-28-build-TOOL-dRankedPlan-16-deviation-162.md](../build/2026-10-28-build-TOOL-dRankedPlan-16-deviation-162.md) | deviation | — |
+| [2026-10-29-build-TOOL-dRankedPlan-16-deviation-163.md](../build/2026-10-29-build-TOOL-dRankedPlan-16-deviation-163.md) | deviation | — |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-fix-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 |
 | [2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md](../prompts/2026-10-26-prompt-TOOL-dRankedPlan-1-spec-brief.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 |
 | [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-crosscheck.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-6 TOOL-dRankedPlan-7 TOOL-dRankedPlan-8 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-13 TOOL-dRankedPlan-14 TOOL-dRankedPlan-15 TOOL-dRankedPlan-19 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-23 TOOL-dRankedPlan-24 TOOL-dRankedPlan-25 TOOL-dRankedPlan-26 TOOL-dRankedPlan-27 TOOL-dRankedPlan-28 TOOL-dRankedPlan-29 TOOL-dRankedPlan-30 TOOL-dRankedPlan-31 TOOL-dRankedPlan-32 TOOL-dRankedPlan-33 TOOL-dRankedPlan-37 TOOL-dRankedPlan-38 TOOL-dRankedPlan-42 TOOL-dRankedPlan-45 TOOL-dRankedPlan-48 TOOL-dRankedPlan-51 TOOL-dRankedPlan-52 TOOL-dRankedPlan-57 TOOL-dRankedPlan-60 TOOL-dRankedPlan-61 TOOL-dRankedPlan-62 TOOL-dRankedPlan-64 TOOL-dRankedPlan-67 TOOL-dRankedPlan-74 TOOL-dRankedPlan-77 TOOL-dRankedPlan-81 |
 | [2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md](../prompts/2026-10-28-prompt-TOOL-dRankedPlan-1-parents-reground.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-2 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-9 TOOL-dRankedPlan-13 TOOL-dRankedPlan-15 TOOL-dRankedPlan-21 TOOL-dRankedPlan-22 TOOL-dRankedPlan-24 TOOL-dRankedPlan-29 TOOL-dRankedPlan-31 TOOL-dRankedPlan-37 TOOL-dRankedPlan-45 |
+| [2026-10-29-prompt-TOOL-dRankedPlan-1-owner-forks.md](../prompts/2026-10-29-prompt-TOOL-dRankedPlan-1-owner-forks.md) | research | TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-15 TOOL-dRankedPlan-31 |
 | [2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md](../reviews/2026-10-26-review-TOOL-dRankedPlan-1-spec-audit.md) | spec-audit | TOOL-dRankedPlan-1 TOOL-dRankedPlan-9 TOOL-dRankedPlan-10 TOOL-dRankedPlan-2 TOOL-dRankedPlan-14 TOOL-dRankedPlan-13 TOOL-dRankedPlan-11 TOOL-dRankedPlan-12 TOOL-dRankedPlan-3 TOOL-dRankedPlan-4 TOOL-dRankedPlan-5 TOOL-dRankedPlan-15 TOOL-dRankedPlan-6 TOOL-dRankedPlan-8 TOOL-dRankedPlan-7 |
 
 <!-- /gen:spec-records -->
@@ -77,8 +79,11 @@ that types a plan field.
   the build's `build/` folder matching the row's home, `None` for none, and raises naming both paths for
   two; `read_plan_fields(root, slug)` returns that record's fields by the factory's `read_record`, the
   field reader every unit of this build reads a plan field through; `python plan_record.py field <slug>
-  <Name>` prints one value, exit 0, 1 for no record or no such field, 2 for two records. Observed by
-  AC6 and AC7.
+  <Name>` prints one value, exit 0, 1 for no record or no such field, 2 for two records; `python
+  plan_record.py path <slug>` prints the path `find_plan_record` returns, exit 0, 1 for no record, 2
+  for two, as `field` exits, the one locator a kit that imports no memory-tree code runs by
+  subprocess (TOOL-dRankedPlan-9 S5 and §8 F6, TOOL-dRankedPlan-15 S2). Observed by AC6, AC7 and
+  AC10.
 - **S5** — The levels as data. A `[[level]]` table in `tools/memory-tree/record-kinds.toml`, its rows in
   level order from the highest: `card` (the session card, holding the session's own facts), `plan`
   (holding `kind:plan`, `front-matter:priority`, `front-matter:parents`), and `brief` (`renders =
@@ -126,12 +131,12 @@ that types a plan field.
 ### Edges
 
 - **hands-off** `TOOL-dRankedPlan-1` — `record-kind.plan`, whose one record per build the plan view's `Plan` cell links, found by `find_plan_record`
-- **hands-off** `TOOL-dRankedPlan-9` — `record-kind.plan`, whose record's newest commit `signed-commit` verifies
+- **hands-off** `TOOL-dRankedPlan-9` — `record-kind.plan` and `plan_record.py path`, whose record's newest commit `signed-commit` verifies
 - **hands-off** `TOOL-dRankedPlan-14` — `record-kind.plan`, the record whose `Scenario` and `Scenario reason` fields that unit sets
 - **hands-off** `TOOL-dRankedPlan-13` — `record-kind.plan`, the record whose `Scope`, `Affected systems` and `Open questions` fields that unit defines, and `check_plan_record`, the schema check its call joins
 - **hands-off** `TOOL-dRankedPlan-11` — `record-kind.plan`, the record whose `Read sets` field that unit sizes
 - **hands-off** `TOOL-dRankedPlan-12` — `record-kind.plan`, the record whose `Probes owed` field that unit declares
-- **hands-off** `TOOL-dRankedPlan-15` — `record-kind.plan`, the one record per build a revision rewrites
+- **hands-off** `TOOL-dRankedPlan-15` — `record-kind.plan` and `plan_record.py path`, the one record per build a revision rewrites
 - **hands-off** `TOOL-dRankedPlan-6` — `record-kind.plan`, the record whose `plan` Serves kind makes a review subject a plan subject
 - **hands-off** `TOOL-dRankedPlan-7` — `BRIEF_SKELETON`, kept the intake record's one shape at the plan level, whose sub-heads that unit's attended-brief grade reads
 - **consumes-from** external — dTotalRecall: `record_kinds.py new` and `--check` (TOOL-dTotalRecall-1 S3, S4, S9), the door `gov_record.py new` (TOOL-dTotalRecall-2 S1 to S4)
@@ -208,7 +213,7 @@ A plan record, as the door writes it:
 | `[[level]]` with `name`, `holds`, `renders`, `artifacts` | table, `record-kinds.toml` | none declared |
 | `tools/memory-tree/plan_record.py` | module | none |
 | `find_plan_record`, `read_plan_fields`, `check_plan_record`, `read_levels`, `check_brief_derived` | functions | `py.function`, asked at the pass |
-| `check`, `field` | verbs of `plan_record.py` | none |
+| `check`, `field`, `path` | verbs of `plan_record.py` | none |
 | `plan:<field>` | handoff key family | none |
 | `plan-kind`, `plan-name-join`, `level-order`, `brief-types-plan-field` | selftest plants | none |
 
@@ -307,6 +312,10 @@ measured none it would red.
   names, `2026-10-26-build-TOOL-tFix-1-plan-1.md` and `2026-10-27-build-TOOL-tFix-1-plan-1.md`, and
   writes nothing.
   Red when: the render picks one of two plan records.
+- **AC10** — When the same arm runs `python tools/memory-tree/plan_record.py path tFix` on AC7's
+  fixture, it prints the record's path and exits 0 with one plan record, exits 1 with none and exits 2
+  with two.
+  Red when: `path` prints a path for none, or picks one of two.
 - **AC8** — When `python tools/memory-tree/gen_build_index.py --selftest` runs its placed-build arm, a
   patch `tPatch` with origin `tOrigin` stages its README and `<date>-build-TOOL-tPatch-1-plan-1.md`
   whose `Problem` is `request <key>`, `Goal` is `patch of tOrigin` and every other field `none`.
@@ -321,7 +330,7 @@ measured none it would red.
 
 New arm: tools/memory-tree/record_kinds.py · covers AC1 AC2 AC3 AC4 AC5 · the `record-kinds` leg's `--selftest` gaining the `plan-kind`, `plan-name-join`, `level-order` and `brief-types-plan-field` plants, staged by a `check_brief_derived` that passes a typed `Scope` line · none
 
-New arm: tools/roles/adopt-roles.test.sh · covers AC6 AC7 · the `plan:` key render over a fixture build holding one, two and no plan records, staged by a render that takes the first of two records · none
+New arm: tools/roles/adopt-roles.test.sh · covers AC6 AC7 AC10 · the `plan:` key render and `plan_record.py path` over a fixture build holding one, two and no plan records, staged by a render that takes the first of two records · none
 
 New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the `--selftest` placed-build arm gaining the plan record, staged by `--placed-build` writing its README alone · none
 
@@ -384,6 +393,9 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the `--selftest` 
   `gov_record.py new plan` stays S3's door call, the cell spelled in the `deviation` row's form with
   no `new`, since no parent claims a generic `new` verb on the factory (TOOL-dTotalRecall-1 §4);
   no other section moves.
+- rev-6 · 2026-10-29 · S4 · §3 · §4 Inventory · §6 AC10 · §7 · gains the verb `plan_record.py path
+  <slug>`, TOOL-dRankedPlan-9 §8 F6 resolved by the owner to (a), by the owner-forks brief
+  `prompts/2026-10-29-prompt-TOOL-dRankedPlan-9-1-spec-writer.md`; no other section moves.
 
 ## 10. Reuse audit
 
