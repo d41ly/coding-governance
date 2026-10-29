@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-13 — the tag-name vocabulary check: a tag's verbs and nouns graded, its name answered by `--suggest`, and no namespace word in `.lexicon.conf`
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 16 · advances TOOL-dMindYourWords-18
+**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 16 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0274@5185348f whole
 
@@ -8,10 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 |
 | [2026-10-29-build-TOOL-dMindYourWords-1-spec-stage-returns.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-spec-stage-returns.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
 | [2026-10-29-build-TOOL-dMindYourWords-11-reuse-scout-c.md](../build/2026-10-29-build-TOOL-dMindYourWords-11-reuse-scout-c.md) | research | TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-16 |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-spec-brief.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
+| [2026-10-29-review-TOOL-dMindYourWords-1-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-1-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-1 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-12 TOOL-dMindYourWords-11 TOOL-dMindYourWords-5 TOOL-dMindYourWords-7 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-6 TOOL-dMindYourWords-8 TOOL-dMindYourWords-10 TOOL-dMindYourWords-9 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
 
 <!-- /gen:spec-records -->
 
@@ -93,6 +94,10 @@ re-specs them. It also needs TOOL-dMindYourWords-1, -6, -10 and -11 built (§3 E
 - **consumes-from** `TOOL-dMindYourWords-10` — `canon.NOUNS` and `read_declared_families`, which S1 grades nouns and verbs against
 - **consumes-from** `TOOL-dMindYourWords-11` — `read_vocabulary_record`, which names the re-baseline record the landing seed of tag rows cites (§4 Migration)
 - **consumes-from** external — PLAY-dOrderedCharter-10 S6 and S7 and -19 S1 and S2 (the point, `--tags`, the cell, the registry); dDeclaredLoop's `policy` namespace and PLAY-dOrderedCharter-32's overlay rows as tag populations
+- **hands-off** `TOOL-dMindYourWords-22` — the `--tags` verdict through `check_debt_pin`, which that unit scopes to the tag slice (review id 1)
+- **hands-off** `TOOL-dMindYourWords-23` — the tag rows the Migration seeds, which that unit's writers carry (review id 43)
+- **consumes-from** `TOOL-dMindYourWords-27` — the ledger home `.lexicon-debt.txt`, where the Migration seeds the tag rows, in place of `memory/project/lexicon-debt.txt` (review id 45)
+- **hands-off** `TOOL-dMindYourWords-29` — `check_tag_name`'s noun rule and the Skill and conf edits, which the minors batch repairs (review ids 28, 41)
 
 ## 4. Design
 
@@ -228,6 +233,7 @@ New arm: tools/lexicon/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · a fi
 ## 9. Revision log
 
 - rev-1 · 2026-10-29 · initial draft.
+- rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (TOOL-dMindYourWords-22, TOOL-dMindYourWords-23, TOOL-dMindYourWords-27, TOOL-dMindYourWords-29); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

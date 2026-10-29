@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18 TOOL-dMindYourWords-19 TOOL-dMindYourWords-20 TOOL-dMindYourWords-21
+ids: TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18 TOOL-dMindYourWords-19 TOOL-dMindYourWords-20 TOOL-dMindYourWords-21 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29
 spec-audit: 2026-10-21
 parents: dWellOiledMachine dWitnessedBar dLinkedLibrary dFurnishedOrders
 may: PLAY-dClosedLoop-3
@@ -77,45 +77,54 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 17 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 25 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13
-ids TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18 TOOL-dMindYourWords-19 TOOL-dMindYourWords-20 TOOL-dMindYourWords-21
+ids TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18 TOOL-dMindYourWords-19 TOOL-dMindYourWords-20 TOOL-dMindYourWords-21 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25
+ids TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dMindYourWords-1 — the definition classes and one shrink-only debt pin held by name](spec/2026-10-29-spec-TOOL-dMindYourWords-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-14 — the lexicon kit's own defects: repeated headers, non-names, dead modes, one pin story](spec/2026-10-29-spec-TOOL-dMindYourWords-14.md) | 2 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-15 — build records kept out of the graded population by a path selector](spec/2026-10-29-spec-TOOL-dMindYourWords-15.md) | 3 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-12 — the definition context the lexicon reads through the `tools/lib` extraction primitive](spec/2026-10-29-spec-TOOL-dMindYourWords-12.md) | 4 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-11 — the vocabulary changed only with the write path's record, which takes over from `ratified`](spec/2026-10-29-spec-TOOL-dMindYourWords-11.md) | 5 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-5 — a reasoned site suppression, recorded and counted, as the owner's fallback](spec/2026-10-29-spec-TOOL-dMindYourWords-5.md) | 6 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-7 — the packs: their file, their loader and the four generators](spec/2026-10-29-spec-TOOL-dMindYourWords-7.md) | 7 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-2 — forced names recognised by what forces them, under `lexicon.forced`](spec/2026-10-29-spec-TOOL-dMindYourWords-2.md) | 8 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-3 — gov's own contract-forced names in a table, with a stale arm](spec/2026-10-29-spec-TOOL-dMindYourWords-3.md) | 9 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-4 — override markers verified against the packs](spec/2026-10-29-spec-TOOL-dMindYourWords-4.md) | 10 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-6 — `--suggest` made forced-aware](spec/2026-10-29-spec-TOOL-dMindYourWords-6.md) | 11 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-8 — packs detected from the import census and manifests and declared by the owner](spec/2026-10-29-spec-TOOL-dMindYourWords-8.md) | 12 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-10 — drift beyond verbs: one verb per declared family per object, and a noun canon](spec/2026-10-29-spec-TOOL-dMindYourWords-10.md) | 13 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-9 — enforcement: the work order's vocabulary slice, staged names at commit, offenders by name at the bar](spec/2026-10-29-spec-TOOL-dMindYourWords-9.md) | 14 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-16 — the lexicon's drift signals as its own leg pack, out of drift-audit's engine](spec/2026-10-29-spec-TOOL-dMindYourWords-16.md) | 15 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-13 — the tag-name vocabulary check: a tag's verbs and nouns graded, its name answered by `--suggest`, and no namespace word in `.lexicon.conf`](spec/2026-10-29-spec-TOOL-dMindYourWords-13.md) | 16 | 2 | OPEN | rev-1 | 2026-10-29 |
-| [TOOL-dMindYourWords-17 — the overloaded terms settled: attended, playbook and baseline each keep one sense, defined once and reworded where a carrier spends it on another](spec/2026-10-29-spec-TOOL-dMindYourWords-17.md) | 17 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-1 — the definition classes and one shrink-only debt pin held by name](spec/2026-10-29-spec-TOOL-dMindYourWords-1.md) | 1 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-14 — the lexicon kit's own defects: repeated headers, non-names, dead modes, one pin story](spec/2026-10-29-spec-TOOL-dMindYourWords-14.md) | 2 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-24 — the lexicon finds its sibling kits through `resolve_kit_dir`, never a `parent.parent` probe](spec/2026-10-29-spec-TOOL-dMindYourWords-24.md) | 2 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-27 — the `lexicon-debt` ledger homed at the repository root beside `.lexicon.conf`, outside the memory tree's closed name set](spec/2026-10-29-spec-TOOL-dMindYourWords-27.md) | 2 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-15 — build records kept out of the graded population by a path selector](spec/2026-10-29-spec-TOOL-dMindYourWords-15.md) | 3 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-12 — the definition context the lexicon reads through the `tools/lib` extraction primitive](spec/2026-10-29-spec-TOOL-dMindYourWords-12.md) | 4 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-11 — the vocabulary changed only with the write path's record, which takes over from `ratified`](spec/2026-10-29-spec-TOOL-dMindYourWords-11.md) | 5 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-26 — a `widened:<record>` ledger row is admitted only when the branch adds its record](spec/2026-10-29-spec-TOOL-dMindYourWords-26.md) | 6 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-5 — a reasoned site suppression, recorded and counted, as the owner's fallback](spec/2026-10-29-spec-TOOL-dMindYourWords-5.md) | 6 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-28 — suppression provenance refused in a shallow history, and judged at a root commit](spec/2026-10-29-spec-TOOL-dMindYourWords-28.md) | 7 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-7 — the packs: their file, their loader and the four generators](spec/2026-10-29-spec-TOOL-dMindYourWords-7.md) | 7 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-2 — forced names recognised by what forces them, under `lexicon.forced`](spec/2026-10-29-spec-TOOL-dMindYourWords-2.md) | 8 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-3 — gov's own contract-forced names in a table, with a stale arm](spec/2026-10-29-spec-TOOL-dMindYourWords-3.md) | 9 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-4 — override markers verified against the packs](spec/2026-10-29-spec-TOOL-dMindYourWords-4.md) | 10 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-6 — `--suggest` made forced-aware](spec/2026-10-29-spec-TOOL-dMindYourWords-6.md) | 11 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-8 — packs detected from the import census and manifests and declared by the owner](spec/2026-10-29-spec-TOOL-dMindYourWords-8.md) | 12 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-10 — drift beyond verbs: one verb per declared family per object, and a noun canon](spec/2026-10-29-spec-TOOL-dMindYourWords-10.md) | 13 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-9 — enforcement: the work order's vocabulary slice, staged names at commit, offenders by name at the bar](spec/2026-10-29-spec-TOOL-dMindYourWords-9.md) | 14 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-16 — the lexicon's drift signals as its own leg pack, out of drift-audit's engine](spec/2026-10-29-spec-TOOL-dMindYourWords-16.md) | 15 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-13 — the tag-name vocabulary check: a tag's verbs and nouns graded, its name answered by `--suggest`, and no namespace word in `.lexicon.conf`](spec/2026-10-29-spec-TOOL-dMindYourWords-13.md) | 16 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-17 — the overloaded terms settled: attended, playbook and baseline each keep one sense, defined once and reworded where a carrier spends it on another](spec/2026-10-29-spec-TOOL-dMindYourWords-17.md) | 17 | 2 | OPEN | rev-2 | 2026-10-29 |
+| [TOOL-dMindYourWords-22 — the debt pin compares only the slice of `lexicon-debt` its own run measures](spec/2026-10-29-spec-TOOL-dMindYourWords-22.md) | 17 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-23 — the `--measure` and `--rebaseline` writers keep the `lexicon-debt` rows they do not measure](spec/2026-10-29-spec-TOOL-dMindYourWords-23.md) | 17 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-25 — the unattended suites' missed readers of `landed-by attended`, re-pointed so their `miss` arms can fail](spec/2026-10-29-spec-TOOL-dMindYourWords-25.md) | 18 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-29 — the round-1 spec audit's 49 minors, batched: one stdout for the ledger, every reader of a moved fact, honest failure states, and the observations that read the wrong thing](spec/2026-10-29-spec-TOOL-dMindYourWords-29.md) | 19 | 2 | OPEN | rev-1 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 3 record folder(s).
+Records: 21 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dMindYourWords-1 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3
-TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9.
+Ids no `spec-audit` record has ever named: TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29.
 
-Ids whose spec moved past its audited revision: none — 0 of 17 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: TOOL-dMindYourWords-1@rev-1 TOOL-dMindYourWords-10@rev-1 TOOL-dMindYourWords-11@rev-1 TOOL-dMindYourWords-12@rev-1 TOOL-dMindYourWords-13@rev-1 TOOL-dMindYourWords-14@rev-1 TOOL-dMindYourWords-15@rev-1 TOOL-dMindYourWords-16@rev-1
+TOOL-dMindYourWords-17@rev-1 TOOL-dMindYourWords-2@rev-1 TOOL-dMindYourWords-3@rev-1 TOOL-dMindYourWords-4@rev-1 TOOL-dMindYourWords-5@rev-1 TOOL-dMindYourWords-6@rev-1 TOOL-dMindYourWords-7@rev-1 TOOL-dMindYourWords-8@rev-1 TOOL-dMindYourWords-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 17 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 25 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 17
 - carried in parts: 0 (none)
@@ -124,7 +133,9 @@ Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 17 spec(s) a
 - stale: 0 (none)
 - ambiguous: 0 (none)
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: `spec/2026-10-29-spec-TOOL-dMindYourWords-22.md` (PLAY-dClosedLoop-2), `spec/2026-10-29-spec-TOOL-dMindYourWords-23.md` (PLAY-dClosedLoop-2), `spec/2026-10-29-spec-TOOL-dMindYourWords-24.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-29-spec-TOOL-dMindYourWords-25.md` (PLAY-dClosedLoop-2), `spec/2026-10-29-spec-TOOL-dMindYourWords-26.md` (PLAY-dClosedLoop-2), `spec/2026-10-29-spec-TOOL-dMindYourWords-27.md` (PLAY-dClosedLoop-2), `spec/2026-10-29-spec-TOOL-dMindYourWords-28.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-29-spec-TOOL-dMindYourWords-29.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0264, cl-dClosedLoop-0265, cl-dClosedLoop-0266, cl-dClosedLoop-0275, cl-dClosedLoop-0277
 <!-- /gen:build-coverage -->
 
@@ -133,12 +144,12 @@ Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 17 spec(s) a
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dMindYourWords-1` | no |
-| 2 | `TOOL-dMindYourWords-14` | no |
+| 2 | `TOOL-dMindYourWords-14`, `TOOL-dMindYourWords-24`, `TOOL-dMindYourWords-27` | no |
 | 3 | `TOOL-dMindYourWords-15` | no |
 | 4 | `TOOL-dMindYourWords-12` | no |
 | 5 | `TOOL-dMindYourWords-11` | no |
-| 6 | `TOOL-dMindYourWords-5` | no |
-| 7 | `TOOL-dMindYourWords-7` | no |
+| 6 | `TOOL-dMindYourWords-26`, `TOOL-dMindYourWords-5` | no |
+| 7 | `TOOL-dMindYourWords-28`, `TOOL-dMindYourWords-7` | no |
 | 8 | `TOOL-dMindYourWords-2` | no |
 | 9 | `TOOL-dMindYourWords-3` | no |
 | 10 | `TOOL-dMindYourWords-4` | no |
@@ -148,7 +159,9 @@ Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 17 spec(s) a
 | 14 | `TOOL-dMindYourWords-9` | no |
 | 15 | `TOOL-dMindYourWords-16` | no |
 | 16 | `TOOL-dMindYourWords-13` | no |
-| 17 | `TOOL-dMindYourWords-17` | no |
+| 17 | `TOOL-dMindYourWords-17`, `TOOL-dMindYourWords-22`, `TOOL-dMindYourWords-23` | no |
+| 18 | `TOOL-dMindYourWords-25` | no |
+| 19 | `TOOL-dMindYourWords-29` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

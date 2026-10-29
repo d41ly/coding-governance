@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-11 — the vocabulary changed only with the write path's record, which takes over from `ratified`
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 5 · advances TOOL-dMindYourWords-18
+**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 5 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0272@51d03a52 whole
 **Carries:** node:record-kind.lexicon-declaration
@@ -9,12 +9,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 |
 | [2026-10-29-build-TOOL-dMindYourWords-1-spec-stage-returns.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-spec-stage-returns.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
 | [2026-10-29-build-TOOL-dMindYourWords-11-deviation-111.md](../build/2026-10-29-build-TOOL-dMindYourWords-11-deviation-111.md) | deviation | — |
 | [2026-10-29-build-TOOL-dMindYourWords-11-reuse-scout-c.md](../build/2026-10-29-build-TOOL-dMindYourWords-11-reuse-scout-c.md) | research | TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-16 |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-5 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-12 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-spec-brief.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
+| [2026-10-29-review-TOOL-dMindYourWords-1-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-1-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-1 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-12 TOOL-dMindYourWords-5 TOOL-dMindYourWords-7 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-6 TOOL-dMindYourWords-8 TOOL-dMindYourWords-10 TOOL-dMindYourWords-9 TOOL-dMindYourWords-16 TOOL-dMindYourWords-13 TOOL-dMindYourWords-17 |
 
 <!-- /gen:spec-records -->
 
@@ -155,6 +156,11 @@ S7 (the factory `tools/memory-tree/build_records.py`, whose `new change` verb is
 - **consumes-from** external — PLAY-dOrderedCharter-15 S7 and PLAY-dOrderedCharter-7 S7 (the `change`
   kind and its stand-in door) and TOOL-dTotalRecall-1 S1 and S9 (the record-kind registry), DEFERRED at
   base and built by ancestor builds before this build run
+- **hands-off** `TOOL-dMindYourWords-23` — `--rebaseline`, which that unit makes carry the tag rows it does not measure (review id 43)
+- **hands-off** `TOOL-dMindYourWords-26` — S8's `shrink-only` admission, which that unit narrows to a vocabulary record the branch adds (review id 44)
+- **hands-off** `TOOL-dMindYourWords-28` — `read_vocabulary_record` with `rev` a commit, whose added set that unit defines for a parentless commit (review id 49)
+- **consumes-from** `TOOL-dMindYourWords-27` — the ledger home `.lexicon-debt.txt`, the debt ledger S3's `--check-record` reads and S4's hook block runs for, in place of `memory/project/lexicon-debt.txt` (review id 45)
+- **hands-off** `TOOL-dMindYourWords-29` — `read_vocabulary_record`, `--check-record`, the hook block and the stamp's other readers, which the minors batch repairs (review ids 16, 26, 34, 35, 52)
 
 ## 4. Design
 
@@ -395,6 +401,7 @@ New arm: tools/drift-audit/selftest.py · covers AC6 · the fixture's planted LA
   and `init-row-inventory`, PLAY-dOrderedCharter-15 S2 to S7, scout C's row and disagreements 1 to 3
   and 6, and the spec brief's I11 and I16. The clause's named hole and readers differ from source:
   deviation record `2026-10-29-build-TOOL-dMindYourWords-11-deviation-111.md`.
+- rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (TOOL-dMindYourWords-23, TOOL-dMindYourWords-26, TOOL-dMindYourWords-28, TOOL-dMindYourWords-27, TOOL-dMindYourWords-29); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 
