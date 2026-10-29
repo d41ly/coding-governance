@@ -7,53 +7,64 @@
 #          step and introduced at the clone's tip, so it walks last; its id is upgrade-walk/<name>
 #   plant  a plant-shaped edit joining release-0's plants
 #   shim   a `[[shim]]`-shaped row (id, kind, from, to, closed) read beside the clone's own
+# `needle` is the text the case's red must hold, or for `exit = 2` its stop's message: a case red
+# for another reason does not catch the arm, and a row with no `needle` is a refusal, exit 2.
 # `with` names arms injected beside it, run as one set. Tokens the leg resolves before the walk:
 # {arms} this fixture's arms/ directory, {plant:<id>} a plant's path, {shim:<arm>} a shim arm's `from`.
 
 [[arm]]
 name = "witness-first"
+needle = ".uw-arm/1-payload"
 case = "kill"
 step = { up = ["python", "{arms}/arm_step.py", "witness-first", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "witness-first", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "witness-first", "witness", "{target}"] }
 
 [[arm]]
 name = "not-rerunnable"
+needle = ".uw-arm/0-lines"
 case = "kill"
 step = { up = ["python", "{arms}/arm_step.py", "not-rerunnable", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "not-rerunnable", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "not-rerunnable", "witness", "{target}"] }
 
 [[arm]]
 name = "no-op"
+needle = "not load-bearing"
 case = "skip"
 step = { up = ["python", "{arms}/arm_step.py", "no-op", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "no-op", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "no-op", "witness", "{target}"] }
 
 [[arm]]
 name = "lossy-down"
+needle = ".uw-arm/lossy"
 case = "down"
 step = { up = ["python", "{arms}/arm_step.py", "lossy-down", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "lossy-down", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "lossy-down", "witness", "{target}"] }
 
 [[arm]]
 name = "drops-plant"
+needle = "engine-edit"
 case = "plants"
 step = { up = ["python", "{arms}/arm_step.py", "drops-plant", "up", "{target}", "{plant:engine-edit}"], down = ["python", "{arms}/arm_step.py", "drops-plant", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "drops-plant", "witness", "{target}", "{plant:engine-edit}"] }
 
 [[arm]]
 name = "held-shim"
+needle = "is gone from the walked target"
 case = "shims"
 with = ["drops-shim"]
 shim = { id = "upgrade-walk/held-shim", kind = "command", from = "tools/check-kit-versions.sh", to = "tools/check-kit-versions-moved.sh", closed = false }
 
 [[arm]]
 name = "drops-shim"
+needle = "is gone from the walked target"
 case = "shims"
 with = ["held-shim"]
 step = { up = ["python", "{arms}/arm_step.py", "drops-shim", "up", "{target}", "{shim:held-shim}"], down = ["python", "{arms}/arm_step.py", "drops-shim", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "drops-shim", "witness", "{target}", "{shim:held-shim}"] }
 
 [[arm]]
 name = "breaks-isolation"
+needle = "breach"
 case = "isolation"
 step = { up = ["python", "{arms}/arm_step.py", "breaks-isolation", "up", "{target}"], down = ["python", "{arms}/arm_step.py", "breaks-isolation", "down", "{target}"], witness = ["python", "{arms}/arm_step.py", "breaks-isolation", "witness", "{target}"] }
 
 [[arm]]
 name = "missing-plant"
+needle = "is absent at release-0"
 case = "up"
 exit = 2
 plant = { id = "missing-plant", path = "tools/upgrade-walk-no-such-file.md", edit = "append", text = "x\n", expect = "carried", unchanged = true }

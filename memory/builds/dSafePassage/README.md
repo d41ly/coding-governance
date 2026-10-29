@@ -226,7 +226,7 @@ ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePas
 | [TOOL-dSafePassage-74 — the introducing commit is found by the TOML parse alone, so a row id in any string spelling the reader accepts is found](spec/2026-10-28-spec-TOOL-dSafePassage-74.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-75 — the step environment keeps `GOV_PYTHON`, so the floor step resolves the interpreter every gate and hook resolves](spec/2026-10-28-spec-TOOL-dSafePassage-75.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-76 — the closing review's nine engine-side minors, from a before-image restoring into the git directory to a walk refusal blamed on the config](spec/2026-10-28-spec-TOOL-dSafePassage-76.md) | 16 | 2 | CLOSED | rev-5 | 2026-10-29 |
-| [TOOL-dSafePassage-77 — the closing review's five walk-leg minors: an order matched by its kind, an arm graded by its defect, a dirty tree refused, reds counted per unit](spec/2026-10-28-spec-TOOL-dSafePassage-77.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
+| [TOOL-dSafePassage-77 — the closing review's five walk-leg minors: an order matched by its kind, an arm graded by its defect, a dirty tree refused, reds counted per unit](spec/2026-10-28-spec-TOOL-dSafePassage-77.md) | 16 | 2 | CLOSED | rev-5 | 2026-10-29 |
 | [TOOL-dSafePassage-78 — the govkit selftest arms red at the build's head: three arms read against the product they grade, and a walk run over a receipt below schema 3](spec/2026-10-28-spec-TOOL-dSafePassage-78.md) | 16 | 2 | CLOSED | rev-2 | 2026-10-29 |
 | [TOOL-dSafePassage-80 — five leg ceilings clear their evidence by the declared margin, and upgrade-walk is budgeted](spec/2026-10-28-spec-TOOL-dSafePassage-80.md) | 16 | 2 | CLOSED | rev-5 | 2026-10-29 |
 | [TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin](spec/2026-10-28-spec-TOOL-dSafePassage-81.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
@@ -235,7 +235,7 @@ ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePas
 | [TOOL-dSafePassage-84 — the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked](spec/2026-10-29-spec-TOOL-dSafePassage-84.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 403 bound to this build, across 4 record folder(s).
+Records: 404 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

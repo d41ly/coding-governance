@@ -17,10 +17,12 @@ THE CASES, each over a fresh copy of the planted release-0: `up`, `down`, `reup`
 meet it"). A walk runs in a child process that rebinds `run_step_isolated` and `read_steps` in the
 clone's `upgrade_steps` module, so no shipped code carries a test switch. Every compare reads the
 tree as `derive_tree_digest` states. The arms of `arms.toml` join only under `--inject`, and the
-leg runs each after its real cases: an arm whose case stays green is a red.
+leg runs each after its real cases: an arm whose case stays green, or goes red naming no `needle`
+of its row, is a red. Every invocation first runs `check_graders` (TOOL-dSafePassage-77 S7).
 
     Exit 0 green · 1 a red · 2 nothing measured: the pin fails, release-0 does not apply clean, a
-    plant's path is absent at release-0, or no step is declared.
+    plant's path is absent at release-0, no step is declared, or an engine file under this
+    directory or its sibling `lib` differs from HEAD outside the leg's own files.
 """
 from __future__ import annotations
 
@@ -49,6 +51,8 @@ CARRY_KEY = "carry"  # DEPL-dCarriedReceipt-9 S2
 RENDERED_KEYS = ("sha256", "oid", "gov_oid", "commit", "version")  # DEPL-dRemeasuredRender-1 S1
 CHILD_TIMEOUT_S = 1800
 OK = {"verdict": "ok", "rc": 0, "tail": ""}
+# TOOL-dSafePassage-77 S3: the files the leg reads from the working tree, relative to HERE
+LEG_OWN = (pathlib.Path(__file__).name, "fixture_target.py", "fixtures/release-0")
 
 
 class Stop(Exception):
@@ -115,7 +119,12 @@ def read_fixture_rows(kind: str, fixture=FIXTURE) -> list[dict]:
 
 
 def read_plant_rows(fixture=FIXTURE) -> list[dict]:
-    return read_fixture_rows("plant", fixture)
+    """TOOL-dSafePassage-77 S1: an `ordered` plant with no `order` kind is a Stop naming it."""
+    rows = read_fixture_rows("plant", fixture)
+    for r in rows:
+        if r.get("expect") == "ordered" and not r.get("order"):
+            raise Stop(f"plant {r.get('id')}: expects ordered and names no `order` kind")
+    return rows
 
 
 def read_condition_rows(fixture=FIXTURE) -> list[dict]:
@@ -123,7 +132,12 @@ def read_condition_rows(fixture=FIXTURE) -> list[dict]:
 
 
 def read_arm_rows(fixture=FIXTURE) -> list[dict]:
-    return read_fixture_rows("arm", fixture)
+    """TOOL-dSafePassage-77 S2: an arm with no `needle` is a Stop naming it."""
+    rows = read_fixture_rows("arm", fixture)
+    for r in rows:
+        if not r.get("needle"):
+            raise Stop(f"arm {r.get('name')}: names no `needle`, the text its case's red must hold")
+    return rows
 
 
 def write_plant_edits(tree, rows: list[dict]) -> None:
@@ -472,16 +486,18 @@ def run_child_walk(ctx: dict, target, argv: list[str], mode: str | None = None, 
 # ------------------------------------------------------------------------------------------ the cases
 def check_plant_rows(ctx: dict, tree, rows: list[dict]) -> list[str]:
     """S3 over a walked, committed tree: one red per `[[plant]]` neither carried by its observation
-    nor, expecting `ordered`, named by an order under the outbox. Prints one line per plant."""
+    nor, expecting `ordered`, named by an order of its `order` kind under the outbox: the file
+    gov's one order writer names by `render_row_order_key` (TOOL-dSafePassage-77 S1). Prints one
+    line per plant."""
+    _us, _shims, gk = load_engine()
     tree, reds = pathlib.Path(tree), []
     sha = run_git(tree, "rev-parse", "HEAD")
-    orders = "\n".join(p.read_text(encoding="utf-8", errors="replace")
-                       for p in (tree / OUTBOX).rglob("*") if p.is_file()) if (tree / OUTBOX).is_dir() else ""
     for r in rows:
         f, got, why = tree / r["path"], None, ""
         if r["expect"] == "ordered":
-            got = "ordered" if r["path"] in orders else None
-            why = "no order under the outbox names it"
+            name = gk.render_row_order_key(r["order"], r["path"]) + ".md"
+            got = "ordered" if (tree / OUTBOX / name).is_file() else None
+            why = f"no {r['order']} order {name} is under the outbox"
         elif "contains" in r:
             got = "carried" if f.is_file() and r["contains"] in f.read_text(encoding="utf-8", errors="replace") else None
             why = f"the walked file does not hold {r['contains']!r}"
@@ -569,12 +585,17 @@ def run_walk_case(ctx: dict, case: str, steps: list | None = None, inject: tuple
     reds: list[str] = []
     walk = ["update", "--target", "{target}", "--to", ctx["tip"], "--write"]
     back = ["update", "--target", "{target}", "--rollback", "--to", ctx["pin"], "--write"]
+    arm_plants = [arms[n]["plant"] for n in inject if "plant" in arms.get(n, {})]
 
     def build_case_tree(name: str, src=None) -> pathlib.Path:
         dst = ctx["root"] / "cases" / name
         if dst.exists():
             remove_tree(dst)
         shutil.copytree(src or ctx["r0"], dst, symlinks=True)
+        if src is None and arm_plants:
+            # TOOL-dSafePassage-77 S6: an injected plant arm joins release-0's plants by their writer
+            write_plant_edits(dst, arm_plants)
+            write_commit(dst, "arm plants")
         return dst
 
     def derive_digest(t):
@@ -810,9 +831,16 @@ def run_condition(ctx, cond: dict, row, walk, inj_rows, build_case_tree) -> tupl
     return held, (f"{cond.get('id', row.id)}: unskipped it reads {seen[False]}, skipped {seen[True]}")
 
 
+def check_arm_caught(rows: list[dict], got: int, want: int, lines: list[str]) -> bool:
+    """TOOL-dSafePassage-77 S2: an arm set is caught by its own defect: its case exited `want`, and
+    every `needle` of its `rows` is in one of `lines`, the case's reds or, for exit 2, the Stop's."""
+    return got == want and all(any(r["needle"] in ln for ln in lines) for r in rows)
+
+
 def run_case_arms(ctx: dict) -> list[str]:
-    """S7: each arm's case run with it injected, after the real cases; an arm whose case stays green
-    is a red. Arms naming each other in `with` run together once."""
+    """S7: each arm's case run with it injected, after the real cases; an arm whose case stays green,
+    or goes red naming no `needle` of its set, is a red. Arms naming each other in `with` run
+    together once."""
     reds, done = [], set()
     for a in ctx["arms"]:
         names = tuple(sorted({a["name"], *a.get("with", [])}))
@@ -823,28 +851,32 @@ def run_case_arms(ctx: dict) -> list[str]:
         try:
             steps = [ctx["arm_rows"][a["name"]]] if a["case"] in PER_STEP and a["name"] in ctx["arm_rows"] else None
             check_inject(ctx, names)
-            got = 1 if run_walk_case(ctx, a["case"], steps, names) else 0
+            lines = run_walk_case(ctx, a["case"], steps, names)
+            got = 1 if lines else 0
         except Stop as e:
             print_line(f"arm {'+'.join(names)} · {e}")
-            got = 2
-        verdict = "red on its case, as it must be" if got == want else f"exit {got} on {a['case']}, expected {want}"
+            lines, got = [str(e)], 2
+        rows = [x for x in ctx["arms"] if x["name"] in names]
+        caught = check_arm_caught(rows, got, want, lines)
+        missed = ", ".join(sorted({r["needle"] for r in rows if not any(r["needle"] in ln for ln in lines)}))
+        verdict = ("red on its case, as it must be" if caught
+                   else f"exit {got} on {a['case']}, expected {want}" if got != want
+                   else f"red, but no red names {missed}")
         print_line(f"arm {'+'.join(names)} · {a['case']} · {verdict}")
-        ctx["arm_verdicts"].append(got == want)
+        ctx["arm_verdicts"].append(caught)
         if got != want:
             reds.append(f"arm {'+'.join(names)} · its case stays {'green' if got == 0 else got}")
+        elif not caught:
+            reds.append(f"arm {'+'.join(names)} · {a['case']} · red, but no red names {missed}")
     return reds
 
 
 def check_inject(ctx: dict, names) -> None:
-    """A `plant` arm joins release-0's plants: its path absent at release-0 is a Stop (exit 2)."""
+    """Each `--inject` name is an `[[arm]]` row's; a `plant` arm's path is tested where
+    `write_plant_edits` applies it to each case tree (TOOL-dSafePassage-77 S6)."""
     for n in names:
-        a = next((x for x in ctx["arms"] if x["name"] == n), None)
-        if a is None:
+        if not any(x["name"] == n for x in ctx["arms"]):
             raise Stop(f"--inject {n}: no [[arm]] row is named so")
-        if "plant" in a:
-            p = a["plant"]["path"]
-            if not (ctx["r0"] / p).exists():
-                raise Stop(f"plant {a['plant']['id']}: {p} is absent at release-0")
 
 
 # ------------------------------------------------------------------------------------------ the leg
@@ -872,6 +904,135 @@ def resolve_arm_rows(ctx: dict, us) -> dict:
     return rows
 
 
+def check_tree_clean(gov_root, own) -> list[str]:
+    """TOOL-dSafePassage-77 S3: the tracked paths under the leg's directory and its sibling `lib`,
+    both spelled from HERE's place in the toplevel, that differ from HEAD in `gov_root`, outside
+    `own` (paths relative to HERE). Only those engine files are what the walk takes from HEAD."""
+    kit = run_git(HERE, "rev-parse", "--show-prefix").rstrip("/")
+    lib = f"{kit.rsplit('/', 1)[0]}/lib" if "/" in kit else "lib"
+    mine = [f"{kit}/{o}" for o in own]
+    out = subprocess.run(["git", "-C", str(gov_root), "status", "--porcelain", "--untracked-files=no", "--", kit, lib],
+                         capture_output=True, text=True, encoding="utf-8", errors="replace",
+                         env={k: v for k, v in os.environ.items() if not k.upper().startswith("GIT_")},
+                         stdin=subprocess.DEVNULL).stdout  # not run_git: its strip eats the first status column
+    paths = [ln[3:].split(" -> ")[-1].strip('"') for ln in out.splitlines() if len(ln) > 3]
+    return sorted(p for p in paths if not any(p == m or p.startswith(m + "/") for m in mine))
+
+
+def render_case_counts(per_case: dict) -> str:
+    """TOOL-dSafePassage-77 S4: each case `<case> <n - u> passed <u> red`, `per_case` mapping a case
+    to (n, its red lines), `u` the units that redded: a per-step or `plants` red line's second
+    ` · ` field, the case itself otherwise. Ends `red lines <k>`, every red line counted."""
+    parts, k = [], 0
+    for c, (n, lines) in per_case.items():
+        k += len(lines)
+        if c in PER_STEP or c == "plants":
+            u = len({ln.split(" · ")[1] if " · " in ln else ln for ln in lines})
+        else:
+            u = 1 if lines else 0
+        parts.append(f"{c} {n - u} passed {u} red")
+    return " · ".join(parts + [f"red lines {k}"])
+
+
+def check_graders() -> list[str]:
+    """TOOL-dSafePassage-77 S7: S1, S2, S3 and S4's functions fed fabricated inputs, one line per
+    grader; returns the reds. Each is a pure call or a scratch repository it removes."""
+    import contextlib
+    import io
+    kit = run_git(HERE, "rev-parse", "--show-prefix").rstrip("/")
+    scratch = pathlib.Path(tempfile.mkdtemp(prefix="uwg"))
+
+    def make_repo(name: str, files: dict) -> pathlib.Path:
+        t = scratch / name
+        t.mkdir()
+        run_git(t, "init", "-q")
+        run_git(t, "config", "core.autocrlf", "false")
+        for p, text in files.items():
+            (t / p).parent.mkdir(parents=True, exist_ok=True)
+            (t / p).write_text(text, encoding="utf-8", newline="\n")
+        write_commit(t, "grader")
+        return t
+
+    def grade_order_kind() -> str:
+        path = ".claude/skills/lexicon/SKILL.md"
+        row = {"id": "edited-render", "path": path, "expect": "ordered", "order": "render-edited"}
+        t = make_repo("order", {f"{OUTBOX}/update-rollback-demo.md": f"# an order naming {path}\n"})
+        with contextlib.redirect_stdout(io.StringIO()):
+            before = check_plant_rows({}, t, [row])
+            _us, _shims, gk = load_engine()
+            (t / OUTBOX / (gk.render_row_order_key("render-edited", path) + ".md")).write_text("x\n", encoding="utf-8")
+            after = check_plant_rows({}, t, [row])
+        if not before:
+            return "an outbox naming the path under another order's file read ordered"
+        return f"its own order's file did not read ordered: {after}" if after else ""
+
+    def grade_arm_needle() -> str:
+        row = {"name": "witness-first", "case": "kill", "needle": ".uw-arm/1-payload"}
+        tie = ["kill · upgrade-walk/witness-first · first write undetermined: a and b share one modification time"]
+        own = ["kill · upgrade-walk/witness-first · the re-run's digest differs from up's at .uw-arm/1-payload"]
+        if check_arm_caught([row], 1, 1, tie):
+            return "a first write undetermined red caught the arm"
+        if check_arm_caught([row], 0, 1, own):
+            return "a case exiting 0 caught the arm"
+        return "" if check_arm_caught([row], 1, 1, own) else "a red naming its needle did not catch the arm"
+
+    def grade_tree_clean() -> str:
+        tools = kit.rsplit("/", 1)[0] if "/" in kit else "."
+        steps, plants = f"{kit}/steps.toml", f"{kit}/fixtures/release-0/plants.toml"
+        memo, evidence = "memory/note.md", f"{tools}/run-gates/ceiling-evidence.txt"
+        t = make_repo("clean", {steps: "a\n", plants: "a\n", memo: "a\n", evidence: "a\n"})
+        for p in (plants, memo, evidence, f"{kit}/untracked.py"):
+            with open(t / p, "a", encoding="utf-8", newline="\n") as fh:
+                fh.write("\n")
+            got = check_tree_clean(t, LEG_OWN)
+            if got:
+                return f"{p} edited, it returned {got}"
+            run_git(t, "checkout", "-q", "--", ".")
+        with open(t / steps, "a", encoding="utf-8", newline="\n") as fh:
+            fh.write("\n")
+        got = check_tree_clean(t, LEG_OWN)
+        return "" if got == [steps] else f"{steps} edited, it returned {got}"
+
+    def grade_case_counts() -> str:
+        line = render_case_counts({"down": (1, ["down · a", "down · b"]),
+                                   "kill": (2, ["kill · r1 · a", "kill · r1 · b"])})
+        want = ("down 0 passed 1 red", "kill 1 passed 1 red", "red lines 4")
+        return "" if all(w in line for w in want) else f"it rendered {line!r}"
+
+    def grade_fixture_keys() -> str:
+        fx = scratch / "fixture"
+        fx.mkdir()
+        seen = []
+        for name, text, read, key in (
+                ("plants.toml", '[[plant]]\nid = "no-kind"\npath = "a"\nedit = "append"\ntext = "x"\nexpect = "ordered"\n',
+                 read_plant_rows, "no-kind"),
+                ("arms.toml", '[[arm]]\nname = "no-needle"\ncase = "up"\n', read_arm_rows, "no-needle")):
+            (fx / name).write_text(text, encoding="utf-8", newline="\n")
+            try:
+                read(fx)
+                seen.append(f"{name} with no key read as a default")
+            except Stop as e:
+                if key not in str(e):
+                    seen.append(f"{name}'s Stop does not name {key}: {e}")
+        return "; ".join(seen)
+
+    reds = []
+    try:
+        for name, grade in (("order-kind", grade_order_kind), ("arm-needle", grade_arm_needle),
+                            ("tree-clean", grade_tree_clean), ("case-counts", grade_case_counts),
+                            ("fixture-keys", grade_fixture_keys)):
+            try:
+                why = grade()
+            except (Stop, OSError, KeyError, ValueError) as e:
+                why = f"it raised {type(e).__name__}: {e}"
+            print_line(f"grader · {name} · " + (f"RED · {why}" if why else "ok"))
+            if why:
+                reds.append(f"grader {name}")
+    finally:
+        remove_tree(scratch)
+    return reds
+
+
 def main(argv: list[str]) -> int:
     args, case, step, inject, pin_rev, listing = list(argv), None, None, [], None, False
     while args:
@@ -895,10 +1056,17 @@ def main(argv: list[str]) -> int:
     if case is not None and case not in CASES:
         print_line(f"no case {case!r}: the cases are {', '.join(CASES)}")
         return 2
+    if check_graders():
+        print_line("RED: a grader of this leg reads wrong, so nothing it would measure is trusted")
+        return 1
     gov_root = pathlib.Path(run_git(HERE, "rev-parse", "--show-toplevel"))
     root = pathlib.Path(tempfile.mkdtemp(prefix="uw"))
     t0 = time.time()
     try:
+        dirty = [] if listing else check_tree_clean(gov_root, LEG_OWN)
+        if dirty:
+            raise Stop(f"the working tree differs from HEAD at {', '.join(dirty)}, engine files the walk "
+                       "takes from HEAD's committed bytes; commit or stash them")
         us, _shims, _gk = load_engine()
         pin = run_git(gov_root, "rev-parse", "--verify", f"{pin_rev}^{{commit}}") if pin_rev else read_release_pin()
         problems = check_release_pin(gov_root, pin)
@@ -936,7 +1104,7 @@ def main(argv: list[str]) -> int:
             pool = [r for r in ctx["rows"] + [ctx["arm_rows"][n] for n in inject if n in ctx["arm_rows"]]
                     if step is None or r.id == step] if c in PER_STEP else None
             got = run_walk_case(ctx, c, pool, tuple(inject))
-            per_case[c] = (len(pool) if pool is not None else len(plants) if c == "plants" else 1, len(got))
+            per_case[c] = (len(pool) if pool is not None else len(plants) if c == "plants" else 1, got)
             reds += got
             # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the case above walked the subject, and a probe stops here.
             if probe:
@@ -946,7 +1114,7 @@ def main(argv: list[str]) -> int:
             reds += run_case_arms(ctx)
         forced = "; ".join(f"{c} {', '.join(sorted(s))}" for c, s in ctx["forced"].items()) or "none"
         print_line(f"summary · pin {pin[:8]} · tip {ctx['tip'][:8]} · {len(ctx['rows'])} step(s) · "
-            + " · ".join(f"{c} {n - k} passed {k} red" for c, (n, k) in per_case.items())
+            + render_case_counts(per_case)
             + f" · forced {forced} · shims {ctx['shims'] if ctx['shims'] is not None else 'not run'}"
             + (" (measured nothing)" if ctx["shims"] == 0 else "")
             + f" · attended {ctx['attended']}"

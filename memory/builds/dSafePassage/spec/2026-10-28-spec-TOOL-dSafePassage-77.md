@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-77 — the closing review's five walk-leg minors: an order matched by its kind, an arm graded by its defect, a dirty tree refused, reds counted per unit
 
-**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · closes TOOL-dSafePassage-79 · ratified 2026-10-28
+**Status:** CLOSED · rev-5 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · closes TOOL-dSafePassage-79 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-28-build-TOOL-dSafePassage-77-ledger.md](../build/2026-10-28-build-TOOL-dSafePassage-77-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-76-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-76-spec-brief.md) | research | TOOL-dSafePassage-76 |
 | [2026-10-28-prompt-TOOL-dSafePassage-77-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-77-build-brief.md) | journal | — |
 | [2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |

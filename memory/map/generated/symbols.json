@@ -3823,6 +3823,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "check_arm_caught",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "check_arm_lines",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -4486,6 +4491,11 @@
       "id": "check_gov_first",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "check_graders",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "check_grant",
@@ -5956,6 +5966,11 @@
       "id": "check_tree_claim",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "check_tree_clean",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "check_true",
@@ -17691,6 +17706,11 @@
       "id": "render_cards_md",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_case_counts",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "render_catalogue_region",

@@ -6,7 +6,9 @@
 #                `contains` (a text the walked file holds), `unchanged = true` (the bytes as planted)
 #                or `policy` (`key`, `value`, and `absent`, the paths the walked commit must not hold,
 #                read by the clone's own `policy.py get <key> --rev <walked commit>`). `ordered` holds
-#                when an order under .governance/outbox/ names the path. An `append` or `replace`
+#                when `.governance/outbox/<render_row_order_key(order, path)>.md` is a file, `order` the
+#                kind gov writes for it (`render-edited`, `retired-edited`); an `ordered` row with no
+#                `order` is a refusal, exit 2. An `append` or `replace`
 #                whose path release-0 lacks is a refusal, exit 2.
 # [[gov_plant]]  a commit on the clone's tip: `id`, `what`, and a plant-shaped edit over gov's tree.
 # [[condition]]  `step`, and `plant` (a plant-shaped edit) or `fakes` (launcher names and the version
@@ -98,6 +100,7 @@ path = ".claude/skills/lexicon/SKILL.md"
 edit = "append"
 text = "<!-- upgrade-walk plant edited-render: an adopter's own line in a rendered file -->\n"
 expect = "ordered"
+order = "render-edited"
 
 [[plant]]
 id = "edited-retired"
@@ -105,6 +108,7 @@ path = "tools/hooks/README.md"
 edit = "append"
 text = "<!-- upgrade-walk plant edited-retired: an adopter's own line in a file gov withdraws -->\n"
 expect = "ordered"
+order = "retired-edited"
 
 [[gov_plant]]
 id = "withdraw-one"

@@ -411,7 +411,8 @@ Each case starts from a fresh copy of release-0, and each prints one line per st
 - `down` — after `up`, `update --rollback --to <pin> --write` leaves a tree equal to release-0.
 - `reup` — walking up again from that rolled-back tree equals the first walk.
 - `plants` — each adopter edit is carried (still there, or read back through the policy reader) or
-  ordered (an order under `.governance/outbox/` names it).
+  ordered: an order of its kind names it, the file gov writes under `.governance/outbox/` for that
+  kind and path (an edited render's `render-edited`, say). An order of another kind does not count.
 - `skip` — each step, passed unrun, changes the outcome: a step that changes nothing is not
   load-bearing. A step that only matters under a condition, like the Python floor under an older
   interpreter, is proven under that condition.
@@ -426,7 +427,11 @@ Each case starts from a fresh copy of release-0, and each prints one line per st
   none of your code.
 
 After the cases, the leg injects each defective step or plant of `arms.toml` and expects its case to
-go red; one that stays green is a red. Exit 0 is green, 1 a red, and 2 when nothing could be measured:
-the pin carries a step row, release-0 does not apply clean, a plant's path is absent at release-0, or
-no step is declared. The whole leg takes over an hour, so it is held: it runs on demand and in remote
+go red naming its defect, the row's `needle`; one that stays green, or goes red for another reason,
+is a red. Before anything else, every run checks its own graders: each check the leg grades by is
+fed inputs whose answer is known, and a wrong answer is exit 1. Exit 0 is green, 1 a red, and 2 when
+nothing could be measured: the pin carries a step row, release-0 does not apply clean, a plant's path
+is absent at release-0, no step is declared, or a file under the leg's `govkit` or `lib` directory
+differs from HEAD, outside the leg's own files: the walk runs HEAD's committed engine, so commit or
+stash the edit first. The whole leg takes over an hour, so it is held: it runs on demand and in remote
 CI's self-test job, never on every push.

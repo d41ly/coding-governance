@@ -457,3 +457,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-28T23:11:04Z brief · item TOOL-dSafePassage-80 · reason 61b7fee70882 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-80-build-brief.md
 
 2026-10-28T23:40:52Z rescope · item add TOOL-dSafePassage-84 · reason a red of this build's own found by TOOL-dSafePassage-78's builder (the preview and the write run answer one question two ways), adopted at once by M10
+
+2026-10-29T00:07:58Z dispatch · item b177b9a9 TOOL-dSafePassage-77 · reason tools/govkit/upgrade_walk.py tools/govkit/fixtures/release-0/arms.toml tools/govkit/fixtures/release-0/plants.toml help/upgrade-steps.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-77.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-77-ledger.md
+
+2026-10-29T00:08:05Z brief · item TOOL-dSafePassage-77 · reason 8bdd4eec6540 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-77-build-brief.md
