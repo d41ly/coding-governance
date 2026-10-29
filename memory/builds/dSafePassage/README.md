@@ -232,22 +232,22 @@ ids TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePas
 | [TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin](spec/2026-10-28-spec-TOOL-dSafePassage-81.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names](spec/2026-10-28-spec-TOOL-dSafePassage-82.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
-| [TOOL-dSafePassage-84 — the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked](spec/2026-10-29-spec-TOOL-dSafePassage-84.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
+| [TOOL-dSafePassage-84 — the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked](spec/2026-10-29-spec-TOOL-dSafePassage-84.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 404 bound to this build, across 4 record folder(s).
+Records: 405 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65
-TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-84.
+TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71.
 
 Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-15@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1
 TOOL-dSafePassage-19@rev-1 TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1
 TOOL-dSafePassage-29@rev-1 TOOL-dSafePassage-3@rev-1 TOOL-dSafePassage-30@rev-1 TOOL-dSafePassage-31@rev-1 TOOL-dSafePassage-32@rev-1 TOOL-dSafePassage-33@rev-1 TOOL-dSafePassage-34@rev-1 TOOL-dSafePassage-35@rev-1 TOOL-dSafePassage-36@rev-1 TOOL-dSafePassage-37@rev-1 TOOL-dSafePassage-38@rev-1
 TOOL-dSafePassage-39@rev-1 TOOL-dSafePassage-4@rev-1 TOOL-dSafePassage-40@rev-1 TOOL-dSafePassage-41@rev-1 TOOL-dSafePassage-42@rev-1 TOOL-dSafePassage-43@rev-1 TOOL-dSafePassage-44@rev-1 TOOL-dSafePassage-45@rev-1 TOOL-dSafePassage-46@rev-1 TOOL-dSafePassage-47@rev-1 TOOL-dSafePassage-48@rev-1
 TOOL-dSafePassage-49@rev-2 TOOL-dSafePassage-5@rev-1 TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-51@rev-1 TOOL-dSafePassage-52@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1 TOOL-dSafePassage-72@rev-3 TOOL-dSafePassage-73@rev-3
-TOOL-dSafePassage-74@rev-2 TOOL-dSafePassage-75@rev-2 TOOL-dSafePassage-76@rev-3 TOOL-dSafePassage-77@rev-3 TOOL-dSafePassage-78@rev-1 TOOL-dSafePassage-80@rev-4 TOOL-dSafePassage-81@rev-3 TOOL-dSafePassage-82@rev-3 TOOL-dSafePassage-83@rev-4.
+TOOL-dSafePassage-74@rev-2 TOOL-dSafePassage-75@rev-2 TOOL-dSafePassage-76@rev-3 TOOL-dSafePassage-77@rev-3 TOOL-dSafePassage-78@rev-1 TOOL-dSafePassage-80@rev-4 TOOL-dSafePassage-81@rev-3 TOOL-dSafePassage-82@rev-3 TOOL-dSafePassage-83@rev-4 TOOL-dSafePassage-84@rev-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
