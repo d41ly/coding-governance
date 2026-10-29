@@ -3158,7 +3158,7 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     check("[dSP-72] AC2 demand_contained_dest refuses every escaping form and returns a contained one",
           leaked72 == [] and gk72.demand_contained_dest("a/b", "selftest") == "a/b", str(leaked72))
 
-    def plant_image72(t: pathlib.Path, step: str, paths: dict) -> None:
+    def write_image72(t: pathlib.Path, step: str, paths: dict) -> None:
         img = t / ".governance" / "steps" / step.split("/")[0] / f"{step.split('/')[1]}.before.json"
         img.parent.mkdir(parents=True, exist_ok=True)
         img.write_text(json.dumps({"step": step, "paths": paths}), encoding="utf-8", newline="\n")
@@ -3168,14 +3168,14 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     odd72 = ["a" + chr(0) + "b/x.txt"] + (["a?b/x.txt", "a|b/x.txt"] if os.name == "nt" else [])
     for n, rel in enumerate(lexical72 + odd72):
         t72 = tmp / "dsp72-forms" / f"c{n}" / "target"
-        plant_image72(t72, "demo/first", {rel: pwned})
+        write_image72(t72, "demo/first", {rel: pwned})
         want = "is not a path inside the target" if rel in lexical72 else "does not read as a path on this node"
         got = [read_refusal(lambda: steps.check_contained(t72, rel)),
                read_refusal(lambda: steps.read_image_paths(t72, "demo/first"))]
         check(f"[dSP-72] AC3 {rel!r} is refused by check_contained and read_image_paths, {want!r}",
               all(want in g for g in got), str(got))
 
-    def plant_link72(link: pathlib.Path, to: pathlib.Path) -> None:
+    def write_link72(link: pathlib.Path, to: pathlib.Path) -> None:
         if os.name == "nt":
             subprocess.run(["cmd", "/c", "mklink", "/J", str(link), str(to)], capture_output=True)
         else:
@@ -3186,10 +3186,10 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     for d in (t72 / "plain", out72, root72 / "gone-to"):
         d.mkdir(parents=True)
     (out72 / "secret.txt").write_bytes(b"secret\n")
-    plant_link72(t72 / "lnk", out72)
-    plant_link72(t72 / "gone", root72 / "gone-to")
+    write_link72(t72 / "lnk", out72)
+    write_link72(t72 / "gone", root72 / "gone-to")
     (root72 / "gone-to").rmdir()
-    plant_image72(t72, "demo/first", {"lnk/planted.txt": pwned})
+    write_image72(t72, "demo/first", {"lnk/planted.txt": pwned})
     down72 = read_refusal(lambda: steps.write_from_before_image(t72, "demo/first"))
     check("[dSP-72] AC4 a down through a linked segment is refused naming it, writing nothing outside",
           "lnk" in down72 and "reparse point" in down72 and not (out72 / "planted.txt").exists(), down72)
@@ -3202,11 +3202,11 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     check("[dSP-72] AC4 a dangling link is refused, never read as absent", "reparse point" in gone72, gone72)
     t72b = root72 / "target-b"
     t72b.mkdir()
-    plant_link72(t72b / ".governance", out72)
+    write_link72(t72b / ".governance", out72)
     img72 = read_refusal(lambda: steps.derive_image_path(t72b, "demo/first"))
     check("[dSP-72] AC4 a before-image whose .governance is a link is refused naming it",
           ".governance" in img72 and "reparse point" in img72, img72)
-    plant_image72(t72, "demo/third", {"plain/f.txt": {"before": base64.b64encode(b"orig\n").decode(),
+    write_image72(t72, "demo/third", {"plain/f.txt": {"before": base64.b64encode(b"orig\n").decode(),
                                                       "after": None}})
     restored72 = steps.write_from_before_image(t72, "demo/third")
     check("[dSP-72] AC4 control: a path under a plain directory restores, so the walk refuses only links",
@@ -3214,7 +3214,7 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
           str(restored72))
     check("[dSP-72] AC4 outside/ holds only what was planted there",
           sorted(p.name for p in out72.iterdir()) == ["secret.txt"], str(list(out72.iterdir())))
-    plant_image72(t72, "demo/held", {"lnk/secret.txt": {"before": None, "after": None}})
+    write_image72(t72, "demo/held", {"lnk/secret.txt": {"before": None, "after": None}})
     handed72: list = []
     held72 = read_refusal(lambda: steps.write_before_image(t72, "demo/held",
                                                            lambda before: handed72.append(before) or {}))
@@ -3637,7 +3637,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     `submodule-name-slashed` and two walk copies."""
     us_py = HERE / "upgrade_steps.py"
 
-    def fixture(py: pathlib.Path, *plant: str, env: dict | None = None) -> tuple[int, str]:
+    def run_fixture(py: pathlib.Path, *plant: str, env: dict | None = None) -> tuple[int, str]:
         p = subprocess.run([sys.executable, str(py), "fixture", "isolation", *(("--plant", *plant) if plant else ())],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=600,
                            env={**os.environ, **env} if env else None)
@@ -3665,7 +3665,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             # TOOL-dSafePassage-26 AC12: the fixture asserts GIT_CONFIG_COUNT is 3 plus the parent's
             # line-ending pairs above, and here a step hashes a CRLF file as the parent does.
             (("autocrlf",), 0, ("fixture/hash · up · ok · the step's oid ", " · equal"))):
-        rc, out = fixture(us_py, *plant)
+        rc, out = run_fixture(us_py, *plant)
         check(f"[dSP-7] fixture isolation {' '.join(plant) or '(base)'} exits {want} and names "
               f"{', '.join(needles)}", rc == want and "isolation: FAILED" not in out
               and all(n in out for n in needles), out)
@@ -3678,7 +3678,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("local-url-userinfo", 1, ("remote.gk-fixture.url in .git/config, so nothing was spawned",
                                        "scp-form remote · not refused · git add exits 0")),
             ("autocrlf-local", 0, ("fixture/hash · up · ok · the step's oid ", " · equal"))):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         check(f"[dSP-35] fixture isolation {plant} exits {want} and names {', '.join(needles)}",
               rc == want and "isolation: FAILED" not in out and all(n in out for n in needles)
               and "gk-planted-user" not in out and "gk-planted-secret" not in out, out)
@@ -3689,7 +3689,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("submodule-url-userinfo", "submodule.s.url in .git/config, so nothing was spawned"),
             ("insteadof-userinfo", "url.https://<redacted>@example.invalid/.insteadof in .git/config, so nothing"),
             ("http-url-key-userinfo", "http.https://<redacted>@example.invalid/.sslkey in .git/config, so nothing")):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         check(f"[dSP-38] fixture isolation {plant} exits 1, names {needle} and prints no planted credential",
               rc == 1 and "isolation: FAILED" not in out and needle in out
               and "dspuser38" not in out and "dsppass38" not in out, out)
@@ -3704,12 +3704,12 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     wrong = [(a, want) for a, want in cases44 if cred44(*a) != want]
     check("[dSP-44] AC1 test_credential_bearing keeps the three ssh-scheme bare users and refuses "
           "ssh://u:p@h/r and https://u@h/r", not wrong, f"wrong: {wrong}")
-    rc, out = fixture(us_py, "ssh-scheme-bare-user")
+    rc, out = run_fixture(us_py, "ssh-scheme-bare-user")
     check("[dSP-44] AC1 fixture isolation ssh-scheme-bare-user exits 0 with its step spawned",
           rc == 0 and "isolation: FAILED" not in out and "ssh-scheme bare user · not refused · git add exits 0" in out, out)
     src = us_py.read_text(encoding="utf-8")
     exempt = 'not (m.group(1).lower() in SSH_BARE_USER_SCHEMES and ":" not in m.group(2))'
-    rc, out = fixture(build_staged_copy(tmp / "no-ssh-exemption", src.replace(exempt, "True")), "ssh-scheme-bare-user")
+    rc, out = run_fixture(build_staged_copy(tmp / "no-ssh-exemption", src.replace(exempt, "True")), "ssh-scheme-bare-user")
     check("[dSP-44] AC1 a copy whose predicate has no ssh exemption refuses fixture isolation ssh-scheme-bare-user",
           src.count(exempt) == 1 and rc == 1 and "an ssh-scheme remote with a bare user was refused" in out, out)
 
@@ -3740,12 +3740,12 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
               and (env.get("GIT_CONFIG_KEY_2"), env.get("GIT_CONFIG_VALUE_2")) == ("protocol.ext.allow", "never")
               and env.get("GIT_CONFIG_KEY_3") == ("core.autocrlf" if name == "set" else None),
               str({k: v for k, v in env.items() if k.startswith("GIT_CONFIG_")}))
-        rc, out = fixture(us_py, env=parent)
+        rc, out = run_fixture(us_py, env=parent)
         check(f"[dSP-45] AC2 fixture isolation (base) under core.autocrlf {name} exits 0 with clean ok",
               rc == 0 and "isolation: FAILED" not in out and "fixture/clean · up · ok" in out, out)
-    derived = 'expect(rep.get("count") == str(rep.get("pairs"))'
+    derived = 'check_ok(rep.get("count") == str(rep.get("pairs"))'
     src = us_py.read_text(encoding="utf-8")
-    rc, out = fixture(build_staged_copy(tmp / "dsp45-bare-count", src.replace(derived, 'expect(rep.get("count") == "3"')),
+    rc, out = run_fixture(build_staged_copy(tmp / "dsp45-bare-count", src.replace(derived, 'check_ok(rep.get("count") == "3"')),
                       env={"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": str(cfgs["set"])})
     check("[dSP-45] AC1 a fixture copy asserting GIT_CONFIG_COUNT 3 reds under core.autocrlf set",
           src.count(derived) == 1 and rc == 1 and "GIT_CONFIG_COUNT is not the GIT_CONFIG_KEY_<n> pairs present" in out, out)
@@ -3761,7 +3761,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("submodule-url-userinfo", "submodule.s.url in .git/config", "dsppass38", "dspuser38"),
             ("insteadof-userinfo", "url.https://<redacted>@example.invalid/.insteadof", "dsppass38", "dspuser38"),
             ("http-url-key-userinfo", "http.https://<redacted>@example.invalid/.sslkey", "dsppass38", "dspuser38")):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         pieces = [secret[i:i + 3] for i in range(len(secret) - 2) if secret[i:i + 3] in out]
         check(f"[dSP-45] AC4 AC5 AC6 fixture isolation {plant} exits 1, names {needle} and prints no "
               f"3-character piece of {secret} nor {plain}",
@@ -3778,7 +3778,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     check("[dSP-45] AC6 render_redacted_config redacts to the last @ before the host",
           got == "http.https://<redacted>@h/.sslkey", got)
     whole = 'for text in (inner, value or "")'
-    rc, out = fixture(build_staged_copy(tmp / "dsp45-dot-split", src.replace(whole, 'for text in (*key.split(".")[1:-1], value or "")')),
+    rc, out = run_fixture(build_staged_copy(tmp / "dsp45-dot-split", src.replace(whole, 'for text in (*key.split(".")[1:-1], value or "")')),
                       "insteadof-dotted-userinfo")
     check("[dSP-45] AC5 a predicate copy testing the key's dot-split segments reds fixture isolation insteadof-dotted-userinfo",
           src.count(whole) == 1 and rc == 1 and "isolation: FAILED" in out, out)
@@ -3795,12 +3795,12 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("submodule-nested-name-differs", 1, ("filter.canary.clean in .git/modules/nm/modules/in/config (submodule lib/p/q)",
                                                   "filter.canary.clean in .git/modules/nm/modules/in/config "
                                                   "(submodule lib/p/in, by name)"))):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         check(f"[dSP-45] AC9 AC10 fixture isolation {plant} exits {want} and names {', '.join(needles)}",
               rc == want and "isolation: FAILED" not in out and all(n in out for n in needles), out)
     shape = 'if not ((c / "HEAD").is_file() and (c / "objects").is_dir() and (c / "refs").is_dir()):'
     into = 'walks.append((c / "modules", c / "modules",'
-    rc, out = fixture(build_staged_copy(tmp / "dsp45-config-walk", src.replace(shape, 'if not (c / "config").is_file():')
+    rc, out = run_fixture(build_staged_copy(tmp / "dsp45-config-walk", src.replace(shape, 'if not (c / "config").is_file():')
                                         .replace(into, "walks.append((c, c,")), "submodule-ref-named-config")
     check("[dSP-45] AC9 a walk copy listing any directory holding a config reds fixture isolation submodule-ref-named-config",
           src.count(shape) == 1 and src.count(into) == 1 and rc == 1 and "isolation: FAILED" in out, out)
@@ -3809,7 +3809,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     # through a name segment. AC1 and AC2 ride the dSP-45 rows above; `submodule-name-slashed` is
     # refused through `lib/`. A walk copy classifying by the `rev-parse --git-dir` exit skips the
     # malformed repository, and one that never descends a non-candidate misses `lib/x`.
-    rc, out = fixture(us_py, "submodule-name-slashed")
+    rc, out = run_fixture(us_py, "submodule-name-slashed")
     check("[dSP-47] AC3 fixture isolation submodule-name-slashed exits 1 naming filter.canary.clean in "
           ".git/modules/lib/x/config", rc == 1 and "isolation: FAILED" not in out
           and "filter.canary.clean in .git/modules/lib/x/config (submodule lib/x)" in out, out)
@@ -3818,7 +3818,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("rev-parse", src.replace(shape, 'if subprocess.run(["git", f"--git-dir={c}", "rev-parse", "--git-dir"], '
                                              "env=env, capture_output=True).returncode:"), "submodule-config-malformed"),
             ("no-descent", src.replace(segment, "pass"), "submodule-name-slashed")):
-        rc, out = fixture(build_staged_copy(tmp / f"dsp47-{name}", text), plant)
+        rc, out = run_fixture(build_staged_copy(tmp / f"dsp47-{name}", text), plant)
         check(f"[dSP-47] AC2 AC3 a {name} walk copy reds fixture isolation {plant}",
               src.count(shape) == 1 and src.count(segment) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
@@ -3853,7 +3853,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("local-hook", ("a credential, hook.canary.command in .git/config, so nothing was spawned",),
              ("hook canary: absent",)),
             ("local-hook-stub", (), ("fixture/clean · up · ok", "hook canary: present · hook-command"))):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
         check(f"[dSP-24] fixture isolation {plant} exits 1, "
               + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
@@ -3875,7 +3875,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("submodule-unpopulated", ("filter.canary.clean in .git/modules/sub/config (submodule sub), so nothing",),
              ("unpopulated canary: absent",)),
             ("submodule-unpopulated-stub", (), ("fixture/status · up · ok",))):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
         check(f"[dSP-30] fixture isolation {plant} exits 1, "
               + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
@@ -3893,7 +3893,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("submodule-unpopulated-worktree-stub", 1, (), ("fixture/update · up · ok",
                                                             "unpopulated-worktree canary: present · filter-clean")),
             ("submodule-main-only", 0, (), ("fixture/update · up · ok", "main-only canary: absent"))):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         line = next((ln for ln in out.splitlines() if ln.startswith(head)), None)
         check(f"[dSP-36] fixture isolation {plant} exits {want}, "
               + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
@@ -3912,7 +3912,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("local-ext-transport", (), ("fixture/fetch · up · failed · rc ", "transport 'ext' not allowed",
                                          "ext-transport canary: absent")),
             ("local-ext-transport-stub", (), ("fixture/fetch · up · failed", "ext-transport canary: present · ext-transport"))):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         line = next((ln for ln in out.splitlines() if " · refused · " in ln), None)
         check(f"[dSP-37] fixture isolation {plant} exits 1, "
               + (f"its refusal line naming {' … '.join(on_refusal)}, " if on_refusal else "refusing nothing, ")
@@ -3929,12 +3929,12 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
 
     walk = '                mods = d / "modules"'
     src = us_py.read_text(encoding="utf-8")
-    rooted = build_staged_copy(tmp / "common-rooted", src.replace(walk, '                mods = (pathlib.Path(git('
+    rooted = build_staged_copy(tmp / "common-rooted", src.replace(walk, '                mods = (pathlib.Path(run_repo_git('
                                                                   'target, "rev-parse", "--path-format=absolute", '
                                                                   '"--git-common-dir").strip()) if not via else d) '
                                                                   '/ "modules"'))
     for plant in ("submodule-unpopulated-worktree", "submodule-main-only"):
-        rc, out = fixture(rooted, plant)
+        rc, out = run_fixture(rooted, plant)
         check(f"[dSP-36] a walk copy rooted at the common dir reds fixture isolation {plant}",
               src.count(walk) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
@@ -3948,13 +3948,13 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("submodule-name-differs", ("filter.canary.clean in .git/modules/nm/config (submodule lib/p)",
                                         "filter.canary.clean in .git/modules/nm/config (submodule nm, by name)",
                                         "name-differs canary: absent"))):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         check(f"[dSP-42] AC5 AC13 fixture isolation {plant} exits 1 and names {', '.join(needles)}",
               rc == 1 and "isolation: FAILED" not in out and all(n in out for n in needles), out)
     gate = "if not read_config(d, label) and work is not None:"
-    first = build_staged_copy(tmp / "index-first", src.replace(gate, 'if work is not None and git(work, "ls-files", '
+    first = build_staged_copy(tmp / "index-first", src.replace(gate, 'if work is not None and run_repo_git(work, "ls-files", '
                                                                '"-s") is not None and not read_config(d, label):'))
-    rc, out = fixture(first, "submodule-fsmonitor")
+    rc, out = run_fixture(first, "submodule-fsmonitor")
     check("[dSP-42] AC5 a walk copy that reads the index before grading reds fixture isolation submodule-fsmonitor",
           src.count(gate) == 1 and rc == 1 and "fsmonitor canary: present" in out and "isolation: FAILED" in out, out)
 
@@ -4025,7 +4025,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
                (("sendemail.work.to", "a@example.com"), False), (("sendemail.work.smtpserver", "smtp.example.com"), False))
     full48, read48 = us.STEP_REFUSED_KEYS, us.read_target_local_config
 
-    def wrong48(table) -> list:
+    def measure_wrong48(table) -> list:
         us.STEP_REFUSED_KEYS = table
         try:
             out = []
@@ -4036,13 +4036,13 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             return out
         finally:
             us.STEP_REFUSED_KEYS, us.read_target_local_config = full48, read48
-    got48 = wrong48(full48)
+    got48 = measure_wrong48(full48)
     check("[dSP-48] AC1 the check refuses sendmailCmd and the identity forms of the send-email keys, "
           "and neither sendemail.work.to nor a host-name smtpServer", not got48, f"wrong: {got48}")
     for drop, key in (("sendemail.<x>.ccCmd", "sendemail.work.cccmd"), ("sendemail.sendmailCmd", "sendemail.sendmailcmd")):
-        got48 = wrong48(tuple(r for r in full48 if r[0] != drop))
+        got48 = measure_wrong48(tuple(r for r in full48 if r[0] != drop))
         check(f"[dSP-48] AC1 a table copy without the {drop} row passes {key}", got48 == [key], f"wrong: {got48}")
-    rc, out = fixture(us_py, "sendemail-identity-cmd")
+    rc, out = run_fixture(us_py, "sendemail-identity-cmd")
     check("[dSP-48] AC2 fixture isolation sendemail-identity-cmd exits 1, refused naming sendemail.work.cccmd "
           "in .git/config, its canary absent",
           rc == 1 and "isolation: FAILED" not in out and "sendemail.work.cccmd in .git/config, so nothing was spawned" in out
@@ -4081,10 +4081,10 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("gitmodules-unreadable", "/.gitmodules does not read: it is no regular file",
              "a .gitmodules read with no file test", "            if not stat.S_ISREG(st.st_mode):",
              "            if False:")):
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         check(f"[dSP-49] AC9 AC13 fixture isolation {plant} exits 1, refused before any spawn naming {needle}",
               rc == 1 and "isolation: FAILED" not in out and needle in out and "fixture/status · up ·" not in out, out)
-        rc, out = fixture(build_staged_copy(tmp / f"dsp49-{plant}", src49.replace(old, new)), plant)
+        rc, out = run_fixture(build_staged_copy(tmp / f"dsp49-{plant}", src49.replace(old, new)), plant)
         check(f"[dSP-49] AC9 AC13 {label} reds fixture isolation {plant}",
               src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
@@ -4105,11 +4105,11 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
             ("submodule-modules-link-loop", "/.git/modules/a/loop is a link under modules/",
              "a walk copy following links", link51, "if False:")):
         t51 = time.monotonic()
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         check(f"[dSP-51] AC3 AC4 fixture isolation {plant} exits 1 within 60 seconds, refused naming {needle}",
               rc == 1 and time.monotonic() - t51 < 60 and "isolation: FAILED" not in out and "Traceback" not in out
               and needle in out, out)
-        rc, out = fixture(build_staged_copy(tmp / f"dsp51-{plant}", src49.replace(old, new)), plant)
+        rc, out = run_fixture(build_staged_copy(tmp / f"dsp51-{plant}", src49.replace(old, new)), plant)
         check(f"[dSP-51] AC3 AC4 {label} reds fixture isolation {plant}",
               src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out)
     back51 = '            state = "applied"\n'
@@ -4123,7 +4123,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     check("[dSP-51] AC6 upgrade_steps.py holds no list of the unlisted executor keys the class arm expects",
           "UNLISTED_EXECUTOR" + "_KEYS" not in src49, "")  # split, so TOOL-dSafePassage-59 AC7's grep reads none
     fifo = hasattr(os, "mkfifo")
-    rc, out = fixture(us_py, "gitmodules-fifo")
+    rc, out = run_fixture(us_py, "gitmodules-fifo")
     check("[dSP-51] AC9 fixture isolation gitmodules-fifo " + ("exits 1 refused naming .gitmodules" if fifo
                                                               else "prints its skip line and exits 0"),
           (rc == 1 and "/.gitmodules does not read" in out and "isolation: FAILED" not in out) if fifo
@@ -4131,13 +4131,13 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     # TOOL-dSafePassage-59 S8: AC9 is read with `os.lstat` alone, the `os.stat` it named not taken.
     typed51 = "            try:\n                st = os.lstat(gm)\n"
     for label, text, want in (("the module", src49, True), ("a read copy spawning config -f before its lstat", src49.replace(
-            typed51, '            git(work, "config", "-f", ".gitmodules", "--list", ok=(0, 1))\n' + typed51), False)):
-        fn = next((n for n in _ast.walk(_ast.parse(text)) if isinstance(n, _ast.FunctionDef) and n.name == "submodule_paths"), None)
+            typed51, '            run_repo_git(work, "config", "-f", ".gitmodules", "--list", ok=(0, 1))\n' + typed51), False)):
+        fn = next((n for n in _ast.walk(_ast.parse(text)) if isinstance(n, _ast.FunctionDef) and n.name == "read_submodule_paths"), None)
         calls = [(n.lineno, _ast.unparse(n.func)) for n in _ast.walk(fn) if isinstance(n, _ast.Call)] if fn else []
         typed = [ln for ln, f in calls if f == "os.lstat"]
-        opened = [ln for ln, f in calls if f == "git" or f.endswith("open")]
+        opened = [ln for ln, f in calls if f == "run_repo_git" or f.endswith("open")]
         got = bool(typed) and bool(opened) and max(typed) < min(opened)
-        check(f"[dSP-51] AC9 {label}: submodule_paths types .gitmodules by lstat before any spawn or open"
+        check(f"[dSP-51] AC9 {label}: read_submodule_paths types .gitmodules by lstat before any spawn or open"
               + ("" if want else " — reds"), src49.count(typed51) == 1 and got == want, f"calls: {calls}")
 
     # TOOL-dSafePassage-53 AC2, AC3: a path git never created is the walk's empty population, and an
@@ -4167,10 +4167,10 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
                             "                    except OSError:\n                        continue\n"
                             "                        raise Refusal(")
     needle53 = "/.git/modules/a/modules does not list (NotADirectoryError"
-    rc, out = fixture(us_py, "submodule-modules-not-a-directory")
+    rc, out = run_fixture(us_py, "submodule-modules-not-a-directory")
     check(f"[dSP-53] AC2 fixture isolation submodule-modules-not-a-directory exits 1, refused naming {needle53}",
           rc == 1 and needle53 in out and "isolation: FAILED" not in out and "Traceback" not in out, out)
-    rc, out = fixture(build_staged_copy(tmp / "dsp53-every", every53), "submodule-modules-not-a-directory")
+    rc, out = run_fixture(build_staged_copy(tmp / "dsp53-every", every53), "submodule-modules-not-a-directory")
     check("[dSP-53] AC2 a walk copy passing every OSError reds fixture isolation submodule-modules-not-a-directory",
           src49.count(refuse53) == 1 and rc == 1 and "isolation: FAILED" in out, out)
 
@@ -4185,7 +4185,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     gd54 = run_gov_git(GOV_ROOT, "rev-parse", "--absolute-git-dir")
     for n, (label, py, mod) in enumerate((("the module", us_py, us),
                                           ("a walk copy with TOOL-dSafePassage-51's single except OSError", lone54, mod54))):
-        rc, out = fixture(py, "submodule-sound-no-nested")
+        rc, out = run_fixture(py, "submodule-sound-no-nested")
         green = (rc == 0 and out.count("isolation: population · ") == 2 and "/.git/modules/sub · reached by sub" in out
                  and not any(x in out for x in ("isolation: FAILED", " · refused · ", "Traceback")))
         check(f"[dSP-54] AC1 {label}: fixture isolation submodule-sound-no-nested "
@@ -4216,7 +4216,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     for plant, ac in (("submodule-modules-link-nested", "AC2"), ("submodule-modules-link-outside", "AC3")):
         for py in (us_py, only56):
             t56 = time.monotonic()
-            rc, out = fixture(py, plant)
+            rc, out = run_fixture(py, plant)
             if py == us_py:
                 check(f"[dSP-56] {ac} fixture isolation {plant} exits 1 within 60 seconds, refused naming "
                       ".git/modules/a/modules, no Traceback and no filter.canary.clean",
@@ -4254,26 +4254,26 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
              "a walk copy filtering by os.path.isdir before the link test", child59,
              "                        if not os.path.isdir(c):\n                            continue\n" + child59)):
         t59 = time.monotonic()
-        rc, out = fixture(us_py, plant)
+        rc, out = run_fixture(us_py, plant)
         check(f"[dSP-59] {ac} fixture isolation {plant} exits 1 within 60 seconds, refused naming {needle}, no Traceback",
               rc == 1 and time.monotonic() - t59 < 60 and "isolation: FAILED" not in out and needle in out
               and "Traceback" not in out, out)
-        rc, out = fixture(build_staged_copy(tmp / f"dsp59-{plant}", src49.replace(old, new)), plant)
+        rc, out = run_fixture(build_staged_copy(tmp / f"dsp59-{plant}", src49.replace(old, new)), plant)
         check(f"[dSP-59] {ac} {label} reds fixture isolation {plant}",
               src49.count(old) == 1 and rc == 1 and "isolation: FAILED" in out, out[-3000:])
     stat59 = "                st = os.lstat(gm)\n"
     follow59 = src49.replace(stat59, "                st = os.stat(gm)\n")
     for label, text, want in (("the module", src49, True), ("a .gitmodules read copy taking os.stat", follow59, False)):
-        fn = next((n for n in _ast.walk(_ast.parse(text)) if isinstance(n, _ast.FunctionDef) and n.name == "submodule_paths"), None)
+        fn = next((n for n in _ast.walk(_ast.parse(text)) if isinstance(n, _ast.FunctionDef) and n.name == "read_submodule_paths"), None)
         calls = [(n.lineno, _ast.unparse(n)) for n in _ast.walk(fn) if isinstance(n, _ast.Call)] if fn else []
         lst = [ln for ln, c in calls if c.startswith("os.lstat(")]
         lnk = [ln for ln, c in calls if c == "stat.S_ISLNK(st.st_mode)"]
-        opened = [ln for ln, c in calls if c.startswith("git(") or c.split("(")[0].endswith("open")]
+        opened = [ln for ln, c in calls if c.startswith("run_repo_git(") or c.split("(")[0].endswith("open")]
         got = bool(lst and lnk and opened) and min(lst) < min(lnk) < min(opened)
-        check(f"[dSP-59] AC6 {label}: submodule_paths tests S_ISLNK on its os.lstat result before its config -f "
+        check(f"[dSP-59] AC6 {label}: read_submodule_paths tests S_ISLNK on its os.lstat result before its config -f "
               "spawn and any open" + ("" if want else " — reds"), src49.count(stat59) == 1 and got == want, f"calls: {calls}")
     for n, py in enumerate((us_py, build_staged_copy(tmp / "dsp59-follow", follow59))):
-        rc, out = fixture(py, "gitmodules-symlink")
+        rc, out = run_fixture(py, "gitmodules-symlink")
         if "isolation: skip — gitmodules-symlink" in out:
             check("[dSP-59] AC6 fixture isolation gitmodules-symlink prints its skip line and exits 0 where the host "
                   "refuses a symlink", rc == 0, out)
@@ -4296,7 +4296,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     for py, label in ((us_py, "fixture isolation subsection-password-space exits 1"),
                       (build_staged_copy(tmp / "dsp49-space-redactor", src49.replace(stop49, "        if False:")),
                        "a redactor copy stopping at a space: fixture isolation subsection-password-space")):
-        rc, out = fixture(py, "subsection-password-space")
+        rc, out = run_fixture(py, "subsection-password-space")
         line = next((ln for ln in out.splitlines() if " · refused · " in ln), "")
         entries = line.partition("sends as a credential, ")[2].partition(", so nothing was spawned")[0]
         pieces = sorted({pw49[i:i + 3] for i in range(len(pw49) - 2)} & {entries[i:i + 3] for i in range(len(entries) - 2)})
@@ -4328,7 +4328,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
 
     # AC6's red: the kit copied whole, a direct spawn of `row["up"]` planted into the copy.
     text = us_py.read_text(encoding="utf-8") + '\n\ndef planted_spawn(row):\n    return subprocess.run(row["up"])\n'
-    rc, out = fixture(build_staged_copy(tmp / "callers", text), "callers")
+    rc, out = run_fixture(build_staged_copy(tmp / "callers", text), "callers")
     check("[dSP-7] AC6 a planted spawn of row[\"up\"] reds the callers probe, naming its line",
           rc == 1 and f"upgrade_steps.py:{len(text.splitlines())}, in planted_spawn" in out, out)
 
@@ -4838,36 +4838,36 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
     step_py = HERE / "steps" / "receipt_schema_4.py"
     kit = "check-wiring"
 
-    def receipt(t: pathlib.Path) -> pathlib.Path:
+    def derive_receipt_path(t: pathlib.Path) -> pathlib.Path:
         return t / ".governance" / "install.json"
 
     def read(t: pathlib.Path) -> dict:
-        return json.loads(receipt(t).read_text(encoding="utf-8"))
+        return json.loads(derive_receipt_path(t).read_text(encoding="utf-8"))
 
-    def installed(tag: str) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
+    def build_installed(tag: str) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
         t = build_target(tmp / tag, DEPLOY_FULL)
         p = run("apply", "--target", str(t), "--kits", kit)
         settle(t, "the install")
         return t, p
 
-    def plant(t: pathlib.Path, fn) -> bytes:
+    def write_plant(t: pathlib.Path, fn) -> bytes:
         rec = read(t)
         fn(rec)
-        receipt(t).write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        derive_receipt_path(t).write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
         settle(t, "the planted receipt")
-        return receipt(t).read_bytes()
+        return derive_receipt_path(t).read_bytes()
 
-    def at(schema: int):
-        def fn(rec: dict) -> None:
+    def build_schema_plant(schema: int):
+        def set_schema(rec: dict) -> None:
             rec["schema"] = schema
             rec.pop("steps", None)
-        return fn
+        return set_schema
 
     def run_step(verb: str, t: pathlib.Path) -> subprocess.CompletedProcess:
         return subprocess.run([sys.executable, "-I", str(step_py), verb, str(t)], capture_output=True,
                               text=True, encoding="utf-8")
 
-    def refused(fn) -> str:
+    def read_refusal(fn) -> str:
         try:
             fn()
         except us.Refusal as e:
@@ -4875,41 +4875,41 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
         return ""
 
     # ---- AC4: a first install is born at schema 4 with an empty `steps` as its last key, by either verb.
-    t, p = installed("rs-ac4a")
+    t, p = build_installed("rs-ac4a")
     rec = read(t)
     check("[dSP-3 AC4] a first `apply` writes schema 4 with `\"steps\": []` as the receipt's last key",
           p.returncode == 0 and rec.get("schema") == 4 and rec.get("steps") == [] and list(rec)[-1] == "steps"
           and "schema 4" in p.stdout, f"{p.returncode} {list(rec)} {p.stdout[-300:]}")
-    t, _p = installed("rs-ac4b")
-    receipt(t).unlink()
+    t, _p = build_installed("rs-ac4b")
+    derive_receipt_path(t).unlink()
     settle(t, "the receipt gone, the files kept: a first adopt")
     p = run("adopt", "--target", str(t), "--write")
-    rec = read(t) if receipt(t).is_file() else {}
+    rec = read(t) if derive_receipt_path(t).is_file() else {}
     check("[dSP-3 AC4] a first `adopt --write` writes the same: schema 4, `\"steps\": []` last",
           p.returncode == 0 and rec.get("schema") == 4 and rec.get("steps") == [] and list(rec)[-1] == "steps",
           f"{p.returncode} {list(rec)} {(p.stdout + p.stderr)[-400:]}")
 
     # ---- AC1 / AC2: the `gov_oid` back-fill runs below schema 3 only.
-    def split_row(schema: int):
-        def fn(rec: dict) -> None:
-            at(schema)(rec)
+    def build_split_row_plant(schema: int):
+        def set_split_row(rec: dict) -> None:
+            build_schema_plant(schema)(rec)
             row = next(f for f in rec["files"] if f.get("role", "engine") == "engine" and f.get("commit"))
-            fn.path, fn.oid = row["path"], row.pop("gov_oid", None)
-        return fn
+            set_split_row.path, set_split_row.oid = row["path"], row.pop("gov_oid", None)
+        return set_split_row
 
-    t, _p = installed("rs-ac1")
-    cut = split_row(3)
-    b1 = plant(t, cut)
+    t, _p = build_installed("rs-ac1")
+    cut = build_split_row_plant(3)
+    b1 = write_plant(t, cut)
     p = run("update", "--target", str(t))
     check("[dSP-3 AC1] a schema-3 receipt whose engine row keeps `commit` with no `gov_oid` refuses by name, "
           "never back-filled, with RECEIPT_SCHEMA at 4",
           gk.RECEIPT_SCHEMA == 4 and bool(cut.oid) and p.returncode == 2
           and any("`commit` and no `gov_oid`" in ln and cut.path in ln for ln in p.stderr.splitlines())
-          and receipt(t).read_bytes() == b1, p.stdout[-300:] + p.stderr)
+          and derive_receipt_path(t).read_bytes() == b1, p.stdout[-300:] + p.stderr)
     _steps = lambda q: [ln for ln in q.stdout.splitlines() if ln.startswith("govkit update — steps:")]
-    t, _p = installed("rs-ac2")
-    cut = split_row(2)
-    plant(t, cut)
+    t, _p = build_installed("rs-ac2")
+    cut = build_split_row_plant(2)
+    write_plant(t, cut)
     pv = run("update", "--target", str(t))
     p = run("update", "--target", str(t), "--write")
     row = next((f for f in read(t)["files"] if f.get("path") == cut.path), {})
@@ -4926,8 +4926,8 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
 
     # ---- TOOL-dSafePassage-84 AC5: a write run over a schema-4 receipt that already has a finding (the
     # ---- unknown-role refusal) walks no step: the findings hold `derive_walk_hold` carries.
-    t, _p = installed("rs-84f")
-    plant(t, lambda rec: next(f for f in rec["files"] if f.get("role", "engine") == "engine")
+    t, _p = build_installed("rs-84f")
+    write_plant(t, lambda rec: next(f for f in rec["files"] if f.get("role", "engine") == "engine")
           .update(role="gk-unknown-role"))
     p = run("update", "--target", str(t), "--write")
     check("[dSP-84 AC5] a write run over a schema-4 receipt that already has a finding walks no step "
@@ -4938,9 +4938,9 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
 
     # ---- AC9: a clean `update --write` that walks no step, a `--kits` run, never moves a receipt past
     # ---- 3 by itself, and keeps a 4.
-    for tag, fn, want in (("rs-ac9a", at(3), 3), ("rs-ac9b", lambda rec: None, 4)):
-        t, _p = installed(tag)
-        plant(t, fn)
+    for tag, fn, want in (("rs-ac9a", build_schema_plant(3), 3), ("rs-ac9b", lambda rec: None, 4)):
+        t, _p = build_installed(tag)
+        write_plant(t, fn)
         p = run("update", "--target", str(t), "--write", "--kits", kit)
         rec = read(t)
         check(f"[dSP-3 AC9] a clean `update --write` over a schema-{want} receipt leaves it at {want}",
@@ -4948,8 +4948,8 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
               f"{p.returncode} {rec.get('schema')} " + (p.stdout + p.stderr)[-300:])
 
     # ---- AC5: the step's witness, up and down over a receipt `apply` wrote, forced back to 3.
-    t, _p = installed("rs-ac5")
-    b3 = plant(t, at(3))
+    t, _p = build_installed("rs-ac5")
+    b3 = write_plant(t, build_schema_plant(3))
     w0, up = run_step("witness", t), run_step("up", t)
     rec = read(t)
     w1 = run_step("witness", t)
@@ -4959,39 +4959,39 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
           and list(rec)[-1] == "steps" and w1.returncode == 0, w0.stdout + up.stdout + up.stderr + w1.stdout)
     down = run_step("down", t)
     check("[dSP-3 AC5] ...and the down restores the schema-3 bytes exactly",
-          down.returncode == 0 and receipt(t).read_bytes() == b3, down.stdout + down.stderr)
+          down.returncode == 0 and derive_receipt_path(t).read_bytes() == b3, down.stdout + down.stderr)
 
     # ---- AC6: the up's and down's refusals write nothing, and a foreign shape is normalised.
-    t, _p = installed("rs-ac6a")
-    b2 = plant(t, at(2))
+    t, _p = build_installed("rs-ac6a")
+    b2 = write_plant(t, build_schema_plant(2))
     up = run_step("up", t)
     check("[dSP-3 AC6] the up over a schema-2 receipt exits 1 naming the schema and writes nothing",
-          up.returncode == 1 and "schema 2" in up.stderr and receipt(t).read_bytes() == b2, up.stdout + up.stderr)
-    t, _p = installed("rs-ac6b")
-    b4 = plant(t, lambda rec: rec.__setitem__(
+          up.returncode == 1 and "schema 2" in up.stderr and derive_receipt_path(t).read_bytes() == b2, up.stdout + up.stderr)
+    t, _p = build_installed("rs-ac6b")
+    b4 = write_plant(t, lambda rec: rec.__setitem__(
         "steps", [{"id": "lib/python-floor-3.15", "introduced": None, "state": "applied"}]))
     down = run_step("down", t)
     check("[dSP-3 AC6] the down while another step reads applied exits 1 naming it and writes nothing",
-          down.returncode == 1 and "lib/python-floor-3.15" in down.stderr and receipt(t).read_bytes() == b4,
+          down.returncode == 1 and "lib/python-floor-3.15" in down.stderr and derive_receipt_path(t).read_bytes() == b4,
           down.stdout + down.stderr)
-    t, _p = installed("rs-ac6c")
-    plant(t, lambda rec: rec.pop("steps"))
+    t, _p = build_installed("rs-ac6c")
+    write_plant(t, lambda rec: rec.pop("steps"))
     down = run_step("down", t)
     rec = read(t)
     check("[dSP-3 AC6] the down over a schema-4 receipt with no `steps` leaves schema 3 without the field",
           down.returncode == 0 and rec.get("schema") == 3 and "steps" not in rec, down.stdout + down.stderr)
     for verb in ("up", "down"):
-        t, _p = installed(f"rs-ac6{verb}")
-        bx = plant(t, lambda rec: rec.__setitem__("schema", "4"))
+        t, _p = build_installed(f"rs-ac6{verb}")
+        bx = write_plant(t, lambda rec: rec.__setitem__("schema", "4"))
         got = run_step(verb, t)
         check(f"[dSP-3 S6] the {verb} over a receipt whose schema is not a number exits 1 and writes nothing",
-              got.returncode == 1 and "not a number" in got.stderr and receipt(t).read_bytes() == bx,
+              got.returncode == 1 and "not a number" in got.stderr and derive_receipt_path(t).read_bytes() == bx,
               got.stdout + got.stderr)
 
     # ---- AC7: the one writer, in process.
     r3 = {"schema": 3}
     check("[dSP-3 AC7] set_step_state refuses a schema-3 receipt and gives it no `steps`",
-          "at schema 3" in refused(lambda: us.set_step_state(r3, "govkit/receipt-schema-4", None, "applied"))
+          "at schema 3" in read_refusal(lambda: us.set_step_state(r3, "govkit/receipt-schema-4", None, "applied"))
           and "steps" not in r3, str(r3))
     r4 = {"schema": 4, "steps": []}
     us.set_step_state(r4, "a/one", "0" * 40, "applied")
@@ -5004,7 +5004,7 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
             ("an empty `failure`", lambda: us.set_step_state(r4, "a/two", None, "failed", ""), "non-empty string"),
             ("an id that is not a string", lambda: us.set_step_state(r4, 7, None, "applied"), "`id` is not"),
             ("an `introduced` that is not a commit", lambda: us.set_step_state(r4, "a/two", "abc", "applied"), "neither a 40-hex")):
-        got = refused(call)
+        got = read_refusal(call)
         check(f"[dSP-3 AC7] it refuses {label}, leaving the field as it was",
               why in got and len(r4["steps"]) == 1, got)
     us.set_step_state(r4, "a/two", None, "failed", "the up exited 1")
@@ -5023,7 +5023,7 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
                                         ("applied", "exit 1: x", False), ("rolled-back", "down exit 1: boom", False),
                                         ("failed", None, False)]):
         r43 = {"schema": 4, "steps": []}
-        got43 = refused(lambda: us.set_step_state(r43, "a/one", None, state43, text43))
+        got43 = read_refusal(lambda: us.set_step_state(r43, "a/one", None, state43, text43))
         check(f"[dSP-43 AC1] the writer {'admits' if admit43 else 'refuses'} a {state43} row with "
               + (f"`failure` {text43!r}" if text43 else "no `failure`"),
               (not got43 and r43["steps"] == [{"id": "a/one", "introduced": None, "state": state43}
@@ -5118,7 +5118,7 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
             ("a schema-4 receipt without the field", {"schema": 4}, "is absent"),
             ("a `steps` that is not a list", {"schema": 4, "steps": {}}, "requires a list"),
             ("a row that is not an object", {"schema": 4, "steps": ["a/one"]}, "not an object")):
-        got = refused(lambda: us.read_step_states(rec))
+        got = read_refusal(lambda: us.read_step_states(rec))
         check(f"[dSP-3 S3] read_step_states refuses {label}", why in got, got)
     check("[dSP-3 S3] ...and reads a receipt below schema 4 without the field as no rows",
           us.read_step_states({"schema": 2}) == [], "")
@@ -5138,8 +5138,8 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
                                         "failure": 5}], "`failure` 5 is neither"),
                            ("rs-49b", [{"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied",
                                         "failure": ""}], "`failure` '' is neither")):
-        t, _p = installed(tag)
-        plant(t, lambda rec, _r=rows: rec.__setitem__("steps", _r))
+        t, _p = build_installed(tag)
+        write_plant(t, lambda rec, _r=rows: rec.__setitem__("steps", _r))
         p = run("check", "--target", str(t))
         out = p.stdout + p.stderr
         hit = [ln for ln in out.splitlines() if "step record is malformed" in ln]
@@ -5153,9 +5153,9 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
     # ---- AC14: a re-run keeps an existing receipt's schema and `steps`, by either verb.
     row = {"id": "govkit/receipt-schema-4", "introduced": None, "state": "applied"}
     for verb in ("apply", "adopt"):
-        for label, fn in (("schema-4", lambda rec: rec.__setitem__("steps", [dict(row)])), ("schema-3", at(3))):
-            t, _p = installed(f"rs-ac14{verb[:2]}{label[-1]}")
-            plant(t, fn)
+        for label, fn in (("schema-4", lambda rec: rec.__setitem__("steps", [dict(row)])), ("schema-3", build_schema_plant(3))):
+            t, _p = build_installed(f"rs-ac14{verb[:2]}{label[-1]}")
+            write_plant(t, fn)
             p = (run("apply", "--target", str(t), "--kits", kit) if verb == "apply"
                  else run("adopt", "--target", str(t), "--re-adopt", "--write"))
             rec = read(t)
@@ -5182,33 +5182,33 @@ def check_source_mode(tmp: pathlib.Path) -> None:
     tmp.mkdir(parents=True, exist_ok=True)
     us = govkit_module().upgrade_steps
 
-    def gitc(repo, *args):
+    def run_gitc(repo, *args):
         return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True,
                               encoding="utf-8", errors="replace")
 
-    def gk_run(gk, *args, cwd=None):
+    def run_gk(gk, *args, cwd=None):
         return subprocess.run([sys.executable, str(gk), *args], capture_output=True, text=True,
                               encoding="utf-8", errors="replace", cwd=str(cwd) if cwd else None, timeout=900)
 
     # AC1 — gov's own deploy file, planned in place.
-    st0 = gitc(GOV_ROOT, "status", "--porcelain").stdout
-    p = gk_run(GOVKIT, "plan", "--target", str(GOV_ROOT))
+    st0 = run_gitc(GOV_ROOT, "status", "--porcelain").stdout
+    p = run_gk(GOVKIT, "plan", "--target", str(GOV_ROOT))
     check("[dSP-8] AC1 plan --target gov's own checkout exits 0 and writes nothing",
           p.returncode == 0 and "NOTHING was written" in p.stdout
-          and gitc(GOV_ROOT, "status", "--porcelain").stdout == st0, (p.stdout + p.stderr)[-2000:])
+          and run_gitc(GOV_ROOT, "status", "--porcelain").stdout == st0, (p.stdout + p.stderr)[-2000:])
 
     # AC2 — a scratch target with gov's deploy file: an interpolated answer is graded, another is not.
     base = (GOV_ROOT / ".governance" / "deploy.toml").read_text(encoding="utf-8")
     base = "".join(ln for ln in base.splitlines(keepends=True) if not ln.startswith("stream_ownership"))
     t2 = tmp / "t2"
     (t2 / ".governance").mkdir(parents=True)
-    gitc(t2, "init", "-q")
+    run_gitc(t2, "init", "-q")
     outs = {}
     for case, line in (("memory_root", 'memory_root = "x; touch PWNED"\n'),
                        ("without", ""), ("stream_ownership", 'stream_ownership = "a; b"\n')):
         (t2 / ".governance" / "deploy.toml").write_text(base.replace("[answers]\n", "[answers]\n" + line, 1),
                                                         encoding="utf-8", newline="\n")
-        outs[case] = gk_run(GOVKIT, "plan", "--target", str(t2))
+        outs[case] = run_gk(GOVKIT, "plan", "--target", str(t2))
     q = outs["memory_root"]
     check("[dSP-8] AC2 a metacharacter in an interpolated answer refuses plan, naming answers.memory_root",
           q.returncode == 2 and "answers.memory_root" in q.stderr and not (t2 / "PWNED").exists(), q.stderr[-2000:])
@@ -5218,16 +5218,16 @@ def check_source_mode(tmp: pathlib.Path) -> None:
 
     # AC3 — a source-mode clone with no receipt.
     clone = tmp / "gf"
-    gitc(tmp, "clone", "-q", str(GOV_ROOT), str(clone))
+    run_gitc(tmp, "clone", "-q", str(GOV_ROOT), str(clone))
     kit = clone / PFX / HERE.name
     for name in ("govkit.py", "upgrade_steps.py"):
         shutil.copyfile(HERE / name, kit / name)
     gk, rp = kit / "govkit.py", clone / ".governance" / "install.json"
-    p = gk_run(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    p = run_gk(gk, "update", "--target", str(clone), "--write", cwd=clone)
     rec = json.loads(rp.read_text(encoding="utf-8")) if rp.is_file() else {}
     declared = us.read_steps(clone, "HEAD", None)
     states = {r.get("id"): r.get("state") for r in rec.get("steps") or []}
-    pl = gk_run(gk, "plan", "--target", str(clone), cwd=clone)
+    pl = run_gk(gk, "plan", "--target", str(clone), cwd=clone)
     dests = extract_plan_writes(pl.stdout, with_kept=True)
     files = [f for f in rec.get("files") or []]
     check("[dSP-8] AC3 update --write on a clone of gov exits 0 and writes a schema-4 source receipt, no gov_commit",
@@ -5240,12 +5240,12 @@ def check_source_mode(tmp: pathlib.Path) -> None:
           and not any(k in f for f in files for k in ("sha256", "oid", "gov_oid")),
           f"{len(files)} rows, {len(dests)} destinations")
     check("[dSP-8] AC3 no path under .governance/outbox/ is left, the lock included",
-          gitc(clone, "status", "--porcelain", "--untracked-files=all", "--", ".governance/outbox").stdout == ""
+          run_gitc(clone, "status", "--porcelain", "--untracked-files=all", "--", ".governance/outbox").stdout == ""
           and not (clone / ".governance" / "outbox" / ".update.lock").exists())
 
     # AC8 — the re-run runs no up and leaves the receipt's bytes.
     was = rp.read_bytes() if rp.is_file() else b""
-    p = gk_run(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    p = run_gk(gk, "update", "--target", str(clone), "--write", cwd=clone)
     check("[dSP-8] AC8 a second source walk runs no step and leaves the receipt's bytes",
           p.returncode == 0 and "steps: 0 pending · 0 applied · 0 skipped" in p.stdout and rp.read_bytes() == was,
           (p.stdout + p.stderr)[-2000:])
@@ -5288,9 +5288,9 @@ def check_source_mode(tmp: pathlib.Path) -> None:
         fh.write('\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\n'
                  'down = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\n'
                  'surfaces = []\nneeds-target = false\n')
-    gitc(clone, "-c", "user.name=gk", "-c", "user.email=gk@invalid", "commit", "-q", "--no-verify", "-m", "plant",
+    run_gitc(clone, "-c", "user.name=gk", "-c", "user.email=gk@invalid", "commit", "-q", "--no-verify", "-m", "plant",
          "--", f"{PFX}{HERE.name}/steps.toml")
-    p = gk_run(gk, "update", "--target", str(clone), "--write", cwd=clone)
+    p = run_gk(gk, "update", "--target", str(clone), "--write", cwd=clone)
     after = {r.get("id"): r.get("state") for r in json.loads(rp.read_text(encoding="utf-8")).get("steps") or []}
     check("[dSP-8] AC4 a planted witness that never holds stops the walk, the steps before it applied",
           p.returncode == 1 and "govkit/planted-witness-fails · failed · witness does not hold after up" in p.stdout
@@ -5303,7 +5303,7 @@ def check_source_mode(tmp: pathlib.Path) -> None:
                                 ("a receipt not in source mode", (), "is not a source-mode receipt")):
         if not args:
             rp.write_text('{"schema": 3, "files": []}\n', encoding="utf-8", newline="\n")
-        p = gk_run(gk, "update", "--target", str(clone), "--write", *args, cwd=clone)
+        p = run_gk(gk, "update", "--target", str(clone), "--write", *args, cwd=clone)
         check(f"[dSP-8] S1 source mode refuses {label}", p.returncode == 2 and needle in p.stderr, p.stderr[-2000:])
 
 

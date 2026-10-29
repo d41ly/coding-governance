@@ -598,7 +598,7 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
     class_ids = ["fx-verb", "fx-key", "fx-hook", "fx-leg", "fx-page", "fx-none"]
     population = set(FIXTURE_POPULATION)
 
-    def edit(rel: str, old: str, new: str) -> None:
+    def write_edit(rel: str, old: str, new: str) -> None:
         p = root / rel
         text = p.read_text(encoding="utf-8")
         if old not in text:
@@ -607,45 +607,45 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
 
     usage, guide, more = f"{FIXTURE_PREFIX}/{FIXTURE_GOVKIT}/{USAGE_FILE}", "help/guide.md", "help/more.md"
     if plant == "stale-page":
-        edit(usage, 'flags = ["--role="]', 'flags = ["--role=", "--dry-run"]')
+        write_edit(usage, 'flags = ["--role="]', 'flags = ["--role=", "--dry-run"]')
     elif plant == "bad-flag":
-        edit(guide, "--part task", "--section task")
+        write_edit(guide, "--part task", "--section task")
     elif plant == "bad-verb":
-        edit(guide, "tool.py render", "tool.py rendr")
+        write_edit(guide, "tool.py render", "tool.py rendr")
     elif plant == "unrowed":
-        edit(guide, "sort -k1", "python tools/fx/other.py --fast\nsort -k1")
+        write_edit(guide, "sort -k1", "python tools/fx/other.py --fast\nsort -k1")
     elif plant == "broken-link":
-        edit(guide, "See [more]", "See [gone](gone.md), [more]")
+        write_edit(guide, "See [more]", "See [gone](gone.md), [more]")
     elif plant == "broken-fragment":
-        edit(guide, "more.md#the-hook", "more.md#no-such-heading")
+        write_edit(guide, "more.md#the-hook", "more.md#no-such-heading")
     elif plant == "external-link":
-        edit(guide, "See [more]", "See [the site](https://example.invalid/x), [more]")
+        write_edit(guide, "See [more]", "See [the site](https://example.invalid/x), [more]")
     elif plant == "undocumented":
-        edit(LIST_REL, "fx-page:guide\tseed\n", "")
+        write_edit(LIST_REL, "fx-page:guide\tseed\n", "")
     elif plant == "drained-row":
-        edit(more, "## The hook\n", "## The hook\n\n<!-- usage: fx-page:guide -->\n")
+        write_edit(more, "## The hook\n", "## The hook\n\n<!-- usage: fx-page:guide -->\n")
     elif plant == "grown-list":
         population.add("fx-page:extra")
-        edit(LIST_REL, "fx-page:guide\tseed\n", "fx-page:guide\tseed\nfx-page:extra\tlater\n")
+        write_edit(LIST_REL, "fx-page:guide\tseed\n", "fx-page:guide\tseed\nfx-page:extra\tlater\n")
         sg.run_git_text(root, "add", "-A")
         sg.write_fixture_commit(root, hooks, "docs fixture: a row added")
     elif plant == "orphan-anchor":
-        edit(more, "## The hook\n", "## The hook\n\n<!-- usage: fx-key:NOPE 0badf00d -->\n")
+        write_edit(more, "## The hook\n", "## The hook\n\n<!-- usage: fx-key:NOPE 0badf00d -->\n")
     elif plant == "restated-row":
-        edit(usage, "[[usage]]\n", '[[usage]]\nid = "fx-hook:fx-hook"\nshape = "hook"\n\n[[usage]]\n')
+        write_edit(usage, "[[usage]]\n", '[[usage]]\nid = "fx-hook:fx-hook"\nshape = "hook"\n\n[[usage]]\n')
     elif plant == "reader-rows":
         (root / "tools/fx/rows.py").write_text(
             f"def read_fx_rows(root):\n    return {{'thing': {dict(FIXTURE_MOD_ROW, default='b')!r}}}\n",
             encoding="utf-8", newline="\n")
-        edit(usage, "[[usage]]\n", '[[class]]\nclass = "fx-mod"\nusage = "key"\nrows = "{prefix}/fx/rows.py:read_fx_rows"\n'
+        write_edit(usage, "[[usage]]\n", '[[class]]\nclass = "fx-mod"\nusage = "key"\nrows = "{prefix}/fx/rows.py:read_fx_rows"\n'
                                    'why = "a reader in a fixture module"\n\n[[usage]]\n')
-        edit(more, "## The hook\n", f"## The hook\n\n<!-- usage: fx-mod:thing {derive_usage_fingerprint(FIXTURE_MOD_ROW)} -->\n")
+        write_edit(more, "## The hook\n", f"## The hook\n\n<!-- usage: fx-mod:thing {derive_usage_fingerprint(FIXTURE_MOD_ROW)} -->\n")
         class_ids.append("fx-mod")
         population.add("fx-mod:thing")
     elif plant == "none-rows":
-        edit(usage, 'usage = "none"\n', 'usage = "none"\nrows = "usage.toml"\n')
+        write_edit(usage, 'usage = "none"\n', 'usage = "none"\nrows = "usage.toml"\n')
     elif plant == "leg-row":
-        edit(f"{FIXTURE_PREFIX}/gate-legs.json", '"go"', '"go", "--quiet"')
+        write_edit(f"{FIXTURE_PREFIX}/gate-legs.json", '"go"', '"go", "--quiet"')
     elif plant == "unclassed":
         class_ids.append("fx-extra")
     elif plant == "empty-class":
@@ -654,7 +654,7 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         # TOOL-dSafePassage-26 S36: a `> ` prompt and a continued console line each carry a flag
         # the row does not declare; an unbalanced quote cannot split; an apostrophe in a comment is
         # no quote, the control that exits 0.
-        edit(guide, "```bash\npython tools/fx/run.py go --part task\n", {
+        write_edit(guide, "```bash\npython tools/fx/run.py go --part task\n", {
             "console-prompt": "```console\n> python tools/fx/run.py go --section task\n```\n\n```bash\n",
             "continued-flag": "```console\n$ python tools/fx/run.py go \\\n    --section task\n```\n\n```bash\n",
             "unbalanced-quote": "```bash\npython tools/fx/run.py go --part \"task\n",
@@ -668,7 +668,7 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         for rel in (guide,):
             (root / rel).write_text(re.sub(r"<!-- usage: [^>]* -->", "", (root / rel).read_text(encoding="utf-8")),
                                     encoding="utf-8", newline="\n")
-        edit(LIST_REL, "fx-page:guide\tseed\n", "fx-page:guide\tseed\nfx-verb:tool\tuntested\n"
+        write_edit(LIST_REL, "fx-page:guide\tseed\n", "fx-page:guide\tseed\nfx-verb:tool\tuntested\n"
              "script:tools/fx/run.py\tuntested\nscript:tools/fx/tool.py\tuntested\n")
     sg.run_git_text(root, "add", "-A")
     return root, class_ids, population

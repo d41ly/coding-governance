@@ -88,7 +88,7 @@ def check_inherited_config() -> int:
     import tempfile  # noqa: PLC0415
     results: list[tuple[bool, str]] = []
 
-    def note(ok: bool, label: str, liveness: bool = False) -> None:
+    def add_result(ok: bool, label: str, liveness: bool = False) -> None:
         results.append((ok, label))
         print(f"fixture-target: {'ok  ' if ok else ('LIVENESS miss' if liveness else 'MISS')} "
               f"{label}")
@@ -110,43 +110,43 @@ def check_inherited_config() -> int:
         os.environ["GIT_CONFIG_GLOBAL"] = str(d / "global")  # run_git copies os.environ
         env = {k: v for k, v in os.environ.items() if k not in GIT_LOCATION_VARS}
 
-        def git(cwd: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+        def run_env_git(cwd: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
             return subprocess.run(["git", "-C", str(cwd), "-c", "user.email=t@e", "-c", "user.name=t",
                                    *args], capture_output=True, text=True, encoding="utf-8",
                                   errors="replace", check=False, env=env)
 
         ctl = d / "control"
         ctl.mkdir()
-        git(ctl, "init", "-q")
-        note((ctl / ".git" / "hooks" / "pre-commit").is_file(),
+        run_env_git(ctl, "init", "-q")
+        add_result((ctl / ".git" / "hooks" / "pre-commit").is_file(),
              "liveness: the unpinned control's init copied the template's pre-commit", True)
-        p = git(ctl, "commit", "--allow-empty", "-qm", "c")
-        note(p.returncode != 0, "liveness: the unpinned control's commit was refused "
+        p = run_env_git(ctl, "commit", "--allow-empty", "-qm", "c")
+        add_result(p.returncode != 0, "liveness: the unpinned control's commit was refused "
              f"(exit {p.returncode})", True)
-        note((canary / "hooks-path").is_file(),
+        add_result((canary / "hooks-path").is_file(),
              "liveness: the unpinned control's commit wrote the hooks-path canary", True)
-        p = git(ctl, "-c", "commit.gpgsign=false", "commit", "--allow-empty", "-qm", "c")
-        note(p.returncode == 0, "liveness: the control's commit with commit.gpgsign=false exits 0 "
+        p = run_env_git(ctl, "-c", "commit.gpgsign=false", "commit", "--allow-empty", "-qm", "c")
+        add_result(p.returncode == 0, "liveness: the control's commit with commit.gpgsign=false exits 0 "
              f"(exit {p.returncode})", True)
         shutil.rmtree(canary, ignore_errors=True)
 
         try:
             t = build_target(d, None)
         except OSError as e:
-            note(False, f"build_target holds base at HEAD: it raised {e}")
+            add_result(False, f"build_target holds base at HEAD: it raised {e}")
         else:
-            subj = git(t, "show", "-s", "--format=%s", "HEAD^{commit}").stdout.strip()
-            note(subj == "base", f"build_target holds base at HEAD (subject {subj!r})")
+            subj = run_env_git(t, "show", "-s", "--format=%s", "HEAD^{commit}").stdout.strip()
+            add_result(subj == "base", f"build_target holds base at HEAD (subject {subj!r})")
             left = sorted(q.name for q in canary.glob("*")) if canary.is_dir() else []
-            note(not left, f"no canary written under the factory's target ({left})")
-            note(not (t / ".git" / "hooks" / "pre-commit").exists(),
+            add_result(not left, f"no canary written under the factory's target ({left})")
+            add_result(not (t / ".git" / "hooks" / "pre-commit").exists(),
                  "no .git/hooks/pre-commit copied into the factory's target")
             try:
                 run_git(t, "-c", "commit.gpgsign=true", "commit", "--allow-empty", "-qm", "signed")
             except OSError as e:
-                note("commit" in str(e), f"run_git raised OSError on the refused signed commit: {e}")
+                add_result("commit" in str(e), f"run_git raised OSError on the refused signed commit: {e}")
             else:
-                note(False, "run_git raised OSError on the refused signed commit: it returned")
+                add_result(False, "run_git raised OSError on the refused signed commit: it returned")
     held = sum(ok for ok, _ in results)
     if held == len(results):
         print(f"fixture-target: PASS · {held} of {len(results)} observations hold")

@@ -15,13 +15,13 @@ path = target / sys.argv[4] if len(sys.argv) > 4 else None
 d = target / ".uw-arm"
 
 
-def put(name: str, text: str, mode: str = "w") -> None:
+def write(name: str, text: str, mode: str = "w") -> None:
     d.mkdir(exist_ok=True)
     with open(d / name, mode, encoding="utf-8", newline="\n") as fh:
         fh.write(text)
 
 
-def clear() -> None:
+def remove_arm_dir() -> None:
     for f in d.glob("*") if d.is_dir() else []:
         f.unlink()
     if d.is_dir():
@@ -51,15 +51,15 @@ if phase == "witness":
     raise SystemExit(0 if ok else 1)
 if phase == "up":
     if arm == "witness-first":  # the defect: its witness lands before its payload
-        put("0-witness", "ok\n")
+        write("0-witness", "ok\n")
         time.sleep(0.05)
-        put("1-payload", "payload\n")
+        write("1-payload", "payload\n")
     elif arm == "not-rerunnable":  # the defect: every run appends again
-        put("0-lines", "one more line\n", "a")
+        write("0-lines", "one more line\n", "a")
         time.sleep(0.05)
-        put("1-done", "done\n")
+        write("1-done", "done\n")
     elif arm == "lossy-down":
-        put("lossy", "payload\n")
+        write("lossy", "payload\n")
     elif arm == "drops-plant":  # the defect: an adopter's line overwritten with no order
         text = path.read_text(encoding="utf-8")
         path.write_text("".join(ln for ln in text.splitlines(True) if MARK not in ln), encoding="utf-8", newline="")
@@ -68,8 +68,8 @@ if phase == "up":
     raise SystemExit(0)
 if phase == "down":
     if arm == "lossy-down":  # the defect: its down leaves one byte behind
-        put("lossy", "p")
+        write("lossy", "p")
     elif arm in ("witness-first", "not-rerunnable"):
-        clear()
+        remove_arm_dir()
     raise SystemExit(0)
 raise SystemExit(2)

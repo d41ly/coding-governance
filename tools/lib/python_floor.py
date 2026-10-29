@@ -197,11 +197,11 @@ def _scan_pep701(data):
     ends = {tokenize.FSTRING_END, getattr(tokenize, "TSTRING_END", tokenize.FSTRING_END)}
     stack, found = [], []  # each open f-string: [quote, brace depth, start row]
 
-    def note(row, what):
+    def add_note(row, what):
         if (row, what) not in found:
             found.append((row, what))
 
-    def quote_of(s):
+    def extract_quote(s):
         s = s.lstrip("rRbBfFtTuU")
         return s[:3] if s[:3] in ('"""', "'''") else s[:1]
 
@@ -212,17 +212,17 @@ def _scan_pep701(data):
             fields = stack[:-1] + ([stack[-1]] if stack and stack[-1][1] > 0 else [])
             if fields:
                 if tok.type in starts or tok.type == tokenize.STRING:
-                    q = quote_of(tok.string)
+                    q = extract_quote(tok.string)
                     if any(q[:1] == f[0][:1] and len(q) >= len(f[0]) for f in fields):
-                        note(tok.start[0], "a string in a replacement field reuses the enclosing f-string's quote")
+                        add_note(tok.start[0], "a string in a replacement field reuses the enclosing f-string's quote")
                 if tok.type in (tokenize.STRING, tokenize.FSTRING_MIDDLE) and "\\" in tok.string:
-                    note(tok.start[0], "a backslash in a replacement field")
+                    add_note(tok.start[0], "a backslash in a replacement field")
                 if tok.type == tokenize.COMMENT or (tok.type in (tokenize.STRING, tokenize.FSTRING_MIDDLE) and "#" in tok.string):
-                    note(tok.start[0], "a # in a replacement field")
+                    add_note(tok.start[0], "a # in a replacement field")
                 if any(len(f[0]) == 1 and tok.end[0] > f[2] for f in fields):
-                    note(tok.start[0], "a line break in a single-quoted f-string's replacement field")
+                    add_note(tok.start[0], "a line break in a single-quoted f-string's replacement field")
             if tok.type in starts:
-                stack.append([quote_of(tok.string), 0, tok.start[0]])
+                stack.append([extract_quote(tok.string), 0, tok.start[0]])
             elif tok.type in ends and stack:
                 stack.pop()
             elif stack and tok.type == tokenize.OP and tok.string in "{}":
@@ -306,13 +306,13 @@ def read_down_population(target, to_commit):
     if not run_git(gov, "rev-parse", "--verify", "--quiet", f"{to_commit}^{{commit}}").strip():
         raise ValueError(f"<to> {to_commit!r} names no commit in {gov.as_posix()}")
 
-    def blob(rel):
+    def read_blob(rel):
         out = subprocess.run(["git", "-C", str(gov), "show", f"{to_commit}:{rel}"], capture_output=True)
         return out.stdout if out.returncode == 0 else None
 
     if target == gov:
         rels = run_git(gov, "ls-tree", "-r", "--name-only", "-z", to_commit).split("\0")
-        return {r: blob(r) for r in rels if r.endswith((".py", ".toml"))}
+        return {r: read_blob(r) for r in rels if r.endswith((".py", ".toml"))}
     try:
         rows = json.loads((target / ".governance" / "install.json").read_text(encoding="utf-8")).get("files") or []
     except (OSError, ValueError, AttributeError):
@@ -321,7 +321,7 @@ def read_down_population(target, to_commit):
     for row in rows:
         if (isinstance(row, dict) and str(row.get("path", "")).endswith((".py", ".toml"))
                 and row.get("role") != "adopter-owned" and isinstance(row.get("source"), str)):
-            data = blob(row["source"])
+            data = read_blob(row["source"])
             if data is not None:
                 out[row["path"]] = data
     for f in sorted((target / ".governance").glob("*.toml")):

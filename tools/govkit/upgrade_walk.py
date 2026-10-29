@@ -955,7 +955,7 @@ def check_graders() -> list[str]:
     kit = run_git(HERE, "rev-parse", "--show-prefix").rstrip("/")
     scratch = pathlib.Path(tempfile.mkdtemp(prefix="uwg"))
 
-    def make_repo(name: str, files: dict) -> pathlib.Path:
+    def build_repo(name: str, files: dict) -> pathlib.Path:
         t = scratch / name
         t.mkdir()
         run_git(t, "init", "-q")
@@ -966,10 +966,10 @@ def check_graders() -> list[str]:
         write_commit(t, "grader")
         return t
 
-    def grade_order_kind() -> str:
+    def check_grade_order_kind() -> str:
         path = ".claude/skills/lexicon/SKILL.md"
         row = {"id": "edited-render", "path": path, "expect": "ordered", "order": "render-edited"}
-        t = make_repo("order", {f"{OUTBOX}/update-rollback-demo.md": f"# an order naming {path}\n"})
+        t = build_repo("order", {f"{OUTBOX}/update-rollback-demo.md": f"# an order naming {path}\n"})
         with contextlib.redirect_stdout(io.StringIO()):
             before = check_plant_rows({}, t, [row])
             _us, _shims, gk = load_engine()
@@ -979,7 +979,7 @@ def check_graders() -> list[str]:
             return "an outbox naming the path under another order's file read ordered"
         return f"its own order's file did not read ordered: {after}" if after else ""
 
-    def grade_arm_needle() -> str:
+    def check_grade_arm_needle() -> str:
         row = {"name": "witness-first", "case": "kill", "needle": ".uw-arm/1-payload"}
         tie = ["kill · upgrade-walk/witness-first · first write undetermined: a and b share one modification time"]
         own = ["kill · upgrade-walk/witness-first · the re-run's digest differs from up's at .uw-arm/1-payload"]
@@ -989,11 +989,11 @@ def check_graders() -> list[str]:
             return "a case exiting 0 caught the arm"
         return "" if check_arm_caught([row], 1, 1, own) else "a red naming its needle did not catch the arm"
 
-    def grade_tree_clean() -> str:
+    def check_grade_tree_clean() -> str:
         tools, gates = (kit.rsplit("/", 1)[0] if "/" in kit else "."), "run-gates"
         steps, plants = f"{kit}/steps.toml", f"{kit}/fixtures/release-0/plants.toml"
         memo, evidence = "memory/note.md", f"{tools}/{gates}/ceiling-evidence.txt"
-        t = make_repo("clean", {steps: "a\n", plants: "a\n", memo: "a\n", evidence: "a\n"})
+        t = build_repo("clean", {steps: "a\n", plants: "a\n", memo: "a\n", evidence: "a\n"})
         for p in (plants, memo, evidence, f"{kit}/untracked.py"):
             with open(t / p, "a", encoding="utf-8", newline="\n") as fh:
                 fh.write("\n")
@@ -1006,13 +1006,13 @@ def check_graders() -> list[str]:
         got = check_tree_clean(t, LEG_OWN)
         return "" if got == [steps] else f"{steps} edited, it returned {got}"
 
-    def grade_case_counts() -> str:
+    def check_grade_case_counts() -> str:
         line = render_case_counts({"down": (1, ["down · a", "down · b"]),
                                    "kill": (2, ["kill · r1 · a", "kill · r1 · b"])})
         want = ("down 0 passed 1 red", "kill 1 passed 1 red", "red lines 4")
         return "" if all(w in line for w in want) else f"it rendered {line!r}"
 
-    def grade_fixture_keys() -> str:
+    def check_grade_fixture_keys() -> str:
         fx = scratch / "fixture"
         fx.mkdir()
         seen = []
@@ -1031,9 +1031,9 @@ def check_graders() -> list[str]:
 
     reds = []
     try:
-        for name, grade in (("order-kind", grade_order_kind), ("arm-needle", grade_arm_needle),
-                            ("tree-clean", grade_tree_clean), ("case-counts", grade_case_counts),
-                            ("fixture-keys", grade_fixture_keys)):
+        for name, grade in (("order-kind", check_grade_order_kind), ("arm-needle", check_grade_arm_needle),
+                            ("tree-clean", check_grade_tree_clean), ("case-counts", check_grade_case_counts),
+                            ("fixture-keys", check_grade_fixture_keys)):
             try:
                 why = grade()
             except (Stop, OSError, KeyError, ValueError) as e:

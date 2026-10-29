@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** CLOSED · rev-4 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-28-build-TOOL-dSafePassage-81-ledger.md](../build/2026-10-28-build-TOOL-dSafePassage-81-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-81-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-81-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-81-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-81-build-brief.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-81-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-81-spec-brief.md) | research | — |

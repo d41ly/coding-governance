@@ -6358,11 +6358,6 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
-      "id": "clear",
-      "kind": "function",
-      "file": "tools/govkit/fixtures/release-0/arms/arm_step.py"
-    },
-    {
       "id": "cli_card",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -6881,11 +6876,6 @@
       "id": "count12",
       "kind": "function",
       "file": "tools/memory-tree/hygiene-parity.test.sh"
-    },
-    {
-      "id": "count37",
-      "kind": "function",
-      "file": "tools/push-main.test.sh"
     },
     {
       "id": "count7",
@@ -11453,6 +11443,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "measure37",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
+    },
+    {
       "id": "measureBlocks",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
@@ -11716,6 +11711,11 @@
       "id": "measure_ranks",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "measure_raw37",
+      "kind": "function",
+      "file": "tools/push-main.test.sh"
     },
     {
       "id": "measure_ready_tree",
@@ -13373,11 +13373,6 @@
       "file": "tools/memory-tree/merge-rows.test.sh"
     },
     {
-      "id": "put",
-      "kind": "function",
-      "file": "tools/govkit/fixtures/release-0/arms/arm_step.py"
-    },
-    {
       "id": "py_verdict",
       "kind": "function",
       "file": "tools/memory-tree/marker-contract.test.sh"
@@ -13441,11 +13436,6 @@
       "id": "raw",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
-    },
-    {
-      "id": "raw37",
-      "kind": "function",
-      "file": "tools/push-main.test.sh"
     },
     {
       "id": "raw_write_cells",
@@ -17031,6 +17021,11 @@
       "id": "remove_announcements",
       "kind": "function",
       "file": "tools/unattended/cross-component.test.sh"
+    },
+    {
+      "id": "remove_arm_dir",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/release-0/arms/arm_step.py"
     },
     {
       "id": "remove_census_watcher",
@@ -26681,6 +26676,11 @@
       "id": "wreset",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write",
+      "kind": "function",
+      "file": "tools/govkit/fixtures/release-0/arms/arm_step.py"
     },
     {
       "id": "write",

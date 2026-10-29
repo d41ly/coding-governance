@@ -10632,9 +10632,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # HERE, after the preview and before the pre-write snapshot, so every down meets the tree its up
     # left and no file row moves before the downs; the write loop below then moves the rows to --to
     # as for any --to. The record is begun before the first down, so a killed rollback leaves what
-    # it began, and `_rb_finish` rewrites it at each return below. A stopped reverse walk ends the
+    # it began, and `_write_rb_finish` rewrites it at each return below. A stopped reverse walk ends the
     # run here with its finding, gov_commit unmoved; a re-run resumes at the row it stopped at.
-    def _rb_finish(stamp: str) -> None:
+    def _write_rb_finish(stamp: str) -> None:
         if rollback:
             upgrade_steps.write_rollback_record(
                 target, base_commit, to_commit, _rb_started, _rb_walk["downs"],
@@ -12743,7 +12743,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"deleted {len(deleted)}, withheld {withheld}, "
               f"{conflicts} conflict(s). The receipt is NOT re-stamped: this run had findings, and a "
               f"stamp would tell the next run that guards which fired here have already been passed")
-        _rb_finish(f"not moved, this run had {len(r.problems)} finding(s)")
+        _write_rb_finish(f"not moved, this run had {len(r.problems)} finding(s)")
         return r.emit()
 
     # TOOL-dSafePassage-3 S5: the re-stamp lifts a schema-1 or schema-2 receipt to 3 and never past
@@ -12782,7 +12782,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"must be attributed from. Clear them with "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write`")
         write_install_receipt(target, receipt_path, receipt)
-        _rb_finish(f"not moved, {ungraded} row(s) carry evidence unattributed")
+        _write_rb_finish(f"not moved, {ungraded} row(s) carry evidence unattributed")
         return r.emit()
 
     receipt["gov_commit"] = to_commit
@@ -12792,7 +12792,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
           f"deleted {len(deleted)}, withheld {withheld}, "
           f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}")
-    _rb_finish(f"moved to {to_commit[:8]}")
+    _write_rb_finish(f"moved to {to_commit[:8]}")
     return r.emit()
 
 
