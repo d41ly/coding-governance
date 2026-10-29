@@ -137,7 +137,7 @@ ids TOOL-dMindYourWords-50 TOOL-dMindYourWords-51 TOOL-dMindYourWords-52
 | [TOOL-dMindYourWords-52 — the audit of units 30 to 37: its 18 lexicon-side minors, batched — honest git reasons, every reader observed, the drain edit's shells and states, and the carriers a move left behind](spec/2026-10-29-spec-TOOL-dMindYourWords-52.md) | 22 | 2 | DEFERRED | rev-1 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 86 bound to this build, across 4 record folder(s).
+Records: 87 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

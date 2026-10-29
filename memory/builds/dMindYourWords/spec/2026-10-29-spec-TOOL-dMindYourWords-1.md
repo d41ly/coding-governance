@@ -13,6 +13,7 @@
 | [2026-10-29-build-TOOL-dMindYourWords-1-deviation-11.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-deviation-11.md) | deviation | — |
 | [2026-10-29-build-TOOL-dMindYourWords-1-reuse-scout-a.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-reuse-scout-a.md) | research | TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 |
 | [2026-10-29-build-TOOL-dMindYourWords-1-spec-stage-returns.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-spec-stage-returns.md) | research | TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
+| [2026-10-30-build-TOOL-dMindYourWords-1-departures-spec.md](../build/2026-10-30-build-TOOL-dMindYourWords-1-departures-spec.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-1-reuse-scout.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-1-reuse-scout.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-2-reuse-scout.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-2-reuse-scout.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-3-reuse-scout.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-3-reuse-scout.md) | journal | — |
