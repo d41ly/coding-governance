@@ -37,8 +37,9 @@ starts it:
 
 - **From gov's checkout**, never yours: a relative path in a step names gov's file.
 - **A clean environment.** Only the names a process needs to start (`PATH`, `SYSTEMROOT`, `LANG`
-  and the like) are copied in, plus `GOV_PYTHON`, the interpreter override the resolver reads, so a
-  step resolves the interpreter gov's gates and hooks resolve on the same node; everything else,
+  and the like) are copied in, plus `GOV_PYTHON` and `GOV_BASH`, the interpreter and shell overrides
+  the resolvers read, so a step resolves the interpreter and the bash gov's gates and hooks resolve
+  on the same node; everything else,
   every token and credential variable included, is left out. Home and temp point at a fresh scratch directory that is removed after the step.
 - **No git config of yours or the machine's, no hooks, no credentials.** Git reads no system or
   global config and never prompts, and three settings passed through `GIT_CONFIG_COUNT`, which
@@ -206,7 +207,9 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
   its up never runs: `step <id> · skipped (witness holds)`. It carries `"via": "witness"` only where
   the receipt held no record of it, or a `rolled-back` one, and no before-image of it exists, so a
   walk killed after an up wrote leaves a re-run that records the row with no `via`, and a step
-  rolled back and walked again keeps its mark.
+  rolled back and walked again keeps its mark. Where a step's before-image does not parse and its
+  witness holds, the walk stops with exit 1 naming the image: put back its committed copy, or
+  where none is committed, remove it, then run again.
 - **A step that runs** is recorded `failed`, `interrupted: started <utc>, no exit recorded`, before
   its up starts, and `applied` once the up exits 0 and the witness holds. Its writes and its
   before-image under `.governance/steps/` are staged, never committed. The image is written
@@ -320,8 +323,9 @@ python tools/govkit/govkit.py update --target <repo> --rollback --to <rev> --wri
   file moves, `gov_commit` does not move, and the run exits 1. Fix the cause and run the same
   command again; it resumes at that step.
 - **A before-image path outside the repository.** A path a before-image lists, or the image's own
-  path, is refused where it climbs out (`..`, or a backslash climb such as `..\x`), is rooted, UNC
-  or on a drive, holds a colon, or passes through a symlink, a junction or any other reparse point.
+  path, is refused where it climbs out (`..`, or a backslash climb such as `..\x`),
+  holds a `..` segment even one that stays inside, is rooted, UNC or on a drive, holds a colon, or
+  passes through a symlink, a junction or any other reparse point.
   The refusal names the path, and for a link the segment that is linked, before anything is read
   or written; a down restores nothing, and an up writes no image.
 - **After a kill past the schema step.** A rollback killed after `govkit/receipt-schema-4`'s down

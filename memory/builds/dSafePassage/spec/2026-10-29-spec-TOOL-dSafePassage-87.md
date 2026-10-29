@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-87 — the round-2 closing review's seven mediums and two lows, each closed at the fix its skeptic judged sound
 
-**Status:** DEFERRED · rev-4 · 2026-10-29 · node a · Tier-2 · base cba885c5 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-29
+**Status:** CLOSED · rev-4 · 2026-10-29 · node a · Tier-2 · base cba885c5 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-29
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-29-build-TOOL-dSafePassage-87-ledger.md](../build/2026-10-29-build-TOOL-dSafePassage-87-ledger.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-86-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-86-spec-brief.md) | research | TOOL-dSafePassage-86 |
 | [2026-10-29-prompt-TOOL-dSafePassage-87-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-87-1-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-87-audit-fold-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-87-audit-fold-brief.md) | research | TOOL-dSafePassage-89 TOOL-dSafePassage-88 |

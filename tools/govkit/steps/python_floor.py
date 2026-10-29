@@ -4,8 +4,9 @@
     python <prefix>/govkit/steps/python_floor.py preflight | down <prior> <target> [<to>] | floor
 
 Its row is the floor row of `steps.toml`. It finds gov's `<prefix>/lib/python-floor.sh` through the
-step module's `resolve_kit_dir`, runs it under that module's `resolve_bash` with this program's own
-arguments, and exits as it exits: the script owns every verb, every line it prints and every refusal.
+step module's `resolve_kit_dir`, runs it under the bash that module's `resolve_shell_argv` resolves,
+`GOV_BASH` first, with this program's own arguments, falling back to bare `bash` where none resolves as
+the parent's argv did before TOOL-dSafePassage-82 (TOOL-dSafePassage-87 S4), and exits as it exits: the script owns every verb, every line it prints and every refusal.
 The step module is loaded by its path, because the runner's `-I` drops this file's own directory from
 `sys.path`; nothing is imported from govkit, so a step running isolated runs this.
 
@@ -32,7 +33,7 @@ def main(argv: list[str]) -> int:
     except LookupError as e:
         sys.stderr.write(f"python_floor.py: {e}\n")
         return 2
-    return subprocess.run([steps.resolve_bash(), (kit / FLOOR_SCRIPT).as_posix(), *argv]).returncode
+    return subprocess.run(steps.resolve_shell_argv(["bash", (kit / FLOOR_SCRIPT).as_posix(), *argv])).returncode
 
 
 if __name__ == "__main__":

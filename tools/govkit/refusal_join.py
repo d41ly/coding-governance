@@ -38,7 +38,11 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 334    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 335    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 334 -> 335 at TOOL-dSafePassage-87, BY THE MEASURED DELTA: the matcher reads 473 over the
+# deployer's directory at that unit's base `cba885c5` and 474 on the tree it left, the one in
+# `upgrade_steps.py`: `check_contained`'s refusal of a key holding a `..` segment that normalises
+# inside (S1, selftest's `[dSP-87 AC1]` checks). S6 rewords a message and adds no site.
 # 327 -> 334 at TOOL-dSafePassage-76, BY THE MEASURED DELTA: the matcher reads 466 over the
 # deployer's directory at that unit's base `f01ff3b9` and 473 on the tree it left, all seven in
 # `upgrade_steps.py`. `check_contained`'s two refusals of a path in the git directory, by a `.git`

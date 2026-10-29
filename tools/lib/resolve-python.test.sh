@@ -335,7 +335,8 @@ out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FT" 2>&1); rc=$?; out=${ou
 { [ "$rc" = 2 ] && [[ $out == *"<to> is required outside gov's own tree"* ]]; } \
   || bad "the down over an adopter with no <to> did not exit 2 saying <to> is required: rc=$rc $out"; ok
 out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FD" 2>&1); rc=$?; out=${out//$'\r'/}
-[ "$rc" != 2 ] || bad "the down over gov's own tree with no <to> exited 2, so its HEAD default is lost: $out"; ok
+{ [ "$rc" = 1 ] && [[ $out == "python-floor down: mode "* ]] && [[ $out == *"planted.toml:"* ]] && [[ $out != *Traceback* ]]; } \
+  || bad "the down over gov's own tree with no <to> did not grade its HEAD default: exit 1 naming planted.toml, no traceback: rc=$rc $out"; ok
 
 # ---- 2. PARITY ----------------------------------------------------------------------------------
 # A TABLE of (marker, canonical source, exclude-prefix), not one hardcoded predicate. It held exactly

@@ -16493,6 +16493,11 @@
       "file": "tools/govkit/upgrade_steps.py"
     },
     {
+      "id": "read_target_prefix",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "read_target_repositories",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"

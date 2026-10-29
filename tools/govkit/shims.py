@@ -57,18 +57,20 @@ GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_D
                      "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX")
 
 
-def read_shim_rows(root) -> list[dict]:
+def read_shim_rows(root, troot: str | None = None) -> list[dict]:
     """-> every `[[shim]]` row of `root`'s `shims.toml`, validated, its `from` and `to` resolved
     through `{prefix}` to repo-relative paths and `policy` set to the policy kit's directory there.
     A malformed row, a duplicate id or an unreadable file is a Refusal: the declaration is the one
-    write boundary every forwarder's bytes pass through."""
+    write boundary every forwarder's bytes pass through. Where `troot` is given, `{prefix}` resolves
+    against it rather than the root's own tool root, for a reader comparing the rows with an install
+    at another prefix (TOOL-dSafePassage-87 S11); the file is still found at the root's own."""
     root = pathlib.Path(root)
     path = govkit.resolve_tool_path(root, govkit.GOVKIT_DIR.name, SHIMS_NAME)
     try:
         doc = tomllib.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
         raise govkit.Refusal(f"shims: cannot read {path.as_posix()}: {exc}") from None
-    troot = govkit.derive_tool_root(root)
+    troot = govkit.derive_tool_root(root) if troot is None else troot
     rows, seen = [], set()
     for n, raw in enumerate(doc.get("shim") or [], 1):
         where = f"{SHIMS_NAME} row {n}"

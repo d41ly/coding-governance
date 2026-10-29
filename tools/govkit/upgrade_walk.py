@@ -115,13 +115,29 @@ def check_release_pin(gov_root, pin: str) -> list[str]:
 
 
 # ----------------------------------------------------------------------------------------- the rows
+def read_target_prefix() -> str:
+    """TOOL-dSafePassage-87 S7: the release-0 target's install prefix, `prefix` in FIXTURE's
+    `deploy.toml`, the one reader of that field: the target's plants, gov's own shim rows and the
+    policy adopter's directory in the target all resolve against it. A literal: the plants are read in
+    `main` before the clone a `{prefix}` token would resolve against exists, so a token is a Stop."""
+    prefix = tomllib.loads((FIXTURE / "deploy.toml").read_text(encoding="utf-8")).get("prefix")
+    if not isinstance(prefix, str) or "{" in prefix:
+        raise Stop(f"{FIXTURE.name}/deploy.toml: prefix {prefix!r} is not a literal path, and the target's "
+                   "plants resolve against it before any tool root exists to resolve a token")
+    return prefix
+
+
 def read_fixture_rows(kind: str, fixture=FIXTURE) -> list[dict]:
     """The `kind` rows, each `path`, and a nested plant's `path` and shim's `from` and `to`, spelled
-    `{prefix}/…` and resolved here against the tool root, the pinned clone's as gov's own: the walk
-    runs the clone's engine at HERE's own relative path (TOOL-dSafePassage-82 S3)."""
+    `{prefix}/…` and resolved against one of two roots (TOOL-dSafePassage-87 S7). A `[[gov_plant]]`
+    edits gov's tree, so it resolves against the working gov's tool root, the clone tip's layout.
+    Every other kind names a path in the adopter target, so it resolves against the target's install
+    prefix, `read_target_prefix`. The two are not claimed equal."""
     name = {"plant": "plants.toml", "gov_plant": "plants.toml", "condition": "plants.toml", "arm": "arms.toml"}[kind]
     gk = load_engine()[2]
-    troot = gk.derive_tool_root(gk.repo_root())
+    # S7: a [[gov_plant]] edits gov's tree, at the clone tip's tool root, HEAD's own; every other kind
+    # names a path in the target, installed at deploy.toml's `prefix`.
+    troot = gk.derive_tool_root(gk.repo_root()) if kind == "gov_plant" else read_target_prefix()
     fix = lambda r: {k: gk.resolve_prefix_token(v, troot) if k in ("path", "from", "to") and isinstance(v, str)
                      else fix(v) if isinstance(v, dict) else v for k, v in r.items()}
     rows = tomllib.loads((pathlib.Path(fixture) / name).read_text(encoding="utf-8")).get(kind) or []
@@ -184,7 +200,7 @@ def derive_release_engine(clone) -> pathlib.Path:
     """The engine release-0's `apply` runs: the pinned clone's own `govkit.py`, at the tool root the
     clone holds at the pin, never HERE's (TOOL-dSafePassage-86). Read while the clone is at the pin."""
     _us, _shims, gk = load_engine()
-    return clone / gk.resolve_prefix_token("{prefix}/govkit/govkit.py", gk.derive_tool_root(clone))
+    return gk.resolve_tool_path(clone, gk.GOVKIT_DIR.name, "govkit.py")
 
 
 def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants: list[dict],
@@ -229,7 +245,7 @@ def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants:
         write_plant_edits(t, plants)
         write_commit(t, "plants")
         adopter = "adopt-policy.sh"
-        p = subprocess.run([gk.resolve_bash(), (gk.resolve_kit_dir("policy", adopter, t / gk.derive_tool_root(clone)) / adopter).as_posix(), "--scaffold", "--target", t.as_posix()],
+        p = subprocess.run([gk.resolve_bash(), (gk.resolve_kit_dir("policy", adopter, t / read_target_prefix()) / adopter).as_posix(), "--scaffold", "--target", t.as_posix()],
                            cwd=str(t), capture_output=True, text=True, encoding="utf-8", errors="replace",
                            stdin=subprocess.DEVNULL)
         if p.returncode:
@@ -562,7 +578,7 @@ def check_shim_paths(ctx: dict, tree, extra_rows: list[dict]) -> tuple[list[str]
         reds.append("shims · the --no-tags clone holds a tag")
     releases = shims.read_releases(ctx["clone"])
     print_line(f"shims · read_releases returned {'none' if not releases else len(releases)}")
-    rows = shims.read_shim_rows(ctx["clone"])
+    rows = shims.read_shim_rows(ctx["clone"], read_target_prefix())  # S11: at the receipt's root
     held = {ln.split()[1] for ln in shims.check_shim_windows(ctx["clone"], releases)}
     for r in rows:
         if r["closed"] and r["id"] not in held:
@@ -927,15 +943,18 @@ def resolve_arm_rows(ctx: dict, us) -> dict:
 def check_tree_clean(gov_root, own) -> list[str]:
     """TOOL-dSafePassage-77 S3: the tracked paths under the leg's directory and its sibling `lib`,
     both spelled from HERE's place in the toplevel, that differ from HEAD in `gov_root`, outside
-    `own` (paths relative to HERE). Only those engine files are what the walk takes from HEAD."""
+    `own` (paths relative to HERE). Only those engine files are what the walk takes from HEAD. A
+    staged move reads as its own deletion and addition, so neither side of it is lost
+    (TOOL-dSafePassage-87 S2)."""
     kit = run_git(HERE, "rev-parse", "--show-prefix").rstrip("/")
     lib = f"{kit.rsplit('/', 1)[0]}/lib" if "/" in kit else "lib"
     mine = [f"{kit}/{o}" for o in own]
-    out = subprocess.run(["git", "-C", str(gov_root), "status", "--porcelain", "--untracked-files=no", "--", kit, lib],
+    out = subprocess.run(["git", "-C", str(gov_root), "status", "--porcelain", "-z", "--no-renames",
+                          "--untracked-files=no", "--", kit, lib],
                          capture_output=True, text=True, encoding="utf-8", errors="replace",
                          env={k: v for k, v in os.environ.items() if not k.upper().startswith("GIT_")},
                          stdin=subprocess.DEVNULL).stdout  # not run_git: its strip eats the first status column
-    paths = [ln[3:].split(" -> ")[-1].strip('"') for ln in out.splitlines() if len(ln) > 3]
+    paths = [e[3:] for e in out.split("\0") if len(e) > 3]
     return sorted(p for p in paths if not any(p == m or p.startswith(m + "/") for m in mine))
 
 
@@ -956,7 +975,8 @@ def render_case_counts(per_case: dict) -> str:
 
 def check_graders() -> list[str]:
     """TOOL-dSafePassage-77 S7: S1, S2, S3 and S4's functions fed fabricated inputs, one line per
-    grader, and TOOL-dSafePassage-86's `derive_release_engine` over three pin-shaped trees; returns
+    grader, TOOL-dSafePassage-86's `derive_release_engine` over three pin-shaped trees, and
+    TOOL-dSafePassage-87's `check_shim_paths` over gov's own row at another tool root; returns
     the reds. Each is a pure call or a scratch repository it removes."""
     import contextlib
     import io
@@ -1001,7 +1021,11 @@ def check_graders() -> list[str]:
         tools, gates = (kit.rsplit("/", 1)[0] if "/" in kit else "."), "run-gates"
         steps, plants = f"{kit}/steps.toml", f"{kit}/fixtures/release-0/plants.toml"
         memo, evidence = "memory/note.md", f"{tools}/{gates}/ceiling-evidence.txt"
-        t = build_repo("clean", {steps: "a\n", plants: "a\n", memo: "a\n", evidence: "a\n"})
+        # TOOL-dSafePassage-87 S2, S3: the sibling `lib`, spelled as check_tree_clean spells it, and an
+        # engine file a staged move takes into the leg's own fixture
+        libf, engine = (f"{kit.rsplit('/', 1)[0]}/lib" if "/" in kit else "lib") + "/x.sh", f"{kit}/engine.py"
+        t = build_repo("clean", {steps: "a\n", plants: "a\n", memo: "a\n", evidence: "a\n", libf: "a\n",
+                                 engine: "a\n"})
         for p in (plants, memo, evidence, f"{kit}/untracked.py"):
             with open(t / p, "a", encoding="utf-8", newline="\n") as fh:
                 fh.write("\n")
@@ -1012,7 +1036,18 @@ def check_graders() -> list[str]:
         with open(t / steps, "a", encoding="utf-8", newline="\n") as fh:
             fh.write("\n")
         got = check_tree_clean(t, LEG_OWN)
-        return "" if got == [steps] else f"{steps} edited, it returned {got}"
+        if got != [steps]:
+            return f"{steps} edited, it returned {got}"
+        run_git(t, "checkout", "-q", "--", ".")
+        with open(t / libf, "a", encoding="utf-8", newline="\n") as fh:
+            fh.write("\n")
+        got = check_tree_clean(t, LEG_OWN)
+        if got != [libf]:
+            return f"{libf} edited, it returned {got}"
+        run_git(t, "checkout", "-q", "--", ".")  # the move runs last: checkout does not undo a staged move
+        run_git(t, "mv", engine, f"{kit}/fixtures/release-0/engine.py")
+        got = check_tree_clean(t, LEG_OWN)
+        return "" if got == [engine] else f"{engine} renamed into fixtures/release-0, it returned {got}"
 
     def check_grade_case_counts() -> str:
         line = render_case_counts({"down": (1, ["down · a", "down · b"]),
@@ -1048,12 +1083,25 @@ def check_graders() -> list[str]:
                 return f"a pin at {pre or 'the repo root'} derived {got}, not {want}"
         return ""
 
+    def check_grade_shim_root() -> str:
+        gkn = load_engine()[2].GOVKIT_DIR.name
+        row = ('[[shim]]\nid = "demo/old"\nkind = "command"\nfrom = "{prefix}/demo/old.sh"\n'
+               'to = "{prefix}/demo/new.sh"\nclosed = false\n')
+        c = build_repo("shim-gov", {f"moved/{gkn}/registry.toml": "", f"moved/{gkn}/shims.toml": row})
+        t, old = scratch / "shim-target", f"{read_target_prefix()}/demo/old.sh"
+        (t / ".governance").mkdir(parents=True)
+        (t / RECEIPT).write_text(json.dumps({"files": [{"path": old}]}), encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()):
+            got, _n = check_shim_paths({"clone": c}, t, [])
+        return "" if any(f"its forwarder {old} is gone from the walked target" in g for g in got) else (
+            f"gov's own row, its forwarder {old} gone, read no red: {got}")
+
     reds = []
     try:
         for name, grade in (("order-kind", check_grade_order_kind), ("arm-needle", check_grade_arm_needle),
                             ("tree-clean", check_grade_tree_clean), ("case-counts", check_grade_case_counts),
                             ("fixture-keys", check_grade_fixture_keys),
-                            ("release-engine", check_grade_release_engine)):
+                            ("release-engine", check_grade_release_engine), ("shim-root", check_grade_shim_root)):
             try:
                 why = grade()
             except (Stop, OSError, KeyError, ValueError) as e:

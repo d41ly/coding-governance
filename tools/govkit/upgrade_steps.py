@@ -175,10 +175,13 @@ THIS_HOST = socket.gethostname()
 # variable included, falls out because nothing copies it in; a name joins by a reviewed edit.
 # `GOV_PYTHON` joins (TOOL-dSafePassage-75): it names the interpreter the resolver tries first, so
 # a step resolves the one gov's gates and hooks resolve; it carries no credential, and it is the
-# same class of name as `PATH`, which already decides what a step spawns.
+# same class of name as `PATH`, which already decides what a step spawns. `GOV_BASH` joins
+# (TOOL-dSafePassage-87): it names the bash `resolve_bash` tries first, so the floor stub runs the
+# shell the parent's `resolve_shell_argv` ran before TOOL-dSafePassage-82 moved the row to a python
+# argv; it carries no credential and is the same class of name as `PATH`.
 STEP_ENV_KEEP = ("PATH", "PATHEXT", "SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "COMSPEC", "OS",
                  "PROCESSOR_ARCHITECTURE", "NUMBER_OF_PROCESSORS", "LANG", "LC_ALL", "TZ",
-                 "GOV_PYTHON")
+                 "GOV_PYTHON", "GOV_BASH")
 STEP_PHASES = ("up", "down", "witness", "resume", "reverted")
 # Where `check_needs_target` gathers canaries: inside the scratch tree it is handed, so a target
 # module planted beside the plants can name its own canary by its own path.
@@ -1075,6 +1078,9 @@ def check_contained(target, rel: str) -> pathlib.Path:
     norm = derive_contained_rel(rel)
     if norm is None:
         raise Refusal(f"'{rel}' is not a path inside the target, so no step may write it")
+    if ".." in rel.replace("\\", "/").split("/"):
+        raise Refusal(f"'{rel}' holds a '..' segment, which a step's own write resolves through any link "
+                      f"on the segment before it, so no step may write it")
     cur = pathlib.Path(target)
     for seg in norm.split("/"):
         cur = cur / seg
@@ -2002,7 +2008,8 @@ def read_image_paths(target, step_id: str, index: bool = False) -> list[str]:
     except (ValueError, KeyError, TypeError):
         if not index:
             raise Refusal(f"{step_id}: its before-image {rel} does not parse or lists no paths, so which "
-                          f"paths its step wrote is unknown; put back its committed copy, then run again") from None
+                          f"paths its step wrote is unknown; put back its committed copy, or where none is "
+                          f"committed, remove it, which gives up the before bytes it held; then run again") from None
         raise Refusal(f"{step_id}: the index's copy of its before-image {rel} does not parse or lists no "
                       f"paths, so which paths its down restored is unknown and none was staged; stage "
                       f"the restored paths and the image's removal by hand, then run the rollback again") from None
@@ -3630,7 +3637,7 @@ while sys.argv[4] != "-" and not pathlib.Path(sys.argv[4]).exists() and time.tim
 '''
 WALK_SCHEMA_PLANTS = ("schema-3", "schema-3-fail", "schema-3-kill")  # TOOL-dSafePassage-15
 WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "not-pending",
-               "truncated-image", "kill-after-up", "kill-before-stage") + WALK_SCHEMA_PLANTS
+               "truncated-image", "truncated-image-held", "kill-after-up", "kill-before-stage") + WALK_SCHEMA_PLANTS
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-foreign-namespace", "lock-unreadable",
                "lock-foreign-pidns", "lock-no-pidns", "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot",
                "lock-other-boot", "lock-no-namespace")
@@ -3899,6 +3906,26 @@ def run_walk_fixture(plant: str | None) -> int:
             check_ok("s2.up" not in read_canaries(t), "s2's up ran over a holding witness")
             check_ok(row.get("state") == "applied" and rc == 0, "s2 does not read applied, or the walk failed")
             check_ok(row.get("via") == "witness", "s2 is not marked applied via its witness (TOOL-dSafePassage-33)")
+        elif plant == "truncated-image-held":
+            # TOOL-dSafePassage-87 S6: s2's witness holds and its before-image, never committed, is cut
+            # short. The walk refuses naming the image and a remedy that applies with no committed
+            # copy; the remedy taken, the re-run passes s2 by its witness.
+            t = build_case_target("t", files={"s2.txt": "s2\n"})
+            image = t / derive_image_path(pathlib.Path("."), "fx/s2")
+            full = json.dumps({"step": "fx/s2", "paths": {"s2.txt": {"after": None, "before": None}}}, indent=2)
+            image.parent.mkdir(parents=True)
+            image.write_text(full[:full.index('"step"')], encoding="utf-8", newline="\n")
+            rc, out = scan(t)
+            named = "where none is committed, remove it" in out
+            print(f"walk: held · rc {rc} · remedy {'named' if named else 'absent'}")
+            check_ok(rc == 1 and "s2.before.json does not parse" in out and named,
+                     "an unparsable image under a holding witness did not stop the walk naming it and its remedy")
+            image.unlink()
+            rc, out = scan(t)
+            s2 = next((r for r in read_receipt_steps(t) if r["id"] == "fx/s2"), {})
+            print(f"walk: held · after the remedy · fx/s2 {s2.get('state')} · rc {rc}")
+            check_ok(rc == 0 and "step fx/s2 · skipped (witness holds)" in extract_step_lines(out),
+                     "the re-run after the remedy did not pass s2 by its witness")
         elif plant == "fail-k":
             t = build_case_target("t")
             t.with_name("t.fx").mkdir()

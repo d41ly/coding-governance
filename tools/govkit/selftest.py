@@ -3140,6 +3140,28 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     got74 = [(r.id, r.retired) for r in steps.read_retired(g, "HEAD", "main")]
     check("[dSP-74] AC2 a single-quoted [[retired]] row reads its committing sha",
           got74 == [("gone", second)], str(got74))
+    # TOOL-dSafePassage-87 AC6: an id whose slash is a TOML unicode escape and a multi-line literal id,
+    # neither of whose raw text a quote-widened pre-filter finds, each read the commit that added them;
+    # a staged copy carrying that pre-filter reads both unlanded, so the first check reds under it.
+    write_file(g, "demo/kit.toml", demo_head + render_row("demo/first")
+               + render_row("demo/single").replace('id = "demo/single"', "id = 'demo/single'")
+               + render_row("demo/esc").replace('id = "demo/esc"', 'id = "demo\\u002Fesc"')
+               + render_row("demo/ml").replace('id = "demo/ml"', "id = '''\ndemo/ml'''"))
+    settle(g, "an escaped and a multi-line literal row")
+    third = run_gov_git(g, "rev-parse", "HEAD")
+    got87 = [(r.id, r.introduced) for r in steps.read_steps(g, "HEAD", "main")][-2:]
+    check("[dSP-87 AC6] an escaped id and a multi-line literal id each read the commit that added them",
+          got87 == [("demo/esc", third), ("demo/ml", third)], str(got87))
+    src87 = (HERE / "upgrade_steps.py").read_text(encoding="utf-8")
+    anchor87 = '                try:\n                    held = {r.get("id")'
+    mutant87 = "                if not any(f'\"{i}\"' in text or f\"'{i}'\" in text for i in want): continue\n"
+    spec87 = importlib.util.spec_from_file_location(
+        "us87_widened", build_staged_copy(tmp / "dsp87-quote-widened", src87.replace(anchor87, mutant87 + anchor87)))
+    us87 = importlib.util.module_from_spec(spec87)
+    spec87.loader.exec_module(us87)
+    got87 = [(r.id, r.introduced) for r in us87.read_steps(g, "HEAD", "main")][-2:]
+    check("[dSP-87 AC6] a copy carrying the quote-widened pre-filter reads both rows unlanded — reds",
+          src87.count(anchor87) == 1 and got87 == [("demo/esc", us87.UNLANDED), ("demo/ml", us87.UNLANDED)], str(got87))
 
     # TOOL-dSafePassage-72 AC1 to AC5: one predicate answers containment for the step module and for
     # govkit's destinations, and `check_contained` refuses a link on any existing segment before a
@@ -3220,6 +3242,14 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
                                                            lambda before: handed72.append(before) or {}))
     check("[dSP-72] AC5 a held image's path through a link is refused before derive_after is handed it",
           "lnk" in held72 and handed72 == [], held72)
+    # TOOL-dSafePassage-87 AC1: a `..` segment is refused even where it normalises inside, since the
+    # kernel resolves `lnk` before applying `..`, so the normalised form is not what a step opens.
+    for rel87 in ("a/../b", "lnk/../planted.txt"):
+        got87 = [read_refusal(lambda: steps.check_contained(t72, rel87))]
+        write_image72(t72, "demo/dotdot", {rel87: pwned})
+        got87.append(read_refusal(lambda: steps.read_image_paths(t72, "demo/dotdot")))
+        check(f"[dSP-87 AC1] {rel87!r} is refused by check_contained and read_image_paths for its '..' segment",
+              all("holds a '..' segment" in g for g in got87), str(got87))
 
     # ---- AC3 and AC16: the commit is main's first-parent landing, never a branch commit.
     g = tmp / "sp-land"
@@ -4379,6 +4409,34 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     check("[dSP-75] the floor row's witness under the contract, 3.12 fakes on PATH and GOV_PYTHON at the floor, is ok",
           got["verdict"] == "ok" and got["rc"] == 0, str(got))
 
+    # TOOL-dSafePassage-87 S4: PATH's first bash a text file that does not run, every other PATH entry
+    # holding a bash dropped but a System32 or WindowsApps launcher, which resolve_bash skips, and
+    # GOV_BASH the parent's own bash: the floor stub resolves bash as the parent does, so it holds.
+    bash87 = us.resolve_bash()
+    fake87 = tmp / "dsp87-nobash"
+    fake87.mkdir(exist_ok=True)
+    for nm in ("bash", "bash.exe"):
+        (fake87 / nm).write_bytes(b"not a program\n")
+        (fake87 / nm).chmod(0o755)
+
+    def test_launcher87(d: str) -> bool:
+        return any(s in d.replace("\\", "/").lower() for s in ("/system32", "/windowsapps"))
+
+    keep87 = [d for d in os.environ.get("PATH", "").split(os.pathsep) if d and (test_launcher87(d) or not any(
+        os.path.isfile(os.path.join(d, n)) for n in ("bash", "bash.exe")))]
+    held = {k: os.environ.get(k) for k in ("PATH", "GOV_PYTHON", "GOV_BASH")}
+    os.environ.update(PATH=os.pathsep.join([str(fake87)] + keep87), GOV_BASH=bash87, GOV_PYTHON=sys.executable)
+    try:
+        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+    finally:
+        for k, v in held.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+    check("[dSP-87 AC5] the floor row's witness, PATH's bash unusable and GOV_BASH the parent's bash, is ok",
+          got["verdict"] == "ok" and got["rc"] == 0, str(got))
+
 
 def check_step_gate_fixture() -> None:
     """TOOL-dSafePassage-10 AC2 to AC9 — `step_gate.py --fixture` over every class row's own plant,
@@ -4469,6 +4527,10 @@ def check_step_walk() -> None:
             ("walk", "truncated-image", 1, ("walk: unchanged · fx/s3 applied · image rewritten",
                                             "exit 1: upgrade_steps.Refusal: .governance/steps/fx/s3.before.json",
                                             "walk: changed · fx/s3 failed · rc 1")),
+            # TOOL-dSafePassage-87 AC7: an unparsable image under a holding witness, never committed,
+            # stops the walk naming a remedy that applies, and the remedy's re-run passes the step.
+            ("walk", "truncated-image-held", 0, ("walk: held · rc 1 · remedy named",
+                                                 "walk: held · after the remedy · fx/s2 applied · rc 0")),
             # TOOL-dSafePassage-40 AC1, AC3: a row whose up ran, by its record or its image, is
             # passed by its witness with no `via`.
             ("walk", "kill-after-up", 0, ("last applied ['fx/s2'] · fx/s3 failed · interrupted: started ",
@@ -4543,6 +4605,7 @@ def check_step_walk() -> None:
                else "dSP-40" if plant == "kill-after-up"
                else "dSP-76" if plant == "kill-before-stage"
                else "dSP-84" if plant == "scoped-read-only"
+               else "dSP-87" if plant == "truncated-image-held"
                else "dSP-33" if family == "walk" and plant in ("witness-holds", "fail-k")
                else "dSP-22" if plant == "lock-live-slow-census"
                else "dSP-31" if plant in ("lock-foreign-pidns", "lock-no-pidns")
@@ -19453,7 +19516,10 @@ user_skills = "/tmp/gk-fake-skills"
                    (["console-prompt"], 1, r"^docs: COMMAND help/guide\.md:\d+ .*flag '--section'"),
                    (["continued-flag"], 1, r"^docs: COMMAND help/guide\.md:\d+ .*flag '--section'"),
                    (["unbalanced-quote"], 1, r"^docs: SPLIT help/guide\.md:\d+: a command line the shell grammar cannot split"),
-                   (["comment-apostrophe"], 0, r"^docs: \d+ classes · .* commands 2 tested, 1 skipped, 0 unrowed")]
+                   (["comment-apostrophe"], 0, r"^docs: \d+ classes · .* commands 2 tested, 1 skipped, 0 unrowed"),
+                   # TOOL-dSafePassage-87 AC10: the fixture laid out under `scripts`, its page commands
+                   # spelled `<prefix>/`, tests both, so the leg resolves them off the tool root.
+                   (["scripts-prefix"], 0, r"^docs: \d+ classes · .* commands 2 tested, 1 skipped, 0 unrowed")]
 
     def _run_docs_case(case):
         return case, subprocess.run([sys.executable, str(HERE / "docs_leg.py"), "--fixture", "--plant", *case[0]],

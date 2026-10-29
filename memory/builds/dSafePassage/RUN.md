@@ -497,3 +497,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-29T07:24:13Z dispatch · item b0106aa1 TOOL-dSafePassage-86 · reason tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-86.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-86-ledger.md
 
 2026-10-29T07:39:16Z dispatch · item b0106aa1 TOOL-dSafePassage-86 · reason tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-86.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-86-ledger.md memory/map/generated/symbols.json
+
+2026-10-29T08:34:57Z brief · item TOOL-dSafePassage-87 · reason f8e75555da14 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-87-build-brief.md
+
+2026-10-29T08:42:28Z dispatch · item 10abda03 TOOL-dSafePassage-87 · reason tools/govkit/upgrade_steps.py tools/govkit/upgrade_walk.py tools/govkit/shims.py tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/steps/python_floor.py tools/govkit/docs_leg.py tools/lib/resolve-python.test.sh help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-87.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-87-ledger.md
+
+2026-10-29T08:50:34Z dispatch · item 10abda03 TOOL-dSafePassage-87 · reason tools/govkit/upgrade_steps.py tools/govkit/upgrade_walk.py tools/govkit/shims.py tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/steps/python_floor.py tools/govkit/docs_leg.py tools/lib/resolve-python.test.sh help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-87.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-87-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json

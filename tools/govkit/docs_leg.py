@@ -77,7 +77,7 @@ INTERPRETERS = ("python", "python3", "bash", "sh")
 PLANTS = ("none", "stale-page", "bad-flag", "bad-verb", "unrowed", "broken-link", "broken-fragment",
           "external-link", "undocumented", "drained-row", "grown-list", "orphan-anchor", "restated-row",
           "reader-rows", "none-rows", "leg-row", "unclassed", "empty-class", "untested",
-          "console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe")
+          "console-prompt", "continued-flag", "unbalanced-quote", "comment-apostrophe", "scripts-prefix")
 
 
 def derive_usage_fingerprint(row: dict) -> str:
@@ -559,26 +559,34 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         raise Refusal(f"no fixture plant '{plant}': the plants are {', '.join(PLANTS)}")
     root, hooks = pathlib.Path(tmp) / "r", pathlib.Path(tmp) / "h"
     hooks.mkdir(parents=True)
+    # TOOL-dSafePassage-87 S8: `scripts-prefix` lays the fixture out under `scripts`, its rows and its
+    # page commands spelled through the prefix token, so a `tools/` the leg types in place of the
+    # tool root resolves to nothing tracked. Every other plant is byte-identical.
+    moved = plant == "scripts-prefix"
+    pre, cmdp = ("scripts", "<prefix>") if moved else (FIXTURE_PREFIX, "tools")
+    usage_text = (FIXTURE_USAGE.replace('"tools/fx/', '"{prefix}/fx/').replace("script:tools/fx/", "script:{prefix}/fx/")
+                  if moved else FIXTURE_USAGE)
     files = {
-        f"{FIXTURE_PREFIX}/{FIXTURE_GOVKIT}/registry.toml": "# the fixture's tool root\n",
-        f"{FIXTURE_PREFIX}/{FIXTURE_GOVKIT}/{USAGE_FILE}": FIXTURE_USAGE,
-        f"{FIXTURE_PREFIX}/{FIXTURE_HOOKS}/fx-hook.fragment.json": json.dumps({"name": "fx-hook", "event": "Stop", "matcher": "*"}) + "\n",
-        f"{FIXTURE_PREFIX}/gate-legs.json": json.dumps([{"name": "fx-leg", "argv": ["python", "{prefix}/fx/run.py", "go"]}]) + "\n",
-        "tools/fx/run.py": "", "tools/fx/tool.py": "", "tools/fx/other.py": "",
+        f"{pre}/{FIXTURE_GOVKIT}/registry.toml": "# the fixture's tool root\n",
+        f"{pre}/{FIXTURE_GOVKIT}/{USAGE_FILE}": usage_text,
+        f"{pre}/{FIXTURE_HOOKS}/fx-hook.fragment.json": json.dumps({"name": "fx-hook", "event": "Stop", "matcher": "*"}) + "\n",
+        f"{pre}/gate-legs.json": json.dumps([{"name": "fx-leg", "argv": ["python", "{prefix}/fx/run.py", "go"]}]) + "\n",
+        f"{pre}/fx/run.py": "", f"{pre}/fx/tool.py": "", f"{pre}/fx/other.py": "",
         LIST_REL: "# the fixture's undocumented members\nfx-page:guide\tseed\nfx-key:FX_ROOT\tseed\n",
     }
     for rel, text in files.items():
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_text(text, encoding="utf-8", newline="\n")
-    shutil.copyfile(__file__, root / FIXTURE_PREFIX / FIXTURE_GOVKIT / pathlib.Path(__file__).name)
+    shutil.copyfile(__file__, root / pre / FIXTURE_GOVKIT / pathlib.Path(__file__).name)
     sg.run_git_text(root, "init", "-q")
     sg.run_git_text(root, "add", "-A")
     rows = read_usage_rows(root, read_usage_classes(root, [])[0], FIXTURE_POPULATION)[0]
     fp ={k: derive_usage_fingerprint(v) for k, v in rows.items()}
+    run_id = f"script:{pre}/fx/run.py#go"  # the row's id as the leg resolves it at `pre`
     pages = {
-        "help/guide.md": (f"# Guide\n\n## Running it\n\n<!-- usage: script:tools/fx/run.py#go {fp['script:tools/fx/run.py#go']} -->\n"
-                          "```bash\npython tools/fx/run.py go --part task\nsort -k1 notes.txt\n```\n\n"
-                          f"Render with `python tools/fx/tool.py render --role builder`. "
+        "help/guide.md": (f"# Guide\n\n## Running it\n\n<!-- usage: {run_id} {fp[run_id]} -->\n"
+                          f"```bash\npython {cmdp}/fx/run.py go --part task\nsort -k1 notes.txt\n```\n\n"
+                          f"Render with `python {cmdp}/fx/tool.py render --role builder`. "
                           f"<!-- usage: fx-verb:tool {fp['fx-verb:tool']} -->\n\n"
                           "See [more](more.md#the-hook) and [running](#running-it).\n"),
         "help/more.md": ("# More\n\n## The hook\n\n"
@@ -605,7 +613,7 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
             raise Refusal(f"the {plant} plant found no '{old}' in {rel}")
         p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
 
-    usage, guide, more = f"{FIXTURE_PREFIX}/{FIXTURE_GOVKIT}/{USAGE_FILE}", "help/guide.md", "help/more.md"
+    usage, guide, more = f"{pre}/{FIXTURE_GOVKIT}/{USAGE_FILE}", "help/guide.md", "help/more.md"
     if plant == "stale-page":
         write_edit(usage, 'flags = ["--role="]', 'flags = ["--role=", "--dry-run"]')
     elif plant == "bad-flag":
