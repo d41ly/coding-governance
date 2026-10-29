@@ -50,6 +50,8 @@ RECEIPT, SUMS, OUTBOX = ".governance/install.json", ".governance/install.sums", 
 CARRY_KEY = "carry"  # DEPL-dCarriedReceipt-9 S2
 RENDERED_KEYS = ("sha256", "oid", "gov_oid", "commit", "version")  # DEPL-dRemeasuredRender-1 S1
 CHILD_TIMEOUT_S = 1800
+# The pinned clone's remote, named here and removed once the landed ref is fetched.
+CLONE_REMOTE = "gk-walk-source"
 OK = {"verdict": "ok", "rc": 0, "tail": ""}
 # TOOL-dSafePassage-77 S3: the files the leg reads from the working tree, relative to HERE
 LEG_OWN = (pathlib.Path(__file__).name, "fixture_target.py", "fixtures/release-0")
@@ -114,8 +116,16 @@ def check_release_pin(gov_root, pin: str) -> list[str]:
 
 # ----------------------------------------------------------------------------------------- the rows
 def read_fixture_rows(kind: str, fixture=FIXTURE) -> list[dict]:
+    """The `kind` rows, each `path`, and a nested plant's `path` and shim's `from` and `to`, spelled
+    `{prefix}/…` and resolved here against the tool root, the pinned clone's as gov's own: the walk
+    runs the clone's engine at HERE's own relative path (TOOL-dSafePassage-82 S3)."""
     name = {"plant": "plants.toml", "gov_plant": "plants.toml", "condition": "plants.toml", "arm": "arms.toml"}[kind]
-    return tomllib.loads((pathlib.Path(fixture) / name).read_text(encoding="utf-8")).get(kind) or []
+    gk = load_engine()[2]
+    troot = gk.derive_tool_root(gk.repo_root())
+    fix = lambda r: {k: gk.resolve_prefix_token(v, troot) if k in ("path", "from", "to") and isinstance(v, str)
+                     else fix(v) if isinstance(v, dict) else v for k, v in r.items()}
+    rows = tomllib.loads((pathlib.Path(fixture) / name).read_text(encoding="utf-8")).get(kind) or []
+    return [fix(r) if isinstance(r, dict) else r for r in rows]
 
 
 def read_plant_rows(fixture=FIXTURE) -> list[dict]:
@@ -184,16 +194,17 @@ def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants:
     clone = root / "gov"
     # PINNED, not inherited: a Windows git install sets core.autocrlf=true system-wide, and the clone
     # would check out its engine bytes by the machine running the leg (fixture-inherits-ambient-machine-state)
-    run_git(root, "clone", "-q", "--no-tags", "-c", "core.autocrlf=false", gov_root.as_posix(), clone.as_posix())
+    run_git(root, "clone", "-q", "--no-tags", "--origin", CLONE_REMOTE, "-c", "core.autocrlf=false", gov_root.as_posix(), clone.as_posix())
     run_git(clone, "-c", "advice.detachedHead=false", "checkout", "-q", "--detach", pin)
     full = run_git(gov_root, "rev-parse", "--symbolic-full-name", landed) or landed
     run_git(clone, "fetch", "-q", "--no-tags", gov_root.as_posix(), f"+{full}:refs/heads/main")
-    run_git(clone, "remote", "remove", "origin")
+    run_git(clone, "remote", "remove", CLONE_REMOTE)
     rel = HERE.relative_to(gov_root.resolve()).as_posix()
     ctx = {"root": root, "gov_root": gov_root, "clone": clone, "pin": pin, "head": head,
            "landed": run_git(gov_root, "rev-parse", landed), "govkit": f"{rel}/govkit.py", "tip": head}
     if with_target:
-        deploy = (FIXTURE / "deploy.toml").read_text(encoding="utf-8").replace("{scratch}", root.as_posix())
+        deploy = gk.resolve_prefix_token((FIXTURE / "deploy.toml").read_text(encoding="utf-8"),
+                                         gk.derive_tool_root(clone)).replace("{scratch}", root.as_posix())
         sys.path.insert(0, str(HERE))
         from fixture_target import build_target  # noqa: E402 — S12, the one factory
         t = build_target(root / "r0", deploy)
@@ -210,7 +221,8 @@ def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants:
             f"receipt schema {schema}")
         write_plant_edits(t, plants)
         write_commit(t, "plants")
-        p = subprocess.run([gk.resolve_bash(), (t / "tools/policy/adopt-policy.sh").as_posix(), "--scaffold", "--target", t.as_posix()],
+        adopter = "adopt-policy.sh"
+        p = subprocess.run([gk.resolve_bash(), (gk.resolve_kit_dir("policy", adopter, t / gk.derive_tool_root(clone)) / adopter).as_posix(), "--scaffold", "--target", t.as_posix()],
                            cwd=str(t), capture_output=True, text=True, encoding="utf-8", errors="replace",
                            stdin=subprocess.DEVNULL)
         if p.returncode:
@@ -507,8 +519,9 @@ def check_plant_rows(ctx: dict, tree, rows: list[dict]) -> list[str]:
             why = "the walked bytes differ from the bytes as planted"
         elif "policy" in r:
             pol = r["policy"]
-            p = subprocess.run([sys.executable, str(ctx["clone"] / pathlib.Path(ctx["govkit"]).parent.parent
-                                                    / "policy" / "policy.py"), "get", pol["key"], "--rev", sha],
+            reader = "policy.py"
+            kit = gk.resolve_kit_dir("policy", reader, ctx["clone"] / pathlib.Path(ctx["govkit"]).parent)
+            p = subprocess.run([sys.executable, str(kit / reader), "get", pol["key"], "--rev", sha],
                                cwd=str(tree), capture_output=True, text=True, encoding="utf-8", errors="replace",
                                stdin=subprocess.DEVNULL)
             value = p.stdout.strip()
@@ -977,9 +990,9 @@ def check_graders() -> list[str]:
         return "" if check_arm_caught([row], 1, 1, own) else "a red naming its needle did not catch the arm"
 
     def grade_tree_clean() -> str:
-        tools = kit.rsplit("/", 1)[0] if "/" in kit else "."
+        tools, gates = (kit.rsplit("/", 1)[0] if "/" in kit else "."), "run-gates"
         steps, plants = f"{kit}/steps.toml", f"{kit}/fixtures/release-0/plants.toml"
-        memo, evidence = "memory/note.md", f"{tools}/run-gates/ceiling-evidence.txt"
+        memo, evidence = "memory/note.md", f"{tools}/{gates}/ceiling-evidence.txt"
         t = make_repo("clean", {steps: "a\n", plants: "a\n", memo: "a\n", evidence: "a\n"})
         for p in (plants, memo, evidence, f"{kit}/untracked.py"):
             with open(t / p, "a", encoding="utf-8", newline="\n") as fh:

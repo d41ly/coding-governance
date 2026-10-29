@@ -31,9 +31,9 @@ needs-target = false
 # the floor it replaces, and never edits this one.
 [[upgrade]]
 id = "lib/python-floor-3.15"
-up = ["bash", "{gov}/lib/python-floor.sh", "preflight"]
-down = ["bash", "{gov}/lib/python-floor.sh", "down", "3.12", "{target}", "{to}"]
-witness = ["bash", "{gov}/lib/python-floor.sh", "preflight"]
+up = ["python", "{gov}/govkit/steps/python_floor.py", "preflight"]
+down = ["python", "{gov}/govkit/steps/python_floor.py", "down", "3.12", "{target}", "{to}"]
+witness = ["python", "{gov}/govkit/steps/python_floor.py", "preflight"]
 reverted = "down-exit"
 surfaces = []
 needs-target = false

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names
 
-**Status:** DEFERRED · rev-6 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 TOOL-dSafePassage-85 · ratified 2026-10-28
+**Status:** CLOSED · rev-6 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 TOOL-dSafePassage-85 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-28-build-TOOL-dSafePassage-82-ledger.md](../build/2026-10-28-build-TOOL-dSafePassage-82-ledger.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-82-1-spec-writer.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-82-1-spec-writer.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-82-build-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-82-build-brief.md) | journal | — |
 | [2026-10-28-prompt-TOOL-dSafePassage-82-spec-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-82-spec-brief.md) | research | TOOL-dSafePassage-83 |

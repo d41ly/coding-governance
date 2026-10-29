@@ -16,6 +16,9 @@ import subprocess
 # A calling hook's location variables would point every fixture git call at another repository.
 GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
                      "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX")
+# Git's own name for a hooks directory, under the planted hooksPath and template dir: named once,
+# so the plant's paths are joined from names (TOOL-dSafePassage-82 S3).
+GIT_HOOKS_DIR = "hooks"
 
 
 def run_git(cwd: pathlib.Path, *args: str) -> None:
@@ -93,8 +96,8 @@ def check_inherited_config() -> int:
     with tempfile.TemporaryDirectory() as td:
         d = pathlib.Path(td)
         canary = d / "canary"
-        for hook, mark in ((d / "hooks" / "pre-commit", "hooks-path"),
-                           (d / "tpl" / "hooks" / "pre-commit", "template")):
+        for hook, mark in ((d / GIT_HOOKS_DIR / "pre-commit", "hooks-path"),
+                           (d / "tpl" / GIT_HOOKS_DIR / "pre-commit", "template")):
             hook.parent.mkdir(parents=True)
             hook.write_text(f'#!/bin/sh\nmkdir -p "{canary.as_posix()}"\n'
                             f'echo hit > "{canary.as_posix()}/{mark}"\nexit 0\n',
@@ -102,7 +105,7 @@ def check_inherited_config() -> int:
             hook.chmod(0o755)
         (d / "global").write_text(
             f'[commit]\n\tgpgsign = true\n[gpg]\n\tprogram = false\n'
-            f'[core]\n\thooksPath = "{(d / "hooks").as_posix()}"\n'
+            f'[core]\n\thooksPath = "{(d / GIT_HOOKS_DIR).as_posix()}"\n'
             f'[init]\n\ttemplateDir = "{(d / "tpl").as_posix()}"\n', encoding="utf-8", newline="\n")
         os.environ["GIT_CONFIG_GLOBAL"] = str(d / "global")  # run_git copies os.environ
         env = {k: v for k, v in os.environ.items() if k not in GIT_LOCATION_VARS}

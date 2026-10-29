@@ -991,10 +991,10 @@ run_minter() {  # base · [head] -> 0 minted, clean or announced-skipped · 1 th
 # no python REFUSES: no later gate runs a step on gov, so a skip would land a step gov never ran. The
 # walk's lines go to stdout on success; on a refusal to stderr, and this returns 1.
 run_gov_first() {  # -> 0 walked or announced-skipped · 1 a step, the landing check or the resolver refused
-  local py dir out rc got
-  got=$(resolve_lander_kit govkit govkit.py); rc=$?
+  local py dir out rc got kit=govkit anchor=govkit.py
+  got=$(resolve_lander_kit "$kit" "$anchor"); rc=$?
   if [ "$rc" = 1 ]; then
-    if [ -f "$self_dir/govkit/govkit.py" ] || [ -f "$self_dir/../govkit/govkit.py" ]; then
+    if [ -f "$self_dir/$kit/$anchor" ] || [ -f "$self_dir/../$kit/$anchor" ]; then
       echo "push-main: the upgrade steps could NOT be run on gov first — a govkit deployer is beside this lander and no usable python launcher runs it, and no later gate runs a step on gov." >&2
       return 1
     fi
@@ -1012,7 +1012,9 @@ run_gov_first() {  # -> 0 walked or announced-skipped · 1 a step, the landing c
     return 0
   fi
   echo "push-main: the upgrade steps REFUSED on gov first (exit $rc):" >&2
-  printf '%s\n' "$out" | sed 's/^/  /' >&2
+  # The indent with no fork; a CR before a line end drops, as Git for Windows' `sed` drops it.
+  out=${out//$'\r\n'/$'\n'}; out=${out%$'\r'}
+  printf '  %s\n' "${out//$'\n'/$'\n  '}" >&2
   return 1
 }
 

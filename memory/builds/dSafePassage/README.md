@@ -231,12 +231,12 @@ ids TOOL-dSafePassage-85
 | [TOOL-dSafePassage-78 — the govkit selftest arms red at the build's head: three arms read against the product they grade, and a walk run over a receipt below schema 3](spec/2026-10-28-spec-TOOL-dSafePassage-78.md) | 16 | 2 | CLOSED | rev-2 | 2026-10-29 |
 | [TOOL-dSafePassage-80 — five leg ceilings clear their evidence by the declared margin, and upgrade-walk is budgeted](spec/2026-10-28-spec-TOOL-dSafePassage-80.md) | 16 | 2 | CLOSED | rev-5 | 2026-10-29 |
 | [TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin](spec/2026-10-28-spec-TOOL-dSafePassage-81.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
-| [TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names](spec/2026-10-28-spec-TOOL-dSafePassage-82.md) | 16 | 2 | DEFERRED | rev-6 | 2026-10-29 |
+| [TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names](spec/2026-10-28-spec-TOOL-dSafePassage-82.md) | 16 | 2 | CLOSED | rev-6 | 2026-10-29 |
 | [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
 | [TOOL-dSafePassage-84 — the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked](spec/2026-10-29-spec-TOOL-dSafePassage-84.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 406 bound to this build, across 4 record folder(s).
+Records: 407 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

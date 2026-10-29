@@ -203,7 +203,7 @@ def read_usage_rows(root, classes: list[dict], population: set[str]) -> tuple[di
     rows: dict = {}
     for c in classes:
         if c["usage"] in FIELDED and c["rows"] and c["rows"] != USAGE_FILE:
-            fn = sg.load_class_callable(root, "{prefix}/" + c["rows"], f"{USAGE_FILE} class {c['class']} key rows")
+            fn = sg.load_class_callable(root, c["rows"], f"{USAGE_FILE} class {c['class']} key rows")
             got = fn(pathlib.Path(root))
             if not isinstance(got, dict):
                 raise Refusal(f"{USAGE_FILE} class {c['class']}: its rows reader returned no table")
@@ -211,9 +211,12 @@ def read_usage_rows(root, classes: list[dict], population: set[str]) -> tuple[di
     by_toml = {c["class"] for c in classes if c["rows"] == USAGE_FILE}
     found = []
     path = gk.resolve_tool_path(root, gk.GOVKIT_DIR.name, USAGE_FILE)
+    troot = gk.derive_tool_root(root)
     for n, row in enumerate(gk.load_toml(path).get("usage", []) or [], 1):
         if not isinstance(row, dict) or not isinstance(row.get("id"), str):
             raise Refusal(f"{USAGE_FILE} [[usage]] row {n}: needs an `id`")
+        row = {k: gk.resolve_prefix_token(v, troot) if k in ("id", "entry") and isinstance(v, str) else v
+               for k, v in row.items()}
         bad = [k for k in row if k not in USAGE_KEYS]
         if bad or row.get("shape") not in FIELDED:
             raise Refusal(f"{USAGE_FILE} [[usage]] {row['id']}: " + (f"key {bad[0]} is not a usage key" if bad
@@ -297,13 +300,14 @@ def read_page_commands(page) -> list[tuple]:
     return out
 
 
-def check_page_command(cmd: list[str], rows_by_entry: dict, tracked: set[str]) -> tuple[str, str]:
+def check_page_command(cmd: list[str], rows_by_entry: dict, tracked: set[str], troot: str) -> tuple[str, str]:
     """(verdict, what): `tested`, `skipped` (no tracked entrypoint), `unrowed` (the entrypoint) or
-    `red` naming the undeclared verb or flag."""
+    `red` naming the undeclared verb or flag. `troot` is the tool root a `{prefix}/` or `<prefix>/`
+    spelling resolves against."""
     i = 1 if cmd[0] in INTERPRETERS else 0
     if i and (len(cmd) < 2 or cmd[1].startswith("-")):
         return "skipped", cmd[0]
-    entry = re.sub(r"^(<prefix>|\{prefix\})/", "tools/", cmd[i])
+    entry = gk.resolve_prefix_token(re.sub(r"^<prefix>/", "{prefix}/", cmd[i]), troot)
     entry = posixpath.normpath(entry[2:] if entry.startswith("./") else entry)
     if entry not in tracked:
         return "skipped", cmd[i]
@@ -381,13 +385,14 @@ def read_legacy_rows(root) -> list[str]:
 def check_legacy_low_water(root, count: int) -> tuple[int | None, list[str]]:
     """(the list's first-parent low-water, a finding where `count` rises above it), through
     drift-audit's `derive_low_waters`, loaded by path from this install; no history is no finding."""
-    path = HERE.parent / "drift-audit" / "drift_report.py"
+    anchor = "drift_report.py"
     try:
+        path = gk.resolve_kit_dir("drift-audit", anchor, HERE) / anchor
         spec = importlib.util.spec_from_file_location("docs_leg_drift_report", path)
         dr = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(dr)
     except Exception as e:  # any failure to load is "will not load", named
-        raise Refusal(f"{path.name} will not load: {type(e).__name__}: {e}") from None
+        raise Refusal(f"{anchor} will not load: {type(e).__name__}: {e}") from None
     low = dr.derive_low_waters(dr.Git(pathlib.Path(root), "HEAD"), [LIST_REL])[LIST_REL]
     if low is not None and count > low:
         return low, [f"GROWN {LIST_REL}: {count} rows, above its low-water {low}; the list only shrinks"]
@@ -445,7 +450,7 @@ def read_docs_state(root, class_ids: list[str], population: set[str]) -> dict:
                 found.append(f"SPLIT {rel}:{n}: a command line the shell grammar cannot split, so no "
                              f"verb or flag on it was tested")
                 continue
-            verdict, what = check_page_command(cmd, by_entry, tracked)
+            verdict, what = check_page_command(cmd, by_entry, tracked, gk.derive_tool_root(root))
             counts["tested" if verdict == "tested" else verdict if verdict != "red" else "tested"] += 1
             if verdict == "red":
                 found.append(f"COMMAND {rel}:{n} {' '.join(cmd)}: {what}")
@@ -498,13 +503,13 @@ why = "a fixture key"
 [[class]]
 class = "fx-hook"
 usage = "hook"
-rows = "govkit/docs_leg.py:read_hook_usage"
+rows = "{prefix}/govkit/docs_leg.py:read_hook_usage"
 why = "a fixture hook, its usage in its fragment"
 
 [[class]]
 class = "fx-leg"
 usage = "leg"
-rows = "govkit/docs_leg.py:read_leg_usage"
+rows = "{prefix}/govkit/docs_leg.py:read_leg_usage"
 why = "a fixture leg, its usage in the manifest"
 
 [[class]]
@@ -540,6 +545,11 @@ flags = ["--part=", "--quiet"]
 FIXTURE_POPULATION = {"fx-verb:tool", "fx-key:FX_ROOT", "fx-hook:fx-hook", "fx-leg:fx-leg", "fx-page:guide",
                       "fx-none:blob"}
 FIXTURE_MOD_ROW = {"shape": "key", "values": "a or b", "default": "a"}
+# The fixture's install prefix and the two kit directories it lays out, each named once so its
+# paths are joined from names (TOOL-dSafePassage-82 S3).
+FIXTURE_PREFIX = "tools"
+FIXTURE_GOVKIT = "govkit"
+FIXTURE_HOOKS = "hooks"
 
 
 def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[str]]:
@@ -550,17 +560,17 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
     root, hooks = pathlib.Path(tmp) / "r", pathlib.Path(tmp) / "h"
     hooks.mkdir(parents=True)
     files = {
-        "tools/govkit/registry.toml": "# the fixture's tool root\n",
-        "tools/govkit/usage.toml": FIXTURE_USAGE,
-        "tools/hooks/fx-hook.fragment.json": json.dumps({"name": "fx-hook", "event": "Stop", "matcher": "*"}) + "\n",
-        "tools/gate-legs.json": json.dumps([{"name": "fx-leg", "argv": ["python", "{prefix}/fx/run.py", "go"]}]) + "\n",
+        f"{FIXTURE_PREFIX}/{FIXTURE_GOVKIT}/registry.toml": "# the fixture's tool root\n",
+        f"{FIXTURE_PREFIX}/{FIXTURE_GOVKIT}/{USAGE_FILE}": FIXTURE_USAGE,
+        f"{FIXTURE_PREFIX}/{FIXTURE_HOOKS}/fx-hook.fragment.json": json.dumps({"name": "fx-hook", "event": "Stop", "matcher": "*"}) + "\n",
+        f"{FIXTURE_PREFIX}/gate-legs.json": json.dumps([{"name": "fx-leg", "argv": ["python", "{prefix}/fx/run.py", "go"]}]) + "\n",
         "tools/fx/run.py": "", "tools/fx/tool.py": "", "tools/fx/other.py": "",
         LIST_REL: "# the fixture's undocumented members\nfx-page:guide\tseed\nfx-key:FX_ROOT\tseed\n",
     }
     for rel, text in files.items():
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_text(text, encoding="utf-8", newline="\n")
-    shutil.copyfile(__file__, root / "tools/govkit/docs_leg.py")
+    shutil.copyfile(__file__, root / FIXTURE_PREFIX / FIXTURE_GOVKIT / pathlib.Path(__file__).name)
     sg.run_git_text(root, "init", "-q")
     sg.run_git_text(root, "add", "-A")
     rows = read_usage_rows(root, read_usage_classes(root, [])[0], FIXTURE_POPULATION)[0]
@@ -595,7 +605,7 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
             raise Refusal(f"the {plant} plant found no '{old}' in {rel}")
         p.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
 
-    usage, guide, more = "tools/govkit/usage.toml", "help/guide.md", "help/more.md"
+    usage, guide, more = f"{FIXTURE_PREFIX}/{FIXTURE_GOVKIT}/{USAGE_FILE}", "help/guide.md", "help/more.md"
     if plant == "stale-page":
         edit(usage, 'flags = ["--role="]', 'flags = ["--role=", "--dry-run"]')
     elif plant == "bad-flag":
@@ -627,7 +637,7 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
         (root / "tools/fx/rows.py").write_text(
             f"def read_fx_rows(root):\n    return {{'thing': {dict(FIXTURE_MOD_ROW, default='b')!r}}}\n",
             encoding="utf-8", newline="\n")
-        edit(usage, "[[usage]]\n", '[[class]]\nclass = "fx-mod"\nusage = "key"\nrows = "fx/rows.py:read_fx_rows"\n'
+        edit(usage, "[[usage]]\n", '[[class]]\nclass = "fx-mod"\nusage = "key"\nrows = "{prefix}/fx/rows.py:read_fx_rows"\n'
                                    'why = "a reader in a fixture module"\n\n[[usage]]\n')
         edit(more, "## The hook\n", f"## The hook\n\n<!-- usage: fx-mod:thing {derive_usage_fingerprint(FIXTURE_MOD_ROW)} -->\n")
         class_ids.append("fx-mod")
@@ -635,7 +645,7 @@ def build_docs_fixture(tmp, plant: str) -> tuple[pathlib.Path, list[str], set[st
     elif plant == "none-rows":
         edit(usage, 'usage = "none"\n', 'usage = "none"\nrows = "usage.toml"\n')
     elif plant == "leg-row":
-        edit("tools/gate-legs.json", '"go"', '"go", "--quiet"')
+        edit(f"{FIXTURE_PREFIX}/gate-legs.json", '"go"', '"go", "--quiet"')
     elif plant == "unclassed":
         class_ids.append("fx-extra")
     elif plant == "empty-class":

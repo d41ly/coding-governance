@@ -912,7 +912,9 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
   case "$out25" in *"no govkit deployer beside this lander"*) g25=1 ;; *) g25=0 ;; esac
   case "$out25" in *"DEAD PROBE"*|*"REFUSED"*) x25=1 ;; *) x25=0 ;; esac
   # TOOL-dSafePassage-8 AC6: the same prepare names the skipped gov-first walk once, with its reason.
-  f25=$(printf '%s\n' "$out25" | grep -c 'steps were NOT run on gov first — no govkit deployer beside this lander')
+  f25=0; while IFS= read -r ln25; do
+    [[ $ln25 == *'steps were NOT run on gov first — no govkit deployer beside this lander'* ]] && f25=$((f25 + 1))
+  done <<<"$out25"
   [ "$l25$g25$x25$f25" = 1101 ] \
     && ok "25 a tree without the lexicon and govkit files skips both checks and the gov-first walk by name, with no DEAD PROBE or REFUSED" \
     || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 gov-first-skip-lines=$f25 $out25"
@@ -1087,6 +1089,8 @@ printf '%s\n' "$out27" | grep -qx 'refused=\[\]' && printf '%s\n' "$out27" | gre
 #      read from the clone's conf. Needs the run-gates kit's regen.py beside the lander; an install
 #      without one says so. Observed RED against the base lander, which pushed the stale row.
 _rg_k=$(cd "$HERE" && for d in */; do [ -f "$d/regen.py" ] && { printf '%s' "${d%/}"; break; }; done)
+# The one interpreter arms 33, 34, 37 and 40 run under, resolved once; empty when no launcher runs.
+_py_arms=$(resolve_python 2>/dev/null) || _py_arms=""
 build_regen_fixture() { # remote dir · work dir -> a clone at SRC's HEAD on main, pushed, with origin/HEAD at main
   git clone -q --bare "$SRC" "$1"
   git clone -q "$1" "$2"
@@ -1209,7 +1213,7 @@ if [ -n "$_rg_k" ]; then
   _pk_k=$(cd "$HERE" && for d in */; do [ -f "$d/policy.py" ] && [ -f "$d/catalogue.toml" ] && { printf '%s' "${d%/}"; break; }; done)
   if [ -z "$_pk_k" ]; then
     echo "  skip — 33 no policy kit beside this lander, so the policy-landing arm did not run"
-  elif ! _py33=$(resolve_python); then
+  elif [ -z "$_py_arms" ]; then
     bad "33 no python launcher runs, so the prepared merge's checks cannot be read"
   else
     out33=$(
@@ -1221,8 +1225,8 @@ if [ -n "$_rg_k" ]; then
       printf '%s\n' "$o33"; echo "prepare-rc=$rc33"
       [ "$rc33" = 0 ] || exit 0
       git rev-parse -q --verify 'HEAD^2' >/dev/null && echo merge=1
-      "$_py33" "${KIT_REL}$_rg_k/regen.py" --check >/dev/null 2>&1; echo "regen-rc=$?"
-      "$_py33" "${KIT_REL}$_pk_k/policy.py" mirror --check >/dev/null 2>&1; echo "mirror-rc=$?"
+      "$_py_arms" "${KIT_REL}$_rg_k/regen.py" --check >/dev/null 2>&1; echo "regen-rc=$?"
+      "$_py_arms" "${KIT_REL}$_pk_k/policy.py" mirror --check >/dev/null 2>&1; echo "mirror-rc=$?"
     )
     _rc33=$(printf '%s\n' "$out33" | sed -n 's/^prepare-rc=//p')
     if [ "$_rc33" != 0 ]; then
@@ -1246,13 +1250,13 @@ fi
 #      row with a failing witness is refused naming it, the branch unmoved. Needs gov's deployer
 #      beside the lander; an install without one says so. Staged red by dropping the call to
 #      `run_gov_first` from cmd_prepare.
-if [ -n "$_mt_gk" ] && _py34=$(resolve_python 2>/dev/null); then
+if [ -n "$_mt_gk" ] && [ -n "$_py_arms" ]; then
   out34=$(
     build_regen_fixture "$tmp/remote14.git" "$tmp/work14" || exit 1
     git checkout -q -b feat
     git commit -q --no-verify --allow-empty -m "TOOL-tFix-34: a unit"
     unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tGovFirst >/dev/null 2>&1; echo "clean-rc=$?"
-    git show HEAD:.governance/install.json > "$tmp/gf34.json" 2>/dev/null && "$_py34" - "${KIT_REL}$_mt_gk" "$tmp/gf34.json" <<'PY' && echo applied=all
+    git show HEAD:.governance/install.json > "$tmp/gf34.json" 2>/dev/null && "$_py_arms" - "${KIT_REL}$_mt_gk" "$tmp/gf34.json" <<'PY' && echo applied=all
 import json, pathlib, sys
 sys.path.insert(0, sys.argv[1])
 import upgrade_steps as u
@@ -1329,11 +1333,23 @@ PY
     { [ -e .governance/install.json ] || [ -n "$(git ls-tree -r --name-only HEAD -- .governance/install.json)" ]; } \
       && echo receipt=present || echo receipt=absent
     [ -z "$(find .governance -name '*.before.json' 2>/dev/null)" ] && echo images=absent
+    # TOOL-dSafePassage-82 S4: the ATTENDED landing's own snapshot refusal, from main, the same file
+    # as TMPDIR: it exits 1 with its full message, main unmoved and no receipt walked.
+    git checkout -q main
+    M39=$(git rev-parse HEAD)
+    TMPDIR="$tmp/tmpdir39" bash "$lander" 2>&1 >/dev/null; echo "land-rc=$?"
+    [ "$(git rev-parse HEAD)" = "$M39" ] && echo land-unmoved=1
+    [ -e .governance/install.json ] && echo land-receipt=present || echo land-receipt=absent
   )
   case "$out39" in
     *"gov first could not snapshot the untracked files"*"rc=1"*"unmoved=1"*"receipt=absent"*"images=absent"*)
       ok "39 --prepare whose snapshot cannot be written refuses at gov first before the walk, leaving no receipt or before-image" ;;
     *) bad "39 an unwritable snapshot fell through to the walk, or the refusal did not name gov first's snapshot: $out39" ;;
+  esac
+  case "$out39" in
+    *"push-main: gov first could not snapshot the untracked files before its walk, so the walk did not run. Aborted (no push)."*"land-rc=1"*"land-unmoved=1"*"land-receipt=absent"*)
+      ok "39 the attended landing whose snapshot cannot be written refuses at gov first before the walk, main unmoved" ;;
+    *) bad "39 the attended landing's unwritable snapshot fell through to the walk, or its refusal is not the full message: $out39" ;;
   esac
 else
   echo "  skip — 34, 36 and 39 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
@@ -1352,11 +1368,13 @@ out35=$(
   resolve_python() { echo bash; }
   resolve_kit_dir() { return 1; }
   printf 'py-absent=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
-  mkdir -p "$self_dir/govkit"; : > "$self_dir/govkit/govkit.py"
+  k35=govkit; mkdir -p "$self_dir/$k35"; : > "$self_dir/$k35/$k35.py"
   resolve_python() { return 1; }
   printf 'nopy-present=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
 )
-n35=$(printf '%s\n' "$out35" | grep -c 'steps were NOT run on gov first — no govkit deployer beside this lander')
+n35=0; while IFS= read -r ln35; do
+  [[ $ln35 == *'steps were NOT run on gov first — no govkit deployer beside this lander'* ]] && n35=$((n35 + 1))
+done <<<"$out35"
 case "$out35" in
   *"nopy-absent=["*"rc=0]"*"py-absent=["*"rc=0]"*"nopy-present=["*"no usable python launcher"*"rc=1]"*)
     [ "$n35" = 2 ] && ok "35 no deployer beside the lander is one skip line and exit 0; a deployer with no python refuses" \
@@ -1387,9 +1405,8 @@ PREPARE_REFUSALS=(
 # TOOL-dSafePassage-42 S12 and S13: the count reads check-arms' blanked lines (`scan_shell_lines`), so
 # a comment or a quoted `return 1` is not counted, from the `if ! run_gov_first` call, never the first
 # mention of the name, to cmd_prepare's closing brace, here-document and continued lines aside.
-_py37=$(resolve_python 2>/dev/null) || _py37=""
 count37() {  # lander path -> the count on stdout
-  "${_py37:-python3}" -c '
+  "${_py_arms:-python3}" -c '
 import importlib.util, re, sys
 spec = importlib.util.spec_from_file_location("check_arms", sys.argv[1])
 arms = importlib.util.module_from_spec(spec)
@@ -1432,7 +1449,7 @@ for _row37 in "${PREPARE_REFUSALS[@]}"; do
   n37=$((n37 + 1))
   IFS='|' read -r st37 pl37 ex37 <<< "$_row37"
   case "$pl37" in unplantable:*) echo "  skip — 37 $st37: ${pl37#unplantable: }, so this refusal is NOT covered"; continue ;; esac
-  if [ -z "$_mt_gk" ] || [ -z "$_rg_k" ] || [ -z "$_ml_lex" ] || [ -z "$_py37" ]; then
+  if [ -z "$_mt_gk" ] || [ -z "$_rg_k" ] || [ -z "$_ml_lex" ] || [ -z "$_py_arms" ]; then
     echo "  skip — 37 $st37: no govkit deployer, regen.py, lexicon kit or python launcher beside this lander, so this refusal is NOT covered"
     continue
   fi
@@ -1481,7 +1498,7 @@ PY
     case "$e37" in *"$want37"*) echo stage=refused ;; *) echo "stage-missing=[$e37]" ;; esac
     nowb=$(git rev-parse refs/heads/feat)
     if [ "$ex37" = moved ]; then
-      mv37=$(cat "$(git rev-parse --git-dir)/cas37-moved" 2>/dev/null)
+      f37="$(git rev-parse --git-dir)/cas37-moved"; mv37=""; [ -f "$f37" ] && mv37=$(<"$f37")
       [ -n "$mv37" ] && [ "$nowb" = "$mv37" ] && [ "$nowb" != "$oldb" ] && echo branch=expected || echo "branch=[$nowb] old=[$oldb] recorded=[$mv37]"
     else
       [ "$nowb" = "$oldb" ] && echo branch=expected || echo "branch=[$nowb] old=[$oldb]"
@@ -1555,15 +1572,14 @@ s38=$(for f in run_post_merge check_merge_losses run_regen run_minter run_gov_fi
 #      no file of the refused run: no `.governance/steps` or `.governance/outbox` path of the planted
 #      step, and a receipt that records no row of it. Staged red by a lander copy whose attended
 #      gov-first refusal does not clean against its snapshot.
-_py40=$(resolve_python 2>/dev/null) || _py40=""
-if [ -n "$_mt_gk" ] && [ -n "$_py40" ]; then
+if [ -n "$_mt_gk" ] && [ -n "$_py_arms" ]; then
   out40=$(
     build_regen_fixture "$tmp/remote40.git" "$tmp/work40" || exit 1
     R40=$(git rev-parse HEAD)
     printf '\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\ndown = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\nsurfaces = []\nneeds-target = false\n' >> "${KIT_REL}$_mt_gk/steps.toml"
     git commit -q --no-verify -am "TOOL-tFix-40: a planted step whose witness never holds"
     unset GATE_PUSH_BASE; e40=$(bash "$lander" 2>&1 >/dev/null); echo "plant-rc=$?"
-    case "$e40" in *"did not hold on gov first"*) echo stage=gov-first ;; *) echo "stage-missing=[$e40]" ;; esac
+    case "$e40" in *"push-main: the upgrade steps this landing declares did not hold on gov first (named above). Aborted (no push)."*) echo stage=gov-first ;; *) echo "stage-missing=[$e40]" ;; esac
     st40=$(git status --porcelain); [ -z "$st40" ] && echo plant-clean=1 || echo "plant-left=[$st40]"
     git checkout -q "$R40" -- "${KIT_REL}$_mt_gk/steps.toml"
     git commit -q --no-verify -m "TOOL-tFix-40: the planted step removed"

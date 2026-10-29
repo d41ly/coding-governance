@@ -28,7 +28,7 @@ why = "the same: a destination is graded through the command, hook or key that r
 [[class]]
 class = "hook"
 usage = "hook"
-rows = "govkit/docs_leg.py:read_hook_usage"
+rows = "{prefix}/govkit/docs_leg.py:read_hook_usage"
 why = "a hook is its event and its matcher, which its fragment states"
 
 [[class]]
@@ -51,13 +51,13 @@ why = "a conf key is its values and its default, which no registry states in one
 [[class]]
 class = "policy"
 usage = "key"
-rows = "govkit/docs_leg.py:read_policy_usage"
+rows = "{prefix}/govkit/docs_leg.py:read_policy_usage"
 why = "a policy key is its allowed values and its default, which its catalogue row states"
 
 [[class]]
 class = "verb"
 usage = "verb"
-rows = "govkit/docs_leg.py:read_verb_usage"
+rows = "{prefix}/govkit/docs_leg.py:read_verb_usage"
 why = "a CLI verb is a verb and its flags, which its declared usage text states"
 
 [[class]]
@@ -72,188 +72,188 @@ verb = "/build"
 flags = []
 
 [[usage]]
-id = "script:tools/roles/handoff.py#render"
+id = "script:{prefix}/roles/handoff.py#render"
 shape = "verb"
-entry = "tools/roles/handoff.py"
+entry = "{prefix}/roles/handoff.py"
 verb = "render"
 flags = ["--role=", "--build=", "--unit=", "--card=", "--input=", "--out=", "--stdout", "--stand-in", "--part="]
 
 [[usage]]
-id = "script:tools/roles/handoff.py#roster"
+id = "script:{prefix}/roles/handoff.py#roster"
 shape = "verb"
-entry = "tools/roles/handoff.py"
+entry = "{prefix}/roles/handoff.py"
 verb = "roster"
 flags = []
 
 [[usage]]
-id = "script:tools/roles/render_agents.py"
+id = "script:{prefix}/roles/render_agents.py"
 shape = "verb"
-entry = "tools/roles/render_agents.py"
+entry = "{prefix}/roles/render_agents.py"
 flags = ["--write", "--check", "--selftest"]
 
 [[usage]]
-id = "script:tools/playbook/adopt-playbook.sh"
+id = "script:{prefix}/playbook/adopt-playbook.sh"
 shape = "verb"
-entry = "tools/playbook/adopt-playbook.sh"
+entry = "{prefix}/playbook/adopt-playbook.sh"
 flags = ["--target=", "--check", "--selftest"]
 
 [[usage]]
-id = "script:tools/run-gates/measure_legs.py"
+id = "script:{prefix}/run-gates/measure_legs.py"
 shape = "verb"
-entry = "tools/run-gates/measure_legs.py"
+entry = "{prefix}/run-gates/measure_legs.py"
 flags = ["--serial", "--concurrent", "--selftest", "--legs=", "--out=", "--census-every=", "--stall-window=", "--stall-cpu="]
 
 [[usage]]
-id = "script:tools/run-gates/derive-ceilings.py"
+id = "script:{prefix}/run-gates/derive-ceilings.py"
 shape = "verb"
-entry = "tools/run-gates/derive-ceilings.py"
+entry = "{prefix}/run-gates/derive-ceilings.py"
 flags = ["--report", "--write", "--check", "--reset=", "--observed=", "--how="]
 
 [[usage]]
-id = "script:tools/policy/policy.py#get"
+id = "script:{prefix}/policy/policy.py#get"
 shape = "verb"
-entry = "tools/policy/policy.py"
+entry = "{prefix}/policy/policy.py"
 verb = "get"
 flags = ["--rev=", "--explain", "--json"]
 
 [[usage]]
-id = "script:tools/policy/policy.py#check"
+id = "script:{prefix}/policy/policy.py#check"
 shape = "verb"
-entry = "tools/policy/policy.py"
+entry = "{prefix}/policy/policy.py"
 verb = "check"
 flags = ["--rev="]
 
 [[usage]]
-id = "script:tools/policy/policy.py#lists"
+id = "script:{prefix}/policy/policy.py#lists"
 shape = "verb"
-entry = "tools/policy/policy.py"
+entry = "{prefix}/policy/policy.py"
 verb = "lists"
 flags = ["--write", "--check"]
 
 [[usage]]
-id = "script:tools/policy/policy.py#mirror"
+id = "script:{prefix}/policy/policy.py#mirror"
 shape = "verb"
-entry = "tools/policy/policy.py"
+entry = "{prefix}/policy/policy.py"
 verb = "mirror"
 flags = ["--write", "--check", "--print"]
 
 [[usage]]
-id = "script:tools/policy/policy.py#settings"
+id = "script:{prefix}/policy/policy.py#settings"
 shape = "verb"
-entry = "tools/policy/policy.py"
+entry = "{prefix}/policy/policy.py"
 verb = "settings"
 flags = ["--write", "--check"]
 
 [[usage]]
-id = "script:tools/policy/check_policy.py"
+id = "script:{prefix}/policy/check_policy.py"
 shape = "verb"
-entry = "tools/policy/check_policy.py"
+entry = "{prefix}/policy/check_policy.py"
 flags = ["--repo=", "--fixture", "--strict-from=", "--live"]
 
 [[usage]]
-id = "script:tools/policy/adopt-policy.sh"
+id = "script:{prefix}/policy/adopt-policy.sh"
 shape = "verb"
-entry = "tools/policy/adopt-policy.sh"
+entry = "{prefix}/policy/adopt-policy.sh"
 flags = ["--scaffold", "--check", "--target="]
 
 [[usage]]
-id = "script:tools/policy/budgets.py#resolve"
+id = "script:{prefix}/policy/budgets.py#resolve"
 shape = "verb"
-entry = "tools/policy/budgets.py"
+entry = "{prefix}/policy/budgets.py"
 verb = "resolve"
 flags = ["--explain"]
 
 [[usage]]
-id = "script:tools/lib/python_floor.py#check"
+id = "script:{prefix}/lib/python_floor.py#check"
 shape = "verb"
-entry = "tools/lib/python_floor.py"
+entry = "{prefix}/lib/python_floor.py"
 verb = "check"
 flags = ["--rev="]
 
 [[usage]]
-id = "script:tools/lib/python-floor.sh#preflight"
+id = "script:{prefix}/lib/python-floor.sh#preflight"
 shape = "verb"
-entry = "tools/lib/python-floor.sh"
+entry = "{prefix}/lib/python-floor.sh"
 verb = "preflight"
 flags = []
 
 [[usage]]
-id = "script:tools/govkit/step_gate.py"
+id = "script:{prefix}/govkit/step_gate.py"
 shape = "verb"
-entry = "tools/govkit/step_gate.py"
+entry = "{prefix}/govkit/step_gate.py"
 flags = ["--base=", "--list", "--print-base", "--fixture", "--plant=", "--with-row"]
 
 [[usage]]
-id = "script:tools/govkit/upgrade_walk.py"
+id = "script:{prefix}/govkit/upgrade_walk.py"
 shape = "verb"
-entry = "tools/govkit/upgrade_walk.py"
+entry = "{prefix}/govkit/upgrade_walk.py"
 flags = ["--list", "--case=", "--step=", "--inject=", "--pin="]
 
 [[usage]]
-id = "script:tools/govkit/upgrade_steps.py#list"
+id = "script:{prefix}/govkit/upgrade_steps.py#list"
 shape = "verb"
-entry = "tools/govkit/upgrade_steps.py"
+entry = "{prefix}/govkit/upgrade_steps.py"
 verb = "list"
 flags = ["--window"]
 
 [[usage]]
-id = "script:tools/govkit/upgrade_steps.py#frozen"
+id = "script:{prefix}/govkit/upgrade_steps.py#frozen"
 shape = "verb"
-entry = "tools/govkit/upgrade_steps.py"
+entry = "{prefix}/govkit/upgrade_steps.py"
 verb = "frozen"
 flags = ["--base="]
 
 [[usage]]
-id = "script:tools/govkit/upgrade_steps.py#fixture"
+id = "script:{prefix}/govkit/upgrade_steps.py#fixture"
 shape = "verb"
-entry = "tools/govkit/upgrade_steps.py"
+entry = "{prefix}/govkit/upgrade_steps.py"
 verb = "fixture"
 flags = ["--plant="]
 
 [[usage]]
-id = "script:tools/govkit/steps/receipt_schema_4.py#up"
+id = "script:{prefix}/govkit/steps/receipt_schema_4.py#up"
 shape = "verb"
-entry = "tools/govkit/steps/receipt_schema_4.py"
+entry = "{prefix}/govkit/steps/receipt_schema_4.py"
 verb = "up"
 flags = []
 
 [[usage]]
-id = "script:tools/govkit/steps/receipt_schema_4.py#witness"
+id = "script:{prefix}/govkit/steps/receipt_schema_4.py#witness"
 shape = "verb"
-entry = "tools/govkit/steps/receipt_schema_4.py"
+entry = "{prefix}/govkit/steps/receipt_schema_4.py"
 verb = "witness"
 flags = []
 
 [[usage]]
-id = "script:tools/govkit/steps/receipt_schema_4.py#down"
+id = "script:{prefix}/govkit/steps/receipt_schema_4.py#down"
 shape = "verb"
-entry = "tools/govkit/steps/receipt_schema_4.py"
+entry = "{prefix}/govkit/steps/receipt_schema_4.py"
 verb = "down"
 flags = []
 
 [[usage]]
-id = "script:tools/govkit/steps/fanout_cap.py#up"
+id = "script:{prefix}/govkit/steps/fanout_cap.py#up"
 shape = "verb"
-entry = "tools/govkit/steps/fanout_cap.py"
+entry = "{prefix}/govkit/steps/fanout_cap.py"
 verb = "up"
 flags = []
 
 [[usage]]
-id = "script:tools/govkit/steps/fanout_cap.py#witness"
+id = "script:{prefix}/govkit/steps/fanout_cap.py#witness"
 shape = "verb"
-entry = "tools/govkit/steps/fanout_cap.py"
+entry = "{prefix}/govkit/steps/fanout_cap.py"
 verb = "witness"
 flags = []
 
 [[usage]]
-id = "script:tools/govkit/steps/fanout_cap.py#down"
+id = "script:{prefix}/govkit/steps/fanout_cap.py#down"
 shape = "verb"
-entry = "tools/govkit/steps/fanout_cap.py"
+entry = "{prefix}/govkit/steps/fanout_cap.py"
 verb = "down"
 flags = []
 
 [[usage]]
-id = "script:tools/govkit/docs_leg.py"
+id = "script:{prefix}/govkit/docs_leg.py"
 shape = "verb"
-entry = "tools/govkit/docs_leg.py"
+entry = "{prefix}/govkit/docs_leg.py"
 flags = ["--list", "--undocumented", "--fixture", "--plant=", "--enforce="]

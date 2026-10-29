@@ -149,7 +149,7 @@ def resolve_floor_interpreter(version):
         cands.append(["py", f"-{version}"])
     if shutil.which("uv"):
         try:
-            p = subprocess.run(["uv", "python", "find", version], capture_output=True, text=True, timeout=60)
+            p = subprocess.run(["uv", "python", "find", version], capture_output=True, text=True, encoding="utf-8", timeout=60)
             if p.returncode == 0 and p.stdout.strip():
                 cands.append([p.stdout.strip()])
         except (OSError, subprocess.TimeoutExpired):
@@ -157,7 +157,7 @@ def resolve_floor_interpreter(version):
     probe = "import sys; print('%d.%d' % sys.version_info[:2]); print(sys.executable)"
     for argv in cands:
         try:
-            p = subprocess.run([*argv, "-I", "-c", probe], capture_output=True, text=True, timeout=60)
+            p = subprocess.run([*argv, "-I", "-c", probe], capture_output=True, text=True, encoding="utf-8", timeout=60)
         except (OSError, subprocess.TimeoutExpired):
             continue
         out = p.stdout.split()

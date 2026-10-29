@@ -47,7 +47,7 @@ name = "held-shim"
 needle = "is gone from the walked target"
 case = "shims"
 with = ["drops-shim"]
-shim = { id = "upgrade-walk/held-shim", kind = "command", from = "tools/check-kit-versions.sh", to = "tools/check-kit-versions-moved.sh", closed = false }
+shim = { id = "upgrade-walk/held-shim", kind = "command", from = "{prefix}/check-kit-versions.sh", to = "{prefix}/check-kit-versions-moved.sh", closed = false }
 
 [[arm]]
 name = "drops-shim"
@@ -67,4 +67,4 @@ name = "missing-plant"
 needle = "is absent at release-0"
 case = "up"
 exit = 2
-plant = { id = "missing-plant", path = "tools/upgrade-walk-no-such-file.md", edit = "append", text = "x\n", expect = "carried", unchanged = true }
+plant = { id = "missing-plant", path = "{prefix}/upgrade-walk-no-such-file.md", edit = "append", text = "x\n", expect = "carried", unchanged = true }

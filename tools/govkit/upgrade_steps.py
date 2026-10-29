@@ -183,6 +183,15 @@ STEP_PHASES = ("up", "down", "witness", "resume", "reverted")
 # Where `check_needs_target` gathers canaries: inside the scratch tree it is handed, so a target
 # module planted beside the plants can name its own canary by its own path.
 CANARY_DIR = ".gk-canaries"
+# The remote the isolation plants write and fetch: a name of the fixture's own, never the default's.
+FIXTURE_REMOTE = "gk-fixture"
+# The install prefix the fixtures lay their scratch gov and target out at, named once so every
+# fixture path is joined from names (TOOL-dSafePassage-82 S3); and the parent directory the
+# submodule plants put `p` and `x` under, a fixture name whose printed paths the arms assert.
+FIXTURE_PREFIX = "tools"
+FIXTURE_SUB_HOME = "lib"
+# The empty directory a step's `core.hooksPath` names, under its scratch: a name no kit holds.
+STEP_HOOKS_DIR = "no-hooks"
 # Every client-side hook name git runs; a name git adds later is unplanted until it is listed here.
 CLIENT_HOOKS = ("applypatch-msg", "pre-applypatch", "post-applypatch", "pre-commit",
                 "pre-merge-commit", "prepare-commit-msg", "commit-msg", "post-commit", "pre-rebase",
@@ -1416,7 +1425,7 @@ def build_step_env(scratch, target=None) -> dict[str, str]:
     `STEP_ENV_KEEP` names present in the parent, plus the contract's own. Home and temp point into
     `scratch`; git reads no system or global config and prompts for nothing, and through
     `GIT_CONFIG_COUNT`, which outranks the target's own config, runs hooks from the empty
-    `<scratch>/hooks`, holds the empty credential helper, and refuses the `ext::` transport
+    `<scratch>/no-hooks`, holds the empty credential helper, and refuses the `ext::` transport
     whatever a local `protocol.*`, `url.*` or `remote.*` key says (TOOL-dSafePassage-37 S3). The
     parent's effective `core.autocrlf` and `core.eol` in `target` follow as further pairs, so a
     step hashes and stages as the parent would (TOOL-dSafePassage-26 S13): the count is 3 plus them."""
@@ -1425,7 +1434,7 @@ def build_step_env(scratch, target=None) -> dict[str, str]:
     env.update(dict.fromkeys(("HOME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "XDG_CONFIG_HOME"),
                              str(scratch / "home")))
     env.update(dict.fromkeys(("TMP", "TEMP", "TMPDIR"), str(scratch / "tmp")))
-    pairs = [("core.hooksPath", str(scratch / "hooks")), ("credential.helper", ""),
+    pairs = [("core.hooksPath", str(scratch / STEP_HOOKS_DIR)), ("credential.helper", ""),
              ("protocol.ext.allow", "never"), *read_line_ending_config(target)]
     env.update({"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_TERMINAL_PROMPT": "0",
                 "GCM_INTERACTIVE": "never", "GIT_CONFIG_COUNT": str(len(pairs))})
@@ -1772,7 +1781,7 @@ def run_step_isolated(row: StepRow, phase: str, target, gov_root, to: str | None
     gov_root = pathlib.Path(gov_root).resolve()
     ctx = derive_step_context(row, target, gov_root, to if phase == "down" else None)
     with tempfile.TemporaryDirectory(prefix="gk-step-", ignore_cleanup_errors=True) as td:
-        for d in ("home", "tmp", "hooks"):
+        for d in ("home", "tmp", STEP_HOOKS_DIR):
             (pathlib.Path(td) / d).mkdir()
         try:
             p = subprocess.run(resolve_step_argv(getattr(row, phase), ctx, row.id), cwd=str(gov_root),
@@ -2805,7 +2814,7 @@ FIXTURE_STEPS = {
         "open(sys.argv[2], 'w', encoding='utf-8').write(str(p.returncode))\n"),
     "fetch.py": (
         "import subprocess, sys\n"
-        "p = subprocess.run(['git', '-C', sys.argv[1], 'fetch', '-q', 'origin'], capture_output=True, timeout=60)\n"
+        "p = subprocess.run(['git', '-C', sys.argv[1], 'fetch', '-q', sys.argv[3]], capture_output=True, timeout=60)\n"
         "sys.stderr.write(p.stderr.decode('utf-8', 'replace'))\n"
         "open(sys.argv[2], 'w', encoding='utf-8').write(str(p.returncode))\n"
         "sys.exit(p.returncode)\n"),
@@ -2864,11 +2873,11 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
     what a `-stub` plant swapped."""
     g = globals()
     gov, target, reports, canaries = tmp / "gov", tmp / "t", tmp / "reports", tmp / "canaries"
-    (gov / "tools" / "steps").mkdir(parents=True)
-    (gov / "tools" / HERE.name).mkdir()
-    (gov / "tools" / HERE.name / REGISTRY_FILE).write_text("", encoding="utf-8")
+    (gov / FIXTURE_PREFIX / "steps").mkdir(parents=True)
+    (gov / FIXTURE_PREFIX / HERE.name).mkdir()
+    (gov / FIXTURE_PREFIX / HERE.name / REGISTRY_FILE).write_text("", encoding="utf-8")
     for name, text in FIXTURE_STEPS.items():
-        (gov / "tools" / "steps" / name).write_text(text, encoding="utf-8", newline="\n")
+        (gov / FIXTURE_PREFIX / "steps" / name).write_text(text, encoding="utf-8", newline="\n")
     reports.mkdir()
     quiet = build_tree_git_env()
     # The scratch target through the factory (TOOL-dSafePassage-26 S19): its deploy file and the
@@ -2935,7 +2944,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                "at index 2 and core.hooksPath naming an empty directory")
         expect(rep.get("isolated") == 1, "the leading python ran without -I")
         expect(bool(rep) and pathlib.Path(rep["cwd"]).resolve() == gov.resolve(), "the working directory is not gov's root")
-        expect(rep.get("prefix") == "tools", "{prefix} did not resolve to the target's install prefix")
+        expect(rep.get("prefix") == FIXTURE_PREFIX, "{prefix} did not resolve to the target's install prefix")
         expect(check_needs_target(clean, target, gov) == "isolated", "clean does not read isolated")
     elif plant in ("hook", "hook-stub"):
         subprocess.run(["git", "-C", str(target), "config", "core.hooksPath", ".githooks"], env=quiet, check=True)
@@ -3014,9 +3023,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         r = run_step_isolated(row("hash", ["python", "{gov}/steps/hash.py", "{target}", out.as_posix()]),
                               "up", target, gov)
         mine = subprocess.run(["git", "-C", str(target), "hash-object", "--path", "crlf.txt", "crlf.txt"],
-                              capture_output=True, text=True).stdout.strip()
+                              capture_output=True, text=True, encoding="utf-8").stdout.strip()
         raw = subprocess.run(["git", "-C", str(target), "-c", "core.autocrlf=false", "hash-object",
-                              "--path", "crlf.txt", "crlf.txt"], capture_output=True, text=True).stdout.strip()
+                              "--path", "crlf.txt", "crlf.txt"], capture_output=True, text=True, encoding="utf-8").stdout.strip()
         got = out.read_text(encoding="utf-8").strip() if out.is_file() else ""
         print(f"isolation: fixture/hash · up · {r['verdict']} · the step's oid {got or 'none'} · the parent's "
               f"{mine} · {'equal' if got == mine else 'DIFFERENT'}")
@@ -3034,9 +3043,9 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         r = run_step_isolated(row("hash", ["python", "{gov}/steps/hash.py", "{target}", out.as_posix()]),
                               "up", target, gov)
         mine = subprocess.run(["git", "-C", str(target), "hash-object", "--path", "crlf.txt", "crlf.txt"],
-                              capture_output=True, text=True).stdout.strip()
+                              capture_output=True, text=True, encoding="utf-8").stdout.strip()
         crlf = subprocess.run(["git", "-C", str(target), "-c", "core.autocrlf=true", "hash-object",
-                               "--path", "crlf.txt", "crlf.txt"], capture_output=True, text=True).stdout.strip()
+                               "--path", "crlf.txt", "crlf.txt"], capture_output=True, text=True, encoding="utf-8").stdout.strip()
         got = out.read_text(encoding="utf-8").strip() if out.is_file() else ""
         print(f"isolation: fixture/hash · up · {r['verdict']} · the step's oid {got or 'none'} · the parent's "
               f"{mine} · {'equal' if got == mine else 'DIFFERENT'}")
@@ -3049,7 +3058,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         cfg = target / ".git" / "config"
         user, secret = "gk-planted-user", "gk-planted-secret"
         base_cfg = cfg.read_text(encoding="utf-8")
-        cfg.write_text(base_cfg + f"[remote \"origin\"]\n\turl = https://{user}:{secret}@example.invalid/x.git\n",
+        cfg.write_text(base_cfg + f"[remote \"{FIXTURE_REMOTE}\"]\n\turl = https://{user}:{secret}@example.invalid/x.git\n",
                        encoding="utf-8", newline="\n")
         try:
             run_clean()
@@ -3057,10 +3066,11 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         except Refusal as e:
             refused = str(e)
             print(f"isolation: {clean.id} · refused · {e}")
-        expect("remote.origin.url in .git/config" in refused, "the step was not refused naming remote.origin.url in .git/config")
+        named = f"remote.{FIXTURE_REMOTE}.url in .git/config"
+        expect(named in refused, f"the step was not refused naming {named}")
         expect(user not in refused and secret not in refused, "the refusal prints the URL's user or password")
         expect(not report.exists(), "the refused step spawned")
-        cfg.write_text(base_cfg + "[remote \"origin\"]\n\turl = git@example.invalid:x.git\n",
+        cfg.write_text(base_cfg + f"[remote \"{FIXTURE_REMOTE}\"]\n\turl = git@example.invalid:x.git\n",
                        encoding="utf-8", newline="\n")
         try:
             rep = run_clean()
@@ -3158,7 +3168,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
         # remote whose `ext::` command writes the canary, `% ` being that transport's escaped space.
         ran = {"recent-objects-hook": "gc", "ext-transport": "fetch"}.get(kind)
         done = reports / f"{ran}.rc" if ran else report
-        step = row(ran, ["python", f"{{gov}}/steps/{ran}.py", "{target}", done.as_posix()]) if ran else clean
+        step = row(ran, ["python", f"{{gov}}/steps/{ran}.py", "{target}", done.as_posix(), FIXTURE_REMOTE]) if ran else clean
         ext = "ext::sh -c " + f": > '{(canaries / 'ext-transport').as_posix()}'".replace("%", "%%").replace(" ", "% ")
         if kind == "gpg":
             gpg.write_text(f"#!/bin/sh\n: > '{(canaries / 'gpg-program').as_posix()}'\nexit 1\n",
@@ -3170,8 +3180,8 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
                    "gpg": f"[commit]\n\tgpgsign = true\n[gpg]\n\tprogram = {gpg.as_posix()}\n",
                    "hook": f"[hook \"canary\"]\n\tcommand = {runs('hook-command')}\n\tevent = pre-commit\n",
                    "recent-objects-hook": f"[gc]\n\trecentObjectsHook = {runs('recent-objects-hook')}\n",
-                   "ext-transport": f"[protocol]\n\tallow = always\n[remote \"origin\"]\n\turl = \"{ext}\"\n"
-                                    "\tfetch = +refs/heads/*:refs/remotes/origin/*\n"}
+                   "ext-transport": f"[protocol]\n\tallow = always\n[remote \"{FIXTURE_REMOTE}\"]\n\turl = \"{ext}\"\n"
+                                    f"\tfetch = +refs/heads/*:refs/remotes/{FIXTURE_REMOTE}/*\n"}
         if kind == "include":
             included.write_text(planted["filter"], encoding="utf-8", newline="\n")
             cfg.write_text(f"[include]\n\tpath = {included.as_posix()}\n", encoding="utf-8", newline="\n")
@@ -3286,7 +3296,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             fx_git(target, "worktree", "add", "-q", stepped.as_posix())
             fx_git(stepped, "-c", "protocol.file.allow=always", "submodule", "update", "-q", "--init")
         deep = {"nested": target / "sub" / "inner", "unpopulated-worktree": stepped / "sub",
-                "name-differs": target / "lib" / "p", "name-slashed": target / "lib" / "x", "nested-name-differs": target / "lib" / "p" / "q"}.get(kind, target / "sub")
+                "name-differs": target / FIXTURE_SUB_HOME / "p", "name-slashed": target / FIXTURE_SUB_HOME / "x", "nested-name-differs": target / FIXTURE_SUB_HOME / "p" / "q"}.get(kind, target / "sub")
         key = "core.fsmonitor" if kind == "fsmonitor" else "filter.canary.clean"
         unkeyed = kind in ("ref-named-config", "config-malformed", "gitmodules-malformed", "format-unknown",
                            "gitmodules-unreadable", "modules-link-loop", "gitmodules-fifo", "modules-not-a-directory",
@@ -3437,7 +3447,7 @@ def run_isolation_case(tmp: pathlib.Path, plant: str | None) -> int:
             fx_git(target, "submodule", "deinit", "-q", "-f", "lib/p")
             # ponytail: the deinit removes `lib/p/q`, the inner's core.worktree, and git then reads no
             # config of it at all (a refusal naming it); the empty directory keeps the label graded.
-            (target / "lib" / "p" / "q").mkdir(parents=True, exist_ok=True)
+            (target / FIXTURE_SUB_HOME / "p" / "q").mkdir(parents=True, exist_ok=True)
             try:
                 run_step_isolated(status, "up", stepped, gov)
                 refused = ""
@@ -3729,7 +3739,7 @@ def build_walk_gov(tmp: pathlib.Path, plant: str | None) -> tuple[pathlib.Path, 
     `s5`. The side commit is dated before B, so only the first-parent order puts `s3` at M. For a
     schema plant, B introduces the copied `govkit/receipt-schema-4` row first (TOOL-dSafePassage-15, -18)."""
     gov = tmp / "gov"
-    gkd = gov / "tools" / HERE.name
+    gkd = gov / FIXTURE_PREFIX / HERE.name
     (gkd / "steps").mkdir(parents=True)
     load_fixture_target().build_scratch_gov(gov)
     (gkd / REGISTRY_FILE).write_text("", encoding="utf-8")
@@ -3997,7 +4007,7 @@ def run_walk_fixture(plant: str | None) -> int:
             expect("fx/s2" in text and "fx.py up" in text.replace("'", ""), "the order does not name s2 and its up argv")
             expect("s2.up" not in canaries(t) and rc == 1, "the attended step spawned, or the walk did not exit 1")
             # The person's turn: s2's up by hand, outside the walk.
-            subprocess.run([sys.executable, str(gov / "tools" / HERE.name / "steps" / "fx.py"), "up", str(t), "s2"],
+            subprocess.run([sys.executable, str(gov / FIXTURE_PREFIX / HERE.name / "steps" / "fx.py"), "up", str(t), "s2"],
                            capture_output=True, env=env, timeout=600)
             rc2, out2 = walk(t)
             expect(lines_of(out2) == ["step fx/s2 · skipped (witness holds)", "step fx/s3 · applied",
@@ -4302,7 +4312,7 @@ def run_lock_fixture(plant: str) -> int:
 
 def run_fixture_govkit(gov: pathlib.Path, env: dict, *args: str) -> tuple[int, str]:
     """The scratch gov's own `govkit.py <args>` under `env`: (exit, stdout and stderr)."""
-    p = subprocess.run([sys.executable, str(gov / "tools" / HERE.name / "govkit.py"), *args], capture_output=True,
+    p = subprocess.run([sys.executable, str(gov / FIXTURE_PREFIX / HERE.name / "govkit.py"), *args], capture_output=True,
                        text=True, encoding="utf-8", errors="replace", env=env, timeout=600)
     return p.returncode, p.stdout + p.stderr
 
@@ -4319,13 +4329,13 @@ def build_update_gov(tmp: pathlib.Path, names, slugs, fails: list[str],
     install is appended to `fails`. Returns (gov, {name: target}, A, B, the env every govkit call
     runs under)."""
     gov = tmp / "gov"
-    gkd, demo = gov / "tools" / HERE.name, gov / "tools" / "demo"
-    for d in (gkd, demo, gov / "tools" / "process-monitor"):
+    pm = resolve_kit_dir("process-monitor", "census.py", HERE)
+    gkd, demo, pmd = gov / FIXTURE_PREFIX / HERE.name, gov / FIXTURE_PREFIX / "demo", gov / FIXTURE_PREFIX / pm.name
+    for d in (gkd, demo, pmd):
         d.mkdir(parents=True)
     for name in ("govkit.py", "upgrade_steps.py", "adopters.toml"):
         shutil.copy2(HERE / name, gkd / name)
-    pm = resolve_kit_dir("process-monitor", "census.py", HERE)
-    shutil.copy2(pm / "census.py", gov / "tools" / "process-monitor" / "census.py")
+    shutil.copy2(pm / "census.py", pmd / "census.py")
     (gkd / REGISTRY_FILE).write_text(
         '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
         '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
@@ -4377,7 +4387,7 @@ def run_update_fixture(plant: str | None) -> int:
         gov, targets, sha_a, sha_b, env = build_update_gov(
             tmp, ("t", "t2") if plant in ("kill-walk", "kill-walk-edit", "schema-3-update") else ("t",), ("s1", "s2"),
             fails, schema3=plant == "schema-3-update")
-        gkd = gov / "tools" / HERE.name
+        gkd = gov / FIXTURE_PREFIX / HERE.name
 
         def expect(ok: bool, what: str) -> None:
             if not ok:
@@ -4440,10 +4450,10 @@ def run_update_fixture(plant: str | None) -> int:
             print(out, end="")
             got = {r["id"]: r["state"] for r in receipt_of(t).get("steps") or []}
             print(f"update: gov_commit {'A' if receipt_of(t).get('gov_commit') == sha_a else receipt_of(t).get('gov_commit')} · "
-                  f"steps {got} · tools/demo/one.txt {(t / 'tools' / 'demo' / 'one.txt').read_bytes()!r}")
+                  f"steps {got} · tools/demo/one.txt {(t / FIXTURE_PREFIX / 'demo' / 'one.txt').read_bytes()!r}")
             expect(rc == 1 and receipt_of(t).get("gov_commit") == sha_a, "a stopped walk let the stamp move")
             expect(got == {"fx/s1": "applied", "fx/s2": "failed"}, "s1 is not applied and s2 failed")
-            expect((t / "tools" / "demo" / "one.txt").read_bytes() == b"v2\n", "the file rows did not land")
+            expect((t / FIXTURE_PREFIX / "demo" / "one.txt").read_bytes() == b"v2\n", "the file rows did not land")
             expect(not [c for c in canaries() if c.endswith(".down")], "a down ran")
         elif plant == "needs-target-source":
             # TOOL-dSafePassage-26 S32, AC31: `update` on gov's own tree, source mode, over a row
@@ -4514,7 +4524,7 @@ def run_update_fixture(plant: str | None) -> int:
             print(f"update: after the kill · journal {sorted(journal)} · staged {sorted(staged(t))}")
             expect(journal and journal == staged(t), "the staging journal's paths do not equal the staged set")
             if plant == "kill-walk-edit":
-                (t / "tools" / "demo" / "one.txt").write_text("operator edit\n", encoding="utf-8", newline="\n")
+                (t / FIXTURE_PREFIX / "demo" / "one.txt").write_text("operator edit\n", encoding="utf-8", newline="\n")
                 run_fixture_git(t, "add", "tools/demo/one.txt")
             rc, out = govkit("update", "--target", str(t), "--to", sha_b, "--write")
             print(out, end="")
@@ -4965,7 +4975,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
             # the write loop moved, and the rollback to A from that state must return them.
             reports.mkdir(exist_ok=True)
             (reports / "schema.block-after").touch()
-            why = run_killed([sys.executable, str(gov / "tools" / HERE.name / "govkit.py"), "update", "--target",
+            why = run_killed([sys.executable, str(gov / FIXTURE_PREFIX / HERE.name / "govkit.py"), "update", "--target",
                               str(t), "--to", sha_b, "--write"], reports, "schema", env)
             expect(why is None, f"the kill was not staged: {why}")
             (reports / "schema.block-after").unlink(missing_ok=True)
@@ -4977,7 +4987,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
             expect(rec.get("gov_commit") == sha_a and row.get("commit") == sha_b,
                    "the killed receipt does not name gov_commit A with the one.txt row at B's vintage")
             rc, out = govkit("--rollback", "--to", sha_a, "--write")
-            rec, one = receipt(), (t / "tools" / "demo" / "one.txt").read_bytes()
+            rec, one = receipt(), (t / FIXTURE_PREFIX / "demo" / "one.txt").read_bytes()
             print(f"rollback-update: the rollback exits {rc} · tools/demo/one.txt {one!r} · schema {rec.get('schema')} · "
                   f"{'WITH' if 'steps' in rec else 'no'} steps · gov_commit {names.get(rec.get('gov_commit'), rec.get('gov_commit'))}")
             expect(rc == 0 and one == b"v1\n" and rec.get("schema") == 3 and "steps" not in rec
@@ -5005,7 +5015,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
                 # the write loop moves a file row; its re-run is compared with the twin above.
                 reports.mkdir(exist_ok=True)
                 (reports / "schema.block-after").touch()
-                why = run_killed([sys.executable, str(gov / "tools" / HERE.name / "govkit.py"), "update", "--target",
+                why = run_killed([sys.executable, str(gov / FIXTURE_PREFIX / HERE.name / "govkit.py"), "update", "--target",
                                   str(t), "--rollback", "--to", sha_a, "--write"], reports, "schema", env)
                 expect(why is None, f"the kill was not staged: {why}")
                 (reports / "schema.block-after").unlink()
@@ -5071,7 +5081,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
             (reports / "s1.down-fails").unlink()
             record = t / ".governance" / "outbox" / f"update-reverted-{sha_b[:8]}-{sha_a[:8]}.md"
             text = record.read_text(encoding="utf-8").splitlines() if record.is_file() else []
-            held = (t / "tools" / "demo" / "one.txt").read_bytes() == b"v2\n" and receipt().get("gov_commit") == sha_b
+            held = (t / FIXTURE_PREFIX / "demo" / "one.txt").read_bytes() == b"v2\n" and receipt().get("gov_commit") == sha_b
             print(f"rollback-update: the stopped run exits {rc1} · file rows and gov_commit "
                   f"{'held at B' if held else 'MOVED'} · record {text[-1:] or 'absent'}")
             expect(rc1 == 1 and held and "the rollback's reverse walk stopped at fx/s1" in out1
@@ -5084,7 +5094,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
             early = saw.is_file() and v2 in saw.read_text(encoding="utf-8").splitlines()
             record = t / ".governance" / "outbox" / f"update-reverted-{sha_b[:8]}-{sha_a[:8]}.md"
             text = record.read_text(encoding="utf-8").splitlines() if record.is_file() else []
-            rec, one = receipt(), (t / "tools" / "demo" / "one.txt").read_bytes()
+            rec, one = receipt(), (t / FIXTURE_PREFIX / "demo" / "one.txt").read_bytes()
             print(f"rollback-update: s1's down found tools/demo/one.txt at "
                   f"{'B, before the write loop moved it' if early else 'NOT B: a file row moved first, or no down ran'}")
             print(f"rollback-update: tools/demo/one.txt {one!r} · gov_commit "
@@ -5102,7 +5112,7 @@ def run_rollback_update_fixture(plant: str | None) -> int:
             # TOOL-dSafePassage-76 AC4: C takes fx/s2 out of the steps file and names it in a
             # `[[retired]]` row; the target, updated to C, still records it applied. Introduced at B,
             # it owes no down to B and owes one to A, which no row declares.
-            gkd = gov / "tools" / HERE.name
+            gkd = gov / FIXTURE_PREFIX / HERE.name
             (gkd / STEPS_FILE).write_text(render_fixture_row("s1"), encoding="utf-8", newline="\n")
             with (gkd / REGISTRY_FILE).open("a", encoding="utf-8", newline="\n") as f:
                 f.write('\n[[retired]]\nid = "fx/s2"\nsuccessor = "none"\nsurfaces = []\n')

@@ -3675,7 +3675,7 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     # core.autocrlf=false wins over the parent's global true in the step's hash. Each failing case is
     # the fixture's own expectation, printed as `isolation: FAILED`.
     for plant, want, needles in (
-            ("local-url-userinfo", 1, ("remote.origin.url in .git/config, so nothing was spawned",
+            ("local-url-userinfo", 1, ("remote.gk-fixture.url in .git/config, so nothing was spawned",
                                        "scp-form remote · not refused · git add exits 0")),
             ("autocrlf-local", 0, ("fixture/hash · up · ok · the step's oid ", " · equal"))):
         rc, out = fixture(us_py, plant)
@@ -4560,9 +4560,9 @@ def check_step_walk() -> None:
     src = us_py.read_text(encoding="utf-8")
     with tempfile.TemporaryDirectory(prefix="gk-judge-", ignore_cleanup_errors=True) as td:
         jd = build_staged_copy(pathlib.Path(td), src.replace(clock, late))
-        (pathlib.Path(td) / "process-monitor").mkdir()
-        shutil.copy(govkit_module().resolve_kit_dir("process-monitor", "census.py", HERE) / "census.py",
-                    pathlib.Path(td) / "process-monitor" / "census.py")
+        pm = govkit_module().resolve_kit_dir("process-monitor", "census.py", HERE)
+        (pathlib.Path(td) / pm.name).mkdir()
+        shutil.copy(pm / "census.py", pathlib.Path(td) / pm.name / "census.py")
         p = subprocess.run([sys.executable, str(jd), "fixture", "lock", "--plant",
                             "lock-live-slow-census"], capture_output=True, text=True, encoding="utf-8",
                            errors="replace", timeout=600)

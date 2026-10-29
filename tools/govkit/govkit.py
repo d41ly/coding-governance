@@ -9425,7 +9425,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             raise Refusal(f"{receipt_path.as_posix()} is on gov's own tree and is not a source-mode "
                           f"receipt (\"mode\": \"source\"); refusing to walk over it")
         out = subprocess.run(["git", "-C", str(root), "rev-parse", "--verify", f"{to_rev}^{{commit}}"],
-                             capture_output=True, text=True)
+                             capture_output=True, text=True, encoding="utf-8")
         if out.returncode != 0:
             raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
         to_commit = out.stdout.strip()

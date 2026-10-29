@@ -384,6 +384,11 @@ TARGETS = {
 }
 # The py targets import this sibling by bare name, as a moved module's own imports do (S35).
 SIBLING = "CODE = 3\n"
+# The scratch tree's install prefix and the two kit directories it lays out, each named once so
+# every fixture path is joined from names (TOOL-dSafePassage-82 S3).
+FIXTURE_PREFIX = "tools"
+FIXTURE_GOVKIT = "govkit"
+FIXTURE_POLICY = "policy"
 CALLER = ('import os\nimport sys\n\nimport oldmod\n\n'
           'print("names: " + oldmod.NAME + " " + os.path.basename(oldmod.__file__))\n'
           'sys.exit(oldmod.main(sys.argv[1:]))\n')
@@ -395,8 +400,8 @@ def build_scratch(t: pathlib.Path) -> None:
     run_git(t, "config", "user.email", "shims@fixture.invalid")
     run_git(t, "config", "user.name", "shims fixture")
     run_git(t, "config", "core.autocrlf", "false")
-    (t / "tools" / "govkit").mkdir(parents=True)
-    (t / "tools" / "govkit" / govkit.REGISTRY_NAME).write_text("", encoding="utf-8")
+    (t / FIXTURE_PREFIX / FIXTURE_GOVKIT).mkdir(parents=True)
+    (t / FIXTURE_PREFIX / FIXTURE_GOVKIT / govkit.REGISTRY_NAME).write_text("", encoding="utf-8")
 
 
 def run_commit(t: pathlib.Path, msg: str) -> str:
@@ -415,9 +420,9 @@ def run_forward_plant(t: pathlib.Path, lang: str, mode: str) -> int:
     stem_old, stem_new = ("oldmod", "newmod") if lang == "module" else ("old", "new")
     row = {"id": f"fixture/moved-{lang}", "kind": "module" if lang == "module" else "command",
            "from": f"tools/demo/{stem_old}{ext}", "to": f"tools/moved/{stem_new}{ext}", "closed": False,
-           "lang": "py" if lang == "module" else lang, "policy": "tools/policy"}
+           "lang": "py" if lang == "module" else lang, "policy": f"{FIXTURE_PREFIX}/{FIXTURE_POLICY}"}
     kit = pathlib.Path(govkit.resolve_kit_dir("policy", "policy.py", govkit.GOVKIT_DIR))
-    shutil.copytree(kit, t / "tools" / "policy",
+    shutil.copytree(kit, t / FIXTURE_PREFIX / FIXTURE_POLICY,
                     ignore=shutil.ignore_patterns("__pycache__", "*.test.sh", "legacy-homes.txt"))
     files = [(row["to"], TARGETS[lang]), (row["from"], render_shim(row))]
     if lang in ("py", "module"):
@@ -426,12 +431,12 @@ def run_forward_plant(t: pathlib.Path, lang: str, mode: str) -> int:
         (t / rel).parent.mkdir(parents=True, exist_ok=True)
         (t / rel).write_bytes(text.encode("utf-8"))
     if lang == "module":
-        (t / "tools" / "demo" / "caller.py").write_bytes(CALLER.encode("utf-8"))
+        (t / FIXTURE_PREFIX / "demo" / "caller.py").write_bytes(CALLER.encode("utf-8"))
     if mode != "unset":
         write_policy(t, f'[install]\non-shim-call = "{mode}"\n')
     run_commit(t, f"a moved surface, mode {mode}")
-    mirror = subprocess.run([sys.executable, str(t / "tools" / "policy" / "policy.py"), "mirror", "--write"],
-                            cwd=t, capture_output=True, text=True, stdin=subprocess.DEVNULL)
+    mirror = subprocess.run([sys.executable, str(t / FIXTURE_PREFIX / FIXTURE_POLICY / "policy.py"), "mirror", "--write"],
+                            cwd=t, capture_output=True, text=True, encoding="utf-8", stdin=subprocess.DEVNULL)
     if mirror.returncode == 0:
         run_commit(t, "the policy mirror")
     rendered = render_shim(row).splitlines()
@@ -497,7 +502,7 @@ def print_observations(case: str, obs: list[tuple[str, str, str]]) -> int:
 def run_window_plant(t: pathlib.Path, window: int, n: int, unlanded: bool, expect: str) -> int:
     write_policy(t, f"[install]\ndeprecation-window = {window}\n")
     run_commit(t, f"window {window}")
-    decl = t / "tools" / "govkit" / SHIMS_NAME
+    decl = t / FIXTURE_PREFIX / FIXTURE_GOVKIT / SHIMS_NAME
     row = ('[[shim]]\nid = "fixture/moved"\nkind = "command"\nfrom = "{prefix}/demo/old.sh"\n'
            'to = "{prefix}/demo/new.sh"\nclosed = false\n')
     decl.write_text("" if unlanded else row, encoding="utf-8", newline="\n")
@@ -519,7 +524,7 @@ def run_window_id_plant(t: pathlib.Path, plant: str) -> int:
     """`window-prefix-id`: a row whose id begins another row's lands after it. `window-comment-id`:
     the id is spelled in the file's header comment a commit before its row lands. Each id must
     resolve to the commit that landed its own row (S17)."""
-    decl = t / "tools" / "govkit" / SHIMS_NAME
+    decl = t / FIXTURE_PREFIX / FIXTURE_GOVKIT / SHIMS_NAME
     row = ('[[shim]]\nid = "{id}"\nkind = "command"\nfrom = "{{prefix}}/demo/{f}.sh"\n'
            'to = "{{prefix}}/demo/new-{f}.sh"\nclosed = false\n')
     if plant == "window-prefix-id":
@@ -545,8 +550,8 @@ def run_missing_target_plant(t: pathlib.Path, lang: str) -> int:
         print("shims fixture: cannot observe: node not found on PATH")
         return 2
     row = {"id": f"fixture/moved-{lang}", "kind": "command", "from": f"tools/demo/old.{lang}",
-           "to": f"tools/moved/new.{lang}", "closed": False, "lang": lang, "policy": "tools/policy"}
-    (t / "tools" / "demo").mkdir(parents=True, exist_ok=True)
+           "to": f"tools/moved/new.{lang}", "closed": False, "lang": lang, "policy": f"{FIXTURE_PREFIX}/{FIXTURE_POLICY}"}
+    (t / FIXTURE_PREFIX / "demo").mkdir(parents=True, exist_ok=True)
     (t / row["from"]).write_bytes(render_shim(row).encode("utf-8"))
     env = {k: v for k, v in os.environ.items() if k not in GIT_LOCATION_VARS}
     p = subprocess.run([node, row["from"]], cwd=t, capture_output=True, text=True, encoding="utf-8",
@@ -557,12 +562,12 @@ def run_missing_target_plant(t: pathlib.Path, lang: str) -> int:
 
 
 def run_parity_plant(t: pathlib.Path) -> int:
-    (t / "tools" / "govkit" / SHIMS_NAME).write_text(
+    (t / FIXTURE_PREFIX / FIXTURE_GOVKIT / SHIMS_NAME).write_text(
         '[[shim]]\nid = "fixture/moved"\nkind = "command"\nfrom = "{prefix}/demo/old.sh"\n'
         'to = "{prefix}/demo/new.sh"\nclosed = false\n', encoding="utf-8", newline="\n")
     write_shims(t)
     before = check_shim_parity(t)[1]
-    with open(t / "tools" / "demo" / "old.sh", "a", encoding="utf-8", newline="\n") as f:
+    with open(t / FIXTURE_PREFIX / "demo" / "old.sh", "a", encoding="utf-8", newline="\n") as f:
         f.write("echo edited by hand\n")
     after = check_shim_parity(t)[1]
     return print_observations("plant parity-edit", [

@@ -20,7 +20,7 @@
 
 [[plant]]
 id = "engine-edit"
-path = "tools/memory-tree/README.md"
+path = "{prefix}/memory-tree/README.md"
 edit = "append"
 text = "<!-- upgrade-walk plant engine-edit: an adopter's own note -->\n"
 expect = "carried"
@@ -28,7 +28,7 @@ contains = "<!-- upgrade-walk plant engine-edit: an adopter's own note -->"
 
 [[plant]]
 id = "project-owned"
-path = "tools/drift-audit/drift_signals.py"
+path = "{prefix}/drift-audit/drift_signals.py"
 edit = "replace"
 old = 'TRACE_CUTOFF: str = ""'
 new = 'TRACE_CUTOFF: str = "2026-01-01"'
@@ -104,7 +104,7 @@ order = "render-edited"
 
 [[plant]]
 id = "edited-retired"
-path = "tools/hooks/README.md"
+path = "{prefix}/hooks/README.md"
 edit = "append"
 text = "<!-- upgrade-walk plant edited-retired: an adopter's own line in a file gov withdraws -->\n"
 expect = "ordered"
@@ -113,7 +113,7 @@ order = "retired-edited"
 [[gov_plant]]
 id = "withdraw-one"
 what = "the hooks README dropped from its descriptor's [[files]], so gov no longer ships an installed file"
-path = "tools/hooks/kit.toml"
+path = "{prefix}/hooks/kit.toml"
 edit = "replace"
 old = '''[[files]]
 include = ["README.md"]
@@ -125,7 +125,7 @@ new = ""
 [[gov_plant]]
 id = "withdraw-one-source"
 what = "the hooks README's source removed with its rule, so no descriptor ships it"
-path = "tools/hooks/README.md"
+path = "{prefix}/hooks/README.md"
 edit = "remove"
 
 [[condition]]

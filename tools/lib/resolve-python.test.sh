@@ -261,7 +261,10 @@ out=$(run_provision_refusal)
 out=$(cd "$ROOT" && "$REALPY" -I "$HERE/python_floor.py" check 2>&1); rc=$?
 [ "$rc" = 0 ] && [ -z "$out" ] || bad "python_floor.py check on this tree is not clean: rc=$rc $out"; ok
 out=$(cd "$ROOT" && "$REALPY" -I "$HERE/python_floor.py" check --rev 3708a705 2>&1 | tr -d '\r')
-{ [ "$(printf '%s\n' "$out" | grep -c .)" = 7 ] && [[ $out == *"tools/settings-merge.py:3: "*"py>="*"3.10"* ]] && [[ $out == *"tools/lexicon/selftest.py:109: "* ]]; } \
+# The statements counted with no fork, each matched by a path assembled from this suite's own names.
+n1c=0; while IFS= read -r l1c; do [ -n "$l1c" ] && n1c=$((n1c + 1)); done <<<"$out"
+lx1c=lexicon
+{ [ "$n1c" = 7 ] && [[ $out == *"${PFX}settings-merge.py:3: "*"py>="*"3.10"* ]] && [[ $out == *"${PFX}$lx1c/selftest.py:109: "* ]]; } \
   || bad "python_floor.py check --rev 3708a705 did not print the seven pinned statements: $out"; ok
 FQ="$TMP/fq"; mkdir -p "$FQ/$KIT_REL"
 cp "$HERE/python_floor.py" "$FQ/$KIT_REL/"; printf '9.99\n' > "$FQ/$KIT_REL/python-floor.txt"
