@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names
 
-**Status:** DEFERRED · rev-5 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** DEFERRED · rev-6 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 TOOL-dSafePassage-85 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -22,8 +22,10 @@ on six product lint legs whose every finding is a line this build added: `encodi
 `install-prefix`, `remote literals`, `harness arms`, `spawn budget` and `shell hygiene (a fork spent
 on builtin work)`. This unit applies, at each finding, the remedy that leg's own message names, so
 each leg passes at the build's head with no waiver row, no widened exemption and no ceiling the leg
-forbids raising. The spawn budget's five ceilings are the owner's to move (§8 F2), so this pass
-leaves them untouched and that leg stays red until the owner rules.
+forbids raising. Two records this build's diff must move are the owner's, held by the ask
+TOOL-dSafePassage-85 in this build's `BACKLOG.md`: the spawn budget's five ceilings, and the three
+evidence rows the install-prefix leg still names. This pass leaves both untouched, so those two legs
+stay red on exactly those rows until the owner rules.
 
 ## 2. Scope (IN)
 
@@ -52,9 +54,13 @@ not the instance.
   `tools/govkit/selftest.py:3560` expects the renamed key; the selftest is outside the gate's
   population and changes only because its expectation follows the plant. Observed by AC2, AC3 and
   AC11.
-- **S3 — install-prefix.** None of the lines the leg names spells a kit path, 129 at `83817478f` and
-  130 at `870c648f6` as the builder measured, each rewritten by
-  the rule of its shape in §4 "The install-prefix shapes": a fixture's scratch layout assembled from
+- **S3 — install-prefix.** Of the lines the leg names, 129 at `83817478f` and 130 at `870c648f6`
+  as the builder measured, every one stops spelling a kit path except
+  the three rows of `tools/run-gates/ceiling-evidence.txt` whose `--how` text spells a kit path,
+  `routed commits name a specced unit`, `spec tokens` and `upgrade-walk` (`:115`, `:134` and
+  `:146` at `870c648f6`). `derive-ceilings.py` writes those rows and
+  cannot respell one, and the file forbids a hand edit, so they belong to the ask
+  TOOL-dSafePassage-85. Every other line is rewritten by the rule of its shape in §4 "The install-prefix shapes": a fixture's scratch layout assembled from
   named values; a sibling kit gov carries routed through `resolve_kit_dir`; declaration data spelled
   with the drained `{prefix}/` token and resolved where it is read; prose in a manifest field spelled
   `<prefix>/`. The floor row's three argvs at `tools/govkit/steps.toml:34-36` name a new program
@@ -84,7 +90,8 @@ not the instance.
 - **S5 — spawn budget.** NOT BUILT by this pass. `memory/project/fork-ceilings.txt` is left
   untouched: its five red rows, `run-gates-1leg`, `run-gates-2leg`, `memory-hygiene`,
   `manifest-check` and `check-wiring`, keep their ceilings, and the leg stays red until the owner
-  rules on §8 F2. The pass builds S1 to S4 and S6. The fork is attributed in §4 "The spawn budget".
+  rules on the ask TOOL-dSafePassage-85, which holds them. The pass builds S1 to S4 and S6. The
+  fork is attributed in §4 "The spawn budget".
   Observed by AC9 and AC11, which name that state.
 - **S6 — shell hygiene.** Each risen count falls back to its registry row by converting the sites
   this build added to the no-fork form the lint names, and the one fallen count lowers its row:
@@ -130,8 +137,9 @@ not the instance.
 
 ### Edges
 
-- **consumes-from** external — the owner's pick on §8 F2. Without it the spawn budget stays red, the
-  state AC9 and AC11 name.
+- **consumes-from** external — the owner's ruling on the ask TOOL-dSafePassage-85, on the five
+  fork-count rows and the three evidence rows. Without it the spawn budget and the install-prefix leg
+  stay red on exactly those rows, the state AC9 and AC11 name.
 - **hands-off** external — the pinned exit sites of S4, each armable only by a stage nobody has
   built, left for a later unit that builds it.
 
@@ -424,8 +432,8 @@ on TOOL-dGroundRules-13, and is not waited for.
   may add to the suite before this pass, and a site it adds is in scope by S6.
 - **AC9** — When `git diff 83817478f -- memory/project/fork-ceilings.txt` runs at the pass's commit,
   it prints nothing: the five rows keep their ceilings 55, 57, 189, 74 and 44 until the owner rules
-  on §8 F2.
-  Red when: the pass moves a ceiling or a reason in the file, a change F2 leaves to the owner.
+  on the ask TOOL-dSafePassage-85.
+  Red when: the pass moves a ceiling or a reason in the file, a change that ask leaves to the owner.
   figure: the measured counts 56, 58, 190, 76 and 45 are PINNED to the discovery bar on node a at
   `83817478f`.
 - **AC10** — When `bash -n tools/push-main.sh` and `bash -n tools/push-main.test.sh` run, each exits
@@ -434,16 +442,18 @@ on TOOL-dGroundRules-13, and is not waited for.
   Red when: the indent rewrite breaks the script's syntax, or the fifth site `run_gov_first` added
   remains, as it did at `83817478f`, where the count is 5.
 - **AC11** — When the main loop runs each of the six legs' argv from `tools/gate-legs.json` alone, in
-  a `git clone --shared` of the pass's head whose `origin/HEAD` points at main, five exit 0:
+  a `git clone --shared` of the pass's head whose `origin/HEAD` points at main, four exit 0:
   `python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills`,
-  `bash tools/check-install-prefix.sh`, `bash tools/check-remote-literals.sh`,
-  `python3 tools/memory-tree/check-arms.py --check` and
+  `bash tools/check-remote-literals.sh`, `python3 tools/memory-tree/check-arms.py --check` and
   `python3 tools/gate-lint/sh_hygiene.py --spawn-idioms memory/project/spawn-idiom-sites.txt . ':!*.test.sh' ':!memory/'`.
   The sixth, `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt .`, exits 1 with
-  `2 passed · 5 red`, naming the same five rows as at `83817478f` and no other, until the owner
-  rules on §8 F2.
-  Red when: one of the five legs still names a site S1, S2, S3, S4 or S6 covers, or one a sibling
-  added in a file of §4; or the spawn budget reds a row other than the five.
+  `2 passed · 5 red`, naming the same five rows as at `83817478f` and no other, and
+  `bash tools/check-install-prefix.sh` exits 1 naming only the three lines of
+  `tools/run-gates/ceiling-evidence.txt` S3 leaves, both until the owner rules on the ask
+  TOOL-dSafePassage-85.
+  Red when: one of the four green legs still names a site S1, S2, S4 or S6 covers, or one a sibling
+  added in a file of §4; the install-prefix leg names any line outside those three; or the spawn
+  budget reds a row other than the five.
   permission: a role agent may not run these six (scratch-guard row G1); the main loop observes them.
   cost: the install-prefix leg's ceiling is 2940 s and the spawn budget's 2400 s.
 - **AC12** — When `git show --stat --format= HEAD` runs at the commit that stages
@@ -492,19 +502,6 @@ regenerates.
   RESOLVED (agent, 2026-10-28, delegated): (b), the program under `tools/govkit/steps/` resolving
   the floor script through `resolve_kit_dir`, ruled by the build's coordinator; rev-4 takes the
   step module's own copy of it, by the spec audit's L11.
-- **F2 — How do the five fork-count rows pass?** The counter now sees a fork the resolver always
-  spent (§4 "The spawn budget"). `fork-ceilings.txt:12-14` call the ceilings shrink-only and state no
-  terms on which a run may raise one, so by M3 a raise is the owner's.
-  - (a) Restore the old trace shape: the resolver lets python print its answer straight to the
-    caller and captures output only on the failure path. Every marked inline copy is re-synced. The
-    probe then trusts a candidate's exit 0 without parsing what it printed, which TOOL-dSafePassage-11
-    added to refuse a stub that exits 0 and runs nothing.
-  - (b) Raise each row to its measured count, 55 to 56, 57 to 58, 189 to 190, 74 to 76 and 44 to 45,
-    each reason naming `ed135af16` and the unchanged process count, measured three times on the node
-    the rows were measured on, as the `TOOL-aSparedSpawn-34` raise was (`e435aafe4`).
-  Recommendation: (b). The count is a lower bound that started seeing a real fork; (a) churns every
-  inline copy to hide it again and weakens the resolver's probe. Open for the owner: until the
-  owner rules, the pass leaves `fork-ceilings.txt` untouched and the leg red (S5, AC9, AC11).
 
 ## 9. Revision log
 
@@ -543,6 +540,14 @@ regenerates.
   printed `(submodule lib/…)` texts `selftest.py` asserts do not move; `scratch / "hooks"` is
   renamed as specced. Two measured facts corrected: the install-prefix population is 130 lines at
   `870c648f6`, and S6's indent strips a CR before each line end to match Git for Windows' `sed`.
+- rev-6 · 2026-10-29 · §1 · S3 · S5 · §3 Edges · AC9 · AC11 · §8 F2 · the builder's second
+  DIVERGENCE, relayed by the coordinator with its saved work (`TOOL-dSafePassage-82-wip2.patch` in
+  the run's scratchpad): hygiene check 12 refuses a terminal status while §8 carries an open fork,
+  so with F2 open this unit could never close. F2 leaves §8; the owner's half of it, the five
+  fork-count rows, is the ask TOOL-dSafePassage-85, which this header now advances, beside the
+  three `ceiling-evidence.txt` rows whose how-text spells a kit path, which the install-prefix leg
+  still names and `derive-ceilings.py` cannot respell. S3 rewrites every other line; S5, AC9, AC11
+  and the §3 edge point at the ask, and AC11 expects the install-prefix leg to name only those three.
 
 ## 10. Reuse audit
 
