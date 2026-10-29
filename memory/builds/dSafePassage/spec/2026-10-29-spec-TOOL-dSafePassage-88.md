@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-88 — a renamed row whose new destination is its own path lands in place, so `update` carries a target across gov's tool-root move
 
-**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base cba885c5 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-10-29 · node a · Tier-2 · base cba885c5 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-29-build-TOOL-dSafePassage-88-ledger.md](../build/2026-10-29-build-TOOL-dSafePassage-88-ledger.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-87-audit-fold-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-87-audit-fold-brief.md) | research | TOOL-dSafePassage-87 TOOL-dSafePassage-89 |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-1-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-2-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-2-spec-writer.md) | journal | — |

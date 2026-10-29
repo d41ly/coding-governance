@@ -509,3 +509,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-29T09:17:32Z dispatch · item be00fcf4 TOOL-dSafePassage-89 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-89.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-89-ledger.md
 
 2026-10-29T09:25:21Z dispatch · item be00fcf4 TOOL-dSafePassage-89 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-89.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-89-ledger.md
+
+2026-10-29T09:37:07Z brief · item TOOL-dSafePassage-88 · reason cb4c22980c0b memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-88-build-brief.md
+
+2026-10-29T09:44:49Z dispatch · item ed22e3ef TOOL-dSafePassage-88 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-88.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-88-ledger.md
+
+2026-10-29T10:00:50Z dispatch · item ed22e3ef TOOL-dSafePassage-88 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-88.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-88-ledger.md

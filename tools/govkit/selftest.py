@@ -12206,27 +12206,28 @@ user_skills = "/tmp/gk-fake-skills"
         }
 
 
-        def build_rename_gov(tag: str, kit_a: str = _11_KIT_A) -> pathlib.Path:
+        def build_rename_gov(tag: str, kit_a: str = _11_KIT_A, root: str = PFX,
+                             src: dict | None = None) -> pathlib.Path:
             """A scratch gov carrying ONE `demo` kit and a copy of the engine.
 
             THE COPY IS TAKEN HERE, at fixture-build time — a break staged into this repo's `govkit.py`
             AFTER the copy runs the UNPATCHED engine and the arm reports on nothing.
             """
             g = tmp / f"rn-{tag}-gov"
-            (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
-            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / PFX / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
-            (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
+            (g / root / KIT_NAMES["govkit"]).mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / root / KIT_NAMES["govkit"] / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / root / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            shutil.copy2(GOVKIT.parent / "upgrade_steps.py", g / root / KIT_NAMES["govkit"] / "upgrade_steps.py")  # govkit.py imports its Refusal from it (TOOL-dSafePassage-1)
+            (g / root / KIT_NAMES["govkit"] / "registry.toml").write_text(
                 '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
                 '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
                 '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            d = g / PFX / "demo"
+            d = g / root / "demo"
             d.mkdir(parents=True, exist_ok=True)
             (d / "kit.toml").write_text(kit_a, encoding="utf-8", newline="\n")
-            for rel, body in _11_SRC.items():
+            for rel, body in (src or _11_SRC).items():
                 (d / rel).write_text(body, encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
@@ -13080,6 +13081,47 @@ user_skills = "/tmp/gk-fake-skills"
               (_t11b / PFX / "demo" / "moved.txt").is_file()
               and [f for f in json.loads((_t11b / ".governance" / "install.json").read_text(
                   encoding="utf-8"))["files"] if f["path"] == f"{PFX}demo/moved.txt"], "")
+
+        # TOOL-dSafePassage-88: gov moves its tool root and the target keeps its prefix, so each renamed
+        # row resolves to its own path and lands there, never refused as its own occupant.
+        _g88 = build_rename_gov(
+            "inplace",
+            'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n'
+            '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n',
+            "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
+        _gk88 = _g88 / "pinned" / KIT_NAMES["govkit"]
+        _t88 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-t")
+        _ap88 = subprocess.run([sys.executable, str(_gk88 / "govkit.py"), "apply", "--target", str(_t88),
+                                "--kits", "demo"], capture_output=True, text=True, encoding="utf-8", errors="replace")
+        settle(_t88, "the install")
+        git(_g88, "mv", "pinned", "moved")
+        (_g88 / "moved" / "demo" / "keep.txt").write_text("one\ntwo\nthree\nFOUR\n", encoding="utf-8", newline="\n")
+        git(_g88, "add", "-A")
+        git(_g88, "commit", "-qm", "B")
+        _up88 = subprocess.run([sys.executable, str(_g88 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                                "--target", str(_t88), "--write"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _row88 = [f.get("source") for f in json.loads((_t88 / ".governance" / "install.json").read_text(
+            encoding="utf-8"))["files"] if f["path"] == "pinned/demo/keep.txt"]
+        check("[dSP-88] a rename gov's tool-root move makes lands at the row's own path, under the new source",
+              _ap88.returncode == 0 and _up88.returncode == 0
+              and "ALREADY holds a file there" not in _up88.stdout
+              and read_bytes11(_t88 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\nthree\nFOUR\n"
+              and _row88 == ["moved/demo/keep.txt"] and not (_t88 / "moved").exists(),
+              f"apply {_ap88.returncode} update {_up88.returncode} {_row88} " + _up88.stdout[-1500:])
+        # A case-only rename: on a case-insensitive filesystem the row's own file answers `exists()` at
+        # the new spelling, and it is still the row's own file, so it moves rather than being refused.
+        settle(_t88, "the in-place update")
+        git(_g88, "mv", "moved/demo/keep.txt", "moved/demo/Keep.txt")
+        git(_g88, "commit", "-qm", "C")
+        _cs88 = subprocess.run([sys.executable, str(_g88 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                                "--target", str(_t88), "--write"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _case88 = [f["path"] for f in json.loads((_t88 / ".governance" / "install.json").read_text(
+            encoding="utf-8"))["files"] if f["path"].lower() == "pinned/demo/keep.txt"]
+        check("[dSP-88] a case-only rename gov makes lands under the new spelling, never refused as its own occupant",
+              _cs88.returncode == 0 and "ALREADY holds a file there" not in _cs88.stdout
+              and _case88 == ["pinned/demo/Keep.txt"], f"update {_cs88.returncode} {_case88} " + _cs88.stdout[-1500:])
 
         _g11c = build_rename_gov("mvfail")
         _t11c = build_rename_target(_g11c, "rn-mvfail-t")

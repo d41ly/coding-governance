@@ -11070,6 +11070,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # ---- rather than half-applied at a new path.
             new_src, new_dest = c["renamed_to"]
             ndp = (target / new_dest).resolve()
+            # TOOL-dSafePassage-88: the target's descriptor answers this row's own path, as it does for
+            # every row when gov moves its tool root, so the file stays and only its source changes.
+            # The occupant is asked of the filesystem, so a case-only rename on a case-insensitive one
+            # is still the row's own file; only the exact spelling skips the move.
+            _own = target / row["path"]
+            own_file = new_dest == row["path"] or (ndp.exists() and _own.exists() and ndp.samefile(_own))
+            in_place = new_dest == row["path"]
             try:
                 ndp.relative_to(target.resolve())
             except ValueError:
@@ -11099,7 +11106,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"whether this target already holds it is UNKNOWN. Skipping this row "
                        f"rather than moving onto a path that may be occupied: {_idx_read_err}")
                 continue
-            if new_dest in _at_dest or ndp.exists():
+            if not own_file and (new_dest in _at_dest or ndp.exists()):
                 r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
                        f"'{new_dest}' — and this target ALREADY holds a file there. Refusing rather "
                        f"than overwriting it: `update` moves one row and would be destroying "
@@ -11157,17 +11164,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # ONE report: the row is left exactly as it was, and nothing about it is rewritten.
             old_path = row["path"]
             mv_err: str | None = None
-            try:
-                ndp.parent.mkdir(parents=True, exist_ok=True)
-                upgrade_steps.write_staging_line(target, old_path, None)
-                upgrade_steps.write_staging_line(target, new_dest,
-                                                 (index0.get(old_path) or (None, "worktree"))[1])
-                mv = subprocess.run(["git", "-C", str(target), "mv", "--", old_path, new_dest],
-                                    capture_output=True, text=True, check=False)
-                if mv.returncode != 0:
-                    mv_err = mv.stderr.strip() or f"git mv exited {mv.returncode}"
-            except OSError as e:
-                mv_err = str(e)
+            if not in_place:
+                try:
+                    ndp.parent.mkdir(parents=True, exist_ok=True)
+                    upgrade_steps.write_staging_line(target, old_path, None)
+                    upgrade_steps.write_staging_line(target, new_dest,
+                                                     (index0.get(old_path) or (None, "worktree"))[1])
+                    mv = subprocess.run(["git", "-C", str(target), "mv", "--", old_path, new_dest],
+                                        capture_output=True, text=True, check=False)
+                    if mv.returncode != 0:
+                        mv_err = mv.stderr.strip() or f"git mv exited {mv.returncode}"
+                except OSError as e:
+                    mv_err = str(e)
             if mv_err:
                 r.fail(f"'{row['path']}' could not be moved to '{new_dest}': {mv_err} — the row is "
                        f"left exactly as it was, at its old path and its old vintage")
@@ -11182,7 +11190,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # `checkout-index` cannot replace — and this suite manufactures none of those; the
                 # two older call sites above are in exactly the same position. What it leaves is a
                 # moved file whose bytes are still the pre-move ones, reported and not re-stamped.
-                r.fail(f"'{row['path']}' was moved to '{new_dest}' and the bytes could not be "
+                r.fail(f"'{row['path']}' could not be landed in place: {why}. The row is NOT advanced, "
+                       f"and a re-run retries it" if in_place else
+                       f"'{row['path']}' was moved to '{new_dest}' and the bytes could not be "
                        f"landed: {why}. The move is staged and the row is NOT advanced, so a re-run "
                        f"sees the file at its new path with its old vintage")
                 continue
@@ -11199,13 +11209,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             row["sha256"] = _sha(data)
             row["commit"] = to_commit
             row["version"] = _resolve_ver_at(row)
-            renamed.extend([old_path, new_dest])
+            if in_place:
+                changed.append(new_dest)
+            else:
+                renamed.extend([old_path, new_dest])
             # The DESTINATION line. The verdict row above names the old path, which is the only
             # spelling the receipt had when it was printed; where the file went is the other half,
             # and it ends in the byte arm rather than in a path so that nothing parsing this output
             # for a row's verdict can mistake this line for one.
-            print(f"  moved            [{row.get('role')}] {old_path} -> {new_dest} · "
-                  f"bytes {byte_arm}")
+            if in_place:
+                print(f"  in place         [{row.get('role')}] {new_dest} · source {new_src} · "
+                      f"bytes {byte_arm}")
+            else:
+                print(f"  moved            [{row.get('role')}] {old_path} -> {new_dest} · "
+                      f"bytes {byte_arm}")
         elif v == "withdrawn":
             # ---- DEPL-dCarriedReceipt-11 S8 + S9. THE ENGINE'S ONLY UNGUARDED DELETE, CLOSED. What
             # ---- stood here removed a tracked file from a repository gov does not own — unlinked
