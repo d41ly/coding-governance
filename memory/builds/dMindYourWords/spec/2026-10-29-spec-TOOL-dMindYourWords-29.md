@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-29 — the round-1 spec audit's 49 minors, batched: one stdout for the ledger, every reader of a moved fact, honest failure states, and the observations that read the wrong thing
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 19
+**Status:** OPEN · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 TOOL-dMindYourWords-38 TOOL-dMindYourWords-39 TOOL-dMindYourWords-40 TOOL-dMindYourWords-41 TOOL-dMindYourWords-42 TOOL-dMindYourWords-43 TOOL-dMindYourWords-44 TOOL-dMindYourWords-45 TOOL-dMindYourWords-46 TOOL-dMindYourWords-47 TOOL-dMindYourWords-48 TOOL-dMindYourWords-49 TOOL-dMindYourWords-50 TOOL-dMindYourWords-51 TOOL-dMindYourWords-52 |
 | [2026-10-29-prompt-TOOL-dMindYourWords-22-promoted-fix-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-22-promoted-fix-brief.md) | research | TOOL-dMindYourWords-22 TOOL-dMindYourWords-24 TOOL-dMindYourWords-27 |
 | [2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-24 TOOL-dMindYourWords-27 TOOL-dMindYourWords-26 TOOL-dMindYourWords-28 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-25 |
 
@@ -247,6 +247,7 @@ to S6, M8 (id 13) is S11, M9 (id 14) S12, M12 to M16 (ids 25, 26, 28, 29, 36) S1
 - **hands-off** `TOOL-dMindYourWords-31` — S42's `read_blame_lines` and S31's contract walk, which that unit runs under the kit's one history pin (review id 11)
 - **hands-off** `TOOL-dMindYourWords-36` — S31's per-commit contract walk, which that unit widens to merges (review id 35)
 - **hands-off** `TOOL-dMindYourWords-37` — S1, S11, S18, S19, S20, S24, S27, S29, S33, S42, S46 and their criteria, which the minors batch repairs (review ids 3, 4, 5, 10, 16, 20, 24, 27, 28, 36, 37, 38, 39 and 40)
+- **consumes-from** `TOOL-dMindYourWords-42` — `--ignore-revs-file=` on the provenance blame, which S42's `read_blame_lines` keeps when it becomes the kit's one blame reader
 
 ## 4. Design
 
@@ -540,6 +541,8 @@ New arm: .githooks/pre-commit.test.sh · covers AC44 · `.lexicon.conf` staged w
   findings, one scope item per raw id.
 - rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 22 to 29
   declare toward this unit (TOOL-dMindYourWords-31, TOOL-dMindYourWords-36, TOOL-dMindYourWords-37); no scope, design or criterion moved.
+- rev-3 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 30 to 37
+  declare toward this unit (TOOL-dMindYourWords-42); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

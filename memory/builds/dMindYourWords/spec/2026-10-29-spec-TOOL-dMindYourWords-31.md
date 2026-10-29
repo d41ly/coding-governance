@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-31 — the kit's one history pin, carried by the shared blame reader into the drift blame
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 20
+**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 20
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 TOOL-dMindYourWords-38 TOOL-dMindYourWords-39 TOOL-dMindYourWords-40 TOOL-dMindYourWords-41 TOOL-dMindYourWords-42 TOOL-dMindYourWords-43 TOOL-dMindYourWords-44 TOOL-dMindYourWords-45 TOOL-dMindYourWords-46 TOOL-dMindYourWords-47 TOOL-dMindYourWords-48 TOOL-dMindYourWords-49 TOOL-dMindYourWords-50 TOOL-dMindYourWords-51 TOOL-dMindYourWords-52 |
+| [2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-34 TOOL-dMindYourWords-30 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,10 @@ commit's time for each. This unit spells the repository's history pin once in th
 - **consumes-from** `TOOL-dMindYourWords-30` — the pinned provenance blame, whose inline pin S3 folds into the helper
 - **consumes-from** `TOOL-dMindYourWords-32` — the pinned `rev` read, whose inline pin S3 folds into the helper
 - **hands-off** `TOOL-dMindYourWords-37` — `read_blame_lines` under the one pin, inside which the batch moves the shallow probe (id 20)
+- **consumes-from** `TOOL-dMindYourWords-41` — `build_graft_fixture`, through which the drift-blame graft arms stage their graft with its control in force
+- **consumes-from** `TOOL-dMindYourWords-42` — `--ignore-revs-file=` on the kit's blame, which S2's pinned argv for `read_blame_lines` keeps
+- **hands-off** `TOOL-dMindYourWords-47` — `build_git_env()` and the call sites S2 and S3 pin by hand, which that unit moves onto the kit's one runner `run_git` (review id 3)
+- **hands-off** `TOOL-dMindYourWords-52` — `build_git_env()`, which the minors batch strips of `GIT_ENV_LEAKS` (review id 17)
 
 ## 4. Design
 
@@ -142,6 +147,8 @@ New arm: tools/lexicon/selftest.py · covers AC1 AC2 · the drift fixture grafte
 
 - rev-1 · 2026-10-29 · initial draft, promoted from review id 11 (HIGH, item H1, shared with ids 1 and
   23) of the round-1 audit of units 22 to 29.
+- rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 30 to 37
+  declare toward this unit (TOOL-dMindYourWords-41, TOOL-dMindYourWords-42, TOOL-dMindYourWords-47, TOOL-dMindYourWords-52); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

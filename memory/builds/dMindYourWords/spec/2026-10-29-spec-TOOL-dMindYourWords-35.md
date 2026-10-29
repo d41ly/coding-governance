@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-35 — the drain edit `--measure > <home>` reads the rows it carries from a copy the redirect cannot truncate
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 18
+**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 TOOL-dMindYourWords-38 TOOL-dMindYourWords-39 TOOL-dMindYourWords-40 TOOL-dMindYourWords-41 TOOL-dMindYourWords-42 TOOL-dMindYourWords-43 TOOL-dMindYourWords-44 TOOL-dMindYourWords-45 TOOL-dMindYourWords-46 TOOL-dMindYourWords-47 TOOL-dMindYourWords-48 TOOL-dMindYourWords-49 TOOL-dMindYourWords-50 TOOL-dMindYourWords-51 TOOL-dMindYourWords-52 |
+| [2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-34 TOOL-dMindYourWords-30 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-31 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,8 @@ index copy, and refuse when no copy survives, so the documented drain edit is sa
 
 - **consumes-from** `TOOL-dMindYourWords-23` — the `--measure` merge that reads the home for the rows it carries; without it there is no read to re-source
 - **hands-off** `TOOL-dMindYourWords-37` — the redirect-safe drain edit, over which the batch re-observes unit 23's AC1 and carries the drift rows a shallow run does not measure (ids 5, 37)
+- **hands-off** `TOOL-dMindYourWords-48` — `read_ledger_source`'s index read, which that unit moves onto the pinned runner (review id 21)
+- **hands-off** `TOOL-dMindYourWords-52` — `read_ledger_source` and its emptied-home refusal, to which the minors batch adds the PowerShell cause and the unmerged-home refusal (review ids 11, 35)
 
 ## 4. Design
 
@@ -165,6 +168,8 @@ New arm: tools/lexicon/selftest.py · covers AC1 AC2 AC3 AC4 · the drain edit r
 
 - rev-1 · 2026-10-29 · initial draft, promoted from review id 30 (HIGH, item H4) of the round-1 audit of
   units 22 to 29, with the redirect detection measured on a Windows node.
+- rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 30 to 37
+  declare toward this unit (TOOL-dMindYourWords-48, TOOL-dMindYourWords-52); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

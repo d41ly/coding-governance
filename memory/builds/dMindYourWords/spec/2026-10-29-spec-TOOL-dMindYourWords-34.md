@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-34 — a kit's root ledger home joins govkit's `root-conf` guard class
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 TOOL-dMindYourWords-38 TOOL-dMindYourWords-39 TOOL-dMindYourWords-40 TOOL-dMindYourWords-41 TOOL-dMindYourWords-42 TOOL-dMindYourWords-43 TOOL-dMindYourWords-44 TOOL-dMindYourWords-45 TOOL-dMindYourWords-46 TOOL-dMindYourWords-47 TOOL-dMindYourWords-48 TOOL-dMindYourWords-49 TOOL-dMindYourWords-50 TOOL-dMindYourWords-51 TOOL-dMindYourWords-52 |
 | [2026-10-29-prompt-TOOL-dMindYourWords-34-promoted-fix-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-34-promoted-fix-brief.md) | research | TOOL-dMindYourWords-37 |
+| [2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-30 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-35 TOOL-dMindYourWords-31 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
 
 <!-- /gen:spec-records -->
 
@@ -50,6 +51,8 @@ descriptor registers is classed, and a root file no descriptor declares still re
 ### Edges
 
 - **consumes-from** `TOOL-dMindYourWords-27` — S1's `[[ledger]]` `home = ".lexicon-debt.txt"` and the guard pathspec naming it; without them no root ledger is declared and nothing needs the class
+- **hands-off** `TOOL-dMindYourWords-38` — the widened 7c2 population, whose argv read that unit resolves through `{prefix}` (review id 7)
+- **hands-off** `TOOL-dMindYourWords-51` — the ledger-home population, which the govkit minors batch widens to the registry's `[[ledger]]` tables and validates (review ids 4, 18)
 
 ## 4. Design
 
@@ -154,6 +157,8 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 · a scratch kit declaring a
 
 - rev-1 · 2026-10-29 · initial draft, promoted from review id 22 (HIGH, item H3) of the round-1 audit of
   units 22 to 29.
+- rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 30 to 37
+  declare toward this unit (TOOL-dMindYourWords-38, TOOL-dMindYourWords-51); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

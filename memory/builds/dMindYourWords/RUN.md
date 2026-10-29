@@ -81,3 +81,35 @@ base: ccd1292ea98467fde27c262948ded176987326dd
 2026-10-29T18:22:33Z hold · item host-owner-action · reason until owner · reaped a8152305 · resume none(owner)
 
 2026-10-29T18:48:03Z resume · item dMindYourWords · reason held · keepalive 40ce7a67 · manual
+
+2026-10-29T19:31:49Z rescope · item add TOOL-dMindYourWords-38 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 7 (HIGH, item H5, shared with id 33): check 7c2 never resolves {prefix} in a leg's argv, so unit 34's widened population grades no prefixed leg
+
+2026-10-29T19:32:02Z rescope · item add TOOL-dMindYourWords-39 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 33 (HIGH, item H5, shared with id 7): check 7c2 skips every leg whose argv file it cannot read, so a prefixed leg is graded as nothing and nothing says so
+
+2026-10-29T19:32:03Z rescope · item add TOOL-dMindYourWords-40 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 6 (HIGH, item H4, shared with id 15): the graft-file arms of units 30 to 32 inherit GIT_GRAFT_FILE=/dev/null from the unattended close bar, so cutting the pin leaves them green
+
+2026-10-29T19:32:04Z rescope · item add TOOL-dMindYourWords-41 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 15 (HIGH, item H4, shared with id 6): no graft arm proves its graft is in force before it judges, so a neutralised graft reads as a working pin
+
+2026-10-29T19:32:05Z rescope · item add TOOL-dMindYourWords-42 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 30 (HIGH, item H6): the provenance and drift blame honour the ambient blame.ignoreRevsFile, which moves a row off the commit that wrote it
+
+2026-10-29T19:32:06Z rescope · item add TOOL-dMindYourWords-43 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 1 (HIGH, item H1, shared with ids 16, 23 and 29): unit 36 S3's merge added set drops -M, so a renamed old record admits a resolution-made row
+
+2026-10-29T19:32:07Z rescope · item add TOOL-dMindYourWords-44 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 16 (HIGH, item H1, shared with ids 1, 23 and 29): the merge added set is a second spelling of unit 33's read that drops its rename rule
+
+2026-10-29T19:32:08Z rescope · item add TOOL-dMindYourWords-45 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 23 (HIGH, item H1, shared with ids 1, 16 and 29): a suppression row blamed to a merge whose resolution renames an old record is admitted through the shared rev mode
+
+2026-10-29T19:32:09Z rescope · item add TOOL-dMindYourWords-46 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 29 (HIGH, item H1, shared with ids 1, 16 and 23): nothing refuses an added-set read in the kit that drops the rename rule
+
+2026-10-29T19:32:10Z rescope · item add TOOL-dMindYourWords-47 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 3 (HIGH, item H2, shared with ids 21 and 22): unit 31 promises every history read runs pinned but pins a closed list of call sites
+
+2026-10-29T19:32:11Z rescope · item add TOOL-dMindYourWords-48 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 21 (HIGH, item H2, shared with ids 3 and 22): the merge-loss guard, the signals module, the rename map and the ledger index read stay unpinned
+
+2026-10-29T19:32:12Z rescope · item add TOOL-dMindYourWords-49 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 22 (HIGH, item H2, shared with ids 3 and 21): the reads units 36 and 37 add, the merge walk and the first-parent added set, carry no history pin
+
+2026-10-29T19:32:13Z rescope · item add TOOL-dMindYourWords-50 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md id 2 (HIGH, item H3): unit 31 AC3's no-replace-objects count cannot fail, and no criterion observes a reader losing its pin
+
+2026-10-29T19:32:14Z rescope · item add TOOL-dMindYourWords-51 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md the 2 minors of item M1 by raw id, MEDIUM ids 4 and 18: the root-conf population reads descriptor ledgers only, missing the registry's ledger tables
+
+2026-10-29T19:32:15Z rescope · item add TOOL-dMindYourWords-52 · reason closes 2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md the other 18 minors by raw id, MEDIUM ids 8 9 11 12 17 24 25 27 28 31 32 35 36 and LOW ids 5 13 14 20 37
+
+2026-10-29T19:52:59Z review · item dMindYourWords-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 13 · minors 20 · disposition promote

@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-30 — the provenance blame reads the real commit graph, so a graft cannot make an old row look like a root's
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 8
+**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 8
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 TOOL-dMindYourWords-38 TOOL-dMindYourWords-39 TOOL-dMindYourWords-40 TOOL-dMindYourWords-41 TOOL-dMindYourWords-42 TOOL-dMindYourWords-43 TOOL-dMindYourWords-44 TOOL-dMindYourWords-45 TOOL-dMindYourWords-46 TOOL-dMindYourWords-47 TOOL-dMindYourWords-48 TOOL-dMindYourWords-49 TOOL-dMindYourWords-50 TOOL-dMindYourWords-51 TOOL-dMindYourWords-52 |
+| [2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-30-to-37-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-34 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-35 TOOL-dMindYourWords-31 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
 
 <!-- /gen:spec-records -->
 
@@ -58,6 +59,9 @@ truly wrote it, and deletes the boundary arm that can never fire.
 
 - **consumes-from** `TOOL-dMindYourWords-28` — the provenance blame with `--root` and the boundary arm S2 deletes; without it there is no blame to pin
 - **hands-off** `TOOL-dMindYourWords-31` — the pinned provenance blame, which that unit folds into the shared `read_blame_lines` with the kit's one pin
+- **hands-off** `TOOL-dMindYourWords-40` — the provenance graft arm, whose graft-file failing case that unit makes reachable by clearing the ambient pin (review id 6)
+- **hands-off** `TOOL-dMindYourWords-41` — the provenance graft arms, which stage their graft through `build_graft_fixture` and its control (review id 15)
+- **hands-off** `TOOL-dMindYourWords-42` — the pinned provenance blame, to whose argv that unit adds `--ignore-revs-file=` (review id 30)
 
 ## 4. Design
 
@@ -164,6 +168,8 @@ New arm: tools/lexicon/selftest.py · covers AC1 AC2 · the replace-ref and graf
 - rev-1 · 2026-10-29 · initial draft, promoted from review id 1 (HIGH, item H1, shared with ids 11 and
   23) of the round-1 audit of units 22 to 29, with the fix measured against a replace ref and a graft
   file.
+- rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 30 to 37
+  declare toward this unit (TOOL-dMindYourWords-40, TOOL-dMindYourWords-41, TOOL-dMindYourWords-42); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 
