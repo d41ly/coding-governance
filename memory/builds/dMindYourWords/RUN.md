@@ -10,17 +10,17 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 hold-run: 
-hold-streak: 1 · at 55f7a811
+hold-streak: 1 · at 611d6388
 resume-owed: none · owner
-held-at: 2026-10-29T18:22:32Z
-hold-reason: the spec-audit chain does not converge (high findings 7, 7 over two rounds, round 2's back on the lexicon-debt ledger and suppression provenance); the parked question asks the owner to keep auditing, stop the chain as for dKeptSession, dLinkedLibrary and dIndexedDesign, or re-scope
+held-at: 2026-10-29T20:25:02Z
+hold-reason: the spec-audit chain diverges (high findings 7, 7, 13 over three rounds, round 3's on the promotions' own git-history hardening); the parked question asks the owner to keep auditing, stop the chain as for dKeptSession, dLinkedLibrary and dIndexedDesign, or re-scope
 hold-until: owner
 hold-code: host-owner-action
 held-from: REVIEWING
 refreshed-at: ccd1292ea98467fde27c262948ded176987326dd · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 84b51f0b4ddc2cdffac234adf25ba15844c3e3e5
-phase: REVIEWING
+witness: 611d63883e6ee26f2f488e2e32e01739606621ca
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -115,3 +115,5 @@ base: ccd1292ea98467fde27c262948ded176987326dd
 2026-10-29T19:52:59Z review · item dMindYourWords-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 13 · minors 20 · disposition promote
 
 2026-10-29T20:24:47Z decision · item The spec-audit chain diverges: high findings ran 7, 7, 13 over three rounds (precision 0.97, 0.90, 0.89), and round 3's highs land on git-history hardening the earlier promotions added (grafts, replace objects, blame.ignoreRevsFile, rename detection in units 30-37), with 15 promotions (TOOL-dMindYourWords-38 to -52) still unaudited and 48 units in the roster. Keep auditing, stop the chain as for dKeptSession, dLinkedLibrary and dIndexedDesign, or re-scope? · reason options (a) round 4 over units 38-52, ~1h and ~2M subagent tokens a round, the highs rising and each round promoting more units than the last (8, 8, 15); (b) stop as for dKeptSession, dLinkedLibrary and dIndexedDesign: units 38-52 close under a recorded specs-audited override, closing-review-recorded overridden, every unit deferred to the build run, the run closes and lands; (c) re-scope the history-reading and provenance units (23, 26, 28, 30-37) into fewer, stricter mechanisms before more rounds. Refused to pick: the owner's standing rule stops a chain without asking only at a no-HIGH round, and on a plateau or a rise holds for the owner's ruling, which round 2's hold already asked once
+
+2026-10-29T20:25:04Z hold · item host-owner-action · reason until owner · reaped 40ce7a67 · resume none(owner)
