@@ -3346,6 +3346,16 @@ def check_upgrade_steps(tmp: pathlib.Path) -> None:
     p = run_steps(g, "frozen", "--base", empty_sha)
     check("[dSP-1 AC5] over a base holding no rows the leg exits 0 printing `0 landed row(s)`",
           p.returncode == 0 and "0 landed row(s)" in p.stdout, p.stdout + p.stderr)
+    # TOOL-dSafePassage-89: one root whose tool root moves between two reads reads the moved registry.
+    t89 = tmp / "dsp89"
+    (t89 / "pinned" / gkn).mkdir(parents=True)
+    (t89 / "pinned" / gkn / "registry.toml").write_text("", encoding="utf-8")
+    got89 = [steps.read_registry_at(t89, None)[:2]]
+    (t89 / "pinned").rename(t89 / "moved")
+    msg89 = read_refusal(lambda: got89.append(steps.read_registry_at(t89, None)[:2]))
+    check("[dSP-89] a root whose tool root moved between two reads reads the moved registry",
+          got89 == [("pinned", f"pinned/{gkn}/registry.toml"), ("moved", f"moved/{gkn}/registry.toml")]
+          and not msg89, f"{got89} {msg89}")
 
 
 def check_succession(tmp: pathlib.Path) -> None:

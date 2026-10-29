@@ -187,7 +187,6 @@ def repo_root() -> pathlib.Path:
     return tool_root.parent
 
 
-@functools.lru_cache(maxsize=None)
 def derive_tool_root(root: pathlib.Path | str) -> str:
     """TOOL-aRepatriatedFork-29 S1 — the repo-relative directory the kits sit under, for `root`.
 
@@ -195,7 +194,9 @@ def derive_tool_root(root: pathlib.Path | str) -> str:
     kits sit at the repo root. For any other `root` — a scratch fixture a caller hands in — it is the
     parent of the one directory under `root` holding a `<govkit>/registry.toml`, searched at depths
     0 to 2. None found, or more than one, is a refusal: a guessed prefix is the shape that makes a
-    broken install look like a working one.
+    broken install look like a working one. The answer is not memoised, because a caller may move
+    the tree under one root between two calls, as the upgrade walk's clone does
+    (TOOL-dSafePassage-89).
     """
     root = pathlib.Path(root).resolve()
     own = GOVKIT_DIR.parent
