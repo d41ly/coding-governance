@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-29-prompt-TOOL-dSafePassage-86-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-86-spec-brief.md) | research | TOOL-dSafePassage-86 |
+| [2026-10-29-prompt-TOOL-dSafePassage-87-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-87-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

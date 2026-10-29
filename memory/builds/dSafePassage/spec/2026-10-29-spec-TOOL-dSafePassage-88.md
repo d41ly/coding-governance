@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-29-prompt-TOOL-dSafePassage-88-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-1-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-2-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-2-spec-writer.md) | journal | — |
+| [2026-10-29-prompt-TOOL-dSafePassage-88-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-build-brief.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-spec-brief.md) | research | TOOL-dSafePassage-89 |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-third-stop-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-third-stop-spec-brief.md) | research | — |
 

@@ -244,7 +244,7 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-89 — the tool root is read from the tree on every call, so `read_steps` finds the registry at a moved tip](spec/2026-10-29-spec-TOOL-dSafePassage-89.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 420 bound to this build, across 4 record folder(s).
+Records: 424 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
