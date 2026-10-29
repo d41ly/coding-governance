@@ -15,7 +15,7 @@ audited here, and built by the build run after it. Read, in this order, before y
    or changed kit contract (`memory/guides/SESSION-KICKOFF.md`, Tier rule).
 4. Your units' rows under "The units", every row of "Shared interfaces" and "Edges", and the scout record your units
    cite: `memory/builds/dMindYourWords/build/2026-10-29-build-TOOL-dMindYourWords-1-reuse-scout-a.md` (units 1-6),
-   `-b.md` (7-10), `-c.md` (11, 12, 13, 16) and `-d.md` (14, 15, 17). Each holds a seam row per clause with path:line
+   `-7-reuse-scout-b.md` (7-10), `-11-reuse-scout-c.md` (11, 12, 13, 16) and `-14-reuse-scout-d.md` (14, 15, 17). Each holds a seam row per clause with path:line
    at `f27c63819`, and a section on where a record and source disagree. Those disagreements are findings you act on.
 
 The design sources the clauses compress are under `memory/builds/dClosedLoop/build/` (`B/` below). The PRIMARY one is

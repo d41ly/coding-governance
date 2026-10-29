@@ -4,8 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18
-status: OPEN
+ids: TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18 TOOL-dMindYourWords-19 TOOL-dMindYourWords-20 TOOL-dMindYourWords-21
 spec-audit: 2026-10-21
 parents: dWellOiledMachine dWitnessedBar dLinkedLibrary dFurnishedOrders
 may: PLAY-dClosedLoop-3
@@ -78,42 +77,78 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 17 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13
-ids TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18
+ids TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18 TOOL-dMindYourWords-19 TOOL-dMindYourWords-20 TOOL-dMindYourWords-21
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dMindYourWords-1 — the definition classes and one shrink-only debt pin held by name](spec/2026-10-29-spec-TOOL-dMindYourWords-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-14 — the lexicon kit's own defects: repeated headers, non-names, dead modes, one pin story](spec/2026-10-29-spec-TOOL-dMindYourWords-14.md) | 2 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-15 — build records kept out of the graded population by a path selector](spec/2026-10-29-spec-TOOL-dMindYourWords-15.md) | 3 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-12 — the definition context the lexicon reads through the `tools/lib` extraction primitive](spec/2026-10-29-spec-TOOL-dMindYourWords-12.md) | 4 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-11 — the vocabulary changed only with the write path's record, which takes over from `ratified`](spec/2026-10-29-spec-TOOL-dMindYourWords-11.md) | 5 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-5 — a reasoned site suppression, recorded and counted, as the owner's fallback](spec/2026-10-29-spec-TOOL-dMindYourWords-5.md) | 6 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-7 — the packs: their file, their loader and the four generators](spec/2026-10-29-spec-TOOL-dMindYourWords-7.md) | 7 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-2 — forced names recognised by what forces them, under `lexicon.forced`](spec/2026-10-29-spec-TOOL-dMindYourWords-2.md) | 8 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-3 — gov's own contract-forced names in a table, with a stale arm](spec/2026-10-29-spec-TOOL-dMindYourWords-3.md) | 9 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-4 — override markers verified against the packs](spec/2026-10-29-spec-TOOL-dMindYourWords-4.md) | 10 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-6 — `--suggest` made forced-aware](spec/2026-10-29-spec-TOOL-dMindYourWords-6.md) | 11 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-8 — packs detected from the import census and manifests and declared by the owner](spec/2026-10-29-spec-TOOL-dMindYourWords-8.md) | 12 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-10 — drift beyond verbs: one verb per declared family per object, and a noun canon](spec/2026-10-29-spec-TOOL-dMindYourWords-10.md) | 13 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-9 — enforcement: the work order's vocabulary slice, staged names at commit, offenders by name at the bar](spec/2026-10-29-spec-TOOL-dMindYourWords-9.md) | 14 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-16 — the lexicon's drift signals as its own leg pack, out of drift-audit's engine](spec/2026-10-29-spec-TOOL-dMindYourWords-16.md) | 15 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-13 — the tag-name vocabulary check: a tag's verbs and nouns graded, its name answered by `--suggest`, and no namespace word in `.lexicon.conf`](spec/2026-10-29-spec-TOOL-dMindYourWords-13.md) | 16 | 2 | OPEN | rev-1 | 2026-10-29 |
+| [TOOL-dMindYourWords-17 — the overloaded terms settled: attended, playbook and baseline each keep one sense, defined once and reworded where a carrier spends it on another](spec/2026-10-29-spec-TOOL-dMindYourWords-17.md) | 17 | 2 | OPEN | rev-1 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 2 record folder(s).
+Records: 17 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dMindYourWords-1 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3
+TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 17 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 17 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 17
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 17 (cl-dClosedLoop-0262, cl-dClosedLoop-0263, cl-dClosedLoop-0264, cl-dClosedLoop-0265, cl-dClosedLoop-0266, cl-dClosedLoop-0267, cl-dClosedLoop-0268, cl-dClosedLoop-0269, cl-dClosedLoop-0270, cl-dClosedLoop-0271, cl-dClosedLoop-0272, cl-dClosedLoop-0273, cl-dClosedLoop-0274,
-  cl-dClosedLoop-0275, cl-dClosedLoop-0276, cl-dClosedLoop-0277, cl-dClosedLoop-0278)
+- uncarried: 0 (none)
 - stale: 0 (none)
 - ambiguous: 0 (none)
-- owned nodes no spec names: policy-key.lexicon.at-commit, policy-key.lexicon.drift, policy-key.lexicon.forced, policy-key.lexicon.packs, policy-key.lexicon.pin, record-kind.lexicon-declaration
+- owned nodes no spec names: none
 - specs derived from no clause: none
-- clauses the token arm cannot see: cl-dClosedLoop-0264, cl-dClosedLoop-0265, cl-dClosedLoop-0266, cl-dClosedLoop-0275, cl-dClosedLoop-0277, cl-dClosedLoop-0278
+- clauses the token arm cannot see: cl-dClosedLoop-0264, cl-dClosedLoop-0265, cl-dClosedLoop-0266, cl-dClosedLoop-0275, cl-dClosedLoop-0277
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dMindYourWords-1` | no |
+| 2 | `TOOL-dMindYourWords-14` | no |
+| 3 | `TOOL-dMindYourWords-15` | no |
+| 4 | `TOOL-dMindYourWords-12` | no |
+| 5 | `TOOL-dMindYourWords-11` | no |
+| 6 | `TOOL-dMindYourWords-5` | no |
+| 7 | `TOOL-dMindYourWords-7` | no |
+| 8 | `TOOL-dMindYourWords-2` | no |
+| 9 | `TOOL-dMindYourWords-3` | no |
+| 10 | `TOOL-dMindYourWords-4` | no |
+| 11 | `TOOL-dMindYourWords-6` | no |
+| 12 | `TOOL-dMindYourWords-8` | no |
+| 13 | `TOOL-dMindYourWords-10` | no |
+| 14 | `TOOL-dMindYourWords-9` | no |
+| 15 | `TOOL-dMindYourWords-16` | no |
+| 16 | `TOOL-dMindYourWords-13` | no |
+| 17 | `TOOL-dMindYourWords-17` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
