@@ -19,14 +19,16 @@ d (Windows) by the unit's own CLI: AC1 in this worktree, AC2 and AC3 over a scra
 worktree at `%TEMP%/sg21` carrying the working `govkit.py` and `step_gate.py`, committed there, since
 the fixture clones its root's HEAD.
 
+**Evidences:** TOOL-dSafePassage-21
 - **AC1** — `python tools/govkit/step_gate.py --list` in this worktree, which carries no receipt,
   printed `file · 337 members`, `installable · 304`, `hook · 12`, `command · 7`, `agent · 10`,
   `conf · 16`, `policy · 267`, `verb · 40`, `entry · 30`, exit 0: every class non-zero.
-- **AC2** — `python tools/govkit/step_gate.py --fixture --plant file` printed `planted
-  file:.claude/skills/build/SKILL.md`, `9 classes · 1022 members at the tip · 1 vanished · 0
-  witnessed` and one `RED file:.claude/skills/build/SKILL.md` line, exit 1; with `--with-row`,
-  `1 vanished · 1 witnessed`, exit 0. Before this unit the same command printed `REFUSED · the file
-  plant needs a source receipt with a .md files row, and the clone carries none`, exit 2.
+- **AC2** — `python tools/govkit/step_gate.py --fixture --plant file` printed
+  `planted file:.claude/skills/build/SKILL.md`,
+  `9 classes · 1022 members at the tip · 1 vanished · 0 witnessed` and one
+  `RED file:.claude/skills/build/SKILL.md` line, exit 1; with `--with-row`,
+  `1 vanished · 1 witnessed`, exit 0. Before this unit the same command printed
+  `REFUSED · the file plant needs a source receipt with a .md files row, and the clone carries none`, exit 2.
 - **AC3** — in the scratch clone, `python tools/govkit/govkit.py update --target . --write` exited
   0 printing `337 file row(s) recorded`; `read_file_members` over the clone printed `with 337
   without 337 equal True`, no member on either side alone. `git grep -n -e "def

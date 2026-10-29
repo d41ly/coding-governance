@@ -28,6 +28,7 @@ AC1 grades the build run's commit order, which no write of this pass moves, so i
 (TOOL-dSafePassage-59 S1).
 
 **Evidences:** TOOL-dSafePassage-51
+- AC2 — amended rev-4 — struck at TOOL-dSafePassage-51's rev-4 with its number retained; its Red when reads never, so no observation is owed.
 - AC3 — `or a file it includes` — `fixture isolation --plant submodule-config-malformed` exited 1 printing `` `git config --list` over .git/modules/sub exits 128, so .git/modules/sub/config or a file it includes does not read ``, nothing spawned; a staged walk copy running `rev-parse` before the config read exited 1 with `isolation: FAILED`, its refusal naming `.git/modules/sub: git will not open this repository`.
 - AC4 — `is a link under modules/` — `fixture isolation --plant submodule-modules-link-loop` exited 1 in 5 s naming `.../t/.git/modules/a/loop is a link under modules/`, no `Traceback`; a staged copy with the link test replaced by `if False:` exited 1 with `isolation: FAILED`, the step run `up · ok`.
 - AC5 — `Refusal: 'fx/s2'` — the reverse-walk copy whose move 3 reads `state = state or "applied"` ran `fixture rollback --plant rolled-back-witness-holds`, exited 1 and printed `upgrade_steps.Refusal: 'fx/s2': a rolled-back row carries no `failure`, and this one carries 'down interrupted: started ...'`; over the module TOOL-dSafePassage-49's dSP-49 row stands for the exit 0.

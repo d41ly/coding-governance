@@ -22,6 +22,7 @@ HOW EACH CRITERION WAS OBSERVED. No gate, suite or bar ran in this pass. Each AC
 running `python tools/govkit/upgrade_steps.py fixture <family> --plant <case>` on node d (Windows,
 Python 3.14); its repositories sit under `%TEMP%`.
 
+**Evidences:** TOOL-dSafePassage-15
 - **AC1** — `fixture walk --plant schema-3` exited 0 and printed `step govkit/receipt-schema-4 ·
   applied` then `step fx/s1` to `fx/s4 · applied`, and `walk: the receipt reads schema 4 · first row
   govkit/receipt-schema-4 applied`.

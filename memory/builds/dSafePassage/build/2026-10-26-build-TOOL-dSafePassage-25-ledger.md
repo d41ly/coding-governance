@@ -28,7 +28,7 @@ Owed at the close: `push-main self-test` with arm 34's RED-first observation (st
 copy whose gov-first refusal drops `remove_new_untracked`), `spec tokens`.
 
 **Evidences:** TOOL-dSafePassage-25
-- AC1 — this pass's lander: `clean-rc=0`, `govkit/planted-witness-fails`, `unmoved=1`, `status-after-refusal=[]`. Red, the HEAD~ lander: `plant-rc=1`, `unmoved=1`, `status-after-refusal=[?? .governance/install.json]`.
+- AC1 — this pass's lander: `clean-rc=0`, `govkit/planted-witness-fails`, `unmoved=1`, `status-after-refusal=[]`, the fixture's `git status --porcelain` after the refused `bash tools/push-main.sh --prepare --slug fx`, read as arm 34 reads it (`tools/push-main.test.sh:1276`). Red, the HEAD~ lander: `plant-rc=1`, `unmoved=1`, `status-after-refusal=[?? .governance/install.json]`.
 - AC2 — this pass's lander: `retry-rc=0`, `retry-tree` and `clean-tree` both `[.governance/deploy.toml .governance/install.json .governance/policy.json .governance/policy.toml]`, `retry-merge=clean`; over `.governance/steps .governance/outbox` both read `[]`. Red, the HEAD~ lander: `retry-rc=1`.
 - AC3 — `git grep -n -A3 "run_gov_first" -- tools/push-main.sh` printed the call at 1061 with `remove_new_untracked "$rgsnap"; rm -f "$rgsnap"` at 1063, and the call at 1261 with `remove_new_untracked "$gfsnap"; rm -f "$gfsnap"` at 1263; its other hits are the function's comment and definition.
 - Syntax — `bash -n` over both files exits 0.

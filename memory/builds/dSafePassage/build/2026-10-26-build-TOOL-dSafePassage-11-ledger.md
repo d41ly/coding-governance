@@ -30,6 +30,7 @@ scripts under the run's scratch directory; fixture repositories sit under `%TEMP
 prelude, `resolve_kit_dir` and the four sections verbatim, and printed `24 assertions, st=0`. The
 suite's existing arms (a) to (e) ran the same way against the new block: `13 assertions, st=0`.
 
+**Evidences:** TOOL-dSafePassage-11
 - **AC1** — `PATH="<fakes>:$PATH" GOV_PYTHON=<fake> bash -c '. "$1"; resolve_python' _ tools/lib/resolve-python.sh`
   with all four fakes printing `3.14 $0` exited 1. Stderr named each of the four as `ran 3.14, below
   the floor 3.15`, then the GOV_PYTHON line and `install the floor with: uv python install 3.15`.
@@ -43,7 +44,7 @@ suite's existing arms (a) to (e) ran the same way against the new block: `13 ass
   `feature` commit and in an uncommitted edit, it printed no command. With `tools/policy` removed it
   printed `reads its catalogue default, name: no reader ran, because no policy kit holding policy.py
   in this install: looked in …` and both commands.
-- **AC4** — `bash tools/lib/python-floor.sh preflight` under AC1's fakes exited 1, and `cmp` found its
+- **AC4** — `bash "tools/lib/python-floor.sh" preflight` under AC1's fakes exited 1, and `cmp` found its
   stderr identical to AC1's. With no fakes it exited 0 printing `python-floor:
   C:/Users/daily-agent/AppData/Local/Python/pythoncore-3.15-64/python.exe runs Python 3.15.2, at the
   floor tools/lib/python-floor.txt declares`.

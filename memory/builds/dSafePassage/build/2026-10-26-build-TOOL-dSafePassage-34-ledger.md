@@ -22,9 +22,9 @@ copy that ignores the key), `drift-audit records`, `drift-audit selftest`, `spec
 names resolve)`, `memory hygiene` and the other §7 legs.
 
 **Evidences:** TOOL-dSafePassage-34
-- AC1 — handed to TOOL-dSafePassage-41 (its S3 carries this AC as its AC1, with the arm covering it); this pass grades nothing by the key. The read itself: a `python` probe importing the checker and calling `read_cutoff_key(<scratch>, AC_ORDER_KEY)` returned `''` for a blank key and `'2026-10-23'` for a set one.
+- AC1 — handed to TOOL-dSafePassage-41 (its S3 carries this AC as its AC1, with the arm covering it); this pass grades nothing by the key. The read itself: a `python` probe importing the checker and calling `read_cutoff_key(<scratch>, AC_ORDER_KEY)`, the key `SPEC_AC_ORDER_CUTOFF`, returned `''` for a blank key and `'2026-10-23'` for a set one.
 - AC2 — the same probe over a scratch conf `SPEC_AC_ORDER_CUTOFF="2026-9-8"` printed `spec-tokens: REFUSING — SPEC_AC_ORDER_CUTOFF 2026-9-8 is not an ISO date (YYYY-MM-DD) ...` and returned `None`, which `main` turns into exit 1 beside the other four keys.
-- AC3 — handed to TOOL-dSafePassage-41 (its AC2); the probe read `'2026-10-23'` from this tree's conf.
+- AC3 — handed to TOOL-dSafePassage-41 (its AC2), whose ledger records the `ac-order` predicate probe printing `key '2026-10-23' · live 37 · graded 1 · out of order 0`, the leg's own `ac-order` line owed to the close; the probe read `'2026-10-23'` from this tree's conf.
 - AC4 — `git grep -n -e "SPEC_AC_ORDER_CUTOFF" -- .memory-tree.conf memory/map/features/spec-tokens.md` printed `.memory-tree.conf:984` (the comment), `.memory-tree.conf:992:SPEC_AC_ORDER_CUTOFF="2026-10-23"` and `memory/map/features/spec-tokens.md:133`.
 - AC5 — `git grep -n -e "cutoff_keys_armed" -e "36 -> 37" -- tools/drift-audit/drift_signals.py` printed `:352` (the comment naming TOOL-dSafePassage-34 and ER:388) and `:354: "cutoff_keys_armed": 37,`; `python tools/drift-audit/drift_report.py --json` read `cutoff_keys_armed` value 37 of 37, tolerance 37; the staged names list `.memory-tree.conf` and `tools/drift-audit/drift_signals.py` and not `memory/DECISIONS.md`.
 

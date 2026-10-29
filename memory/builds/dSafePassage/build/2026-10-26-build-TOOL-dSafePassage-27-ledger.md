@@ -28,8 +28,8 @@ Owed at the close: `push-main self-test` with arm 36's RED-first observation (st
 shape), `spec tokens`.
 
 **Evidences:** TOOL-dSafePassage-27
-- AC1 — this pass's lander: `could NOT be regenerated`, `fail-rc=1`, `unmoved=1`, `status-after-refusal=[]`, and no gov-first refusal line, so the walk passed. Red: `fail-rc=1`, `unmoved=1`, `status-after-refusal=[?? .governance/install.json]`.
-- AC2 — this pass's lander: `retry-rc=0`, `merge=1`, `retry-governance=[.governance/deploy.toml .governance/install.json .governance/policy.json .governance/policy.toml]`, `steps-outbox=[]`. Red: `retry-rc=1`, `steps-outbox=[]`.
+- AC1 — this pass's lander: `could NOT be regenerated`, `fail-rc=1`, `unmoved=1`, `status-after-refusal=[]`, the fixture's `git status --porcelain` after the refused `bash tools/push-main.sh --prepare --slug fx`, read as arm 36 reads it (`tools/push-main.test.sh:1303`), and no gov-first refusal line, so the walk passed. Red: `fail-rc=1`, `unmoved=1`, `status-after-refusal=[?? .governance/install.json]`.
+- AC2 — this pass's lander: `retry-rc=0`, `merge=1`, `retry-governance=[.governance/deploy.toml .governance/install.json .governance/policy.json .governance/policy.toml]`, `steps-outbox=[]`, the prepared merge's `git ls-tree -r --name-only HEAD -- .governance/steps .governance/outbox`, which arm 36 prints as `steps-outbox=` (`tools/push-main.test.sh:1310`). Red: `retry-rc=1`, `steps-outbox=[]`.
 - AC3 — `git grep -n -e "gfsnap" -e "rgsnap" -- tools/push-main.sh` printed `cmd_prepare`'s `gfsnap` at its one assignment (1061), both refusal branches (1064, 1073) and the removal after `run_regen` (1078); `rgsnap` only at 1280, 1283 and 1287, the attended path; the attended path's own `gfsnap` (TOOL-dSafePassage-25) at 1261-1268.
 - Syntax — `bash -n` over both files exits 0.
 - Liveness — the bug-class checklist over the pass commit named `fixture-passes-by-finding-nothing`: arm 36 now also asserts `walk-receipt=1`, the retry merge tracking `.governance/install.json`, which `main` does not track, so the walk is shown to make the file the refusal must clean. The probe's `retry-governance` line above is that observation.

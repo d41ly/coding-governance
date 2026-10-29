@@ -20,6 +20,7 @@ The fixture is `tools/govkit/fixtures/retired_edits.py` (deviation 175); the sel
 HOW EACH CRITERION WAS OBSERVED. No gate, suite or bar ran in this pass. Each AC was observed on
 node d (Windows, Python 3.15.2) by the fixture CLI or a `python` probe of the changed code.
 
+**Evidences:** TOOL-dSafePassage-9
 - AC1 — `--plant fragment-withdrawn` exit 0, 5 of 5: entry `gone`, fragment `present`, one withdrawn order; `--write-withdrawals` exit 0, entry `gone`, file `gone` (the unwire read the fragment, so it ran first); `--rerender-off` exit 0, 6 of 6: entry `wired`, file `present`, one `left WIRED — GOVKIT_RERENDER=0` line.
 - AC2 — `--plant fragment-rollback` exit 0, 6 of 6: `hooks: tools/demo/hook.fragment.json unwired, gov no longer ships it`, `ROLLED BACK`, the entry `wired` after. Red when, observed: the re-wire guard patched to `if False:` printed `settings entry after the rollback: 'gone' · expects 'wired' · MISS`, exit 1; restored byte-identical.
 - AC3 — `--plant edited-gone` exit 0, 7 of 7: verdict `retired-edited`, one `update-retired-edited-` order, role `retired-edited`, bytes kept under `--write-withdrawals`. Red when, observed: the cell patched back to `patched` printed four MISS lines (`verdict ... 'patched'`, `retired-edited orders: '0'`), exit 1.
