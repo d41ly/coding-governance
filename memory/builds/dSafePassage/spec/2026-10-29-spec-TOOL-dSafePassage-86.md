@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-86 — release-0's apply runs the pinned clone's own engine, so the walk applies release-0 at every tool root
 
-**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base b634d60e · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-29 · node a · Tier-2 · base b634d60e · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -65,6 +65,8 @@ HERE-relative again.
   install prefix (M7), and the moved-prefix run past the plants that only both fixes together can make
 - **hands-off** `TOOL-dSafePassage-89` — the moved-prefix run past `read_steps`, which stops there
   until `derive_tool_root` reads the clone's tree at its tip as well as at the pin
+- **hands-off** `TOOL-dSafePassage-88` — the moved-prefix run past `update`'s in-place renames, whose
+  walk applies release-0 only through `derive_release_engine`
 
 ## 4. Design
 
@@ -246,6 +248,10 @@ none
   string up to `{rel}`, which still matches only `:204`. The spec-token check read both as
   untracked paths.
   §3 gains the hands-off edge to TOOL-dSafePassage-89, the mirror of its consumes-from.
+- rev-3 · 2026-10-29 · §3 · from the brief
+  `memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-88-third-stop-spec-brief.md`.
+  §3 gains the hands-off edge to TOOL-dSafePassage-88, the mirror of its consumes-from: 88's AC2 walk
+  applies release-0 at a moved prefix only through S1.
 
 ## 10. Reuse audit
 

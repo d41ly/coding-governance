@@ -1,12 +1,14 @@
 # TOOL-dSafePassage-89 — the tool root is read from the tree on every call, so `read_steps` finds the registry at a moved tip
 
-**Status:** DEFERRED · rev-1 · 2026-10-29 · node a · Tier-2 · base b634d60e · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base b634d60e · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-29-prompt-TOOL-dSafePassage-88-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-spec-brief.md) | research | TOOL-dSafePassage-88 |
 
 <!-- /gen:spec-records -->
 
@@ -56,10 +58,11 @@ the memo returns.
   walk stops at release-0's apply and never reaches `read_steps`
 - **consumes-from** `TOOL-dSafePassage-87` — S7's two roots, without which AC2's walk stops at the
   `engine-edit` plant before the clone moves to its tip
-- **hands-off** external — the third stop at a moved prefix, measured on 2026-10-29 with all three
-  units staged at `scripts`. The `up` case's walk to the tip exits 1, holding back every kit and
-  naming each installed file under the target's `tools` as a held path no ordered plant names. It
-  was not diagnosed here, and the build's coordinator promotes it.
+- **hands-off** `TOOL-dSafePassage-88` — the third stop at a moved prefix, measured on 2026-10-29
+  with all three units staged at `scripts`. The `up` case's walk to the tip exits 1, holding back
+  every kit and naming each installed file under the target's `tools` as a held path no ordered
+  plant names. TOOL-dSafePassage-88 diagnoses it as `update`'s rename-destination guard refusing
+  the row's own file, and closes it.
 
 ## 4. Design
 
@@ -275,6 +278,10 @@ none
   re-measured here at the leg's own move, diagnosed as the memo, and S1 was staged and measured in a
   clone of `b634d60e5` (§4 "Measured at writing time"). The brief's first item, the CRLF stop, is
   refused, for the reason in §4 "The CRLF stop, re-measured".
+- rev-2 · 2026-10-29 · §3 · from the brief
+  `memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-88-third-stop-spec-brief.md`.
+  §3's hands-off external edge, the third stop at a moved prefix, now points at
+  TOOL-dSafePassage-88, which closes it and declares the mirroring consumes-from.
 
 ## 10. Reuse audit
 

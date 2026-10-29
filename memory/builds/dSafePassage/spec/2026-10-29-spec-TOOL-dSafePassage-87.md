@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-87 — the round-2 closing review's seven mediums and two lows, each closed at the fix its skeptic judged sound
 
-**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base b634d60e · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-29
+**Status:** DEFERRED · rev-3 · 2026-10-29 · node a · Tier-2 · base b634d60e · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-29
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -99,6 +99,8 @@ sets overlap (BUILD-METHOD M4), and the batch builds after TOOL-dSafePassage-86.
 - **hands-off** `TOOL-dSafePassage-89` — the stop past the plants at a moved prefix (§4 "Past the
   plants, measured"): `read_steps` reads the registry under the pin's `tools` at a tip that holds
   `scripts`, because `derive_tool_root` answers the clone's first read
+- **hands-off** `TOOL-dSafePassage-88` — the moved-prefix walk past `read_steps`, whose `up` case
+  needs S7's plant paths to reach `update`, where TOOL-dSafePassage-88 closes the third stop
 
 ## 4. Design
 
@@ -605,6 +607,10 @@ to 335, which is the only floor this unit moves.
   2026-10-29 printed the two lines AC8 names. §3's hands-off external edge now points at
   TOOL-dSafePassage-89. §4 "Past the plants, measured" records that the CRLF stop does not occur
   at the leg's own move, so no unit closes it.
+- rev-3 · 2026-10-29 · §3 · from the brief
+  `memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-88-third-stop-spec-brief.md`.
+  §3 gains the hands-off edge to TOOL-dSafePassage-88, the mirror of its consumes-from: 88's AC2 walk
+  reaches `update` at a moved prefix only through S7's plant paths.
 
 ## 10. Reuse audit
 

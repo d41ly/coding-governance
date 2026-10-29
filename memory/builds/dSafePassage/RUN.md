@@ -483,3 +483,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-29T05:01:15Z review · item dSafePassage · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 5 · minors 15 · disposition promote
 
 2026-10-29T05:01:35Z review · item dSafePassage-r1-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 9 · disposition promote
+
+2026-10-29T06:17:51Z rescope · item add TOOL-dSafePassage-86 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
+
+2026-10-29T06:17:59Z rescope · item add TOOL-dSafePassage-87 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
+
+2026-10-29T06:18:07Z rescope · item add TOOL-dSafePassage-89 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
