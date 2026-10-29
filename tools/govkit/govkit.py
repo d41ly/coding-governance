@@ -11072,10 +11072,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             ndp = (target / new_dest).resolve()
             # TOOL-dSafePassage-88: the target's descriptor answers this row's own path, as it does for
             # every row when gov moves its tool root, so the file stays and only its source changes.
-            # The occupant is asked of the filesystem, so a case-only rename on a case-insensitive one
-            # is still the row's own file; only the exact spelling skips the move.
+            # TOOL-dSafePassage-90: only the exact spelling is the row's own path. A case-only rename on
+            # a case-insensitive filesystem names the row's own file under a second spelling, and the
+            # rollback restores a row's spellings as separate paths, so the move is refused, by name.
             _own = target / row["path"]
-            own_file = new_dest == row["path"] or (ndp.exists() and _own.exists() and ndp.samefile(_own))
             in_place = new_dest == row["path"]
             try:
                 ndp.relative_to(target.resolve())
@@ -11106,8 +11106,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"whether this target already holds it is UNKNOWN. Skipping this row "
                        f"rather than moving onto a path that may be occupied: {_idx_read_err}")
                 continue
-            if not own_file and (new_dest in _at_dest or ndp.exists()):
+            if not in_place and (new_dest in _at_dest or ndp.exists()):
+                _alias = ndp.exists() and _own.exists() and ndp.samefile(_own)
+                _case = _alias and new_dest.casefold() == row["path"].casefold()
                 r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
+                       f"'{new_dest}' — this row's own file '{row['path']}' under a second spelling, "
+                       f"as a case-only rename is on a case-insensitive filesystem. Refusing the move: "
+                       f"a rollback cannot restore one file held under two spellings. The file is "
+                       f"untouched, so do not move or remove it; run `update` from a checkout on a "
+                       f"case-sensitive filesystem, where the new spelling is a second path" if _case else
+                       f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
+                       f"'{new_dest}' — the row's own file '{row['path']}' under another name (a link "
+                       f"or a filesystem alias). Refusing the move: a rollback cannot restore one file "
+                       f"held under two names. The file is untouched. If '{new_dest}' is a link you "
+                       f"made, remove the link and re-run" if _alias else
+                       f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
                        f"'{new_dest}' — and this target ALREADY holds a file there. Refusing rather "
                        f"than overwriting it: `update` moves one row and would be destroying "
                        f"another file's bytes to do it. Move or remove '{new_dest}' and re-run")

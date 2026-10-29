@@ -13109,19 +13109,25 @@ user_skills = "/tmp/gk-fake-skills"
               and read_bytes11(_t88 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\nthree\nFOUR\n"
               and _row88 == ["moved/demo/keep.txt"] and not (_t88 / "moved").exists(),
               f"apply {_ap88.returncode} update {_up88.returncode} {_row88} " + _up88.stdout[-1500:])
-        # A case-only rename: on a case-insensitive filesystem the row's own file answers `exists()` at
-        # the new spelling, and it is still the row's own file, so it moves rather than being refused.
+        # TOOL-dSafePassage-90: a case-only rename. Where the filesystem folds case the new spelling is
+        # the row's own file, so the move is refused by name and nothing is written; where it does not,
+        # the new spelling is a second path and moves. Either way the target's INDEX is read, never the
+        # receipt row, which the arm writes whether or not `git mv` ran.
         settle(_t88, "the in-place update")
+        _fold90 = (_t88 / "pinned" / "demo" / "KEEP.TXT").exists()
         git(_g88, "mv", "moved/demo/keep.txt", "moved/demo/Keep.txt")
         git(_g88, "commit", "-qm", "C")
-        _cs88 = subprocess.run([sys.executable, str(_g88 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
+        _cs90 = subprocess.run([sys.executable, str(_g88 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
                                 "--target", str(_t88), "--write"],
                                capture_output=True, text=True, encoding="utf-8", errors="replace")
-        _case88 = [f["path"] for f in json.loads((_t88 / ".governance" / "install.json").read_text(
-            encoding="utf-8"))["files"] if f["path"].lower() == "pinned/demo/keep.txt"]
-        check("[dSP-88] a case-only rename gov makes lands under the new spelling, never refused as its own occupant",
-              _cs88.returncode == 0 and "ALREADY holds a file there" not in _cs88.stdout
-              and _case88 == ["pinned/demo/Keep.txt"], f"update {_cs88.returncode} {_case88} " + _cs88.stdout[-1500:])
+        _ix90 = [p for p in gout(_t88, "ls-files", "--", "pinned/demo").split()
+                 if p.lower() == "pinned/demo/keep.txt"]
+        check("[dSP-90] a case-only rename is refused by name where the filesystem folds case, and moves where it does not",
+              (_cs90.returncode == 1 and "case-only rename is on a case-insensitive filesystem" in _cs90.stdout
+               and _ix90 == ["pinned/demo/keep.txt"]
+               and read_bytes11(_t88 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\nthree\nFOUR\n")
+              if _fold90 else (_cs90.returncode == 0 and _ix90 == ["pinned/demo/Keep.txt"]),
+              f"fold {_fold90} update {_cs90.returncode} {_ix90} " + _cs90.stdout[-1500:])
 
         _g11c = build_rename_gov("mvfail")
         _t11c = build_rename_target(_g11c, "rn-mvfail-t")

@@ -244,11 +244,11 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-87 — the round-2 closing review's seven mediums and two lows, each closed at the fix its skeptic judged sound](spec/2026-10-29-spec-TOOL-dSafePassage-87.md) | 16 | 2 | CLOSED | rev-4 | 2026-10-29 |
 | [TOOL-dSafePassage-88 — a renamed row whose new destination is its own path lands in place, so `update` carries a target across gov's tool-root move](spec/2026-10-29-spec-TOOL-dSafePassage-88.md) | 16 | 2 | CLOSED | rev-2 | 2026-10-29 |
 | [TOOL-dSafePassage-89 — the tool root is read from the tree on every call, so `read_steps` finds the registry at a moved tip](spec/2026-10-29-spec-TOOL-dSafePassage-89.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-29 |
-| [TOOL-dSafePassage-90 — a case-only rename is refused by name where the filesystem folds case, so no rollback restores one file under two spellings](spec/2026-10-29-spec-TOOL-dSafePassage-90.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
+| [TOOL-dSafePassage-90 — a case-only rename is refused by name where the filesystem folds case, so no rollback restores one file under two spellings](spec/2026-10-29-spec-TOOL-dSafePassage-90.md) | 16 | 2 | CLOSED | rev-2 | 2026-10-29 |
 | [TOOL-dSafePassage-91 — the round-3 closing review's three remaining minors: the in-place row's one snapshot path, a grader for the walk's two roots, and an arm for the floor stub's bash fallback](spec/2026-10-29-spec-TOOL-dSafePassage-91.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 439 bound to this build, across 4 record folder(s).
+Records: 440 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

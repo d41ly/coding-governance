@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-90 — a case-only rename is refused by name where the filesystem folds case, so no rollback restores one file under two spellings
 
-**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base cbaaeebe · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-10-29 · node a · Tier-2 · base cbaaeebe · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-29-build-TOOL-dSafePassage-90-ledger.md](../build/2026-10-29-build-TOOL-dSafePassage-90-ledger.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-1-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-2-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-2-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md) | research | TOOL-dSafePassage-91 |
