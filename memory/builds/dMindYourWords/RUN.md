@@ -9,10 +9,18 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at 55f7a811
+resume-owed: none · owner
+held-at: 2026-10-29T18:22:32Z
+hold-reason: the spec-audit chain does not converge (high findings 7, 7 over two rounds, round 2's back on the lexicon-debt ledger and suppression provenance); the parked question asks the owner to keep auditing, stop the chain as for dKeptSession, dLinkedLibrary and dIndexedDesign, or re-scope
+hold-until: owner
+hold-code: host-owner-action
+held-from: REVIEWING
 refreshed-at: ccd1292ea98467fde27c262948ded176987326dd · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 7fba335c57ca1ec4c3e778c0692303f3970134b0
-phase: REVIEWING
+witness: 55f7a811b255a340d34768edbb633f7a69d65035
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -69,3 +77,5 @@ base: ccd1292ea98467fde27c262948ded176987326dd
 2026-10-29T17:50:00Z review · item dMindYourWords-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 31 · disposition promote
 
 2026-10-29T18:22:18Z decision · item The spec-audit chain does not converge: high findings ran 7, 7 over two rounds (precision 0.97, 0.90), and round 2's highs return to the surface round 1's did, the lexicon-debt ledger and suppression provenance (units 23, 27, 28, 29), with 8 promotions (TOOL-dMindYourWords-30 to -37) still unaudited. Keep auditing, stop the chain as for dKeptSession, dLinkedLibrary and dIndexedDesign, or re-scope? · reason options (a) round 3 over units 30-37 and onward, ~1h and ~2M subagent tokens a round with no sign of the highs falling; (b) stop as for dKeptSession, dLinkedLibrary and dIndexedDesign: units 30-37 close under a recorded specs-audited override, closing-review-recorded overridden, every unit deferred to the build run, the run closes and lands; (c) re-scope the ledger and provenance units (1, 5, 22, 23, 26, 27, 28) before more rounds. Refused to pick: the owner's standing rule stops a chain without asking only at a no-HIGH round, and on a plateau holds for the owner's ruling
+
+2026-10-29T18:22:33Z hold · item host-owner-action · reason until owner · reaped a8152305 · resume none(owner)
