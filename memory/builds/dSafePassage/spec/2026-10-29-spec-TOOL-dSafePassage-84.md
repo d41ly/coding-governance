@@ -9,9 +9,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-29-build-TOOL-dSafePassage-84-ledger.md](../build/2026-10-29-build-TOOL-dSafePassage-84-ledger.md) | journal | — |
+| [2026-10-29-prompt-TOOL-dSafePassage-72-close-arms-d-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-72-close-arms-d-brief.md) | research | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-78 |
 | [2026-10-29-prompt-TOOL-dSafePassage-84-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-84-1-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-84-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-84-build-brief.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-84-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-84-spec-brief.md) | research | — |
+| [2026-10-29-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-84-closing-diff-round2.md](../reviews/2026-10-29-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-84-closing-diff-round2.md) | diff-review | TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 |
 | [2026-10-29-review-TOOL-dSafePassage-84-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dSafePassage-84-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
