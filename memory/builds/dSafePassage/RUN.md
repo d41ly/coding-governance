@@ -19,8 +19,8 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: 0c0f3a18370405a51f97df5d1d12bf1a0da2cf74 · park · 135 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 1dba5274385915c809aea621b27d2bbe50a18033
-phase: VERIFYING
+witness: 51994336b7d8a53181703a4e0475981b5a77f847
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -489,3 +489,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-29T06:17:59Z rescope · item add TOOL-dSafePassage-87 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
 
 2026-10-29T06:18:07Z rescope · item add TOOL-dSafePassage-89 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
+
+2026-10-29T06:56:48Z rescope · item add TOOL-dSafePassage-88 · reason the moved-prefix walk's third stop, adopted at once (M10), spec at 51994336b
