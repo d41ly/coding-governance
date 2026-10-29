@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** CLOSED · rev-11 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-12 · 2026-10-29 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -303,6 +303,9 @@ TOOL-dSafePassage-N, each item naming the unit it amends; cites are at base `370
 - **hands-off** `TOOL-dSafePassage-41` — S45's `ac-order` join, AC43 and its arm, built there with its key, so this pass adds no join (finding 22, audit of units 27 to 35)
 - **hands-off** `TOOL-dSafePassage-61` — S8, S21, S22 and S23 (ids 9, 38, 39, 40) and their criteria, which observe only the size-limits step, built there with that step beside `write_atomic`
 - **hands-off** `TOOL-dSafePassage-45` — S13 read as "3 plus those pairs" and S33's lock record with `started_boot` and `pid_ns` as unit 42 S10 spells it, keeping unit 32's key (findings 14 and 3, audit of units 36 to 42)
+- **hands-off** `TOOL-dSafePassage-67` — `build_scratch_gov`, lifted into the factory by S19, and the callers routed through it, which unit 67 pins
+- **hands-off** `TOOL-dSafePassage-68` — `run_step_isolated`'s fifth parameter `to` and `run_step_reread`'s positional pass of it, which unit 68's stand-ins take and pass on
+- **hands-off** `TOOL-dSafePassage-69` — S10's `{to}` and S11's population read at `<to>`, which make the pin's own code what unit 69's down grades
 
 ## 4. Design
 
@@ -637,6 +640,9 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
   they call the factory, since TOOL-dSafePassage-5 rev-10 leaves them to S19 and its fourth pass
   measured a local binding of that name recursing, by
   `2026-10-27-prompt-TOOL-dSafePassage-5-8-spec-writer.md`; no other section moved.
+- rev-12 · 2026-10-29 · §3 · the reciprocal **hands-off** edge to TOOL-dSafePassage-67, -68, -69, whose
+  **consumes-from** onto this unit had no match back (hygiene check 12). Written by the
+  gov-spec-writer pass for TOOL-dSafePassage-83 S1, by that unit's edge ruling.
 
 ## 10. Reuse audit
 

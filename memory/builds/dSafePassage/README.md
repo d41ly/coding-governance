@@ -161,7 +161,7 @@ ids TOOL-dSafePassage-85
 | [TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal](spec/2026-10-23-spec-TOOL-dSafePassage-4.md) | 2 | 2 | CLOSED | rev-5 | 2026-10-26 |
 | [TOOL-dSafePassage-43 — the step row's one writer admits a stopped down's failure on an `applied` row, by one declared prefix set, and refuses every other](spec/2026-10-23-spec-TOOL-dSafePassage-43.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field](spec/2026-10-23-spec-TOOL-dSafePassage-7.md) | 2 | 2 | CLOSED | rev-5 | 2026-10-26 |
-| [TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step](spec/2026-10-23-spec-TOOL-dSafePassage-11.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-26 |
+| [TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step](spec/2026-10-23-spec-TOOL-dSafePassage-11.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-29 |
 | [TOOL-dSafePassage-12 — gov's remote CI at the interpreter floor, read from its one declaration, with the floor's preflight as the bar's first step](spec/2026-10-23-spec-TOOL-dSafePassage-12.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-26 |
 | [TOOL-dSafePassage-15 — the walk persists no step row below schema 4, so a schema-3 receipt reaches the schema step](spec/2026-10-23-spec-TOOL-dSafePassage-15.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-18 — the reverse walk writes no row once a down leaves the receipt below schema 4](spec/2026-10-23-spec-TOOL-dSafePassage-18.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-26 |
@@ -185,13 +185,13 @@ ids TOOL-dSafePassage-85
 | [TOOL-dSafePassage-33 — a missing before-image means "never ran" only for a row the forward walk applied by witness alone, recorded as such](spec/2026-10-23-spec-TOOL-dSafePassage-33.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-27 |
 | [TOOL-dSafePassage-36 — the config check walks the target worktree's own git directory for submodules, so a linked worktree's submodules are graded](spec/2026-10-23-spec-TOOL-dSafePassage-36.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-27 |
 | [TOOL-dSafePassage-37 — the refused-key predicate keeps every key named as a hook, and the step environment closes the `ext::` transport by one command-scope pair](spec/2026-10-23-spec-TOOL-dSafePassage-37.md) | 5 | 2 | CLOSED | rev-3 | 2026-10-27 |
-| [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | CLOSED | rev-11 | 2026-10-27 |
+| [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | CLOSED | rev-12 | 2026-10-29 |
 | [TOOL-dSafePassage-62 — `update` writes the receipt its file pass moved before the first step, so a walk killed below schema 4 leaves rows a rollback can return](spec/2026-10-27-spec-TOOL-dSafePassage-62.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-63 — `update` proves an edit to a rendered file from the sha256 its install recorded, when the row has no `oid`](spec/2026-10-27-spec-TOOL-dSafePassage-63.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-64 — a `retired-edited` row takes back the role gov's descriptor gives its path once gov ships that path again](spec/2026-10-27-spec-TOOL-dSafePassage-64.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-65 — `update` resolves a row's role from the descriptor at `--to`, not from the gov checkout's working tree](spec/2026-10-27-spec-TOOL-dSafePassage-65.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
 | [TOOL-dSafePassage-66 — `update` puts a held kit's writes back before the first upgrade step, so a walk killed inside a step leaves that kit at its pre-run bytes](spec/2026-10-27-spec-TOOL-dSafePassage-66.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-27 |
-| [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | CLOSED | rev-11 | 2026-10-27 |
+| [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | CLOSED | rev-12 | 2026-10-29 |
 | [TOOL-dSafePassage-39 — the step row's `via` mark survives every rewrite that keeps the row `applied`, so the reverse walk's own records cannot erase it](spec/2026-10-23-spec-TOOL-dSafePassage-39.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-27 |
 | [TOOL-dSafePassage-40 — the forward walk marks a row `via: witness` only when nothing records that its up ever ran](spec/2026-10-23-spec-TOOL-dSafePassage-40.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-27 |
 | [TOOL-dSafePassage-67 — the fixture factory pins commit signing and hooks in every repository it builds, and refuses a git command that fails](spec/2026-10-27-spec-TOOL-dSafePassage-67.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-27 |
@@ -232,7 +232,7 @@ ids TOOL-dSafePassage-85
 | [TOOL-dSafePassage-80 — five leg ceilings clear their evidence by the declared margin, and upgrade-walk is budgeted](spec/2026-10-28-spec-TOOL-dSafePassage-80.md) | 16 | 2 | CLOSED | rev-5 | 2026-10-29 |
 | [TOOL-dSafePassage-81 — the 70 verb offenders this build introduced, renamed to declared verbs with every caller, so the lexicon leg returns to its pin](spec/2026-10-28-spec-TOOL-dSafePassage-81.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names](spec/2026-10-28-spec-TOOL-dSafePassage-82.md) | 16 | 2 | CLOSED | rev-6 | 2026-10-29 |
-| [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-28 |
+| [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | DEFERRED | rev-6 | 2026-10-29 |
 | [TOOL-dSafePassage-84 — the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked](spec/2026-10-29-spec-TOOL-dSafePassage-84.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-29 |
 <!-- /gen:build-units -->
 

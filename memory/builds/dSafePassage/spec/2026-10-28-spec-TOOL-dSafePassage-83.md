@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited
 
-**Status:** DEFERRED · rev-5 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** DEFERRED · rev-6 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -26,15 +26,17 @@ for them, and the ceiling raises their new evidence rows ask for are TOOL-dSafeP
 
 ## 2. Scope (IN)
 
-- **S1 — check 12, the edges.** The hands-off side answers. TOOL-dSafePassage-5, -11 and -26 each
+- **S1 — check 12, the edges.** Made by the gov-spec-writer pass committed before this unit's build, because
+  scratch-guard lets only that role write the spec class; this unit's build writes no spec line. The
+  hands-off side answers. TOOL-dSafePassage-5, -11 and -26 each
   gain the reciprocal `**hands-off**` line for every unit that declares a `**consumes-from**` onto
   them: 5 to TOOL-dSafePassage-67, -68 and -69; 11 to -69; 26 to -67, -68 and -69. Each payload
   names what the consumer's own line says it took. Each of the three specs bumps its rev, logs it in
-  §9 naming §3 and check 12, and moves its header date to the pass date; each stays CLOSED.
-  TOOL-dSafePassage-67, -68 and -69 do not change. §4 "The edge ruling" gives the reason. The
-  build README's generated blocks render those headers, so the pass commit carries
-  `python tools/memory-tree/gen_build_index.py --write`'s re-render with them.
-  Observed by AC1, AC2 and AC6.
+  §9 naming §3 and check 12, and moves its header date to that pass's date, 2026-10-29; each stays
+  CLOSED. TOOL-dSafePassage-67, -68 and -69 do not change. §4 "The edge ruling" gives the reason.
+  The build README's generated blocks render those headers, so the commit carrying them also
+  carries `python tools/memory-tree/gen_build_index.py --write`'s re-render. AC1, AC2 and AC6
+  observe that committed state at this unit's pass head.
 - **S2 — check 23, the unevidenced criteria.** Every criterion of the eight units gains a ledger
   line in one of the two legal forms:
   - the ledgers of TOOL-dSafePassage-9, -13, -15, -21, -26 and -31 already carry their `AC` lines
@@ -49,11 +51,13 @@ for them, and the ceiling raises their new evidence rows ask for are TOOL-dSafeP
   line says so. None is written as satisfied without one. Observed by AC3 and AC6.
 - **S3 — check 23, the unshared tokens.** Each of the nine answers shares a backticked token with its
   criterion as the gate reads it, naming the same observation the answer records: TOOL-dSafePassage-25
-  AC1, -27 AC1, -27 AC2, -28 AC3, -32 AC3, -34 AC1, -34 AC3, -35 AC4 by an edit to the ledger, and
-  -16 AC2 by §8 F3's resolution: TOOL-dSafePassage-16's AC2 is re-wrapped so the backticked call
+  AC1, -27 AC1, -27 AC2, -28 AC3, -32 AC3, -34 AC1, -34 AC3 and -35 AC4 by this unit's edit to the
+  ledger, and -16 AC2 by §8 F3's resolution, made by the gov-spec-writer pass committed before this unit's build:
+  TOOL-dSafePassage-16's AC2 is re-wrapped so the backticked call
   `set_step_state(receipt, "govkit/receipt-schema-4", None, "applied")` sits on one line, a
   whitespace-only edit with no rev bump, and the answer already carries that call. §4 "The nine
-  answers" names the token each one can honestly carry. Observed by AC4, AC6 and AC7.
+  answers" names the token each one can honestly carry. Observed by AC4, AC6 and AC7, AC7 over
+  the committed re-wrap.
 - **S4 — check 9, the manifest.** `memory/guides/SESSION-KICKOFF.md` §B is re-read against the tree
   at the pass's parent: each bullet's cited path resolves in `git ls-files`, and each flag, key and
   command it spells is spelled by the file it points at. §B gains one trap bullet for the interpreter
@@ -63,9 +67,10 @@ for them, and the ceiling raises their new evidence rows ask for are TOOL-dSafeP
 
 ## 3. Non-goals (OUT)
 
-- Any edit to TOOL-dSafePassage-67, -68 or -69, and any spec edit beyond S1's seven lines, their
-  three rev lines and three headers, and S3's whitespace-only re-wrap of TOOL-dSafePassage-16's AC2,
-  which the coordinator whose brief set this non-goal approved (§8 F3).
+- Any spec edit by this unit's build. S1's seven lines, their three rev lines and three headers, and
+  S3's whitespace-only re-wrap of TOOL-dSafePassage-16's AC2, which the coordinator whose brief set
+  this non-goal approved (§8 F3), are the gov-spec-writer pass committed before this unit's build.
+  TOOL-dSafePassage-67, -68 and -69 are not edited at all.
 - Any `**Evidences:**` line that says satisfied without an observation, and any token chosen only
   because it matches.
 - The product legs, which TOOL-dSafePassage-82 owns, and the ceiling, budget and lexicon legs, which
@@ -78,12 +83,15 @@ for them, and the ceiling raises their new evidence rows ask for are TOOL-dSafeP
 ### Edges
 
 - **consumes-from** external — the main loop's own edits to 65 ledgers under
-  `memory/builds/dSafePassage/build/`, uncommitted in the run's worktree at writing time: its record
-  of each `New arm:` line observed at the close. S2 and S3 edit nine of those files, so the pass starts
-  from a tree where those edits are committed.
+  `memory/builds/dSafePassage/build/`, its record of each `New arm:` line observed at the close. S2
+  and S3 edit nine of those files. Met: they were committed in `84ffa523f`, which
+  `git log --oneline -1 -- memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-16-ledger.md`
+  names.
+- **consumes-from** external — the gov-spec-writer pass committed before this unit's build, carrying S1's lines in
+  TOOL-dSafePassage-5, -11 and -26 and S3's re-wrap in -16, with the build README's re-render.
 
 TOOL-dSafePassage-5, -11, -16, -26 and -67 to -69 are CLOSED and read, so they are named here
-rather than joined; S1 writes their reciprocal lines.
+rather than joined; the writer pass writes their reciprocal lines.
 
 ## 4. Design
 
@@ -275,11 +283,12 @@ which every spec of this build post-dates.
 
 ### Inventory
 
-None minted. S1 to S4 add lines to existing records.
+None minted. S2 and S4 add lines to existing records.
 
 ### Migration
 
-None. Every file S1 to S4 touches is a record under `memory/`, which no adopter receives.
+None. Every file this unit and its writer pass touch is a record under `memory/`, which no adopter
+receives.
 
 ### Rollout
 
@@ -289,13 +298,11 @@ each re-stamps `last-audit` in its own commit, so `last-audit` will already have
 this pass; S4 moves it a third time and is the only one to advance `last-body-change`. Every watched
 commit landing after S4's advance counts toward check 9 again. -81 touches no watched path, so
 building before it leaves the close's own commits as the only ones counted. TOOL-dSafePassage-61, held on TOOL-dGroundRules-13, is not waited
-for. The main loop's ledger edits named in §3 "Edges" are committed first.
+for. The main loop's ledger edits named in §3 "Edges" are committed (`84ffa523f`), and the
+gov-spec-writer pass carrying S1 and S3's spec edits is committed before this build begins.
 
 ### Files touched (estimate)
 
-- `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-5.md`
-- `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-11.md`
-- `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md`
 - `memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-9-ledger.md`
 - `memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-11-ledger.md`
 - `memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-13-ledger.md`
@@ -305,10 +312,10 @@ for. The main loop's ledger edits named in §3 "Edges" are committed first.
 - `memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-31-ledger.md`
 - `memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md`
 - the ledgers of TOOL-dSafePassage-25, -27, -28, -32, -34 and -35 under the same folder
-- `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md`
 - `memory/guides/SESSION-KICKOFF.md`
-- `memory/builds/dSafePassage/README.md`, and the other outputs `gen_build_index.py --write`
-  re-renders
+
+The four specs S1 and S3 name, and the build README's re-render, are the writer pass's commit,
+not this build's.
 
 ### Alternatives rejected
 
@@ -337,20 +344,26 @@ for. The main loop's ledger edits named in §3 "Edges" are committed first.
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -cE '^- \*\*hands-off\*\* .TOOL-dSafePassage-6[789]' <spec>` runs over the
-  specs of TOOL-dSafePassage-5, -11 and -26, it prints 3, 1 and 3.
+  specs of TOOL-dSafePassage-5, -11 and -26 at this unit's pass head, it prints 3, 1 and 3, the
+  lines the writer pass committed.
   Red when: a reciprocal line is missing, so the count is lower, as all three printed 0 at
   `83817478f`.
 - **AC2** — When `grep -m1 '^\*\*Status:\*\*'` and `grep '^- rev-'` run over the same three specs,
   the headers read `CLOSED · rev-12`, `CLOSED · rev-5` and `CLOSED · rev-12`, and each spec's last
   `- rev-` entry names `§3` and `check 12`.
   Red when: a spec gains its line with no rev bump, or with a bump no §9 entry logs.
-- **AC3** — When `python <scratch>/ledger_check.py` runs from the repository root, it prints `gap 0 []`
-  and `bad []`.
+- **AC3** — When `python <scratch>/ledger_check.py` runs from the repository root, neither its `gap`
+  nor its `bad` line names TOOL-dSafePassage-9, -11, -13, -15, -21, -26, -31 or -51.
   Red when: a ledger's `AC` lines stay outside an `**Evidences:**` block, or an answer is in neither
-  form, as `gap 94` at `83817478f`.
-- **AC4** — When the same probe runs, it prints `notok []`.
-  Red when: an answer still shares no token with its criterion as the gate reads it, as the nine of
-  §4 did at `83817478f`.
+  form, as `gap 94` over those eight units at `83817478f`.
+  The probe at `5fe2dab8e` also prints `bad ['TOOL-dSafePassage-80/AC2']`. That line, like
+  TOOL-dSafePassage-77 AC8 and -82 AC2 under AC4, is an owed-at-close answer a sibling pass left;
+  the main loop answers it at the close, and this unit does not own it.
+- **AC4** — When the same probe runs, its `notok` line names none of the nine answers of §4 "The
+  nine answers".
+  Red when: one of them still shares no token with its criterion as the gate reads it, as all nine
+  did at `83817478f`. TOOL-dSafePassage-77 AC8 and -82 AC2, which the probe also names at
+  `5fe2dab8e`, are owed-at-close lines the main loop answers, outside this unit.
 - **AC5** — When the command below runs at the pass's commit, it prints 0, the count
   `manifest-check.sh` check 9 makes:
   ```bash
@@ -365,17 +378,19 @@ for. The main loop's ledger edits named in §3 "Edges" are committed first.
   figure: 0 is DERIVED at the pass; every later watched commit adds one.
 - **AC6** — When the main loop runs `bash tools/memory-tree/check-memory-hygiene.sh` and
   `bash skills/session-kickoff/manifest-check.sh` in a clone of the pass head whose `origin/HEAD`
-  points at main, the hygiene run prints no check 12 line naming a dSafePassage spec and no check 23
-  line naming a `TOOL-dSafePassage` id and no `HYGIENE check 9` line, and the manifest run prints
+  points at main, the hygiene run prints no check 12 line naming a dSafePassage spec, no check 23
+  line naming one of the eight units of S2 or the nine answers of S3, and no `HYGIENE check 9` line, and the manifest run prints
   no `MANIFEST check 9` line.
   Red when: any of the reds of §4 "The reds, reproduced" survives, or S1's header moves leave the
   build README's generated blocks stale.
+  A check 23 line naming TOOL-dSafePassage-59 AC12, -77 AC8, -80 AC2 or -82 AC2, which the gate
+  printed over this worktree on 2026-10-29, is a sibling's owed-at-close answer and not this unit's.
   permission: the builder role runs only the naming lexicon (`tools/roles/house/policy.toml:28`); the
   main loop observes both.
   cost: the hygiene run took 279 s alone in the clone.
-- **AC7** — When `python -c "import subprocess,sys; f=sys.argv[1]; a=subprocess.run(['git','show','HEAD~:'+f],capture_output=True,text=True,encoding='utf-8').stdout; b=open(f,encoding='utf-8').read(); print(a.split()==b.split(), a.splitlines()[2]==b.splitlines()[2])" memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md`
-  runs at the pass's commit, it prints `True True`: spec 16 moved only whitespace and its status
-  header, rev included, is unchanged.
+- **AC7** — When `python -c "import subprocess,sys; f=sys.argv[1]; a=subprocess.run(['git','show','5fe2dab8e:'+f],capture_output=True,text=True,encoding='utf-8').stdout; b=open(f,encoding='utf-8').read(); print(a.split()==b.split(), a.splitlines()[2]==b.splitlines()[2])" memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md`
+  runs at this unit's pass head, it prints `True True`: since `5fe2dab8e`, the head before the
+  writer pass, spec 16 moved only whitespace and its status header, rev included, is unchanged.
   Red when: the re-wrap changes a word or bumps the rev, so a departure is recorded for a
   whitespace edit.
 
@@ -456,6 +471,14 @@ ceilings are TOOL-dSafePassage-80's.
   Files touched, and AC6 also refuses `HYGIENE check 9`), M1's sentence for this unit (Rollout:
   `last-audit` will have moved twice, by -80 and -82, before this pass), and L1 (Rollout: after
   -82, before -81, which builds last). The header's node reads `a`, this host.
+- rev-6 · 2026-10-29 · S1 · S3 · §3 · §3 Edges · §4 · AC1 · AC3 · AC4 · AC6 · AC7 · the builder's
+  DIVERGENCE before any write, relayed by the coordinator: scratch-guard lets only the
+  gov-spec-writer write the spec class, so a builder cannot make S1's spec lines or S3's re-wrap.
+  The writer pass made both, committed before this build; S1 and S3 say so, AC1, AC2 and AC7
+  observe the committed state, and the four specs leave Files touched. AC3 and AC4 are scoped to
+  this unit's own entries, the owed-at-close lines of -77 AC8, -80 AC2 and -82 AC2 being the main
+  loop's, and AC6 is scoped the same way, the full gate also naming -59 AC12. §3's ledger edge is
+  met, at `84ffa523f`.
 
 ## 10. Reuse audit
 

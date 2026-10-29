@@ -134,9 +134,9 @@ run sequences those passes by M6's disjointness rule.
   `test_steps_recordable` on the five shapes of §4 "Data model", it prints False, True, False, False,
   False in that order.
   Red when: the schema-3 receipt with `"steps": []` or the string schema reads True.
-- **AC2** — When the same probe calls `set_step_state(receipt, "govkit/receipt-schema-4", None,
-  "applied")` on each of the five shapes, it raises `Refusal` exactly on the shapes AC1 printed False
-  for, and appends one row on the other.
+- **AC2** — When the same probe calls
+  `set_step_state(receipt, "govkit/receipt-schema-4", None, "applied")` on each of the five shapes,
+  it raises `Refusal` exactly on the shapes AC1 printed False for, and appends one row on the other.
   Red when: the writer and the predicate disagree on any shape, so a caller asking the predicate
   could still meet a refusal.
 - **AC3** — When `git grep -n -e "def test_steps_recordable" -e "test_steps_recordable(" -- tools/govkit/upgrade_steps.py`

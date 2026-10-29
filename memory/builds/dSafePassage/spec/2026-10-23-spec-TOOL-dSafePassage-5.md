@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** CLOSED · rev-11 · 2026-10-27 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-12 · 2026-10-29 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 part 1/2
 
@@ -185,6 +185,9 @@ order, which the `edited-retired` plant expects.
 - **consumes-from** `TOOL-dSafePassage-62` — the receipt `update` writes before its first step, rows and sidecar through `write_install_receipt`; without it the `kill` case's rollback from the schema step's killed state reads every file the killed run moved as an adopter's edit, writes none, and never reaches release-0's digest
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 - **hands-off** `TOOL-dSafePassage-61` — the `size-limits` `[[condition]]` row of `tools/govkit/fixtures/release-0/plants.toml`, added with the step it names, which joins the population when that unit lands
+- **hands-off** `TOOL-dSafePassage-67` — `fixture_target.py`, `build_target` and the upgrade walk's release-0 target built through it, which unit 67's factory pins (its S12)
+- **hands-off** `TOOL-dSafePassage-68` — the `upgrade-walk` leg, its child script `CHILD`, `run_child_walk`, and the selftest block observing the leg, whose stand-ins unit 68 fixes and extends
+- **hands-off** `TOOL-dSafePassage-69` — the `upgrade-walk` leg and its `kill` and `down` cases, which unit 69's AC5 and AC7 run
 
 ## 4. Design
 
@@ -656,6 +659,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   `govkit/receipt-schema-4` recording `"via": "witness"` where `up` records none, read as
   TOOL-dSafePassage-33 S1 declares it, not a defect: the killed step's row carries the mark exactly
   when the killed state's witness holds, by `2026-10-27-prompt-TOOL-dSafePassage-5-10-spec-writer.md`.
+- rev-12 · 2026-10-29 · §3 · the reciprocal **hands-off** edge to TOOL-dSafePassage-67, -68, -69, whose
+  **consumes-from** onto this unit had no match back (hygiene check 12). Written by the
+  gov-spec-writer pass for TOOL-dSafePassage-83 S1, by that unit's edge ruling.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step
 
-**Status:** CLOSED · rev-4 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-5 · 2026-10-29 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0028@dae8abad whole
 **Carries:** node:policy-key.platforms.provision
@@ -136,6 +136,7 @@ run under the floor it restores, and the step is the template a later raise copi
 - **hands-off** `TOOL-dSafePassage-17` — the floor row declaring that its down's own exit decides a rollback, the repair of finding 51
 - **hands-off** `TOOL-dSafePassage-23` — the resolver keeping an override's own name, the repair of finding 35
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
+- **hands-off** `TOOL-dSafePassage-69` — the floor row, `python-floor.sh down`, `python_floor.py`'s down and its static mode, which unit 69 corrects
 
 ## 4. Design
 
@@ -584,6 +585,9 @@ then.
   the inlined `resolve_kit_dir`, the existing row is filled and drained, and the shim joins S5's
   population; §4 Rollout and Files touched gain the regenerated mirror's second commit, which the
   guard admits once the policy file and the catalogue equal HEAD; no other section moved.
+- rev-5 · 2026-10-29 · §3 · the reciprocal **hands-off** edge to TOOL-dSafePassage-69, whose
+  **consumes-from** onto this unit had no match back (hygiene check 12). Written by the
+  gov-spec-writer pass for TOOL-dSafePassage-83 S1, by that unit's edge ruling.
 
 ## 10. Reuse audit
 
