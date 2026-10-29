@@ -13,5 +13,5 @@
 - **Approver:** spec writer, the gov-spec-writer role of dMindYourWords' spec run, citing ER:328, under the chain's `author-recorded` value; carried for the owner's walk unless it rules otherwise
 - **Follow-through:** amends cl-dClosedLoop-0278@3bd5d4af
 - **Caused-by:** TOOL-dMindYourWords-17
-- **Bound:** the reach of "settled" into names and other kits' vocabularies that spell attended, playbook or baseline in another sense
+- **Bound:** the clause's settlement over the identifier-bound senses and the other kits' baseline senses
 - **Tier:** weakest, a reach the spec read into the clause beyond its text
