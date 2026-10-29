@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-23 — the `--measure` and `--rebaseline` writers keep the `lexicon-debt` rows they do not measure
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 17
+**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
+| [2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-24 TOOL-dMindYourWords-27 TOOL-dMindYourWords-26 TOOL-dMindYourWords-28 TOOL-dMindYourWords-22 TOOL-dMindYourWords-25 TOOL-dMindYourWords-29 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,8 @@ through unchanged.
 - **consumes-from** `TOOL-dMindYourWords-13` — the tag rows its Migration seeds into the home, the slice both writers carry
 - **consumes-from** `TOOL-dMindYourWords-22` — `derive_ledger_slice`, the one predicate deciding which rows a writer carries
 - **hands-off** `TOOL-dMindYourWords-29` — `--measure`'s stdout as the ledger file alone, on which the batch routes the tally lines to stderr and sets LF line endings (ids 2, 13)
+- **hands-off** `TOOL-dMindYourWords-35` — the `--measure` merge's read of the home, which that unit re-sources from the index copy when stdout is the home (review id 30)
+- **hands-off** `TOOL-dMindYourWords-37` — the `--measure` carry and AC1's drain edit, which the minors batch re-observes after the tally lines move to stderr and widens to the drift rows a shallow run holds (review ids 5 and 37)
 
 ## 4. Design
 
@@ -155,6 +158,8 @@ New arm: tools/lexicon/selftest.py · covers AC1 AC2 AC3 · a fixture home holdi
 
 - rev-1 · 2026-10-29 · initial draft, promoted from review id 43 (HIGH, item H1) of the round-1 spec
   audit; the comparison half of the item is TOOL-dMindYourWords-22.
+- rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 22 to 29
+  declare toward this unit (TOOL-dMindYourWords-35, TOOL-dMindYourWords-37); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

@@ -68,7 +68,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `a1f119ec662f11a5f974b33657087f336c2273d8`
+- rendered at: `ba4023059d4c5b995c8a4a53aa8ebf753eed3e22`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -173,12 +173,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dMindYourWords`:
 
-Coverage of dMindYourWords's 17 clauses and 6 owned nodes, over 25 specs:
+Coverage of dMindYourWords's 17 clauses and 6 owned nodes, over 33 specs:
 - carried whole: 17; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0272, cl-dClosedLoop-0277, cl-dClosedLoop-0278; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-22.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-23.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-24.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-25.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-26.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-27.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-28.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-29.md (PLAY-dClosedLoop-2)
+- specs derived from no clause: memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-22.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-23.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-24.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-25.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-26.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-27.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-28.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-29.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-30.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-31.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-32.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-33.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-34.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-35.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-36.md (PLAY-dClosedLoop-2), memory/builds/dMindYourWords/spec/2026-10-29-spec-TOOL-dMindYourWords-37.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0264, cl-dClosedLoop-0265, cl-dClosedLoop-0266, cl-dClosedLoop-0275, cl-dClosedLoop-0277, cl-dClosedLoop-0278
 
 ### Reading order

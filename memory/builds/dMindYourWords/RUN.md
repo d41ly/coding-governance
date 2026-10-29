@@ -48,3 +48,21 @@ base: ccd1292ea98467fde27c262948ded176987326dd
 2026-10-29T15:43:05Z rescope · item add TOOL-dMindYourWords-29 · reason closes 2026-10-29-review-TOOL-dMindYourWords-1-spec-audit-round1.md the 49 minors by raw id, MEDIUM ids 2 3 4 5 6 7 8 13 14 15 16 19 25 26 28 29 32 33 35 36 37 38 39 40 46 47 48 50 51 52 53 54 55 and LOW ids 9 10 11 12 17 20 21 22 27 30 34 41 42 56 57 58
 
 2026-10-29T16:07:56Z review · item dMindYourWords-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 49 · disposition promote
+
+2026-10-29T17:26:43Z rescope · item add TOOL-dMindYourWords-30 · reason closes 2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md id 1 (HIGH, item H1, shared with ids 11 and 23): the provenance blame trusts a grafted commit as a root, so its graft refusal never fires
+
+2026-10-29T17:26:44Z rescope · item add TOOL-dMindYourWords-31 · reason closes 2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md id 11 (HIGH, item H1, shared with ids 1 and 23): the shared porcelain blame reader carries the --root graft hole into the drift blame
+
+2026-10-29T17:26:45Z rescope · item add TOOL-dMindYourWords-32 · reason closes 2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md id 23 (HIGH, item H1, shared with ids 1 and 11): the added-set reader reads a grafted commit as adding its whole tree
+
+2026-10-29T17:26:45Z rescope · item add TOOL-dMindYourWords-33 · reason closes 2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md id 12 (HIGH, item H2): the records that commit adds list every path the commit touches, modified and renamed included
+
+2026-10-29T17:26:46Z rescope · item add TOOL-dMindYourWords-34 · reason closes 2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md id 22 (HIGH, item H3): the root ledger guard pathspec .lexicon-debt.txt falls into no govkit guard class
+
+2026-10-29T17:26:47Z rescope · item add TOOL-dMindYourWords-35 · reason closes 2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md id 30 (HIGH, item H4): the drain edit --measure > <home> truncates the home before --measure reads the rows it carries
+
+2026-10-29T17:26:47Z rescope · item add TOOL-dMindYourWords-36 · reason closes 2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md id 35 (HIGH, item H5): the contract-record walk runs --no-merges, so an evil merge's CONTRACTS row is never examined
+
+2026-10-29T17:26:48Z rescope · item add TOOL-dMindYourWords-37 · reason closes 2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md the 31 minors by raw id, MEDIUM ids 2 3 4 5 6 7 8 9 13 14 15 24 25 31 32 33 34 36 37 38 39 40 and LOW ids 10 16 19 20 26 27 28 29 41
+
+2026-10-29T17:50:00Z review · item dMindYourWords-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 31 · disposition promote

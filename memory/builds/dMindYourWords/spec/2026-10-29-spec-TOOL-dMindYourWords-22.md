@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-22 — the debt pin compares only the slice of `lexicon-debt` its own run measures
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 17
+**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 17
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
 | [2026-10-29-prompt-TOOL-dMindYourWords-22-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-22-1-spec-writer.md) | journal | — |
+| [2026-10-29-prompt-TOOL-dMindYourWords-22-promoted-fix-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-22-promoted-fix-brief.md) | research | TOOL-dMindYourWords-24 TOOL-dMindYourWords-27 TOOL-dMindYourWords-29 |
+| [2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dMindYourWords-22-to-29-spec-audit-round1.md) | spec-audit | TOOL-dMindYourWords-24 TOOL-dMindYourWords-27 TOOL-dMindYourWords-26 TOOL-dMindYourWords-28 TOOL-dMindYourWords-23 TOOL-dMindYourWords-25 TOOL-dMindYourWords-29 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +61,7 @@ compare its own slice only, so neither run advises deleting the other's debt.
 - **consumes-from** `TOOL-dMindYourWords-1` — `check_debt_pin`, its call to `compare_counts` and `compare_to_base` after `carry_renames`, and the `lexicon-debt` registration; without it there is no comparison to scope
 - **consumes-from** `TOOL-dMindYourWords-13` — the `--tags` verdict that calls `check_debt_pin` and the tag row's key, path the registry and rule `verb` or `noun`; without it there is no second slice
 - **hands-off** `TOOL-dMindYourWords-23` — `derive_ledger_slice`, the one predicate by which the `--measure` and `--rebaseline` writers keep the slice they do not measure
+- **hands-off** `TOOL-dMindYourWords-37` — `derive_ledger_slice`, `registry_rel`, the held count and AC4's base case, which the minors batch spells POSIX, bounds to the root, keys on the path alone and fixtures with a remote (review ids 9, 14, 15, 31, 32 and 37)
 
 ## 4. Design
 
@@ -167,6 +170,8 @@ New arm: tools/lexicon/selftest.py · covers AC1 AC2 AC3 AC4 · a fixture ledger
 
 - rev-1 · 2026-10-29 · initial draft, promoted from review id 1 (HIGH, item H1) of the round-1 spec
   audit; the writer half of the item is TOOL-dMindYourWords-23.
+- rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 22 to 29
+  declare toward this unit (TOOL-dMindYourWords-37); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

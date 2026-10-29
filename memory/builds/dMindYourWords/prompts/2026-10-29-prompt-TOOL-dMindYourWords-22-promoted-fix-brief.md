@@ -1,4 +1,4 @@
-**Serves:** research TOOL-dMindYourWords-24 TOOL-dMindYourWords-27 TOOL-dMindYourWords-29
+**Serves:** research TOOL-dMindYourWords-22 TOOL-dMindYourWords-24 TOOL-dMindYourWords-27 TOOL-dMindYourWords-29
 
 # Promoted-fix brief — dMindYourWords, the round-1 promotions' mechanical reds
 

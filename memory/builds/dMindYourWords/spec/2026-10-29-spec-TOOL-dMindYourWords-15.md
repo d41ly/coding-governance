@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-15 — build records kept out of the graded population by a path selector
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 3 · advances TOOL-dMindYourWords-18
+**Status:** OPEN · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 3 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0276@c565a516 whole
 
@@ -8,7 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 |
+| [2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-agent-ledger.md) | journal | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-24 TOOL-dMindYourWords-25 TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dMindYourWords-29 TOOL-dMindYourWords-30 TOOL-dMindYourWords-31 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-34 TOOL-dMindYourWords-35 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 |
 | [2026-10-29-build-TOOL-dMindYourWords-1-spec-stage-returns.md](../build/2026-10-29-build-TOOL-dMindYourWords-1-spec-stage-returns.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 |
 | [2026-10-29-build-TOOL-dMindYourWords-14-reuse-scout-d.md](../build/2026-10-29-build-TOOL-dMindYourWords-14-reuse-scout-d.md) | research | TOOL-dMindYourWords-14 TOOL-dMindYourWords-17 |
 | [2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md](../prompts/2026-10-29-prompt-TOOL-dMindYourWords-1-fix-brief.md) | research | TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-5 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-14 TOOL-dMindYourWords-16 |
@@ -114,6 +114,7 @@ the recording grammar and can never meet a code convention (gap-lex-04, ask TOOL
 - **consumes-from** external — TOOL-dTotalRecall-13 S2's `read_defs_at`, an ancestor build's, which `read_defs_at_sha` adapts at the build run's base
 - **consumes-from** `TOOL-dMindYourWords-27` — the ledger home `.lexicon-debt.txt`, which S7's rows join, in place of `memory/project/lexicon-debt.txt` (review id 45)
 - **hands-off** `TOOL-dMindYourWords-29` — the `LANGS` rows S10 takes out and `check_out_of_scope`, which the minors batch repairs (review ids 36, 57)
+- **hands-off** `TOOL-dMindYourWords-37` — S7's rows and AC6's counts, which the minors batch re-observes over the root home `.lexicon-debt.txt` (review id 7 of the audit of units 22 to 29)
 
 ## 4. Design
 
@@ -310,6 +311,8 @@ New arm: tools/lexicon/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC8 AC9 · plan
   `[fixes]` and L-6, gap-lex-04, ask TOOL-aSurfacedLexicon-23, scout D's row 2 and its interfaces 2,
   3 and 7, and the spec brief's I17.
 - rev-2 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (TOOL-dMindYourWords-27, TOOL-dMindYourWords-29); no scope, design or criterion moved.
+- rev-3 · 2026-10-29 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 audit of units 22 to 29
+  declare toward this unit (TOOL-dMindYourWords-37); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 
