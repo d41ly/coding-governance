@@ -244,16 +244,16 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-87 — the round-2 closing review's seven mediums and two lows, each closed at the fix its skeptic judged sound](spec/2026-10-29-spec-TOOL-dSafePassage-87.md) | 16 | 2 | CLOSED | rev-4 | 2026-10-29 |
 | [TOOL-dSafePassage-88 — a renamed row whose new destination is its own path lands in place, so `update` carries a target across gov's tool-root move](spec/2026-10-29-spec-TOOL-dSafePassage-88.md) | 16 | 2 | CLOSED | rev-2 | 2026-10-29 |
 | [TOOL-dSafePassage-89 — the tool root is read from the tree on every call, so `read_steps` finds the registry at a moved tip](spec/2026-10-29-spec-TOOL-dSafePassage-89.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-29 |
-| [TOOL-dSafePassage-90 — a case-only rename is refused by name where the filesystem folds case, so no rollback restores one file under two spellings](spec/2026-10-29-spec-TOOL-dSafePassage-90.md) | 16 | 2 | DEFERRED | rev-1 | 2026-10-29 |
-| [TOOL-dSafePassage-91 — the round-3 closing review's three remaining minors: the in-place row's one snapshot path, a grader for the walk's two roots, and an arm for the floor stub's bash fallback](spec/2026-10-29-spec-TOOL-dSafePassage-91.md) | 16 | 2 | DEFERRED | rev-1 | 2026-10-29 |
+| [TOOL-dSafePassage-90 — a case-only rename is refused by name where the filesystem folds case, so no rollback restores one file under two spellings](spec/2026-10-29-spec-TOOL-dSafePassage-90.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
+| [TOOL-dSafePassage-91 — the round-3 closing review's three remaining minors: the in-place row's one snapshot path, a grader for the walk's two roots, and an arm for the floor stub's bash fallback](spec/2026-10-29-spec-TOOL-dSafePassage-91.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 436 bound to this build, across 4 record folder(s).
+Records: 439 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65
-TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-90 TOOL-dSafePassage-91.
+TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71.
 
 Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-15@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1
 TOOL-dSafePassage-19@rev-1 TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1
@@ -261,7 +261,7 @@ TOOL-dSafePassage-29@rev-1 TOOL-dSafePassage-3@rev-1 TOOL-dSafePassage-30@rev-1 
 TOOL-dSafePassage-39@rev-1 TOOL-dSafePassage-4@rev-1 TOOL-dSafePassage-40@rev-1 TOOL-dSafePassage-41@rev-1 TOOL-dSafePassage-42@rev-1 TOOL-dSafePassage-43@rev-1 TOOL-dSafePassage-44@rev-1 TOOL-dSafePassage-45@rev-1 TOOL-dSafePassage-46@rev-1 TOOL-dSafePassage-47@rev-1 TOOL-dSafePassage-48@rev-1
 TOOL-dSafePassage-49@rev-2 TOOL-dSafePassage-5@rev-1 TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-51@rev-1 TOOL-dSafePassage-52@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1 TOOL-dSafePassage-72@rev-3 TOOL-dSafePassage-73@rev-3
 TOOL-dSafePassage-74@rev-2 TOOL-dSafePassage-75@rev-2 TOOL-dSafePassage-76@rev-3 TOOL-dSafePassage-77@rev-3 TOOL-dSafePassage-78@rev-1 TOOL-dSafePassage-80@rev-4 TOOL-dSafePassage-81@rev-3 TOOL-dSafePassage-82@rev-3 TOOL-dSafePassage-83@rev-4 TOOL-dSafePassage-84@rev-2 TOOL-dSafePassage-87@rev-3
-TOOL-dSafePassage-88@rev-1 TOOL-dSafePassage-89@rev-2.
+TOOL-dSafePassage-88@rev-1 TOOL-dSafePassage-89@rev-2 TOOL-dSafePassage-90@rev-1 TOOL-dSafePassage-91@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->

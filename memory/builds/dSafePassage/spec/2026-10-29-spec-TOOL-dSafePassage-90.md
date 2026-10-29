@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-90 — a case-only rename is refused by name where the filesystem folds case, so no rollback restores one file under two spellings
 
-**Status:** DEFERRED · rev-1 · 2026-10-29 · node a · Tier-2 · base cbaaeebe · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base cbaaeebe · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -9,8 +9,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-29-prompt-TOOL-dSafePassage-90-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-1-spec-writer.md) | journal | — |
+| [2026-10-29-prompt-TOOL-dSafePassage-90-2-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-2-spec-writer.md) | journal | — |
+| [2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md) | research | TOOL-dSafePassage-91 |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-build-brief.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md) | research | TOOL-dSafePassage-91 |
+| [2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-91 |
 
 <!-- /gen:spec-records -->
 
@@ -32,9 +35,11 @@ reverts the round-1 spec audit's M5 (id 18).
   test. The occupancy refusal (`:11109`) reads
   `if not in_place and (new_dest in _at_dest or ndp.exists()):`, so one predicate, `in_place`
   (`:11079`), decides both the refusal and the move block (`:11167`). The refusal keeps its one
-  `r.fail` call. Its message names a case-only rename and its remedy where the destination is the
-  row's own file by `samefile`, and reads as it does now everywhere else. The comment at
-  `:11073-11076` says so. This closes H1 (id 3) and M2 (id 2): the row is refused before any byte
+  `r.fail` call, and its message is picked three ways. Where the destination is the row's own file
+  by `samefile` and the two spellings are equal under `casefold`, it names a case-only rename and its
+  remedy. Where `samefile` holds and they are not, it names the row's own file under another name,
+  a link or a filesystem alias, and tells the adopter to take their link out of the way. Everywhere
+  else it reads as it does now. The comment at `:11073-11076` says so. This closes H1 (id 3) and M2 (id 2): the row is refused before any byte
   moves, so the rollback has nothing to restore. It leaves M1 (id 1) unreachable: the index arm is
   skipped only in place. §4 "Each finding, after S1" gives the code lines. §4 "S1". Observed by AC1
   and AC2.
@@ -68,13 +73,16 @@ reverts the round-1 spec audit's M5 (id 18).
 ### Edges
 
 - **hands-off** `TOOL-dSafePassage-91` — the round-3 review's L1 (id 4), M4 (id 6) and L2 (id 7),
-  which that unit batches; its L1 fix and its arm edit the same snapshot block and selftest block
-  after this unit
+  which that unit batches; its L1 fix edits `govkit.py`'s pre-write snapshot (`:10745-10747`), which
+  this unit does not touch, and its L1 check sits after this unit's `[dSP-90]` check in the
+  `DEPL-dCarriedReceipt-11` block of `selftest.py`, which is the one block the two units share
 
 ## 4. Design
 
 Every cited line holds at `cbaaeebeb`, the build head with TOOL-dSafePassage-86, -87, -89 and -88
-landed. Outside `memory/`, HEAD of this branch matched it when this spec was written.
+landed. Outside `memory/`, HEAD of this branch matched it when this spec was written, and at rev-2
+`git diff --stat cbaaeebeb a3ad798cf -- tools skills` printed nothing, so every line still holds
+at `a3ad798cf`.
 
 ### Which mechanism
 
@@ -114,7 +122,7 @@ takes the ordinary rename path, which the `[-11]` move checks hold. It was not m
 which folds case.
 
 This reverts the round-1 spec audit's M5 (id 18). Its left-shift, that a path-identity test uses
-`samefile`, is kept: `samefile` now decides only which message the refusal prints.
+`samefile`, is kept: `samefile` and `casefold` now decide only which message the refusal prints.
 
 ### Each finding, after S1
 
@@ -145,18 +153,24 @@ At `govkit.py:11073-11079`:
             in_place = new_dest == row["path"]
 ```
 
-At `:11109-11114`, the one `r.fail` call takes a conditional message, so the refusal join's count
+At `:11109-11114`, the one `r.fail` call takes a three-way message, so the refusal join's count
 does not move:
 
 ```python
             if not in_place and (new_dest in _at_dest or ndp.exists()):
                 _alias = ndp.exists() and _own.exists() and ndp.samefile(_own)
+                _case = _alias and new_dest.casefold() == row["path"].casefold()
                 r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
                        f"'{new_dest}' — this row's own file '{row['path']}' under a second spelling, "
                        f"as a case-only rename is on a case-insensitive filesystem. Refusing the move: "
                        f"a rollback cannot restore one file held under two spellings. The file is "
                        f"untouched, so do not move or remove it; run `update` from a checkout on a "
-                       f"case-sensitive filesystem, where the new spelling is a second path" if _alias else
+                       f"case-sensitive filesystem, where the new spelling is a second path" if _case else
+                       f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
+                       f"'{new_dest}' — the row's own file '{row['path']}' under another name (a link "
+                       f"or a filesystem alias). Refusing the move: a rollback cannot restore one file "
+                       f"held under two names. The file is untouched. If '{new_dest}' is a link you "
+                       f"made, remove the link and re-run" if _alias else
                        f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
                        f"'{new_dest}' — and this target ALREADY holds a file there. Refusing rather "
                        f"than overwriting it: `update` moves one row and would be destroying "
@@ -164,10 +178,19 @@ does not move:
                 continue
 ```
 
-`samefile` raises when either path is absent, so both are tested first, as 88 tested them. The alias
-message carries no `ALREADY holds a file there`, so the `[-11]` checks that read that text
+`samefile` raises when either path is absent, so both are tested first, as 88 tested them. Neither
+alias message carries `ALREADY holds a file there`, so the `[-11]` checks that read that text
 (`selftest.py:13075-13076`) still read only the occupied-by-another-file refusal. The rest of the arm
 is unchanged. A case-only row never reaches the move block, so `in_place` is the one test there too.
+
+`samefile` is an `os.stat` identity, so it also holds for a symlink or hard link at `new_dest` that
+names the row's file, on any filesystem, and for a macOS NFC/NFD alias. `ndp` is resolved
+(`:11072`), so a symlink reads as its target. That is the round-1 spec audit's M5 (id 13). `_alias`
+stays the identity test, and `casefold` only picks the wording: the case-only text is printed only
+where the two spellings fold together, and every other alias reads the other-name text, whose remedy
+is to take the link out of the way. One shape still reads the case-only text wrongly: a link whose
+name differs from the row's only by case, on a case-sensitive filesystem. Its refusal still fires
+and no byte moves.
 
 ### S2
 
@@ -203,13 +226,15 @@ observes S1. On one that does not, it observes the ordinary move and not S1.
 ### The probe
 
 `p90_probe.py`, run from the repository root. Its one optional argument is the engine directory,
-`tools/govkit` by default. It runs one case-only rename twice, each in a fresh scratch gov at
-`pinned` and a target installed there. The first run renames only `keep.txt` to `Keep.txt`. The
-second also renames `other.txt` onto `renamed.txt`, a path the adopter's own file holds, so the kit
-is held back and rolled back.
+`tools/govkit` by default. It runs three updates, each in a fresh scratch gov at `pinned` and a
+target installed there. The first renames only `keep.txt` to `Keep.txt`. The second also renames
+`other.txt` onto `renamed.txt`, a path the adopter's own file holds, so the kit is held back and
+rolled back. The third is M5's shape: the adopter commits a hard link `linked.txt` to `keep.txt`, and
+gov renames `keep.txt` to `linked.txt`. A hard link stands in for a symlink because NTFS makes one
+without a privilege, and `samefile` answers both alike.
 
 ```python
-import json, pathlib, shutil, subprocess, sys, tempfile
+import os, pathlib, shutil, subprocess, sys, tempfile
 eng = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "tools/govkit").resolve()
 sys.path.insert(0, str(eng))
 from fixture_target import build_scratch_gov, build_target
@@ -217,8 +242,7 @@ tmp = pathlib.Path(tempfile.mkdtemp(prefix="p90-"))
 def git(cwd, *a):
     return subprocess.run(["git", "-C", str(cwd), "-c", "user.email=t@e", "-c", "user.name=t", *a],
                           capture_output=True, text=True, check=True).stdout
-def run(sibling):
-    tag = "sibling" if sibling else "alone"
+def run(tag):
     g = build_scratch_gov(tmp / f"gov-{tag}")
     (g / "pinned" / "govkit").mkdir(parents=True)
     for f in ("govkit.py", "adopters.toml", "upgrade_steps.py"):
@@ -239,28 +263,42 @@ def run(sibling):
     gk = [sys.executable, str(g / "pinned" / "govkit" / "govkit.py")]
     subprocess.run(gk + ["apply", "--target", str(t), "--kits", "demo"], capture_output=True, check=True)
     git(t, "add", "-A"); git(t, "commit", "-qm", "install")
-    if sibling:
+    if tag == "sibling":
         (t / "pinned/demo/renamed.txt").write_text("the adopter's own file\n", encoding="utf-8", newline="\n")
         git(t, "add", "-A"); git(t, "commit", "-qm", "own file")
         git(g, "mv", "pinned/demo/other.txt", "pinned/demo/renamed.txt")
-    git(g, "mv", "pinned/demo/keep.txt", "pinned/demo/Keep.txt")
+    if tag == "link":
+        os.link(t / "pinned/demo/keep.txt", t / "pinned/demo/linked.txt")
+        git(t, "add", "-A"); git(t, "commit", "-qm", "own link")
+        git(g, "mv", "pinned/demo/keep.txt", "pinned/demo/linked.txt")
+    else:
+        git(g, "mv", "pinned/demo/keep.txt", "pinned/demo/Keep.txt")
     git(g, "commit", "-qm", "B")
     up = subprocess.run(gk + ["update", "--target", str(t), "--write"],
                         capture_output=True, text=True, encoding="utf-8", errors="replace")
-    idx = [p.rsplit("/", 1)[1] for p in git(t, "ls-files", "--", "pinned/demo").split() if p.lower() == "pinned/demo/keep.txt"]
     disk = (t / "pinned/demo/keep.txt").read_bytes() if (t / "pinned/demo/keep.txt").is_file() else None
+    kept = disk == b"one" + bytes([10]) + b"two" + bytes([10])
+    if tag == "link":
+        print(f"hard link: update exit {up.returncode} | case-only named: "
+              f"{'case-only rename' in up.stdout} | other name named: {'under another name' in up.stdout} | bytes kept: {kept}")
+        return
+    idx = [p.rsplit("/", 1)[1] for p in git(t, "ls-files", "--", "pinned/demo").split() if p.lower() == "pinned/demo/keep.txt"]
     print(f"case-only {tag}: update exit {up.returncode} | second spelling named: "
-          f"{'under a second spelling' in up.stdout} | index: {idx} | bytes kept: {disk == b'one' + bytes([10]) + b'two' + bytes([10])}"
-          + (f" | occupied refused: {'ALREADY holds a file there' in up.stdout}" if sibling else ""))
+          f"{'under a second spelling' in up.stdout} | index: {idx} | bytes kept: {kept}"
+          + (f" | occupied refused: {'ALREADY holds a file there' in up.stdout}" if tag == "sibling" else ""))
 print("case-insensitive:", (pathlib.Path(eng) / "GOVKIT.PY").exists())
-run(False)
-run(True)
+run("alone")
+run("sibling")
+run("link")
 ```
 
 ### Measured at writing time
 
 Measured on 2026-10-29 on node a, where `git config core.ignorecase` reads `true`. "S1 staged" is a
-scratch copy of `tools/govkit` with §4 "S1" applied as written. The probe takes about 15 s.
+scratch copy of `tools/govkit` with §4 "S1" applied as written. At rev-1 the probe ran only its
+first two updates, in about 15 s. At rev-2, with the third update added, it ran in about 20 s, and
+the engine at `a3ad798cf` and the S1-staged engine were re-run, and each printed the same first
+three lines as at rev-1.
 
 - **The probe at `cbaaeebeb`.** `case-insensitive: True`, then
   `case-only alone: update exit 0 | second spelling named: False | index: ['Keep.txt'] | bytes kept: True`,
@@ -268,12 +306,17 @@ scratch copy of `tools/govkit` with §4 "S1" applied as written. The probe takes
   `case-only sibling: update exit 1 | second spelling named: False | index: ['keep.txt'] | bytes kept: False | occupied refused: True`.
   The sibling run's `git status --porcelain`, read in a first version of the probe, showed
   ` D pinned/demo/keep.txt`, while its verify line read `ROLLED BACK` and named both spellings
-  restored. That is H1 reproduced.
+  restored. That is H1 reproduced. At rev-2 the fourth line read
+  `hard link: update exit 1 | case-only named: False | other name named: False | bytes kept: True`.
 - **The probe, S1 staged.** `case-insensitive: True`, then
   `case-only alone: update exit 1 | second spelling named: True | index: ['keep.txt'] | bytes kept: True`,
   then
   `case-only sibling: update exit 1 | second spelling named: True | index: ['keep.txt'] | bytes kept: True | occupied refused: True`.
-  The sibling run's verify line read `ROLLED BACK · (no path restored)`.
+  The sibling run's verify line read `ROLLED BACK · (no path restored)`. At rev-2 the fourth line
+  read `hard link: update exit 1 | case-only named: False | other name named: True | bytes kept: True`.
+- **S1 staged with rev-1's two-way message.** That is `_case = _alias`, so every alias prints the
+  case-only text, which is M5 (id 13). The fourth line read
+  `hard link: update exit 1 | case-only named: True | other name named: False | bytes kept: True`.
 - **The bare string test staged without the message.** That is `own_file = new_dest == row["path"]`
   with the message unchanged, run alone and with the refused sibling. Each read `update exit 1`, the
   index `['keep.txt']` and `keep.txt` on disk, and the sibling run's verify line read
@@ -286,7 +329,8 @@ miniature, without the root move that precedes it there.
 
 ### Inventory
 
-Minted: the local `_alias`, the case-only refusal message, the check label `[dSP-90]`, and the
+Minted: the locals `_alias` and `_case`, the case-only and other-name refusal messages, the check
+label `[dSP-90]`, and the
 locals `_fold90`, `_cs90` and `_ix90`. The local `own_file` goes from `govkit.py` (S1's readers). No
 function, `Refusal` site, flag, conf key, gate leg or receipt field is added. The refusal join's
 anchors do not move, because the occupancy refusal keeps its one `r.fail` call. The `[dSP-88]` label
@@ -299,8 +343,10 @@ in its receipt and index, and S1 never revisits that row.
 
 ### Rollout
 
-Live at landing, at order 16, after TOOL-dSafePassage-88. TOOL-dSafePassage-91 edits the same
-`govkit.py` snapshot block and the same selftest block after this unit.
+Live at landing, at order 16, after TOOL-dSafePassage-88. TOOL-dSafePassage-91 builds after this
+unit. In `govkit.py` it edits the pre-write snapshot (`:10745-10747`), which this unit does not
+touch. In `selftest.py` its L1 check sits after this unit's `[dSP-90]` check in the
+`DEPL-dCarriedReceipt-11` block, the one block the two units share.
 
 ### Files touched (estimate)
 
@@ -314,8 +360,12 @@ Live at landing, at order 16, after TOOL-dSafePassage-88. TOOL-dSafePassage-91 e
   a move no gov commit has needed, needs M1's and M3's fixes beside it, and leaves `written_paths`,
   `_left` and the rollback's list removal reasoning about one file under two spellings (§4 "Which
   mechanism").
-- **Decide the alias message by a lowercase compare.** That answers a string question about a
-  filesystem fact. `samefile` is the filesystem's own answer, and it is the audit's left-shift.
+- **Decide the alias by a lowercase compare.** That answers a string question about a filesystem
+  fact. `samefile` is the filesystem's own answer, and it is the audit's left-shift. `casefold`
+  only picks which alias message prints, after `samefile` has said the two names are one file.
+- **One alias message for every alias, the case-only text.** That is rev-1's form. It tells an
+  adopter whose own link sits at gov's new name that the cause is case folding, and sends them to
+  a case-sensitive checkout they may already be on (M5, id 13).
 - **Keep the bare message.** It tells the adopter to move or remove `'<new spelling>'`, which on a
   case-insensitive filesystem is their own installed file.
 
@@ -324,11 +374,13 @@ Live at landing, at order 16, after TOOL-dSafePassage-88. TOOL-dSafePassage-91 e
 - security: the occupancy guard refuses every rename whose destination string is not the row's own
   path, case-only renames included, so `git mv` never overwrites an index entry through a folded
   spelling (M1). No new write path, spawn or surface.
-- perf / scale: one `samefile` call, and only on a row already being refused.
+- perf / scale: one `samefile` call and one `casefold` compare, and only on a row already being
+  refused.
 - error / empty / loading states: a case-only row on a case-insensitive filesystem is refused with a
   message naming the cause, the untouched file and a remedy. Its kit is held back, as any refused
   row's kit is.
-- observability: the refusal names both spellings and the case-only cause.
+- observability: the refusal names both spellings, and either the case-only cause or a link or
+  filesystem alias.
 - risks: an adopter past a gov case-only rename on Windows or macOS keeps that kit held back on every
   run until gov's spelling differs by more than case or the update runs on a case-sensitive checkout.
   No gov commit has made such a rename (§4 "Which mechanism").
@@ -340,24 +392,29 @@ Live at landing, at order 16, after TOOL-dSafePassage-88. TOOL-dSafePassage-91 e
 
 ## 6. Acceptance criteria
 
-- **AC1** — When §4 "The probe", `python <scratch>/p90_probe.py`, runs from the repository root on a
+- **AC1** — When §4 "The probe", saved under the temp root as `p90_probe.py`, runs with `python` from the repository root on a
   node whose filesystem folds case, its second line reads
   `case-only alone: update exit 1 | second spelling named: True | index: ['keep.txt'] | bytes kept: True`,
   and its third reads
-  `case-only sibling: update exit 1 | second spelling named: True | index: ['keep.txt'] | bytes kept: True | occupied refused: True`.
+  `case-only sibling: update exit 1 | second spelling named: True | index: ['keep.txt'] | bytes kept: True | occupied refused: True`,
+  and its fourth reads
+  `hard link: update exit 1 | case-only named: False | other name named: True | bytes kept: True`.
   Red when: the `samefile` arm stays in the occupancy test, so the second line reads
   `update exit 0 | second spelling named: False | index: ['Keep.txt']` and the third reads
-  `bytes kept: False`, as at `cbaaeebeb`.
-  cost: about 15 s.
+  `bytes kept: False`, as at `cbaaeebeb`; or `_alias` alone picks the case-only text, so the fourth
+  reads `case-only named: True | other name named: False`, as measured with that form staged.
+  cost: about 20 s.
   fixture: two scratch govs and targets under the temp root, and a case-insensitive filesystem, as
   on node a, where the probe's first line reads `case-insensitive: True`. The tree holds none today.
-  On a case-sensitive filesystem the probe observes nothing of S1.
+  On a case-sensitive filesystem the probe observes nothing of S1's case-only half. The fourth line
+  needs `os.link`, which NTFS grants without a privilege.
 - **AC2** — When `git grep -n -e "own_file" -e "samefile" -- tools/govkit/govkit.py` runs, it prints
   one line, the `_alias` test inside the occupancy refusal; and
-  `git grep -n -F "case-only rename is on a case-insensitive filesystem" -- tools/govkit/govkit.py`
-  prints one line.
+  `git grep -n -F "case-only rename is on a case-insensitive filesystem" -- tools/govkit/govkit.py`,
+  `git grep -n -F "casefold()" -- tools/govkit/govkit.py` and
+  `git grep -n -F "under another name (a link" -- tools/govkit/govkit.py` each print one line.
   Red when: the arm stays in the test, so the first grep prints the `own_file` lines at `:11078` and
-  `:11109`, and the second prints nothing, as at `cbaaeebeb`.
+  `:11109` and the other three print nothing, as at `a3ad798cf`.
 - **AC3** — When `git grep -n -F "[dSP-90]" -- tools/govkit/selftest.py` runs, it prints one line,
   inside the `DEPL-dCarriedReceipt-11` block, and `git grep -n -F "[dSP-88]" -- tools/govkit/selftest.py`
   prints one line, the in-place check.
@@ -390,6 +447,17 @@ none
   TOOL-dSafePassage-91 as the brief directs. The brief's option (b) was chosen over the review's fix
   (§4 "Which mechanism"). H1 was reproduced at `cbaaeebeb`, and S1 was staged in a scratch copy of the
   engine and measured.
+- rev-2 · 2026-10-29 · §2 S1 · §3 Edges · §4 S1, The probe, Measured, Inventory, Rollout,
+  Alternatives rejected · §5 · AC1 · AC2 · folded the round-1 spec audit,
+  `memory/builds/dSafePassage/reviews/2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md`,
+  from its brief
+  `memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md`.
+  M5 (id 13), at the skeptic's corrected fix: `_alias` stays the identity test and `casefold` picks
+  the case-only or other-name wording; the probe gained a hard-link run, measured green with the fix
+  and red with rev-1's wording. L1 (ids 3, 5), this unit's half: the Edges and Rollout notes name
+  `selftest.py`'s `DEPL-dCarriedReceipt-11` block as the one block shared with TOOL-dSafePassage-91.
+  Every cited line was re-verified at `a3ad798cf`. AC1 names its probe by its bare filename, so
+  every backticked path in §6 is tracked.
 
 ## 10. Reuse audit
 

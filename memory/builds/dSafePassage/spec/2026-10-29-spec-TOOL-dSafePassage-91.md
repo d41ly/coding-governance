@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-91 — the round-3 closing review's three remaining minors: the in-place row's one snapshot path, a grader for the walk's two roots, and an arm for the floor stub's bash fallback
 
-**Status:** DEFERRED · rev-1 · 2026-10-29 · node a · Tier-2 · base cbaaeebe · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base cbaaeebe · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,8 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md) | research | TOOL-dSafePassage-90 |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md) | research | TOOL-dSafePassage-90 |
 | [2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md) | journal | — |
+| [2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-90 |
 
 <!-- /gen:spec-records -->
 
@@ -37,15 +39,23 @@ same files.
 - **S2** — M4 (id 6), the walk's two roots are patched apart and graded. A new function in
   `tools/govkit/upgrade_walk.py`, `derive_policy_adopter`, answers the policy adopter's path in the
   walked target from the target's install prefix. `build_release_tree` calls it at `:248`, where the
-  expression sits inline now. `check_graders` (`:976`) gains a `plant-root` grader. With
-  `derive_tool_root` patched to answer `moved`, it requires the `engine-edit` plant under
-  `read_target_prefix()`, the `withdraw-one` gov_plant under `moved`, and the policy adopter under
-  the target's prefix. §4 "S2". Observed by AC3 and AC4.
-- **S3** — L2 (id 7), the floor stub's fallback to bare `bash` has an arm. `check_step_isolation` of
-  `tools/govkit/selftest.py` gains a `[dSP-91 L2]` check after `[dSP-87 AC5]` (`:4447-4448`). It runs
-  the floor row's witness on the same unusable-bash `PATH` with `GOV_BASH` unset. It requires only
-  that the witness's tail carry neither `upgrade_steps.Refusal` nor `Set GOV_BASH`.
-  `tools/govkit/steps/python_floor.py` is not edited. §4 "S3". Observed by AC5 and AC6.
+  expression sits inline now. The kind-to-file table typed inside `read_fixture_rows` (`:136`)
+  becomes the module constant `FIXTURE_FILES`, which that function reads. `check_graders` (`:976`)
+  gains a `plant-root` grader, and its docstring (`:977-980`) names it. With `derive_tool_root`
+  patched to answer `moved`, the grader reads every row of every kind in `FIXTURE_FILES`. Each
+  `path`, `from` and `to`, nested ones included, that resolves under either root must resolve under
+  its own kind's: `moved` for `gov_plant`, `read_target_prefix()` for every other kind. Both roots
+  must be sampled, and the policy adopter must sit under the target's prefix. §4 "S2". Observed by
+  AC3 and AC4.
+- **S3** — L2 (id 7), the floor stub's fallback to bare `bash` has an arm. A new module function of
+  `tools/govkit/selftest.py`, `check_floor_bash`, takes TOOL-dSafePassage-87's `[dSP-87 AC5]` block
+  out of `check_step_isolation` (`:4422-4448`), which calls it there, and adds a `[dSP-91 L2]` check
+  after it. The new check runs the floor row's witness on the same unusable-bash `PATH` with
+  `GOV_BASH` unset. Its tail must name `bash` or the floor script, and must carry none of
+  `python_floor.py:`, `upgrade_steps.Refusal` and `Set GOV_BASH`. A new context manager of
+  `selftest.py`, `set_environ`, holds the environment for both checks and for the two other copies
+  of that save-and-restore loop in `check_step_isolation` (`:3766`, `:4409`).
+  `tools/govkit/steps/python_floor.py` is not edited. §4 "S3". Observed by AC5, AC6 and AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -58,19 +68,24 @@ same files.
   checklist exists, and each item's persisted arm here is its gate.
 - A green `upgrade-walk` row in the foreign-prefix parity leg. S2's grader observes the root split on
   the real tree, at gov's own root, by patching one root apart.
-- Asserting an rc in S3's check. What bare `bash` finds on the check's `PATH` is the node's: measured,
-  the WSL launcher's `127` on node a (§4 "S3").
+- Asserting an rc in S3's check. What bare `bash` resolves to is the node's. On Windows the loader
+  finds the System32 WSL launcher before it searches `PATH`, whatever `PATH` holds
+  (`upgrade_steps.py:372-376`), measured as rc `127` on node a (§4 "S3").
+- The round-1 spec audit's left-shift gates. The main loop takes them; none is authored here.
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-90` — its S1 edits the same `renamed` write arm and its
-  `[dSP-90]` check is the one S1's check sits after; without it S1's check has no anchor in the block
+- **consumes-from** `TOOL-dSafePassage-90` — its S1 edits `_cmd_update`'s `renamed` write arm
+  (`govkit.py:11062-11114`), which this unit does not touch; the two share only the
+  `DEPL-dCarriedReceipt-11` block of `selftest.py`, where this unit's `[dSP-91 L1]` check anchors
+  after 90's `[dSP-90]` check and binds `_kit88`; without 90 that check has no anchor in the block
 
 ## 4. Design
 
 Every cited line holds at `cbaaeebeb`, the build head with TOOL-dSafePassage-86, -87, -89 and -88
-landed. TOOL-dSafePassage-90 edits `govkit.py` and `selftest.py` before this unit builds, so the
-builder re-reads each cited line by content before editing. Each measurement below was taken on
+landed. At rev-2 `git diff --stat cbaaeebeb a3ad798cf -- tools skills` printed nothing, and every
+line rev-2 adds was read at `a3ad798cf`. TOOL-dSafePassage-90 edits `govkit.py` and `selftest.py`
+before this unit builds, so the builder re-reads each cited line by content before editing. Each measurement below was taken on
 2026-10-29 on node a, in scratch copies of the engine under the temp root.
 
 ### S1: one snapshot path for an in-place row
@@ -181,6 +196,17 @@ Measured, about 6 s each:
 
 ### S2: the plant-root grader
 
+Beside `FIXTURE` (`upgrade_walk.py:44`), the table `read_fixture_rows` types inline at `:136`:
+
+```python
+# TOOL-dSafePassage-91 S2: each fixture row kind and the file holding it, read by `read_fixture_rows`
+# and walked whole by the plant-root grader.
+FIXTURE_FILES = {"plant": "plants.toml", "gov_plant": "plants.toml", "condition": "plants.toml", "arm": "arms.toml"}
+```
+
+`:136` then reads `name = FIXTURE_FILES[kind]`. The grader walks the dispatch's own kinds, so a kind
+added to the table is graded the day it lands, and no second list of kinds is typed.
+
 Beside `derive_release_engine` (`upgrade_walk.py:199-203`):
 
 ```python
@@ -195,6 +221,11 @@ At `:247-248` the local `adopter` and the inline `resolve_kit_dir` call give way
 `[gk.resolve_bash(), derive_policy_adopter(t).as_posix(), "--scaffold", "--target", t.as_posix()]`.
 The function returns the script, not its directory, so the anchor is spelled once.
 
+The `check_graders` docstring (`:977-980`) ends `TOOL-dSafePassage-87's check_shim_paths over gov's
+own row at another tool root; returns the reds.` It gains, before `returns the reds`: `and
+TOOL-dSafePassage-91's plant-root split: the target's plants and the policy adopter at the install
+prefix, gov plants at a moved tool root`.
+
 In `check_graders`, after `check_grade_shim_root` (`:1086-1097`):
 
 ```python
@@ -204,16 +235,32 @@ In `check_graders`, after `check_grade_shim_root` (`:1086-1097`):
         real = gk.derive_tool_root
         gk.derive_tool_root = lambda root: "moved"
         try:
-            ee = next(r["path"] for r in read_plant_rows() if r["id"] == "engine-edit")
-            wo = next(r["path"] for r in read_fixture_rows("gov_plant") if r["id"] == "withdraw-one")
+            got = {kind: read_fixture_rows(kind) for kind in FIXTURE_FILES}
             try:
                 pol = derive_policy_adopter(t)
             except LookupError as e:
                 pol = f"LookupError: {e}"
         finally:
             gk.derive_tool_root = real
-        bad = [] if ee.startswith(pfx + "/") else [f"the engine-edit plant read {ee}, not under {pfx}/"]
-        bad += [] if wo.startswith("moved/") else [f"the withdraw-one gov_plant read {wo}, not under moved/"]
+
+        def extract_paths(row):
+            for k, v in row.items():
+                if k in ("path", "from", "to") and isinstance(v, str):
+                    yield v
+                elif isinstance(v, dict):
+                    yield from extract_paths(v)
+
+        bad, seen = [], set()
+        for kind, rows in got.items():
+            want, wrong = ("moved", pfx) if kind == "gov_plant" else (pfx, "moved")
+            for r in (r for r in rows if isinstance(r, dict)):
+                for p in extract_paths(r):
+                    if p.startswith(want + "/"):
+                        seen.add(want)
+                    elif p.startswith(wrong + "/"):
+                        bad.append(f"the {kind} row {r.get('id') or r.get('name')} read {p}, not under {want}/")
+        bad += [f"no fixture row resolved under {w}/, so that root went unsampled" for w in ("moved", pfx)
+                if w not in seen]
         bad += [] if isinstance(pol, pathlib.Path) and t / pfx in pol.parents else [
             f"the policy adopter read {pol}, not under the target's {pfx}"]
         return "; ".join(bad)
@@ -221,52 +268,137 @@ In `check_graders`, after `check_grade_shim_root` (`:1086-1097`):
 
 Its row joins the grader tuple (`:1101-1104`) as `("plant-root", check_grade_plant_root)`.
 `read_fixture_rows` reads `gk.derive_tool_root` off the module that `load_engine` returns
-(`:138-140`), so the patch reaches it. The grader catches `LookupError` itself, because the grader
-loop catches only `Stop`, `OSError`, `KeyError` and `ValueError` (`:1107`). `build_repo` (`:986-995`)
-gives the scratch target a `.git` and no receipt, so `resolve_kit_dir` answers from its probe, which
-is the target's prefix or nothing (`govkit.py:265-270`).
+(`:137-140`), so the patch reaches it. The resolved `{prefix}` is the only root a path carries, so a
+path under `moved/` or under the target's prefix is one that `:140` resolved, and the fixture's
+literal paths, such as `.claude/settings.json` (`plants.toml:48`), are under neither and are not
+graded. At `a3ad798cf` no literal `path`, `from` or `to` in `plants.toml` or `arms.toml` starts with
+`tools/` or `moved/`. Every kind's rows are walked, nested ones included: the `held-shim` arm's `shim.from` and
+`shim.to` (`arms.toml:50`) and the `missing-plant` arm's `plant.path` (`arms.toml:70`) are sampled
+beside the plants and gov plants. That is the round-1 spec audit's M4 (id 12). The `condition` kind
+holds no `{prefix}` token today (`plants.toml:131-134`), so it is walked and samples nothing, and
+the grader cannot see a mis-split of it until one of its rows carries a token.
 
-Measured with S2 staged in a scratch tree made by `git archive cbaaeebeb tools`, its
-`check_graders` taking about 5 s:
+The grader looks no row up by id, so a fixture missing a row cannot raise `StopIteration` past the
+loop, which catches only `Stop`, `OSError`, `KeyError` and `ValueError` (`:1107`). A fixture with
+no row resolving under one root reads the named `unsampled` red instead. That is the round-1 spec
+audit's L5 (id 14). The grader catches `LookupError` itself for the same reason. `build_repo`
+(`:986-995`) gives the scratch target a `.git` and no receipt, so `resolve_kit_dir` answers from its
+probe, which is the target's prefix or nothing (`govkit.py:265-270`).
+
+Measured at rev-2 with S2 staged in a scratch tree made by `git archive a3ad798cf tools` and
+committed, its `check_graders` taking about 2 s a run:
 
 | Staged | `plant-root` row |
 |---|---|
 | S2 as written | `upgrade-walk: grader · plant-root · ok`, and the list `[]` |
-| `:140` in its `b634d60e5` form, one root for every kind | `RED · the engine-edit plant read moved/memory-tree/README.md, not under tools/` |
-| `:140` resolving every kind against `read_target_prefix()` | `RED · the withdraw-one gov_plant read tools/hooks/kit.toml, not under moved/` |
+| `:140` in its `b634d60e5` form, one root for every kind | `RED · the plant row engine-edit read moved/memory-tree/README.md, not under tools/`, then the other plant and arm rows, then `no fixture row resolved under tools/, so that root went unsampled` |
+| `:140` resolving every kind against `read_target_prefix()` | `RED · the gov_plant row withdraw-one read tools/hooks/kit.toml, not under moved/`, then `withdraw-one-source`, then `no fixture row resolved under moved/, so that root went unsampled` |
+| `:140` sending `kind in ("gov_plant", "arm")` to gov's tool root | `RED · the arm row held-shim read moved/check-kit-versions.sh, not under tools/`, then its `to` and the `missing-plant` arm's plant |
 | `derive_policy_adopter` resolving at `t / gk.derive_tool_root(t)` | `RED · the policy adopter read LookupError: no policy kit holding adopt-policy.sh` |
 
-Every other grader row read `ok` in each.
+Every other grader row read `ok` in each. Rev-1's grader sampled only `engine-edit`, `withdraw-one`
+and the policy adopter, so it reads no arm row and passes the fourth row's break, as the audit's M4
+reasons. That form was not staged at rev-2.
 
 ### S3: the floor stub's fallback
 
-After `[dSP-87 AC5]` (`selftest.py:4447-4448`), reusing that check's `fake87`, `keep87` and
-`floor_row`:
+After `check` (`selftest.py:279-284`), shaped as `measure_legs.set_environ`
+(`tools/run-gates/measure_legs.py:2046-2057`), which this copy-installed kit cannot import across
+kits. It also unsets, because `[dSP-91 L2]` needs `GOV_BASH` absent:
 
 ```python
-    # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
-    # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. Only the
-    # tail is graded: what bare `bash` finds on this PATH, and so the rc, is the node's.
-    held = {k: os.environ.get(k) for k in ("PATH", "GOV_PYTHON", "GOV_BASH")}
-    os.environ.update(PATH=os.pathsep.join([str(fake87)] + keep87), GOV_PYTHON=sys.executable)
-    os.environ.pop("GOV_BASH", None)
+@contextlib.contextmanager
+def set_environ(values: dict):
+    """TOOL-dSafePassage-91 S3: `values` set in this process's environment for the block, a `None`
+    unsetting its key, and the previous state restored after. Shaped as `measure_legs.set_environ`,
+    which this copy-installed kit cannot import across kits."""
+    held = {k: os.environ.get(k) for k in values}
+    for k, v in values.items():
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
     try:
-        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+        yield
     finally:
         for k, v in held.items():
             if v is None:
                 os.environ.pop(k, None)
             else:
                 os.environ[k] = v
-    check("[dSP-91 L2] the floor row's witness, no bash resolving and GOV_BASH unset, falls back to bare bash",
-          "upgrade_steps.Refusal" not in got["tail"] and "Set GOV_BASH" not in got["tail"], str(got))
 ```
+
+`contextlib` is imported at `selftest.py:19`. The three hand-typed copies of this loop in
+`check_step_isolation` take it. At `:3766-3775` the hold is `with set_environ(parent):` around the
+`build_step_env` call; `parent` stays, because `run_fixture` reads it at `:3783`. At `:4409-4418`
+it is `with set_environ({"PATH": str(fakes) + os.pathsep + os.environ.get("PATH", ""),
+"GOV_PYTHON": sys.executable}):`. The third copy, at `:4437-4446`, goes with `[dSP-87 AC5]` into
+`check_floor_bash`. That is the round-1 spec audit's L3 (id 7).
+
+The block at `:4422-4448`, which is the end of `check_step_isolation`, becomes one call,
+`check_floor_bash(tmp)`, and the block moves into that new module function, placed before
+`check_step_gate_fixture` (`:4451`):
+
+```python
+def check_floor_bash(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-87 AC5 and TOOL-dSafePassage-91 S3, the floor row's witness on one PATH whose
+    every bash is unusable: with GOV_BASH the parent's bash it holds, and with GOV_BASH unset the
+    floor stub reaches its fallback to bare `bash`. Called from `check_step_isolation`."""
+    us = govkit_module().upgrade_steps
+    floor_row = next(r for r in us.read_steps(GOV_ROOT, None, None) if r.id == "lib/python-floor-3.15")
+    # (:4422-4436 as they stand: the TOOL-dSafePassage-87 S4 comment, bash87, fake87,
+    #  test_launcher87 and keep87)
+    path87 = os.pathsep.join([str(fake87)] + keep87)
+    with set_environ({"PATH": path87, "GOV_BASH": bash87, "GOV_PYTHON": sys.executable}):
+        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+    check("[dSP-87 AC5] the floor row's witness, PATH's bash unusable and GOV_BASH the parent's bash, is ok",
+          got["verdict"] == "ok" and got["rc"] == 0, str(got))
+
+    # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
+    # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. What bare
+    # `bash` resolves to (on Windows the loader's System32 WSL launcher, elsewhere PATH or nothing), and
+    # so the rc, is the node's, so only the tail is graded: it names bash or the floor script, and it
+    # carries neither the stub's own early exit nor the Refusal.
+    with set_environ({"PATH": path87, "GOV_BASH": None, "GOV_PYTHON": sys.executable}):
+        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+    tail = got["tail"]
+    check("[dSP-91 L2] the floor row's witness, no bash resolving and GOV_BASH unset, falls back to bare bash",
+          ("bash" in tail or "python-floor.sh" in tail) and "python_floor.py:" not in tail
+          and "upgrade_steps.Refusal" not in tail and "Set GOV_BASH" not in tail, str(got))
+```
+
+`floor_row` is read as `:4403` reads it, because `[dSP-75]` still reads that one in
+`check_step_isolation`. The function is its own so that AC5 can call it the way
+TOOL-dSafePassage-71's criteria call `selftest.build_staged_copy`, without running the suite. That is
+the round-1 spec audit's M2 (id 2): rev-1's AC5 ran only the witness, which reads the same before
+the build as after it.
 
 `resolve_bash` refuses with `Set GOV_BASH.` when no `PATH` candidate runs (`upgrade_steps.py:421-422`),
 and `resolve_shell_argv` falls back to the bare argv on that `Refusal` (`:437-440`). The witness's
 `tail` is its stderr (`upgrade_steps.py:1766`, `:1805`).
 
-`l2_probe.py` runs the same witness outside the selftest. Its one argument is a gov root whose
+The positive half is the round-1 spec audit's M3 (id 11). Rev-1's check asserted only absences, so
+it read green on any failure that stops before `python_floor.py:36`. The stub's own early exit
+writes `python_floor.py: <the LookupError>` and returns 2 (`python_floor.py:31-35`), and that tail
+carries neither absence. The check now requires the tail to name `bash` or the floor script
+`python-floor.sh` (`FLOOR_SCRIPT`, `python_floor.py:22`), and refuses `python_floor.py:`. The
+literal is spelled in the check because the stub's constant sits in a step program the selftest
+does not import.
+
+Measured at rev-2 by AC5's command, in the scratch tree of §4 "S2" with S3 staged and committed,
+about 3 s a run:
+
+| Staged | Lines |
+|---|---|
+| S3 as written | `ok   [dSP-87 AC5] ...`, `ok   [dSP-91 L2] ...`, and the list `[]` |
+| `python_floor.py:36` as `[steps.resolve_bash(), (kit / FLOOR_SCRIPT).as_posix(), *argv]` | `ok   [dSP-87 AC5] ...`, then `FAIL [dSP-91 L2] ...` with `upgrade_steps.Refusal: govkit: no usable bash on PATH that shares this filesystem` in its detail |
+| `python_floor.py:32` resolving `"no-such-floor.sh"` in place of `FLOOR_SCRIPT` | `FAIL [dSP-87 AC5] ...` and `FAIL [dSP-91 L2] ...`, each tail `python_floor.py: no lib kit holding no-such-floor.sh in this install: ...`, rc 2 |
+
+The third row's tail carries neither `upgrade_steps.Refusal` nor `Set GOV_BASH`, so rev-1's
+absence-only check reads it `ok`. That follows from the measured tail; rev-1's check was not staged.
+
+`l2_probe.py` runs the same witness outside the selftest. It is a measurement of the stub, not a
+criterion: it reads the same before the build as after it. Its one argument is a gov root whose
 `tools/govkit` is the engine under test:
 
 ```python
@@ -297,11 +429,14 @@ back to `[steps.resolve_bash(), (kit / FLOOR_SCRIPT).as_posix(), *argv]`, it pri
 
 ### Inventory
 
-Minted: the function `derive_policy_adopter` in `upgrade_walk.py`, its nested grader
-`check_grade_plant_root` and the grader row `plant-root`, the check labels `[dSP-91 L1]` and
-`[dSP-91 L2]`, the selftest name `_kit88`, the locals `_g91`, `_t91`, `_ap91`, `_up91`, `_ord91` and
-`_rs91`, and the scratch directories `rn-inplace-held-gov`, `rn-inplace-held-t` and
-`plant-root-target`. No `Refusal` site, flag, conf key, gate leg or receipt field.
+Minted: in `upgrade_walk.py`, the constant `FIXTURE_FILES`, the function `derive_policy_adopter`,
+its nested grader `check_grade_plant_root` with its nested generator `extract_paths`, and the grader
+row `plant-root`. In `selftest.py`, the context manager `set_environ`, the function
+`check_floor_bash` with its locals `path87` and `tail`, the check labels `[dSP-91 L1]` and
+`[dSP-91 L2]`, the name `_kit88`, and the locals `_g91`, `_t91`, `_ap91`, `_up91`, `_ord91` and
+`_rs91`. The scratch directories `rn-inplace-held-gov`, `rn-inplace-held-t` and `plant-root-target`.
+Each function's leading token is a verb of `.lexicon.conf`'s table: `derive`, `check`, `extract`
+and `set`. No `Refusal` site, flag, conf key, gate leg or receipt field.
 
 ### Migration
 
@@ -324,9 +459,17 @@ Live at landing, at order 16, after TOOL-dSafePassage-90.
 - **M4: the finder's fix.** The skeptic rejected it, and the corrected fix is S2.
 - **M4: patch the fixture's `deploy.toml` prefix apart instead of the tool root.** The grader would
   then edit a tracked fixture file, and `read_target_prefix` reads it from disk.
-- **L2: assert no traceback at all, or an rc.** The skeptic rejected both. Bare `bash` on a node
-  with none on `PATH` raises a `FileNotFoundError` traceback in the stub, which is the fallback
-  working.
+- **L2: assert no traceback at all, or an rc.** The skeptic rejected both. On a node where no bare
+  `bash` resolves at all, the stub's bare-`bash` spawn raises a `FileNotFoundError` traceback, which
+  is the fallback working. On Windows the loader resolves bare `bash` to the System32 WSL launcher
+  before `PATH` (`upgrade_steps.py:372-376`), so node a read rc `127` and no traceback.
+- **M4: sample one named row per kind.** A fixed sample misses the next row and the next kind;
+  walking every row of every `FIXTURE_FILES` kind does not, and costs the same one read per kind.
+- **M2: AC5 as the `[dSP-91 L2]` line in the `govkit selftest` output.** That is the skeptic's
+  wording. A criterion is never a self-test suite, so AC5 calls `check_floor_bash` alone, and the
+  suite's own red and green ride §7's New arm lines.
+- **L3: keep the inline copy and say why in §10.** The audit's alternative. The helper is ten lines,
+  in the one file that types the loop, and it leaves one copy where there were three.
 
 ## 5. Production-readiness checklist
 
@@ -334,19 +477,20 @@ Live at landing, at order 16, after TOOL-dSafePassage-90.
   paths a row occupies. S2 and S3 are checks.
 - perf / scale: one more `update` fixture in the selftest, about 6 s by its probe, and one more
   grader, which shares `check_graders`' scratch directory.
-- error / empty / loading states: the grader returns a red string on a missing policy adopter, as the
-  other graders return theirs, rather than raising past the loop.
+- error / empty / loading states: the grader returns a red string on a missing policy adopter and on
+  a root no fixture row resolves under, as the other graders return theirs, rather than raising past
+  the loop. It looks no row up with `next`, so a missing fixture row cannot raise `StopIteration`.
 - observability: the update-rollback order names an in-place row once.
 - risks: S2's patch of `derive_tool_root` is restored in a `finally`, so a red grader cannot leak the
   patched root into the walk that follows in the same process.
-- testing: §7's three New arms, and AC1 to AC6.
+- testing: §7's four New arms, and AC1 to AC7.
 - migration: none.
 - user docs: none. No page under `help/` describes the update-rollback order's lines, the walk's
   graders or the floor stub's fallback, so no page sentence changes.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When §4 "S1's probe", `python <scratch>/l1_probe.py`, runs from the repository root, it
+- **AC1** — When §4 "S1's probe", saved under the temp root as `l1_probe.py`, runs with `python` from the repository root, it
   prints
   `in place, sibling refused: update exit 1 | occupied refused: True | restored lines for keep.txt: 1 | bytes: ['one', 'two']`.
   Red when: the snapshot appends a renamed row's destination unconditionally, so it prints
@@ -361,33 +505,56 @@ Live at landing, at order 16, after TOOL-dSafePassage-90.
   `python -c "import sys; sys.path.insert(0, 'tools/govkit'); import upgrade_walk as u; print(u.check_graders())"`
   runs from the repository root, it prints `upgrade-walk: grader · plant-root · ok`, and its last
   line is `[]`.
-  Red when: `read_fixture_rows` resolves every kind against one root, or `derive_policy_adopter`
-  resolves at gov's tool root, so it prints `grader · plant-root · RED ·` and names the plant or the
-  adopter (§4 "S2"). At `cbaaeebeb` no `plant-root` row prints.
-  cost: about 5 s.
+  Red when: `read_fixture_rows` resolves every kind against one root, resolves every kind against
+  the target's prefix, or sends the `arm` kind to gov's tool root, or `derive_policy_adopter`
+  resolves at gov's tool root, so it prints `grader · plant-root · RED ·` and names the rows or the
+  adopter (§4 "S2"). At `a3ad798cf` no `plant-root` row prints.
+  cost: about 2 s, measured at rev-2.
 - **AC4** — When `git grep -n -F "derive_policy_adopter(t)" -- tools/govkit/upgrade_walk.py` runs, it
-  prints two lines, one in `build_release_tree` and one in `check_grade_plant_root`; and
-  `git grep -n -F 'resolve_kit_dir("policy", adopter' -- tools/govkit/upgrade_walk.py` prints nothing.
+  prints three lines: the `def` beside `derive_release_engine`, the call in `build_release_tree` and
+  the call in `check_grade_plant_root`. `git grep -n -F 'resolve_kit_dir("policy", adopter' -- tools/govkit/upgrade_walk.py`
+  prints nothing. `git grep -n -F "FIXTURE_FILES" -- tools/govkit/upgrade_walk.py` prints three
+  lines: the binding, `read_fixture_rows` and the grader. And
+  `git grep -n -F "plant-root split" -- tools/govkit/upgrade_walk.py` prints one line, in
+  `check_graders`' docstring.
   Red when: the adopter's path stays inline in `build_release_tree`, where no grader reaches it, so
-  the second grep prints the line at `:248`, as at `cbaaeebeb`.
-- **AC5** — When §4 "S3"'s `python <scratch>/l2_probe.py <scratch>/gov` runs from the repository root,
-  over a committed `git archive` of this tree's `tools`, it prints
-  `Refusal in tail: False | Set GOV_BASH in tail: False`.
-  Red when: `python_floor.py:36` calls `steps.resolve_bash()` directly, so it prints
-  `rc 1 | Refusal in tail: True | Set GOV_BASH in tail: True`, as measured with that line staged.
-  fixture: a scratch gov tree under the temp root, and a node whose `PATH` holds a bash, so the
-  probe's filtered `PATH` holds none that runs. The tree holds none today.
-- **AC6** — When `git grep -n -F "[dSP-91 L2]" -- tools/govkit/selftest.py` runs, it prints one line,
-  inside `check_step_isolation`.
-  Red when: the arm is absent, so it prints nothing, as at `cbaaeebeb`.
+  the second grep prints the line at `:248`; or the docstring is not updated, so the fourth prints
+  nothing, as at `a3ad798cf`.
+  figure: each count is PINNED, measured at rev-2 over S2 staged in a scratch tree.
+- **AC5** — When
+  `python -c "import pathlib, sys, tempfile; sys.path.insert(0, 'tools/govkit'); import selftest as s; s.check_floor_bash(pathlib.Path(tempfile.mkdtemp())); print(s.FAILURES)"`
+  runs from the repository root, it prints `ok   [dSP-87 AC5]`, then `ok   [dSP-91 L2]`, and its last
+  line is `[]`.
+  Red when: `selftest` holds no `check_floor_bash`, so it raises `AttributeError`, as at
+  `a3ad798cf`; or the check is built but its fallback is dead, as AC6 stages.
+  cost: about 3 s, measured at rev-2.
+  fixture: a node whose `PATH` holds a bash, so the check's filtered `PATH` holds none that runs, as
+  `[dSP-87 AC5]` already needs.
+- **AC6** — When `tools/govkit/steps/python_floor.py:36` is staged to
+  `[steps.resolve_bash(), (kit / FLOOR_SCRIPT).as_posix(), *argv]` and committed, AC5's command
+  prints `FAIL [dSP-91 L2]` with `upgrade_steps.Refusal` in its detail. When `:32` is staged to
+  resolve `"no-such-floor.sh"` in place of `FLOOR_SCRIPT` and committed, it prints
+  `FAIL [dSP-91 L2]` with `python_floor.py:` in its detail, and `FAIL [dSP-87 AC5]`.
+  Red when: the check asserts only absences, so the `:32` stage, whose tail carries neither
+  absence, reads `ok   [dSP-91 L2]`.
+  fixture: each stage edits a tracked file, so the build runs it in a scratch tree made by
+  `git archive HEAD tools` and committed, as rev-2 measured it, and records the two FAIL lines. The
+  tree holds no such scratch tree today.
+- **AC7** — When `git grep -n -F "[dSP-91 L2]" -- tools/govkit/selftest.py` runs, it prints one line,
+  inside `check_floor_bash`; and `git grep -n -F "os.environ.get(k) for k in" -- tools/govkit/selftest.py`
+  prints one line, inside `set_environ`.
+  Red when: the arm is absent, so the first grep prints nothing; or the save-and-restore loop is
+  typed again, so the second prints more than one line. At `a3ad798cf` they print nothing and three
+  lines.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `upgrade-walk` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/govkit/selftest.py · covers AC1 · the `[dSP-91 L1]` check in the `DEPL-dCarriedReceipt-11` block, staged red by the snapshot appending a renamed row's destination unconditionally, which restores the in-place row twice · none
-New arm: tools/govkit/upgrade_walk.py · covers AC3 · the `plant-root` grader of `check_graders`, staged red by `read_fixture_rows` in its `b634d60e5` one-root form and, separately, by `derive_policy_adopter` resolving at gov's tool root · none
-New arm: tools/govkit/selftest.py · covers AC5 · the `[dSP-91 L2]` check of `check_step_isolation`, staged red by `python_floor.py:36` calling `steps.resolve_bash()` directly, whose `Refusal` reaches the tail · none
+New arm: tools/govkit/upgrade_walk.py · covers AC3 · the `plant-root` grader of `check_graders`, staged red by `read_fixture_rows` in its `b634d60e5` one-root form, by every kind resolved at the target's prefix, by the `arm` kind sent to gov's tool root and, separately, by `derive_policy_adopter` resolving at gov's tool root · none
+New arm: tools/govkit/selftest.py · covers AC5 AC6 · the `[dSP-91 L2]` check of `check_floor_bash`, staged red by `python_floor.py:36` calling `steps.resolve_bash()` directly, whose `Refusal` reaches the tail, and separately by `:32` resolving a script no lib kit holds, whose early exit reaches it · none
+New arm: tools/govkit/selftest.py · covers AC5 · the `[dSP-87 AC5]` check, moved from `check_step_isolation` into `check_floor_bash`, staged red by `python_floor.py:32` resolving a script no lib kit holds, so the witness exits 2 · none
 
 The `{prefix}/govkit/` legs and `policy fixtures` are the guard join's for the three files; their
 other guards are broad. `upgrade-walk` runs `check_graders` first on every invocation
@@ -408,6 +575,23 @@ none
   L1 (id 4), M4 (id 6) and L2 (id 7), at the skeptic's fixes. M1 (id 1), M2 (id 2) and M3 (id 5)
   moved to TOOL-dSafePassage-90, whose mechanism closes them. Each fix and each staged break was
   measured in a scratch copy of the engine.
+- rev-2 · 2026-10-29 · §2 S2 S3 · §3 Edges · §4 S2, S3, Inventory, Alternatives rejected · §5 ·
+  AC1 · AC3 · AC4 · AC5 · AC6 · AC7 · §7 · §10 · folded the round-1 spec audit,
+  `memory/builds/dSafePassage/reviews/2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md`,
+  from its brief
+  `memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md`.
+  M1 (ids 1, 4, 8, 10), at the skeptic's corrected fix: AC4's first grep prints three lines, the
+  `def` included. M2 (id 2): AC5 calls the new `check_floor_bash` and is red before the build, and
+  AC6 stages its reds; `l2_probe.py` stays a §4 measurement. M3 (id 11): the check gains a positive
+  marker and refuses the stub's early exit, with that exit staged red. M4 (id 12): the grader walks
+  every row of every kind in the new `FIXTURE_FILES`, and the arm-kind break is staged red. L1 (ids
+  3, 5), this unit's half: the Edges note names the one block shared with TOOL-dSafePassage-90. L2
+  (id 6): the check's comment and the L2 alternative name the Windows loader's order. L3 (id 7): one
+  `set_environ` in `selftest.py` holds all four uses. L4 (id 9): the `check_graders` docstring names
+  the grader. L5 (id 14): the grader looks no row up by `next`, and an unsampled root is a named red.
+  S2 and S3 were staged in a scratch tree from `a3ad798cf` and measured, and every cited line was
+  re-verified there. AC1 names its probe by its bare filename, so every backticked path in §6 is
+  tracked.
 
 ## 10. Reuse audit
 
@@ -416,8 +600,10 @@ and its arm extends the `DEPL-dCarriedReceipt-11` block of `tools/govkit/selftes
 block's factory, `build_rename_gov` (`selftest.py:12209`), with the kit text bound once rather than
 copied. S2 extends `check_graders` (`tools/govkit/upgrade_walk.py:976`), whose `build_repo` it
 reuses, and its new function reads the existing `read_target_prefix` and `resolve_kit_dir` beside
-`derive_release_engine`. S3 extends `check_step_isolation` beside `[dSP-87 AC5]`, reusing its fake
-`PATH`. `python tools/codebase-map/reuse_lookup.py "a grader patches gov's tool root apart from the target prefix and checks each fixture row resolves against its own root"`
+`derive_release_engine`. S3 moves `[dSP-87 AC5]` out of `check_step_isolation` into `check_floor_bash`, whose new check
+reuses that check's fake `PATH`. Its `set_environ` takes the shape of
+`measure_legs.set_environ` (`tools/run-gates/measure_legs.py:2046`), which a copy-installed kit
+cannot import, and takes the three hand-typed copies of the loop in `selftest.py`. `python tools/codebase-map/reuse_lookup.py "a grader patches gov's tool root apart from the target prefix and checks each fixture row resolves against its own root"`
 ranked `resolve_kit_dir`, `repo_root` and `resolve_prefix_token` as seams. S2 calls the first
 through `derive_policy_adopter` and reaches the other two through `read_fixture_rows`, unchanged. The
 recall probe ranked the round-3 review's M4 item and TOOL-dSafePassage-87's S7, the split S2 grades.

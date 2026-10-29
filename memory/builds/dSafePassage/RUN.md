@@ -521,3 +521,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-29T10:51:48Z rescope · item add TOOL-dSafePassage-90 · reason the round-3 closing review's promotions (M4), specs at 83b250f87
 
 2026-10-29T10:51:58Z rescope · item add TOOL-dSafePassage-91 · reason the round-3 closing review's promotions (M4), specs at 83b250f87
+
+2026-10-29T11:10:10Z brief · item TOOL-dSafePassage-90 · reason 639de0225f70 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-90-build-brief.md
+
+2026-10-29T11:19:33Z dispatch · item a3ad798c TOOL-dSafePassage-90 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-90.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-90-ledger.md
