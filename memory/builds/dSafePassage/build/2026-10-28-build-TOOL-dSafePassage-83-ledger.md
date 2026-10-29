@@ -36,5 +36,5 @@ extracted to the session scratchpad.
 - AC6 — OWED to the main loop at the close: `bash tools/memory-tree/check-memory-hygiene.sh` and `bash skills/session-kickoff/manifest-check.sh` in a clone of the pass head whose `origin/HEAD` points at main. The builder role runs neither.
 - AC7 — the spec's `python -c` comparison over `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md` printed `True True`.
 
-OWED AT THE CLOSE: AC6's two runs, and the legs of §7, `memory hygiene`, `kickoff-manifest
-ratchet`, `recall floor` and `recall floor arms`. The unit adds no `New arm:` line.
+OWED AT THE CLOSE: AC6's two runs, and the legs of §7, `memory hygiene`,
+`kickoff-manifest ratchet`, `recall floor` and `recall floor arms`. The unit adds no `New arm:` line.
