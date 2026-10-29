@@ -225,13 +225,16 @@ re-renders, so a step meets the new files and the renders meet the moved ones:
   `attended: the step needs the target's code`, and writes
   `.governance/outbox/update-attended-step-<slug>.md`, naming the step and the command to run. Run
   it yourself; the next `update --write` skips the step once its witness holds.
-- **Read-only, and `--kits`.** Without `--write`, `update` prints `would walk <id>` for each pending
-  step and runs none of them, witnesses included. A `--kits` run walks none and prints `steps: not
-  walked` with the pending count; the next run without `--kits` walks them. A write run that
+- **Read-only, and `--kits`.** Without `--write`, `update` prints `would walk <id>`
+  for each pending step a write run would walk and runs none of them, witnesses included. A
+  `--kits` run walks none and prints `steps: not walked` with the pending count; the next run without `--kits` walks them. A write run that
   already has a finding walks none either, and prints `steps: not walked — this run already has
   <n> finding(s) · <n> pending` in place of the count line.
   A receipt below schema 3 is not walked either: the run prints `steps: not walked`, a clean run
   lifts the receipt to 3, and the next `update --write` walks from there.
+  A read-only run over such a receipt with no finding prints the same `steps: not walked` line, and
+  no `would walk`. A read-only run does not weigh its own findings, so with a finding it still lists
+  the steps a clean write run would walk.
 
 Every write run prints one line with every count, zeros included:
 `govkit update — steps: <n> pending · <a> applied · <s> skipped · stopped at <id|none>`.

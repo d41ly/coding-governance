@@ -10570,6 +10570,23 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # not go looking for the saving.
         return _land, _ref
 
+    def derive_walk_hold(findings: int) -> str | None:
+        """Why this run walks no step forward, or None when it walks. TOOL-dSafePassage-84.
+
+        DEFINED ONCE AND CALLED TWICE, by the read-only preview and by the write run's walk branch, so
+        the preview cannot list a step the write run would not walk for `--kits` or for the schema. The
+        preview passes no findings (TOOL-dSafePassage-84 §8 F1), so a write run's findings hold is its
+        own."""
+        if kits:
+            return ("a --kits run walks no step, since a subset would run a later step before an "
+                    "earlier one")
+        if findings:
+            return f"this run already has {findings} finding(s)"
+        if schema < 3:
+            return (f"the receipt is at schema {schema}, and its first step starts from 3: a clean "
+                    "`update --write` lifts it to 3, and the next one walks them")
+        return None
+
     # ===================== THE UNCLAIMED-SOURCE PREVIEW, ON THE READ-ONLY PATH ==================
     # THE `would land` BRANCHES WERE DEAD CODE. The landing block sits far below this return, so on
     # a read-only run it never executed: `unclaimed sources` appeared in no output, and the ternaries
@@ -10600,9 +10617,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             print(f"govkit update — steps: {len(_rb_rows)} to roll back")
             for _sw_row in _rb_rows:
                 print(f"govkit update —   would roll back {_sw_row.id}")
-        elif kits:
-            print(f"govkit update — steps: not walked — a --kits run walks no step, since a subset "
-                  f"would run a later step before an earlier one · {len(_sw_pending)} pending")
+        # ponytail: the preview's findings are not the write run's at the walk, so it passes none
+        # (TOOL-dSafePassage-84 §8 F1).
+        elif _sw_hold := derive_walk_hold(0):
+            print(f"govkit update — steps: not walked — {_sw_hold} · {len(_sw_pending)} pending")
         else:
             print(f"govkit update — steps: {len(_sw_pending)} pending")
             for _sw_row in _sw_pending:
@@ -11707,18 +11725,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # yet (§8 F3): a subset of the steps would run a later one before an earlier one out of scope.
     # And only over a receipt at schema 3 or above (TOOL-dSafePassage-78 S2): the first step starts
     # from 3, and the lift to 3 is this run's own stamp below, after the walk, so the next run walks.
-    # A stopped walk is a finding, so the `gov_commit` stamp below is withheld.
+    # The condition is `derive_walk_hold`'s, which the preview reads too, with no findings
+    # (TOOL-dSafePassage-84). A stopped walk is a finding, so the `gov_commit` stamp below is withheld.
     _sw_pending = [] if rollback else upgrade_steps.derive_pending_steps(root, receipt, to_commit)
     if rollback:
         # TOOL-dSafePassage-4 S5: the reverse walk above took the steps back; none walks forward.
         print("govkit update — steps: not walked — a rollback walks no step forward")
-    elif kits or r.problems or schema < 3:
-        print(f"govkit update — steps: not walked — "
-              + ("a --kits run walks no step, since a subset would run a later step before an "
-                 "earlier one" if kits else f"this run already has {len(r.problems)} finding(s)"
-                 if r.problems else f"the receipt is at schema {schema}, and its first step starts "
-                 "from 3: this run lifts it to 3, and the next `update --write` walks them")
-              + f" · {len(_sw_pending)} pending")
+    elif _sw_hold := derive_walk_hold(len(r.problems)):
+        print(f"govkit update — steps: not walked — {_sw_hold} · {len(_sw_pending)} pending")
     else:
         # TOOL-dSafePassage-62 S1. THE ROWS THE WRITE LOOP STAMPED REACH THE DISK BEFORE THE FIRST
         # STEP, `gov_commit` unmoved. Below schema 4 the walk persists nothing (TOOL-dSafePassage-15

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-84 — the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked
 
-**Status:** DEFERRED · rev-3 · 2026-10-29 · node a · Tier-2 · base 460ffb58 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-29
+**Status:** CLOSED · rev-3 · 2026-10-29 · node a · Tier-2 · base 460ffb58 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-29
 
 **Derived:** TOOL-dSafePassage-78
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-29-build-TOOL-dSafePassage-84-ledger.md](../build/2026-10-29-build-TOOL-dSafePassage-84-ledger.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-84-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-84-1-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-84-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-84-build-brief.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-84-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-84-spec-brief.md) | research | — |

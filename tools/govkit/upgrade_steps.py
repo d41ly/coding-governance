@@ -3624,8 +3624,8 @@ WALK_PLANTS = ("witness-holds", "fail-k", "kill-step", "resume", "attended", "no
 LOCK_PLANTS = ("lock-dead", "lock-live", "lock-reused", "lock-foreign-host", "lock-foreign-namespace", "lock-unreadable",
                "lock-foreign-pidns", "lock-no-pidns", "lock-race", "guard-dead", "lock-live-slow-census", "lock-wall-step", "lock-wall-step-no-boot",
                "lock-other-boot", "lock-no-namespace")
-UPDATE_PLANTS = ("read-only", "scoped", "update-fail", "kill-walk", "kill-walk-edit", "schema-3-update",
-                 "needs-target-source")
+UPDATE_PLANTS = ("read-only", "scoped", "scoped-read-only", "update-fail", "kill-walk", "kill-walk-edit",
+                 "schema-3-update", "needs-target-source")
 ROLLBACK_SCHEMA_PLANTS = ("schema-step", "schema-step-kill", "schema-step-early")  # TOOL-dSafePassage-18
 NODE_WITNESS_PLANTS = ("node-witness", "node-witness-refuses")  # TOOL-dSafePassage-17: s2 is the floor row's shape
 DOWN_KILLED_PLANTS = ("witness-only-down-killed", "unrecorded-witness-down-killed")  # TOOL-dSafePassage-39
@@ -4418,9 +4418,10 @@ def run_update_fixture(plant: str | None) -> int:
             want = {"s1.txt", "s2.txt", ".governance/steps/fx/s1.before.json", ".governance/steps/fx/s2.before.json"}
             print(f"update: staged step writes: {sorted(want & staged(t))}")
             expect(want <= staged(t), "a step's write is left unstaged")
-        elif plant in ("read-only", "scoped"):
+        elif plant in ("read-only", "scoped", "scoped-read-only"):
             rc, out = govkit("update", "--target", str(t), "--to", sha_b,
-                             *(("--kits", "demo", "--write") if plant == "scoped" else ()))
+                             *(("--kits", "demo", "--write") if plant == "scoped"
+                               else ("--kits", "demo") if plant == "scoped-read-only" else ()))
             print(out, end="")
             print(f"update: step canaries {canaries() or 'none'}")
             if plant == "read-only":
@@ -4430,6 +4431,7 @@ def run_update_fixture(plant: str | None) -> int:
             else:
                 expect(any(ln.startswith("govkit update — steps: not walked") and ln.endswith("· 2 pending")
                            for ln in out.splitlines()), "the scoped run does not print `steps: not walked` with 2 pending")
+                expect(plant == "scoped" or "would walk" not in out, "the scoped read-only run prints `would walk`")
             expect(not canaries(), "a step spawned on a read-only or scoped run")
         elif plant == "update-fail":
             reports.mkdir()

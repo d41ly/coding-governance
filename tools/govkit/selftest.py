@@ -4522,6 +4522,8 @@ def check_step_walk() -> None:
                                         "update: step canaries none")),
             ("update", "scoped", 0, ("govkit update — steps: not walked — a --kits run walks no step",
                                      "update: step canaries none")),
+            ("update", "scoped-read-only", 0, ("govkit update — steps: not walked — a --kits run walks no step",
+                                               "update: step canaries none")),
             ("update", "update-fail", 1, ("govkit update — steps: 2 pending · 1 applied · 0 skipped · stopped at fx/s2",
                                           "update: gov_commit A · steps {'fx/s1': 'applied', 'fx/s2': 'failed'}")),
             ("update", "kill-walk", 0, ("govkit update — reclaimed ", "update: the re-run's bytes equal an "
@@ -4540,6 +4542,7 @@ def check_step_walk() -> None:
         tag = ("dSP-15" if (plant or "").startswith("schema-3")
                else "dSP-40" if plant == "kill-after-up"
                else "dSP-76" if plant == "kill-before-stage"
+               else "dSP-84" if plant == "scoped-read-only"
                else "dSP-33" if family == "walk" and plant in ("witness-holds", "fail-k")
                else "dSP-22" if plant == "lock-live-slow-census"
                else "dSP-31" if plant in ("lock-foreign-pidns", "lock-no-pidns")
@@ -4903,9 +4906,11 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
           gk.RECEIPT_SCHEMA == 4 and bool(cut.oid) and p.returncode == 2
           and any("`commit` and no `gov_oid`" in ln and cut.path in ln for ln in p.stderr.splitlines())
           and receipt(t).read_bytes() == b1, p.stdout[-300:] + p.stderr)
+    _steps = lambda q: [ln for ln in q.stdout.splitlines() if ln.startswith("govkit update — steps:")]
     t, _p = installed("rs-ac2")
     cut = split_row(2)
     plant(t, cut)
+    pv = run("update", "--target", str(t))
     p = run("update", "--target", str(t), "--write")
     row = next((f for f in read(t)["files"] if f.get("path") == cut.path), {})
     check("[dSP-3 AC2] the same row at schema 2 is back-filled from gov's blob at its `commit` and classified",
@@ -4913,6 +4918,23 @@ def check_receipt_schema(tmp: pathlib.Path) -> None:
           f"{row.get('gov_oid')} != {cut.oid} · " + (p.stdout + p.stderr)[-400:])
     check("[dSP-3 AC2] ...and the clean run lifts it to schema 3, no further and with no `steps`",
           read(t).get("schema") == 3 and "steps" not in read(t), str(read(t).get("schema")))
+    check("[dSP-84 AC2] the read-only run over the schema-2 receipt prints the write run's `steps:` line "
+          "and lists no `would walk`",
+          pv.returncode == 0 and "would walk" not in pv.stdout and _steps(pv) == _steps(p)
+          and any("the receipt is at schema 2" in ln for ln in _steps(p)),
+          f"{_steps(pv)} != {_steps(p)}")
+
+    # ---- TOOL-dSafePassage-84 AC5: a write run over a schema-4 receipt that already has a finding (the
+    # ---- unknown-role refusal) walks no step: the findings hold `derive_walk_hold` carries.
+    t, _p = installed("rs-84f")
+    plant(t, lambda rec: next(f for f in rec["files"] if f.get("role", "engine") == "engine")
+          .update(role="gk-unknown-role"))
+    p = run("update", "--target", str(t), "--write")
+    check("[dSP-84 AC5] a write run over a schema-4 receipt that already has a finding walks no step "
+          "and names the finding",
+          p.returncode == 1 and read(t).get("steps") == []
+          and any("steps: not walked — this run already has 1 finding(s)" in ln for ln in _steps(p)),
+          f"{_steps(p)} · {read(t).get('steps')}")
 
     # ---- AC9: a clean `update --write` that walks no step, a `--kits` run, never moves a receipt past
     # ---- 3 by itself, and keeps a 4.
