@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-35 — the drain edit `--measure > <home>` reads the rows it carries from a copy the redirect cannot truncate
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 18 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

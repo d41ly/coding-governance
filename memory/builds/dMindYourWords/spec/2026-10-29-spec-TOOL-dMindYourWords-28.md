@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-28 — suppression provenance refused in a shallow history, and judged at a root commit
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 7
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 7 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

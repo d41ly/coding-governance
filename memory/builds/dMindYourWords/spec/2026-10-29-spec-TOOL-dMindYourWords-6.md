@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-6 — `--suggest` made forced-aware
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 11 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 11 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0267@06ce7948 whole
 

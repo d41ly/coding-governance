@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-10 — drift beyond verbs: one verb per declared family per object, and a noun canon
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 13 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 13 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0271@09fb0fff whole
 **Carries:** node:policy-key.lexicon.drift

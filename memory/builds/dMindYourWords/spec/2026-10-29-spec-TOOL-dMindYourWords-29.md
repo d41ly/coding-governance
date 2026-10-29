@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-29 — the round-1 spec audit's 49 minors, batched: one stdout for the ledger, every reader of a moved fact, honest failure states, and the observations that read the wrong thing
 
-**Status:** OPEN · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 19
+**Status:** DEFERRED · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 19 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-37 — the audit of units 22 to 29: its 31 minors, batched — fixtures that reach their branch, observations that read what they claim, and the readers a move or a merge left behind
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 21
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 21 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -13,3 +13,7 @@
 - SEV · TOOL-dMindYourWords-19 · LOW · the builder's work order carries no vocabulary slice, so it names a unit's definitions without the verb rows, packs and forced-aware answers
 - SEV · TOOL-dMindYourWords-20 · LOW · the lexicon's commit arm stays a hand-written block in `.githooks/pre-commit`, outside the hook-pack contract
 - SEV · TOOL-dMindYourWords-21 · LOW · the two runtime keys keep the retired session sense of "attended" while every other carrier says "owner session"
+- DEFERRED · TOOL-dMindYourWords-18 · until TOOL-dMindYourWords-52 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order carries `closes` for it
+- DEFERRED · TOOL-dMindYourWords-19 · until TOOL-dMindYourWords-9 · TOOL-dMindYourWords-9's build run renders the work order's vocabulary slice, so dFurnishedOrders' `ORDER_SLOTS` must carry `vocabulary` by then
+- DEFERRED · TOOL-dMindYourWords-20 · until TOOL-dMindYourWords-9 · TOOL-dMindYourWords-9's build run writes the lexicon's commit arm into `.githooks/pre-commit` by hand, the form a dWellOiledMachine hook-pack render must reproduce byte for byte
+- DEFERRED · TOOL-dMindYourWords-21 · until TOOL-dMindYourWords-17 · TOOL-dMindYourWords-17's build run settles "attended" as a mode, which dWellOiledMachine's two runtime keys then follow by its own deviation

@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-7 — the packs: their file, their loader and the four generators
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 7 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 7 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0268@2d14651f whole
 

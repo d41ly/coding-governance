@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-3 — gov's own contract-forced names in a table, with a stale arm
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 9 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 9 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0264@a1b36116 whole
 

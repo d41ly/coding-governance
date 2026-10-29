@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-36 — the contract-record walk examines merges, so a `CONTRACTS:` row made in a merge's resolution needs its record
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 20
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 20 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

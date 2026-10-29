@@ -19,20 +19,20 @@ hold-code: host-owner-action
 held-from: REVIEWING
 refreshed-at: ccd1292ea98467fde27c262948ded176987326dd · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 611d63883e6ee26f2f488e2e32e01739606621ca
-phase: HELD
+witness: 95525e5e2463f561e9b3a9cbcf3f1f988d10ed38
+phase: REVIEWING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/dmindyourwords-unattended-c60cfd
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-10-29T18:47:58Z
+lease-utc: 2026-10-29T22:36:53Z
 pid-image: claude.exe
 host: compeeto
 pid: 30052
 session: 5ea42bfe-aa7a-4065-b7a3-708d28096fd6
-keepalive: 40ce7a67
+keepalive: 573e8027
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: ccd1292ea98467fde27c262948ded176987326dd
 anchor-ref: refs/heads/main
@@ -117,3 +117,101 @@ base: ccd1292ea98467fde27c262948ded176987326dd
 2026-10-29T20:24:47Z decision · item The spec-audit chain diverges: high findings ran 7, 7, 13 over three rounds (precision 0.97, 0.90, 0.89), and round 3's highs land on git-history hardening the earlier promotions added (grafts, replace objects, blame.ignoreRevsFile, rename detection in units 30-37), with 15 promotions (TOOL-dMindYourWords-38 to -52) still unaudited and 48 units in the roster. Keep auditing, stop the chain as for dKeptSession, dLinkedLibrary and dIndexedDesign, or re-scope? · reason options (a) round 4 over units 38-52, ~1h and ~2M subagent tokens a round, the highs rising and each round promoting more units than the last (8, 8, 15); (b) stop as for dKeptSession, dLinkedLibrary and dIndexedDesign: units 38-52 close under a recorded specs-audited override, closing-review-recorded overridden, every unit deferred to the build run, the run closes and lands; (c) re-scope the history-reading and provenance units (23, 26, 28, 30-37) into fewer, stricter mechanisms before more rounds. Refused to pick: the owner's standing rule stops a chain without asking only at a no-HIGH round, and on a plateau or a rise holds for the owner's ruling, which round 2's hold already asked once
 
 2026-10-29T20:25:04Z hold · item host-owner-action · reason until owner · reaped 40ce7a67 · resume none(owner)
+
+2026-10-29T22:36:57Z resume · item dMindYourWords · reason held · keepalive 573e8027 · manual
+
+2026-10-29T22:37:42Z rescope · item defer TOOL-dMindYourWords-1 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:43Z rescope · item defer TOOL-dMindYourWords-14 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:43Z rescope · item defer TOOL-dMindYourWords-24 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:44Z rescope · item defer TOOL-dMindYourWords-27 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:45Z rescope · item defer TOOL-dMindYourWords-15 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:45Z rescope · item defer TOOL-dMindYourWords-34 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:46Z rescope · item defer TOOL-dMindYourWords-12 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:47Z rescope · item defer TOOL-dMindYourWords-38 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:47Z rescope · item defer TOOL-dMindYourWords-39 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:48Z rescope · item defer TOOL-dMindYourWords-51 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:49Z rescope · item defer TOOL-dMindYourWords-11 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:50Z rescope · item defer TOOL-dMindYourWords-26 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:50Z rescope · item defer TOOL-dMindYourWords-5 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:51Z rescope · item defer TOOL-dMindYourWords-28 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:52Z rescope · item defer TOOL-dMindYourWords-7 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:52Z rescope · item defer TOOL-dMindYourWords-2 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:53Z rescope · item defer TOOL-dMindYourWords-30 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:54Z rescope · item defer TOOL-dMindYourWords-32 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:54Z rescope · item defer TOOL-dMindYourWords-33 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:55Z rescope · item defer TOOL-dMindYourWords-3 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:56Z rescope · item defer TOOL-dMindYourWords-40 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:57Z rescope · item defer TOOL-dMindYourWords-41 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:57Z rescope · item defer TOOL-dMindYourWords-42 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:58Z rescope · item defer TOOL-dMindYourWords-4 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:37:59Z rescope · item defer TOOL-dMindYourWords-6 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:00Z rescope · item defer TOOL-dMindYourWords-8 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:00Z rescope · item defer TOOL-dMindYourWords-10 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:01Z rescope · item defer TOOL-dMindYourWords-9 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:02Z rescope · item defer TOOL-dMindYourWords-16 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:02Z rescope · item defer TOOL-dMindYourWords-13 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:03Z rescope · item defer TOOL-dMindYourWords-17 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:04Z rescope · item defer TOOL-dMindYourWords-22 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:05Z rescope · item defer TOOL-dMindYourWords-23 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:05Z rescope · item defer TOOL-dMindYourWords-25 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:06Z rescope · item defer TOOL-dMindYourWords-35 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:07Z rescope · item defer TOOL-dMindYourWords-29 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:07Z rescope · item defer TOOL-dMindYourWords-31 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:08Z rescope · item defer TOOL-dMindYourWords-36 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:09Z rescope · item defer TOOL-dMindYourWords-37 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:09Z rescope · item defer TOOL-dMindYourWords-43 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:10Z rescope · item defer TOOL-dMindYourWords-44 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:11Z rescope · item defer TOOL-dMindYourWords-45 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:11Z rescope · item defer TOOL-dMindYourWords-46 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:12Z rescope · item defer TOOL-dMindYourWords-47 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:13Z rescope · item defer TOOL-dMindYourWords-48 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:14Z rescope · item defer TOOL-dMindYourWords-49 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:14Z rescope · item defer TOOL-dMindYourWords-50 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-29T22:38:15Z rescope · item defer TOOL-dMindYourWords-52 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run

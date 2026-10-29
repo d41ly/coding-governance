@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-48 — the history reads unit 31 never pinned run through the kit's pinned runner
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 21
+**Status:** DEFERRED · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 21 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

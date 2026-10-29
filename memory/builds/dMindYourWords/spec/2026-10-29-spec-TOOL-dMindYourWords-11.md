@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-11 — the vocabulary changed only with the write path's record, which takes over from `ratified`
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 5 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 5 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0272@51d03a52 whole
 **Carries:** node:record-kind.lexicon-declaration

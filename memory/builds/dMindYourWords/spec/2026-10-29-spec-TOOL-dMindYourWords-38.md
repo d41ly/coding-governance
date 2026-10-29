@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-38 — check 7c2 resolves `{prefix}` in a leg's argv before it looks for the file
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 4
+**Status:** DEFERRED · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 4 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

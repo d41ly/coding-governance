@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-8 — packs detected from the import census and manifests and declared by the owner
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 12 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 12 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0269@f2bbdcc2 whole
 **Carries:** node:policy-key.lexicon.packs

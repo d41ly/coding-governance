@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-5 — a reasoned site suppression, recorded and counted, as the owner's fallback
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 6 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 6 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0266@db50d898 whole
 

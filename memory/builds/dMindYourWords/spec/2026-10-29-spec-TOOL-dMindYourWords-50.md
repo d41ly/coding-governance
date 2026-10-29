@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-50 — the kit refuses any git spawn of its own that bypasses the pinned runner
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 21
+**Status:** DEFERRED · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 21 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

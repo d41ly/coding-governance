@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-2 — forced names recognised by what forces them, under `lexicon.forced`
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 8 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 8 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0263@bab0ffd1 whole
 **Carries:** node:policy-key.lexicon.forced

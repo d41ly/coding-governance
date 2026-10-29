@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-39 — check 7c2 refuses a graded leg whose argv names no file it can read
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 4
+**Status:** DEFERRED · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 4 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-15 — build records kept out of the graded population by a path selector
 
-**Status:** OPEN · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 3 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 3 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0276@c565a516 whole
 

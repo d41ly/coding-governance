@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-23 — the `--measure` and `--rebaseline` writers keep the `lexicon-debt` rows they do not measure
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 17
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 17 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

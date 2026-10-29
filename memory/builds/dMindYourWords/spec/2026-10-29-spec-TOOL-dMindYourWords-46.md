@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-46 — the kit refuses any added-set argv of its own that drops the rename rule
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 21
+**Status:** DEFERRED · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 21 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

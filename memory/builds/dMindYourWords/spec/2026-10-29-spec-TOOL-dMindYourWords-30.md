@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-30 — the provenance blame reads the real commit graph, so a graft cannot make an old row look like a root's
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 8
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 8 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

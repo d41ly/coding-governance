@@ -500,10 +500,10 @@ Cite ids, never line numbers.
 | [TOOL-dLinkedLibrary-34](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-20 | 2026-10-26 | THE feature NAMESPACE ROW IS SPECCED WITHOUT ITS ROLE.… |
 | [TOOL-dLinkedLibrary-35](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | MED | TOOL-dLinkedLibrary-24 | 2026-10-26 | --all-ungated READS THE STAND-IN. TOOL-dFairHearing-15 S6 prints every… |
 | [TOOL-dLinkedLibrary-36](../builds/dLinkedLibrary/BACKLOG.md) | DEFERRED | LOW | TOOL-dLinkedLibrary-24 | 2026-10-26 | A GATED OR JUDGEMENT CLASS EARNS A LEFT-SHIFT. TOOL-dDeclaredLoop-20… |
-| [TOOL-dMindYourWords-18](../builds/dMindYourWords/BACKLOG.md) | SPECCED | MED | TOOL-dMindYourWords-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dMindYourWords-19](../builds/dMindYourWords/BACKLOG.md) | OPEN | LOW | — | 2026-10-29 | THE WORK ORDER HAS NO VOCABULARY SLOT. TOOL-dMindYourWords-9 hands the… |
-| [TOOL-dMindYourWords-20](../builds/dMindYourWords/BACKLOG.md) | OPEN | LOW | — | 2026-10-29 | NO HOOK PACK RENDERS INTO A GIT HOOK. TOOL-dWellOiledMachine-10's… |
-| [TOOL-dMindYourWords-21](../builds/dMindYourWords/BACKLOG.md) | OPEN | LOW | — | 2026-10-29 | THE RUNTIME KEYS SPELL ATTENDED AS A SESSION KIND.… |
+| [TOOL-dMindYourWords-18](../builds/dMindYourWords/BACKLOG.md) | DEFERRED | MED | TOOL-dMindYourWords-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dMindYourWords-19](../builds/dMindYourWords/BACKLOG.md) | DEFERRED | LOW | TOOL-dMindYourWords-9 | 2026-10-29 | THE WORK ORDER HAS NO VOCABULARY SLOT. TOOL-dMindYourWords-9 hands the… |
+| [TOOL-dMindYourWords-20](../builds/dMindYourWords/BACKLOG.md) | DEFERRED | LOW | TOOL-dMindYourWords-9 | 2026-10-29 | NO HOOK PACK RENDERS INTO A GIT HOOK. TOOL-dWellOiledMachine-10's… |
+| [TOOL-dMindYourWords-21](../builds/dMindYourWords/BACKLOG.md) | DEFERRED | LOW | TOOL-dMindYourWords-17 | 2026-10-29 | THE RUNTIME KEYS SPELL ATTENDED AS A SESSION KIND.… |
 | [TOOL-dMispairedQuote-4](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | agent-cap.js models no regex literal, which is the ROOT of every… |
 | [TOOL-dMispairedQuote-5](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | checkLiteralOpen's keyword clause admits a quote after any of eleven JS… |
 | [TOOL-dMispairedQuote-6](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | resolveLiteralEnd opener-tests only the OPENING quote, so a mispairing… |

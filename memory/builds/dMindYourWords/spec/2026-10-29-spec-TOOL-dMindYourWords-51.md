@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-51 — the audit of units 30 to 37: the minors on govkit's root-file class, batched — the registry's ledger tables join the population, read and validated once
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 4
+**Status:** DEFERRED · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 4 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

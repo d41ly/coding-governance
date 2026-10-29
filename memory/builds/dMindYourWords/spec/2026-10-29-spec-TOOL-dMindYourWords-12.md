@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-12 — the definition context the lexicon reads through the `tools/lib` extraction primitive
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 4 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 4 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0273@e1bd67f4 whole
 

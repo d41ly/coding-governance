@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-27 — the `lexicon-debt` ledger homed at the repository root beside `.lexicon.conf`, outside the memory tree's closed name set
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 2
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 2 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

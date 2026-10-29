@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-16 — the lexicon's drift signals as its own leg pack, out of drift-audit's engine
 
-**Status:** OPEN · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 15 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 15 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0277@089f8d27 whole
 

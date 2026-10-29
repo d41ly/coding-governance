@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-9 — enforcement: the work order's vocabulary slice, staged names at commit, offenders by name at the bar
 
-**Status:** OPEN · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 14 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 14 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0270@01096b8c whole
 **Carries:** node:policy-key.lexicon.at-commit

@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-13 — the tag-name vocabulary check: a tag's verbs and nouns graded, its name answered by `--suggest`, and no namespace word in `.lexicon.conf`
 
-**Status:** OPEN · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 16 · advances TOOL-dMindYourWords-18
+**Status:** DEFERRED · rev-3 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 16 · advances TOOL-dMindYourWords-18
 
 **Carries:** cl-dClosedLoop-0274@5185348f whole
 

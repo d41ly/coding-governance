@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-52 — the audit of units 30 to 37: its 18 lexicon-side minors, batched — honest git reasons, every reader observed, the drain edit's shells and states, and the carriers a move left behind
 
-**Status:** OPEN · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 22
+**Status:** DEFERRED · rev-1 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 22 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 

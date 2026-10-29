@@ -1,6 +1,6 @@
 # TOOL-dMindYourWords-24 — the lexicon finds its sibling kits through `resolve_kit_dir`, never a `parent.parent` probe
 
-**Status:** OPEN · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 2
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node d · Tier-2 · base ccd1292e · streams tooling · order 2 · advances TOOL-dMindYourWords-18
 
 **Derived:** PLAY-dClosedLoop-2
 
