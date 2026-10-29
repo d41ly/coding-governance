@@ -120,7 +120,7 @@ ids TOOL-dMindYourWords-26 TOOL-dMindYourWords-27 TOOL-dMindYourWords-28 TOOL-dM
 | [TOOL-dMindYourWords-37 — the audit of units 22 to 29: its 31 minors, batched — fixtures that reach their branch, observations that read what they claim, and the readers a move or a merge left behind](spec/2026-10-29-spec-TOOL-dMindYourWords-37.md) | 21 | 2 | OPEN | rev-1 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 4 record folder(s).
+Records: 25 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
