@@ -248,7 +248,7 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-91 — the round-3 closing review's three remaining minors: the in-place row's one snapshot path, a grader for the walk's two roots, and an arm for the floor stub's bash fallback](spec/2026-10-29-spec-TOOL-dSafePassage-91.md) | 16 | 2 | DEFERRED | rev-1 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 434 bound to this build, across 4 record folder(s).
+Records: 436 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
