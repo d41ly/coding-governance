@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-88 — a renamed row whose new destination is its own path lands in place, so `update` carries a target across gov's tool-root move
 
-**Status:** DEFERRED · rev-1 · 2026-10-29 · node a · Tier-2 · base 0f46b69d · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base cba885c5 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,11 +8,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-29-prompt-TOOL-dSafePassage-87-audit-fold-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-87-audit-fold-brief.md) | research | TOOL-dSafePassage-87 TOOL-dSafePassage-89 |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-1-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-2-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-2-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-build-brief.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-spec-brief.md) | research | TOOL-dSafePassage-89 |
 | [2026-10-29-prompt-TOOL-dSafePassage-88-third-stop-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-88-third-stop-spec-brief.md) | research | — |
+| [2026-10-29-review-TOOL-dSafePassage-86-87-89-88-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dSafePassage-86-87-89-88-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePassage-89 |
 
 <!-- /gen:spec-records -->
 
@@ -28,18 +30,28 @@ adds a selftest arm that reds when the guard refuses the row's own file again.
 ## 2. Scope (IN)
 
 - **S1** — The in-place rename. In `_cmd_update`'s `renamed` write arm (`tools/govkit/govkit.py:11061`),
-  `in_place = new_dest == row["path"]` is set beside `new_src, new_dest` (`:11070`). The occupancy
-  refusal (`:11101-11106`) runs only when `not in_place`. The move block, two staging lines and
-  `git mv` (`:11159-11169`), runs only when `not in_place`. An in-place row's bytes are still decided
-  and landed as they are now (`:11122-11151`, `:11175`), and its four fields are still rewritten
-  (`:11195-11200`). It joins `changed`, not `renamed` (`:11201`), and prints an `in place` line in
-  place of the `moved` line (`:11206-11207`). §4 "S1". Observed by AC1, AC2 and AC3.
-- **S2** — The arm. The `DEPL-dCarriedReceipt-11` block of `tools/govkit/selftest.py` gains a
-  `[dSP-88]` check after the occupied-destination checks (`:12990-13009`). It builds a scratch gov
-  whose tool root is `pinned`, installs a target at `prefix = "pinned"`, moves gov's root to `moved`
-  with an edit to the one source, and runs `update --write`. The check requires exit 0, no
-  `ALREADY holds a file there`, gov's new bytes at the row's own path, the receipt row's `source`
-  under `moved`, and nothing written under `moved` in the target. §4 "S2". Observed by AC4.
+  two tests are set beside `new_src, new_dest` (`:11070`), split by what each skips (round-1 spec
+  audit, M5). `own_file` asks whether the destination is the row's own file: `new_dest == row["path"]`,
+  or both exist and `ndp.samefile(target / row["path"])`. `in_place` is `new_dest == row["path"]`,
+  exact string equality. The occupancy refusal (`:11101-11106`) runs only when `not own_file`. The move
+  block, two staging lines and `git mv` (`:11159-11169`), runs only when `not in_place`. So a
+  case-only rename on a case-insensitive filesystem passes the guard and still runs `git mv`, and the
+  index and receipt take the new spelling. An in-place row's bytes are still decided and landed as
+  they are now (`:11122-11151`, `:11175`), and its four fields are still rewritten (`:11195-11200`).
+  It joins `changed`, not `renamed` (`:11201`), and prints an `in place` line in place of the `moved`
+  line (`:11206-11207`). Its landing-failure message names an in-place landing, not a move (audit
+  L10). §4 "S1". Observed by AC1, AC2 and AC5. AC3 is the preservation criterion that the guard still
+  refuses every other occupant.
+- **S2** — The arm. The `DEPL-dCarriedReceipt-11` block of `tools/govkit/selftest.py` gains two
+  `[dSP-88]` checks after the occupied-destination checks (`:12990-13009`). Its scratch gov comes from
+  `build_rename_gov` (`:12136-12164`), which gains a `root` and a `src` parameter, so the engine-copy
+  list stays in one place (audit L9). The gov's tool root is `pinned`; a target is installed at
+  `prefix = "pinned"`; gov's root moves to `moved` with an edit to the one source, and `update --write`
+  runs. The first check requires exit 0, no `ALREADY holds a file there`, gov's new bytes at the row's
+  own path, the receipt row's `source` under `moved`, and nothing written under `moved` in the target.
+  Gov then renames that source to a case-only respelling and `update --write` runs again. The second
+  check requires exit 0, no `ALREADY holds a file there`, and the receipt path in the new spelling.
+  §4 "S2". Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -68,12 +80,14 @@ adds a selftest arm that reds when the guard refuses the row's own file again.
 
 ## 4. Design
 
-Every cited line holds at `0f46b69d2`, and `tools/` there is byte-identical to the build head.
+Every cited line holds at `cba885c58`, the build head with TOOL-dSafePassage-86 landed. Outside
+`memory/` it differs from `0f46b69d2` only in `tools/govkit/upgrade_walk.py`, whose lines are cited
+at `cba885c58`. TOOL-dSafePassage-87 moves them again before this unit builds.
 
 ### The defect, at `0f46b69d2`
 
 The walk's `up` case runs the tip clone's own `update --target <t> --to <tip> --write` in a child
-(`tools/govkit/upgrade_walk.py:599`, `:478-495`). The target was installed at release-0 under the
+(`tools/govkit/upgrade_walk.py:606`, `:485-502`). The target was installed at release-0 under the
 prefix `fixtures/release-0/deploy.toml:8` spells, `tools`. The leg's move leaves that file alone:
 `write_declarations` skips every file the move brought in that is not a render
 (`tools/run-gates/foreign-prefix.gov.test.sh:519`). TOOL-dSafePassage-87's S7 resolves the plants
@@ -90,8 +104,8 @@ verdict is `renamed` (`:9072`).
 The write arm (`:11061`) then asks whether the target already holds `new_dest` (`:11101`). It does,
 because `new_dest` is the row's own file. So `:11102-11106` refuses the row: `ALREADY holds a file
 there`, and the remedy is to move or remove that file. Every refused row holds its kit back. Each
-held path is a `tools` path no ordered plant names, so `check_walk_exit` (`upgrade_walk.py:305-323`)
-returns problems and `run_up_walk` raises its `Stop` (`:631`).
+held path is a `tools` path no ordered plant names, so `check_walk_exit` (`upgrade_walk.py:312-330`)
+returns problems and `run_up_walk` raises its `Stop` (`:638`).
 
 ### Which of the three
 
@@ -117,6 +131,15 @@ The guard fires on any rename whose recomputed destination is the row's own path
 inside a `[[files]]` rule with one explicit `to` reaches it too, because `resolve_entry` answers the
 rule's `to` and not the source's spelling. That case is reasoned from `resolve_renamed`, not measured.
 
+A case-only rename reaches the guard on a case-insensitive filesystem, as Windows and macOS are by
+default. When gov renames `keep.txt` to `Keep.txt`, `new_dest` differs from the row's path as a
+string, but `ndp.exists()` is true on the row's own file. Measured on node a at `cba885c58`, where
+`git config core.ignorecase` reads `true`, the probe's case-only step was refused with
+`ALREADY holds a file there`, and its remedy would have the adopter remove their own installed file.
+So the occupant test asks the filesystem, through `samefile`, and the string test only decides
+whether a move is needed (§4 "S1"). On a case-sensitive filesystem `Keep.txt` is a different path,
+nothing occupies it, and the rename moves as any other does.
+
 ### S1
 
 At `govkit.py:11070`, after `new_src, new_dest = c["renamed_to"]`:
@@ -124,19 +147,42 @@ At `govkit.py:11070`, after `new_src, new_dest = c["renamed_to"]`:
 ```python
             # TOOL-dSafePassage-88: the target's descriptor answers this row's own path, as it does for
             # every row when gov moves its tool root, so the file stays and only its source changes.
+            # The occupant is asked of the filesystem, so a case-only rename on a case-insensitive one
+            # is still the row's own file; only the exact spelling skips the move.
+            _own = target / row["path"]
+            own_file = new_dest == row["path"] or (ndp.exists() and _own.exists() and ndp.samefile(_own))
             in_place = new_dest == row["path"]
 ```
 
+`samefile` raises when either path is absent, so both are tested first. A row whose own file the
+operator removed, beside an occupied destination, is therefore not its own occupant, and is refused
+as now.
+
 The containment check (`:11071-11080`) and the index read (`:11094-11100`) run as they do now. The
 occupancy test at `:11101` becomes
-`if not in_place and (new_dest in _at_dest or ndp.exists()):`. The byte decision (`:11122-11151`)
+`if not own_file and (new_dest in _at_dest or ndp.exists()):`. The byte decision (`:11122-11151`)
 is unchanged. Its conflict order already says the file was left byte-identical at its old path, which
 holds in place too.
 
 The move block keeps `old_path` and `mv_err` (`:11157-11158`), and its `try`/`except` (`:11159-11169`)
-moves one level in under `if not in_place:`. `land_through_index` (`:11175`) then lands the bytes at
-`new_dest`, which is `old_path`, and reads the mode from `old_path`'s entry as it does now. The four
-fields are rewritten as they are now (`:11195-11200`). At `:11201`:
+moves one level in under `if not in_place:`. A case-only rename is not in place, so it runs the
+staging lines and `git mv`, which renames a case-only path on a case-insensitive filesystem.
+`land_through_index` (`:11175`) then lands the bytes at `new_dest`. For an in-place row that is
+`old_path`, and it reads the mode from `old_path`'s entry as it does now.
+
+The `oid is None` arm (`:11177-11187`) says the row "was moved" and that "The move is staged", which
+is false for an in-place row (audit L10). Its one `r.fail` call takes a conditional message, so the
+refusal join's count does not move:
+
+```python
+                r.fail(f"'{row['path']}' could not be landed in place: {why}. The row is NOT advanced, "
+                       f"and a re-run retries it" if in_place else
+                       f"'{row['path']}' was moved to '{new_dest}' and the bytes could not be "
+                       f"landed: {why}. The move is staged and the row is NOT advanced, so a re-run "
+                       f"sees the file at its new path with its old vintage")
+```
+
+The four fields are rewritten as they are now (`:11195-11200`). At `:11201`:
 
 ```python
             if in_place:
@@ -146,6 +192,7 @@ fields are rewritten as they are now (`:11195-11200`). At `:11201`:
 ```
 
 So the closing count's `moved` stays a count of moved files, and an in-place row counts under `wrote`.
+A case-only rename is moved, so it counts under `moved` and prints the `moved` line.
 The destination line (`:11206-11207`) prints, for an in-place row,
 `  in place         [<role>] <path> · source <new source> · bytes <arm>`. It ends in the byte arm, as
 the `moved` line does, so `verdict_of`-style readers, which take a line ending in a path as a verdict
@@ -153,28 +200,32 @@ row (`selftest.py:10550-10555`), do not read it as one.
 
 ### S2: the arm
 
-After the `[-11]` check `...and the row it refused is still at its old path, at its old vintage`
-(`selftest.py:13006-13009`), and before the `mvfail` fixture (`:13011`). It reuses
-`build_scratch_gov` and `build_target` (`:681`), `git` (`:583`), `settle` (`:587`), `read_bytes11`
-(`:12092`), `GOVKIT`, `KIT_NAMES` and `_g11`'s registry:
+`build_rename_gov` (`selftest.py:12136-12164`) gains two parameters, with defaults that keep its four
+callers (`:12217`, `:12990`, `:13011`, `:13041`) byte-identical:
+
+```python
+        def build_rename_gov(tag: str, kit_a: str = _11_KIT_A, root: str = PFX,
+                             src: dict | None = None) -> pathlib.Path:
+```
+
+Each `PFX` in its body (`:12143-12147`, `:12153`) reads `root`, and `_11_SRC.items()` (`:12156`) reads
+`(src or _11_SRC).items()`. Its registry text (`:12147-12152`) is the one 88's arm copied from
+`_g11` before, so the copy goes. The engine copy list (`:12144-12146`) now has one home.
+
+The arm sits after the `[-11]` check `...and the row it refused is still at its old path, at its old
+vintage` (`selftest.py:13006-13009`), and before the `mvfail` fixture (`:13011`). It reuses
+`build_rename_gov`, `build_target` (`:681`), `git` (`:583`), `settle` (`:587`), `read_bytes11`
+(`:12092`) and `KIT_NAMES`:
 
 ```python
         # TOOL-dSafePassage-88: gov moves its tool root and the target keeps its prefix, so each renamed
         # row resolves to its own path and lands there, never refused as its own occupant.
-        _g88 = build_scratch_gov(tmp / "rn-inplace-gov")
-        _gk88 = _g88 / "pinned" / KIT_NAMES["govkit"]
-        _gk88.mkdir(parents=True)
-        for _f88 in ("govkit.py", "adopters.toml", "upgrade_steps.py"):
-            shutil.copy2(GOVKIT.parent / _f88, _gk88 / _f88)
-        shutil.copy2(_g11 / PFX / KIT_NAMES["govkit"] / "registry.toml", _gk88 / "registry.toml")
-        (_g88 / "pinned" / "demo").mkdir()
-        (_g88 / "pinned" / "demo" / "kit.toml").write_text(
+        _g88 = build_rename_gov(
+            "inplace",
             'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n'
             '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n',
-            encoding="utf-8", newline="\n")
-        (_g88 / "pinned" / "demo" / "keep.txt").write_text("one\ntwo\nthree\nfour\n", encoding="utf-8", newline="\n")
-        git(_g88, "add", "-A")
-        git(_g88, "commit", "-qm", "A")
+            "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
+        _gk88 = _g88 / "pinned" / KIT_NAMES["govkit"]
         _t88 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-t")
         _ap88 = subprocess.run([sys.executable, str(_gk88 / "govkit.py"), "apply", "--target", str(_t88),
                                 "--kits", "demo"], capture_output=True, text=True, encoding="utf-8", errors="replace")
@@ -194,20 +245,38 @@ After the `[-11]` check `...and the row it refused is still at its old path, at 
               and read_bytes11(_t88 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\nthree\nFOUR\n"
               and _row88 == ["moved/demo/keep.txt"] and not (_t88 / "moved").exists(),
               f"apply {_ap88.returncode} update {_up88.returncode} {_row88} " + _up88.stdout[-1500:])
+        # A case-only rename: on a case-insensitive filesystem the row's own file answers `exists()` at
+        # the new spelling, and it is still the row's own file, so it moves rather than being refused.
+        settle(_t88, "the in-place update")
+        git(_g88, "mv", "moved/demo/keep.txt", "moved/demo/Keep.txt")
+        git(_g88, "commit", "-qm", "C")
+        _cs88 = subprocess.run([sys.executable, str(_g88 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                                "--target", str(_t88), "--write"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _case88 = [f["path"] for f in json.loads((_t88 / ".governance" / "install.json").read_text(
+            encoding="utf-8"))["files"] if f["path"].lower() == "pinned/demo/keep.txt"]
+        check("[dSP-88] a case-only rename gov makes lands under the new spelling, never refused as its own occupant",
+              _cs88.returncode == 0 and "ALREADY holds a file there" not in _cs88.stdout
+              and _case88 == ["pinned/demo/Keep.txt"], f"update {_cs88.returncode} {_case88} " + _cs88.stdout[-1500:])
 ```
 
 The roots are `pinned` and `moved`, so no literal spells a prefix the foreign-prefix leg moves gov
 to, and the arm runs the same at every prefix. The engine copy is taken when the fixture is built,
-as `build_rename_gov` takes it (`:12136-12146`), so a staged break reaches it. The existing `[-11]`
-check at `:13001-13002` stays the arm that a rename onto an occupied different path is refused, and
-S1 keeps it green: its destination, `renamed.txt`, is not its row's path.
+inside `build_rename_gov`, so a staged break reaches it. The existing `[-11]` check at
+`:13001-13002` stays the arm that a rename onto an occupied different path is refused, and S1 keeps
+it green: its destination, `renamed.txt`, is not its row's path.
+
+The case-only check passes on a case-sensitive filesystem with or without S1's `samefile` half,
+because `Keep.txt` is unoccupied there. It observes the identity half only on a case-insensitive
+node, such as node a.
 
 ### The probe
 
 `p88_probe.py`, run from the repository root. Its one optional argument is the engine directory,
 `tools/govkit` by default. It installs a target from a scratch gov at `pinned`, moves gov's root to
-`moved` with an edit, and runs `update --write`. It then plants the adopter's own file at the path a
-second rename resolves to, renames the source within `moved`, and runs `update --write` again.
+`moved` with an edit, and runs `update --write`. It then renames the source to `Keep.txt`, a
+case-only respelling, and runs `update --write` again. Last, it plants the adopter's own file at the
+path a third rename resolves to, renames the source within `moved`, and runs `update --write` again.
 
 ```python
 import json, pathlib, shutil, subprocess, sys, tempfile
@@ -249,9 +318,17 @@ print("update exit", up.returncode, "| refused in place:", "ALREADY holds a file
       "| bytes:", (t / "pinned/demo/keep.txt").read_text(encoding="utf-8").split()[-1],
       "| source:", row[0].get("source") if row else None, "| moved dir in target:", (t / "moved").exists())
 git(t, "add", "-A"); git(t, "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "update", "--allow-empty")
+git(g, "mv", "moved/demo/keep.txt", "moved/demo/Keep.txt")
+git(g, "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "case")
+cs = gk("moved", "update", "--target", str(t), "--write")
+own = [f["path"] for f in json.loads((t / ".governance/install.json").read_text(encoding="utf-8"))["files"]
+       if f["path"].lower() == "pinned/demo/keep.txt"]
+print("case-only: update exit", cs.returncode, "| refused as its own occupant:", "ALREADY holds a file there" in cs.stdout,
+      "| receipt:", own)
+git(t, "add", "-A"); git(t, "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "case", "--allow-empty")
 (t / "pinned/demo/kept.txt").write_text("the adopter's own file\n", encoding="utf-8", newline="\n")
 git(t, "add", "-A"); git(t, "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "own file")
-git(g, "mv", "moved/demo/keep.txt", "moved/demo/kept.txt")
+git(g, "mv", "moved/demo/Keep.txt", "moved/demo/kept.txt")
 git(g, "-c", "user.email=t@e", "-c", "user.name=t", "commit", "-qm", "C")
 oc = gk("moved", "update", "--target", str(t), "--write")
 print("occupied refused:", oc.returncode == 1 and "ALREADY holds a file there" in oc.stdout,
@@ -287,6 +364,17 @@ output was read by running the walk's `build_release_tree` and `run_child_walk` 
 - **The probe, S1 staged.** `update exit 0 | refused in place: False | bytes: FOUR`, the source under
   `moved`, no `moved` directory in the target, and `occupied refused: True | own file kept: True`.
 - **The probe, with the occupancy test dropped altogether.** `occupied refused: False`.
+- **The probe with its case-only step, at `cba885c58`, 2026-10-29.** Its four lines were
+  `apply exit 0`, then `update exit 1 | refused in place: True | bytes: four`, then
+  `case-only: update exit 1 | refused as its own occupant: True | receipt: ['pinned/demo/keep.txt']`,
+  then `occupied refused: True | own file kept: True`.
+- **The same probe, its argument a scratch copy of `tools/govkit` with §4 "S1" staged as written.**
+  `update exit 0 | refused in place: False | bytes: FOUR`, then
+  `case-only: update exit 0 | refused as its own occupant: False | receipt: ['pinned/demo/Keep.txt']`,
+  then `occupied refused: True | own file kept: True`.
+- **The same, with the bare string test deciding both the guard and the move.** The second line read
+  `update exit 0`, and the case-only line read `update exit 1 | refused as its own occupant: True`
+  with the receipt still at the old spelling.
 
 The staged S1 differed from §4 "S1" in shape only: it skipped the move block by raising and catching a
 local exception, not with an `if`, and it kept the `moved` line. The 262 s, 4 s, 407, 173, 159, 14,
@@ -300,10 +388,11 @@ further stop was measured there. `vendor/gov` and the repo root were not run.
 
 ### Inventory
 
-Minted: the local name `in_place`, the console line `in place`, the check label `[dSP-88]`, and the
-scratch directories `rn-inplace-gov` and `rn-inplace-t`. No function, `Refusal` site, flag, conf key,
-gate leg or receipt field. The refusal join's anchors do not move, because no refusal call site is
-added or removed.
+Minted: the local names `in_place`, `own_file` and `_own`, the console line `in place`, the in-place
+landing-failure message, the check label `[dSP-88]` on two checks, the parameters `root` and `src` of
+`build_rename_gov`, and the scratch directories `rn-inplace-gov` and `rn-inplace-t`. No function,
+`Refusal` site, flag, conf key, gate leg or receipt field. The refusal join's anchors do not move,
+because no refusal call site is added or removed: the landing-failure arm keeps its one `r.fail`.
 
 ### Migration
 
@@ -339,18 +428,22 @@ line by content before editing.
 ## 5. Production-readiness checklist
 
 - security: the occupancy guard still refuses every rename whose destination is not the row's own
-  path (AC3). An in-place row writes only the path the receipt already claims, after the containment
-  check (`govkit.py:11071-11080`) has run. No new write path, spawn or surface.
+  file (AC3). The identity test is the filesystem's, `samefile`, so only the row's own file passes it,
+  by whatever spelling reaches that file. An in-place row writes only the path the receipt already
+  claims, after the containment check (`govkit.py:11071-11080`) has run. No new write path, spawn or
+  surface.
 - perf / scale: an in-place row skips two staging lines and one `git mv`. The moved walk's `up` case
   measured 262 s with S1 staged.
 - error / empty / loading states: a three-way conflict on an in-place row takes the existing conflict
   arm, whose order says nothing was moved and the file was left byte-identical. That is true in place.
+  A landing the target's git refuses for an in-place row reads `could not be landed in place`, the
+  row not advanced, and a re-run retries it. A moved row keeps the existing message.
 - observability: the `in place` line names the row, its new source and its byte arm. The tally still
   counts the row as `renamed`.
 - risks: a rolled-back kit restores an in-place row's one pre-run index entry twice (§3), which is
   idempotent by reading and not measured. The closing count's `moved` no longer counts in-place rows,
   which count under `wrote`.
-- testing: §7's New arm and AC1 to AC4.
+- testing: §7's New arm and AC1 to AC5. AC3's arm is the existing `[-11]` refusal checks.
 - migration: none.
 - user docs: none. `grep -rln renamed help/` names only `help/step-gate.md`, whose line 4 is about a
   step whose installed file disappears. No page describes `update`'s rename lines or this refusal, so
@@ -375,23 +468,37 @@ line by content before editing.
   cost: one clone of the repository, the leg's move, and the walk, about five minutes.
   fixture: the moved clone, built by the leg's own `set_tool_root` and `write_declarations`. The tree
   holds none today.
-- **AC3** — When the probe of AC1 runs, its last line reads
+- **AC3** — A preservation criterion: it is green at `0f46b69d2` and at `cba885c58`, and S1 must
+  keep it so. When the probe of AC1 runs, its last line reads
   `occupied refused: True | own file kept: True`.
-  Red when: the occupancy test is dropped for every rename rather than for the in-place one, so the
+  Red when: the occupancy test is dropped for every rename rather than for the row's own file, so the
   line reads `occupied refused: False`.
   cost: inside AC1's run.
-- **AC4** — When `git grep -n -F "[dSP-88]" -- tools/govkit/selftest.py` runs, it prints one line,
-  the check's label inside the `DEPL-dCarriedReceipt-11` block.
+  Its persisted arm is the existing `[-11]` refusal checks (`selftest.py:13001-13005`), which this
+  unit does not move.
+- **AC4** — When `git grep -n -F "[dSP-88]" -- tools/govkit/selftest.py` runs, it prints two lines,
+  the two checks' labels inside the `DEPL-dCarriedReceipt-11` block.
   Red when: the arm is absent, so it prints nothing.
+- **AC5** — When the probe of AC1 runs on a node whose filesystem is case-insensitive, its third line
+  reads `case-only: update exit 0 | refused as its own occupant: False` and names the receipt path
+  `Keep.txt` under `pinned/demo`.
+  Red when: the occupancy skip is the bare string test, so the line reads
+  `case-only: update exit 1 | refused as its own occupant: True` with the receipt path still `keep.txt`,
+  as at `cba885c58`.
+  cost: inside AC1's run.
+  fixture: a case-insensitive filesystem, as on node a, where `git config core.ignorecase` reads
+  `true`. On a case-sensitive one the line reads exit 0 with or without the identity half, so it
+  observes nothing there.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `policy fixtures` · `upgrade-walk` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 · the `[dSP-88]` check in the `DEPL-dCarriedReceipt-11` block, staged red by the occupancy test at `govkit.py:11101` kept unconditional, which refuses the row's own file and leaves gov's old bytes · none
+New arm: tools/govkit/selftest.py · covers AC1 AC5 · the two `[dSP-88]` checks in the `DEPL-dCarriedReceipt-11` block; the first staged red by the occupancy test at `govkit.py:11101` kept unconditional, which refuses the row's own file and leaves gov's old bytes, the second, on a case-insensitive node, by the bare string test deciding the occupancy skip · none
 
 The four `{prefix}/govkit/` legs and `policy fixtures` are the guard join's for the two files; their
-other guards are broad. `upgrade-walk` runs the walk whose stop this closes. The foreign-prefix parity
+other guards are broad. AC3's arm is the existing `[-11]` refusal checks, which this unit keeps green
+and does not move. `upgrade-walk` runs the walk whose stop this closes. The foreign-prefix parity
 leg is not on the line: only its `scripts` prefix was measured green (§4 "Past this stop"), and AC2
 observes this unit's part of its `upgrade-walk` row directly.
 
@@ -410,13 +517,26 @@ none
   re-measured"), and the id now names this stop. It was reproduced at the leg's own move in a clone of
   `0f46b69d2`, diagnosed as the occupancy guard refusing the row's own file, and S1 was staged and
   measured there (§4 "Measured at writing time").
+- rev-2 · 2026-10-29 · §2 §4 §5 §6 §7 §10 · S1 S2 · AC3 AC4 AC5 · folds the round-1 spec audit,
+  `memory/builds/dSafePassage/reviews/2026-10-29-review-TOOL-dSafePassage-86-87-89-88-spec-audit-round1.md`,
+  from the brief
+  `memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-87-audit-fold-brief.md`.
+  M5: S1 splits its test, `own_file` by `samefile` skipping the occupancy refusal and `in_place` by
+  string equality skipping the move, so a case-only rename moves. The probe gains a case-only step,
+  AC5 observes it, and the arm gains its check. L3: AC3 is labelled a preservation criterion, its arm
+  the existing `[-11]` checks. L9: the arm builds its gov through `build_rename_gov`, extended with
+  `root` and `src`. L10: the landing-failure message has an in-place spelling. The base moves to
+  `cba885c5`, with 86 landed, and `upgrade_walk.py`'s lines are re-cited there. The probe and S1
+  were re-measured there, S1 staged in a scratch copy of the engine.
 
 ## 10. Reuse audit
 
 S1 changes `_cmd_update`'s existing `renamed` write arm (`tools/govkit/govkit.py:11061`) in place,
 and keeps `resolve_renamed`, `land_through_index` and the conflict arm as they are. S2 extends the
-`DEPL-dCarriedReceipt-11` block of `tools/govkit/selftest.py`, with `build_scratch_gov` and
-`build_target` from `fixture_target.py`, `settle`, `read_bytes11` and `_g11`'s registry. No new seam.
+`DEPL-dCarriedReceipt-11` block of `tools/govkit/selftest.py`. Its scratch gov comes from that
+block's own factory, `build_rename_gov` (`selftest.py:12136-12164`), extended with `root` and `src`
+parameters rather than copied, so the engine-copy list has one home. It also reuses `build_target`
+from `fixture_target.py`, `settle` and `read_bytes11`. No new seam.
 `python tools/codebase-map/reuse_lookup.py "land a renamed row in place when gov's new source resolves to the row's own destination"`
 ranked `resolve_entry` and `build_scratch_gov` as seams, beside name-stem matches (`rows`, `row`,
 `resolve`, `resolve_kit_dir`) that do not decide a rename. The recall probe ranked
