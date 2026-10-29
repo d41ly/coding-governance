@@ -491,3 +491,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-29T06:18:07Z rescope · item add TOOL-dSafePassage-89 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
 
 2026-10-29T06:56:48Z rescope · item add TOOL-dSafePassage-88 · reason the moved-prefix walk's third stop, adopted at once (M10), spec at 51994336b
+
+2026-10-29T07:13:29Z brief · item TOOL-dSafePassage-86 · reason e91a5723a1b2 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-86-build-brief.md
+
+2026-10-29T07:24:13Z dispatch · item b0106aa1 TOOL-dSafePassage-86 · reason tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-86.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-86-ledger.md
+
+2026-10-29T07:39:16Z dispatch · item b0106aa1 TOOL-dSafePassage-86 · reason tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-86.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-86-ledger.md memory/map/generated/symbols.json

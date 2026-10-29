@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-86 — release-0's apply runs the pinned clone's own engine, so the walk applies release-0 at every tool root
 
-**Status:** DEFERRED · rev-3 · 2026-10-29 · node a · Tier-2 · base b634d60e · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-3 · 2026-10-29 · node a · Tier-2 · base b634d60e · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-29-build-TOOL-dSafePassage-86-ledger.md](../build/2026-10-29-build-TOOL-dSafePassage-86-ledger.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-86-1-spec-writer.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-86-1-spec-writer.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-86-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-86-build-brief.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-86-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-86-spec-brief.md) | research | TOOL-dSafePassage-87 |

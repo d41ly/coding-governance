@@ -8338,6 +8338,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "derive_release_engine",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
+    },
+    {
       "id": "derive_rename_map",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

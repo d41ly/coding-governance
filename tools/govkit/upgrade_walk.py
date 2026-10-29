@@ -180,6 +180,13 @@ def write_plant_edits(tree, rows: list[dict]) -> None:
 
 
 # ------------------------------------------------------------------------------------ release-0
+def derive_release_engine(clone) -> pathlib.Path:
+    """The engine release-0's `apply` runs: the pinned clone's own `govkit.py`, at the tool root the
+    clone holds at the pin, never HERE's (TOOL-dSafePassage-86). Read while the clone is at the pin."""
+    _us, _shims, gk = load_engine()
+    return clone / gk.resolve_prefix_token("{prefix}/govkit/govkit.py", gk.derive_tool_root(clone))
+
+
 def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants: list[dict],
                        with_target: bool = True) -> dict:
     """S2: the scratch clone at the pin, its landed ref gov's own, release-0 applied by its own
@@ -209,7 +216,7 @@ def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants:
         from fixture_target import build_target  # noqa: E402 — S12, the one factory
         t = build_target(root / "r0", deploy)
         shutil.copytree(FIXTURE / "seed", t, dirs_exist_ok=True)
-        p = subprocess.run([sys.executable, str(clone / ctx["govkit"]), "apply", "--target", str(t)],
+        p = subprocess.run([sys.executable, str(derive_release_engine(clone)), "apply", "--target", str(t)],
                            cwd=str(clone), capture_output=True, text=True, encoding="utf-8", errors="replace",
                            stdin=subprocess.DEVNULL)
         if p.returncode:
@@ -949,7 +956,8 @@ def render_case_counts(per_case: dict) -> str:
 
 def check_graders() -> list[str]:
     """TOOL-dSafePassage-77 S7: S1, S2, S3 and S4's functions fed fabricated inputs, one line per
-    grader; returns the reds. Each is a pure call or a scratch repository it removes."""
+    grader, and TOOL-dSafePassage-86's `derive_release_engine` over three pin-shaped trees; returns
+    the reds. Each is a pure call or a scratch repository it removes."""
     import contextlib
     import io
     kit = run_git(HERE, "rev-parse", "--show-prefix").rstrip("/")
@@ -1029,11 +1037,23 @@ def check_graders() -> list[str]:
                     seen.append(f"{name}'s Stop does not name {key}: {e}")
         return "; ".join(seen)
 
+    def check_grade_release_engine() -> str:
+        for pre in ("tools", "scripts", ""):
+            c = scratch / f"pin-{pre or 'root'}"
+            for f in ("govkit/registry.toml", "govkit/govkit.py"):
+                (c / pre / f).parent.mkdir(parents=True, exist_ok=True)
+                (c / pre / f).write_text("x", encoding="utf-8")
+            got, want = derive_release_engine(c), c / pre / "govkit" / "govkit.py"
+            if got != want:
+                return f"a pin at {pre or 'the repo root'} derived {got}, not {want}"
+        return ""
+
     reds = []
     try:
         for name, grade in (("order-kind", check_grade_order_kind), ("arm-needle", check_grade_arm_needle),
                             ("tree-clean", check_grade_tree_clean), ("case-counts", check_grade_case_counts),
-                            ("fixture-keys", check_grade_fixture_keys)):
+                            ("fixture-keys", check_grade_fixture_keys),
+                            ("release-engine", check_grade_release_engine)):
             try:
                 why = grade()
             except (Stop, OSError, KeyError, ValueError) as e:

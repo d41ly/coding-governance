@@ -238,13 +238,13 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names](spec/2026-10-28-spec-TOOL-dSafePassage-82.md) | 16 | 2 | CLOSED | rev-6 | 2026-10-29 |
 | [TOOL-dSafePassage-83 — the records legs at the build's head: edges answered, criteria evidenced, and the manifest re-audited](spec/2026-10-28-spec-TOOL-dSafePassage-83.md) | 16 | 2 | CLOSED | rev-6 | 2026-10-29 |
 | [TOOL-dSafePassage-84 — the read-only preview reads the write run's walk predicate, so a receipt below schema 3 is previewed as not walked](spec/2026-10-29-spec-TOOL-dSafePassage-84.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-29 |
-| [TOOL-dSafePassage-86 — release-0's apply runs the pinned clone's own engine, so the walk applies release-0 at every tool root](spec/2026-10-29-spec-TOOL-dSafePassage-86.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-29 |
+| [TOOL-dSafePassage-86 — release-0's apply runs the pinned clone's own engine, so the walk applies release-0 at every tool root](spec/2026-10-29-spec-TOOL-dSafePassage-86.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-29 |
 | [TOOL-dSafePassage-87 — the round-2 closing review's seven mediums and two lows, each closed at the fix its skeptic judged sound](spec/2026-10-29-spec-TOOL-dSafePassage-87.md) | 16 | 2 | DEFERRED | rev-3 | 2026-10-29 |
 | [TOOL-dSafePassage-88 — a renamed row whose new destination is its own path lands in place, so `update` carries a target across gov's tool-root move](spec/2026-10-29-spec-TOOL-dSafePassage-88.md) | 16 | 2 | DEFERRED | rev-1 | 2026-10-29 |
 | [TOOL-dSafePassage-89 — the tool root is read from the tree on every call, so `read_steps` finds the registry at a moved tip](spec/2026-10-29-spec-TOOL-dSafePassage-89.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-29 |
 <!-- /gen:build-units -->
 
-Records: 424 bound to this build, across 4 record folder(s).
+Records: 425 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
