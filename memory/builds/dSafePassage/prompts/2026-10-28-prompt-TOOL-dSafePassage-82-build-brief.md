@@ -12,6 +12,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - The close's spec audit of TOOL-dSafePassage-72 to -83 ran one round (`REVIEW_ROUNDS=1`) and its findings are folded into your spec (record: `memory/builds/dSafePassage/reviews/2026-10-28-review-TOOL-dSafePassage-72-73-74-75-76-77-78-80-81-82-83-spec-audit-round1.md`). Build what the spec says. A spec you cannot build as written is a DIVERGENCE hand-back, never an edit of the spec.
 - The pinned base is `60d90cb71db51e651aa1c5efe3f6d48ba21a997d`, with dGroundRules landed on it. Your spec's `base 3708a705` is the spec run's; where the tree moved since, the code at
   this branch's HEAD is the truth, and a difference that changes what you must build is a DIVERGENCE.
+- A first pass of this unit diverged and restored the tree; its work in progress is saved at `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dsafepassage-567339/c5f50d22-89c6-41d7-84e5-2382dcd49faa/scratchpad/TOOL-dSafePassage-82-wip.patch` (S1, S2, most of S3, S6 and the parts of S4 that stand). Your spec is rev-5, which settles both divergences; apply what the patch holds that rev-5 keeps, but never its `RUN.md` rows or spec-header edits, which this pass writes afresh.
 - Writes stay in your `--dispatch --writes` paths and this build's folder (README, "Build-level rules").
 
 ## What the main loop needs from your commit

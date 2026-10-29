@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-82 — the six product lint legs this build's diff turned red, each cleared by the remedy its own message names
 
-**Status:** DEFERRED · rev-4 · 2026-10-28 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
+**Status:** DEFERRED · rev-5 · 2026-10-29 · node a · Tier-2 · base 83817478 · streams tooling · order 16 · advances TOOL-dSafePassage-14 · ratified 2026-10-28
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -52,7 +52,8 @@ not the instance.
   `tools/govkit/selftest.py:3560` expects the renamed key; the selftest is outside the gate's
   population and changes only because its expectation follows the plant. Observed by AC2, AC3 and
   AC11.
-- **S3 — install-prefix.** None of the 129 lines the leg named spells a kit path, each rewritten by
+- **S3 — install-prefix.** None of the lines the leg names spells a kit path, 129 at `83817478f` and
+  130 at `870c648f6` as the builder measured, each rewritten by
   the rule of its shape in §4 "The install-prefix shapes": a fixture's scratch layout assembled from
   named values; a sibling kit gov carries routed through `resolve_kit_dir`; declaration data spelled
   with the drained `{prefix}/` token and resolved where it is read; prose in a manifest field spelled
@@ -63,8 +64,15 @@ not the instance.
   `resolve_bash`; it imports nothing from govkit (§8 F1). Observed by AC4, AC5, AC6 and AC11.
 - **S4 — harness arms.** Each of the eight unarmed exit sites is armed or pinned, by the leg's own
   two remedies:
-  - `tools/push-main.sh:1319` and `:1325` are armed: arm 39 of `tools/push-main.test.sh` and arm 40
-    assert each refusal's full message, which each already drives and asserts only in part;
+  - `tools/push-main.sh:1319`, `cmd_land`'s gov-first snapshot refusal, is armed by a second staged
+    run inside arm 39 of `tools/push-main.test.sh`. The arm's existing run drives `--prepare`, whose
+    snapshot refusal is `cmd_prepare`'s `return 1` sibling and never this exit site. The added run
+    is the attended landing, `bash "$lander"`, with `TMPDIR` naming a file so the `mktemp` that
+    opens gov first's snapshot fails, and it asserts the full `push-main: gov first could not
+    snapshot the untracked files before its walk, so the walk did not run. Aborted (no push).`
+    message;
+  - `tools/push-main.sh:1325` is armed by arm 40, which already drives it, asserting its full
+    message;
   - `tools/push-main.sh:1333` and `:1343` gain pin rows in `memory/project/unarmed-branches.txt`, each
     reason naming the precondition no arm stages, as the sibling mint and regeneration commit
     refusals are pinned there (rows 109 and 110);
@@ -81,7 +89,9 @@ not the instance.
 - **S6 — shell hygiene.** Each risen count falls back to its registry row by converting the sites
   this build added to the no-fork form the lint names, and the one fallen count lowers its row:
   - `tools/lib/resolve-python.test.sh:264` counts the output's non-empty lines with no pipe;
-  - `tools/push-main.sh:1015` indents the refusal's lines with no `sed`;
+  - `tools/push-main.sh:1015` indents the refusal's lines with no `sed`, by a parameter expansion
+    that also strips a CR before each line end, so its output matches Git for Windows' `sed` byte for
+    byte;
   - `tools/push-main.test.sh` resolves its interpreter once for arms 33, 34, 37 and 40, so one
     `$(resolve_python …)` site remains where four stand; reads `cas37-moved` with `$(<file)`; and
     counts the skip line of arms 25 and 35 with no pipe;
@@ -115,6 +125,8 @@ not the instance.
 - A new suite for `tools/lib/python-floor.sh`, §4 "Alternatives rejected".
 - Any change to what a fixture, a plant or a step observes. Every rewrite here keeps its arm's
   verdict and its printed text, except the remote name a plant writes and the key its refusal names.
+  One exception widens an arm: S4's second run in arm 39 observes `cmd_land`'s exit site, which the
+  arm did not reach before.
 
 ### Edges
 
@@ -183,7 +195,7 @@ one its shape admits.
 
 | Shape | Lines at `83817478f` | Remedy |
 |---|---|---|
-| A fixture laying out its own scratch gov or target | `upgrade_steps.py` 2747-2751, 2818, 3169, 3317, 3600, 3840, 4145, 4162-4168, 4220, 4281, 4284, 4355, 4750, 4762, 4790, 4856, 4869 · `shims.py` all 12 · `selftest.py` 4416, 4418 · `docs_leg.py` 553-556, 563, 598, 638 · `fixture_target.py` 96, 97, 105 · `push-main.test.sh` 1355 | The fixture's prefix and each kit directory it lays out are named once, in a module constant or a suite variable, and every path is joined from those names. That is the form the gate's header gives a fixture laid out at a foreign prefix (`check-install-prefix.sh:59-60`). A scratch directory whose name is only a kit's homonym, `scratch / "hooks"` at `upgrade_steps.py:1368` and `target / "lib"` at `:3169` and `:3317`, takes a name that is no kit's instead. |
+| A fixture laying out its own scratch gov or target | `upgrade_steps.py` 2747-2751, 2818, 3169, 3317, 3600, 3840, 4145, 4162-4168, 4220, 4281, 4284, 4355, 4750, 4762, 4790, 4856, 4869 · `shims.py` all 12 · `selftest.py` 4416, 4418 · `docs_leg.py` 553-556, 563, 598, 638 · `fixture_target.py` 96, 97, 105 · `push-main.test.sh` 1355 | The fixture's prefix and each kit directory it lays out are named once, in a module constant or a suite variable, and every path is joined from those names. That is the form the gate's header gives a fixture laid out at a foreign prefix (`check-install-prefix.sh:59-60`). A scratch directory whose name is only a kit's homonym, `scratch / "hooks"` at `upgrade_steps.py:1368`, takes a name that is no kit's instead. The submodule fixture's home, `target / "lib"` at `:3169` and `:3317`, is held once in a module constant such as `FIXTURE_SUB_HOME = "lib"`, so the leg clears and the printed `(submodule lib/…)` texts `selftest.py` asserts at `:3795`, `:3797`, `:3815` and `:3948` do not move. |
 | A sibling kit gov carries, read at run time | `docs_leg.py:384` · `upgrade_walk.py:199`, `:495` · `push-main.sh:997` | `gk.resolve_kit_dir(<home>, <anchor>, <here>)` (`tools/govkit/govkit.py:235`), as `govkit.py:283` finds the policy kit. In `push-main.sh` the check reuses the kit and anchor `run_gov_first` already hands `resolve_lander_kit` (`:995`), so the branch tests what the resolver was asked for. |
 | Declaration data a reader resolves | `usage.toml` all 59 · `docs_leg.py:501`, `:507` · `tools/govkit/fixtures/release-0/arms.toml:42`, `:59` · `plants.toml` 21, 29, 104, 112, 124 · `deploy.toml` 41, 43, 47, 48 | Spelled `{prefix}/…`, and resolved by `gk.resolve_prefix_token(value, gk.derive_tool_root(root))` (`govkit.py:218`, `:192`) where the file is read and before any join or fingerprint. `docs_leg.read_usage_rows` resolves each `[[usage]]` `id` and `entry`, and stops prepending `"{prefix}/" +` to a class's `rows` (`docs_leg.py:206`), since the value now carries the token. `check_page_command` resolves through the same call where it now substitutes the literal `"tools/"` (`:306`). `upgrade_walk.py` resolves the three fixture files' fields against the pinned clone's tool root. Every resolved id, entry, path and text is byte-identical to today's, so no help page's usage anchor or fingerprint moves. |
 | Prose in a manifest field | `gate-legs.json:1480`, the `upgrade-walk` row's `reads.history` | `<prefix>/govkit`. |
@@ -269,7 +281,9 @@ None. `usage.toml`, `steps.toml`, the release-0 fixture files, `upgrade_walk.py`
 (`memory/project/encoding-posture-sites.txt:23`). `steps.toml` is on no landed commit
 (`git cat-file -e origin/main:tools/govkit/steps.toml` fails), so `step-rows-frozen` freezes none of
 its rows yet. The S3 and S6 lines of `push-main.sh` change no output byte, so an adopter that
-receives the lander sees no difference.
+receives the lander sees no difference. For S6's indent that holds because the parameter expansion
+strips a CR before each line end, as Git for Windows' `sed` does; without it a CRLF refusal would
+print its CRs where the `sed` form printed none.
 
 ### Rollout
 
@@ -396,8 +410,10 @@ on TOOL-dGroundRules-13, and is not waited for.
   runs, it prints 4. When `grep -cF 'push-main: gov first could not snapshot the untracked files
   before its walk, so the walk did not run. Aborted (no push).' tools/push-main.test.sh` runs, it
   prints at least 1, and so does the same count of `push-main: the upgrade steps this landing
-  declares did not hold on gov first (named above). Aborted (no push).`
-  Red when: a pin row is missing, or an arm still asserts only a slice of its site's message.
+  declares did not hold on gov first (named above). Aborted (no push).` Arm 39's added run is the
+  attended landing, `bash "$lander"`, under a `TMPDIR` that names a file.
+  Red when: a pin row is missing, an arm still asserts only a slice of its site's message, or arm 39
+  asserts the full message only on its `--prepare` run, which never reaches `cmd_land`'s exit.
 - **AC8** — When `python <scratch>/fnsubst_probe.py tools/push-main.test.sh` runs, its
   `resolve_python` count is 1. When `grep -cF '| grep -c .' tools/lib/resolve-python.test.sh` runs,
   it prints 3. When `grep -P '^tools/memory-tree/merge-rows\.test\.sh\tvar-pipe\t'
@@ -445,7 +461,7 @@ on TOOL-dGroundRules-13, and is not waited for.
 
 `encoding posture (text IO names its encoding)` · `install-prefix (shipped surface)` · `remote literals (kit code names no remote)` · `harness arms (fail branches armed or pinned)` · `spawn budget (forks per hot entrypoint)` · `shell hygiene (a fork spent on builtin work)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `policy fixtures` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `upgrade-walk` · `docs` · `step-rows-frozen` · `python resolver (behaviour + inline parity + idiom ban)` · `push-main self-test` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/push-main.test.sh · covers AC7 AC8 · arms 39 and 40 assert their sites' full messages and arms 33, 34, 37 and 40 read one resolution, staged red by shortening either message in tools/push-main.sh · none
+New arm: tools/push-main.test.sh · covers AC7 AC8 · arm 39 gains an attended-landing run whose TMPDIR names a file and asserts cmd_land's full snapshot refusal, arm 40 asserts its site's full message, and arms 33, 34, 37 and 40 read one resolution, staged red by shortening either message in tools/push-main.sh · none
 New arm: tools/lib/resolve-python.test.sh · covers AC8 · the seven-statement assertion counts lines with no pipe and names paths from the suite's variables, staged red by a check printing six statements · none
 New arm: tools/govkit/selftest.py · covers AC3 · the isolation plants expect the fixture's own remote name, staged red by the refusal naming another key · none
 
@@ -517,6 +533,16 @@ regenerates.
   §3's owner of the two timed-out legs), L11 (the floor program loads the step module by path and
   imports nothing from govkit, AC6 runs it under `run_step_isolated`, §10 cites `fanout_cap.py`),
   and L1 (Rollout: 83 next, 81 last). The header's node reads `a`, this host.
+- rev-5 · 2026-10-29 · S3 · S4 · S6 · §3 · §4 · AC7 · §7 · the builder's DIVERGENCE, relayed by the
+  coordinator with its saved work (`TOOL-dSafePassage-82-wip.patch` in the run's scratchpad). Arm 39
+  drives `--prepare`, whose snapshot refusal is `cmd_prepare`'s sibling, and never `cmd_land`'s exit
+  site: RESOLVED (agent, 2026-10-29, delegated) as option (a), a second staged run in arm 39, the
+  attended landing under a `TMPDIR` naming a file, asserting the full message; §3 records the
+  widening as an exception to its last non-goal, and arm 40 stays as specced. The submodule
+  fixture's home: RESOLVED (agent, 2026-10-29, delegated), held once in a module constant so the
+  printed `(submodule lib/…)` texts `selftest.py` asserts do not move; `scratch / "hooks"` is
+  renamed as specced. Two measured facts corrected: the install-prefix population is 130 lines at
+  `870c648f6`, and S6's indent strips a CR before each line end to match Git for Windows' `sed`.
 
 ## 10. Reuse audit
 
