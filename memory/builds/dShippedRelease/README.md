@@ -103,7 +103,7 @@ ids DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 6 bound to this build, across 1 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
