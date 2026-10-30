@@ -42,4 +42,20 @@ Cite ids, never line numbers.
 | [DEPL-dSealedTally-6](../builds/dSealedTally/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE _decided LOOP EXISTS TWICE and only an arm keeps the copies honest:… |
 | [DEPL-dSettledRoster-1](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | govkit apply appends its eol=lf pins LAST to a target's .gitattributes… |
 | [DEPL-dSettledRoster-2](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | a govkit apply against a kind = "manifest" target runs that target's… |
-| [DEPL-dShippedRelease-32](../builds/dShippedRelease/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [DEPL-dShippedRelease-32](../builds/dShippedRelease/BACKLOG.md) | SPECCED | MED | DEPL-dShippedRelease-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [DEPL-dShippedRelease-33](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | LOW | DEPL-dShippedRelease-3 | 2026-10-30 | A CADENCE ROW CANNOT WAKE ON AN EVENT OR PER SESSION.… |
+| [DEPL-dShippedRelease-34](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | HIGH | DEPL-dShippedRelease-4 | 2026-10-30 | THE LANDED WRITE ENDS THE LEASE TOO SOON. TOOL-dPlacedRequest-16 S2… |
+| [DEPL-dShippedRelease-35](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-4 | 2026-10-30 | THE WITHDRAW PATH HAS A SECOND CLOSER. TOOL-dWellOiledMachine-58 S9… |
+| [DEPL-dShippedRelease-36](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | LOW | DEPL-dShippedRelease-5 | 2026-10-30 | A LANDED BUILD'S ITEM CANNOT PARK. TOOL-dWellOiledMachine-48 S4 parks… |
+| [DEPL-dShippedRelease-37](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | LOW | DEPL-dShippedRelease-5 | 2026-10-30 | A POST AFTER A CLOSED MAILBOX RECREATES ITS REF. Under close-only the… |
+| [DEPL-dShippedRelease-38](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-7 | 2026-10-30 | THE KITS ITEMS NAME NO STEP. check_program admits a route only to a… |
+| [DEPL-dShippedRelease-39](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-9 | 2026-10-30 | A RENDERED REGION HAS NO LOCK EXEMPTION. PLAY-dOrderedCharter-20 S5… |
+| [DEPL-dShippedRelease-40](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | LOW | DEPL-dShippedRelease-9 | 2026-10-30 | THE ISOLATE HALF OF A RUNBOOK GAP HAS NO CARRIER. gap-deploy-08's… |
+| [DEPL-dShippedRelease-41](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | HIGH | DEPL-dShippedRelease-13 | 2026-10-30 | THE PATCH INTAKE REFUSES A LANDING. TOOL-dWellOiledMachine-27 S1, S3… |
+| [DEPL-dShippedRelease-42](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-21 | 2026-10-30 | A SHARED HOME REDS THE LAYER RULE. PLAY-dOrderedCharter-16's no-layer… |
+| [DEPL-dShippedRelease-43](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | LOW | DEPL-dShippedRelease-22 | 2026-10-30 | A SELECTED ADAPTER MAY HAVE NO KIT. check_expansion_value passes… |
+| [DEPL-dShippedRelease-44](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-23 | 2026-10-30 | THE DEPLOYER CANNOT ACT ON AN ITEM. TOOL-dBoundRoles-1 S7 and AC6… |
+| [DEPL-dShippedRelease-45](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | LOW | DEPL-dShippedRelease-27 | 2026-10-30 | THE COMMIT-MESSAGE HOOK SAYS NEVER ON A SQUASH.… |
+| [DEPL-dShippedRelease-46](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | HIGH | DEPL-dShippedRelease-30 | 2026-10-30 | A PATCH'S DRAW HAS THE WRONG HOME AND ROOT. TOOL-dDeclaredLoop-30's S3… |
+| [DEPL-dShippedRelease-47](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | HIGH | DEPL-dShippedRelease-30 | 2026-10-30 | A DRAW IS THREE PUSHES AND MEETS NO ABSENT REF. TOOL-dPlacedRequest-16… |
+| [DEPL-dShippedRelease-48](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-25 | 2026-10-30 | A SOURCE RECEIPT STAYS AT THE OLD FIELDS. TOOL-dSafePassage-8's source… |

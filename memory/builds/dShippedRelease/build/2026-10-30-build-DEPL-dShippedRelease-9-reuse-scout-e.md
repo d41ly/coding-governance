@@ -23,7 +23,7 @@ Neither the `reuse_lookup.py` shortlists nor my searches found a conformance gat
   - The order source already exists: `derive_install_order` at `tools/govkit/govkit.py:911`.
 - **Closest parent shapes (not built):**
   - PLAY-dOrderedCharter-37 S1 and S2: a `references.toml` reader that returns rows, a `--check` that compares bytes, and the rendered header line.
-  - TOOL-dLinkedLibrary-18: the region parser, for a rendered section inside a hand-written document.
+  - Also TOOL-dLinkedLibrary-18: the region parser, for a rendered section inside a hand-written document.
 - **Design lines:** v2:1782; layer-expansions:435 and :440; research-distribution-a:108; fates:180; gap-register:398; layer-expansions:125 ("in part").
 - **Owned nodes:** none.
 - **Policy keys:** none.

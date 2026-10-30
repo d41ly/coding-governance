@@ -167,7 +167,7 @@ Within this group: -1, then -2 and -13, then -4, then -5 and -14.
 | -4 | TOOL-dWellOiledMachine-58, -60, -3; TOOL-dPlacedRequest-1, -15, -16, -17, -21; KICK-dKeptSession-5, -39 |
 | -5 | TOOL-dWellOiledMachine-18, -48, -6, -25; TOOL-dPlacedRequest-17 |
 | -13 | TOOL-dWellOiledMachine-27 (with change); PLAY-dOrderedCharter-7; TOOL-dWitnessedBar-6 |
-| -14 | TOOL-dDeclaredLoop-19, -20; TOOL-dFairHearing-3, -13 |
+| -14 | needs TOOL-dDeclaredLoop-19, -20; TOOL-dFairHearing-3, -13 |
 
 Note that `parents:` omits dPlacedRequest, dKeptSession, dDeclaredLoop, dFairHearing and dOrderedCharter. They arrive only transitively, and the table needs them all.
 
