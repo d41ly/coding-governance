@@ -9,6 +9,9 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dMindYourWords-18=DEFERRED TOOL-dMindYourWords-19=DEFERRED TOOL-dMindYourWords-20=DEFERRED TOOL-dMindYourWords-21=DEFERRED
+units-at-landing: TOOL-dMindYourWords-1 TOOL-dMindYourWords-14 TOOL-dMindYourWords-24 TOOL-dMindYourWords-27 TOOL-dMindYourWords-15 TOOL-dMindYourWords-34 TOOL-dMindYourWords-12 TOOL-dMindYourWords-38 TOOL-dMindYourWords-39 TOOL-dMindYourWords-51 TOOL-dMindYourWords-11 TOOL-dMindYourWords-26 TOOL-dMindYourWords-5 TOOL-dMindYourWords-28 TOOL-dMindYourWords-7 TOOL-dMindYourWords-2 TOOL-dMindYourWords-30 TOOL-dMindYourWords-32 TOOL-dMindYourWords-33 TOOL-dMindYourWords-3 TOOL-dMindYourWords-40 TOOL-dMindYourWords-41 TOOL-dMindYourWords-42 TOOL-dMindYourWords-4 TOOL-dMindYourWords-6 TOOL-dMindYourWords-8 TOOL-dMindYourWords-10 TOOL-dMindYourWords-9 TOOL-dMindYourWords-16 TOOL-dMindYourWords-13 TOOL-dMindYourWords-17 TOOL-dMindYourWords-22 TOOL-dMindYourWords-23 TOOL-dMindYourWords-25 TOOL-dMindYourWords-35 TOOL-dMindYourWords-29 TOOL-dMindYourWords-31 TOOL-dMindYourWords-36 TOOL-dMindYourWords-37 TOOL-dMindYourWords-43 TOOL-dMindYourWords-44 TOOL-dMindYourWords-45 TOOL-dMindYourWords-46 TOOL-dMindYourWords-47 TOOL-dMindYourWords-48 TOOL-dMindYourWords-49 TOOL-dMindYourWords-50 TOOL-dMindYourWords-52
+gates-run: unattended-179331946036255019938-1409 2a4ffae0
 parked-surfaced: yes
 keepalive-reaped: yes
 hold-run: 
@@ -22,7 +25,7 @@ held-from: REVIEWING
 refreshed-at: ccd1292ea98467fde27c262948ded176987326dd · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: a470d7260279594b14eb62284f0d5013e14be10c
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -217,3 +220,7 @@ base: ccd1292ea98467fde27c262948ded176987326dd
 2026-10-29T22:38:14Z rescope · item defer TOOL-dMindYourWords-50 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
 
 2026-10-29T22:38:15Z rescope · item defer TOOL-dMindYourWords-52 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md), carried forward to the build run
+
+2026-10-30T00:31:24Z override · item specs-audited · reason the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md) ends the spec-audit chain at round 3; its promotions TOOL-dMindYourWords-38 to -52 close unaudited, as the owner ruled for dKeptSession, dLinkedLibrary and dIndexedDesign
+
+2026-10-30T00:31:24Z override · item closing-review-recorded · reason a spec run writes no code, so its diff is specs and records only; the owner's ruling of 2026-10-30 (memory/builds/dMindYourWords/prompts/2026-10-30-prompt-TOOL-dMindYourWords-1-owner-stop-chain.md) takes the three-round spec-audit chain as the review of this spec-only diff, as for dKeptSession, dLinkedLibrary and dIndexedDesign; the build run's closing diff review is unaffected
