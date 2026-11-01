@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-48 — the round-1 spec audit's 40 minors, batched: run scopes and criteria that can pass, stable filing keys, one policy adapter, committed recurrence, and the carriers each unit owes
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 20 · advances TOOL-dTendedCadence-19
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 20 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-35 TOOL-dTendedCadence-36 TOOL-dTendedCadence-37 TOOL-dTendedCadence-38 TOOL-dTendedCadence-39 TOOL-dTendedCadence-40 TOOL-dTendedCadence-41 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-46 TOOL-dTendedCadence-47 |
-| [2026-11-01-prompt-TOOL-dTendedCadence-35-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-35-promoted-fix-brief.md) | research | TOOL-dTendedCadence-39 |
+| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-35 TOOL-dTendedCadence-36 TOOL-dTendedCadence-37 TOOL-dTendedCadence-38 TOOL-dTendedCadence-39 TOOL-dTendedCadence-40 TOOL-dTendedCadence-41 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-46 TOOL-dTendedCadence-47 TOOL-dTendedCadence-49 TOOL-dTendedCadence-50 TOOL-dTendedCadence-51 TOOL-dTendedCadence-52 TOOL-dTendedCadence-53 TOOL-dTendedCadence-54 TOOL-dTendedCadence-55 TOOL-dTendedCadence-56 TOOL-dTendedCadence-57 TOOL-dTendedCadence-58 TOOL-dTendedCadence-59 |
+| [2026-11-01-prompt-TOOL-dTendedCadence-35-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-35-promoted-fix-brief.md) | research | TOOL-dTendedCadence-35 TOOL-dTendedCadence-39 |
+| [2026-11-01-review-TOOL-dTendedCadence-35-to-48-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dTendedCadence-35-to-48-spec-audit-round1.md) | spec-audit | TOOL-dTendedCadence-35 TOOL-dTendedCadence-37 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-47 TOOL-dTendedCadence-36 TOOL-dTendedCadence-46 TOOL-dTendedCadence-40 TOOL-dTendedCadence-38 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-39 TOOL-dTendedCadence-41 |
 
 <!-- /gen:spec-records -->
 
@@ -179,6 +180,12 @@ M26 50; M27 51; M28 52; M29 53; L1 16; L2 17; L3 18; L4 19, 38; L5 20; L6 22; L7
 - **consumes-from** `TOOL-dTendedCadence-38` — `ROUTE_VALUES`, the set S11 and S12 cite
 - **consumes-from** `TOOL-dTendedCadence-39` — the review's base read, which S17 adds `carrying=` to
 - **consumes-from** `TOOL-dTendedCadence-47` — `write_breach_ask`'s closed-ask case, beside which S23 changes step (1)
+- **hands-off** `TOOL-dTendedCadence-49` — S24's landing intake, whose readings digest and re-derivation that unit replaces with the written record carried under `refs/gov/maintain-record/<key>` (review id 1)
+- **hands-off** `TOOL-dTendedCadence-50` — S24's patch build, whose re-derivation that unit's `maintenance.py land` replaces with a check of commit and digest (review id 28)
+- **hands-off** `TOOL-dTendedCadence-51` — S24 and AC20's round trip, which that unit's arm observes across two clones (review id 42)
+- **hands-off** `TOOL-dTendedCadence-52` — S24's single landing grammar, onto whose replacement that unit puts the security review's landing (review id 43)
+- **hands-off** `TOOL-dTendedCadence-58` — AC9 and AC18, which that unit grades over the build's own non-merge commits (review id 18)
+- **hands-off** `TOOL-dTendedCadence-59` — its criteria, scratch tree, journal, `probe:` line, dossier, inventory and §7, which the minors batch repairs (review ids 6, 7, 8, 9, 14, 20, 24, 25, 30, 31, 33, 34, 37, 39, 44, 45)
 
 ## 4. Design
 
@@ -373,6 +380,7 @@ New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 AC5 AC6 AC8 AC10 AC
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the 30 MEDIUM and 10 LOW of the round-1 spec
   audit, one scope item per raw id.
+- rev-2 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 spec audit of units 35 to 48 declare toward this unit (units 49, 50, 51, 52, 58 and 59); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

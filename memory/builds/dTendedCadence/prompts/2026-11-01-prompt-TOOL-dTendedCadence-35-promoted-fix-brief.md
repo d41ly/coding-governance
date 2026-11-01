@@ -1,4 +1,4 @@
-**Serves:** research TOOL-dTendedCadence-39 TOOL-dTendedCadence-48
+**Serves:** research TOOL-dTendedCadence-35 TOOL-dTendedCadence-39 TOOL-dTendedCadence-48
 
 # Promoted-fix brief — dTendedCadence, the round-1 promotions' mechanical reds
 

@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-35 — the maintenance record's key class: every family a sibling mints, one anchored pattern each, held at the write boundary
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dTendedCadence-19
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-36 TOOL-dTendedCadence-37 TOOL-dTendedCadence-38 TOOL-dTendedCadence-39 TOOL-dTendedCadence-40 TOOL-dTendedCadence-41 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-46 TOOL-dTendedCadence-47 TOOL-dTendedCadence-48 |
+| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-36 TOOL-dTendedCadence-37 TOOL-dTendedCadence-38 TOOL-dTendedCadence-39 TOOL-dTendedCadence-40 TOOL-dTendedCadence-41 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-46 TOOL-dTendedCadence-47 TOOL-dTendedCadence-48 TOOL-dTendedCadence-49 TOOL-dTendedCadence-50 TOOL-dTendedCadence-51 TOOL-dTendedCadence-52 TOOL-dTendedCadence-53 TOOL-dTendedCadence-54 TOOL-dTendedCadence-55 TOOL-dTendedCadence-56 TOOL-dTendedCadence-57 TOOL-dTendedCadence-58 TOOL-dTendedCadence-59 |
 | [2026-11-01-prompt-TOOL-dTendedCadence-35-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-35-1-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dTendedCadence-35-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-35-promoted-fix-brief.md) | research | TOOL-dTendedCadence-39 TOOL-dTendedCadence-48 |
+| [2026-11-01-review-TOOL-dTendedCadence-35-to-48-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dTendedCadence-35-to-48-spec-audit-round1.md) | spec-audit | TOOL-dTendedCadence-37 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-47 TOOL-dTendedCadence-36 TOOL-dTendedCadence-46 TOOL-dTendedCadence-40 TOOL-dTendedCadence-38 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-39 TOOL-dTendedCadence-41 TOOL-dTendedCadence-48 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +56,8 @@ pattern, so every key a sibling mints is admitted and no key is a path.
 - **hands-off** `TOOL-dTendedCadence-43` — `RECORD_KEY_FAMILIES`, whose rows that unit gives a run kind
 - **hands-off** `TOOL-dTendedCadence-16` — the `node` family, which admits the `<period>.<node>` key its node pass writes the record under
 - **hands-off** `TOOL-dTendedCadence-2` — the `session` family, which admits the `s-<12hex>` key an `every-session` run writes the record under
+- **hands-off** `TOOL-dTendedCadence-55` — the `node` family, by whose key's node segment that unit groups the records the leg reads (review id 2)
+- **hands-off** `TOOL-dTendedCadence-59` — the refusal line's family list, the `node` row's pipe and the `\d` patterns, which the minors batch repairs (review ids 10, 11, 21, 53)
 
 ## 4. Design
 
@@ -142,6 +146,7 @@ New arm: tools/drift-audit/selftest.py · covers AC1 AC2 · one planted key per 
 
 - rev-1 · 2026-11-01 · initial draft, promoted from review id 1 (HIGH, item H1) of the round-1 spec
   audit.
+- rev-2 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 spec audit of units 35 to 48 declare toward this unit (units 55 and 59); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 
