@@ -249,10 +249,10 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-90 — a case-only rename is refused by name where the filesystem folds case, so no rollback restores one file under two spellings](spec/2026-10-29-spec-TOOL-dSafePassage-90.md) | 16 | 2 | CLOSED | rev-2 | 2026-10-29 |
 | [TOOL-dSafePassage-91 — the round-3 closing review's three remaining minors: the in-place row's one snapshot path, a grader for the walk's two roots, and an arm for the floor stub's bash fallback](spec/2026-10-29-spec-TOOL-dSafePassage-91.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
 | [TOOL-dSafePassage-92 — the floor stub's fallback check grades a crash, not the word bash, over every host shape the bar runs on](spec/2026-11-01-spec-TOOL-dSafePassage-92.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
-| [TOOL-dSafePassage-93 — the round-4 closing review's two minors: an arm that triggers the link-or-alias refusal, and the set_environ claim narrowed](spec/2026-11-01-spec-TOOL-dSafePassage-93.md) | 16 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [TOOL-dSafePassage-93 — the round-4 closing review's two minors: an arm that triggers the link-or-alias refusal, and the set_environ claim narrowed](spec/2026-11-01-spec-TOOL-dSafePassage-93.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 450 bound to this build, across 4 record folder(s).
+Records: 451 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

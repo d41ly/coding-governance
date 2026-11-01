@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-93 — the round-4 closing review's two minors: an arm that triggers the link-or-alias refusal, and the set_environ claim narrowed
 
-**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base 2e6d4845 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base 2e6d4845 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-93-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-93-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-92-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-92-audit-fold-brief.md) | research | TOOL-dSafePassage-92 |
 | [2026-11-01-prompt-TOOL-dSafePassage-92-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-92-spec-brief.md) | research | TOOL-dSafePassage-92 |
 | [2026-11-01-prompt-TOOL-dSafePassage-93-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-93-build-brief.md) | journal | — |

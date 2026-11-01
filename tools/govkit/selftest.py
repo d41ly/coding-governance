@@ -8488,8 +8488,8 @@ user_skills = "/tmp/gk-fake-skills"
             return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"),
                                    "selfcheck"], capture_output=True, text=True, encoding="utf-8", errors="replace")
 
-        def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-            return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
+        def run_in_gov(g: pathlib.Path, *args: str, root: str = PFX) -> subprocess.CompletedProcess:
+            return subprocess.run([sys.executable, str(g / root / KIT_NAMES["govkit"] / "govkit.py"), *args],
                                   capture_output=True, text=True, encoding="utf-8", errors="replace")
 
         def build_scratch_gov_kit(tag: str, kit_toml: str) -> pathlib.Path:
@@ -13219,6 +13219,35 @@ user_skills = "/tmp/gk-fake-skills"
               _ap91.returncode == 0 and _up91.returncode == 1 and "ALREADY holds a file there" in _up91.stdout
               and _rs91 == 1 and read_bytes11(_t91 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\n",
               f"apply {_ap91.returncode} update {_up91.returncode} restored {_rs91} " + _up91.stdout[-1500:])
+
+        # TOOL-dSafePassage-93: the adopter's own hard link at gov's new name. The new name is the row's
+        # own file under another name, never a second spelling, so the move is refused naming the link.
+        # Gov's B changes the last line, so a write through either name moves bytes the check reads, and
+        # the two names must still be one file. A hard link stands in for a symlink: NTFS makes one
+        # without a privilege, and `samefile` answers both alike.
+        _g93 = build_rename_gov("link", _kit88, "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
+        _t93 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-link-t")
+        _ap93 = run_in_gov(_g93, "apply", "--target", str(_t93), "--kits", "demo", root="pinned")
+        _keep93, _link93 = (_t93 / "pinned" / "demo" / n for n in ("keep.txt", "linked.txt"))
+        try:
+            os.link(_keep93, _link93)
+            _ln93 = ""
+        except OSError as _e93:
+            _ln93 = f"os.link failed: {_e93}; "
+        settle(_t93, "the install and the adopter's own link")
+        git(_g93, "mv", "pinned/demo/keep.txt", "pinned/demo/linked.txt")
+        (_g93 / "pinned" / "demo" / "linked.txt").write_text("one\ntwo\nthree\nFOUR\n", encoding="utf-8", newline="\n")
+        git(_g93, "add", "-A")
+        git(_g93, "commit", "-qm", "B")
+        _up93 = (run_in_gov(_g93, "update", "--target", str(_t93), "--write", root="pinned")
+                 if _ap93.returncode == 0 and not _ln93 else None)
+        check("[dSP-93] a rename onto the adopter's own link to the row's file is refused naming the link, not case folding",
+              _up93 is not None and _up93.returncode == 1 and "under another name (a link" in _up93.stdout
+              and "case-only rename is on a case-insensitive filesystem" not in _up93.stdout
+              and all(read_bytes11(f) == b"one\ntwo\nthree\nfour\n" for f in (_keep93, _link93))
+              and os.path.samefile(_keep93, _link93),
+              f"{_ln93}apply {_ap93.returncode} update {_up93 and _up93.returncode} "
+              + (_up93 or _ap93).stdout[-1500:])
 
         _g11c = build_rename_gov("mvfail")
         _t11c = build_rename_target(_g11c, "rn-mvfail-t")
