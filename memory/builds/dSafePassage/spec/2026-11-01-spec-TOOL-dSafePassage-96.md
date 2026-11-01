@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-96 — the round-7 closing review's three minors: each restore check reads the path its label names, and a reused tmp stages afresh
 
-**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base 744d2551 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-11-01 · node a · Tier-2 · base 744d2551 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-96-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-96-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-96-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-96-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-96-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-96-build-brief.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-96-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-96-spec-brief.md) | research | — |

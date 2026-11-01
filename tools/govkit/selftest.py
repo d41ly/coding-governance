@@ -4491,6 +4491,7 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     anchor94 = "returncode == 0\n        except OSError:"
     sentinel94 = "dsp95-sentinel"
     steps94 = types.ModuleType("dsp94_upgrade_steps")
+    shutil.rmtree(tmp / "dsp94-narrowed", ignore_errors=True)  # TOOL-dSafePassage-96: a reused tmp stages afresh
     try:
         spec94 = importlib.util.spec_from_file_location("dsp94_upgrade_steps", build_staged_copy(
             tmp / "dsp94-narrowed", src94.replace(anchor94, "returncode == 0\n        except ValueError:", 1)))
@@ -4513,9 +4514,11 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
           argv94 == ["bash", "x"], repr(argv94))
     check("[dSP-94] the same read, check_runs narrowed to catch ValueError, reads the spawn's OSError",
           src94.count(anchor94) == 1 and isinstance(cut94, OSError), f"anchor count {src94.count(anchor94)}; {cut94!r}")
-    check("[dSP-95] the read gives the parent's bash cache back", us._BASH == bash87, repr(us._BASH))
+    check("[dSP-95] the read gives the parent's bash cache back",
+          argv94 == ["bash", "x"] and us._BASH == bash87, f"argv94 {argv94!r}; {us._BASH!r}")
     check("[dSP-95] the read that raises gives the copy's bash cache back",
-          getattr(steps94, "_BASH", None) == sentinel94, repr(getattr(steps94, "_BASH", None)))
+          isinstance(cut94, OSError) and getattr(steps94, "_BASH", None) == sentinel94,
+          f"cut94 {cut94!r}; {getattr(steps94, '_BASH', None)!r}")
 
     # TOOL-dSafePassage-92: the same predicate over every host shape the bar runs on, so a node with a
     # WSL distribution still grades the hosts without one. The five tracebacks are the real stub's, run
