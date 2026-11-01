@@ -4,14 +4,13 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-30, the newest record date in this tree (dMindYourWords).
+Dormant: no record dated within 21 days of 2026-11-01, the newest record date in this tree (dFoldedAudit).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
 | Build | Status | Node | Opened | Streams | Ids (n) | Last record | Activity | Landed-unclosed |
 |---|---|---|---|---|---|---|---|---|
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | tooling+kickoff+playbook | 33 | 2026-10-16 | active | 0 |
-| [aRoutedQuill](builds/aRoutedQuill/README.md) | DEFERRED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 15 | 2026-10-10 | active | 0 |
 | [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | active | 0 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | DEFERRED | d | 2026-10-21 | tooling | 75 | 2026-10-26 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | OPEN | d | 2026-10-21 | tooling | 18 | 2026-10-21 | active | 0 |
@@ -19,6 +18,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 24 | 2026-10-21 | active | 0 |
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | DEFERRED | d | 2026-10-21 | tooling | 108 | 2026-10-26 | active | 0 |
 | [dFairHearing](builds/dFairHearing/README.md) | DEFERRED | d | 2026-10-21 | tooling | 40 | 2026-10-23 | active | 0 |
+| [dFoldedAudit](builds/dFoldedAudit/README.md) | OPEN | d | 2026-11-01 | tooling | 8 | 2026-11-01 | active | 0 |
 | [dFurnishedOrders](builds/dFurnishedOrders/README.md) | DEFERRED | d | 2026-10-21 | tooling | 61 | 2026-10-28 | active | 0 |
 | [dIndexedDesign](builds/dIndexedDesign/README.md) | DEFERRED | d | 2026-10-21 | tooling | 53 | 2026-10-28 | active | 0 |
 | [dKeptSession](builds/dKeptSession/README.md) | DEFERRED | d | 2026-10-21 | kickoff | 66 | 2026-10-26 | active | 0 |
@@ -43,6 +43,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aPacedTurnstile](builds/aPacedTurnstile/README.md) | SPECCED | a | 2026-08-18 | tooling | 16 | 2026-08-20 | dormant | 0 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 | 2026-07-13 | dormant | 0 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 | 2026-08-08 | dormant | 0 |
+| [aRoutedQuill](builds/aRoutedQuill/README.md) | DEFERRED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 15 | 2026-10-10 | dormant | 0 |
 | [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 | 2026-08-20 | dormant | 0 |
 | [aTunedCompass](builds/aTunedCompass/README.md) | BLOCKED | a | 2026-09-04 | tooling | 11 | 2026-09-05 | dormant | 0 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 | 2026-08-18 | dormant | 0 |
