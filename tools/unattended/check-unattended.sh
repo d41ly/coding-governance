@@ -240,6 +240,9 @@ ADV_NAME=""
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 DISPOSITION_CUTOFF=""
+# TOOL-dFoldedAudit-2 S7 - the date from which a spec audit's exit row counts its folds and promotions.
+# The driver's constants come off its source; this one is a conf key, so it is imported as the line above.
+SPEC_FOLD_CUTOFF=""
 # TOOL-dDerivedDocket-22 S10 - the date from which the landed fact-set arm grades a record.
 LANDED_FACTS_CUTOFF=""
 # TOOL-dUnstuckLanding-13 S8 - the date from which ABORTED means DISCARD. Initialised and admitted
@@ -332,7 +335,7 @@ while IFS= read -r -d '' _ck; do
     # as a whole line, and a region it cannot read is a refusal, not an empty set.
     # gov:conf-allow-begin
     MEMORY_ROOT|LANDER|LANDER_MODE|SELFTESTS_OWED_PATHS|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
-    PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|LANDED_FACTS_CUTOFF|HANDOFF_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
+    PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|LANDED_FACTS_CUTOFF|HANDOFF_CUTOFF|DISPOSITION_CUTOFF|SPEC_FOLD_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
     HALT_FLOOR|UNDECLARED_WRITE_BUDGET|HOLD_CODES_EXTRA|HOLD_FLOOR|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
@@ -717,6 +720,11 @@ else
   # ---- silently disabled clause reads exactly like a clause finding nothing wrong.
   echo "unattended: DISPOSITION_CUTOFF is blank or undeclared, so check 2 clause 3 grades EVERY record on the id-delta proxy and reads no recorded disposition — a run that folded correctly is still graded as though it had promoted"
 fi
+# ---- ANNOUNCED FOR THE SAME REASON: a blank SPEC_FOLD_CUTOFF turns the exit-row clause below off, and a
+# ---- clause turned off reads exactly like one finding nothing wrong (TOOL-dFoldedAudit-2 S7).
+if [ -z "$SPEC_FOLD_CUTOFF" ]; then
+  echo "unattended: SPEC_FOLD_CUTOFF is blank or undeclared, so every spec audit exit keeps the old rule and no fold is graded"
+fi
 if [ "$_disp_ok" != 1 ]; then
   # ---- AND THE LOOP BELOW IS SKIPPED ENTIRELY. An unreadable cutoff means this leg cannot decide
   # ---- WHICH predicate applies, and grading every record on the other one is precisely the silent
@@ -740,6 +748,15 @@ else
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
     *) rv_speccut=""; rv_bad="$rv_bad
   (the driver declares no readable ISO-date SPEC_COUNTS_CUTOFF, so the counted-spec-row clause cannot tell a record written when a spec subject's terminal row carried no counts and could fold from one written after, and would red every record or none: '$SPEC_COUNTS_CUTOFF')" ;;
+  esac
+  # A CONF KEY, not a driver constant, so a blank one is a real value, announced above, and only a
+  # malformed one is named here. It feeds the same failure and `rv_foldcut` stays empty, as
+  # SPEC_COUNTS_CUTOFF's does, because a new `fail` site would pass this file's refusal ceiling.
+  rv_foldcut=$SPEC_FOLD_CUTOFF
+  case "$SPEC_FOLD_CUTOFF" in
+    ""|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) rv_foldcut=""; rv_bad="$rv_bad
+  (.unattended.conf declares SPEC_FOLD_CUTOFF as no ISO date, so the exit-row clause cannot tell a spec audit exit that keeps the old rule from one that counts its folds and promotions, and would grade every record or none: '$SPEC_FOLD_CUTOFF')" ;;
   esac
   for rvf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$rvf" ] || continue
@@ -818,7 +835,13 @@ else
     # grades here too, for the reason the sibling gives: it is the in-flight run.
     rv_foldgraded=0
     if [ "$rv_graded" = 1 ] && { [ -z "$rv_fc" ] || printf '%s\n%s\n' "$FOLD_CUTOFF" "$rv_fc" | sort -C; }; then rv_foldgraded=1; fi
-    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
+    # THE SPEC EXIT ROW'S CUTOFF KEYS ON THE DAY THE RECORD BEGAN, by the function the driver's
+    # `read_spec_exit_rule` calls, so the two cannot disagree about one record. `rv_fc` will not do: it
+    # has no floor, so a re-preflighted slug would read as the previous run's date. The function is
+    # named for its first cutoff and reads any record cutoff; it grades a record with no history.
+    rv_foldpast=0
+    if [ -n "$rv_foldcut" ] && check_landed_facts_due "$rvf" "$rv_foldcut"; then rv_foldpast=1; fi
+    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v foldpast="$rv_foldpast" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -832,25 +855,42 @@ else
         # `--review` writes `highs <n> · minors <n>` on a subject terminal round, BOTH or neither: a
         # row carrying both, on any subject, is a counted exit whose every confirmed finding is
         # promoted, and it owes one unit per blocker and high plus one for the minors batch. A row
-        # carrying neither - one written before its subject was counted - keeps the floor of one.
+        # carrying neither - one written before its subject was counted - keeps the floor of one. A
+        # spec row past SPEC_FOLD_CUTOFF carries folded and promoted too, and owes by those below.
         # NOT CHECKED: that the minors went into at most two units, or that a promoted unit
         # mechanism closes its finding - the region records ids, never which finding an id closes.
         hi = -1; mi = -1
         if (match(rs, / · highs [0-9]+/)) { hi = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", hi); hi += 0 }
         if (match(rs, / · minors [0-9]+/)) { mi = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", mi); mi += 0 }
         cnt = (hi >= 0 && mi >= 0)
+        fo = -1; pr = -1
+        if (match(rs, / · folded [0-9]+/)) { fo = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", fo); fo += 0 }
+        if (match(rs, / · promoted [0-9]+/)) { pr = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", pr); pr += 0 }
         if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
         last[it] = b
         if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) term[it] = 1
         nf = split(rs, fld, " · ")
         # A COUNTED SPEC ROW (TOOL-aEvidencedLens-9 S7). In a record first-committed on or after
         # SPEC_COUNTS_CUTOFF (an empty date is the in-flight run and grades), a terminal row on a
-        # subject other than the build slug owes both counts and never folds; before it the driver
-        # refused the counts there and accepted fold at CONVERGED, so the old reading stands.
+        # subject other than the build slug owes both counts, and folds only past SPEC_FOLD_CUTOFF; before
+        # the first the driver refused the counts there and accepted fold at CONVERGED, so the old
+        # reading stands.
         if (speccut != "" && (fc == "" || fc >= speccut) && it != slug && rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/ \
-            && (!cnt || (nf > 0 && fld[nf] == "disposition fold"))) specbad[it] = 1
+            && (!cnt || (foldpast != 1 && nf > 0 && fld[nf] == "disposition fold"))) specbad[it] = 1
+        # THE EXIT ROW PAST SPEC_FOLD_CUTOFF (TOOL-dFoldedAudit-2 S8), on a spec subject only: a closing
+        # review keeps its grading whatever the date. It runs on the COUNTS and never on the verdict
+        # word, so a `verdict CLEAN` row with a short sum reds: the old disposal stage read the verdict
+        # and a high could reconcile into prose. Findings adjudicated above b + h + m are legal, so the
+        # sum is a floor. NOT CHECKED: which finding went where, or that a fold named its spec and rev.
+        # A row names neither, and the disposal stage reconciles that.
+        nr = (foldpast == 1 && it != slug)
+        if (nr && rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/ && cnt) {
+          want = pr > 0 ? "promote" : (fo > 0 ? "fold" : "")
+          got  = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], 13) : ""
+          if (fo < 0 || pr < 0 || fo + pr < b + hi + mi || want != got) rowbad[it] = 1
+        }
         if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; pp[it] = pr; nw[it] = nr
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
         }
         # A CONVERGED ROW CARRYING A DISPOSITION IS READ TOO (closing review of aProbedUnit, cluster
@@ -860,14 +900,15 @@ else
         # proxy predates the field and never read a converged row, and a converged subject is not
         # one that "EXITED without converging".
         else if (rs ~ /CONVERGED/ && graded == 1 && nf > 0 && fld[nf] ~ /^disposition /) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; pp[it] = pr; nw[it] = nr
           disp[it] = substr(fld[nf], length("disposition ") + 1)
         }
         # ...and a converged CLOSING row standing on a high or a minor with NO disposition owes one:
         # the closing review promotes every finding, so it reaches the no-disposition refusal below
-        # rather than reading as the ordinary converged round that demands nothing.
-        else if (rs ~ /CONVERGED/ && graded == 1 && cnt && hi + mi > 0) {
-          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; disp[it] = ""
+        # rather than reading as the ordinary converged round that demands nothing. The exit-row
+        # clause above grades a row past SPEC_FOLD_CUTOFF instead, so this one leaves it alone.
+        else if (rs ~ /CONVERGED/ && graded == 1 && cnt && hi + mi > 0 && !nr) {
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; pp[it] = pr; nw[it] = nr; disp[it] = ""
         }
       }
       END {
@@ -878,7 +919,19 @@ else
           else if (flat[it] >= 1 && !(it in term))
             printf "\n  %s (subject %s: blocker counts did not shrink across consecutive rounds and no round carries an exit token, so the loop is non-convergent and nothing recorded that it stopped)", f, it
           if (it in needs) {
-            if (graded != 1) nneed++
+            # A ROW PAST SPEC_FOLD_CUTOFF OWES BY ITS OWN COUNTS, ahead of `graded`, so a fold owes
+            # nothing with DISPOSITION_CUTOFF blank too and never reaches `closefold`. `mm` counts
+            # every MEDIUM, LOW and adjudicated UNVERIFIED finding, so `pp - mm` is a lower bound on
+            # the promoted BLOCKERs and HIGHs, each its own unit, and a positive `pp` takes at least one.
+            # The row names no severity per promotion, so this is a floor and it stops there.
+            if (nw[it]) {
+              if (disp[it] == "promote") {
+                nsubj++
+                owe = pp[it] - mm[it]
+                nneed += (owe > 0 ? owe : 1)
+              }
+            }
+            else if (graded != 1) nneed++
             else if (disp[it] == "") nomiss = nomiss " " it
             else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
             else if (disp[it] == "promote") {
@@ -898,6 +951,9 @@ else
         specs = ""; for (it in specbad) specs = specs " " it
         if (specs != "")
           printf "\n  %s (spec subject(s)%s record a terminal row with no highs and minors counts or with disposition fold in a record first-committed on or after SPEC_COUNTS_CUTOFF, after which the driver requires both counts at every terminal exit of every subject and refuses fold at all of them, so every confirmed finding is promoted)", f, specs
+        rows = ""; for (it in rowbad) rows = rows " " it
+        if (rows != "")
+          printf "\n  %s (spec subject(s)%s record an exit row past SPEC_FOLD_CUTOFF whose folded and promoted counts are absent, fall short of the findings it counted, or disagree with its disposition, so a confirmed finding cannot be traced to a fold or a unit)", f, rows
         if (graded == 1) {
           if (nomiss != "")
             printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss

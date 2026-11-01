@@ -244,6 +244,9 @@ RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 # and therefore the same announcement on every bar. Whether it should fire there is dFoldedVerdict's
 # question, not this fixture's, and it is untouched.
 DISPOSITION_CUTOFF="2099-01-01"
+# THE SAME REASON, TOOL-dFoldedAudit-2: a blank key announces on every run, and a date ahead of every
+# fixture record moves no arm's verdict. The blank-cutoff arm strips this line.
+SPEC_FOLD_CUTOFF="2099-01-01"
 UNDECLARED_WRITE_BUDGET="${UWB_OVERRIDE:-0}"
 EOF
 }
@@ -480,6 +483,7 @@ add_local_scope() { printf 'ANCHOR_SCOPE="local"\n' >> .unattended.conf; }
 # ---- `UEND`) still reads one the calling block sets first — a definition crossing a cut is safe,
 # ---- its caller's block crossing one is what the variable scan is for.
 dispconf() { mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf; printf 'DISPOSITION_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
+foldconf() { sed -i '/^SPEC_FOLD_CUTOFF=/d' .unattended.conf; printf 'SPEC_FOLD_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
 mkdisp() { # base-region-rows · head-region-rows · run rows
   mkdir -p memory/builds/tDisp
   printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$1" > memory/builds/tDisp/README.md
@@ -1546,6 +1550,72 @@ miss "$(run)" "check 2 FAILED"
 reset_tree; mkconf
 mutate $KIT_REL/unattended.sh 's|^SPEC_COUNTS_CUTOFF=.*|SPEC_COUNTS_CUTOFF=2026-10-06|'
 hit "$(run)" "the driver declares no readable ISO-date SPEC_COUNTS_CUTOFF, so the counted-spec-row clause cannot tell"
+
+# ---- TOOL-dFoldedAudit-2 S7 to S9: A SPEC EXIT ROW PAST SPEC_FOLD_CUTOFF COUNTS ITS FOLDS AND PROMOTIONS,
+# ---- graded on the record's own first commit either side of the cutoff, so no arm depends on the day
+# ---- it runs. Hand-written rows stand for what the driver refuses to write, and each red row has a
+# ---- green control beside it, so no arm passes by finding nothing.
+FR_DATED="2026-11-02T12:00:00 +0000"; FR_EARLY="2026-10-30T12:00:00 +0000"
+FR_BAD="record an exit row past SPEC_FOLD_CUTOFF whose folded and promoted counts are absent, fall short of the findings it counted, or disagree with its disposition, so a confirmed finding cannot be traced to a fold or a unit"
+FR_FOLD='2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 2 · folded 3 · promoted 0 · disposition fold\n'
+# AC1 and AC2: one fold row, either side of the cutoff. Past it the row owes no unit and leaves
+# `specbad` and `closefold`; before it the old clause reads it, so a landed record keeps its grading.
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_EARLY" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+# AC3: the closing review is no spec subject, so the same counts on the slug still fold nothing.
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 3 · folded 3 · promoted 0 · disposition fold\n'
+hit "$(run)" "record disposition fold on a row carrying highs and minors, and a counted exit folds nothing on any subject"
+# AC5: the clause reads the counts and never the verdict word, so `verdict CLEAN` hides nothing...
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 0 · folded 1 · promoted 0 · disposition fold\n'
+hit "$(run)" "spec subject(s) S1 $FR_BAD"
+# ...AC6: a disposition the counts do not derive reds...
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 2 · folded 1 · promoted 2 · disposition fold\n'
+hit "$(run)" "spec subject(s) S1 $FR_BAD"
+# ...and so does a row past the cutoff that counts neither, the shape an old driver writes.
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_TWO" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · disposition promote\n'
+hit "$(run)" "spec subject(s) S1 $FR_BAD"
+# ...and a sum above the findings is legal, because an adjudicated UNVERIFIED finding counts there.
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · folded 3 · promoted 0 · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+# AC10: `max(1, p - m)`, the floor the row can show. Today's `owe` would ask three here, and a blocker
+# promoted past the minors counts through the same subtraction.
+FR_PROM='2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 1 · folded 0 · promoted 3 · disposition promote\n'
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_TWO" "$FR_PROM"
+hit "$(run)" "against a floor of 2"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_THREE" "$FR_PROM"
+miss "$(run)" "check 2 FAILED"
+# ...a promoted row with every promotion a minor still owes the one unit
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · folded 0 · promoted 2 · disposition promote\n'
+hit "$(run)" "against a floor of 1"
+# ...and a fold owes none with DISPOSITION_CUTOFF stripped too, which is why the branch precedes `graded`.
+reset_tree; mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+out=$(run)
+miss "$out" "check 2 FAILED"
+hit "$out" "DISPOSITION_CUTOFF is blank or undeclared"
+# AC8 and AC11: the key's two other shapes. A blank one is announced, because a clause turned off reads
+# like one finding nothing. A malformed one is named inside check 2 and grades no row as past it.
+reset_tree; mkconf; sed -i '/^SPEC_FOLD_CUTOFF=/d' .unattended.conf
+hit "$(run)" "SPEC_FOLD_CUTOFF is blank or undeclared, so every spec audit exit keeps the old rule and no fold is graded"
+reset_tree; mkconf; foldconf 2026-11-01
+miss "$(run)" "SPEC_FOLD_CUTOFF is blank or undeclared"
+reset_tree; mkconf; foldconf soon
+out=$(run)
+hit "$out" ".unattended.conf declares SPEC_FOLD_CUTOFF as no ISO date, so the exit-row clause cannot tell"
+hit "$out" "'soon'"
+reset_tree
 
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
 # ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`
@@ -6870,13 +6940,17 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- LOWERED 1046 -> 1041 by TOOL-aSparedSpawn-14 (row 15 of the first retirement batch): check 47's
 # ---- sixteen assertions and check 23's tombstone arm left, check 52's twelve arrived, counted off the
 # ---- diff; region 3 carries -1 and region 7 -4. This pass runs no suite. OWED: observed at VERIFYING.
-FLOOR_ASSERTIONS=1041
+# ---- RAISED 1041 -> 1057 by exactly the arms, TOOL-dFoldedAudit-2: check 2's exit-row arms, eleven `hit`
+# ---- and five `miss`, all beside the counted-spec-row block in region 2, so FLOOR_SHARD_2 carries the
+# ---- same +16 and the other seven are untouched. COUNTED off the block's own lines; this pass runs no
+# ---- suite, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=1057
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
 FLOOR_SHARD_1=159
-FLOOR_SHARD_2=67
+FLOOR_SHARD_2=83
 FLOOR_SHARD_3=127
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133

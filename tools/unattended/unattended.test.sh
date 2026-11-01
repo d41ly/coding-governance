@@ -2489,6 +2489,134 @@ else
   hit "$out" "outside the closed set this driver branches on"
   same "AC10 no line is the value alone" "$(printf '%s\n' "$out" | grep -cx 'fold-all')" "0"
 fi
+
+# ---- TOOL-dFoldedAudit-2: --review RECORDS A SPEC AUDIT'S EXIT THAT FOLDS. Each case takes a fresh
+# ---- repository off `write_switch_fixture`, with no policy kit beside the driver unless the arm is about
+# ---- the switch: the reader then answers its kit default, by-nature, and says so on stderr, which is
+# ---- what lets AC8 tell an exit that read the switch from one that did not. REVIEW_ROUNDS is 1 so a
+# ---- first blocked round exits. The record's first commit is pinned either side of the cutoff, so no
+# ---- arm depends on the day it runs. The hand-written rows beside these are the gate suite's.
+_fa_r="$_sw_tmp/r"; _fa_run="$_fa_r/memory/builds/tFix/RUN.md"
+_fa_dated="2026-11-02T12:00:00 +0000"; _fa_early="2026-10-30T12:00:00 +0000"; _fa_cf="CLEAN WITH FIXES"
+_fa_refused="--review cannot record this spec audit exit: "
+_fa_old="--folded and --promoted are counted only at a spec audit's terminal exit past SPEC_FOLD_CUTOFF"
+commit_fold_fixture() { # committer date · message
+  ( cd "$_fa_r" && git add -A >/dev/null && GIT_COMMITTER_DATE="$1" git commit -q -m "$2" --no-verify )
+}
+write_fold_fixture() { # the record's first commit · SPEC_FOLD_CUTOFF's value · 1 for the policy kit beside the driver
+  rm -rf "$_fa_r"
+  write_switch_fixture "$_fa_r" "${3:-0}" ""
+  printf 'DISPOSITION_CUTOFF="2000-01-01"\nREVIEW_ROUNDS="1"\nSPEC_FOLD_CUTOFF="%s"\n' "$2" >> "$_fa_r/.unattended.conf"
+  mkdir -p "${_fa_run%/*}"
+  printf '# tFix\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n## Parked\n\n' > "$_fa_run"
+  commit_fold_fixture "$1" record
+}
+run_fold() { # the --review flags after the slug -> the fixture driver's output and status
+  ( cd "$_fa_r" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash "$_fa_r/u/unattended.sh" --review tFix "$@" ) 2>&1
+}
+# AC1 and AC4: a fold past the cutoff records the new row with the disposition last, on the counts alone
+# and on a LOCAL BLOCKER at a bounded exit, which today's state gate refuses. The `hit` on the reader's
+# note is AC8's control: this is what an exit that reads the switch prints with no kit beside it.
+write_fold_fixture "$_fa_dated" 2026-11-01
+out=$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0 --disposition fold); rc=$?
+same "AC1 a spec fold past the cutoff records" "$rc" "0"
+hit "$out" "CONVERGED · highs 1 · minors 2 · folded 3 · promoted 0 · disposition fold — the loop is done for this subject, and every finding confirmed at this exit FOLDS into the spec it names, rev bumped, and none needs a new mechanism"
+hit "$out" "no policy kit resolves beside this kit"
+same "AC1 the disposition is the row's last field" "$(grep -c 'review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 2 · folded 3 · promoted 0 · disposition fold$' "$_fa_run")" "1"
+out=$(run_fold --subject S2 --verdict BLOCKED --blockers 2 --highs 0 --minors 0 --folded 2 --promoted 0 --disposition fold); rc=$?
+same "AC4 a local blocker folds at a bounded exit" "$rc" "0"
+hit "$out" "BOUNDED · highs 0 · minors 0 · folded 2 · promoted 0 · disposition fold"
+hit "$out" "so the loop STOPS here and every CONFIRMED finding is DISPOSED BY NATURE: every finding confirmed at this exit FOLDS"
+# ...a promotion under the same rule keeps PROMOTED and FOLDS, and owes the floor check 2 grades: 3 - 1
+out=$(run_fold --subject S3 --verdict "$_fa_cf" --blockers 0 --highs 2 --minors 1 --folded 0 --promoted 3 --disposition promote); rc=$?
+same "a promotion past the cutoff records" "$rc" "0"
+hit "$out" "a finding that needs a new mechanism is PROMOTED to a unit of this build, a BLOCKER or HIGH to its own, the MEDIUMs and LOWs batched into one unit or two across disjoint write sets, and every other finding FOLDS into the spec it names"
+hit "$out" "this exit owes at least 2 new unit(s)"
+# ...and a promotion of minors alone owes the one unit, never zero
+out=$(run_fold --subject S4 --verdict "$_fa_cf" --blockers 0 --highs 0 --minors 2 --folded 0 --promoted 2 --disposition promote)
+hit "$out" "this exit owes at least 1 new unit(s)"
+# ...an exit with nothing standing counts its zeros and records no disposition
+out=$(run_fold --subject S5 --verdict CLEAN --blockers 0 --highs 0 --minors 0 --folded 0 --promoted 0); rc=$?
+same "an exit with nothing standing records" "$rc" "0"
+same "an exit with nothing standing names no disposition" "$(grep -c 'review · item S5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0 · folded 0 · promoted 0$' "$_fa_run")" "1"
+# AC3, AC5 and AC6: one call per row of the exit check's table, every one before anything is written.
+# Row 3 keeps a sentence naming `exits <state>`, which is the word a harness's bare first call reads.
+write_fold_fixture "$_fa_dated" 2026-11-01
+hit "$(run_fold --subject tFix --verdict "$_fa_cf" --blockers 0 --highs 0 --minors 3 --folded 3 --promoted 0 --disposition fold)" "$_fa_refused$_fa_old"
+hit "$(run_fold --subject T1 --verdict BLOCKED --blockers 2)" "--review exits BOUNDED on a spec audit and requires --highs and --minors"
+hit "$(run_fold --subject T1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --disposition fold)" "${_fa_refused}the exit requires both --folded and --promoted"
+hit "$(run_fold --subject T1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 1 --disposition fold)" "${_fa_refused}the exit requires both --folded and --promoted"
+hit "$(run_fold --subject T1 --verdict BLOCKED --blockers 0 --highs 2 --minors 0 --folded 1 --promoted 0 --disposition fold)" "${_fa_refused}--folded 1 and --promoted 0 fall short of the 2 finding(s) this exit counts"
+hit "$(run_fold --subject T1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 1 --promoted 2 --disposition fold)" "${_fa_refused}--folded 1 and --promoted 2 derive --disposition promote, and this call names fold"
+hit "$(run_fold --subject T1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0)" "${_fa_refused}--folded 3 and --promoted 0 derive --disposition fold, and this call names none"
+hit "$(run_fold --subject T1 --verdict CLEAN --blockers 0 --highs 0 --minors 0 --folded 0 --promoted 0 --disposition fold)" "${_fa_refused}--folded 0 and --promoted 0 derive no disposition, and this call names fold"
+hit "$(run_fold --subject T1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 08 --promoted 0 --disposition fold)" "--review requires --folded as a decimal of at most nine digits with no leading zero"
+hit "$(run_fold --subject T1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted x --disposition fold)" "--review requires --promoted as a decimal of at most nine digits with no leading zero"
+same "a refused counted exit wrote nothing" "$(grep -c 'review · item' "$_fa_run")" "0"
+# AC8 and AC9: the rule keys on the day the record began. A blank cutoff keeps today's row and reads no
+# switch, which is why the fixture has no kit: a read would print the note AC1 hits.
+write_fold_fixture "$_fa_dated" ""
+out=$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --disposition promote); rc=$?
+same "AC8 a blank cutoff records today's row" "$rc" "0"
+miss "$out" "no policy kit resolves beside this kit"
+same "AC8 today's row has no new field" "$(grep -c 'review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · disposition promote$' "$_fa_run")" "1"
+hit "$(run_fold --subject S2 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 0 --disposition promote)" "$_fa_refused$_fa_old"
+# ...a later commit does not move the day a record began, or the last commit would be the rule
+write_fold_fixture "$_fa_early" 2026-11-01
+sed -i 's/^witness: abc/witness: abd/' "$_fa_run"; commit_fold_fixture "$_fa_dated" later
+hit "$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 0 --disposition promote)" "$_fa_refused$_fa_old"
+# ...and a rotation does, because a re-preflighted slug's live record begins at the rotation: it writes
+# the archive and records the live path `M`, the floor `read_first_commit_date` applies.
+write_fold_fixture "$_fa_early" 2026-11-01
+cp "$_fa_run" "${_fa_run%/*}/RUN.LANDED.0bd0bd00.md"
+sed -i 's/^witness: abc/witness: abd/' "$_fa_run"; commit_fold_fixture "$_fa_dated" rotation
+out=$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0 --disposition fold); rc=$?
+same "AC9 a rotation past the cutoff admits the live record" "$rc" "0"
+# AC12: one subject still takes no further round, and the refusal names the rule that applied. The chain's
+# route is the new sentence; the slug and a blank cutoff keep today's, which the arms above pin whole.
+_fa_route="a blocker confirmed on it now is DISPOSED under the build method's M4 by its nature, through the chain's next subject, and never re-rounded: S1"
+_fa_sev="a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
+write_fold_fixture "$_fa_dated" 2026-11-01
+run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0 --disposition fold >/dev/null
+out=$(run_fold --subject S1 --verdict BLOCKED --blockers 1); rc=$?
+same "AC12 a terminal subject refuses a further round" "$rc" "1"
+hit "$out" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; $_fa_route"
+same "AC12 the refused round wrote nothing" "$(grep -c 'review · item S1 · reason' "$_fa_run")" "1"
+run_fold --subject tFix --verdict CLEAN --blockers 0 --highs 0 --minors 0 >/dev/null
+hit "$(run_fold --subject tFix --verdict BLOCKED --blockers 1)" "$_fa_sev"
+write_fold_fixture "$_fa_dated" ""
+run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --disposition promote >/dev/null
+hit "$(run_fold --subject S1 --verdict BLOCKED --blockers 1)" "$_fa_sev"
+# AC7: the switch's old value restores every refusal it replaced, and still writes the new row, so check 2
+# reads one row shape past the cutoff and never a policy file. Row 4's fold reaches today's sentence, and
+# the bare call keeps today's first refusal. COUNTED EITHER WAY, as the reader's own arms above are.
+if [ -z "$_sw_rel" ]; then
+  n=$((n+11))
+  echo "  SKIP the spec exit's switch arms over a policy kit: no policy kit resolves beside this one, so nothing answers them; their 11 assertions are counted, not run"
+else
+  write_fold_fixture "$_fa_dated" 2026-11-01 1
+  mkdir -p "$_fa_r/.governance"
+  printf '[review.spec-audit]\ndisposal = "promote-all"\n' > "$_fa_r/.governance/policy.toml"
+  commit_fold_fixture "$_fa_dated" policy
+  hit "$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 1 --promoted 0 --disposition fold)" "--review exits CONVERGED on a spec audit, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+  hit "$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 1 --promoted 1 --disposition promote)" "${_fa_refused}a spec exit under promote-all folds nothing"
+  hit "$(run_fold --subject S1 --verdict BLOCKED --blockers 2)" "--review exits BOUNDED with 2 blocker(s) standing and requires --disposition promote"
+  out=$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 0 --promoted 1 --disposition promote); rc=$?
+  same "AC7 a counted promotion records" "$rc" "0"
+  miss "$out" "FOLDS"
+  hit "$out" "one per BLOCKER and HIGH"
+  same "AC7 the old value writes the new row" "$(grep -c 'review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · folded 0 · promoted 1 · disposition promote$' "$_fa_run")" "1"
+  hit "$(run_fold --subject S2 --verdict BLOCKED --blockers 2 --highs 0 --minors 0 --folded 0 --promoted 2 --disposition promote)" "every CONFIRMED finding is DISPOSED BY SEVERITY:"
+  # ...and a value the closed set refuses reaches the one exit check's refusal, with no row written
+  write_fold_fixture "$_fa_dated" 2026-11-01 1
+  mkdir -p "$_fa_r/.governance"
+  printf '[review.spec-audit]\ndisposal = "fold-all"\n' > "$_fa_r/.governance/policy.toml"
+  commit_fold_fixture "$_fa_dated" policy
+  out=$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 1 --promoted 0 --disposition fold); rc=$?
+  same "AC7 an out-of-set value refuses" "$rc" "1"
+  hit "$out" "policy: refused"
+  same "AC7 a refused read wrote nothing" "$(grep -c 'review · item' "$_fa_run")" "0"
+fi
 rm -rf "$_sw_tmp"
 
 # ---- TOOL-aSparedSpawn-6 S8, AC8: THE TOP-LEVEL EXIT ARM. An `exit` the driver runs at top level,
@@ -18085,7 +18213,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # beside the parity table, one row's 3, AC7's 8, AC8's 3, AC4's 9, AC10's bad argument 4, and 23 over a
 # policy kit, those COUNTED EITHER WAY, counted off the block's own lines; no suite ran, and their
 # RED-first observation is the close's.
-FLOOR_ASSERTIONS=2836
+# RAISED 2836 -> 2882 by TOOL-dFoldedAudit-2: --review's spec exit arms in region one after the switch
+# reader's, 35 unconditional and 11 over a policy kit, those COUNTED EITHER WAY, counted off the block's
+# own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=2882
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18223,7 +18354,8 @@ PROLOGUE_ARMS=20
 # MERGED at the reconcile of local main into origin/main: base 209 + aMendedFleet's 56 + aGraftedHelix's 2 = 267.
 # 267 -> 269 by TOOL-aSparedSpawn-14: one retired run-state arm, three helper arms.
 # RAISED 269 -> 319 by TOOL-dFoldedAudit-7: the same 50 region-one cutoff and switch assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=319
+# RAISED 319 -> 365 by TOOL-dFoldedAudit-2: the same 46 region-one spec exit assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=365
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.

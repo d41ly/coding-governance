@@ -4223,6 +4223,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "check_exit_fold",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_exit_rows",
       "kind": "function",
       "file": "tools/unattended/runlog-writer.test.sh"
@@ -5548,6 +5553,11 @@
       "file": "tools/hooks/agent-cap.test.sh"
     },
     {
+      "id": "check_spec_exit",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_spec_run",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6476,6 +6486,11 @@
       "id": "commit_engine",
       "kind": "function",
       "file": "tools/memory-tree/check-verdict-epoch.test.sh"
+    },
+    {
+      "id": "commit_fold_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "common_git_dir",
@@ -9376,6 +9391,11 @@
       "id": "fnmatchcase_path",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "foldconf",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
     },
     {
       "id": "foreign_kit_present",
@@ -15488,6 +15508,11 @@
       "file": "tools/memory-tree/design_lib.py"
     },
     {
+      "id": "read_spec_exit_rule",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_spec_marks",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -20226,6 +20251,11 @@
       "id": "run_fixtures_guard_census",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_fold",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_format",
@@ -25671,6 +25701,11 @@
       "id": "write_fleet_claim",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "write_fold_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_fork_spec",

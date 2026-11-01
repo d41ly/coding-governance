@@ -19,7 +19,7 @@
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
-#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--disposition fold|promote]
+#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
 #   unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason <text> --reaped <id>|--keepalive-unreachable <node>   # HELD for an owner to land or decide
@@ -747,7 +747,7 @@ PLAN_PATHS=""
 # beside the unit rows; the UNDECIDED `next:` input is derived either way, because that is an
 # input to the rung ladder rather than a property of this output mode.
 PLAN_ASKS=""
-RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""; RV_HIGHS=""; RV_MINORS=""
+RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""; RV_HIGHS=""; RV_MINORS=""; RV_FOLDED=""; RV_PROMOTED=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
@@ -12718,21 +12718,99 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
 }
 
 # The sentence a TERMINAL round prints, per disposition. Defined once because four exits share it and
-# a second copy is a second thing to keep true. It keeps the word PROMOTED: existing suite arms assert
-# that literal. Every subject's exit promotes every confirmed finding, the MEDIUMs and LOWs batched
-# (TOOL-aBatchedMinors-2 for the closing review, TOOL-aEvidencedLens-7 for a spec audit), so `promote`
-# and `closing` are one sentence. `fold` is recordable at NO exit, so it falls to the final branch, as an
-# empty value does: that branch is UNREACHABLE, because the verb refuses `fold` at every terminal exit and an
-# empty disposition beside anything standing, and it says so loudly rather than printing something
-# reassuring.
+# a second copy is a second thing to keep true. `promote|closing` keeps the word PROMOTED: existing suite
+# arms assert that literal. TWO RULES (TOOL-dFoldedAudit-2). The closing review, and a spec audit under
+# `old` or `counted`, promote every confirmed finding, the MEDIUMs and LOWs batched (TOOL-aBatchedMinors-2
+# for the closing review, TOOL-aEvidencedLens-7 for a spec audit), so `promote` and `closing` are one
+# sentence and `fold` falls to the final branch. A spec audit under `folds` disposes by nature, and
+# `spec-fold` and `spec-promote` are that rule's two sentences, used only there. The final branch is
+# UNREACHABLE, because the verb refuses `fold` at every exit that rule does not admit and an empty
+# disposition beside anything standing, and it says so loudly rather than printing something reassuring.
 review_exit_note() { # disposition -> the sentence
   case "$1" in
     promote|closing) printf '%s' "every finding confirmed at this exit is PROMOTED to a unit of this build: one per BLOCKER and HIGH, and the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. Not folded, not parked, not waived, not re-reviewed" ;;
+    spec-fold) printf '%s' "every finding confirmed at this exit FOLDS into the spec it names, rev bumped, and none needs a new mechanism" ;;
+    spec-promote) printf '%s' "a finding that needs a new mechanism is PROMOTED to a unit of this build, a BLOCKER or HIGH to its own, the MEDIUMs and LOWs batched into one unit or two across disjoint write sets, and every other finding FOLDS into the spec it names" ;;
     *)       printf '%s' "NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
   esac
 }
-verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors
-  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" rel prior state note disp bound counts owe exitnote rkind rround rexit
+
+# WHICH RULE A SPEC AUDIT'S EXIT TAKES (TOOL-dFoldedAudit-2). `_se_rule` answers `old`, `counted` or
+# `folds` and `_se_why` holds a refused switch read, the out-variable idiom of `runmd_of` and `fact`.
+# The closing diff review is `old` whatever else holds. A spec subject is `old` under a blank
+# SPEC_FOLD_CUTOFF or in a record that began before it, and past it the disposal switch picks: both
+# values write the counted row, and only `by-nature` admits a fold.
+#
+# THE DATE IS THE PREFLIGHT'S, never the README's `opened:`, because the chain builds opened in October
+# and not yet started must inherit the new rule. `check_landed_facts_due` is named for its first cutoff
+# and reads any record cutoff: 0 past it, 1 before it, 2 on a blank one. Check 2 calls it for the same
+# date, so the driver and the gate cannot disagree about one record.
+#
+# The switch is read only when the cutoff admits the record, so a run under `old` spawns no Python. A
+# refused read leaves `_se_rule` at `counted`.
+read_spec_exit_rule() { # run-state file · slug · subject -> sets _se_rule and _se_why
+  local out
+  _se_rule=old; _se_why=""
+  [ "$3" != "$2" ] || return 0
+  check_landed_facts_due "$1" "$SPEC_FOLD_CUTOFF" || return 0
+  _se_rule=counted
+  if out=$(read_spec_audit_switch disposal); then
+    [ "$out" != by-nature ] || _se_rule=folds
+  else
+    _se_why=$out
+  fi
+  return 0
+}
+
+# ONE SITE FOR EVERY REFUSAL OF A COUNTED EXIT (TOOL-dFoldedAudit-2), because `REFUSAL_CEILINGS` holds
+# this file at its ceiling and the way up is the owner's review; `check_exit_fold` below pays for it.
+# Called once, straight after the state is computed. It reads the rule on a terminal state only and
+# leaves `old` on every other, so the flags on a mid-loop round refuse here. Past `old`, a call with no
+# counts, or a fold under `counted`, RETURNS: the refusals below answer those with today's sentences,
+# which name `exits <state>`, and that is the word a harness's bare first call reads. A disposition is
+# DERIVED from the counts and the flag has to agree, so a row cannot say fold beside a promotion.
+check_spec_exit() { # run-state file · slug · subject · state · blockers · disposition · highs · minors · folded · promoted -> 1 on a refusal
+  local b="$5" d="$6" h="$7" m="$8" f="$9" p="${10}" want=""
+  _se_rule=old; _se_why=""
+  case "$4" in CONVERGED|NON-CONVERGENT|CEILING|BOUNDED) read_spec_exit_rule "$1" "$2" "$3" ;; esac
+  if [ -z "$_se_why" ]; then
+    if [ "$_se_rule" = old ]; then
+      [ -n "$f$p" ] || return 0
+      _se_why="--folded and --promoted are counted only at a spec audit's terminal exit past SPEC_FOLD_CUTOFF"
+    elif [ -z "$h" ] || [ -z "$m" ]; then
+      return 0
+    elif [ "$_se_rule" = counted ] && [ "$d" = fold ]; then
+      return 0
+    elif [ -z "$f" ] || [ -z "$p" ]; then
+      _se_why="the exit requires both --folded and --promoted, because every confirmed finding is folded or promoted and a row that does not count them cannot be graded"
+    elif [ "$(( f + p ))" -lt "$(( b + h + m ))" ]; then
+      _se_why="--folded $f and --promoted $p fall short of the $(( b + h + m )) finding(s) this exit counts, so a confirmed finding has no disposition"
+    elif [ "$_se_rule" = counted ] && [ "$f" -gt 0 ]; then
+      _se_why="a spec exit under promote-all folds nothing, and --folded is $f"
+    else
+      if [ "$p" -gt 0 ]; then want=promote; elif [ "$f" -gt 0 ]; then want=fold; fi
+      [ "$d" != "$want" ] || return 0
+      _se_why="--folded $f and --promoted $p derive ${want:+--disposition }${want:-no disposition}, and this call names ${d:-none}"
+    fi
+  fi
+  fail 37 "--review cannot record this spec audit exit: $_se_why"
+  return 1
+}
+
+# THE ONE FOLD REFUSAL, called from the state gate and the counted block in that order. It names the
+# state and the review kind as locals, because a `fail` line reads as armed through its literal text
+# and check-arms drops only named interpolations. A helper naming its literal check number stays
+# visible to that tool, and a helper taking the code as a parameter would not.
+check_exit_fold() { # state · review kind · disposition -> 1 on a fold the exit's rule refuses
+  local state="$1" rkind="$2"
+  [ "$3" = fold ] || return 0
+  [ "$_se_rule" != folds ] || return 0
+  fail 37 "--review exits $state on $rkind, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+  return 1
+}
+
+verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors · folded · promoted
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" folded="${8:-}" promoted="${9:-}" rel prior state note disp bound counts owe exitnote rkind rround rexit route dby
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record a review round against" || return 1
@@ -12748,10 +12826,12 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # THE EXIT'S COUNTS, ON EVERY SUBJECT. The owner ruled on 2026-10-04 that every finding the closing
   # diff review confirms is PROMOTED — one unit per BLOCKER and HIGH, the MEDIUMs and LOWs batched
   # into one unit or two (TOOL-aBatchedMinors-2) — and answered on 2026-10-05 that a spec audit's are
-  # promoted the same way (TOOL-aEvidencedLens-7). A row recording only the blocker count could not
-  # say what else stood, so both counts are required at every terminal exit of every subject. The
-  # subject's KIND only names the review in the refusals: the closing review's subject IS the build
-  # slug, the equality the bound below makes, and every other subject is a spec audit.
+  # promoted the same way (TOOL-aEvidencedLens-7). A record past SPEC_FOLD_CUTOFF takes a spec audit's
+  # rule from `read_spec_exit_rule`, whose `by-nature` value folds what needs no new mechanism
+  # (TOOL-dFoldedAudit-2); the closing review keeps the first rule. A row recording only the blocker
+  # count could not say what else stood, so both counts are required at every terminal exit of every
+  # subject. The subject's KIND only names the review in the refusals: the closing review's subject IS
+  # the build slug, the equality the bound below makes, and every other subject is a spec audit.
   if [ "$subj" = "$slug" ]; then
     rkind="the closing diff review"; rround="a closing round"; rexit="the closing review's exit"
   else
@@ -12766,11 +12846,13 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # ONE INTEGER FOR TWO READERS (closing review round 1, L1). The counts reach bash arithmetic below,
   # which reads a leading zero as OCTAL (`08` aborts the driver, `010` is 8) and wraps past 2^63,
   # while check 2's awk reads the same row field as decimal. A canonical decimal of at most nine
-  # digits is the one spelling both read alike, so anything else is refused before either does.
-  for _rv_n in "blockers $blockers" "highs $highs" "minors $minors"; do
+  # digits is the one spelling both read alike, so anything else is refused before either does. The
+  # `*[!0-9]*` alternative only --folded and --promoted can reach, the other three being refused above,
+  # and they join this site rather than adding one, because the census stands at its ceiling.
+  for _rv_n in "blockers $blockers" "highs $highs" "minors $minors" "folded $folded" "promoted $promoted"; do
     _rv_flag=${_rv_n%% *}
     case "${_rv_n#* }" in
-      0[0-9]*|??????????*) fail 37 "--review requires --$_rv_flag as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
+      0[0-9]*|??????????*|*[!0-9]*) fail 37 "--review requires --$_rv_flag as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
     esac
   done
   # THE CLOSED SET, checked HERE and not below with the state gate. S3a decides the order and the
@@ -12824,8 +12906,13 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # subject matched, and an exit token appearing anywhere on the line counted - including inside a
   # subject or a park reason that merely quotes one. Both are restored, with -F still doing the
   # subject comparison so the subject is never a pattern.
+  # ONE SUBJECT STILL TAKES NO FURTHER ROUND under either rule, and the route names the rule that
+  # applied: a chain's later round is a fresh subject `<slug>-spec-set-r<N>`, never this one again.
   if grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rel" 2>/dev/null      | grep -F -- " · item $subj · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)'; then
-    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded: $subj"
+    read_spec_exit_rule "$rel" "$slug" "$subj"
+    route="is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
+    [ "$_se_rule" != folds ] || route="is DISPOSED under the build method's M4 by its nature, through the chain's next subject, and never re-rounded"
+    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now $route: $subj"
     return 1
   fi
   # THE BOUND IS THE SUBJECT'S. The closing diff review's subject IS the build slug and keeps the
@@ -12833,30 +12920,30 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # takes the declared REVIEW_ROUNDS. The same equality `review_last_reason` and the --close term make.
   bound=$RUNAWAY_CEILING; [ "$subj" = "$slug" ] || bound=$REVIEW_ROUNDS
   state=$(review_state "$prior" "$blockers" "$bound")
+  check_spec_exit "$rel" "$slug" "$subj" "$state" "$blockers" "$disposition" "$highs" "$minors" "$folded" "$promoted" || return 1
   # THE STATE GATE. Keyed on the COMPUTED state and never on --verdict, whose closed set holds none
   # of the state tokens. A terminal exit must say which disposition it took: M4 disposes by
   # SEVERITY and the field records which value the exit took, and check 2 could otherwise only ever
   # observe promotion — so a run that folded correctly had no way to say so and was graded as
   # though it had promoted. TOOL-dBriefedPass-9 measured that.
   #
-  # THE FIELD'S LEGAL SET FOLLOWS THE SEVERITY RULE AT BOTH ENDS (closing review of aProbedUnit,
-  # cluster C). `review_state` returns CONVERGED for count 0 unconditionally, so every
-  # NON-CONVERGENT, CEILING or BOUNDED exit stands on at least one BLOCKER, and the severity rule
-  # promotes every blocker: `fold` cannot be that exit's disposition, and accepting it wrote
-  # `blockers 3 · disposition fold`, a row the gate read as demanding nothing. A converged round is
-  # decided by its counts, in the block below.
+  # THE FIELD'S LEGAL SET FOLLOWS THE EXIT'S RULE AT BOTH ENDS (closing review of aProbedUnit, cluster
+  # C). `review_state` returns CONVERGED for count 0 unconditionally, so every NON-CONVERGENT, CEILING or
+  # BOUNDED exit stands on at least one BLOCKER. Under the severity rule, every subject but a spec audit
+  # under `folds`, every blocker is promoted: `fold` cannot be that exit's disposition, and accepting it
+  # wrote `blockers 3 · disposition fold`, a row the gate read as demanding nothing. Under `folds` a
+  # LOCAL blocker folds and `check_spec_exit` has derived the value, so an absent one is its row 3 or
+  # row 8 to answer. A converged round is decided by its counts, in the block below.
   case "$state" in
     NON-CONVERGENT|CEILING|BOUNDED)
-      if [ -z "$disposition" ]; then
+      if [ -z "$disposition" ] && [ "$_se_rule" != folds ]; then
         fail 37 "--review exits $state with $blockers blocker(s) standing and requires --disposition promote, because the severity rule promotes every blocker and a record naming no disposition leaves the gate inferring one from ids"
         return 1
       fi
-      if [ "$disposition" = fold ]; then
-        # ...and fold is legal at NO exit of ANY subject (closing review round 1, L3, and
-        # TOOL-aEvidencedLens-7 for a spec audit), so the sentence never points at another exit.
-        fail 37 "--review exits $state on $rkind, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
-        return 1
-      fi ;;
+      # ...and fold is legal at NO exit of ANY subject but a spec audit under `folds` (closing review
+      # round 1, L3, TOOL-aEvidencedLens-7 and TOOL-dFoldedAudit-2), so the sentence never points at
+      # another exit.
+      check_exit_fold "$state" "$rkind" "$disposition" || return 1 ;;
     CONVERGED) ;;
     *)
       if [ -n "$disposition" ]; then
@@ -12864,12 +12951,15 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
         return 1
       fi ;;
   esac
-  # EVERY TERMINAL EXIT PROMOTES EVERY STANDING FINDING, on every subject (TOOL-aBatchedMinors-2 for
-  # the closing review, TOOL-aEvidencedLens-7 for a spec audit). Spelled after the state gate above,
-  # which has already refused fold and an absent value beside a standing blocker, so the refusals below
-  # are the ones only the counts can decide: a converged round standing on a high or a minor, and a
-  # promotion of nothing. BOUNDED is reachable on a spec subject only: the slug's bound is the
-  # ceiling, which `review_state` tests first.
+  # A TERMINAL EXIT DISPOSES EVERY STANDING FINDING, on every subject (TOOL-aBatchedMinors-2 for the
+  # closing review, TOOL-aEvidencedLens-7 for a spec audit), by promotion under `old`. Spelled after the
+  # state gate above, which has already refused fold and an absent value beside a standing blocker, so
+  # the refusals below are the ones only the counts can decide: a converged round standing on a high or
+  # a minor, and a promotion of nothing. Past `old`, `check_spec_exit` has derived the disposition from
+  # `folded` and `promoted`, so those two refusals are skipped, and `owe` is the note's floor, the one
+  # check 2 grades: `promoted - minors` is a lower bound on the promoted BLOCKERs and HIGHs, each its own
+  # unit, and a positive `promoted` takes at least one. BOUNDED is reachable on a spec subject only: the
+  # slug's bound is the ceiling, which `review_state` tests first.
   counts=""; owe=0
   case "$state" in
     CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)
@@ -12877,20 +12967,25 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
         fail 37 "--review exits $state on $rkind and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is promoted and a row that does not count them cannot be graded"
         return 1
       fi
-      if [ "$disposition" = fold ]; then
-        fail 37 "--review exits $state on $rkind, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
-        return 1
-      fi
-      owe=$(( blockers + highs + (minors > 0 ? 1 : 0) ))
-      if [ "$owe" -gt 0 ] && [ "$disposition" != promote ]; then
-        fail 37 "--review exits $state on $rkind with $blockers blocker(s), $highs high(s) and $minors minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
-        return 1
-      fi
-      if [ "$owe" -eq 0 ] && [ -n "$disposition" ]; then
-        fail 37 "--review exits $state on $rkind with nothing standing, so --disposition $disposition promotes nothing, and the gate would read the row as owing a unit"
-        return 1
-      fi
-      counts=" · highs $highs · minors $minors" ;;
+      check_exit_fold "$state" "$rkind" "$disposition" || return 1
+      counts=" · highs $highs · minors $minors"
+      if [ "$_se_rule" = old ]; then
+        owe=$(( blockers + highs + (minors > 0 ? 1 : 0) ))
+        if [ "$owe" -gt 0 ] && [ "$disposition" != promote ]; then
+          fail 37 "--review exits $state on $rkind with $blockers blocker(s), $highs high(s) and $minors minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
+          return 1
+        fi
+        if [ "$owe" -eq 0 ] && [ -n "$disposition" ]; then
+          fail 37 "--review exits $state on $rkind with nothing standing, so --disposition $disposition promotes nothing, and the gate would read the row as owing a unit"
+          return 1
+        fi
+      else
+        counts="$counts · folded $folded · promoted $promoted"
+        if [ "$promoted" -gt 0 ]; then
+          owe=$(( promoted - minors ))
+          [ "$owe" -ge 1 ] || owe=1
+        fi
+      fi ;;
     *)
       if [ -n "$highs$minors" ]; then
         fail 37 "--review names --highs or --minors on $rround that is not a terminal exit, and a count of what stands at the exit is a claim about an exit that has not happened yet: state $state"
@@ -12912,6 +13007,14 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   stage_or_fail "$rel" || return 1
   exitnote=$(review_exit_note "$disposition")
   [ -n "$counts" ] && [ "$disposition" = promote ] && exitnote="$(review_exit_note closing); this exit owes at least $owe new unit(s), one per blocker and high plus one for the minors when any stood"
+  dby=SEVERITY
+  if [ "$_se_rule" = folds ]; then
+    dby=NATURE
+    case "$disposition" in
+      fold)    exitnote=$(review_exit_note spec-fold) ;;
+      promote) exitnote="$(review_exit_note spec-promote); this exit owes at least $owe new unit(s), the floor check 2 grades" ;;
+    esac
+  fi
   case "$state" in
     CONVERGED)      if [ -n "$disposition" ]; then
                       echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED$counts · disposition $disposition — the loop is done for this subject, and $exitnote"
@@ -12920,7 +13023,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
                     fi ;;
     NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT$counts · disposition $disposition — the count did not shrink, so the loop STOPS here and $exitnote" ;;
     CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING$counts · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $exitnote; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
-    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY: $exitnote" ;;
+    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY $dby: $exitnote" ;;
     *)              if [ -z "${prior//[[:space:]]/}" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else
@@ -14535,6 +14638,8 @@ while [ $# -gt 0 ]; do
     --disposition)  RV_DISPOSITION="${2:-}"; shift 2 || shift ;;
     --highs)        RV_HIGHS="${2:-}"; shift 2 || shift ;;
     --minors)       RV_MINORS="${2:-}"; shift 2 || shift ;;
+    --folded)       RV_FOLDED="${2:-}"; shift 2 || shift ;;
+    --promoted)     RV_PROMOTED="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is
@@ -14631,7 +14736,7 @@ case "$VERB" in
   --park)    verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
-  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" ;;
+  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" "$RV_FOLDED" "$RV_PROMOTED" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
