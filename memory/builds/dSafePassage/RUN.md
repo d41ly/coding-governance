@@ -23,8 +23,8 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · handoff · 145 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 934578e53ef1da280de59b6de49f1c4022f8ee4b
-phase: BUILDING
+witness: 02030bc97
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
