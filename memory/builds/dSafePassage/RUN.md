@@ -21,8 +21,8 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · handoff · 145 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4f7ba0a3019e904f7cc404c60c1ceb90ecdeccdc
-phase: VERIFYING
+witness: 9a3d926a9cb1fa0e1c377f8afe7513e318812e5f
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -633,3 +633,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T16:37:37Z hold · item owner-decision · reason until owner · reaped 3740de71 · resume none(owner)
 
 2026-11-01T16:44:37Z resume · item dSafePassage · reason held · keepalive e7f5ef83 · manual
+
+2026-11-01T17:03:36Z rescope · item add TOOL-dSafePassage-102 · reason the owner ruled ask TOOL-dSafePassage-85 in chat on 2026-11-01: raise the five fork ceilings, and the three evidence rows are respelled under gate-guard's rule
