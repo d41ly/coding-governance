@@ -1,4 +1,4 @@
-**Serves:** journal TOOL-dScopedBuild-1
+**Serves:** journal TOOL-dScopedBuild-2
 
 # gov-reuse-scout handoff — TOOL-dScopedBuild-1
 
