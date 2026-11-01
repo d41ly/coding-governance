@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-103 — the census tree reads gov's source-mode receipt as gov's own tree, by the registry search it makes with no receipt
 
-**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f25d719e4 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f25d719e4 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-8
 
@@ -9,8 +9,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-01-prompt-TOOL-dSafePassage-103-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-103-1-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-103-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-103-2-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-103-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-103-audit-fold-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-103-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-103-build-brief.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-103-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-103-spec-brief.md) | research | — |
+| [2026-11-01-review-TOOL-dSafePassage-103-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dSafePassage-103-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -37,14 +40,38 @@ exactly as before.
   receipt. Observed by AC5.
 - **S3 — the regression case.** `tools/policy/check_policy.py` gains one outcome case,
   `census-source-receipt`, in `CASES` after `census-window-edge` (line 4411), run by a new
-  `run_census_source_receipt`. It runs the three checks §4 "The regression case" lists. Observed by
+  `run_census_source_receipt`. It runs the four checks §4 "The regression case" lists. Observed by
   AC3, AC4 and AC5.
-- **S4 — the docs that state the old rule.** Four places say that any receipt makes the tree an
-  adopter. They are the `derive_census_tree` docstring (policy.py lines 1044-1050), the "WHERE IT
-  INSTALLS" paragraph of the module docstring of `tools/policy/check_policy.py` (lines 146-150), and
-  `tools/policy/README.md` lines 170-178 and 653. Each gains the source-mode exception. The
-  README's census-case paragraphs (lines 539-550) gain one paragraph for the new case. Observed by
-  AC6.
+- **S4 — the docs that state the old rule.** The class is every line in `tools/policy/README.md`,
+  `tools/policy/policy.py` and `tools/policy/check_policy.py` that ties an install receipt to the
+  adopter reading or to `not graded`, that lists the derivation's Refusal causes, or that places the
+  registry search in `derive_census_tree`. Ten sites hold it, per the table below. Each gains the
+  source-mode exception, the S2 refusal or the new function's name, as its row says. Observed by AC6.
+
+  | Site | What it says today | It gains |
+  |---|---|---|
+  | `derive_census_tree` docstring, policy.py lines 1044-1050 | any receipt answers `adopter` | the source-mode exception and the S2 refusal |
+  | WHERE IT INSTALLS paragraph, check_policy.py lines 146-150 | a tree with a receipt is read as an adopter | the source-mode exception |
+  | `arm_legacy_homes` docstring, check_policy.py lines 394-402 | the one finding is "a receipt that does not read, or two registries" (lines 401-402) | the source-mode exception, and S2's refusal among the causes |
+  | `arm_cap_census` docstring, check_policy.py lines 659-672 | the same cause list (line 672) | S2's refusal among the causes |
+  | `seed_ambiguous_registry` docstring, check_policy.py line 3621 | the window `derive_census_tree` searches | `derive_registry_tree` as the function holding the search |
+  | README line 23, the `policy.py` row of the module table | lists `derive_census_tree` alone | `derive_registry_tree` beside it |
+  | README lines 170-178 | the arm says `not graded` wherever the tree holds a receipt (line 174) | the source-mode exception |
+  | README line 650, the `arm_legacy_homes` row | `not graded` "in any tree holding an install receipt" | the source-mode exception, written in place of that phrase |
+  | README line 653, the `arm_cap_census` row | the receipt makes the target an adopter | the source-mode exception and the S2 refusal |
+  | README census-case paragraphs, lines 539-550 | no paragraph for the new case | one paragraph for `census-source-receipt` |
+
+  Each site that gains the exception or S2's refusal spells it with the word `source-mode`, which
+  AC6 greps. No site spells it so today.
+
+  The predicate `git grep -n -i 'install receipt\|install.json' -- tools/policy/`, run at
+  `bacc82c20`, also returns lines that stay unchanged. They are the inlined `resolve_kit_dir` blocks
+  (`tools/policy/adopt-policy.sh` 122 and 134, `tools/policy/policy-shim.sh` 140 and 152, policy.py
+  1136 and 1148), which follow a receipt row's `path` and never read the tree as an adopter. They
+  are also the `kits` comment at `tools/policy/caps.toml` line 25, the receipt's read, parse and
+  object Refusal strings (policy.py 1063, 1067 and 1069), the `invalid` finding string
+  (check_policy.py 683) and the fixture reader's docstring (check_policy.py 1193). None of these
+  states the adopter rule.
 - **S5 — no other reader changes.** §4 "The class" lists every reader of the receipt the predicate
   returns. Only `derive_census_tree` is shown misreading it, so only `tools/policy/policy.py`,
   `tools/policy/check_policy.py` and `tools/policy/README.md` change under the tool root. Observed by
@@ -80,7 +107,8 @@ exactly as before.
 ## 4. Design
 
 Every line cited here was read at `f25d719e4`, the HEAD this spec was written at, on 2026-11-01 on
-node a. The bar log is the close's run on the prepared landing merge `f14f0f72c`, saved at
+node a. rev-2 re-read every cited line at `bacc82c20`. `git diff --stat f25d719e4 bacc82c20 -- tools/
+.githooks/` prints nothing, so the line numbers hold there too. The bar log is the close's run on the prepared landing merge `f14f0f72c`, saved at
 `C:/Users/daily-agent/AppData/Local/Temp/dsp86-logs/close-f14f0f72c.log`. That merge was local-only
 and has been reset. Its policy-check output reproduces at HEAD on the fixture AC1 names, by the probe
 §4 "The finding, reproduced" records.
@@ -200,16 +228,28 @@ source's registry at this kit's tool root, the path `derive_window_edge_paths` w
 writes a receipt at `RECEIPT_REL` carrying `"schema": 4`, `"mode": "source"`, `"gov_source": "."`,
 this kit's tool root as `"prefix"`, `ADOPTER_KITS` as `"kits"` and an empty `"files"`. Those are the
 keys govkit's writer sets (govkit.py lines 9445-9447). It then prints one `policy-fixture:` line per
-check through `print_checks`:
+check through `print_checks`. The scenarios run in this order over the one repository:
 
 | Scenario label | Tree | Expected |
 |---|---|---|
 | `source-mode receipt` | registry and source receipt | `derive_census_tree` answers `("source", budgets.derive_tool_root())`, and `check_legacy_graded(t, KIT)` answers `True` |
 | `adopter receipt` | the same receipt with its `"mode"` key removed | the first element answers `adopter`, and `check_legacy_graded(t, KIT)` answers `False` |
 | `no registry` | the source receipt with the registry deleted | a Refusal whose path is `RECEIPT_REL` |
+| `source-mode receipt, two registries` | the source receipt, the registry rewritten at `written[0]`, and a copy at `planted`, both from `derive_window_edge_paths` (check_policy.py lines 4183-4190) | a Refusal whose path is `", ".join(sorted((written[0], planted)))`, not `RECEIPT_REL` |
 
-The case catches `subprocess.CalledProcessError` and `OSError` as its sibling does, and it removes
-the repository in a `finally`. Its source reads are the registry and this kit's `legacy-homes.txt`.
+The fourth scenario observes S2's promise that two or more registries raise the search's existing
+Refusal. `planted` is a registry two deep, inside the search window, as in `run_census_window_edge`.
+A build that re-raised S2's message, or answered from the receipt's `prefix`, reds that line.
+
+Every scenario calls `derive_census_tree` and `check_legacy_graded` through one wrapper, as
+`run_census_window_edge`'s `ask()` does (check_policy.py lines 4203-4207). The wrapper turns a
+`policy.Refusal` into the value `refused <path>`. The scenario compares that value with its expected
+result and prints `WRONG` on a mismatch. Without it, a Refusal in the first two scenarios would
+propagate: `check_legacy_graded` leaves a Refusal to its caller (policy.py lines 1087-1093), and
+`run_fixture`'s outcome-case loop (check_policy.py lines 4483-4487) catches nothing, so the run
+would end in a traceback before the remaining checks. The case also catches
+`subprocess.CalledProcessError` and `OSError` as its sibling does, and it removes the repository in
+a `finally`. Its source reads are the registry and this kit's `legacy-homes.txt`.
 Both sit inside the `policy fixtures` guard, so the guard trace stays green.
 
 ### What it does not cover
@@ -234,6 +274,13 @@ Minted: one function `derive_registry_tree` in `tools/policy/policy.py`. One fun
 `py.function snake` cell (`.lexicon.conf` line 581). Their verbs, `derive` and `run`, are declared
 at lines 644 and 647. No file, flag, conf key, gate leg or receipt field is minted.
 
+Both new functions enter the codebase map's symbol tier. That tier is rendered into
+`memory/map/generated/symbols.json`, which today holds `derive_census_tree` and
+`run_census_window_edge`. The builder regenerates it with `python tools/codebase-map/gen_map.py
+--write`, the command `map_lib.regen_cmd` spells (`tools/codebase-map/map_lib.py` lines 149-153). The
+`codebase-map coverage + freshness` leg compares that file byte for byte with a fresh render. So does
+the pre-commit hook on any staged `.py` change (`.githooks/pre-commit` lines 264-293).
+
 ### Migration
 
 None. The receipt's shape is unchanged, and no adopter receipt carries a top-level `mode`.
@@ -245,9 +292,11 @@ landing's own bar reds `policy check` as `f14f0f72c` did.
 
 ### Files touched (estimate)
 
-- `tools/policy/policy.py` — S1 and S2, and the docstring of S4.
-- `tools/policy/check_policy.py` — S3, and the module docstring of S4.
-- `tools/policy/README.md` — S4.
+- `tools/policy/policy.py` — S1 and S2, and the `derive_census_tree` docstring of S4.
+- `tools/policy/check_policy.py` — S3, and the four docstrings of S4: WHERE IT INSTALLS,
+  `arm_legacy_homes`, `arm_cap_census` and `seed_ambiguous_registry`.
+- `tools/policy/README.md` — the five README sites of S4.
+- `memory/map/generated/symbols.json` — regenerated for the two new functions, per §4 "Inventory".
 - The unit's acceptance ledger, under the build's own build-records folder.
 
 ### Alternatives rejected
@@ -330,18 +379,33 @@ landing's own bar reds `policy check` as `f14f0f72c` did.
   Red when: S1 keys on something every receipt carries, such as `prefix`. The adopter receipt then
   reads as source, and an adopter's census grades each row at its `enforcer` path. That is the
   converse of the `arm_cap_census` line AC1 quotes.
-- **AC5** — When the AC3 run is made, its `no registry` line carries no `WRONG`, and the run's last
-  line reads `policy-fixture: <n> assertion(s) executed · 0 wrong`. The run exits 0.
+- **AC5** — When the AC3 run is made, its `no registry` line and its
+  `source-mode receipt, two registries` line carry no `WRONG`, and the run's last line reads
+  `policy-fixture: <n> assertion(s) executed · 0 wrong`. The run exits 0.
   Red when: S2 is absent. A source-mode receipt with no registry then answers `unadopted`, and every
   census row is announced and none graded. That is a silent version of the `arm_cap_census` line AC1
-  quotes, with no finding at all.
-  figure: `<n>` is DERIVED by the run, the case's three checks plus the guard trace's.
-- **AC6** — When `git grep -c census-source-receipt -- tools/policy/README.md tools/policy/check_policy.py`
-  runs at the build commit, it prints both files, each with a count of 1 or more. When
-  `git grep -n -e "source-mode" -- tools/policy/README.md` runs there, it prints the lines that
-  replace README lines 174 and 653.
-  Red when: a doc still says any receipt makes the tree an adopter. The `arm_cap_census` line AC1
-  quotes is that rule's output on gov's tree.
+  quotes, with no finding at all. The second line reds when the two-registry tree ends anywhere but
+  the search's own Refusal, such as S2's message naming `RECEIPT_REL` or a `source` answer read from
+  the receipt's `prefix`.
+  figure: `<n>` is DERIVED by the run, the case's four checks plus the guard trace's.
+- **AC6** — When these five probes run at the build commit, each prints what its clause names. At
+  `bacc82c20` the second, third and fifth probes print nothing, and the fourth prints README line 650,
+  so each clause can fail.
+  1. `git grep -c census-source-receipt -- tools/policy/README.md tools/policy/check_policy.py`
+     prints both files, each with a count of 1 or more.
+  2. `git grep -n -e "source-mode" -- tools/policy/README.md` prints the lines that replace README
+     lines 174, 650 and 653.
+  3. `git grep -n -e "source-mode" -- tools/policy/policy.py tools/policy/check_policy.py` prints one
+     line inside the `derive_census_tree` docstring. It also prints one line inside each of three
+     check_policy.py docstring passages: the WHERE IT INSTALLS paragraph, the `arm_legacy_homes`
+     docstring and the `arm_cap_census` docstring.
+  4. `git grep -n "any tree holding an install receipt" -- tools/policy/README.md` prints nothing.
+  5. `git grep -n derive_registry_tree -- tools/policy/README.md tools/policy/check_policy.py` prints
+     the README's `policy.py` module-table row and a line inside the `seed_ambiguous_registry`
+     docstring.
+  Red when: a doc still says any receipt makes the tree an adopter, a Refusal-cause list leaves out
+  S2's refusal, or the module table or the window docstring leaves out the function that now holds
+  the search. The `arm_cap_census` line AC1 quotes is the old rule's output on gov's tree.
 - **AC7** — When `git show --name-only --format= HEAD -- tools/` runs at the build commit, it prints
   exactly these three lines:
   ```
@@ -355,15 +419,27 @@ landing's own bar reds `policy check` as `f14f0f72c` did.
 
 ## 7. Gates
 
-`policy check` · `policy fixtures` · `memory hygiene`
+`policy check` · `policy fixtures` · `memory hygiene` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms`
 
-New arm: tools/policy/check_policy.py --fixture · covers AC3 AC4 AC5 · `census-source-receipt` plants a source-mode receipt beside one registry, removes its mode key, then deletes the registry, in one scratch repository · none
+New arm: tools/policy/check_policy.py --fixture · covers AC3 AC4 AC5 · `census-source-receipt` plants a source-mode receipt beside one registry, removes its mode key, deletes the registry, then plants two registries, in one scratch repository · none
 
-`policy check` reds at `f14f0f72c`, and AC1 and AC2 read its checker on the fixture.
-`policy fixtures` is the one narrow guard the estimate trips (`tools/policy/`, carried by one leg in
-`tools/gate-legs.json`), and it runs the new case. Every other leg the estimate trips is reached
-only through the broad `tools/` guard, carried by 12 legs. `memory hygiene` grades this spec and its
-ledger. The fixture suite pins no assertion count, so no floor moves.
+The branch's `policy check` leg cannot observe S1 or S2. The branch tracks no
+`.governance/install.json` (`git ls-files .governance` lists `deploy.toml`, `policy.json` and
+`policy.toml`), so `derive_census_tree` takes the receiptless path to the registry search
+(policy.py lines 1054-1061) with or without S1, and the leg prints the same either way. Only two
+observations of that checker can go red for this change. One is AC1's run on the fixture clone,
+where `govkit update --target . --write` writes the receipt. The other is the prepare's bar on the
+landing merge, which carries the receipt as `f14f0f72c` did. On the branch, `policy fixtures` is
+the gate that observes the change, because it runs the new `census-source-receipt` case.
+
+The legs the estimate trips were derived by matching each backticked Files-touched path against the
+guards in `tools/gate-legs.json`. `policy fixtures` is tripped by the narrow `tools/policy/` guard,
+carried by one leg. `recall floor` and `recall floor arms` are tripped by the `memory/` guard,
+carried by those two legs, through `memory/map/generated/symbols.json`, the acceptance ledger and
+this spec. Every other leg the estimate trips is reached only through the broad `tools/` guard,
+carried by 12 legs. `codebase-map coverage + freshness` and `memory hygiene` carry no guard and run
+on every bar. The first compares the regenerated `symbols.json` with a fresh render. The second
+grades this spec and its ledger. The fixture suite pins no assertion count, so no floor moves.
 
 ## 8. Open questions
 
@@ -387,6 +463,17 @@ none
   `not graded` (log line 159), which S1 corrects with no further edit. S2's refusal is derived from the
   function's own refusal of a non-object receipt and from the charter's deny-by-default rule, as §4
   "Alternatives rejected" states. Every cited line was read at `f25d719e4`.
+- rev-2 · 2026-11-01 · S3 · S4 · §4 · AC5 · AC6 · §7 · folded the round-1 spec audit
+  `memory/builds/dSafePassage/reviews/2026-11-01-review-TOOL-dSafePassage-103-spec-audit-round1.md`
+  (CLEAN WITH FIXES, 2 medium and 7 low) under its brief
+  `memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-103-audit-fold-brief.md`.
+  M1, M2, L1 and L5 widened S4 to a named class of ten doc sites and AC6 to five probes that each fail
+  at `bacc82c20`. L2 and L4 rewrote §7 to declare the branch's `policy check` leg blind to S1 and to
+  add `recall floor` and `recall floor arms`. L3 added `memory/map/generated/symbols.json` to Files
+  touched, its regen to §4 "Inventory" and `codebase-map coverage + freshness` to §7. L6 added the
+  `source-mode receipt, two registries` scenario at the skeptic's corrected fix, bound to AC5. L7
+  routed every scenario through a Refusal-to-value wrapper. Every line cited was re-read at
+  `bacc82c20`.
 
 ## 10. Reuse audit
 
