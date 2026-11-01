@@ -19,8 +19,8 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: 0c0f3a18370405a51f97df5d1d12bf1a0da2cf74 · park · 135 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 2c459254d
-phase: VERIFYING
+witness: 81bdf452b12db6499215db8f8245171172aaa8c4
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -615,3 +615,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T13:19:20Z dispatch · item 3909ba68 TOOL-dSafePassage-100 · reason tools/push-main.test.sh memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-100.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-100-ledger.md
 
 2026-11-01T13:24:59Z dispatch · item 3909ba68 TOOL-dSafePassage-100 · reason tools/push-main.test.sh memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-100.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-100-ledger.md
+
+2026-11-01T14:35:52Z rescope · item add TOOL-dSafePassage-101 · reason the close's merge bar at 70273a468 reds memory hygiene, shell hygiene and install-prefix on this build's own lines
