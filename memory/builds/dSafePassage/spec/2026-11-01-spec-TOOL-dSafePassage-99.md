@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process
 
-**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-3 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-87
 
@@ -11,8 +11,10 @@
 | [2026-11-01-build-TOOL-dSafePassage-99-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-99-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-2-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-99-3-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-3-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md) | research | TOOL-dSafePassage-100 |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-build-brief.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-99-rev3-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-rev3-brief.md) | research | TOOL-dSafePassage-101 |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-spec-brief.md) | research | — |
 | [2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-100 |
 
@@ -61,10 +63,12 @@ arm holds both. The one by-path load of the engine left in place is named in S2.
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-87` — its AC6 staged load at selftest.py:3179-3182 is the
-  load that displaces the engine, and AC1 re-runs it unchanged.
-- **consumes-from** `TOOL-dSafePassage-71` — `build_staged_copy`, which S3's arm stages its copy
-  through.
+none
+
+TOOL-dSafePassage-87 and -71 are CLOSED, and this unit reads their landed code: 87 AC6's staged
+load at selftest.py:3179-3182, the load that displaces the engine, which AC1 re-runs unchanged, and
+71's `build_staged_copy`, which S3's arm stages its copy through. They are named here rather than
+joined, so neither CLOSED spec gains a line (TOOL-dSafePassage-101 S1).
 
 ## 4. Design
 
@@ -325,6 +329,10 @@ none
   answers `held99` once `govkit_module()` has re-bound the table, with AC2's count, its red case
   and §7's `New arm:` line moved from three to four. "What it does not cover" names the window of
   the step module's own `load_govkit()`. Every newly cited line was read at `6414e1dc6`.
+- rev-3 · 2026-11-01 · §3 · the `### Edges` block's two `**consumes-from**` bullets, which memory
+  hygiene check 12 graded as unreciprocated by the CLOSED 87 and 71, become `none` and a prose
+  paragraph naming both as read-and-closed, per TOOL-dSafePassage-101 S1 and its §4 "The edge
+  ruling". No other text changes.
 
 ## 10. Reuse audit
 

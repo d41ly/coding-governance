@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-01-prompt-TOOL-dSafePassage-101-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-101-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-101-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-101-spec-brief.md) | research | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-99-rev3-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-rev3-brief.md) | research | TOOL-dSafePassage-99 |
 
 <!-- /gen:spec-records -->
 
