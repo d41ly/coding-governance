@@ -10743,7 +10743,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if a["how"] != "table" or (a["verdict"] not in _touching and not a.get("mode_to")):
             continue
         _paths = [a["row"]["path"]]
-        if a["verdict"] == "renamed" and a["c"].get("renamed_to"):
+        # TOOL-dSafePassage-91: an in-place row's destination is its own path, so it is recorded once
+        # and the rollback restores it once.
+        if a["verdict"] == "renamed" and a["c"].get("renamed_to") and a["c"]["renamed_to"][1] != _paths[0]:
             _paths.append(a["c"]["renamed_to"][1])
         # DEPL-dSealedTally-1. `origin` DECLARED, so the restore branch can tell a receipt
         # row it must put back from a row this run MINTED and must remove.

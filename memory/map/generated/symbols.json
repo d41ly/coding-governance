@@ -4433,6 +4433,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "check_floor_bash",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_floor_copies",
       "kind": "function",
       "file": "tools/lib/python_floor.py"
@@ -8201,6 +8206,11 @@
       "id": "derive_plant_needle",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "derive_policy_adopter",
+      "kind": "function",
+      "file": "tools/govkit/upgrade_walk.py"
     },
     {
       "id": "derive_predictor_verdict",
@@ -23816,6 +23826,11 @@
       "id": "set_env_aside",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "set_environ",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "set_environ",

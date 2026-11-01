@@ -42,6 +42,9 @@ import tomllib
 
 HERE = pathlib.Path(__file__).resolve().parent
 FIXTURE = HERE / "fixtures" / "release-0"
+# TOOL-dSafePassage-91 S2: each fixture row kind and the file holding it, read by `read_fixture_rows`
+# and walked whole by the plant-root grader.
+FIXTURE_FILES = {"plant": "plants.toml", "gov_plant": "plants.toml", "condition": "plants.toml", "arm": "arms.toml"}
 CASES = ("up", "down", "reup", "plants", "skip", "kill", "fail", "shims", "isolation")
 PER_STEP = ("skip", "kill", "fail", "isolation")
 SCHEMA_STEP = "govkit/receipt-schema-4"
@@ -133,7 +136,7 @@ def read_fixture_rows(kind: str, fixture=FIXTURE) -> list[dict]:
     edits gov's tree, so it resolves against the working gov's tool root, the clone tip's layout.
     Every other kind names a path in the adopter target, so it resolves against the target's install
     prefix, `read_target_prefix`. The two are not claimed equal."""
-    name = {"plant": "plants.toml", "gov_plant": "plants.toml", "condition": "plants.toml", "arm": "arms.toml"}[kind]
+    name = FIXTURE_FILES[kind]
     gk = load_engine()[2]
     # S7: a [[gov_plant]] edits gov's tree, at the clone tip's tool root, HEAD's own; every other kind
     # names a path in the target, installed at deploy.toml's `prefix`.
@@ -203,6 +206,13 @@ def derive_release_engine(clone) -> pathlib.Path:
     return gk.resolve_tool_path(clone, gk.GOVKIT_DIR.name, "govkit.py")
 
 
+def derive_policy_adopter(t) -> pathlib.Path:
+    """TOOL-dSafePassage-91 S2: the policy adopter in the walked target. It is a target path, so it
+    resolves against the target's install prefix (TOOL-dSafePassage-87 S7), never gov's tool root."""
+    _us, _shims, gk = load_engine()
+    return gk.resolve_kit_dir("policy", "adopt-policy.sh", t / read_target_prefix()) / "adopt-policy.sh"
+
+
 def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants: list[dict],
                        with_target: bool = True) -> dict:
     """S2: the scratch clone at the pin, its landed ref gov's own, release-0 applied by its own
@@ -244,8 +254,7 @@ def build_release_tree(gov_root, root, pin: str, plants: list[dict], gov_plants:
             f"receipt schema {schema}")
         write_plant_edits(t, plants)
         write_commit(t, "plants")
-        adopter = "adopt-policy.sh"
-        p = subprocess.run([gk.resolve_bash(), (gk.resolve_kit_dir("policy", adopter, t / read_target_prefix()) / adopter).as_posix(), "--scaffold", "--target", t.as_posix()],
+        p = subprocess.run([gk.resolve_bash(), derive_policy_adopter(t).as_posix(), "--scaffold", "--target", t.as_posix()],
                            cwd=str(t), capture_output=True, text=True, encoding="utf-8", errors="replace",
                            stdin=subprocess.DEVNULL)
         if p.returncode:
@@ -976,8 +985,9 @@ def render_case_counts(per_case: dict) -> str:
 def check_graders() -> list[str]:
     """TOOL-dSafePassage-77 S7: S1, S2, S3 and S4's functions fed fabricated inputs, one line per
     grader, TOOL-dSafePassage-86's `derive_release_engine` over three pin-shaped trees, and
-    TOOL-dSafePassage-87's `check_shim_paths` over gov's own row at another tool root; returns
-    the reds. Each is a pure call or a scratch repository it removes."""
+    TOOL-dSafePassage-87's `check_shim_paths` over gov's own row at another tool root, and
+    TOOL-dSafePassage-91's plant-root split: the target's plants and the policy adopter at the install
+    prefix, gov plants at a moved tool root; returns the reds. Each is a pure call or a scratch repository it removes."""
     import contextlib
     import io
     kit = run_git(HERE, "rev-parse", "--show-prefix").rstrip("/")
@@ -1096,12 +1106,49 @@ def check_graders() -> list[str]:
         return "" if any(f"its forwarder {old} is gone from the walked target" in g for g in got) else (
             f"gov's own row, its forwarder {old} gone, read no red: {got}")
 
+    def check_grade_plant_root() -> str:
+        gk, pfx = load_engine()[2], read_target_prefix()
+        t = build_repo("plant-root-target", {f"{pfx}/policy/adopt-policy.sh": ""})
+        real = gk.derive_tool_root
+        gk.derive_tool_root = lambda root: "moved"
+        try:
+            got = {kind: read_fixture_rows(kind) for kind in FIXTURE_FILES}
+            try:
+                pol = derive_policy_adopter(t)
+            except LookupError as e:
+                pol = f"LookupError: {e}"
+        finally:
+            gk.derive_tool_root = real
+
+        def extract_paths(row):
+            for k, v in row.items():
+                if k in ("path", "from", "to") and isinstance(v, str):
+                    yield v
+                elif isinstance(v, dict):
+                    yield from extract_paths(v)
+
+        bad, seen = [], set()
+        for kind, rows in got.items():
+            want, wrong = ("moved", pfx) if kind == "gov_plant" else (pfx, "moved")
+            for r in (r for r in rows if isinstance(r, dict)):
+                for p in extract_paths(r):
+                    if p.startswith(want + "/"):
+                        seen.add(want)
+                    elif p.startswith(wrong + "/"):
+                        bad.append(f"the {kind} row {r.get('id') or r.get('name')} read {p}, not under {want}/")
+        bad += [f"no fixture row resolved under {w}/, so that root went unsampled" for w in ("moved", pfx)
+                if w not in seen]
+        bad += [] if isinstance(pol, pathlib.Path) and t / pfx in pol.parents else [
+            f"the policy adopter read {pol}, not under the target's {pfx}"]
+        return "; ".join(bad)
+
     reds = []
     try:
         for name, grade in (("order-kind", check_grade_order_kind), ("arm-needle", check_grade_arm_needle),
                             ("tree-clean", check_grade_tree_clean), ("case-counts", check_grade_case_counts),
                             ("fixture-keys", check_grade_fixture_keys),
-                            ("release-engine", check_grade_release_engine), ("shim-root", check_grade_shim_root)):
+                            ("release-engine", check_grade_release_engine), ("shim-root", check_grade_shim_root),
+                            ("plant-root", check_grade_plant_root)):
             try:
                 why = grade()
             except (Stop, OSError, KeyError, ValueError) as e:

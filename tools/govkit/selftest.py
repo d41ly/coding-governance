@@ -284,6 +284,27 @@ def check(label: str, cond: bool, detail: str = "") -> None:
         print(f"FAIL {label}{(' — ' + detail) if detail else ''}")
 
 
+@contextlib.contextmanager
+def set_environ(values: dict):
+    """TOOL-dSafePassage-91 S3: `values` set in this process's environment for the block, a `None`
+    unsetting its key, and the previous state restored after. Shaped as `measure_legs.set_environ`,
+    which this copy-installed kit cannot import across kits."""
+    held = {k: os.environ.get(k) for k in values}
+    for k, v in values.items():
+        if v is None:
+            os.environ.pop(k, None)
+        else:
+            os.environ[k] = v
+    try:
+        yield
+    finally:
+        for k, v in held.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+
+
 # ================= DEPL-cMendedVintage-20 — A RETIRED FLAG, GRADED BY CLASS ==================
 # One row per flag this engine has retired: the name, the date it went, and the unit that retired
 # it. A retirement with no row here is a retirement nothing grades, so the ROW — not the arm — is
@@ -3763,16 +3784,8 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     (tmp / "dsp45-env").mkdir(exist_ok=True)
     for name, cfg in cfgs.items():
         parent = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": str(cfg)}
-        held = {k: os.environ.get(k) for k in parent}
-        os.environ.update(parent)
-        try:
+        with set_environ(parent):
             env = us45.build_step_env(tmp / "dsp45-env", tmp / "dsp45-env")
-        finally:
-            for k, v in held.items():
-                if v is None:
-                    os.environ.pop(k)
-                else:
-                    os.environ[k] = v
         present = sum(k.startswith("GIT_CONFIG_KEY_") for k in env)
         check(f"[dSP-45] AC1 core.autocrlf {name}: GIT_CONFIG_COUNT is the {present} pair(s) present, index 2 "
               f"protocol.ext.allow = never, index 3 core.autocrlf only where set",
@@ -4406,19 +4419,20 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
     for nm in ("python3", "python", "py"):  # shaped as resolve-python.test.sh's write_fake_launcher
         (fakes / nm).write_bytes(b'#!/usr/bin/env bash\necho "3.12 $0"\n')
         (fakes / nm).chmod(0o755)
-    held = {k: os.environ.get(k) for k in ("PATH", "GOV_PYTHON")}
-    os.environ.update(PATH=str(fakes) + os.pathsep + os.environ.get("PATH", ""), GOV_PYTHON=sys.executable)
-    try:
+    with set_environ({"PATH": str(fakes) + os.pathsep + os.environ.get("PATH", ""),
+                      "GOV_PYTHON": sys.executable}):
         got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
-    finally:
-        for k, v in held.items():
-            if v is None:
-                os.environ.pop(k, None)
-            else:
-                os.environ[k] = v
     check("[dSP-75] the floor row's witness under the contract, 3.12 fakes on PATH and GOV_PYTHON at the floor, is ok",
           got["verdict"] == "ok" and got["rc"] == 0, str(got))
+    check_floor_bash(tmp)
 
+
+def check_floor_bash(tmp: pathlib.Path) -> None:
+    """TOOL-dSafePassage-87 AC5 and TOOL-dSafePassage-91 S3, the floor row's witness on one PATH whose
+    every bash is unusable: with GOV_BASH the parent's bash it holds, and with GOV_BASH unset the
+    floor stub reaches its fallback to bare `bash`. Called from `check_step_isolation`."""
+    us = govkit_module().upgrade_steps
+    floor_row = next(r for r in us.read_steps(GOV_ROOT, None, None) if r.id == "lib/python-floor-3.15")
     # TOOL-dSafePassage-87 S4: PATH's first bash a text file that does not run, every other PATH entry
     # holding a bash dropped but a System32 or WindowsApps launcher, which resolve_bash skips, and
     # GOV_BASH the parent's own bash: the floor stub resolves bash as the parent does, so it holds.
@@ -4434,18 +4448,23 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
 
     keep87 = [d for d in os.environ.get("PATH", "").split(os.pathsep) if d and (test_launcher87(d) or not any(
         os.path.isfile(os.path.join(d, n)) for n in ("bash", "bash.exe")))]
-    held = {k: os.environ.get(k) for k in ("PATH", "GOV_PYTHON", "GOV_BASH")}
-    os.environ.update(PATH=os.pathsep.join([str(fake87)] + keep87), GOV_BASH=bash87, GOV_PYTHON=sys.executable)
-    try:
+    path87 = os.pathsep.join([str(fake87)] + keep87)
+    with set_environ({"PATH": path87, "GOV_BASH": bash87, "GOV_PYTHON": sys.executable}):
         got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
-    finally:
-        for k, v in held.items():
-            if v is None:
-                os.environ.pop(k, None)
-            else:
-                os.environ[k] = v
     check("[dSP-87 AC5] the floor row's witness, PATH's bash unusable and GOV_BASH the parent's bash, is ok",
           got["verdict"] == "ok" and got["rc"] == 0, str(got))
+
+    # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
+    # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. What bare
+    # `bash` resolves to (on Windows the loader's System32 WSL launcher, elsewhere PATH or nothing), and
+    # so the rc, is the node's, so only the tail is graded: it names bash or the floor script, and it
+    # carries neither the stub's own early exit nor the Refusal.
+    with set_environ({"PATH": path87, "GOV_BASH": None, "GOV_PYTHON": sys.executable}):
+        got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+    tail = got["tail"]
+    check("[dSP-91 L2] the floor row's witness, no bash resolving and GOV_BASH unset, falls back to bare bash",
+          ("bash" in tail or "python-floor.sh" in tail) and "python_floor.py:" not in tail
+          and "upgrade_steps.Refusal" not in tail and "Set GOV_BASH" not in tail, str(got))
 
 
 def check_step_gate_fixture() -> None:
@@ -13084,11 +13103,9 @@ user_skills = "/tmp/gk-fake-skills"
 
         # TOOL-dSafePassage-88: gov moves its tool root and the target keeps its prefix, so each renamed
         # row resolves to its own path and lands there, never refused as its own occupant.
-        _g88 = build_rename_gov(
-            "inplace",
-            'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n'
-            '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n',
-            "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
+        _kit88 = ('id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n'
+                  '[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n')
+        _g88 = build_rename_gov("inplace", _kit88, "pinned", {"keep.txt": "one\ntwo\nthree\nfour\n"})
         _gk88 = _g88 / "pinned" / KIT_NAMES["govkit"]
         _t88 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-t")
         _ap88 = subprocess.run([sys.executable, str(_gk88 / "govkit.py"), "apply", "--target", str(_t88),
@@ -13128,6 +13145,30 @@ user_skills = "/tmp/gk-fake-skills"
                and read_bytes11(_t88 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\nthree\nFOUR\n")
               if _fold90 else (_cs90.returncode == 0 and _ix90 == ["pinned/demo/Keep.txt"]),
               f"fold {_fold90} update {_cs90.returncode} {_ix90} " + _cs90.stdout[-1500:])
+
+        # TOOL-dSafePassage-91: an in-place row in a held-back kit. Gov's root moves, so keep.txt is in
+        # place, and other.txt is renamed onto the adopter's own file, so the kit is rolled back. The
+        # in-place row is snapshotted at its one path, so the order restores it once.
+        _g91 = build_rename_gov("inplace-held", _kit88, "pinned", {"keep.txt": "one\ntwo\n", "other.txt": "other\n"})
+        _t91 = build_target(tmp, 'gov_source = "local"\nprefix = "pinned"\nkits = ["demo"]\n', "rn-inplace-held-t")
+        _ap91 = subprocess.run([sys.executable, str(_g91 / "pinned" / KIT_NAMES["govkit"] / "govkit.py"), "apply",
+                                "--target", str(_t91), "--kits", "demo"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        (_t91 / "pinned" / "demo" / "renamed.txt").write_text("the adopter's own file\n", encoding="utf-8", newline="\n")
+        settle(_t91, "the install and the adopter's own file")
+        git(_g91, "mv", "pinned", "moved")
+        git(_g91, "mv", "moved/demo/other.txt", "moved/demo/renamed.txt")
+        git(_g91, "commit", "-qm", "B")
+        _up91 = subprocess.run([sys.executable, str(_g91 / "moved" / KIT_NAMES["govkit"] / "govkit.py"), "update",
+                                "--target", str(_t91), "--write"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        _ord91 = _t91 / ".governance" / "outbox" / "update-rollback-demo.md"
+        _rs91 = _ord91.read_text(encoding="utf-8").splitlines().count("restored  pinned/demo/keep.txt") \
+            if _ord91.is_file() else None
+        check("[dSP-91 L1] a held-back kit's in-place row is restored once, and its order names it once",
+              _ap91.returncode == 0 and _up91.returncode == 1 and "ALREADY holds a file there" in _up91.stdout
+              and _rs91 == 1 and read_bytes11(_t91 / "pinned" / "demo" / "keep.txt") == b"one\ntwo\n",
+              f"apply {_ap91.returncode} update {_up91.returncode} restored {_rs91} " + _up91.stdout[-1500:])
 
         _g11c = build_rename_gov("mvfail")
         _t11c = build_rename_target(_g11c, "rn-mvfail-t")

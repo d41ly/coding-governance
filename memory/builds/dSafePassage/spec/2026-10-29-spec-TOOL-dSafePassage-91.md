@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-91 — the round-3 closing review's three remaining minors: the in-place row's one snapshot path, a grader for the walk's two roots, and an arm for the floor stub's bash fallback
 
-**Status:** DEFERRED · rev-2 · 2026-10-29 · node a · Tier-2 · base cbaaeebe · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base cbaaeebe · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-29-build-TOOL-dSafePassage-91-ledger.md](../build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md) | journal | — |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md) | research | TOOL-dSafePassage-90 |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md) | research | TOOL-dSafePassage-90 |
 | [2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md) | journal | — |

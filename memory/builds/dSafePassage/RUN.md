@@ -27,12 +27,12 @@ mode: slug
 run-branch: refs/heads/branch/unattended-dsafepassage-567339
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-26T18:23:28Z
+lease-utc: 2026-11-01T04:44:38Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 23020
+pid: 18428
 session: c5f50d22-89c6-41d7-84e5-2382dcd49faa
-keepalive: 94fa87dd
+keepalive: 3740de71
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 anchor-ref: refs/heads/main
@@ -527,3 +527,11 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-10-29T11:19:33Z dispatch · item a3ad798c TOOL-dSafePassage-90 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-90.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-90-ledger.md
 
 2026-10-29T12:09:34Z dispatch · item a21607b1 TOOL-dSafePassage-90 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-90.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-90-ledger.md
+
+2026-11-01T04:39:58Z brief · item TOOL-dSafePassage-91 · reason e26a2169a048 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md
+
+2026-11-01T04:44:22Z dispatch · item cef70e87 TOOL-dSafePassage-91 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-91.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md
+
+2026-11-01T04:50:29Z dispatch · item cef70e87 TOOL-dSafePassage-91 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-91.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-11-01T05:01:34Z dispatch · item cef70e87 TOOL-dSafePassage-91 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-91.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/LIVE.md
