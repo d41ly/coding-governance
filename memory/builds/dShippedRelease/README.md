@@ -239,7 +239,7 @@ ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 D
 | [DEPL-dShippedRelease-144 — the round-5 spec audit's 32 MEDIUM and 11 LOW findings, batched](spec/2026-11-01-spec-DEPL-dShippedRelease-144.md) | 38 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 51 bound to this build, across 4 record folder(s).
+Records: 52 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
