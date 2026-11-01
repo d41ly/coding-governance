@@ -28,6 +28,8 @@
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
+#   unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h> [--finding <row>]... [--sibling <unit>@rev-<n>]...   # append one spec-audit round, no run-state file needed
+#   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
@@ -108,7 +110,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief --beat"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --check-commit --claims --overlaps --version"
@@ -833,6 +835,7 @@ VERB_REQUIRES="--abort --reason --code
 --brief --unit --path
 --record-set --leg --verdict
 --record-piece --path --leg --verdict
+--record-round --subject --audited --blockers --highs
 --dispatch --writes"
 check_verb_flag() { # verb · flag · value -> 0 when the value is non-empty, else check 112 and 1
   local verb="$1" flag="$2"
@@ -3283,13 +3286,13 @@ check_waivers() { # run-state file
     # carrying one forges a second, well-formed entry the owner never granted.
     # GUARDED on non-empty. An empty BYPASS_BAN makes this glob `*""*`, which matches every
     # string — so an undeclared bypass flag would refuse every waiver ever offered.
-    case "${BYPASS_BAN:+x}$r" in "") ;; *"$BYPASS_BAN"*)
-      fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
-      return 1 ;;
-    esac
     # A CARRIAGE RETURN with it (closing review round 2 M1): park() now refuses one, and it is
     # reached only after --preflight has written its facts, so the refusal belongs here, before them.
-    if [ "$(printf '%s' "$r" | wc -l | tr -d ' ')" != "0" ] || case "$r" in *$'\r'*) true ;; *) false ;; esac; then
+    # ONE `if` OVER THE THREE (TOOL-dFoldedAudit-5 S11): the two branches printed the same line, so the
+    # merge retires no refusal, and the conditions keep their order.
+    if case "${BYPASS_BAN:+x}$r" in "") false ;; *"$BYPASS_BAN"*) true ;; *) false ;; esac \
+       || [ "$(printf '%s' "$r" | wc -l | tr -d ' ')" != "0" ] \
+       || case "$r" in *$'\r'*) true ;; *) false ;; esac; then
       fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
       return 1
     fi
@@ -13444,6 +13447,226 @@ verb_record_piece() { # slug · piece · leg · verdict
   record_piece "$rr_root" "$piece" "$leg" "$verdict" \
     "$(GIT rev-parse "$_rp_base:$_rp_pb" 2>/dev/null)" "$slug"
 }
+# TOOL-dFoldedAudit-5 - THE SPEC-AUDIT CHAIN'S RECORD AND ITS VERDICT. Each promotion is a fresh review
+# subject, so no `--review` row can say a chain is done: a row names no spec, an attended run writes
+# none, and `REVIEW_ROUNDS` bounds one subject and no chain of them. `--record-round` appends what a
+# round audited and how it disposed to one tracked file under the build's `build/` folder, and
+# `--chain-verdict` derives CONTINUE, STOP or HOLD from that file and the roster alone. BOTH ANSWER WITH
+# NO RUN-STATE FILE, so an attended run takes the same route, and the verdict lives here and nowhere
+# else: the build harness renders the recording command and reads no set.
+#
+# ONE REFUSAL SITE FOR BOTH VERBS, because the driver's census sits at its ceiling and the way up is the
+# owner's retirement review. Each reason is a value of `why`, so one arm quotes the signature and each
+# reason is observed by its own criterion. BOUND TO A NAME, never `$1`: check-arms reads a bare
+# positional as literal text, so it would land in the signature and nothing could arm the branch.
+check_chain_fault() { # why -> 0 when empty, else check 118 and 1
+  local why="$1"
+  [ -z "$why" ] && return 0
+  fail 118 "the spec-audit chain record refuses this: $why"
+  return 1
+}
+# THE RECORD, found and never named: `git ls-files` reads the index, so a round staged and not yet
+# committed is found by the next one. Two files split the rounds across two readers, and a tracked path
+# gone from the worktree would read as a chain with no rounds, so each refuses. An empty `_chain_rec`
+# is a chain no round has reached. Called in the caller's shell: a refusal in `$( )` loses its status.
+read_chain_record() { # slug -> 0 with _chain_rec the tracked record or empty, else check 118 and 1
+  local slug="$1"
+  _chain_rec=$(git ls-files "$M/builds/$slug/build/*-chain-rounds.md" 2>/dev/null)
+  case "$_chain_rec" in
+    *$'\n'*) check_chain_fault "two -chain-rounds.md files would split the rounds across two readers: ${_chain_rec//$'\n'/ }"
+             return 1 ;;
+  esac
+  [ -z "$_chain_rec" ] || [ -f "$_chain_rec" ] || {
+    check_chain_fault "the tracked record is gone from the worktree, and it would read as a chain with no rounds: $_chain_rec"
+    return 1; }
+}
+# THE ROUND IS THE RECORD'S OWN ORDINAL, the last round plus one and never the harness's `round`: under
+# `REVIEW_ROUNDS` above 1 one generation spends several invocation rounds, which would burn the ceiling
+# faster than generations pass. `--subject` is the generation key, which is what refuses a replay.
+#
+# EVERY REFUSAL RUNS BEFORE ANY BYTE IS WRITTEN. These tokens reach a tracked record the verdict parses,
+# so each is held to its grammar here as well as in the harness, because the verb is callable by hand: a
+# separator or a newline would forge a row. The counts are the review's: read from rows alone "every
+# confirmed BLOCKER and HIGH was disposed somewhere" could not fail, because a row at HIGH always names
+# a nature and a unit. A finding the disposal adjudicated from UNVERIFIED may add a row above the count,
+# so the test is "fewer", never "differs". It names no run-state file: `refuse_if_terminal` passes where
+# none exists, and the caller commits the record beside the disposal's folds.
+write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS
+  local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5"
+  local id='[A-Z]+-[A-Za-z0-9]+-[0-9]+' rel rec now tok rows="" last=0 seen=0 round
+  local f_id f_sev f_nat f_specs f_unit f_rev
+  local re_ids="^$id( $id)*\$" re_sibling="^$id@rev-[0-9]+\$"
+  local re_finding="^[0-9]+/(BLOCKER|HIGH|MEDIUM|LOW)/(local|new-mechanism)/$id(,$id)*/$id/[0-9]+\$"
+  local -A b_ids=() h_ids=()
+  check_slug "$slug" || return 1
+  check_verb_flag --record-round --subject "$subj" || return 1
+  check_verb_flag --record-round --audited "$audited" || return 1
+  check_verb_flag --record-round --blockers "$blockers" || return 1
+  check_verb_flag --record-round --highs "$highs" || return 1
+  runmd_of "$slug" >/dev/null; rel=$_runmd
+  refuse_if_terminal "$rel" --record-round || return 1
+  [ -d "$M/builds/$slug" ] || { check_chain_fault "no build folder holds this slug, so a round has nothing to bind to: $slug"; return 1; }
+  [[ $subj =~ ^[A-Za-z0-9-]+$ ]] || { check_chain_fault "--subject is outside [A-Za-z0-9-]+, and a row nothing can parse is prose in a record the verdict reads: $subj"; return 1; }
+  [[ $audited =~ $re_ids ]] || { check_chain_fault "--audited holds a token that is no unit id, or two spaces, and a row nothing can parse is prose in a record the verdict reads: $audited"; return 1; }
+  [[ "$blockers:$highs" =~ ^[0-9]{1,6}:[0-9]{1,6}$ ]] || { check_chain_fault "--blockers and --highs are the review's two integers: $blockers and $highs"; return 1; }
+  read_chain_record "$slug" || return 1
+  if [ -n "$_chain_rec" ]; then
+    read -r last seen < <(awk -v subj="$subj" '
+      { sub(/\r$/, "") }
+      /^round [0-9]+ · subject / {
+        split($0, f, " · "); split(f[1], w, " ")
+        if (w[2] + 0 > last) last = w[2] + 0
+        if (f[2] == "subject " subj) seen = 1
+      }
+      END { print last + 0, seen + 0 }' "$_chain_rec")
+  fi
+  [ "$seen" = 0 ] || { check_chain_fault "an earlier round of the record already carries this --subject, and a replay would count one generation twice: $subj"; return 1; }
+  round=$((last + 1))
+  for tok in ${RR_FINDINGS[@]+"${RR_FINDINGS[@]}"}; do
+    [[ $tok =~ $re_finding ]] || { check_chain_fault "a --finding is outside <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>: $tok"; return 1; }
+    IFS=/ read -r f_id f_sev f_nat f_specs f_unit f_rev <<<"$tok"
+    rows+="round $round · finding $f_id · $f_sev · $f_nat · specs ${f_specs//,/ } · unit $f_unit · rev $f_rev"$'\n'
+    case "$f_sev" in BLOCKER) b_ids[$f_id]=1 ;; HIGH) h_ids[$f_id]=1 ;; esac
+  done
+  for tok in ${RR_SIBLINGS[@]+"${RR_SIBLINGS[@]}"}; do
+    [[ $tok =~ $re_sibling ]] || { check_chain_fault "a --sibling is outside <id>@rev-<N>: $tok"; return 1; }
+    rows+="round $round · sibling · unit ${tok%@rev-*} · rev ${tok##*@rev-}"$'\n'
+  done
+  if [ "${#b_ids[@]}" -lt "$blockers" ] || [ "${#h_ids[@]}" -lt "$highs" ]; then
+    check_chain_fault "the rows dispose ${#b_ids[@]} BLOCKER and ${#h_ids[@]} HIGH id(s) where the review counted $blockers and $highs, and every confirmed one is disposed somewhere"
+    return 1
+  fi
+  rec=$_chain_rec
+  if [ -z "$rec" ]; then
+    now=$(read_utc_now)
+    [ -n "$now" ] || print_env_failure 118 "the clock answered nothing, so the record cannot be named and no round was written"
+    rec="$M/builds/$slug/build/${now%%T*}-build-${audited%% *}-chain-rounds.md"
+    mkdir -p "${rec%/*}" 2>/dev/null || print_env_failure 118 "cannot create the build's record folder, so no round was written: ${rec%/*}"
+  fi
+  {
+    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** journal %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "${audited%% *}"
+    printf 'round %s · subject %s · audited %s\n%s' "$round" "$subj" "$audited" "$rows"
+  } >> "$rec" || print_env_failure 118 "cannot append to the record, so this round is not recorded: $rec"
+  stage_runmd "$rec" || print_env_failure 118 "the round is written and git could not stage it, so the next call cannot find the record: $rec"
+  echo "unattended: chain round recorded — $slug · round $round · $rec"
+}
+# THE SETS, COMPUTED ONCE, in one awk over the record, in the design's order. For round N the last the
+# record holds, 0 when it holds none: H is the BLOCKER and HIGH ids with their specs, P the unit of every
+# `new-mechanism` row whatever its severity, and F the unit of every `local` row at BLOCKER or HIGH and of
+# every `sibling` row, because M4 already counts a review's own fold of a minor as reviewed. U is the
+# live roster less every audited id and less P(N): a unit round N just promoted is named by no audit yet,
+# so a U holding it would answer CONTINUE before the stop or the ceiling is read.
+#   1. U non-empty: CONTINUE, unreviewed, auditing U, P(N) and F(N).
+#   2. H(N) and P(N) empty: STOP, clean.
+#   3. own-work, N >= 2, H(N) NON-EMPTY, every high's specs inside P(N-1) and F(N-1): STOP, own-work.
+#   4. N at the ceiling: HOLD. 5. Otherwise CONTINUE, open, auditing P(N) and F(N).
+# THE POPULATION IN STEP 3 IS THE POINT: an empty H is a subset of anything, so without it a clean round
+# would read as R5, and step 2 answers a clean round first anyway. POSIX awk, for the reason `spec_facts`
+# gives, so the lists sort by hand, as strings. A row outside the grammar was hand-edited: the file is
+# append-only, so one no reader can parse is a fault to name, never a question for the owner.
+derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -> 0 with _cv_* set, else check 118 and 1
+  local out
+  out=$(awk -v live="$2" -v stop="$3" -v ceiling="$4" '
+    function isid(s) { return s ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/ }
+    function isids(s,   a, k, i) {
+      k = split(s, a, " ")
+      for (i = 1; i <= k; i++) if (!isid(a[i])) return 0
+      return k > 0
+    }
+    function toset(s, set,   a, k, i) { k = split(s, a, " "); for (i = 1; i <= k; i++) set[a[i]] = 1 }
+    function joined(set,   id, v, n, i, j, o, s) {
+      n = 0
+      for (id in set) v[++n] = id
+      for (i = 2; i <= n; i++) {
+        o = v[i]
+        for (j = i - 1; j >= 1 && (v[j] "") > (o ""); j--) v[j + 1] = v[j]
+        v[j + 1] = o
+      }
+      s = ""
+      for (i = 1; i <= n; i++) s = s (i > 1 ? " " : "") v[i]
+      return s
+    }
+    function inside(s, set,   a, k, i) {
+      k = split(s, a, " ")
+      for (i = 1; i <= k; i++) if (!(a[i] in set)) return 0
+      return 1
+    }
+    { sub(/\r$/, "") }
+    /^$/ || /^# / || /^\*\*Serves:\*\* journal / || /^Appended by / { next }
+    {
+      k = split($0, f, " · "); c = split(f[1], w, " ")
+      if (c != 2 || w[1] != "round" || w[2] !~ /^[1-9][0-9]*$/) { bad = $0; exit }
+      r = w[2] + 0
+      if (k == 3 && f[2] ~ /^subject [A-Za-z0-9-]+$/ && f[3] ~ /^audited / && isids(substr(f[3], 9))) {
+        toset(substr(f[3], 9), aud)
+      } else if (k == 4 && f[2] == "sibling" && f[3] ~ /^unit / && isid(substr(f[3], 6)) && f[4] ~ /^rev [0-9]+$/) {
+        fold[r] = fold[r] " " substr(f[3], 6)
+      } else if (k == 7 && f[2] ~ /^finding [0-9]+$/ && f[3] ~ /^(BLOCKER|HIGH|MEDIUM|LOW)$/ &&
+                 f[4] ~ /^(local|new-mechanism)$/ && f[5] ~ /^specs / && isids(substr(f[5], 7)) &&
+                 f[6] ~ /^unit / && isid(substr(f[6], 6)) && f[7] ~ /^rev [0-9]+$/) {
+        major = (f[3] == "BLOCKER" || f[3] == "HIGH")
+        if (major) high[r] = high[r] " " substr(f[5], 7)
+        if (f[4] == "new-mechanism") prom[r] = prom[r] " " substr(f[6], 6)
+        else if (major) fold[r] = fold[r] " " substr(f[6], 6)
+      } else { bad = $0; exit }
+      if (r > last) last = r
+    }
+    END {
+      if (bad != "") { print "BAD|" bad; exit }
+      N = last + 0
+      toset(prom[N], P); toset(fold[N], F); toset(prom[N - 1] " " fold[N - 1], prior)
+      c = split(live, L, " ")
+      for (i = 1; i <= c; i++) if (!(L[i] in aud) && !(L[i] in P)) { U[L[i]] = 1; unreviewed = 1 }
+      pn = joined(P)
+      word = "CONTINUE"; reason = "open"; override = ""
+      if (unreviewed) reason = "unreviewed"
+      else if (high[N] == "" && pn == "") { word = "STOP"; reason = "clean" }
+      else if (stop == "own-work" && N >= 2 && high[N] != "" && inside(high[N], prior)) { word = "STOP"; reason = "own-work"; override = pn }
+      else if (N >= ceiling + 0) { word = "HOLD"; reason = "ceiling" }
+      audit = ""
+      if (word == "CONTINUE") {
+        for (i in P) U[i] = 1
+        for (i in F) U[i] = 1
+        audit = joined(U)
+      }
+      print N "|" word "|" reason "|" audit "|" override
+    }' "${1:-/dev/null}") || print_env_failure 118 "awk could not read the record, so no verdict exists: ${1:-(none)}"
+  case "$out" in
+    BAD\|*) check_chain_fault "a body row is outside the grammar, and the record is append-only, so it was edited by hand: ${out#BAD|}"
+            return 1 ;;
+  esac
+  IFS='|' read -r _cv_round _cv_word _cv_reason _cv_audit _cv_override <<<"$out"
+}
+# A verdict of each of the three exits 0: the verb answered, and the caller acts on the word. The roster
+# is the specs and the authored plan together, so a promoted unit counts once its spec is tracked. CLOSED
+# and WONTDO are terminal, because a frozen spec cannot take a fold and a retired one is never audited,
+# so either would hold U non-empty for ever. A HOLD stays the answer until the owner moves the ceiling or
+# rules, because a re-read of one record derives one verdict, and it prints a recipe because the main
+# loop owns the keepalive: `--hold` refuses `owner-decision`, `--handoff` being that code's only producer.
+print_chain_verdict() { # slug -> the verdict line, then the recipe line on a HOLD
+  local slug="$1" dir ids planned stop ceiling specs id st live="" line
+  check_slug "$slug" || return 1
+  dir="$M/builds/$slug"
+  ids=$(spec_ids "$dir")
+  planned=$(roster_ids "$slug") || { check_chain_fault "the build README's roster pair is malformed, so no roster can be read: $slug"; return 1; }
+  [ -n "$ids$planned" ] || { check_chain_fault "the roster yields no id, and a verdict over nothing is the vacuous-selector shape: $slug"; return 1; }
+  read_chain_record "$slug" || return 1
+  stop=$(read_spec_audit_switch chain-stop) || { check_chain_fault "$stop"; return 1; }
+  ceiling=$(read_spec_audit_switch chain-ceiling) || { check_chain_fault "$ceiling"; return 1; }
+  specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null | drop_working_specs)
+  load_spec_facts $specs || print_env_failure 118 "the build's specs could not be read, so no status can be taken: $dir"
+  for id in $ids $planned; do
+    st=""; [ -z "${SPEC_PATH[$id]:-}" ] || st=${SPEC_ST[${SPEC_PATH[$id]}]:-}
+    case "$st" in CLOSED|WONTDO) ;; *) live="$live${live:+ }$id" ;; esac
+  done
+  derive_chain_verdict "$_chain_rec" "$live" "$stop" "$ceiling" || return 1
+  line="unattended: chain $slug · round $_cv_round · $_cv_word · reason $_cv_reason"
+  [ -z "$_cv_audit" ] || line="$line · audit $_cv_audit"
+  [ -z "$_cv_override" ] || line="$line · override specs-audited $_cv_override"
+  printf '%s\n' "$line"
+  [ "$_cv_word" != HOLD ] || printf 'unattended: chain %s holds for the owner at the ceiling of %s round(s): bash %s --park %s --item spec-audit-chain-ceiling --reason <what stands>, then reap the keepalive and bash %s --handoff %s --code owner-decision --reason <what the owner decides> --reaped <the keepalive id you deleted>; an attended run asks the owner.\n' \
+    "$slug" "$ceiling" "$DRIVER_ARGV0" "$slug" "$DRIVER_ARGV0" "$slug"
+}
 # TOOL-dUnstalledConvoy-5 - the amendment record. M2's AMEND acts are legal in code and were
 # undocumented; M3 now delegates the build's own scope. An authority with no record is
 # indistinguishable from a run doing whatever it likes, so every amendment leaves a row here.
@@ -14560,6 +14783,7 @@ HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
+RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -14640,6 +14864,9 @@ while [ $# -gt 0 ]; do
     --minors)       RV_MINORS="${2:-}"; shift 2 || shift ;;
     --folded)       RV_FOLDED="${2:-}"; shift 2 || shift ;;
     --promoted)     RV_PROMOTED="${2:-}"; shift 2 || shift ;;
+    --audited)      RR_AUDITED="${2:-}"; shift 2 || shift ;;
+    --finding)      RR_FINDINGS+=("${2:-}"); shift 2 || shift ;;
+    --sibling)      RR_SIBLINGS+=("${2:-}"); shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is
@@ -14740,6 +14967,8 @@ case "$VERB" in
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
+  --record-round) write_chain_round "$SLUG" "$RV_SUBJECT" "$RR_AUDITED" "$RV_BLOCKERS" "$RV_HIGHS" ;;
+  --chain-verdict) print_chain_verdict "$SLUG" ;;
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
   --beat)      write_claim_beat "$SLUG" ;;

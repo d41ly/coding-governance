@@ -3983,6 +3983,16 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "check_chain_fault",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_chain_refused",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "check_claim_canary",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -7076,6 +7086,11 @@
       "id": "derive_census_tree",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "derive_chain_verdict",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "derive_change_commit",
@@ -12453,6 +12468,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "print_chain_verdict",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_check_verdicts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -13576,6 +13596,16 @@
       "id": "read_chain_clauses",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_chain_file",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "read_chain_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_charter_shapes",
@@ -15193,6 +15223,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "read_result_fa5",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "read_retired_ids",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -16486,6 +16521,26 @@
       "id": "renderCell",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderChainRecord",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderChainRecord",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "renderChainRoute",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderChainRoute",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "renderChecklistUnion",
@@ -20119,6 +20174,11 @@
     },
     {
       "id": "run_cf_preflight",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_chain",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
     },
@@ -25618,6 +25678,16 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "write_chain_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_chain_round",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "write_claim",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -25756,6 +25826,11 @@
       "id": "write_fixture_records",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_fixture_round",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_fleet_claim",

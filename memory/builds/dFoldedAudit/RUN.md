@@ -61,3 +61,9 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-01T22:55:51Z brief · item TOOL-dFoldedAudit-4 · reason fa8f60beae36 memory/builds/dFoldedAudit/prompts/2026-11-01-prompt-TOOL-dFoldedAudit-4-build-brief.md
 
 2026-11-01T23:15:50Z dispatch · item dc10ff9e TOOL-dFoldedAudit-4 · reason tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md memory/map/generated/symbols.json memory/LIVE.md memory/builds/dFoldedAudit/README.md memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFoldedAudit-4.md memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-4-ledger.md memory/guides/SESSION-KICKOFF.md
+
+2026-11-01T23:19:53Z dispatch · item f1a7b161 TOOL-dFoldedAudit-5 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFoldedAudit-5.md
+
+2026-11-01T23:19:54Z brief · item TOOL-dFoldedAudit-5 · reason 37011a3e443b memory/builds/dFoldedAudit/prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-build-brief.md
+
+2026-11-01T23:53:21Z dispatch · item f1a7b161 TOOL-dFoldedAudit-5 · reason memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-5-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/builds/dFoldedAudit/README.md

@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-5 — each HIGH records its specs and a verb derives the chain's stop verdict
 
-**Status:** INPROGRESS · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 50 · ratified 2026-11-01
+**Status:** CLOSED · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 50 · ratified 2026-11-01
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-02-build-TOOL-dFoldedAudit-5-ledger.md](../build/2026-11-02-build-TOOL-dFoldedAudit-5-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-5-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-5-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-build-brief.md) | research | — |

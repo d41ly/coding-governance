@@ -378,9 +378,9 @@ const buildVerdicts = (verdict) => (label, prompt) => {
 const buildSynth = (drop) => (label, prompt) => {
   const head = prompt.split('UNVERIFIED findings')[0]
   const ids = [...head.matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)).filter((id) => id !== drop)
-  return { path: 'memory/reviews/r.md', summary: 's', items: [{ severity: 'HIGH', ids: ids }] }
+  return { path: 'memory/reviews/r.md', summary: 's', items: [{ severity: 'HIGH', ids: ids, specs: ['TOOL-x-1'] }] }
 }
-const ALL_OK = { 'resume:probe': buildProbe(), 'find:': buildLensReturn, 'verify:': buildVerdicts('confirmed'), synth: buildSynth(null) }
+const ALL_OK ={ 'resume:probe': buildProbe(), 'find:': buildLensReturn, 'verify:': buildVerdicts('confirmed'), synth: buildSynth(null) }
 const buildStubs = (over) => Object.assign({}, ALL_OK, over)
 const checkNoThrow = (r, name) => { if (r.threw) { console.log('HARNESS-BROKEN ' + name + ' -> ' + r.threw); fail++; return false } return true }
 // A lens FILE as the probe would re-emit it, under a given key.
@@ -1724,6 +1724,44 @@ async function runLedgerArms() {
   await runLensYieldArms()
   await runRolesArms()
   await runEffortsArms()
+  await runAddressArms()
+}
+
+// ==== TOOL-dFoldedAudit-5 — THE ADDRESS, each spec-kind BLOCKER or HIGH naming the specs its fix changes ====
+// The failing case is staged by dropping the `isSpec` clause from the tally, which reds the diff-kind
+// control, and by dropping the clause's body, which reds AC2: both observed at the close, not by the pass
+// that wrote this. An arm reads the return, the prompt and the render; none proves a live synthesis obeys.
+async function runAddressArms() {
+  const buildSynthItem = (over) => (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
+    items: [Object.assign({ severity: 'HIGH', ids: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)) }, over)] })
+  const scanSynth = (run) => run.trace.filter((t) => t.label.indexOf('synth') === 0)[0].prompt
+  // ---- AC1: the item's address comes back beside the counts, and the prompt asks for the line.
+  let r = await runReview(SPEC, buildStubs({ synth: buildSynthItem({ specs: ['TOOL-x-1'] }) }))
+  if (checkNoThrow(r, 'address carried')) {
+    const a = r.result.addresses
+    ck(Array.isArray(a) && a.length === 1 && a[0].severity === 'HIGH' && a[0].ids.length === 5 && a[0].specs.join() === 'TOOL-x-1',
+      'address: the return carries the item\'s ids, severity and specs: ' + JSON.stringify(a))
+    ck(r.result.highs === 5, 'address: an addressed HIGH item counts its raw ids')
+    ck(scanSynth(r).indexOf('**Specs:**') !== -1, 'address: the spec-kind synthesis prompt orders the **Specs:** line')
+  }
+  // ---- AC2: a HIGH with no well-formed address is a tally fault, in three spellings, and a minor owes none.
+  for (const [name, over] of [['an empty list', { specs: [] }], ['no key', {}], ['a token that is no id', { specs: ['not an id'] }]]) {
+    r = await runReview(SPEC, buildStubs({ synth: buildSynthItem(over) }))
+    if (checkNoThrow(r, 'address ' + name))
+      ck(r.result.blockers === null && r.result.highs === null && /^UNVERIFIED/.test(r.result.note) && r.result.addresses.length === 0,
+        'address: ' + name + ' nulls both counts, and the note opens UNVERIFIED: ' + r.result.note)
+  }
+  r = await runReview(SPEC, buildStubs({ synth: buildSynthItem({ severity: 'MEDIUM' }) }))
+  if (checkNoThrow(r, 'address minor'))
+    ck(r.result.blockers === 0 && r.result.highs === 0 && r.result.addresses.length === 0, 'address: a MEDIUM with no specs returns integer counts')
+  // ---- AC3: a diff review's HIGH owes none, and neither its prompt nor its return moves.
+  r = await runReview(DIFF, buildStubs({ synth: buildSynthItem({}) }))
+  if (checkNoThrow(r, 'address diff kind')) {
+    ck(r.result.blockers === 0 && r.result.highs === 5, 'address: a diff review\'s HIGH with no specs counts')
+    ck(scanSynth(r).indexOf('**Specs:**') === -1, 'address: the diff prompt carries no **Specs:** line')
+    ck(!Object.prototype.hasOwnProperty.call(r.result, 'addresses'), 'address: a diff review\'s return has no `addresses` key')
+  }
+  ck(src.indexOf('**Specs:**') !== -1, 'address: the render moved with its template')
 }
 
 // ==== TOOL-aOrientedCast-10 — `efforts`, each stage spawned at the reasoning effort its caller names ====
@@ -1774,7 +1812,7 @@ async function runLensYieldArms() {
   const LORDER = ['security', 'correctness', 'seams', 'verification', 'intent']
   const scanYield = (run, n) => !!run.result && Array.isArray(run.result.lensYield) && run.result.lensYield.length === n
   const buildSynthOwn = (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
-    items: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => ({ severity: 'HIGH', ids: [parseInt(x[1], 10)] })) })
+    items: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => ({ severity: 'HIGH', ids: [parseInt(x[1], 10)], specs: ['TOOL-x-1'] })) })
   const buildVerdictById = (pick) => (label, prompt) => {
     const m = /ids ([0-9, ]+)\)/.exec(prompt)
     const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
@@ -2215,7 +2253,10 @@ printf '%s\n' "$out"
 # by hand, not by a run: the pass runs no suite.
 # RAISED 342 -> 343 by TOOL-dTrueNorth-20: 1 assertion, the `mark:` arm, the harness defining the function
 # gen_build_index.py's AUDIT_WRITER_MARK names. Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=343
+# RAISED 343 -> 354 by TOOL-dFoldedAudit-5: 11 assertions, counted off the `address:` arms — the carried
+# item (3), the three malformed items (3), the minor (1), the diff kind (3) and the render (1). Counted by
+# hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=354
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
