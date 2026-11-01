@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-3 — scope at the push: each commit's routed paths inside its unit's write set, graded by `build.scope`
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 4 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 4 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0401@e53987d9 whole
 **Carries:** node:item.build.scope
@@ -13,12 +13,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md](../build/2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md) | research | TOOL-dScopedBuild-5 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-6 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-3-1-reuse-scout.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-3-1-reuse-scout.md) | journal | — |
+| [2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-1 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-2 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 |
 
 <!-- /gen:spec-records -->
 
@@ -142,6 +143,11 @@ Build-run preconditions this unit calls and does not build: `read_first_passes` 
 - **consumes-from** `TOOL-dScopedBuild-14` — `policy.py get`, read through `read_gate_value`, with `render_gate_outcome` and `write_gate_asks`, the one renderer and filer each stray goes to, and `--build`, the one Build-exit mode S7's arm and `--write` join; without them the arm has no value, no outcome and no exit mode
 - **hands-off** `TOOL-dScopedBuild-9` — `read_spec_writes`, through `read_unit_writes`, the unit's reduced write set, and the per-unit population of graded commits the touch join runs over
 - **hands-off** `TOOL-dScopedBuild-5` — `read_spec_writes`, through `read_unit_writes`, the write set the derived write gate also reads, and the push-time scope arm that backstops the main loop's shell writes
+- **hands-off** `TOOL-dScopedBuild-27` — AC2's `warn-and-ask` clause, which that unit's S1 restates as the push writing no `BACKLOG.md` and its S2 as the exit filing the ask (id 3)
+- **consumes-from** `TOOL-dScopedBuild-30` — S4's `build.scope` read, spelled `check_gate_value("build.scope", read_policy_value("build.scope", root), <the three values>)`, through the reader that unit makes the kit's one in place of `read_gate_value`; without it the arm reads through a second reader (id 19)
+- **consumes-from** `TOOL-dScopedBuild-33` — the precondition `read_first_passes`, which stays in `deviation_join.py`; the scope arm reads its base through `read_build_base`, without which `--build <slug>` has no base (id 30)
+- **hands-off** `TOOL-dScopedBuild-34` — S1's `derive_kit_dir` fall-through, which that unit narrows so a file directly under `tools/` or `skills/` reduces to itself, and AC2's fixture, which it extends (id 36)
+- **hands-off** `TOOL-dScopedBuild-35` — S2's bash spawn, S26; S3's `at_exit` argument, S37; S4's scope subject as a dedupe key, S32; and S7's `scope` kind and its grammar line, S7 and S18 (ids 44, 11, 50, 21, 34)
 
 ## 4. Design
 
@@ -393,6 +399,7 @@ New arm: tools/policy/check_policy.py · covers AC7 · reader coverage over `bui
 - rev-1 · 2026-11-01 · initial draft, from the packet's Items 3, gap-build-01, the Build item table's
   `build.scope`, `build.revert-pass` and `build.resolve` rows, walk B1, the research's candidate A,
   scout B's row for this unit and its disagreements 6 and 7, and shared interfaces I1, I4 to I8.
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-27, TOOL-dScopedBuild-30, TOOL-dScopedBuild-33, TOOL-dScopedBuild-34, TOOL-dScopedBuild-35, promoted by the round-1 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-9 — the touch join as `build.scope`'s one check: the unit's own hunks, the map's grace shrink behind a point, and the claim arm `not-installed` where the map is absent
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 5 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 5 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0407@f551b213 whole
 
@@ -8,12 +8,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md](../build/2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md) | research | TOOL-dScopedBuild-3 TOOL-dScopedBuild-5 TOOL-dScopedBuild-8 |
 | [2026-11-01-build-TOOL-dScopedBuild-9-deviation-91.md](../build/2026-11-01-build-TOOL-dScopedBuild-9-deviation-91.md) | deviation | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-3 TOOL-dScopedBuild-6 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
+| [2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-1 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 |
 
 <!-- /gen:spec-records -->
 
@@ -113,6 +114,9 @@ S4, a parent).
 
 - **consumes-from** `TOOL-dScopedBuild-3` — `read_spec_writes`, through `read_unit_writes`, the unit's reduced write set, and `check_build_scope`, the per-unit population that calls the join; without them the join has no unit and no value
 - **hands-off** `TOOL-dScopedBuild-8` — `read_touched_hunks`, the hunk set the drain grades, and `check_touch_join`'s arm slots, where the drain arm and the claim arm's key half run
+- **hands-off** `TOOL-dScopedBuild-27` — AC3's `warn-and-ask` clause, which that unit's S1 restates as the push writing no `BACKLOG.md` and its S2 as the exit filing the ask (id 3)
+- **hands-off** `TOOL-dScopedBuild-29` — S3's and S5's `map_diff.py` launches and S6's exit mapping, which that unit runs under the running interpreter and completes for every non-zero exit (id 17)
+- **hands-off** `TOOL-dScopedBuild-35` — S1's `read_touched_hunks` argv, `--root` in S5 and the full path set in S28, and S2's call through `check_build_scope`'s `at_exit`, S37 (ids 16, 46, 11)
 
 ## 4. Design
 
@@ -300,6 +304,7 @@ New arm: tools/codebase-map/selftest.py · covers AC5 · `--paths-from` with `--
 - rev-1 · 2026-11-01 · initial draft, from the packet's Items 9, gap-mem-23, retrofit `[drain]`, recut
   H5, scout B's row for this unit and its disagreements 1, 3, 4 and 5, and shared interfaces I6, I8,
   I9 and I10.
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-27, TOOL-dScopedBuild-29, TOOL-dScopedBuild-35, promoted by the round-1 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

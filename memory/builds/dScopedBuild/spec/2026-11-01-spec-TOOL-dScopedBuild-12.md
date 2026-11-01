@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-12 — `build.reuse-check`: the reuse scout over the units a unit's commits add, before the closing review
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 13 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 13 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0410@869f06dd whole
 **Carries:** node:item.build.reuse-check
@@ -10,11 +10,12 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-10-reuse-scout-d.md](../build/2026-11-01-build-TOOL-dScopedBuild-10-reuse-scout-d.md) | research | TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 |
 | [2026-11-01-build-TOOL-dScopedBuild-12-deviation-121.md](../build/2026-11-01-build-TOOL-dScopedBuild-12-deviation-121.md) | deviation | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
+| [2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-1 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 |
 
 <!-- /gen:spec-records -->
 
@@ -166,6 +167,8 @@ method (TOOL-dFairHearing-14) for S11. Where the code record is absent the liste
 - **hands-off** `TOOL-dScopedBuild-13` — `read_spec_musts`, the one MUST-seam reader, and `read_reuse_records`, whose `## Disputed` rows the closing review is handed
 - **consumes-from** external — TOOL-dTotalRecall-8 (the code record), TOOL-dDeclaredLoop-29 S5, S6 (`join_upstream`), TOOL-dDeclaredLoop-30 S3, S4, S6 (`count_returns`, `promotion_target`), TOOL-dFairHearing-12 S4 and -14 (the grader and the method), all specced and DEFERRED at base
 - **hands-off** external — the arming of the reuse edge at `measured`, citing S11's record, and the reconciliation of TOOL-aScoutedSeam-3 with this unit (§8 F2)
+- **hands-off** `TOOL-dScopedBuild-26` — S4's, S7's and S8's two policy reads in `reuse_check.py`, and AC11's and AC15's grep clauses, which that unit reads through the memory-tree adapter and supersedes (id 2)
+- **hands-off** `TOOL-dScopedBuild-35` — the new leg's map claim, S15, and S9's status for a stale head and a never-built unit, S29 (ids 31, 47)
 
 ## 4. Design
 
@@ -452,6 +455,7 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC13 · the stubbed 
 - rev-1 · 2026-11-01 · initial draft, from the packet's Items 12, v2:1298 and :1984, flow-steps:288-294,
   night-pass-two:189-193 and :609-611, research-scoutedseam-apply:166-192, gap-register:367, scout D's
   row 12 and its disagreements 1, 2, 4 to 7, and the spec brief's I15, I16, I17 and I20.
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-26, TOOL-dScopedBuild-35, promoted by the round-1 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -30,3 +30,27 @@ anchor-ref: refs/heads/main
 base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 
 ## Parked
+
+2026-11-01T11:10:07Z rescope · item add TOOL-dScopedBuild-25 · reason spec-audit round1 of units 1-15 finding id 1 at HIGH, report item H1
+
+2026-11-01T11:10:18Z rescope · item add TOOL-dScopedBuild-26 · reason spec-audit round1 of units 1-15 finding id 2 at HIGH, report item H2
+
+2026-11-01T11:10:20Z rescope · item add TOOL-dScopedBuild-27 · reason spec-audit round1 of units 1-15 finding id 3 at HIGH, report item H3
+
+2026-11-01T11:10:21Z rescope · item add TOOL-dScopedBuild-28 · reason spec-audit round1 of units 1-15 finding id 14 at HIGH, report item H4
+
+2026-11-01T11:10:23Z rescope · item add TOOL-dScopedBuild-29 · reason spec-audit round1 of units 1-15 finding id 17 at HIGH, report item H5
+
+2026-11-01T11:10:24Z rescope · item add TOOL-dScopedBuild-30 · reason spec-audit round1 of units 1-15 finding id 19 at HIGH, report item H6
+
+2026-11-01T11:10:26Z rescope · item add TOOL-dScopedBuild-31 · reason spec-audit round1 of units 1-15 finding id 20 at HIGH, report item H7
+
+2026-11-01T11:10:27Z rescope · item add TOOL-dScopedBuild-32 · reason spec-audit round1 of units 1-15 finding id 22 at HIGH, report item H8
+
+2026-11-01T11:10:29Z rescope · item add TOOL-dScopedBuild-33 · reason spec-audit round1 of units 1-15 finding id 30 at HIGH, report item H9
+
+2026-11-01T11:10:30Z rescope · item add TOOL-dScopedBuild-34 · reason spec-audit round1 of units 1-15 finding id 36 at HIGH, report item H10
+
+2026-11-01T11:10:31Z rescope · item add TOOL-dScopedBuild-35 · reason spec-audit round1 of units 1-15 minors batch, MEDIUM ids 4 5 6 12 13 15 16 18 21 25 26 27 28 29 31 32 33 34 37 38 39 40 41 42 43 44 45 46 47 48 49 50 and LOW ids 7 8 9 10 11 35
+
+2026-11-01T11:39:09Z review · item dScopedBuild-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 10 · minors 38 · disposition promote
