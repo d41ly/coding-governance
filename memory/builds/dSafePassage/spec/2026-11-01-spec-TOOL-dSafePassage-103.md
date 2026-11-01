@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-103 — the census tree reads gov's source-mode receipt as gov's own tree, by the registry search it makes with no receipt
 
-**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base f25d719e4 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-3 · 2026-11-02 · node a · Tier-2 · base f25d719e4 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-8
 
@@ -95,9 +95,6 @@ exactly as before.
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-8` — the source-mode receipt its `govkit update` writes on
-  gov's tree (govkit.py lines 9445-9447), whose top-level `"mode"` S1 reads. Without that key this
-  unit could not tell gov's receipt from an adopter's.
 - **consumes-from** external — the main loop's runs of the `policy check` leg's checker on the AC1
   fixture, and of the `policy fixtures` case. Scratch-guard row G1 refuses a leg's argv to a role
   whose allowlist does not name that leg (`tools/hooks/README.md` line 518). Without those runs, AC1
@@ -105,6 +102,11 @@ exactly as before.
 - **hands-off** external — observing the 73 selftest legs the close held on a tree carrying gov's
   receipt, per §4 "What it does not cover". That needs a selftest run on such a tree, which no unit
   of this build owns.
+
+TOOL-dSafePassage-8 is CLOSED, and this unit reads what it landed: the source-mode receipt its
+`govkit update` writes on gov's tree (govkit.py lines 9445-9447), whose top-level `"mode"` S1
+reads. Without that key this unit could not tell gov's receipt from an adopter's. It is named here
+rather than joined, so its CLOSED spec gains no line (TOOL-dSafePassage-104 S1).
 
 ## 4. Design
 
@@ -476,6 +478,11 @@ none
   `source-mode receipt, two registries` scenario at the skeptic's corrected fix, bound to AC5. L7
   routed every scenario through a Refusal-to-value wrapper. Every line cited was re-read at
   `bacc82c20`.
+- rev-3 · 2026-11-02 · §3 · the `### Edges` bullet declaring consumes-from onto TOOL-dSafePassage-8,
+  which memory hygiene check 12 refused at the landing merge `9f8812d80` because CLOSED
+  TOOL-dSafePassage-8 declares no matching hands-off back, becomes a prose paragraph naming 8 as
+  read and closed. Made by the spec-writer pass of TOOL-dSafePassage-104 S1, as TOOL-dSafePassage-101
+  S1 did for TOOL-dSafePassage-99. The two `external` bullets stay. No other section moves.
 
 ## 10. Reuse audit
 
