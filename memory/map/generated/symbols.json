@@ -15478,6 +15478,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_spec_audit_switch",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_spec_edges",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
@@ -21143,6 +21148,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "run_switch_probe",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_tail_retry",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -26244,6 +26254,11 @@
     },
     {
       "id": "write_su_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_switch_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
     },

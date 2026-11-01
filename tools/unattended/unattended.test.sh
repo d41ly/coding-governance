@@ -2352,7 +2352,8 @@ beat | : | --beat tRun
 overlaps | : | --overlaps
 no conf, rc 2 | rm -f .unattended.conf | --status tRun
 a conf holding declare, rc 2 | printf 'declare LANDER_MODE=\"bogus\"\\n' >> .unattended.conf | --status tRun
-a malformed GATE_BOUND, rc 2 | printf 'GATE_BOUND=\"soon\"\\n' >> .unattended.conf | --status tRun"
+a malformed GATE_BOUND, rc 2 | printf 'GATE_BOUND=\"soon\"\\n' >> .unattended.conf | --status tRun
+a malformed SPEC_FOLD_CUTOFF, rc 2 | printf 'SPEC_FOLD_CUTOFF=\"soon\"\\n' >> .unattended.conf | --status tRun"
 export GIT_AUTHOR_DATE="2026-10-11T00:00:00Z" GIT_COMMITTER_DATE="2026-10-11T00:00:00Z"
 _pt_rows=0; _pt_rc0=0; _pt_rc1=0; _pt_rc2=0
 while IFS='|' read -r _pt_l _pt_s _pt_a; do
@@ -2375,6 +2376,118 @@ same "parity: the rows reach exit 0, 1 and 2" "$_pt_rc0$_pt_rc1$_pt_rc2" "111"
 for _pt_v in $(verbs_all) --overlaps; do
   n=$((n+1)); grep -qE -- "\| *$_pt_v( |\$)" <<< "$PARITY_ROWS" || { echo "FAIL parity: the verb $_pt_v has no row in the parity table"; st=1; }
 done
+
+# ---- TOOL-dFoldedAudit-7 AC7: THE CUTOFF'S SHAPE, read by its text and its status. The table's row
+# ---- compares its two sides alone, so deleting the shape case changes both alike and leaves that row
+# ---- green; these two read the refusal itself. Blank, dated and absent all load.
+_sw_refusal="SPEC_FOLD_CUTOFF is declared as 'soon', which is not an ISO date"
+reset_tree; printf 'SPEC_FOLD_CUTOFF="soon"\n' >> .unattended.conf
+out=$(run --version); rc=$?
+hit "$out" "$_sw_refusal"
+same "AC7 a cutoff that is no date exits 2" "$rc" "2"
+for _sw_line in 'SPEC_FOLD_CUTOFF=""' 'SPEC_FOLD_CUTOFF="2026-11-02"' ''; do
+  reset_tree; printf '%s\n' "$_sw_line" >> .unattended.conf
+  out=$(run --version); rc=$?
+  miss "$out" "$_sw_refusal"
+  same "AC7 a conf line of [$_sw_line] loads" "$rc" "0"
+done
+reset_tree
+
+# ---- TOOL-dFoldedAudit-7 AC8: THE READER STAYS OFF THE VERB PATH, a source read. The loader runs on
+# ---- every verb, so a read there is a Python start on each, and a key reaching `get` through a variable
+# ---- reads as unread to the policy kit's coverage scan. The `hit` is the read's liveness: it holds the
+# ---- case the loader's body ends near, so a range that stopped early cannot pass as a zero.
+_sw_body=$(sed -n '/^load_driver_conf()/,/^}/p' "$SCRIPT")
+hit "$_sw_body" "SPEC_FOLD_CUTOFF is declared as"
+same "AC8 the loader never calls the switch reader" "$(grep -c read_spec_audit_switch <<<"$_sw_body")" "0"
+same "AC8 each of the three keys reaches get as a literal" "$(grep -c 'policy.py" get review.spec-audit\.' "$SCRIPT")" "3"
+
+# ---- TOOL-dFoldedAudit-7 AC1 to AC5 and AC10: THE SPEC-AUDIT SWITCHES' READER, each case over a
+# ---- repository of its own, because the policy reader takes the landed revision and this suite's tree
+# ---- has a remote: with none, it reads the local `main`. The driver runs from a COPY, beside a copy of
+# ---- the policy kit or beside nothing, sitting at the <home> its resolver asks for, held once so no
+# ---- line spells a kit path. The fixture holds budgets.py because `validate` imports it whenever a
+# ---- policy file is committed. The reader's stderr lands in a file, so stdout is the answer alone.
+_sw_home=policy
+_sw_rel=$(resolve_kit_dir "$_rkd_py" "$_sw_home" policy.py "$HERE" 2>/dev/null) || _sw_rel=""
+_sw_tmp=$(mktemp -d)
+write_switch_fixture() { # dir · 1 for the policy kit beside the driver, 0 for none · the policy file's text, or nothing
+  mkdir -p "$1/u"
+  cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$1/u/"
+  printf 'MEMORY_ROOT=memory\n' > "$1/.unattended.conf"
+  if [ "$2" = 1 ]; then
+    mkdir -p "$1/$_sw_home"
+    cp "$_sw_src/policy.py" "$_sw_src/budgets.py" "$_sw_src/catalogue.toml" "$1/$_sw_home/"
+  fi
+  if [ -n "$3" ]; then mkdir -p "$1/.governance"; printf '%s' "$3" > "$1/.governance/policy.toml"; fi
+  ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false && git add -A >/dev/null && git commit -q -m fixture --no-verify )
+}
+run_switch_probe() { # fixture · switch -> the reader's stdout and status, its stderr in $_sw_tmp/err
+  ( cd "$1" && bash -c '. "$1"; load_driver_conf; read_spec_audit_switch "$2"' _ "$1/u/unattended.sh" "$2" ) 2>"$_sw_tmp/err"
+}
+# AC4: with no policy kit each switch takes its kit default and says so. AC10's bad argument sits here
+# too, because the reader's first `case` refuses it before it resolves anything, so no kit is needed.
+write_switch_fixture "$_sw_tmp/n" 0 ""
+_sw_defaults=""
+for _sw_row in disposal:by-nature chain-stop:own-work chain-ceiling:4; do
+  out=$(run_switch_probe "$_sw_tmp/n" "${_sw_row%%:*}"); rc=$?
+  same "AC4 with no policy kit ${_sw_row%%:*} takes the kit default" "$out" "${_sw_row#*:}"
+  same "AC4 ${_sw_row%%:*} exits 0 with no policy kit" "$rc" "0"
+  hit "$(cat "$_sw_tmp/err")" "no policy kit resolves beside this kit"
+  _sw_defaults="$_sw_defaults $out"
+done
+out=$(run_switch_probe "$_sw_tmp/n" bogus); rc=$?
+same "AC10 an argument outside the three exits 1" "$rc" "1"
+hit "$out" "disposal"
+hit "$out" "chain-stop"
+hit "$out" "chain-ceiling"
+if [ -z "$_sw_rel" ]; then
+  n=$((n+23))   # COUNTED EITHER WAY, so the floor grades this suite and not which kits sit beside it
+  echo "  SKIP the spec-audit switch arms over a policy kit: no policy kit resolves beside this one, so nothing answers them; their 23 assertions are counted, not run"
+else
+  _sw_src="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_sw_rel"
+  # AC1 and AC5: with no policy file the reader answers the catalogue's defaults, and those are the
+  # constants an install with no policy kit answers. A gate over the two, because the driver repeats them.
+  write_switch_fixture "$_sw_tmp/k" 1 ""
+  _sw_answers=""
+  for _sw_row in disposal:by-nature chain-stop:own-work chain-ceiling:4; do
+    out=$(run_switch_probe "$_sw_tmp/k" "${_sw_row%%:*}"); rc=$?
+    same "AC1 the catalogue's default for ${_sw_row%%:*}" "$out" "${_sw_row#*:}"
+    same "AC1 ${_sw_row%%:*} exits 0 over the catalogue's default" "$rc" "0"
+    _sw_answers="$_sw_answers $out"
+  done
+  same "AC5 the kit defaults are the catalogue's" "$_sw_answers" "$_sw_defaults"
+  # AC2: a committed file moves all three onto the old rule.
+  mkdir -p "$_sw_tmp/k/.governance"
+  printf '[review.spec-audit]\ndisposal = "promote-all"\nchain-stop = "clean-only"\nchain-ceiling = 2\n' > "$_sw_tmp/k/.governance/policy.toml"
+  ( cd "$_sw_tmp/k" && git add -A >/dev/null && git commit -q -m policy --no-verify )
+  for _sw_row in disposal:promote-all chain-stop:clean-only chain-ceiling:2; do
+    out=$(run_switch_probe "$_sw_tmp/k" "${_sw_row%%:*}"); rc=$?
+    same "AC2 the committed file sets ${_sw_row%%:*}" "$out" "${_sw_row#*:}"
+    same "AC2 ${_sw_row%%:*} exits 0 over the committed file" "$rc" "0"
+  done
+  # AC3: an invalid file in the FIRST commit has no valid revision to fall back to, so it refuses and
+  # never reads a default. Its status crossing the reader's `$(...)` is half of what this holds.
+  write_switch_fixture "$_sw_tmp/f" 1 $'[review.spec-audit]\ndisposal = "fold-all"\n'
+  out=$(run_switch_probe "$_sw_tmp/f" disposal); rc=$?
+  same "AC3 an invalid file with no valid revision exits 1" "$rc" "1"
+  hit "$out" "policy: refused"
+  hit "$out" ".governance/policy.toml"
+  same "AC3 no value line beside the refusal" "$(printf '%s\n' "$out" | grep -cxE 'by-nature|promote-all|fold-all')" "0"
+  # AC10: a catalogue that allows a value this driver does not branch on. The file is now valid, so
+  # `get` answers it and the reader's closed set is what refuses, which the third `hit` tells apart
+  # from a `policy: refused` line that names the same key and value.
+  mutate "$_sw_tmp/f/$_sw_home/catalogue.toml" 's/^allowed = \["by-nature", "promote-all"\]$/allowed = ["by-nature", "promote-all", "fold-all"]/'
+  ( cd "$_sw_tmp/f" && git add -A >/dev/null && git commit -q -m widen --no-verify )
+  out=$(run_switch_probe "$_sw_tmp/f" disposal); rc=$?
+  same "AC10 a value outside the closed set exits 1" "$rc" "1"
+  hit "$out" "review.spec-audit.disposal"
+  hit "$out" "'fold-all'"
+  hit "$out" "outside the closed set this driver branches on"
+  same "AC10 no line is the value alone" "$(printf '%s\n' "$out" | grep -cx 'fold-all')" "0"
+fi
+rm -rf "$_sw_tmp"
 
 # ---- TOOL-aSparedSpawn-6 S8, AC8: THE TOP-LEVEL EXIT ARM. An `exit` the driver runs at top level,
 # ---- outside every function, runs when this suite SOURCES it and ends this shell instead of a call.
@@ -17966,7 +18079,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # the block's own lines; no suite ran, and its RED-first observation is the close's.
 # RAISED 2785 -> 2786 by TOOL-dGroundRules-70: the reader arm's added hop through read_open_passes in
 # region four, one `same`, counted off the block's own lines; no suite ran.
-FLOOR_ASSERTIONS=2786
+# RAISED 2786 -> 2836 by TOOL-dFoldedAudit-7: the cutoff's and the switch reader's arms in region one
+# beside the parity table, one row's 3, AC7's 8, AC8's 3, AC4's 9, AC10's bad argument 4, and 23 over a
+# policy kit, those COUNTED EITHER WAY, counted off the block's own lines; no suite ran, and their
+# RED-first observation is the close's.
+FLOOR_ASSERTIONS=2836
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18103,7 +18220,8 @@ PROLOGUE_ARMS=20
 # RAISED 209 -> 211: the two closing-review guard-sentence arms, see FLOOR_ASSERTIONS.
 # MERGED at the reconcile of local main into origin/main: base 209 + aMendedFleet's 56 + aGraftedHelix's 2 = 267.
 # 267 -> 269 by TOOL-aSparedSpawn-14: one retired run-state arm, three helper arms.
-FLOOR_SHARD_1=269
+# RAISED 269 -> 319 by TOOL-dFoldedAudit-7: the same 50 region-one cutoff and switch assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=319
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.

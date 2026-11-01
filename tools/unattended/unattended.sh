@@ -563,7 +563,7 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI="";
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
-DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; PROMPT_BRIEF_SKELETON_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+DISPOSITION_CUTOFF=""; SPEC_FOLD_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; PROMPT_BRIEF_SKELETON_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
 # is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
@@ -613,6 +613,10 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUT
 #   * PROMPT_BRIEF_SKELETON_CUTOFF (TOOL-aRoutedQuill-7 S5) - the README `opened:` date from which
 #     that brief's sub-heads are the kickoff kit's `--brief-skeleton` at BASE, not the five. Blank is
 #     off, announced; re-read beside PROMPT_BRIEF_CUTOFF, and read only for a record that key grades.
+#   * SPEC_FOLD_CUTOFF (TOOL-dFoldedAudit-7 S4) - the date from which a run takes the rules the three
+#     spec-audit policy keys answer. Blank keeps every run on the old rule. A conf key, unlike
+#     SPEC_COUNTS_CUTOFF, because a kit update must not move an adopter onto a new disposal. This load
+#     grades its shape alone, in the case under RUN_CLAIMS; which runs are past it is check 2's reading.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -673,6 +677,14 @@ case "$RUN_CLAIMS" in
   "") RUN_CLAIMS=off; RUN_CLAIMS_SET="" ;;
   on|off) ;;
   *) echo "unattended: REFUSING - RUN_CLAIMS is declared as '$RUN_CLAIMS', which is outside the closed set 'on off'. A switch that cannot be resolved is a claim policy nobody declared." >&2
+     RUNLOG_CLEAN=1; exit 2 ;;
+esac
+# TOOL-dFoldedAudit-7 S4 - THE SPEC-AUDIT CUTOFF'S SHAPE, refused here because this load runs before any
+# record is read against it and the first refusal must not arrive at a spec exit. A pattern and no
+# spawn, so no verb pays for it. Blank or absent is the old rule and passes.
+case "$SPEC_FOLD_CUTOFF" in
+  ""|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+  *) echo "unattended: REFUSING - SPEC_FOLD_CUTOFF is declared as '$SPEC_FOLD_CUTOFF', which is not an ISO date, and a cutoff nothing can compare grades every run or none." >&2
      RUNLOG_CLEAN=1; exit 2 ;;
 esac
 # `read_bound_key` — a bound key DEFAULTED, VALIDATED and ANNOUNCED — lives in `lib-unattended.sh`,
@@ -1021,6 +1033,13 @@ FOLD_CUTOFF="2026-09-15"
 # reading). Dated by FOLD_CUTOFF's idiom, strictly past the newest record any branch could still
 # write under the old contract: the newest spec-subject `review` row on any ref was 2026-10-05.
 SPEC_COUNTS_CUTOFF="2026-10-06"
+# THE THREE SPEC-AUDIT SWITCHES' KIT DEFAULTS (TOOL-dFoldedAudit-7 S3), which `read_spec_audit_switch`
+# answers when no policy kit resolves. They repeat the catalogue's defaults because a copy-installed
+# kit cannot read a kit that is not there, and the suite's AC5 arm compares the two. File constants
+# assigned after the conf is sourced, so a conf cannot preset them.
+SPEC_AUDIT_DISPOSAL_DEFAULT="by-nature"
+SPEC_AUDIT_CHAIN_STOP_DEFAULT="own-work"
+SPEC_AUDIT_CHAIN_CEILING_DEFAULT="4"
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost"
 # THE HOLD VOCABULARY, a SECOND closed set beside the halt one and never an extension of it. Each
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
@@ -1271,6 +1290,48 @@ print_drift_delta() { # run-state file
   fi
   "$py" "$d/drift_report.py" --delta "$base" HEAD || true
   return 0
+}
+# TOOL-dFoldedAudit-7 S2 - THE SPEC-AUDIT SWITCHES, the driver's ONE reader of the three policy keys.
+# CALLED ON DEMAND and never by `load_driver_conf`, which runs on every verb: a spec exit and the chain
+# verdict are the only readers, so no other verb pays a Python start.
+#
+# IT CARRIES NO `fail`: each caller turns status 1 into its own refusal under its own check number,
+# because `check-arms` finds a branch by its literal number. Only an absent kit reads a default. A
+# `get` that refuses keeps its line, because an invalid file never reads defaults, and a policy kit
+# older than these rows lands there too, its refusal naming the catalogue. A value outside the closed
+# set refuses for LANDER_MODE's reason: one from a newer catalogue must not fall through to a
+# behaviour nobody declared.
+#
+# EACH KEY IS SPELLED ON A LINE OF ITS OWN in the second `case`, because the policy kit's reader
+# coverage greps a literal key on its `get` shape, so a key passed in a variable reads as unread.
+# `$d` is repo-relative, which is sound because `load_driver_conf` has `cd`'d to the root.
+read_spec_audit_switch() { # disposal|chain-stop|chain-ceiling -> the value on stdout; 1 and the refusal on stdout
+  local key def py d out
+  case "${1:-}" in
+    disposal) key=review.spec-audit.disposal; def=$SPEC_AUDIT_DISPOSAL_DEFAULT ;;
+    chain-stop) key=review.spec-audit.chain-stop; def=$SPEC_AUDIT_CHAIN_STOP_DEFAULT ;;
+    chain-ceiling) key=review.spec-audit.chain-ceiling; def=$SPEC_AUDIT_CHAIN_CEILING_DEFAULT ;;
+    *) echo "unattended: read_spec_audit_switch reads disposal, chain-stop or chain-ceiling, and was asked for '${1:-}'."
+       return 1 ;;
+  esac
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "unattended: NOTE - no policy kit resolves beside this kit, so $key takes the kit default '$def'." >&2
+    printf '%s\n' "$def"
+    return 0
+  fi
+  case "$1" in
+    disposal) out=$("$py" "$d/policy.py" get review.spec-audit.disposal 2>&1) ;;
+    chain-stop) out=$("$py" "$d/policy.py" get review.spec-audit.chain-stop 2>&1) ;;
+    chain-ceiling) out=$("$py" "$d/policy.py" get review.spec-audit.chain-ceiling 2>&1) ;;
+  esac || { printf '%s\n' "$out"; return 1; }
+  case "$1:$out" in
+    disposal:by-nature|disposal:promote-all|chain-stop:own-work|chain-stop:clean-only) ;;
+    chain-ceiling:|chain-ceiling:0*|chain-ceiling:*[!0-9]*|disposal:*|chain-stop:*)
+      echo "unattended: $key answered '$out', which is outside the closed set this driver branches on, and a value nobody declared here takes no behaviour."
+      return 1 ;;
+  esac
+  printf '%s\n' "$out"
 }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
