@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-102 — ask 85's two red legs, by the owner's ruling: five fork ceilings raised to their measured counts, three evidence how texts respelled through the prefix token
 
-**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base 4f7ba0a30 · streams tooling · order 16 · closes TOOL-dSafePassage-85
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base 4f7ba0a30 · streams tooling · order 16 · closes TOOL-dSafePassage-85
 
 **Derived:** TOOL-dSafePassage-85
 
@@ -9,8 +9,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-01-prompt-TOOL-dSafePassage-102-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-102-1-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-102-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-102-2-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-102-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-102-audit-fold-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-102-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-102-build-brief.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-102-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-102-spec-brief.md) | research | — |
+| [2026-11-01-review-TOOL-dSafePassage-102-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dSafePassage-102-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -20,16 +23,17 @@ The close's merge bar at `5fe2c7e34` reds two of 75 legs, and both are the recor
 TOOL-dSafePassage-85. The spawn budget reds on five rows of `memory/project/fork-ceilings.txt`. The
 install-prefix leg reds on three rows of `tools/run-gates/ceiling-evidence.txt`. The owner ruled the
 ask on 2026-11-01. This unit carries that ruling into the two records. It raises each of the five
-ceilings to its measured count, and it respells each of the three `--how` texts through the
-`<prefix>/` token. Nothing else in either file moves.
+ceilings to the largest of three counts the build measures, and it respells each of the three
+`--how` texts through the `<prefix>/` token. Nothing else in either file moves.
 
 ## 2. Scope (IN)
 
 - **S1 — the five fork ceilings.** In `memory/project/fork-ceilings.txt`, the rows `run-gates-1leg`,
   `run-gates-2leg`, `memory-hygiene`, `manifest-check` and `check-wiring` each take a ceiling equal
-  to the count the bar measured at `5fe2c7e34`, per §4 "The five rows". Each row's reason field keeps
-  its text and gains one clause. That clause names the owner's ruling on ask TOOL-dSafePassage-85 and
-  the cause the ask states. The `id`, `bash`, `base`, `setup` and `command` fields do not change.
+  to the largest of three readings the build takes with `--only`, inside the band §4 "The five rows"
+  states, or the build halts. Each row's reason field keeps its text and gains one clause. That
+  clause names the owner's ruling on ask TOOL-dSafePassage-85, the three readings, the bar's count
+  and the cause the ask states. The `id`, `bash`, `base`, `setup` and `command` fields do not change.
   Observed by AC1, AC2 and AC3.
 - **S2 — the three evidence how texts.** In `tools/run-gates/ceiling-evidence.txt`, lines 115, 134
   and 146 each change one word in their sixth field, the `--how` text. That word is a kit path
@@ -63,7 +67,9 @@ ceilings to its measured count, and it respells each of the three `--how` texts 
 ## 4. Design
 
 Every line cited here was read at `4f7ba0a30`, the HEAD this spec was written at, on 2026-11-01 on
-node a. The bar log is the close's run at `5fe2c7e34`, copied to
+node a. rev-2 re-read each one at `d0c6ec438`: between the two, `git diff --stat` names no file under
+`tools/` or `memory/project/`, and the build README, `memory/backlog/TOOL.md` and the hygiene engine
+lines rev-2 adds were read there. The bar log is the close's run at `5fe2c7e34`, copied to
 `C:/Users/daily-agent/AppData/Local/Temp/dsp86-logs/bar-5fe2c7e34.log`. Between `5fe2c7e34` and
 `4f7ba0a30`, `git diff --stat` names one file, the build's `RUN.md`, so every finding in the log
 holds at HEAD.
@@ -93,29 +99,54 @@ carry. A respelled row clears install-prefix and keeps every reading. Ask 85 its
 
 ### The five rows
 
-The counter reds a count above its ceiling, and it reds a ceiling more than its margin above its
-count. The margin is `FC_COUNT * 5 / 100`, floored at 3 (`tools/gate-lint/fork-count.sh` line 162).
-A ceiling equal to its count trips neither branch. The counts below are PINNED: the bar measured
-each one at `5fe2c7e34` on node a under bash 5.3 (log lines 43, 55, 67, 79 and 91).
+The counter reds a count above its ceiling (`tools/gate-lint/fork-count.sh` line 163), and it reds
+a ceiling more than its margin above its count (line 167). The margin is `FC_COUNT * 5 / 100`,
+floored at 3 (line 162), so it is computed from the reading being graded. A ceiling C clears a
+reading r when r <= C <= r + max(3, r * 5 / 100), integer division as the counter does it. The bar's
+counts below are PINNED: the bar measured each one at `5fe2c7e34` on node a under bash 5.3 (log
+lines 43, 55, 67, 79 and 91). The ceiling after is not pinned: it is set from the build's readings,
+and the table gives the band it must fall in, from the bar's count to that count plus its margin.
 
-| Row | Line | Ceiling now | Measured at `5fe2c7e34` | Ceiling after | Margin | `base`, unchanged |
+| Row | Line | Ceiling now | Bar's count at `5fe2c7e34` | Margin at that count | Ceiling after, within | `base`, unchanged |
 |---|---|---|---|---|---|---|
-| `run-gates-1leg` | 17 | 55 | 56 | 56 | 3 | 72 |
-| `run-gates-2leg` | 18 | 57 | 58 | 58 | 3 | 97 |
-| `memory-hygiene` | 19 | 189 | 190 | 190 | 9 | 219 |
-| `manifest-check` | 20 | 74 | 76 | 76 | 3 | 108 |
-| `check-wiring` | 21 | 44 | 45 | 45 | 3 | 55 |
+| `run-gates-1leg` | 17 | 55 | 56 | 3 | 56 to 59 | 72 |
+| `run-gates-2leg` | 18 | 57 | 58 | 3 | 58 to 61 | 97 |
+| `memory-hygiene` | 19 | 189 | 190 | 9 | 190 to 199 | 219 |
+| `manifest-check` | 20 | 74 | 76 | 3 | 76 to 79 | 108 |
+| `check-wiring` | 21 | 44 | 45 | 3 | 45 to 48 | 55 |
 
 The two rows the bar printed `ok`, `unattended-status` and `check-unattended`, do not change.
 
+**The build measures each row three times before it edits.** The owner ruled "raise the five fork
+ceilings with evidence", and three readings per row are that evidence. At the build's parent, before
+any edit, the builder runs the leg's checker with `--only <id>` three times for each of the five
+rows, from the repository root under bash 5.3 on node a:
+
+```
+bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt . --only <id>
+```
+
+It records the fifteen readings, each the number after `measured` on the row's verdict line (line
+164 or 171), in the unit's ledger. Scratch-guard row G1 matches an argv equal to a leg's (`tools/hooks/README.md` line
+518), and the spawn budget leg's argv in `tools/gate-legs.json` carries no `--only`, so G1 does not
+refuse these runs.
+
+Each row's ceiling C is the largest of its three readings. The build halts, edits nothing and hands
+the readings back to the main loop when any of the four readings, the three and the bar's count, is
+one C does not clear. That happens when C is below the bar's count, or when C sits more than a
+reading's margin above it, which the stale branch (line 167) would red. So the build never writes a
+number in the owner's name that one of the measured readings would red.
+
 Each reason field keeps its text and gains one clause, appended after a `; `. The clause follows the
-form the file's own raised rows use (line 17), and reads, for `run-gates-1leg`:
+form the file's own raised rows use (line 17), and reads, for `run-gates-1leg` with readings 56, 57
+and 56 as an example:
 
 ```
-raised 55 -> 56 by the owner's ruling on ask TOOL-dSafePassage-85, 2026-11-01, measured 56 by the close's bar at 5fe2c7e34 on node a under bash 5.3: TOOL-dSafePassage-11's inlined resolver probe makes the counter see a fork the old form already spent, the real process count unchanged
+raised 55 -> 57 by the owner's ruling on ask TOOL-dSafePassage-85, 2026-11-01, measured 56, 57 and 56 with --only on node a under bash 5.3 and 56 by the close's bar at 5fe2c7e34, the ceiling the largest of the three: TOOL-dSafePassage-11's inlined resolver probe makes the counter see a fork the old form already spent, the real process count unchanged
 ```
 
-The other four rows substitute their own two numbers. The clause holds no tab, because a row is
+The other four rows substitute their own old ceiling, new ceiling, three readings and bar's count.
+The readings are written in the order they were taken. The clause holds no tab, because a row is
 tab-separated with the reason as its seventh field (fork-ceilings.txt line 4), and the counter
 reads that field as the row's remainder and never grades it (`tools/gate-lint/fork-count.sh`
 line 147).
@@ -123,11 +154,6 @@ line 147).
 The cause is ask 85's diagnosis (`memory/builds/dSafePassage/BACKLOG.md` line 8), and this spec
 does not re-derive it. That the counted fork is one the old form already spent, with the real
 process count unchanged, is UNVERIFIED here. The reason text attributes it to the ask.
-
-**The build re-measures before it edits.** The builder runs the leg's checker once with `--only`
-for each of the five rows at the build's parent, before any edit. A count that differs from the
-table means the tree moved under the ruling. Then the build stops and hands the count back to the
-main loop. It does not write a different number in the owner's name.
 
 ### The three rows
 
@@ -171,9 +197,12 @@ each leg's ceiling still clears its reading: 510 against 253, 740 against 366, a
 
 ### What it does not cover
 
-- Whether a raised ceiling holds on a later run. The `run-gates-2leg` row's own history records a
-  polled reading that varied before TOOL-aSparedSpawn-4 (fork-ceilings.txt line 18). A ceiling set
-  equal to its count has no headroom, by the file's rule, so a reading one higher reds again.
+- Whether a raised ceiling holds on a later run. The `run-gates-2leg` row's own reason says the
+  pool's liveness count on the fork "is what made the polled reading vary before", and that the
+  ceiling was "lowered to the measured 53 plus two, the margin that polled reading still needs"
+  (fork-ceilings.txt line 18). Its last raise set the ceiling to one reading of 57, and
+  the bar read 58. Three readings bound the spread the build sees, not every later run's: a reading
+  above the largest of the three reds again.
 - Any bash version other than 5.3. Every row declares 5.3, and a run under another bash prints the
   counter's NOT MEASURED shape (fork-count.sh line 186).
 - Whether ask 85's diagnosis of the extra fork is right. That is the ask's claim, and S1 records it
@@ -195,7 +224,17 @@ Live at landing, at order 16, before the build lands with TOOL-dSafePassage-61 d
 
 - `memory/project/fork-ceilings.txt` — S1.
 - `tools/run-gates/ceiling-evidence.txt` — S2.
-- The unit's acceptance ledger, under the build's own build-records folder.
+- The unit's acceptance ledger, under the build's own build-records folder, holding the fifteen
+  readings.
+- `memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-102.md` — its Status flips from
+  DEFERRED to CLOSED at the build commit.
+- `memory/builds/dSafePassage/README.md` and `memory/backlog/TOOL.md` — re-rendered by the
+  memory-tree kit's build-index renderer, gen_build_index.py, with its `--write` flag, after the
+  flip. Both are its renders: the README's roster rows for this unit (lines 157 and 244 at
+  `d0c6ec438`) and TOOL.md's row for ask 85 (line 497). The hygiene engine runs the renderer as a
+  drift check (check-memory-hygiene.sh line 1483), so a render left stale reds that leg.
+- RUN.md's `asks-at-landing` token `TOOL-dSafePassage-85=OPEN` (line 12) is the main loop's to move,
+  not this unit's (§3).
 
 ### Alternatives rejected
 
@@ -205,9 +244,16 @@ Live at landing, at order 16, before the build lands with TOOL-dSafePassage-61 d
   out.
 - **`--write --reset` and then `--write --observed` per row.** It moves the date field and deletes
   run records outside the tree (§4 "The three rows").
-- **Each ceiling set with headroom above its count.** Any value above the count by more than the
-  margin reds as stale (fork-count.sh line 162). A value inside the margin but above the count is a
-  number nobody measured. The brief asks for the count.
+- **Each ceiling set to the bar's one count.** That is one reading per row, and the
+  `run-gates-2leg` row's last raise shows one reading is not enough: it was set to 57, and the next
+  bar read 58. The owner asked for evidence, and three readings per row are it.
+- **`run-gates-2leg` at the bar's count plus 2, 60, the row's own precedent (line 18).** 60 sits
+  inside the margin of 3, so it would not red as stale. But the +2 is a margin no run of this tree
+  measured. The audit record offered it beside the measured option, and the fold brief took the
+  measured one for all five rows.
+- **Each ceiling set above its largest reading.** A value more than a reading's margin above it reds
+  as stale (fork-count.sh line 167). A value inside the margin but above every reading is a number
+  no run measured.
 - **Reshaping the resolver probe so the counter sees no extra fork.** The owner did not choose it,
   and §3 rules it out.
 
@@ -218,9 +264,10 @@ Live at landing, at order 16, before the build lands with TOOL-dSafePassage-61 d
 - error / empty / loading states: N/A — no code path changes. A malformed row would be refused by
   the counter's parser by line (fork-count.sh line 126), and AC2 would read that refusal.
 - observability: the ceiling checker's out-of-band line prints the respelled how texts.
-- risks: a ceiling equal to its count has no headroom, so one more fork reds the leg again (§4 "What
-  it does not cover"). A hand-edited evidence row could carry a typo, so AC6 compares the diff word
-  by word.
+- risks: a ceiling equal to the largest of three readings has no headroom above that reading, so a
+  later reading above all three reds the leg again (§4 "What it does not cover"). A hand-edited
+  reason could lose its history, so AC3 compares each row field by field. A hand-edited evidence row
+  could carry a typo, so AC6 compares the diff word by word.
 - testing: AC1 to AC6.
 - migration: N/A — no data or state changes.
 - user docs: N/A — no page under `help/` names either record, checked with `git grep` on 2026-11-01.
@@ -228,12 +275,13 @@ Live at landing, at order 16, before the build lands with TOOL-dSafePassage-61 d
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -v '^#' memory/project/fork-ceilings.txt | cut -f1,3,4` runs from the
-  repository root at the build commit, it prints seven lines. In order, each holds the row id, its
-  ceiling and its base: `unattended-status` 47 57, `check-unattended` 684 709, `run-gates-1leg` 56
-  72, `run-gates-2leg` 58 97, `memory-hygiene` 190 219, `manifest-check` 76 108 and `check-wiring`
-  45 55, tab-separated.
-  Red when: a ceiling stays below its count. At `5fe2c7e34` the spawn budget leg printed, among its
-  lines:
+  repository root at the build commit, it prints seven tab-separated lines. In order, each holds the
+  row id, its ceiling and its base: `unattended-status` 47 57 and `check-unattended` 684 709, as
+  they stand, then `run-gates-1leg`, `run-gates-2leg`, `memory-hygiene`, `manifest-check` and
+  `check-wiring`, with bases 72, 97, 219, 108 and 55 and ceilings within 56 to 59, 58 to 61, 190 to
+  199, 76 to 79 and 45 to 48, the bands §4 "The five rows" tabulates.
+  Red when: a ceiling stays below the bar's count, or sits more than that count's margin above it.
+  At `5fe2c7e34` the spawn budget leg printed, among its lines:
   ```
   fork-count: RED run-gates-1leg · measured 56 · ceiling 55 · delta +1 · base 72 — the sites the most forked subshells first traced at:
   fork-count: RED run-gates-2leg · measured 58 · ceiling 57 · delta +1 · base 97 — the sites the most forked subshells first traced at:
@@ -241,7 +289,9 @@ Live at landing, at order 16, before the build lands with TOOL-dSafePassage-61 d
   fork-count: RED manifest-check · measured 76 · ceiling 74 · delta +2 · base 108 — the sites the most forked subshells first traced at:
   fork-count: RED check-wiring · measured 45 · ceiling 44 · delta +1 · base 55 — the sites the most forked subshells first traced at:
   ```
-  figure: every number is PINNED from the bar at `5fe2c7e34`.
+  figure: the bases, the two unchanged rows and each band's bounds are PINNED from the bar at
+  `5fe2c7e34`. Each new ceiling is DERIVED from the build's three readings, and AC3 grades it
+  against them.
 - **AC2** — When `bash tools/gate-lint/fork-count.sh memory/project/fork-ceilings.txt .` runs from the
   repository root at the build commit under bash 5.3, it exits 0. It prints `fork-count: ok` for
   each of the seven rows, and its summary reads `fork-count: 7 passed · 0 red · 0 skipped — a skipped
@@ -253,17 +303,45 @@ Live at landing, at order 16, before the build lands with TOOL-dSafePassage-61 d
   observation.
   permission: scratch-guard row G1 refuses this argv to a role whose allowlist does not name the
   spawn budget leg.
-- **AC3** — When
-  `git diff -U0 4f7ba0a30 -- memory/project/fork-ceilings.txt | grep -E '^[-+][a-z]' | cut -c2- | cut -f1,2,4-6 | sort | uniq -u`
-  runs from the repository root at the build commit, it prints nothing. When
-  `git diff -U0 4f7ba0a30 -- memory/project/fork-ceilings.txt | grep -E '^\+[a-z]' | cut -f7 | grep -c -F 'TOOL-dSafePassage-85'`
-  runs there, it prints `5`, and the same pipeline counting `TOOL-dSafePassage-11` prints `5`.
-  Red when: a `base`, `setup`, `command`, `bash` or `id` field moves, or a sixth row changes. A
-  moved `base` makes the first pipeline print that row twice, once per side. That was measured on a
-  scratch copy on 2026-11-01, with check-wiring's base moved from 55 to 54. A reason without the
-  ruling makes the count print less than `5`. The rows S1 moves are the five the spawn budget leg
+- **AC3** — Five pipelines over the diff of `memory/project/fork-ceilings.txt` against `4f7ba0a30`
+  run from the repository root at the build commit. The diff holds both sides of every changed line,
+  so it joins each old row to its new row by id, and a row it does not hold is byte-identical.
+  (a) `git diff -U0 4f7ba0a30 -- memory/project/fork-ceilings.txt | grep -cE '^[-+]([^-+a-z]|$)'`
+  prints `0`: no comment line, blank line or other non-row line changed.
+  (b) `git diff -U0 4f7ba0a30 -- memory/project/fork-ceilings.txt | grep -cE '^\+[a-z]'` prints `5`,
+  and the same count over `'^-[a-z]'` prints `5`.
+  (c) `git diff -U0 4f7ba0a30 -- memory/project/fork-ceilings.txt | grep -E '^[-+][a-z]' | cut -c2- | cut -f1 | sort -u`
+  prints exactly `check-wiring`, `manifest-check`, `memory-hygiene`, `run-gates-1leg` and
+  `run-gates-2leg`, one per line.
+  (d) The field join prints nothing. It drops the ceiling, field 3, which AC1 and (e) grade. It keeps
+  the reason, field 7, with only the new clause cut from it, so each new row's other fields and the
+  old reason must match the old row exactly:
+  ```
+  git diff -U0 4f7ba0a30 -- memory/project/fork-ceilings.txt | grep -E '^[-+][a-z]' | cut -c2- | cut -f1,2,4-7 | sed 's/; raised [0-9]* -> [0-9]* by the owner.s ruling on ask TOOL-dSafePassage-85, 2026-11-01, measured .*$//' | sort | uniq -u
+  ```
+  (e) The clause grade prints `5`. For each added row it reads the new ceiling and the clause's
+  numbers, and counts a row whose clause has §4's form and whose ceiling equals the clause's new
+  ceiling, equals the largest of its three readings, is at least the bar's count, and is within the
+  margin of each of the four readings:
+  ```
+  git diff -U0 4f7ba0a30 -- memory/project/fork-ceilings.txt | grep -E '^\+[a-z]' | cut -f3,7 | sed -nE 's/^([0-9]+)\t.* -> ([0-9]+) by the owner.s ruling on ask TOOL-dSafePassage-85, 2026-11-01, measured ([0-9]+), ([0-9]+) and ([0-9]+) with --only on node a under bash 5.3 and ([0-9]+) by the close.s bar at 5fe2c7e34, the ceiling the largest of the three: TOOL-dSafePassage-11.s inlined resolver probe .*$/\1 \2 \3 \4 \5 \6/p' | awk 'function ok(r){m=int(r*5/100); if(m<3)m=3; return $2<=r+m} {x=$3; if($4>x)x=$4; if($5>x)x=$5; if($1==$2 && $2==x && $2>=$6 && ok($3) && ok($4) && ok($5) && ok($6)) n++} END {print n+0}'
+  ```
+  Red when: a sixth row's reason is edited, a reason loses its history, a comment line is edited, a
+  `base`, `setup`, `command`, `bash` or `id` field moves, a clause lands on a sixth row, or a ceiling
+  is not the largest of its readings or falls outside a reading's band. Each was staged on a scratch
+  repository holding the file at `4f7ba0a30`, with S1's edit applied, on 2026-11-01. The unbroken
+  copy printed `0`, `5` and `5`, the five ids, nothing, and `5`. A reason cut down to its last words
+  on `run-gates-1leg` made (d) print that row on each side. ` EDITED` appended to
+  `unattended-status`'s reason made (b) print `6` and `6`, (c) six ids, and (d) the row on each side.
+  An edit to line 13, a comment line of the SHRINK-ONLY header, made (a) print `2`. A clause appended to
+  `unattended-status` made (b) and (c) count six. `check-wiring`'s base moved from 55 to 54 made (d)
+  print the row on each side. A `run-gates-2leg` ceiling one below its largest reading, a
+  `run-gates-1leg` ceiling of 60 over readings 56, 60 and 56, and a ceiling of 55 over readings of 55
+  against the bar's 56 each made (e) print `4`. The rows S1 moves are the five the spawn budget leg
   refused at `5fe2c7e34`, whose summary line read
   `fork-count: 2 passed · 5 red · 0 skipped — a skipped row is not a pass`.
+  What it does not check: that the old ceiling a clause names matches the old row's field 3, and
+  that the readings are the ones the ledger records, which the reader compares.
   fixture: no other commit between `4f7ba0a30` and the build commit edits the file, read with
   `git log` at observation time.
 - **AC4** — When `bash tools/check-install-prefix.sh` runs from the repository root at the build
@@ -342,6 +420,19 @@ none
   token clears install-prefix and keeps every reading, and ask 85 lists hand-respelling as an owner
   option. §4 "The ruling, and the one departure" states the departure. Every cited line was read at
   `4f7ba0a30`.
+- rev-2 · 2026-11-01 · §1 · §4 · §5 · S1 · AC1 · AC3 · folded the round-1 spec audit
+  `memory/builds/dSafePassage/reviews/2026-11-01-review-TOOL-dSafePassage-102-spec-audit-round1.md`
+  from the brief `memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-102-audit-fold-brief.md`.
+  MEDIUM 1 (ids 1, 3, 6), at the skeptics' corrected fix: AC3 joins old and new rows by id through
+  the diff, grades the reason with only the new clause cut, counts changed comment lines at 0 and
+  changed rows at 5 per side, and names the five ids; its staged breaks were run on a scratch copy.
+  MEDIUM 2 (id 2): §4 quotes line 18's own words for `run-gates-2leg`'s history, and the build takes
+  three `--only` readings per row, sets each ceiling to the largest, and halts on a reading that
+  ceiling does not clear, the bar's count included; AC1 grades bands and AC3 (e) grades the clause.
+  "Halting on a reading the bar's own did not bound" is read as the counter's own band, both
+  branches, over the three readings and the bar's count. LOW 3 (id 5): Files touched names the
+  Status flip and the two renders; RUN.md's token stays the main loop's, by §3. Re-read at
+  `d0c6ec438`.
 
 ## 10. Reuse audit
 
