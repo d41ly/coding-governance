@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-1 — the Maintain run as its step checklist: `[[item]]` rows walked in `needs` order by `maintain.py` under the period lease, never a recipe-mode playbook
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 8 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 8 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0442@d7b64b62 whole
 **Carries:** node:item.maintain.lease
@@ -21,6 +21,7 @@
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-4-reuse-scout.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-4-reuse-scout.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-5-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-5-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-fix-brief.md) | research | TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
+| [2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md) | research | — |
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-spec-brief.md) | research | TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
 | [2026-11-01-review-TOOL-dTendedCadence-1-to-18-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dTendedCadence-1-to-18-spec-audit-round1.md) | spec-audit | TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 |
 

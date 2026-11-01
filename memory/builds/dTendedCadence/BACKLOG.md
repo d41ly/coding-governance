@@ -37,3 +37,19 @@
 - SEV · TOOL-dTendedCadence-32 · LOW · `every-node` reads only on the lease holder's node, as `lease-holder` does
 - SEV · TOOL-dTendedCadence-33 · LOW · each retrofit sweep names the build that armed its population as a stand-in origin
 - SEV · TOOL-dTendedCadence-34 · LOW · 14 drift readings pinned at 0 have no pin row once TOOL-dWitnessedBar-16 lands
+- DEFERRED · TOOL-dTendedCadence-19 · until TOOL-dTendedCadence-74 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order carries `closes` for it
+- DEFERRED · TOOL-dTendedCadence-20 · until TOOL-dTendedCadence-3 · TOOL-dTendedCadence-3's build run builds `defer dormant` over dRankedPlan's `--dormant` proposer and owner-gated `dispose`, so TOOL-dTendedCadence-3's header keeps `closes` for this ask
+- DEFERRED · TOOL-dTendedCadence-21 · until TOOL-dTendedCadence-8 · TOOL-dTendedCadence-8's build run renders Maintain's patch intakes, which wait at the owner's breakpoint until dWellOiledMachine ratifies a cadence receipt under a standing-ask value
+- DEFERRED · TOOL-dTendedCadence-22 · until TOOL-dTendedCadence-15 · TOOL-dTendedCadence-15's build run sends `report` through the notification adapter, which needs dWellOiledMachine's sender for a non-owner item
+- DEFERRED · TOOL-dTendedCadence-23 · until TOOL-dTendedCadence-14 · TOOL-dTendedCadence-14's build run probes the diagnose band, which needs dPlacedRequest's `probe.py trigger` to take a cadence target
+- DEFERRED · TOOL-dTendedCadence-24 · until TOOL-dTendedCadence-11 · TOOL-dTendedCadence-11's build run files `repeat` intakes, whose derived README must pass the recipe preflight dPlacedRequest's entry writes for
+- DEFERRED · TOOL-dTendedCadence-25 · until TOOL-dTendedCadence-1 · TOOL-dTendedCadence-1's build run declares Maintain's `[[item]]` rows in the drift-audit kit, which dDeclaredLoop's loop kit must read
+- DEFERRED · TOOL-dTendedCadence-26 · until TOOL-dTendedCadence-18 · TOOL-dTendedCadence-18's build run extracts the signal-leg factory, which TOOL-dMindYourWords-16 must then call rather than copy
+- DEFERRED · TOOL-dTendedCadence-27 · until TOOL-dTendedCadence-1 · TOOL-dTendedCadence-1's build run reads its period from the cadence argv's environment, which dWellOiledMachine's `run_cadence_period` must set
+- DEFERRED · TOOL-dTendedCadence-28 · until TOOL-dTendedCadence-1 · TOOL-dTendedCadence-1's build run walks the item rows inside its argv (deviation 11) until dDeclaredLoop's position engine answers a cadence program
+- DEFERRED · TOOL-dTendedCadence-29 · until TOOL-dTendedCadence-2 · TOOL-dTendedCadence-2's build run registers the `maintain` row under `maintain.cadence`, whose `every-session` value needs dWellOiledMachine's `period-key`
+- DEFERRED · TOOL-dTendedCadence-30 · until TOOL-dTendedCadence-2 · TOOL-dTendedCadence-2's build run registers the `session-start` host, whose readiness needs dWellOiledMachine's `fragment` key
+- DEFERRED · TOOL-dTendedCadence-31 · until TOOL-dTendedCadence-16 · TOOL-dTendedCadence-16's build run takes the commit reading, which needs dWellOiledMachine's `commit_keys.py --check` to take `--repo` and `--default-tip`
+- DEFERRED · TOOL-dTendedCadence-32 · until TOOL-dTendedCadence-16 · TOOL-dTendedCadence-16's build run reads `every-node` on each node, which needs dWellOiledMachine's per-node cadence row
+- DEFERRED · TOOL-dTendedCadence-33 · until TOOL-dTendedCadence-9 · TOOL-dTendedCadence-9's build run files each retrofit sweep as a patch, which needs dPlacedRequest to admit a ledger population as a patch's origin
+- DEFERRED · TOOL-dTendedCadence-34 · until TOOL-dTendedCadence-14 · TOOL-dTendedCadence-14's build run puts band edges on the reading row, and dWitnessedBar must say where a zero pin lives

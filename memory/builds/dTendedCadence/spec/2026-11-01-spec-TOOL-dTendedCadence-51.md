@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-51 — the landing round trip as a drift-audit arm: walk, intake and landing on another clone under another home, the landed record byte-equal
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

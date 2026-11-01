@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-66 — the record push's fixture runs with the tracked hooks installed, and a lander's marker leaves its three verdict files intact
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 22 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 22 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

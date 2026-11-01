@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-2 — the cadence: Maintain's row on Runtime's hosts, its period, its event runs and the session-start host
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 18 · closes TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 18 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0443@06da9bab whole
 **Carries:** node:policy-key.maintain.host

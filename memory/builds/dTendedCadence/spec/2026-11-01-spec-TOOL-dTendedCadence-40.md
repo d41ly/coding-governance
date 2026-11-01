@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-40 — the `dead-path carriers` leg judges its served-text record as gateable, while the report's copy stays report-only
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 11 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 11 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

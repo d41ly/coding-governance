@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-52 — the security review's record lands through the one landing seam, so a `security-` landing is the same four lines a period landing is
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

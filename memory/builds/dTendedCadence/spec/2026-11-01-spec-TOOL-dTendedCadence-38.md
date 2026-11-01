@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-38 — the `[[reading]]` key `route` and its closed value set `ask | patch | file`, owned once by the registry's check
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

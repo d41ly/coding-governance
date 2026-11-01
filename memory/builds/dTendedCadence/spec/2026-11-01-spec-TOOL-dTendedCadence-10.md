@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-10 — the maintainer's definition, registered through the observability layer's contract
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 1 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 1 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0451@8cb0a7a7 whole
 

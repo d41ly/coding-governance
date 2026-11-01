@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-67 — the record payload's tree built through a scratch index over an unfiltered blob, so a nested path builds and both digests cover one byte string
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

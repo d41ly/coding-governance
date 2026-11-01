@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-35 — the maintenance record's key class: every family a sibling mints, one anchored pattern each, held at the write boundary
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

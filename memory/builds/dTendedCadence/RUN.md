@@ -19,20 +19,20 @@ hold-code: host-owner-action
 held-from: REVIEWING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: d85b4e77e36e462c11df1a5e365bf47dcae3f490
-phase: HELD
+witness: 62118c754c50207c374eee524a398448b30f1d44
+phase: REVIEWING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dtendedcadence-e82dac
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-11-01T07:34:01Z
+lease-utc: 2026-11-01T16:43:28Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 21568
 session: d0ebabbc-fb8a-4ad6-a3f0-13d769046272
-keepalive: 90e760c8
+keepalive: 26230954
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 anchor-ref: refs/heads/main
@@ -129,3 +129,121 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T16:40:06Z decision · item The spec-audit chain does not converge: high finding ids ran 13, 5 (with 5 blockers), 14 over three rounds (precision 1.00, 0.94, 0.91), and round 3's highs land mostly on the record transport round 2's promotions added (units 49 to 52: the parentless record commit under refs/gov/maintain-record/<key>, its claim guards, git mktree, the remote rule, the landing grammar), with 15 promotions (TOOL-dTendedCadence-60 to -74) still unaudited and 58 units in the roster. Keep auditing, stop the chain as for dIndexedDesign, dLinkedLibrary and dMindYourWords, or re-scope? · reason options (a) round 4 over units 60 to 74, about 1h10m and 2M subagent tokens a round, each round promoting 11 to 15 units; (b) stop as for dIndexedDesign, dLinkedLibrary and dMindYourWords: units 60 to 74 close under a recorded specs-audited override, closing-review-recorded overridden with the audit chain as this spec-only diff's review, every unit deferred to the build run, the run closes and lands; (c) re-scope the record-transport units 49 to 52 and their promotions. Refused to choose: the owner's standing rule stops a chain without asking only at a round confirming no BLOCKER and no HIGH, M4 ends it only below the precision floor, neither is in reach, and the owner ruled each sibling in this state from a hold
 
 2026-11-01T16:40:51Z hold · item host-owner-action · reason until owner · reaped 90e760c8 · resume none(owner)
+
+2026-11-01T16:43:33Z resume · item dTendedCadence · reason held · keepalive 26230954 · manual
+
+2026-11-01T16:44:39Z rescope · item defer TOOL-dTendedCadence-1 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:40Z rescope · item defer TOOL-dTendedCadence-10 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:42Z rescope · item defer TOOL-dTendedCadence-11 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:44Z rescope · item defer TOOL-dTendedCadence-12 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:46Z rescope · item defer TOOL-dTendedCadence-13 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:48Z rescope · item defer TOOL-dTendedCadence-14 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:49Z rescope · item defer TOOL-dTendedCadence-15 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:51Z rescope · item defer TOOL-dTendedCadence-16 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:53Z rescope · item defer TOOL-dTendedCadence-17 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:56Z rescope · item defer TOOL-dTendedCadence-18 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:57Z rescope · item defer TOOL-dTendedCadence-2 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:44:59Z rescope · item defer TOOL-dTendedCadence-3 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:01Z rescope · item defer TOOL-dTendedCadence-35 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:03Z rescope · item defer TOOL-dTendedCadence-36 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:05Z rescope · item defer TOOL-dTendedCadence-37 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:07Z rescope · item defer TOOL-dTendedCadence-38 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:09Z rescope · item defer TOOL-dTendedCadence-39 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:13Z rescope · item defer TOOL-dTendedCadence-4 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:15Z rescope · item defer TOOL-dTendedCadence-40 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:17Z rescope · item defer TOOL-dTendedCadence-41 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:19Z rescope · item defer TOOL-dTendedCadence-42 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:21Z rescope · item defer TOOL-dTendedCadence-43 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:23Z rescope · item defer TOOL-dTendedCadence-44 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:25Z rescope · item defer TOOL-dTendedCadence-45 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:26Z rescope · item defer TOOL-dTendedCadence-46 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:28Z rescope · item defer TOOL-dTendedCadence-47 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:30Z rescope · item defer TOOL-dTendedCadence-48 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:31Z rescope · item defer TOOL-dTendedCadence-49 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:33Z rescope · item defer TOOL-dTendedCadence-5 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:35Z rescope · item defer TOOL-dTendedCadence-50 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:36Z rescope · item defer TOOL-dTendedCadence-51 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:38Z rescope · item defer TOOL-dTendedCadence-52 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:40Z rescope · item defer TOOL-dTendedCadence-53 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:41Z rescope · item defer TOOL-dTendedCadence-54 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:43Z rescope · item defer TOOL-dTendedCadence-55 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:44Z rescope · item defer TOOL-dTendedCadence-56 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:46Z rescope · item defer TOOL-dTendedCadence-57 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:48Z rescope · item defer TOOL-dTendedCadence-58 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:49Z rescope · item defer TOOL-dTendedCadence-59 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:51Z rescope · item defer TOOL-dTendedCadence-6 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:53Z rescope · item defer TOOL-dTendedCadence-60 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:54Z rescope · item defer TOOL-dTendedCadence-61 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:56Z rescope · item defer TOOL-dTendedCadence-62 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:57Z rescope · item defer TOOL-dTendedCadence-63 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:45:59Z rescope · item defer TOOL-dTendedCadence-64 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:00Z rescope · item defer TOOL-dTendedCadence-65 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:02Z rescope · item defer TOOL-dTendedCadence-66 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:05Z rescope · item defer TOOL-dTendedCadence-67 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:07Z rescope · item defer TOOL-dTendedCadence-68 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:09Z rescope · item defer TOOL-dTendedCadence-69 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:11Z rescope · item defer TOOL-dTendedCadence-7 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:13Z rescope · item defer TOOL-dTendedCadence-70 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:14Z rescope · item defer TOOL-dTendedCadence-71 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:16Z rescope · item defer TOOL-dTendedCadence-72 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:17Z rescope · item defer TOOL-dTendedCadence-73 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:19Z rescope · item defer TOOL-dTendedCadence-74 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:20Z rescope · item defer TOOL-dTendedCadence-8 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T16:46:22Z rescope · item defer TOOL-dTendedCadence-9 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run

@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-69 — the landing asks the remote which payload its record ref names on every run, whether or not the payload object is local
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 22 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 22 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

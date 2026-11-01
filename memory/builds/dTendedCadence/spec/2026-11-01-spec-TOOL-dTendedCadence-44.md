@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-44 — the retrofit sweep's offender key carries only its target's identity, so an unchanged target recurs instead of filing a new sweep each period
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 16 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 16 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-48 — the round-1 spec audit's 40 minors, batched: run scopes and criteria that can pass, stable filing keys, one policy adapter, committed recurrence, and the carriers each unit owes
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 20 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 20 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

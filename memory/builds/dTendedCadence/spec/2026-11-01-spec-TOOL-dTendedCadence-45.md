@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-45 — a cyclic playbook's repeat intake text carries no period, so an open cycle recurs instead of stacking a second build
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 17 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 17 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

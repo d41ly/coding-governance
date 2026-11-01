@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-49 — the written maintenance record carried unchanged to its landing, a parentless commit pushed under `refs/gov/maintain-record/<key>` and named by the landing intake
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

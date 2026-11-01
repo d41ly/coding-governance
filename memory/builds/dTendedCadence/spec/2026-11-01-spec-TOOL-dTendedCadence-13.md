@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-13 — the recurring security review over each period's landed range
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 17 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 17 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0454@3bb6c0f8 whole
 **Carries:** node:policy-key.maintain.security-review

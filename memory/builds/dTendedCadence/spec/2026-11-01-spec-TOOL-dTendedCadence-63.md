@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-63 — a drift-audit selftest case derives the record's route set from the shipped kit descriptor, never a planted copy
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 5 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 5 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

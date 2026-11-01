@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-59 — the round-1 spec audit of units 35 to 48, its 40 minors batched: one landing grammar for every family, ask texts that stay their own, a scaffold that unwires the old hook, criteria with lower bounds, and the prose the siblings miscite
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 22 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 22 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

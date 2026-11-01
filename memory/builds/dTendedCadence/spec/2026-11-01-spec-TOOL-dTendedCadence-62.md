@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-62 — unit 15's breach route spells the red leg's hold `red-leg` in its route list, its S3 and its diagram
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 5 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 5 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

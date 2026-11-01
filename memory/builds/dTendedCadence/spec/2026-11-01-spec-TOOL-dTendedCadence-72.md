@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-72 — the close's "every carrier" version criterion reads its population from govkit's registry, never a glob over `tools/*/kit.toml`
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 23 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 23 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

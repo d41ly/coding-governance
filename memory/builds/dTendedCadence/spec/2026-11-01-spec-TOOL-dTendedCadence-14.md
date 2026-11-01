@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-14 — reading bands: log, diagnose read-only or act, by a reading's deviation from its pin
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 5 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 5 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0455@238dcec0 whole
 **Carries:** node:policy-key.maintain.tiers

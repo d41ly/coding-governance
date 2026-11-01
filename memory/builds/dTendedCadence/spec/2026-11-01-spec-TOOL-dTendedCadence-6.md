@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-6 — the maintenance record and the run record written by the journal reader
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0447@d34b1bee whole
 **Carries:** node:item.maintain.record

@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-42 — the adopter instructions follow `PRODUCT_GLOBS` to `tools/loop/flow_layer.py`, from a Readers list built over the whole tree
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling+deployer · order 7 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling+deployer · order 7 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

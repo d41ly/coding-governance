@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-17 — the interpreter floor's end-of-life reading, filing an intake six months before it as `maintain.interpreter-eol` says
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 13 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 13 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0457@2214ebfb whole
 

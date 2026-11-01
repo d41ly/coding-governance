@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-68 — the record's push and the landing's fetch resolve their remote through drift-audit's own remote ladder, never a second exactly-one rule
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

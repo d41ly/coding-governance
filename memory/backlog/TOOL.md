@@ -570,22 +570,22 @@ Cite ids, never line numbers.
 | [TOOL-dSpentCeiling-8](../builds/dSpentCeiling/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | THE FULL BAR IS NONDETERMINISTIC UNDER ITS OWN CONCURRENCY, on at least… |
 | [TOOL-dSweptBranches-22](../builds/dSweptBranches/BACKLOG.md) | OPEN | LOW | — | 2026-10-13 | two staged-set readers read a merge of the default branch as additions… |
 | [TOOL-dSweptBranches-25](../builds/dSweptBranches/BACKLOG.md) | OPEN | HIGH | — | 2026-10-13 | held red: suite process-monitor census selftest red at 37200355 on the… |
-| [TOOL-dTendedCadence-19](../builds/dTendedCadence/BACKLOG.md) | SPECCED | MED | TOOL-dTendedCadence-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [TOOL-dTendedCadence-20](../builds/dTendedCadence/BACKLOG.md) | SPECCED | LOW | TOOL-dTendedCadence-3 | 2026-10-26 | THE SAFE FIX defer dormant HAS ITS TWO HALVES IN dRankedPlan. v2:1321… |
-| [TOOL-dTendedCadence-21](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | A CADENCE INTAKE NEVER BECOMES A BUILD. TOOL-dWellOiledMachine-27 S3… |
-| [TOOL-dTendedCadence-22](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | NO SENDER TAKES A NON-OWNER ITEM. TOOL-dWellOiledMachine-48 S7 sends… |
-| [TOOL-dTendedCadence-23](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | PROBE.TRIGGER HAS NO CADENCE TARGET. TOOL-dPlacedRequest-7 S3 requires… |
-| [TOOL-dTendedCadence-24](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | A REPEAT BUILD'S DERIVED README FAILS THE RECIPE PREFLIGHT.… |
-| [TOOL-dTendedCadence-25](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | THE LOOP KIT READS NO EXPANSION'S ITEM ROWS. read_items reads only the… |
-| [TOOL-dTendedCadence-26](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | THE FIRST SIGNAL MOVE KEEPS ITS OWN COPY. TOOL-dTendedCadence-18… |
-| [TOOL-dTendedCadence-27](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | A CADENCE ARGV CANNOT TELL WHICH PERIOD IT RUNS. run_cadence_period… |
-| [TOOL-dTendedCadence-28](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | THE POSITION ENGINE IS KEYED BY BUILD ONLY. position.py answers a… |
-| [TOOL-dTendedCadence-29](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | A CADENCE ROW CANNOT TAKE ITS PERIOD FROM A KEY, AND NO PERIOD IS A… |
-| [TOOL-dTendedCadence-30](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | A HOST'S READINESS DOES NOT FOLLOW ITS HOOK. check_host_row refuses a… |
-| [TOOL-dTendedCadence-31](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | THE COMMIT-KEY CHECK TAKES NO REPO OR TIP. commit_keys.py --check reads… |
-| [TOOL-dTendedCadence-32](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | A CADENCE ROW RUNS ONCE PER PERIOD ACROSS ALL NODES. The period lease… |
-| [TOOL-dTendedCadence-33](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | A PATCH MUST NAME A TERMINAL BUILD. TOOL-dPlacedRequest-4's patch fact… |
-| [TOOL-dTendedCadence-34](../builds/dTendedCadence/BACKLOG.md) | OPEN | LOW | — | 2026-11-01 | A ZERO PIN HAS NO LEDGER ROW. TOOL-dWitnessedBar-13's ledger rows… |
+| [TOOL-dTendedCadence-19](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | MED | TOOL-dTendedCadence-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dTendedCadence-20](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-3 | 2026-10-26 | THE SAFE FIX defer dormant HAS ITS TWO HALVES IN dRankedPlan. v2:1321… |
+| [TOOL-dTendedCadence-21](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-8 | 2026-11-01 | A CADENCE INTAKE NEVER BECOMES A BUILD. TOOL-dWellOiledMachine-27 S3… |
+| [TOOL-dTendedCadence-22](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-15 | 2026-11-01 | NO SENDER TAKES A NON-OWNER ITEM. TOOL-dWellOiledMachine-48 S7 sends… |
+| [TOOL-dTendedCadence-23](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-14 | 2026-11-01 | PROBE.TRIGGER HAS NO CADENCE TARGET. TOOL-dPlacedRequest-7 S3 requires… |
+| [TOOL-dTendedCadence-24](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-11 | 2026-11-01 | A REPEAT BUILD'S DERIVED README FAILS THE RECIPE PREFLIGHT.… |
+| [TOOL-dTendedCadence-25](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-1 | 2026-11-01 | THE LOOP KIT READS NO EXPANSION'S ITEM ROWS. read_items reads only the… |
+| [TOOL-dTendedCadence-26](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-18 | 2026-11-01 | THE FIRST SIGNAL MOVE KEEPS ITS OWN COPY. TOOL-dTendedCadence-18… |
+| [TOOL-dTendedCadence-27](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-1 | 2026-11-01 | A CADENCE ARGV CANNOT TELL WHICH PERIOD IT RUNS. run_cadence_period… |
+| [TOOL-dTendedCadence-28](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-1 | 2026-11-01 | THE POSITION ENGINE IS KEYED BY BUILD ONLY. position.py answers a… |
+| [TOOL-dTendedCadence-29](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-2 | 2026-11-01 | A CADENCE ROW CANNOT TAKE ITS PERIOD FROM A KEY, AND NO PERIOD IS A… |
+| [TOOL-dTendedCadence-30](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-2 | 2026-11-01 | A HOST'S READINESS DOES NOT FOLLOW ITS HOOK. check_host_row refuses a… |
+| [TOOL-dTendedCadence-31](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-16 | 2026-11-01 | THE COMMIT-KEY CHECK TAKES NO REPO OR TIP. commit_keys.py --check reads… |
+| [TOOL-dTendedCadence-32](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-16 | 2026-11-01 | A CADENCE ROW RUNS ONCE PER PERIOD ACROSS ALL NODES. The period lease… |
+| [TOOL-dTendedCadence-33](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-9 | 2026-11-01 | A PATCH MUST NAME A TERMINAL BUILD. TOOL-dPlacedRequest-4's patch fact… |
+| [TOOL-dTendedCadence-34](../builds/dTendedCadence/BACKLOG.md) | DEFERRED | LOW | TOOL-dTendedCadence-14 | 2026-11-01 | A ZERO PIN HAS NO LEDGER ROW. TOOL-dWitnessedBar-13's ledger rows… |
 | [TOOL-dThriftyLanding-7](../builds/dThriftyLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | unattended kit gate costs 222 s standalone on node d and reads every… |
 | [TOOL-dTieredTribunal-4](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | the args-must-be-an-object guard is not ported into the two drift-audit… |
 | [TOOL-dTieredTribunal-6](../builds/dTieredTribunal/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-26 | The RECLASSIFICATION that created this row was ratified 2026-08-26… |

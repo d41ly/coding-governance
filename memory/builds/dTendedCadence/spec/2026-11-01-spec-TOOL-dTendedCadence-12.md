@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-12 — bundle members whose code moved under an unchanged head line, and the body-moved test extracted at its second caller
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 12 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 12 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0453@42f1bc0c whole
 

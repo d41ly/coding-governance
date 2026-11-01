@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-4 — reading admission: an ownerless or pinless reading refused at registration, or reported unowned
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 4 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 4 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0445@768c9f5b whole
 **Carries:** node:policy-key.maintain.reading-admission

@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-9 — `maintain.retrofit-heat`: the share of reads on untouched legacy, each period's sweep filed as a patch build under `retrofit.cadence: hot-first`, and the progress cell's share of reads
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 15 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 15 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0450@ff08f57f whole
 

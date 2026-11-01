@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-16 — four readings over what one node and its pushes leave behind, each filed as an ask and never a bar or push leg, read on the nodes `maintain.node-readings` names
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0456@a3633e7f whole
 

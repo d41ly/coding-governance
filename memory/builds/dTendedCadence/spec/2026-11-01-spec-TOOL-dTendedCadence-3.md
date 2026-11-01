@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-3 — the safe-fix set: `maintain.fixes` read as a literal set, each fix routed direct, patch or owner-gated, and `maintain.direct` reaping and pruning
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 9 · advances TOOL-dTendedCadence-19 · closes TOOL-dTendedCadence-20
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 9 · advances TOOL-dTendedCadence-19 · closes TOOL-dTendedCadence-20
 
 **Carries:** cl-dClosedLoop-0444@f4079d73 whole
 **Carries:** node:policy-key.maintain.fixes

@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-5 — map freshness on the caller map, each stale dossier one keyed `regenerate stale` patch
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 11 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 11 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0446@617f13e8 whole
 

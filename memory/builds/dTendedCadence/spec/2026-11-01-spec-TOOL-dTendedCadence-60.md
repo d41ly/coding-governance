@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-60 — unit 1's item rows route `red-leg`, `pending`, `declined` and `refused` to the record, so the derived route set holds what the walk returns
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 5 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-1 · base f4597719 · streams tooling · order 5 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 

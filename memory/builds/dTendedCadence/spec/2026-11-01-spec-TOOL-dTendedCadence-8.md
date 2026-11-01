@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-8 — Maintain's readings registered by layer, keyed, and filed as patch intakes, with event runs keyed by event
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0449@503e50af whole
 **Carries:** node:item.maintain.patch

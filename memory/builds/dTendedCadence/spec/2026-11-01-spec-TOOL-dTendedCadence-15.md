@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-15 — `maintain.file`: an offender over its pin filed as an ask, held by a red leg, or reported, as `maintain.on-breach` says
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 7 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 7 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0509@9b0389cc whole
 **Carries:** node:policy-key.maintain.on-breach

@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-73 — the role counts govkit's selftest and the runbook state are derived from the roles kit, so an eleventh role reds nothing it did not change
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 23 · advances TOOL-dTendedCadence-19
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 23 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 
