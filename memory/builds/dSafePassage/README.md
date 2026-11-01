@@ -254,12 +254,12 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-94 — the round-5 closing review's two minors: the floor stub's fallback read in process, and each stand-in shape run from its own source](spec/2026-11-01-spec-TOOL-dSafePassage-94.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 456 bound to this build, across 4 record folder(s).
+Records: 457 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65
-TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-94.
+TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71.
 
 Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-15@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1
 TOOL-dSafePassage-19@rev-1 TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1
