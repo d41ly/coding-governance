@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-100 — arm 37's count runs the resolved launcher with no `python3` default, and skips naming what is not covered when none resolved
 
-**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 17 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 17 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-82
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-11-01-prompt-TOOL-dSafePassage-100-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-100-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-100-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-100-spec-brief.md) | research | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md) | research | TOOL-dSafePassage-99 |
+| [2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-99 |
 
 <!-- /gen:spec-records -->
 
@@ -103,6 +105,8 @@ its two `ok — 37` lines. On a host where none resolves, it prints one `skip �
 ### Files touched (estimate)
 
 - `tools/push-main.test.sh`
+- `memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-100-ledger.md` — the
+  acceptance ledger.
 
 ### Alternatives rejected
 
@@ -167,7 +171,7 @@ its two `ok — 37` lines. On a host where none resolves, it prints one `skip �
 
 ## 7. Gates
 
-`python resolver (behaviour + inline parity + idiom ban)` · `push-main self-test` · `foreign-prefix parity (every self-test at three prefixes)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`python resolver (behaviour + inline parity + idiom ban)` · `push-main self-test` · `foreign-prefix parity (every self-test at three prefixes)` · `recall floor arms` · `recall floor` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/push-main.test.sh · covers AC4 · arm 37's derived-count block in a suite copy whose `_py_arms=` line assigns the empty string prints its `skip — 37 ... NOT covered` line and no `FAIL — 37` line; staged red by a copy whose guard lacks `[ -n "$_py_arms" ]`, which prints two `FAIL — 37` lines · none
 
@@ -178,10 +182,13 @@ observes it green once this unit lands. Arm 37's guard does move, which changes 
 with an empty launcher, and only a run shows that. That is the one `New arm:` line. TOOL-dSafePassage-46
 and -58 declared one each for their own changes to the same guard and skip.
 
-The touched path trips only the `{prefix}/` guard, which twelve legs carry, so the spec-token join
-drops it as broad (`BROAD_LEG_FLOOR = 5`, `tools/check-spec-tokens.py:368`), read on 2026-11-01. The
-leg line names the resolver leg that reds, the lander suite's own leg, and the leg that runs it at
-three prefixes, beside the two that grade this spec.
+The lander suite's path trips only the `{prefix}/` guard, which twelve legs carry, so the
+spec-token join drops it as broad (`BROAD_LEG_FLOOR = 5`, `tools/check-spec-tokens.py:368`), read on
+2026-11-01. The acceptance ledger's `memory/` path trips `recall floor` and `recall floor arms`.
+Both were printed by `python tools/check-spec-tokens.py --legs-for` over the full write set on
+2026-11-01. The leg line names the resolver leg that reds, the lander suite's own leg, the leg that
+runs it at three prefixes, the two recall legs the ledger trips, and the two that grade this spec
+and its ledger.
 
 ## 8. Open questions
 
@@ -201,6 +208,12 @@ none
   TOOL-dSafePassage-82 at `5fe2dab8e` renamed the variable to `_py_arms`, writing line 1409 as it
   reads today. The ban's parameter-default shape predates both, at `8c53af8f1`. Why the bar did not
   red at either landing is UNVERIFIED.
+- rev-2 · 2026-11-01 · §4 · §7 · folded the round-1 spec audit
+  `memory/builds/dSafePassage/reviews/2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md`
+  from the brief `memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md`.
+  LOW 3 (id 2): §4's Files touched now lists the acceptance ledger, and §7's leg line names
+  `recall floor` and `recall floor arms`, which the ledger's `memory/` path trips. Re-checked with
+  `python tools/check-spec-tokens.py --legs-for` over both paths on 2026-11-01, at `6414e1dc6`.
 
 ## 10. Reuse audit
 

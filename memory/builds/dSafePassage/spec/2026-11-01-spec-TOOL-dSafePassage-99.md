@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process
 
-**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 17 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 17 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-87
 
@@ -9,7 +9,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-01-prompt-TOOL-dSafePassage-99-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-1-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-99-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-2-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md) | research | TOOL-dSafePassage-100 |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-spec-brief.md) | research | — |
+| [2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-100 |
 
 <!-- /gen:spec-records -->
 
@@ -19,8 +22,9 @@ TOOL-dSafePassage-87 AC6 loads a staged copy of the step module in process, and 
 `load_govkit()` puts the copy's engine into `sys.modules["govkit"]`. From then on
 `govkit_module()` answers that copy, so `check_upgrade_steps` crashes at its `[dSP-72]` arms and the
 `govkit selftest` leg reds at HEAD. This unit fixes it once, in `govkit_module()`, which holds the
-engine at `GOVKIT` and re-binds the module table to it on every call. Every other reader of the
-engine in the suite routes through that function, and one arm holds both.
+engine at `GOVKIT` and re-binds the module table to it on every call. After it no import
+statement in the suite names `govkit`, so every engine import goes through that function, and one
+arm holds both. The one by-path load of the engine left in place is named in S2.
 
 ## 2. Scope (IN)
 
@@ -29,14 +33,18 @@ engine in the suite routes through that function, and one arm holds both.
   by path under the name `govkit`. Every call then re-binds `sys.modules["govkit"]` to the held
   engine and `sys.modules["upgrade_steps"]` to that engine's own `upgrade_steps`, and returns the
   held engine (§4 "The held engine"). This closes the review item id 1. Observed by AC1 and AC2.
-- **S2** — every other reader of the engine in the govkit selftest routes through
-  `govkit_module()`. These are the three helpers `govkit_steps`, `govkit_kind_marks` and
-  `govkit_update_role`, and the six in-function imports in `main` (§4 "Inventory"). After it, no
-  statement in the file imports `govkit` by name. Observed by AC3.
-- **S3** — the regression arm, review item id 2: three `[dSP-99]` checks at the end of
+- **S2** — no import statement in the govkit selftest names `govkit`. The nine that did now read
+  `govkit_module()`: the three helpers `govkit_steps`, `govkit_kind_marks` and
+  `govkit_update_role`, and the six in-function imports in `main` (§4 "Inventory"). One by-path
+  load of the engine is left in place: `govkit_mod` at selftest.py:9764-9766. It never binds a
+  copy's step module (govkit.py:125-128), and after S1 it reuses the held one. It reads only
+  `LANDABLE_ROLES`, `ROLE_KINDS` and `KIND_MARKS` (selftest.py:9767-9770). Observed by AC3.
+- **S3** — the regression arm, review item id 2: four `[dSP-99]` checks at the end of
   `check_staged_copies` (§4 "The arm"). They load a staged copy in process, call its
   `load_govkit()`, and assert that `govkit_module()` then answers the engine at `GOVKIT`. The third
-  check grades S2's class over the file's own syntax tree. Observed by AC2.
+  check grades S2's import statements over the file's own syntax tree, and reads no by-path load.
+  The fourth asserts that the held step module's own `load_govkit()` answers the held engine once
+  `govkit_module()` has re-bound the table. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -58,8 +66,9 @@ engine in the suite routes through that function, and one arm holds both.
 
 ## 4. Design
 
-Every line cited here was read at `f519c1934`, the HEAD this spec was written at. Every
-measurement below was made on 2026-11-01 on node a.
+Every line cited here was read at `f519c1934`, the HEAD this spec was written at, and re-read at
+`6414e1dc6` for rev-2, where `tools/` is unchanged. Every measurement below was made on 2026-11-01
+on node a.
 
 ### The mechanism
 
@@ -117,8 +126,9 @@ The first-call load follows the identity test and the by-path load that `load_go
 (upgrade_steps.py:2683-2692), against the suite's own `GOVKIT` (selftest.py:155). The
 `sys.path.insert` stays, because the function inserted the kit directory before this unit. The
 `upgrade_steps` re-bind keeps the pair that `load_upgrade_steps` documents as one class
-(govkit.py:116-124). A later by-path load of the engine, such as `govkit_mod` at
-selftest.py:9764-9766, then reuses the real step module and not a copy's.
+(govkit.py:116-124). The one by-path load S2 leaves, `govkit_mod` at selftest.py:9764-9766, then
+reuses the held step module and never a copy's, because `load_upgrade_steps` takes the cached step
+module only when its file is the one beside the engine (govkit.py:125-128).
 
 `GOVKIT` is assigned on the line after the function (selftest.py:155). The name is read only when
 the function is called, so the order does not matter.
@@ -140,11 +150,16 @@ At the end of `check_staged_copies` (selftest.py:3663), after its `[dSP-71]` che
 5. Check 3: over `_ast.parse(own)`, the line numbers of every `Import` node naming `govkit` and every
    `ImportFrom` node whose module is `govkit` form the empty list. `own` is the file text the
    function already reads.
+6. Check 4: `held99.upgrade_steps.load_govkit() is held99`, called after check 2's
+   `govkit_module()`. A comment above it states the window it bounds: before that re-bind the same
+   call finds `copy99` in the table, whose file is not the `govkit.py` beside the step module, and
+   loads a third engine by path (upgrade_steps.py:2683-2692).
 
 Each label carries `[dSP-99]`, and no label or docstring line opens with an import of `govkit`, so
 AC3's grep reads only statements. Under the break, the old `import govkit` body of
-`govkit_module()`, check 1 stays green, while check 2 reds because the call answers the copy and
-check 3 reds on the import inside `govkit_module()`.
+`govkit_module()`, check 1 stays green. Check 2 reds because the call answers the copy, check 3 reds
+on the import inside `govkit_module()`, and check 4 reds because nothing re-bound the table, so the
+step module loads a third engine.
 
 ### What it does not cover
 
@@ -155,6 +170,21 @@ at `f519c1934`. The suite first imports `step_gate` inside `check_update_safety`
 selftest.py:5663. The import of `govkit` in `upgrade_walk.py` sits inside a function
 (upgrade_walk.py:94), and `main` calls `govkit_module()` on the line after it imports that module
 (selftest.py:19777-19778). The arm does not grade this case.
+
+The held step module's own `load_govkit()` opens the same window by a second path. It returns the
+cached `govkit` only when that module's file is the `govkit.py` beside it, and otherwise loads a
+fresh engine by path, with its own `Refusal` (upgrade_steps.py:2675-2692). So any call into the
+held engine's step module that reaches `load_govkit()`, `read_registry_at` (upgrade_steps.py:757)
+among them, between a staged copy's `load_govkit()` and the next `govkit_module()` call builds a
+third engine whose `Refusal` the suite's catchers do not catch. Check 4 grades the window's closing
+edge, not the window. None falls in it at `f519c1934`. After 87 AC6's `us87.read_steps`
+(selftest.py:3183) the suite calls only `steps.derive_contained_rel` (selftest.py:3194-3195), which
+does not call `load_govkit()` (upgrade_steps.py:1059-1068), before `gk72 = govkit_module()` at
+selftest.py:3198. The arm's own staged load is followed by check 1, which makes no step call, and
+then check 2's `govkit_module()`.
+
+Check 3 reads import statements only. A by-path or `importlib.import_module` load of the engine
+added later passes it, and `govkit_mod` (S2) is the one such load at `f519c1934`.
 
 ### Inventory
 
@@ -238,12 +268,12 @@ Live at landing, at order 17. The suite is the only reader.
   name `govkit selftest`, measured for `gov-spec-writer` on 2026-11-01.
 - **AC2** — When
   `python -c "import pathlib, tempfile, selftest as s; s.check_staged_copies(pathlib.Path(tempfile.mkdtemp())); print('FAILURES', s.FAILURES)"`
-  runs in the same working directory, it prints three `ok   [dSP-99]` lines and its last line is
+  runs in the same working directory, it prints four `ok   [dSP-99]` lines and its last line is
   `FAILURES []`.
   Red when: `govkit_module()` is given back its `import govkit` body. Then the first `[dSP-99]`
-  check stays `ok`, and the second and third print `FAIL`. This is derived from §4 "The arm" and
-  not measured, because the role that wrote this spec may not run the suite.
-  figure: three is PINNED by §4 "The arm".
+  check stays `ok`, and the second, third and fourth print `FAIL`. This is derived from §4 "The
+  arm" and not measured, because the role that wrote this spec may not run the suite.
+  figure: four is PINNED by §4 "The arm".
   fixture: as AC1.
   permission: as AC1.
 - **AC3** — When `git grep -n -E "^\s*(import|from) govkit\b" -- "*selftest.py"` runs from the
@@ -257,7 +287,7 @@ Live at landing, at order 17. The suite is the only reader.
 
 `govkit selftest` · `policy fixtures` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `recall floor` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC2 AC3 · the three `[dSP-99]` checks of `check_staged_copies`; the break is `govkit_module()` given back its `import govkit` body, under which the second and third red · none
+New arm: tools/govkit/selftest.py · covers AC2 AC3 · the four `[dSP-99]` checks of `check_staged_copies`; the break is `govkit_module()` given back its `import govkit` body, under which the second, third and fourth red · none
 
 The first five legs are the non-broad legs whose guards `tools/govkit/selftest.py` trips, and
 `recall floor` and `recall floor arms` are tripped by the ledger's `memory/` path. All were printed
@@ -282,6 +312,17 @@ none
   widens id 1 to the class the goal names, every reader of the engine in the suite, because the
   helpers and `main` imported the engine by name beside `govkit_module()`. Every cited line was read
   at `f519c1934`.
+- rev-2 · 2026-11-01 · §1 · S2 · S3 · §4 · AC2 · §7 · folded the round-1 spec audit
+  `memory/builds/dSafePassage/reviews/2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md`
+  from the brief `memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md`.
+  LOW 1 (ids 3, 5), at the narrowing option the record names as the default: §1 and S2 now claim
+  import statements only, S2 names `govkit_mod` at selftest.py:9764-9766 as the by-path load left in
+  place, §4 "The held engine" says the same, S3 says check 3 grades import statements only, and
+  "What it does not cover" names the by-path gap. Check 3 and AC3 are unchanged. LOW 2 (id 4), at
+  the record's preferred fix: a fourth `[dSP-99]` check, that `held99.upgrade_steps.load_govkit()`
+  answers `held99` once `govkit_module()` has re-bound the table, with AC2's count, its red case
+  and §7's `New arm:` line moved from three to four. "What it does not cover" names the window of
+  the step module's own `load_govkit()`. Every newly cited line was read at `6414e1dc6`.
 
 ## 10. Reuse audit
 
