@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-4 — a repair unit edits its unbuilt sibling's spec with a rev bump
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 40
+**Status:** INPROGRESS · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 40
 
 <!-- gen:spec-records -->
 
