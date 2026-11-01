@@ -231,3 +231,17 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T16:05:36Z rescope · item add DEPL-dShippedRelease-137 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 58 (HIGH, item H9): read_appendix_table promises every row, but the reused loop drops rows it cannot place
 
 2026-11-01T16:05:37Z rescope · item add DEPL-dShippedRelease-138 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md the 51 minors by raw id, MEDIUM ids 3 25 33 7 48 63 8 9 44 59 10 26 40 11 42 12 13 14 15 50 16 17 24 31 32 64 35 36 41 45 46 52 60 61 62 65 66 68 69 70 71 and LOW ids 19 67 20 27 28 34 37 38 47 53
+
+2026-11-01T18:04:43Z rescope · item add DEPL-dShippedRelease-140 · reason closes 2026-11-01-review-DEPL-dShippedRelease-126-spec-audit-round1.md id 23 (HIGH, item H2): units 127 and 128 rebuild a govkit descriptor walk inside a shipped kit file and grade gov-only facts there
+
+2026-11-01T18:04:44Z rescope · item add DEPL-dShippedRelease-141 · reason closes 2026-11-01-review-DEPL-dShippedRelease-126-spec-audit-round1.md id 29 (HIGH, item H3): unit 138 S27's deploy items guard omits the engine the leg drives, so an edit to it skips or reuses the leg
+
+2026-11-01T18:04:45Z rescope · item add DEPL-dShippedRelease-142 · reason closes 2026-11-01-review-DEPL-dShippedRelease-126-spec-audit-round1.md id 40 (HIGH, item H4): unit 135 says no key binds a return to a landing, but the harness's key does, so a stale clean return certifies an unreviewed landing
+
+2026-11-01T18:04:46Z rescope · item add DEPL-dShippedRelease-143 · reason closes 2026-11-01-review-DEPL-dShippedRelease-126-spec-audit-round1.md id 41 (HIGH, item H5): a table that lost its separator line silently drops its first body row in unit 137's promise of every row
+
+2026-11-01T18:04:47Z rescope · item add DEPL-dShippedRelease-144 · reason closes 2026-11-01-review-DEPL-dShippedRelease-126-spec-audit-round1.md the 43 minors by raw id, MEDIUM ids 1 18 30 2 4 5 36 6 7 42 8 51 9 45 14 26 15 16 17 19 50 24 25 27 31 32 43 44 46 47 48 49 and LOW ids 10 11 12 28 20 21 22 37 38 52 53
+
+2026-11-01T18:04:58Z rescope · item add DEPL-dShippedRelease-145 · reason closes 2026-11-01-review-DEPL-dShippedRelease-126-spec-audit-round1.md id 3 (HIGH, item H1): unit 128's mint-regenerate-kits arm never enters cmd_mint, so its stated failing case cannot red it
+
+2026-11-01T18:23:30Z review · item dShippedRelease-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 43 · disposition promote
