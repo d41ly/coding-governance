@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-17935639408748478388-366387 b0b9f801
+asks-at-landing: TOOL-dScopedBuild-16=DEFERRED TOOL-dScopedBuild-17=DEFERRED TOOL-dScopedBuild-18=DEFERRED TOOL-dScopedBuild-19=DEFERRED TOOL-dScopedBuild-20=DEFERRED TOOL-dScopedBuild-21=DEFERRED TOOL-dScopedBuild-22=DEFERRED TOOL-dScopedBuild-23=DEFERRED TOOL-dScopedBuild-24=DEFERRED
+units-at-landing: TOOL-dScopedBuild-1 TOOL-dScopedBuild-14 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-2 TOOL-dScopedBuild-30 TOOL-dScopedBuild-37 TOOL-dScopedBuild-28 TOOL-dScopedBuild-3 TOOL-dScopedBuild-34 TOOL-dScopedBuild-9 TOOL-dScopedBuild-27 TOOL-dScopedBuild-29 TOOL-dScopedBuild-38 TOOL-dScopedBuild-8 TOOL-dScopedBuild-36 TOOL-dScopedBuild-40 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-15 TOOL-dScopedBuild-31 TOOL-dScopedBuild-11 TOOL-dScopedBuild-10 TOOL-dScopedBuild-12 TOOL-dScopedBuild-26 TOOL-dScopedBuild-4 TOOL-dScopedBuild-13 TOOL-dScopedBuild-25 TOOL-dScopedBuild-35 TOOL-dScopedBuild-39 TOOL-dScopedBuild-41 TOOL-dScopedBuild-42 TOOL-dScopedBuild-43
+gates-run: unattended-17935707429654061474-27459 13e1207d
 parked-surfaced: yes, 34 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: ebbf7802cb091b9bc22a6d50cdb6f03221cb3e25
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -147,3 +149,7 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T17:29:41Z rescope · item defer TOOL-dScopedBuild-42 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
 
 2026-11-01T17:29:43Z rescope · item defer TOOL-dScopedBuild-43 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T22:43:29Z override · item specs-audited · reason the owner ended the spec-audit chain at round 4 (memory/builds/dScopedBuild/prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-owner-stop-chain.md): TOOL-dScopedBuild-42 and -43, round 4's promotions, are the only specs no spec-audit record names and are deferred to the build run
+
+2026-11-01T22:43:29Z override · item closing-review-recorded · reason the owner's ruling ending the audit chain (memory/builds/dScopedBuild/prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-owner-stop-chain.md): the four spec-audit rounds are the review of this spec-only diff, as for dMindYourWords, dKeptSession, dLinkedLibrary and dIndexedDesign; the build run's closing diff review is unaffected
