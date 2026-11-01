@@ -12,6 +12,7 @@
 | [2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-audit-fold-brief.md) | research | TOOL-dSafePassage-90 |
 | [2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md) | research | TOOL-dSafePassage-90 |
 | [2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-91-1-researcher.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-91-1-researcher.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-91-close-arms-g-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-91-close-arms-g-brief.md) | research | TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-95 TOOL-dSafePassage-96 |
 | [2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-90 |
 | [2026-11-01-review-TOOL-dSafePassage-90-91-closing-diff-round4.md](../reviews/2026-11-01-review-TOOL-dSafePassage-90-91-closing-diff-round4.md) | diff-review | TOOL-dSafePassage-90 |
