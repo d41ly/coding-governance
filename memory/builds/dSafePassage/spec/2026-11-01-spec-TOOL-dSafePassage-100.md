@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-100 — arm 37's count runs the resolved launcher with no `python3` default, and skips naming what is not covered when none resolved
 
-**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 17 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-82
 
@@ -100,7 +100,7 @@ None.
 
 ### Rollout
 
-Live at landing, at order 17. On a host where a launcher resolves, arm 37 runs as before and prints
+Live at landing, at order 16. On a host where a launcher resolves, arm 37 runs as before and prints
 its two `ok — 37` lines. On a host where none resolves, it prints one `skip — 37` line.
 
 ### Files touched (estimate)

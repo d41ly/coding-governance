@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process
 
-**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 17 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-87
 
@@ -217,7 +217,7 @@ None.
 
 ### Rollout
 
-Live at landing, at order 17. The suite is the only reader.
+Live at landing, at order 16. The suite is the only reader.
 
 ### Files touched (estimate)
 

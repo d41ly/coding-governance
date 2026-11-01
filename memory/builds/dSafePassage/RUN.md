@@ -603,3 +603,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T11:59:50Z rescope · item add TOOL-dSafePassage-99 · reason the close's arm observation found check_upgrade_steps crashing at [dSP-72] after 87 AC6's staged copy rebinds sys.modules[govkit]: the govkit selftest bar leg reds at 390033278
 
 2026-11-01T11:59:54Z rescope · item add TOOL-dSafePassage-100 · reason the close's AC11 observation found the resolver suite's launcher ban naming tools/push-main.test.sh:1409 at 390033278: the python resolver bar leg reds
+
+2026-11-01T12:37:13Z brief · item TOOL-dSafePassage-99 · reason b346f72527aa memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-99-build-brief.md
+
+2026-11-01T12:37:15Z brief · item TOOL-dSafePassage-100 · reason a71c21d321f1 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-100-build-brief.md

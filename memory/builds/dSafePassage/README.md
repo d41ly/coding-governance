@@ -237,6 +237,7 @@ ids TOOL-dSafePassage-99 TOOL-dSafePassage-100
 | [TOOL-dSafePassage-55 — the roster hand-out refuses on TOOL-49 AC2's whole order predicate, written once as one probe](spec/2026-10-23-spec-TOOL-dSafePassage-55.md) | 15 | 2 | WONTDO | rev-2 | 2026-10-28 |
 | [TOOL-dSafePassage-56 — the walk tests for a link on every path it enters, the root and each `modules/` it recurses into, before listing it](spec/2026-10-23-spec-TOOL-dSafePassage-56.md) | 15 | 2 | CLOSED | rev-3 | 2026-10-28 |
 | [TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the commit-order criterion's attribution and form, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-59.md) | 15 | 2 | CLOSED | rev-3 | 2026-10-28 |
+| [TOOL-dSafePassage-100 — arm 37's count runs the resolved launcher with no `python3` default, and skips naming what is not covered when none resolved](spec/2026-11-01-spec-TOOL-dSafePassage-100.md) | 16 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-72 — a before-image path is contained by one predicate govkit's destinations share, and refused where any segment on it is a link](spec/2026-10-28-spec-TOOL-dSafePassage-72.md) | 16 | 2 | CLOSED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-73 — the forward and reverse walks read "no up on record" through one predicate, so a step re-applied by its witness after a rollback keeps its `via` mark](spec/2026-10-28-spec-TOOL-dSafePassage-73.md) | 16 | 2 | CLOSED | rev-4 | 2026-10-28 |
@@ -263,8 +264,7 @@ ids TOOL-dSafePassage-99 TOOL-dSafePassage-100
 | [TOOL-dSafePassage-96 — the round-7 closing review's three minors: each restore check reads the path its label names, and a reused tmp stages afresh](spec/2026-11-01-spec-TOOL-dSafePassage-96.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
 | [TOOL-dSafePassage-97 — the round-8 closing review's five wording lows: spec 96's text corrected in one table](spec/2026-11-01-spec-TOOL-dSafePassage-97.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
 | [TOOL-dSafePassage-98 — the round-9 closing review's one low: 97's S3 narrowed to what its AC3 reads](spec/2026-11-01-spec-TOOL-dSafePassage-98.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
-| [TOOL-dSafePassage-100 — arm 37's count runs the resolved launcher with no `python3` default, and skips naming what is not covered when none resolved](spec/2026-11-01-spec-TOOL-dSafePassage-100.md) | 17 | 2 | DEFERRED | rev-2 | 2026-11-01 |
-| [TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process](spec/2026-11-01-spec-TOOL-dSafePassage-99.md) | 17 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process](spec/2026-11-01-spec-TOOL-dSafePassage-99.md) | 16 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 <!-- /gen:build-units -->
 
 Records: 494 bound to this build, across 4 record folder(s).
@@ -337,8 +337,7 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 95 spec(s) at 
 | 13 | `TOOL-dSafePassage-49`, `TOOL-dSafePassage-52` | yes |
 | 14 | `TOOL-dSafePassage-51`, `TOOL-dSafePassage-57`, `TOOL-dSafePassage-58` | no |
 | 15 | `TOOL-dSafePassage-53`, `TOOL-dSafePassage-54`, `TOOL-dSafePassage-55`, `TOOL-dSafePassage-56`, `TOOL-dSafePassage-59` | unknown |
-| 16 | `TOOL-dSafePassage-61`, `TOOL-dSafePassage-72`, `TOOL-dSafePassage-73`, `TOOL-dSafePassage-74`, `TOOL-dSafePassage-75`, `TOOL-dSafePassage-76`, `TOOL-dSafePassage-77`, `TOOL-dSafePassage-78`, `TOOL-dSafePassage-80`, `TOOL-dSafePassage-81`, `TOOL-dSafePassage-82`, `TOOL-dSafePassage-83`, `TOOL-dSafePassage-84`, `TOOL-dSafePassage-86`, `TOOL-dSafePassage-87`, `TOOL-dSafePassage-88`, `TOOL-dSafePassage-89`, `TOOL-dSafePassage-90`, `TOOL-dSafePassage-91`, `TOOL-dSafePassage-92`, `TOOL-dSafePassage-93`, `TOOL-dSafePassage-94`, `TOOL-dSafePassage-95`, `TOOL-dSafePassage-96`, `TOOL-dSafePassage-97`, `TOOL-dSafePassage-98` | no |
-| 17 | `TOOL-dSafePassage-100`, `TOOL-dSafePassage-99` | yes |
+| 16 | `TOOL-dSafePassage-100`, `TOOL-dSafePassage-61`, `TOOL-dSafePassage-72`, `TOOL-dSafePassage-73`, `TOOL-dSafePassage-74`, `TOOL-dSafePassage-75`, `TOOL-dSafePassage-76`, `TOOL-dSafePassage-77`, `TOOL-dSafePassage-78`, `TOOL-dSafePassage-80`, `TOOL-dSafePassage-81`, `TOOL-dSafePassage-82`, `TOOL-dSafePassage-83`, `TOOL-dSafePassage-84`, `TOOL-dSafePassage-86`, `TOOL-dSafePassage-87`, `TOOL-dSafePassage-88`, `TOOL-dSafePassage-89`, `TOOL-dSafePassage-90`, `TOOL-dSafePassage-91`, `TOOL-dSafePassage-92`, `TOOL-dSafePassage-93`, `TOOL-dSafePassage-94`, `TOOL-dSafePassage-95`, `TOOL-dSafePassage-96`, `TOOL-dSafePassage-97`, `TOOL-dSafePassage-98`, `TOOL-dSafePassage-99` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
