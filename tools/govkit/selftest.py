@@ -4471,7 +4471,10 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
         # TOOL-dSafePassage-94: what `steps` hands the stub for a bare bash, read in this process with
         # its cached bash cleared, or the exception the call raised. A spawn crash's tail cannot show
         # which spawn crashed, so this read is what proves the call reaches its fallback.
-        held = steps._BASH
+        try:
+            held = steps._BASH
+        except AttributeError as e:  # TOOL-dSafePassage-95: a copy that did not load has no memo
+            return e
         steps._BASH = None
         try:
             return steps.resolve_shell_argv(["bash", "x"])
@@ -4482,11 +4485,20 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
 
     # TOOL-dSafePassage-94: the regression that read must see, check_runs no longer catching a spawn's
     # OSError, staged in a copy of upgrade_steps.py, so the read is seen red on every run.
+    # TOOL-dSafePassage-95: staged by build_staged_copy, its anchor replaced once, and a copy that
+    # does not load is a labelled FAIL rather than a crash of the suite.
+    src94 = (HERE / "upgrade_steps.py").read_text(encoding="utf-8")
+    anchor94 = "returncode == 0\n        except OSError:"
+    sentinel94 = "dsp95-sentinel"
     steps94 = types.ModuleType("dsp94_upgrade_steps")
-    steps94.__file__ = str(HERE / "upgrade_steps.py")
-    exec(compile((HERE / "upgrade_steps.py").read_text(encoding="utf-8").replace(
-        "returncode == 0\n        except OSError:", "returncode == 0\n        except ValueError:"),
-        steps94.__file__, "exec"), steps94.__dict__)
+    try:
+        spec94 = importlib.util.spec_from_file_location("dsp94_upgrade_steps", build_staged_copy(
+            tmp / "dsp94-narrowed", src94.replace(anchor94, "returncode == 0\n        except ValueError:", 1)))
+        steps94 = importlib.util.module_from_spec(spec94)
+        spec94.loader.exec_module(steps94)
+        steps94._BASH = sentinel94  # TOOL-dSafePassage-95: a memo only the raise path's restore gives back
+    except Exception as e:  # noqa: BLE001 - a copy that does not load is what this records
+        check("[dSP-95] the staged copy of upgrade_steps.py loads", False, repr(e))
 
     # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
     # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. What bare
@@ -4500,7 +4512,10 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     check("[dSP-94] resolve_shell_argv on that PATH, GOV_BASH unset and no bash cached, hands back bare bash",
           argv94 == ["bash", "x"], repr(argv94))
     check("[dSP-94] the same read, check_runs narrowed to catch ValueError, reads the spawn's OSError",
-          isinstance(cut94, OSError), repr(cut94))
+          src94.count(anchor94) == 1 and isinstance(cut94, OSError), f"anchor count {src94.count(anchor94)}; {cut94!r}")
+    check("[dSP-95] the read gives the parent's bash cache back", us._BASH == bash87, repr(us._BASH))
+    check("[dSP-95] the read that raises gives the copy's bash cache back",
+          getattr(steps94, "_BASH", None) == sentinel94, repr(getattr(steps94, "_BASH", None)))
 
     # TOOL-dSafePassage-92: the same predicate over every host shape the bar runs on, so a node with a
     # WSL distribution still grades the hosts without one. The five tracebacks are the real stub's, run
@@ -4509,6 +4524,7 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     # the [dSP-91 L2] tail is.
     root92 = tmp / "dsp92"
     stub92 = root92 / "govkit"
+    stand94 = stub92.joinpath("upgrade_steps.py")  # TOOL-dSafePassage-95: the stand-in, one name
     (stub92 / "steps").mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / "steps" / "python_floor.py", stub92 / "steps" / "python_floor.py")
     (stub92 / "registry.toml").write_text("", encoding="utf-8")  # derive_tool_root's one tool root
@@ -4520,11 +4536,11 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
         # TOOL-dSafePassage-94: no shape runs the last one's bytecode, which the stub's loader writes
         shutil.rmtree(stub92 / "__pycache__", ignore_errors=True)
         if resolve_src is None:
-            (stub92 / "upgrade_steps.py").unlink(missing_ok=True)
+            stand94.unlink(missing_ok=True)
         else:
-            (stub92 / "upgrade_steps.py").write_text("def resolve_kit_dir(home, script, gov):\n    return gov\n\n\n"
-                                                     + resolve_src, encoding="utf-8", newline="\n")
-            os.utime(stub92 / "upgrade_steps.py", ns=(0, 0))  # one mtime for every stand-in: only size parts two
+            stand94.write_text("def resolve_kit_dir(home, script, gov):\n    return gov\n\n\n"
+                               + resolve_src, encoding="utf-8", newline="\n")
+            os.utime(stand94, ns=(0, 0))  # one mtime for every stand-in: only size parts two
         return us.run_step_isolated(floor_row, "witness", GOV_ROOT, root92)["tail"]
 
     wsl92 = "Windows Subsystem for Linux has no installed distributions.\r\n"
@@ -4550,9 +4566,12 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     absent94 = 'def resolve_shell_argv(argv):\n    return ["dsp92-absent"] + argv[1:]\n'
     second94 = 'def resolve_shell_argv(argv):\n    raise RuntimeError("dsp94-second")\n'
     read_stub_tail(absent94)
+    pyc94 = any((stub92 / "__pycache__").glob("upgrade_steps.*.pyc"))  # TOOL-dSafePassage-95: the red's precondition
     tail94 = read_stub_tail(second94)
+    mtime94 = os.stat(stand94).st_mtime_ns
     check("[dSP-94] a stand-in the size of the one before it runs its own source, not that one's bytecode",
-          len(second94) == len(absent94) and "dsp94-second" in tail94, repr(tail94[-600:]))
+          len(second94) == len(absent94) and pyc94 and mtime94 == 0 and "dsp94-second" in tail94,
+          f"pyc {pyc94}; mtime_ns {mtime94}; tail {tail94[-600:]!r}")
 
 
 def check_step_gate_fixture() -> None:
