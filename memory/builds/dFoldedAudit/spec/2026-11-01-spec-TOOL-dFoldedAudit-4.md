@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-4 — a repair unit edits its unbuilt sibling's spec with a rev bump
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 40
+**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 40
 
 <!-- gen:spec-records -->
 
@@ -9,7 +9,9 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-4-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-4-build-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-4-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-4-spec-brief.md) | research | — |
 
@@ -315,7 +317,7 @@ probe the pass writes under the run's scratch, which loads `tools/check-spec-tok
 
 ## 7. Gates
 
-`unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `policy fixtures` · `workflow script syntax` · `harness arms (fail branches armed or pinned)` · `review-protocol parity (kit vs dogfood)` · `kit version markers` · `memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `transition-audit arms` · `straggler-guard arms` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test`
+`unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `policy fixtures` · `workflow script syntax` · `harness arms (fail branches armed or pinned)` · `review-protocol parity (kit vs dogfood)` · `kit version markers` · `memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test`
 
 New arm: tools/workflows/unattended-build.test.sh · covers AC1 AC3 · a sibling edit admitted, and its five malformed returns, the failing case the `siblingEdits` rows cut from `deriveDispositionFault`, which hands the roster out · none
 New arm: tools/workflows/unattended-build.test.sh · covers AC2 AC4 · the frozen join over both lists, its failing case the `DONE` prefix test changed to equality, which admits `DONE (THIN)` · none
@@ -334,6 +336,9 @@ none
 - rev-2 · 2026-11-01 · §3 · M2's cross-read: the hand-off to `TOOL-dFoldedAudit-1` said "plan state"
   in prose where every other spec spells `planState`, and the hands-off join reads backticked
   tokens only, so no gate read that hand-off. The bullet now carries the token.
+- rev-3 · 2026-11-01 · §7 · the fix brief's item 2. `memory/map/features/spec-tokens.md` under Files
+  touched trips the guard `memory/`, which `recall floor` and `recall floor arms` both carry. §7
+  already named the first, so the guards join's one hit was the second, and the leg line now names it.
 
 ## 10. Reuse audit
 

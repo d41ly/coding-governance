@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-7 — policy keys switch the disposal, the stop and the ceiling
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 10
+**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -9,7 +9,10 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-7-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-7-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-build-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-7-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-spec-brief.md) | research | — |
 
@@ -298,9 +301,12 @@ The `_` keeps `$0` apart from the sourced path: the source guard at
   each file.
   Red when: a switch is homed in `.unattended.conf`, or a new row lacks `summary` or `usage`.
 - **AC7** — When K's `.unattended.conf` gains `SPEC_FOLD_CUTOFF="soon"`,
-  `bash "$F/tools/unattended/unattended.sh" --version` exits 2 naming `SPEC_FOLD_CUTOFF` and `soon`;
-  with the key blank, absent, or `"2026-11-02"`, it exits 0.
-  Red when: the shape check is absent, which prints the version, or a blank value refuses.
+  `bash "$F/tools/unattended/unattended.sh" --version` exits 2 and its output carries
+  `SPEC_FOLD_CUTOFF is declared as 'soon', which is not an ISO date`; with the key blank, absent, or
+  `"2026-11-02"`, it exits 0 and that text is absent.
+  Red when: the shape check is absent, which exits 0 and prints the version with no refusal text, or
+  a blank value refuses. The text and the status are the observation: process and in-process
+  agreeing proves neither, because a deleted check changes both sides alike.
 - **AC8** — When `sed -n '/^load_driver_conf()/,/^}/p' tools/unattended/unattended.sh | grep -c read_spec_audit_switch`
   runs, it prints 0, and `grep -c 'policy.py" get review.spec-audit\.' tools/unattended/unattended.sh`
   prints 3.
@@ -320,7 +326,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · a fixture poli
 New arm: tools/unattended/unattended.test.sh · covers AC3 · a first commit setting an out-of-set value, staged with the reader's refusal branch falling through to the default · none
 New arm: tools/unattended/unattended.test.sh · covers AC4 · a fixture with no policy kit, staged with the absent-kit branch refusing · none
 New arm: tools/unattended/unattended.test.sh · covers AC5 · `SPEC_AUDIT_DISPOSAL_DEFAULT` staged to `promote-all` · none
-New arm: tools/unattended/unattended.test.sh · covers AC7 · a `PARITY_ROWS` conf-refusal row with `SPEC_FOLD_CUTOFF="soon"`, staged with the shape case deleted · none
+New arm: tools/unattended/unattended.test.sh · covers AC7 · a `PARITY_ROWS` conf-refusal row with `SPEC_FOLD_CUTOFF="soon"`, and beside it, after the table's loop in the same shard, `run --version` over that conf held by `hit` on `SPEC_FOLD_CUTOFF is declared as 'soon', which is not an ISO date` and `same` on exit 2, and over a blank and a dated key by `miss` on that text and `same` on exit 0; staged with the shape case deleted, which reds the `hit` and the `same` and leaves the row green · none
 New arm: tools/unattended/unattended.test.sh · covers AC8 · the source read of `load_driver_conf`'s body, staged with the reader called from it · none
 
 ## 8. Open questions
@@ -335,6 +341,11 @@ none
   `tools/unattended/unattended.sh:1009-1012` reads any branch and `TOOL-dFoldedAudit-2`'s rule keys on
   the day a record began; the check is now that read, with today's measure. The key table named
   `TOOL-dFoldedAudit-3` a reader of the disposal key, where that unit's §3 reads no key.
+- rev-3 · 2026-11-01 · §6 §7 · AC7 · the fix brief's item 4. The first builder showed AC7's arm could
+  not go RED: a `PARITY_ROWS` row compares only the process and in-process output, status and tree
+  (`tools/unattended/unattended.test.sh:2361-2366`), so deleting the shape case changes both sides
+  alike. The row stays, a positive assertion of the refusal text and exit status now sits beside
+  it, and AC7 names that text. The driver's design does not move.
 
 ## 10. Reuse audit
 

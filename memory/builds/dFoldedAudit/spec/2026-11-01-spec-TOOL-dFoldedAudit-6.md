@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-6 — an audit's own fold owes no hand `spec-revised` deviation record
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 60
+**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 60
 
 <!-- gen:spec-records -->
 
@@ -9,7 +9,9 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-7 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-7 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-6-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-6-build-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-6-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-6-spec-brief.md) | research | — |
 
@@ -266,7 +268,7 @@ import it at module level, and it is where the kit's spec-text readers live
 
 ## 7. Gates
 
-`build-index selftest` · `routed-commits selftest` · `tier2-review self-test` · `policy fixtures` · `memory hygiene` · `kit/dogfood doc parity` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `verdict epoch (kit version dates the engine)` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `routed-commits selftest` · `tier2-review self-test` · `policy fixtures` · `memory hygiene` · `kit/dogfood doc parity` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `verdict epoch (kit version dates the engine)` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms`
 
 New arm: tools/memory-tree/deviation_join.py · covers AC1 AC2 AC3 AC4 · the five plants in `PLANTS` under `PLANT_EXITS`, read by its arms and by `routed_commits.py`'s; the failing case is staged by making `check_audit_fold` return False for AC1 and AC2 and True for AC3 and AC4 · none
 New arm: tools/memory-tree/gen_build_index.py · covers AC5 AC6 AC7 · the past-pin arm beside `TOOL-dTrueNorth-5 AC6` at `gen_build_index.py:6074`, plus the predicate's boundary cases; the failing case is staged by clearing a unit on its first citing entry · none
@@ -282,6 +284,9 @@ none
 - rev-2 · 2026-11-01 · §4 · M2's cross-read: this spec said the disposal prompt names the path
   `lastReport` holds, where `TOOL-dFoldedAudit-3` §4 and `TOOL-dFoldedAudit-4` §4 write
   `<report stem>`. The predicate and every criterion stand, because the stem is what they read.
+- rev-3 · 2026-11-01 · §7 · the fix brief's item 3. The three build READMEs under Files touched trip
+  the guard `memory/`, which `recall floor` and `recall floor arms` both carry, and §7 named neither.
+  The leg line now names both, which clears the guards join's two hits.
 
 ## 10. Reuse audit
 

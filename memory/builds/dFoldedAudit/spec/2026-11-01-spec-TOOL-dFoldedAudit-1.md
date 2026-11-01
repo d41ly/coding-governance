@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
+**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
 
 <!-- gen:spec-records -->
 
@@ -11,10 +11,12 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-1-reuse-scout.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-1-reuse-scout.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-2-orienter.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-2-orienter.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-build-brief.md) | research | — |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-spec-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md) | research | TOOL-dFoldedAudit-5 |
 
@@ -363,11 +365,12 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
 - **AC4** — When `tr -d '\r' < memory/guides/BUILD-METHOD.md | wc -c` runs, it prints at most 30720.
   Red when: the new paragraphs and an as-built name run long and M1's ceiling is passed.
   figure: 30720 is PINNED, M1's budget at base `74274869`.
-- **AC5** — When `diff` compares `git show 74274869:tools/memory-tree/BUILD-METHOD.template.md` with
+- **AC5** — When `diff` compares `git show <base>:tools/memory-tree/BUILD-METHOD.template.md` with
   the working template, each passed through `awk '/^## M4 /{f=1} /^## M5 /{f=0} !f'`, it prints
   nothing; and when `grep -c 'DISPOSED BY SEVERITY, on CONVERGED too'` and
   `grep -c 'never one per minor'` run over the M4 slice, each prints 1.
   Red when: the DIFF half is reworded, or M8 moves, so a closing review's text changes.
+  figure: `<base>` is PINNED as `74274869`, the base on this spec's status line.
 - **AC6** — When `sed 's#{{TOOL_ROOT}}#tools/#g' tools/workflows/REVIEW-PROTOCOL.template.md | tr -d '\r'`
   is compared by `diff` with `memory/guides/REVIEW-PROTOCOL.md`, it prints nothing, and
   `bash tools/memory-tree/adopt-memory-tree.sh --render` on the committed tree leaves
@@ -444,6 +447,9 @@ none
   §4 and the `TOOL-dFoldedAudit-2` edge said check 26 grades a flag against the verbs carrier. It
   grades the driver's header and suite, and it requires each verb in the kit Skill, a carrier no spec
   owned, so `tools/unattended/SKILL.template.md`, its render and its size row join this unit.
+- rev-3 · 2026-11-01 · §6 · AC5 · the fix brief's item 1. AC5 spelled the sha and the template path
+  as one word, which the spec-tokens paths join read as an untracked path, so `--dispatch` refused the
+  unit. The sha is now `<base>`, pinned under the criterion. The observation does not move.
 
 ## 10. Reuse audit
 
