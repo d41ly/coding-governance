@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-98 — the round-9 closing review's one low: 97's S3 narrowed to what its AC3 reads
 
-**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base e3038fea6 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-11-01 · node a · Tier-2 · base e3038fea6 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-98-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-98-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-98-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-98-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-98-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-98-build-brief.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-98-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-98-spec-brief.md) | research | — |

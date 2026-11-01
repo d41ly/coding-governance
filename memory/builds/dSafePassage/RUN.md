@@ -595,3 +595,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T10:39:36Z review · item dSafePassage-r8-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 1 · disposition promote
 
 2026-11-01T10:53:54Z rescope · item add TOOL-dSafePassage-98 · reason the round-9 closing review's one low (M4), the last promotion: round 9's precision 0.2 is under the floor and ends the chain; records only
+
+2026-11-01T11:03:15Z brief · item TOOL-dSafePassage-98 · reason 43050f971eab memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-98-build-brief.md
+
+2026-11-01T11:08:13Z dispatch · item f51d88ae TOOL-dSafePassage-98 · reason memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-98.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-98-ledger.md

@@ -259,10 +259,10 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-95 — the round-6 closing review's nine minors: the floor-bash arms of 94 made self-consistent](spec/2026-11-01-spec-TOOL-dSafePassage-95.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
 | [TOOL-dSafePassage-96 — the round-7 closing review's three minors: each restore check reads the path its label names, and a reused tmp stages afresh](spec/2026-11-01-spec-TOOL-dSafePassage-96.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
 | [TOOL-dSafePassage-97 — the round-8 closing review's five wording lows: spec 96's text corrected in one table](spec/2026-11-01-spec-TOOL-dSafePassage-97.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
-| [TOOL-dSafePassage-98 — the round-9 closing review's one low: 97's S3 narrowed to what its AC3 reads](spec/2026-11-01-spec-TOOL-dSafePassage-98.md) | 16 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [TOOL-dSafePassage-98 — the round-9 closing review's one low: 97's S3 narrowed to what its AC3 reads](spec/2026-11-01-spec-TOOL-dSafePassage-98.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 480 bound to this build, across 4 record folder(s).
+Records: 481 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
