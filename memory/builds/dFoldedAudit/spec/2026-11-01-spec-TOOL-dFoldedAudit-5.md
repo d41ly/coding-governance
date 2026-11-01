@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-5 — each HIGH records its specs and a verb derives the chain's stop verdict
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 50
+**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 50 · ratified 2026-11-01
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,10 @@
 |---|---|---|
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-5-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-1-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md) | research | TOOL-dFoldedAudit-1 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-5-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -286,6 +289,8 @@ only.
 
 `renderChainRecord(subject, audited, dispositions, siblingEdits)` returns the command string. `audited`
 is the units whose `specPath` is among `subjects`. The string carries `au.blockers` and `au.highs`.
+`siblingEdits` reads as `[]` under `promote-all`, because `TOOL-dFoldedAudit-4`'s stage returns the
+list under `by-nature` alone.
 The harness reads no set and spells neither stop value, which AC16 greps.
 
 `nextAction` branches on a declared `disposal` and `specAudit`, at
@@ -344,7 +349,8 @@ absent state keeps every existing run on today's route.
 
 The suite doubles move with the contract. `buildSynth` at `tools/workflows/tier2-review.test.sh:378`
 and `buildSynthOwn` at `:1776` gain `specs`, because a spec-kind arm using them would otherwise take
-the tally fault. The review double behind `TOOL-dFoldedAudit-3`'s declared arms gains `addresses`.
+the tally fault. The review double behind `TOOL-dFoldedAudit-3`'s and `TOOL-dFoldedAudit-4`'s declared
+arms gains `addresses`, because row 17 reads it on any round carrying a BLOCKER or HIGH.
 
 ### Alternatives rejected
 
@@ -524,11 +530,18 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC11 AC12 AC13 AC16 
     R1's "all the specs fully reviewed".
   Recommendation: (b). It is the only option meeting both rulings and R1, and it changes one set's
   definition and no step's position. AC6 and AC8 are its discriminating arms.
+  RESOLVED (agent, 2026-11-01, delegated): (b). U leaves out P(N), and step 1's audit set is U with
+  P(N) and F(N), because it alone meets both owner rulings and R1.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-01 · initial draft, from the design's [chain] and [address], the brief's acceptance
   line 5, the scout's Q4 and Q5, and `TOOL-dFoldedAudit-3`, `-4` and `-7` as authored.
+- rev-2 · 2026-11-01 · §4 · §8 · F1 is RESOLVED to option (b) and the header gains `ratified`. M2's
+  cross-read found two disagreements with `TOOL-dFoldedAudit-4`: `renderChainRecord` read
+  `siblingEdits` under any declared `disposal` where that unit returns it under `by-nature` alone,
+  and the suite doubles gained `addresses` for `TOOL-dFoldedAudit-3`'s arms only, where row 17 also
+  reaches that unit's.
 
 ## 10. Reuse audit
 

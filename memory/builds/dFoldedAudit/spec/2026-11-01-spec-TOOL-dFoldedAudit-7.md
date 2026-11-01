@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-7 — policy keys switch the disposal, the stop and the ceiling
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 10
+**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-7-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-spec-brief.md) | research | — |
 
@@ -54,7 +55,7 @@ later unit of this build reads one switch instead of coding one rule.
 - **hands-off** `TOOL-dFoldedAudit-3` — the DISPOSAL stage takes the disposal switch's two values and their meaning from this unit's rows
 - **hands-off** `TOOL-dFoldedAudit-5` — reads `read_spec_audit_switch chain-stop` and `read_spec_audit_switch chain-ceiling` in the chain verdict
 - **hands-off** `TOOL-dFoldedAudit-1` — the three key names, their defaults, and the protocol key-table row check 22 owes for `SPEC_FOLD_CUTOFF`
-- **hands-off** external — the close writes the landing date into `.unattended.conf`'s `SPEC_FOLD_CUTOFF`, after confirming no run was preflighted that day
+- **hands-off** external — the close writes the landing date into `.unattended.conf`'s `SPEC_FOLD_CUTOFF`, after §5 risks' read of every ref shows no run but this build's began on or after that date; a hit parks the close, because that record would read as past the cutoff
 
 ## 4. Design
 
@@ -62,7 +63,7 @@ later unit of this build reads one switch instead of coding one rule.
 
 | Key | `allowed` | Default | The old rule | Read by |
 |---|---|---|---|---|
-| `review.spec-audit.disposal` | `["by-nature", "promote-all"]` | `by-nature` | `promote-all`, the refusal of `fold` included | `TOOL-dFoldedAudit-2`, `TOOL-dFoldedAudit-3` |
+| `review.spec-audit.disposal` | `["by-nature", "promote-all"]` | `by-nature` | `promote-all`, the refusal of `fold` included | `TOOL-dFoldedAudit-2`, and the caller that hands `TOOL-dFoldedAudit-3` its `disposal` arg |
 | `review.spec-audit.chain-stop` | `["own-work", "clean-only"]` | `own-work` | `clean-only`, R1 alone | `TOOL-dFoldedAudit-5` |
 | `review.spec-audit.chain-ceiling` | `{ type = "round-count", min = 1 }` | `4` | none: a bound, and the old rule had no chain bound | `TOOL-dFoldedAudit-5` |
 
@@ -239,9 +240,17 @@ an input it records, so the catalogue commits first and `policy.py mirror --writ
 - **observability** — The kit-default answer prints a NOTE. `policy.py get --explain` names source and
   revision.
 - **risks** — The value is the landing date by design tag `[cutoff]`, and the idiom at
-  `tools/unattended/unattended.sh:1009-1012` records the failure that invites: a run that wrote on the
-  landing day under the old driver reds at the merge, because its record reads as on or after the
-  cutoff. Edges therefore gives the close a check before it writes the date.
+  `tools/unattended/unattended.sh:1009-1012` records the failure that invites: a record begun on the
+  landing day under the old driver reds at the merge, because it reads as on or after the cutoff.
+  The landing date meets that idiom's "strictly past" only when every old-contract record began
+  before it, and `check_landed_facts_due` keys on the day a record began, so one begun earlier is
+  safe at any later value. Edges therefore gives the close a read before it writes the date, over
+  every ref because such a record sits on a run branch and not on `main`:
+  `git log --all --diff-filter=A --format='%cs %h' --name-only -- 'memory/builds/*/RUN.md' 'memory/builds/*/RUN.*.md'`,
+  each line dated on or after the value being a hit, and this build's own record excepted, because
+  it carries no spec-audit row. PINNED, measured 2026-11-01: `dTendedCadence` and `dScopedBuild` both
+  began that day and hold old-shape spec exit rows on their run branches, so a value of `2026-11-01`
+  reds them and any later value does not.
 - **testing** — One fixture repository per criterion, no gate. The arms are `New arm:` lines in §7.
 - **migration** — Additive. An unset key reads its default, a blank cutoff changes nothing, and the
   shrink-only lists stay as they are.
@@ -320,6 +329,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-01 · initial draft.
+- rev-2 · 2026-11-01 · §3 §4 §5 · M2's cross-read found two disagreements. The close's check said no
+  run was preflighted that day, which names no ref, where the idiom at
+  `tools/unattended/unattended.sh:1009-1012` reads any branch and `TOOL-dFoldedAudit-2`'s rule keys on
+  the day a record began; the check is now that read, with today's measure. The key table named
+  `TOOL-dFoldedAudit-3` a reader of the disposal key, where that unit's §3 reads no key.
 
 ## 10. Reuse audit
 

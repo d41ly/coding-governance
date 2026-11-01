@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
+**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
 
 <!-- gen:spec-records -->
 
@@ -10,10 +10,12 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-2-orient-dclosedloop.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-2-orient-dclosedloop.md) | research | — |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-1-reuse-scout.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-1-reuse-scout.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-2-orienter.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-2-orienter.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-spec-brief.md) | research | — |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md) | research | TOOL-dFoldedAudit-5 |
 
 <!-- /gen:spec-records -->
 
@@ -48,10 +50,11 @@ exactly as it did.
 - **S7** — `tools/unattended/VERBS.template.md` and its render describe, as built: the spec exit's
   row, tag [row]; the `--review` entry, the state list and the "Every terminal exit" paragraph split
   into a spec half and a diff half; `--record-round` and `--chain-verdict`, tag [address]; and the
-  three switches, tag [switches], with each old value. Observed by AC7.
+  three switches, tag [switches], with each old value. `tools/unattended/SKILL.template.md` and its
+  render invoke both verbs, as check 26 requires of every declared verb. Observed by AC7.
 - **S8** — `tools/unattended/PROTOCOL.template.md` and its render carry a key-table row for
-  `SPEC_FOLD_CUTOFF`, the one conf key TOOL-dFoldedAudit-7 adds, and the protocol's size row is raised
-  on the limits file's own terms. Observed by AC8.
+  `SPEC_FOLD_CUTOFF`, the one conf key TOOL-dFoldedAudit-7 adds, and the size rows of the protocol and
+  the unattended Skill are raised on the limits file's own terms. Observed by AC8.
 - **S9** — `tools/roles/agents/gov-spec-writer.agent.md` and its render state the repair rule for the
   disposal's writer. Observed by AC9.
 - **S10** — One row in `memory/DECISIONS.md` records the ruling, the superseded rows and the clause it
@@ -61,8 +64,9 @@ exactly as it did.
 - **S12** — The verbs carrier's "Drive the build as ONE program" bullet and the `/build` Skill tell a
   caller to pass the harness's `disposal` arg, read from `review.spec-audit.disposal`, because a run
   changes behaviour only when a caller passes it (TOOL-dFoldedAudit-3 §4), and the bullet tells an
-  unattended caller to copy each unit's `planState` into the args (TOOL-dFoldedAudit-4 §4).
-  Observed by AC12.
+  unattended caller to copy each unit's `planState` from `--plan <slug> --paths` into the args,
+  because a disposal naming a unit with no `planState` is refused at rows 15 and 16 of
+  TOOL-dFoldedAudit-4 §4. Observed by AC12.
 - **S13** — The suite arm the `New arm:` lines in §7 declare, a pin of M4 and the method's byte figure
   in the memory-tree parity suite. Observed by AC1, AC2, AC4, AC5 through those lines, RED first at
   the close.
@@ -87,8 +91,8 @@ exactly as it did.
   landing (`tools/push-main.sh:26-31`), which is how tag [limits] "bump where a kit moves" is met.
 - The review protocol's precision bullet keeps its measured figure and its "Below 0.5" lever.
 - No help page: `help/` documents neither `--review` nor the spec audit, and `help/policy.md:231`
-  names `REVIEW_ROUNDS` only as a row example. TOOL-dFoldedAudit-7 owns what policy prose moves.
-- The cutoff's value and the `.unattended.conf` writes are TOOL-dFoldedAudit-2's and the close's.
+  names `REVIEW_ROUNDS` only as a row example, so no page names the three switches and none moves.
+- The `.unattended.conf` writes are TOOL-dFoldedAudit-7's, and the cutoff's value is the close's.
 - dClosedLoop's specs and design record are TOOL-dFoldedAudit-8's.
 
 ### Edges
@@ -97,7 +101,7 @@ exactly as it did.
   `.chain-ceiling` with their defaults, and `SPEC_FOLD_CUTOFF`, which owes a protocol row; without
   them the carriers name no key and no old value
 - **consumes-from** `TOOL-dFoldedAudit-2` — the spec exit's row and its `--folded` and `--promoted`
-  flags, which check 26 grades against the verbs carrier
+  flags, which the verbs carrier describes
 - **consumes-from** `TOOL-dFoldedAudit-3` — the DISPOSAL stage as built, which the carriers describe,
   and its `disposal` arg, which no caller passes until the carriers say to
 - **consumes-from** `TOOL-dFoldedAudit-4` — the sibling edit as built, which M4 and the role text
@@ -132,9 +136,9 @@ DIFF half and change nothing else in it: `**At the exit every` becomes `**At a D
 paragraphs follow it:
 
 ```
-**A SPEC exit disposes by NATURE, severity apart** (owner, 2026-11-01), on the outstanding count and never the verdict word. A finding NEEDS A NEW MECHANISM when its fix adds a document, gate, adopter, generated artifact, verb or write path no unit's Scope names; every other finding is LOCAL. A LOCAL finding, a BLOCKER too, folds at the disposal into each spec it touches: rev bump and a revision-log line naming the record and the finding. A NEW MECHANISM finding is PROMOTED: a BLOCKER or HIGH to its own unit, a MEDIUM or LOW batched into one unit, two across disjoint write sets. A repair unit corrects an UNBUILT sibling's spec itself, rev bump and revision-log line naming the repair; a CLOSED spec stays frozen, and its correction is a new unit on top.
+**A SPEC exit disposes by NATURE, severity apart** (owner, 2026-11-01), on the outstanding count and never the verdict word. A finding NEEDS A NEW MECHANISM when its fix adds a document, gate, adopter, generated artifact, verb or write path no unit's Scope names; every other finding is LOCAL. A LOCAL finding, a BLOCKER too, folds at the disposal into each spec it touches: rev bump and a revision-log line naming the record and the finding. A NEW MECHANISM finding is PROMOTED: a BLOCKER or HIGH to its own unit, a MEDIUM or LOW batched into one unit, two across disjoint write sets. A repair unit corrects an UNBUILT sibling's spec itself, rev bump and revision-log line naming the repair and the record; a CLOSED spec stays frozen, and its correction is a new unit on top.
 
-**The CHAIN stops on a derived verdict.** Each generation is a FRESH subject, so `REVIEW_ROUNDS` bounds no chain. `--chain-verdict`, reading only what `--record-round` recorded and the roster, answers in this order: a roster spec no `spec-audit` record names, audit those; no BLOCKER or HIGH and nothing promoted, STOP; from round 2, every BLOCKER's and HIGH's specs inside the previous round's promotions and BLOCKER-or-HIGH folds, STOP, this round's disposal still running, its promotions built from their specs as written and, where `specs-audited` is owed, closed under a recorded override of it; at `review.spec-audit.chain-ceiling` rounds, HOLD for the owner; otherwise audit what this round promoted or folded for a BLOCKER or HIGH.
+**The CHAIN stops on a derived verdict.** Each generation is a FRESH subject, so `REVIEW_ROUNDS` bounds no chain. `--chain-verdict`, reading only what `--record-round` recorded and the roster, answers in this order: a live roster spec no round audited and this round did not promote, audit it with the last step's set; no BLOCKER or HIGH and nothing promoted, STOP; from round 2, every BLOCKER's and HIGH's specs inside the previous round's promotions and BLOCKER-or-HIGH folds, STOP, this round's disposal still running, its promotions built from their specs as written and, where `specs-audited` is owed, closed under a recorded override of it; at `review.spec-audit.chain-ceiling` rounds, HOLD for the owner; otherwise audit what this round promoted or folded for a BLOCKER or HIGH.
 ```
 
 The CONVERGED paragraph, line 146-148, keeps its first clause and reads:
@@ -145,8 +149,8 @@ fold text, say — takes the severity rule's disposition on the DIFF review, the
 refuses the round and names this route.
 ```
 
-**The bytes.** The render measured 29354 at BASE and 30504 with this text, leaving 216 of 30720.
-PINNED at 2026-11-01 over the render, CR-stripped.
+**The bytes.** The render measured 29354 at BASE and 30565 with this text, leaving 155 of 30720.
+PINNED at 2026-11-01 over the render, CR-stripped, by applying these edits to the BASE render.
 Should a name run long, the builder shortens the new paragraphs and never touches M1's ceiling.
 TOOL-dDeclaredLoop-20's unbuilt S9 will need about 60 more of those bytes, so the builder leaves them.
 
@@ -175,13 +179,19 @@ Four edits in `tools/unattended/VERBS.template.md`, each describing what the sib
 | "Every terminal exit" paragraph, `:808-818` | promotes EVERY confirmed finding on every subject | the closing diff review keeps it; a spec subject gets one paragraph on `--folded` and `--promoted` and on what a hand-recorded exit derives |
 | a new entry per verb | none | `--record-round` and `--chain-verdict`, their one record, the verdict line's CONTINUE, STOP and HOLD, its `audit` and `override specs-audited` fields, a HOLD's route through `--park` and `--handoff --code owner-decision`, and that the verdict is computed once, in the driver |
 
-The fifth edit is the "Drive the build as ONE program" bullet (`:723-730`), which gains two sentences
-beside its `specAudit` sentence: a run preflighted on or after the cutoff passes `disposal`, the value
-`python tools/policy/policy.py get review.spec-audit.disposal` reports, and a run before it omits the
-arg; and every `units[]` entry then carries its `planState` from `--plan`.
+The fifth edit is the "Drive the build as ONE program" bullet (`:723-730`), which gains these two
+sentences beside its `specAudit` sentence:
+
+```
+A run preflighted on or after `SPEC_FOLD_CUTOFF` passes `disposal`, the value `python tools/policy/policy.py get review.spec-audit.disposal` reports, and a run before it omits the arg. Under `by-nature` every `units[]` entry also carries its `planState` from `--plan <slug> --paths`, because a disposal naming a unit with no `planState` is refused and its hand-out carries no roster.
+```
+
+`planState` is required in attended mode only today, and the verbs carrier spells it nowhere at BASE,
+so an unattended caller following the carrier would meet refusal rows 15 and 16 of
+TOOL-dFoldedAudit-4 §4 on its first fold.
 `tools/roles/SKILL.template.md:50` gains the attended half beside its `specAudit` clause: `disposal`
-from the same read. It already spells `planState` (`:48`). Absent means a caller keeps the old rule,
-so these sentences are what turn the default on.
+from the same `policy.py get` read. It already spells `planState` (`:48`). Absent means a caller keeps
+the old rule, so these sentences are what turn the default on.
 
 The entry also names the three switches and each old value, tag [switches], because the verbs carrier
 is where a reader of a row asks why it holds no disposition: `promote-all` under
@@ -190,9 +200,11 @@ is where a reader of a row asks why it holds no disposition: `promote-all` under
 chain alive, an empty set of HIGHs never reads as the own-work stop, a HIGH with no address is refused
 at synthesis, and a round whose HIGHs reached neither a promotion nor a fold is a refusal.
 
-Check 26 refuses a verb or flag with no entry here, and check 22 a key with no row, so the kit gate is
-red on the tree units 2, 5 and 7 leave until this unit lands. The bar runs after this unit, so that
-red is expected and is never read as a failure.
+Check 26 refuses a verb with no entry here or no invocation in the kit Skill
+(`tools/unattended/check-unattended.sh:4578`, `:4584`), and check 22 a key with no row, so the kit
+gate is red on the tree units 2, 5 and 7 leave until this unit lands. It joins a flag to the driver's
+header and suite instead (`:4630`, `:4642`), which those units write. The bar runs after this unit,
+so that red is expected and is never read as a failure.
 
 ### The protocol table and its ceiling
 
@@ -212,6 +224,23 @@ to the owner and states no headroom, so the new value is the measured render exa
 argued above the row as `RAISED <old> -> <new>`, with the date, this unit, the figure and why; and S10's
 row lands with it. M3 states that a raise on those terms changes no governance carrier.
 
+### The kit Skill
+
+`tools/unattended/SKILL.template.md` gains two lines in its fenced verb list, after the `--review`
+line (`:120`), because check 26 reads the literal `unattended.sh <verb> ` there:
+
+```
+unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <N> --highs <N>
+unattended.sh --chain-verdict <slug>
+```
+
+`bash tools/unattended/adopt-unattended.sh`, the kit's `[[regenerate]]` argv
+(`tools/unattended/kit.toml:193-194`), writes `.claude/skills/unattended/SKILL.md`. That render is
+10237 bytes CR-stripped against a row of 10240 (`tools/template-size-limits.txt:154`), PINNED at
+2026-11-01, so the two lines pass it, and the row is raised to the measured render on the four terms
+above. The row's comment reserves nothing to the owner and states no headroom rule. It calls the Skill
+a router holding "the blocks the kit gate reads", which is what these two lines are.
+
 ### The role text
 
 `bash tools/roles/adopt-roles.sh --scaffold`, the kit's `[[regenerate]]` argv
@@ -220,7 +249,8 @@ row lands with it. M3 states that a raise on those terms changes no governance c
 One sentence joins the "You are not building" paragraph of
 `tools/roles/agents/gov-spec-writer.agent.md`: "At a spec audit's disposal, a correction to an unbuilt
 sibling's spec rewrites that sibling's text, with a rev bump and a revision-log line naming the repair
-unit, and a CLOSED sibling stays frozen." `python tools/roles/render_agents.py --write` renders
+unit and the review record by its file stem, and a CLOSED sibling stays frozen."
+`python tools/roles/render_agents.py --write` renders
 `.claude/agents/gov-spec-writer.md`. It reaches an agent type at the next session, which is what
 `tools/roles/README.md` already states of a render.
 
@@ -278,6 +308,8 @@ No switch of its own: this unit is the description, and the three switches are T
 - `memory/guides/UNATTENDED-PROTOCOL.md`
 - `tools/unattended/VERBS.template.md`
 - `memory/guides/UNATTENDED-VERBS.md`
+- `tools/unattended/SKILL.template.md`
+- `.claude/skills/unattended/SKILL.md`
 - `tools/roles/agents/gov-spec-writer.agent.md`
 - `.claude/agents/gov-spec-writer.md`
 - `tools/roles/SKILL.template.md`
@@ -287,9 +319,9 @@ No switch of its own: this unit is the description, and the three switches are T
 
 ### Alternatives rejected
 
-- **Trim the protocol to fund its new rows.** The brief bars a governance-carrier write beyond M4's
-  stated change, and unrelated rows would be that. M3 and the limits file make the raise the sanctioned
-  route, and neither needs an owner turn.
+- **Trim the protocol or the Skill to fund their new lines.** The brief bars a governance-carrier write
+  beyond M4's stated change, and unrelated rows would be that. M3 and the limits file make the raise
+  the sanctioned route, and neither needs an owner turn.
 - **State the ceiling's default, 4, in M4.** Tag [limits] and the charter's `[one-fact]` put a value
   in one place, and the policy catalogue owns it, so M4 names the key.
 - **A new gate over M4's prose.** A gate is its own unit by M2. One block in the leg that already reads
@@ -304,8 +336,8 @@ No switch of its own: this unit is the description, and the three switches are T
 - observability — the parity arm prints the missing literal or the byte figure it read.
 - risks — the carriers go stale if a sibling's as-built name differs from the spec it was written
   from, which is why this unit runs last among them. `budgets.py` reads the limits row at the landed
-  revision (`tools/policy/budgets.py`), so until landing `unattended protocol size` prints a warning
-  and exits 0, which is expected and is not the raise failing.
+  revision (`tools/policy/budgets.py`), so until landing `unattended protocol size` and
+  `unattended skill size` print a warning and exit 0, which is expected and is not the raise failing.
 - testing — the pass runs the greps and diffs of §6; the main loop observes the arms in §7.
 - migration — none.
 - user docs — none: no `help/` page covers these verbs, as §3 states.
@@ -343,16 +375,21 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
 - **AC7** — When `grep -c` runs over `memory/guides/UNATTENDED-VERBS.md` for the row literal
   `folded <f> · promoted <p>`, `--record-round`, `--chain-verdict`, `review.spec-audit.disposal`,
   `review.spec-audit.chain-stop` and `review.spec-audit.chain-ceiling`, each prints at least 1; when it
-  runs for `exit of every subject` and for `^\*\*Every terminal exit promotes EVERY` each prints 0; and
-  `diff` between the CR-stripped `tools/unattended/VERBS.template.md` and the render prints nothing.
+  runs for `exit of every subject` and for `^\*\*Every terminal exit promotes EVERY` each prints 0;
+  `diff` between the CR-stripped `tools/unattended/VERBS.template.md` and the render prints nothing;
+  `grep -c 'unattended.sh --record-round '` and `grep -c 'unattended.sh --chain-verdict '` over
+  `tools/unattended/SKILL.template.md` and `.claude/skills/unattended/SKILL.md` each print at least 1;
+  and `bash tools/unattended/adopt-unattended.sh --check` exits 0.
   Red when: the verbs carrier keeps either unscoped sentence, each of which prints 1 at base, so it
-  describes the old driver.
+  describes the old driver, or a verb reaches the carrier and not the Skill, which check 26 refuses.
 - **AC8** — When `grep -c '^| .SPEC_FOLD_CUTOFF. |' memory/guides/UNATTENDED-PROTOCOL.md` runs it
-  prints 1; and `tr -d '\r' < memory/guides/UNATTENDED-PROTOCOL.md | wc -c` prints exactly the figure
+  prints 1; `tr -d '\r' < memory/guides/UNATTENDED-PROTOCOL.md | wc -c` prints exactly the figure
   on that file's row of `tools/template-size-limits.txt`, the comment block above it carrying
-  `RAISED 66860 ->`.
-  Red when: the row is raised with headroom, or a key ships undocumented.
-  figure: both numbers are DERIVED at observation; only 66860, the old row, is PINNED.
+  `RAISED 66860 ->`; and `tr -d '\r' < .claude/skills/unattended/SKILL.md | wc -c` prints exactly the
+  figure on its row, the comment block above it carrying `RAISED 10240 ->`.
+  Red when: a row is raised with headroom, or a key ships undocumented.
+  figure: the measured numbers are DERIVED at observation; only 66860 and 10240, the old rows, are
+  PINNED.
 - **AC9** — When `grep -c 'CLOSED sibling'` runs over
   `tools/roles/agents/gov-spec-writer.agent.md` and `.claude/agents/gov-spec-writer.md`, each prints 1,
   and `python tools/roles/render_agents.py --check` exits 0.
@@ -367,17 +404,19 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
   Red when: a new sentence cites by position, which tag [limits] refuses.
   figure: both counts are DERIVED at observation.
 - **AC12** — When `grep -c 'disposal'` runs over `.claude/skills/build/SKILL.md` it prints at least 1,
-  `grep -c 'passes .disposal.'` and `grep -c 'review.spec-audit.disposal'` over
+  `grep -c 'passes .disposal.'`, `grep -c 'review.spec-audit.disposal'` and `grep -c 'planState'` over
   `memory/guides/UNATTENDED-VERBS.md` each print at least 1, and
   `bash tools/roles/adopt-roles.sh --check` exits 0.
-  Red when: the arg is documented in one carrier only, so an attended run stays on the old rule.
+  Red when: the arg is documented in one carrier only, so an attended run stays on the old rule, or
+  `planState` still prints 0, as it does at base, so an unattended caller meets refusal rows 15 and 16
+  on its first fold.
 - **AC13** — When `grep -c 'addresses'` and `grep -c 'chainRecord'` run over
   `tools/workflows/README.md`, each prints at least 1.
   Red when: a caller reads the return from the README and never learns the fields exist.
 
 ## 7. Gates
 
-`kit/dogfood doc parity` · `review-protocol parity (kit vs dogfood)` · `build-method size` · `unattended protocol size` · `unattended kit gate` · `kit version markers` · `memory hygiene` · `roles render wiring` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `policy fixtures`
+`kit/dogfood doc parity` · `review-protocol parity (kit vs dogfood)` · `build-method size` · `unattended protocol size` · `unattended skill size` · `unattended kit gate` · `kit version markers` · `memory hygiene` · `roles render wiring` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `policy fixtures`
 
 New arm: tools/memory-tree/kit-dogfood-parity.test.sh · covers AC1 AC2 AC4 AC5 · the block of §4, staged by deleting one required literal from the template and the render together, which parity alone cannot see, and by padding the render past its Budget line · none
 
@@ -392,6 +431,18 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-01 · initial draft, from the design record's every tag and the brief's item 1.
+- rev-2 · 2026-11-01 · §3 §4 §5 §7 · S7 S8 S12 · AC7 AC8 AC12 · the M3 sweep and M2's cross-read.
+  §3 gave the `.unattended.conf` writes to `TOOL-dFoldedAudit-2`, and they are `TOOL-dFoldedAudit-7`'s.
+  §3 gave policy prose to `TOOL-dFoldedAudit-7`, whose §5 gives it here, and no page moves.
+  The verbs bullet now states the `planState` requirement of `TOOL-dFoldedAudit-4` §3 as literal text,
+  from `--plan <slug> --paths` where this spec said `--plan`, and AC12 observes it.
+  M4's first chain step disagreed with `TOOL-dFoldedAudit-5` §4 and F1: it read `spec-audit` records
+  and counted this round's promotions as unreviewed.
+  M4's repair clause and the role sentence named the repair alone, where `TOOL-dFoldedAudit-4` §4 and
+  `TOOL-dFoldedAudit-6` also need the record, so the byte figure moved from 30504 to 30565.
+  §4 and the `TOOL-dFoldedAudit-2` edge said check 26 grades a flag against the verbs carrier. It
+  grades the driver's header and suite, and it requires each verb in the kit Skill, a carrier no spec
+  owned, so `tools/unattended/SKILL.template.md`, its render and its size row join this unit.
 
 ## 10. Reuse audit
 

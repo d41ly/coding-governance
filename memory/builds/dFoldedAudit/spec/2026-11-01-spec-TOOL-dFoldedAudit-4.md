@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-4 — a repair unit edits its unbuilt sibling's spec with a rev bump
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 40
+**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 40
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-4-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-4-spec-brief.md) | research | — |
 
@@ -66,7 +67,7 @@ text while A stayed wrong.
 - **consumes-from** `TOOL-dFoldedAudit-3` — `disposal`, `dispositions`, `deriveDispositionFault`, `deriveReadRev` and the hoist; without them there is no by-nature prompt to extend, no reconciliation to join, and no rev the audit read.
 - **hands-off** `TOOL-dFoldedAudit-5` — `siblingEdits` on the hand-out, which enters that round's folded set.
 - **hands-off** `TOOL-dFoldedAudit-6` — the §9 line a sibling edit writes, naming the repair unit and the review record by its file stem.
-- **hands-off** `TOOL-dFoldedAudit-1` — the sentence telling a caller to copy each unit's plan state into the harness args, and M4's sentence gaining the disposal's sibling edit.
+- **hands-off** `TOOL-dFoldedAudit-1` — the sentence telling a caller to copy each unit's `planState` into the harness args, and M4's sentence gaining the disposal's sibling edit.
 - **hands-off** external — the main loop re-derives the cutoff's value at landing, as the sibling keys' comments require, and a commit on a later day re-derives it again.
 
 ## 4. Design
@@ -329,6 +330,9 @@ none
 - rev-1 · 2026-11-01 · initial draft, from `build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md`
   tag [repair]. Its DERIVE, the gate's home, resolves to `tools/check-spec-tokens.py` with a key of its
   own, for the reasons §4 records.
+- rev-2 · 2026-11-01 · §3 · M2's cross-read: the hand-off to `TOOL-dFoldedAudit-1` said "plan state"
+  in prose where every other spec spells `planState`, and the hands-off join reads backticked
+  tokens only, so no gate read that hand-off. The bullet now carries the token.
 
 ## 10. Reuse audit
 

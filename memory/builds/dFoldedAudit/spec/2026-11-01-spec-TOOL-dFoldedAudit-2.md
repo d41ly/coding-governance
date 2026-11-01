@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-2 — --review and check 2 record and grade a spec exit that folds
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 20
+**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 20
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-2-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-2-spec-brief.md) | research | — |
 
@@ -22,7 +23,8 @@ cutoff, a closing diff review and every landed record keep today's bytes.
 ## 2. Scope (IN)
 
 - **S1** — The flags. `--review` takes `--folded <N>` and `--promoted <N>`, parsed beside `--minors`
-  and held to the same decimal rule. Observed by AC1 and AC6.
+  and held to the same decimal rule, and the driver's header line for `--review` documents both.
+  Observed by AC1, AC6 and AC14.
 - **S2** — The rule. `read_spec_exit_rule` answers `old`, `counted` or `folds` from the subject, the
   cutoff, the record's own date and the disposal switch. Observed by AC7, AC8 and AC9.
 - **S3** — The exit check. `check_spec_exit` holds this unit's one new `fail 37` site and refuses the
@@ -143,6 +145,11 @@ a helper taking the code as a parameter.
 ```
 verdict <v> · blockers <b> · <EXIT> · highs <h> · minors <m> · folded <f> · promoted <p>[ · disposition fold|promote]
 ```
+
+The driver's header line at `:22` gains `[--folded <N> --promoted <N>]` before
+`[--disposition fold|promote]`, because check 26 refuses a flag the parser accepts and no header line
+documents (`tools/unattended/check-unattended.sh:4630`), and it joins a flag to the header and the
+suite and never to the verbs carrier.
 
 `counts` at `:12832` gains the two fields under `counted` and `folds`, and `disp` stays last because
 check 2 reads the disposition as the last field (`:12849`). The disposition is `promote` when `p > 0`,
@@ -273,8 +280,8 @@ strips it.
 - **observability** — The rule shows on the row: only a spec exit past the cutoff carries `folded`.
   A blank cutoff is announced on every kit-gate run.
 - **risks** — `check-arms` stands at 323 of 323 after this unit, so `TOOL-dFoldedAudit-5`'s verbs owe
-  their own site-for-site cover or the owner's review. A row dated on the landing day by a run still
-  on the old driver reads as past the cutoff, the `FOLD_CUTOFF` scar at
+  their own site-for-site cover or the owner's review. A record begun on the landing day by a run
+  still on the old driver reads as past the cutoff, the `FOLD_CUTOFF` scar at
   `tools/unattended/unattended.sh:1009-1012`; `TOOL-dFoldedAudit-7` gives the close that check.
 - **testing** — Fixture repositories, hand-written rows for what the driver refuses to write, and
   committer dates pinned so no arm depends on the day it runs. `fixture-passes-by-finding-nothing` is
@@ -357,6 +364,9 @@ fixture's own copies by absolute path, run with the fixture as the working direc
   figure: both PINNED, measured 2026-11-01 at `dccdeaa8`, and valid until a later unit of this build
   adds a site.
   Red when: a refusal is written as a new site, which passes the ceiling.
+- **AC14** — When `grep -cE -- '^#   unattended[.]sh --review .*--folded <N> --promoted <N>' tools/unattended/unattended.sh`
+  runs, it prints 1.
+  Red when: the parser takes the flags and the header does not, so check 26 refuses them at the close.
 
 ## 7. Gates
 
@@ -383,6 +393,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-01 · initial draft.
+- rev-2 · 2026-11-01 · §4 · §5 · S1 · AC14 · M2's cross-read found two disagreements. `TOOL-dFoldedAudit-5`
+  S9 owns its flags' header lines and this spec owned none, while check 26 joins every parsed flag to
+  the header, so the `--review` line and AC14 join this unit. §5 said a row dated on the landing day
+  reads as past the cutoff, where this spec's rule keys on the day the record began.
 
 ## 10. Reuse audit
 

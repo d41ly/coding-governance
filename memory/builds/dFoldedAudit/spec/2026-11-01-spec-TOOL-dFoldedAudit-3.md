@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-3 — the DISPOSAL stage disposes by nature and reconciles folds to their specs
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 30
+**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-3-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-3-spec-brief.md) | research | — |
 
@@ -163,9 +164,10 @@ The return sentence joins the prompt's return block under either declared value:
 
 ```
 Return in `dispositions` one entry per finding per spec as {id, severity, nature, specs, unit, rev}:
-`id` the integer raw id, `nature` exactly `local` or `new-mechanism`, `specs` the non-empty unit ids
-the fix would change, `unit` the spec folded into or the unit promoted to, and `rev` that spec's rev
-now. A refuted finding has no entry.
+`id` the integer raw id, `nature` exactly `local` or `new-mechanism`, `specs` the unit ids on the
+finding's `**Specs:**` line, or where none is printed the non-empty unit ids the fix would change,
+`unit` the spec folded into or the unit promoted to, and `rev` that spec's rev now. A refuted finding
+has no entry.
 ```
 
 The in-loop fold at `unattended-build.template.js:1997-1998` stays. [fold-stage] keeps non-exit rounds
@@ -281,9 +283,12 @@ unreachable stays true under `by-nature`, by the same arithmetic over the entrie
 
 The template is the source. The render comes from `check-protocol-parity.test.sh --render`, as the
 marker at `unattended-build.template.js:3` says. That render is the main loop's or the pass's own
-tool use, not a verdict, and the parity leg grades it at the close. The kit marker moves once in this
-build, here, and TOOL-dFoldedAudit-4 and TOOL-dFoldedAudit-5 do not move it again. The arm at
-`unattended-build.test.sh:1960` pins the literal and moves with it.
+tool use, not a verdict, and the parity leg grades it at the close. The engine marker moves once in
+this build, here, and TOOL-dFoldedAudit-4 and TOOL-dFoldedAudit-5 do not move it again. It is the one
+version a pass of this build moves by hand: `unattended-build` is no kit entry, because the entry that
+claims this directory is `review-harness` (`tools/workflows/kit.toml:3`), so the lander's mint
+(`tools/push-main.sh:26-31`) never reaches the marker, and every kit version still waits for that mint.
+The arm at `unattended-build.test.sh:1960` pins the literal and moves with it.
 
 No run changes behaviour until a caller passes `disposal`. The key's default reaches runs through
 the carriers TOOL-dFoldedAudit-1 writes.
@@ -409,6 +414,11 @@ none
   tags [scope], [nature], [survive], [fold-stage] and [address]. The tag [address] is split with
   TOOL-dFoldedAudit-5: this unit owns the `dispositions` return and that unit owns the review's
   `specs` line and both verbs.
+- rev-2 · 2026-11-01 · §4 · S9 · M2's cross-read found two disagreements. `TOOL-dFoldedAudit-5` says
+  the disposal reads the report's `**Specs:**` line and refuses a differing address at its row 17,
+  and this prompt never named that line, so the return sentence now does. This Rollout called the
+  marker it moves a kit marker, where units 1, 5, 6 and 7 say no kit version moves by hand; it is an
+  engine marker no mint reaches, and S9 and AC9 stand.
 
 ## 10. Reuse audit
 

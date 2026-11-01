@@ -63,8 +63,9 @@ non-empty set of unit ids its fix would change. P(N) is the units that round pro
 BLOCKER or HIGH that round, sibling edits included; a spec folded only for mediums or lows is not in F(N), because
 M4 already counts a review's own fold as reviewed.
 Evaluated in this order after round N's disposal:
-1. UNREVIEWED: some roster spec is named by no `spec-audit` record. CONTINUE, auditing those. This is "all the specs
-   fully reviewed". Round 1 is the whole set.
+1. UNREVIEWED: some roster spec outside P(N) is named by no `spec-audit` record. CONTINUE, auditing those with P(N)
+   and F(N). This is "all the specs fully reviewed". Round 1 is the whole set. Read as TOOL-dFoldedAudit-5 F1 (b)
+   resolved it: taken literally, the first wording would pre-empt R5 and the ceiling on any promoting round.
 2. CLEAN: H(N) empty and P(N) empty. STOP, reason `clean`.
 3. R5: N >= 2, H(N) non-empty, and every high's address is a subset of P(N-1) union F(N-1). STOP, reason `own-work`.
    This round's own disposal still runs: local highs fold, a new-mechanism high is promoted once more and built from

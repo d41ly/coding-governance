@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-6 — an audit's own fold owes no hand `spec-revised` deviation record
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 60
+**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 60
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
+| [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-6-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-6-spec-brief.md) | research | — |
 
@@ -145,10 +146,10 @@ measured 2026-11-01 at `dccdeaa8` by a read-only probe; S5's diff re-derives the
 
 ### What the other units write
 
-The disposal prompt orders a §9 line naming the path `lastReport` holds and the finding id
-(`TOOL-dFoldedAudit-3` §4 "The by-nature prompt"), and that path carries the stem, so a fold's own
-line satisfies the predicate with no change here. `TOOL-dFoldedAudit-3` also has a caller renaming
-the report rename the citation in the same commit. A sibling edit is admitted by the same test,
+The disposal prompt orders a §9 line naming `<report stem>`, the file name `lastReport` ends in less
+`.md`, and the finding id (`TOOL-dFoldedAudit-3` §4 "The by-nature prompt"). That is the stem this
+predicate matches, so a fold's own line satisfies it with no change here. `TOOL-dFoldedAudit-3` also
+has a caller renaming the report rename the citation in the same commit. A sibling edit is admitted by the same test,
 because `TOOL-dFoldedAudit-4`'s prompt has every §9 line the stage writes name the report's stem, a
 §3 mirror's included. No criterion here rests on either, because every plant writes its own entry.
 
@@ -277,6 +278,9 @@ none
 
 - rev-1 · 2026-11-01 · initial draft, from the design's [fold-records], the brief's acceptance line
   6 and the reuse scout's Q2.
+- rev-2 · 2026-11-01 · §4 · M2's cross-read: this spec said the disposal prompt names the path
+  `lastReport` holds, where `TOOL-dFoldedAudit-3` §4 and `TOOL-dFoldedAudit-4` §4 write
+  `<report stem>`. The predicate and every criterion stand, because the stem is what they read.
 
 ## 10. Reuse audit
 
