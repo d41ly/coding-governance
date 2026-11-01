@@ -41,3 +41,7 @@ base: 94188878323ef3b20e96b769791de73453b09909
 2026-11-01T22:57:43Z dispatch · item c9f8c488 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md
 
 2026-11-01T22:57:54Z dispatch · item c9f8c488 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md
+
+2026-11-01T23:14:18Z review · item dEasedEffort · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition promote
+
+2026-11-01T23:14:19Z rescope · item add TOOL-dEasedEffort-2 · reason the closing review's round-1 lows, batched: the AC1 and AC3 ledger lines record commands that could not have printed their results when written

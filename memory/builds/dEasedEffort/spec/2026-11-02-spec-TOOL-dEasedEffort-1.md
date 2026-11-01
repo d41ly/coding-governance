@@ -9,6 +9,7 @@
 | [2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md](../build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-02-build-TOOL-dEasedEffort-1-agent-ledger.md](../build/2026-11-02-build-TOOL-dEasedEffort-1-agent-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dEasedEffort-1-brief.md](../prompts/2026-11-02-prompt-TOOL-dEasedEffort-1-brief.md) | research | — |
+| [2026-11-02-review-TOOL-dEasedEffort-1-closing-diff-review-round1.md](../reviews/2026-11-02-review-TOOL-dEasedEffort-1-closing-diff-review-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
