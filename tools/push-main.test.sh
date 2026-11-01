@@ -1406,7 +1406,7 @@ PREPARE_REFUSALS=(
 # a comment or a quoted `return 1` is not counted, from the `if ! run_gov_first` call, never the first
 # mention of the name, to cmd_prepare's closing brace, here-document and continued lines aside.
 measure37() {  # lander path -> the count on stdout
-  "${_py_arms:-python3}" -c '
+  "$_py_arms" -c '
 import importlib.util, re, sys
 spec = importlib.util.spec_from_file_location("check_arms", sys.argv[1])
 arms = importlib.util.module_from_spec(spec)
@@ -1420,7 +1420,8 @@ print(sum(1 for raw, code, cont, here in rows[at:end] if not cont and not here a
 }
 # TOOL-dSafePassage-46 S2: check-arms.py is loaded from the memory-tree kit arm 26's scan found
 # beside this lander (`_mt_rc`), never by a typed kit path, so the arm runs at any install prefix.
-if [ -n "$_mt_rc" ] && [ -f "$HERE/$_mt_rc/check-arms.py" ]; then
+# TOOL-dSafePassage-100: the arm runs only under the launcher line 1093 resolved, so measure37 names no default.
+if [ -n "$_mt_rc" ] && [ -n "$_py_arms" ] && [ -f "$HERE/$_mt_rc/check-arms.py" ]; then
   d37=$(measure37 "$HERE/push-main.sh")
   if [ "$d37" -gt 0 ] && [ "$d37" = "${#PREPARE_REFUSALS[@]}" ]; then
     ok "37 cmd_prepare refuses $d37 way(s) after the gov-first walk, and PREPARE_REFUSALS carries a row for each"
@@ -1442,7 +1443,7 @@ if [ -n "$_mt_rc" ] && [ -f "$HERE/$_mt_rc/check-arms.py" ]; then
     bad "37 the derived count moved on a lander copy carrying a commented and a quoted return 1 and an earlier run_gov_first: $b37, not $d37"
   fi
 else
-  echo "  skip — 37 no memory-tree kit (check-arms.py) beside this lander, so the derived-count arm did not run"
+  echo "  skip — 37 no memory-tree kit (check-arms.py) or python launcher beside this lander, so the derived-count arm is NOT covered"
 fi
 n37=0
 for _row37 in "${PREPARE_REFUSALS[@]}"; do

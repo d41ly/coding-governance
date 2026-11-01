@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-100 — arm 37's count runs the resolved launcher with no `python3` default, and skips naming what is not covered when none resolved
 
-**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-82
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-100-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-100-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-100-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-100-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-100-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-100-build-brief.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-100-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-100-spec-brief.md) | research | — |
