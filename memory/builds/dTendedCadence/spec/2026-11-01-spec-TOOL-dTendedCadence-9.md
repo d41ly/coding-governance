@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-9 — `maintain.retrofit-heat`: the share of reads on untouched legacy, each period's sweep filed as a patch build under `retrofit.cadence: hot-first`, and the progress cell's share of reads
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 15 · advances TOOL-dTendedCadence-19
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 15 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0450@ff08f57f whole
 
@@ -10,11 +10,12 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
+| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-35 TOOL-dTendedCadence-36 TOOL-dTendedCadence-37 TOOL-dTendedCadence-38 TOOL-dTendedCadence-39 TOOL-dTendedCadence-40 TOOL-dTendedCadence-41 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-46 TOOL-dTendedCadence-47 TOOL-dTendedCadence-48 |
 | [2026-11-01-build-TOOL-dTendedCadence-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-spec-stage-returns.md) | research | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
 | [2026-11-01-build-TOOL-dTendedCadence-9-reuse-scout-d.md](../build/2026-11-01-build-TOOL-dTendedCadence-9-reuse-scout-d.md) | research | TOOL-dTendedCadence-11 TOOL-dTendedCadence-13 |
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-fix-brief.md) | research | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-spec-brief.md) | research | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
+| [2026-11-01-review-TOOL-dTendedCadence-1-to-18-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dTendedCadence-1-to-18-spec-audit-round1.md) | spec-audit | TOOL-dTendedCadence-1 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 |
 
 <!-- /gen:spec-records -->
 
@@ -146,6 +147,9 @@ asks TOOL-dTendedCadence-21 and TOOL-dTendedCadence-33 (§8 F4, F1); and this bu
 - **consumes-from** `TOOL-dTendedCadence-4` — `read_policy_value`, drift-audit's one policy adapter, which S6 reads `retrofit.cadence` through
 - **consumes-from** `TOOL-dTendedCadence-17` — `route`, the row key whose value `patch` S4 adds
 - **consumes-from** external — TOOL-dWitnessedBar-13 S1, S2 and S8, TOOL-dLinkedLibrary-8 and -10 S2, S3 and S5, TOOL-dWellOiledMachine-27 S1, S3 and S4, TOOL-dPlacedRequest-4 and -21, and asks TOOL-dTendedCadence-21 and TOOL-dTendedCadence-33
+- **hands-off** `TOOL-dTendedCadence-44` — `measure_retrofit_heat`'s detail row, which that unit narrows to the target's identity (review id 41)
+- **consumes-from** `TOOL-dTendedCadence-38` — `ROUTE_VALUES`, the set whose `patch` value S4's row declares and cites (review id 4)
+- **hands-off** `TOOL-dTendedCadence-48` — the node-pass criterion, the recurrence observation, the manifest re-stamp and the route citation, which the minors batch repairs (review ids 8, 9, 37, 49)
 
 ## 4. Design
 
@@ -345,6 +349,7 @@ drain's; and ratification and placement at Entry, which are the parents' arms on
 ## 9. Revision log
 
 - rev-1 · 2026-11-01 · initial draft.
+- rev-2 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (units 38, 44, 48); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-1 — the Maintain run as its step checklist: `[[item]]` rows walked in `needs` order by `maintain.py` under the period lease, never a recipe-mode playbook
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 8 · advances TOOL-dTendedCadence-19
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 8 · advances TOOL-dTendedCadence-19
 
 **Carries:** cl-dClosedLoop-0442@d7b64b62 whole
 **Carries:** node:item.maintain.lease
@@ -11,7 +11,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
+| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-35 TOOL-dTendedCadence-36 TOOL-dTendedCadence-37 TOOL-dTendedCadence-38 TOOL-dTendedCadence-39 TOOL-dTendedCadence-40 TOOL-dTendedCadence-41 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-46 TOOL-dTendedCadence-47 TOOL-dTendedCadence-48 |
 | [2026-11-01-build-TOOL-dTendedCadence-1-deviation-11.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-deviation-11.md) | deviation | — |
 | [2026-11-01-build-TOOL-dTendedCadence-1-reuse-scout-a.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-reuse-scout-a.md) | research | TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-6 TOOL-dTendedCadence-8 TOOL-dTendedCadence-10 |
 | [2026-11-01-build-TOOL-dTendedCadence-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-spec-stage-returns.md) | research | TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
@@ -22,6 +22,7 @@
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-5-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-5-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-fix-brief.md) | research | TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
 | [2026-11-01-prompt-TOOL-dTendedCadence-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-spec-brief.md) | research | TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 |
+| [2026-11-01-review-TOOL-dTendedCadence-1-to-18-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dTendedCadence-1-to-18-spec-audit-round1.md) | spec-audit | TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 |
 
 <!-- /gen:spec-records -->
 
@@ -129,6 +130,9 @@ TOOL-dWitnessedBar-9 S1 (the `level` key on a leg).
 - **hands-off** `TOOL-dTendedCadence-2` — `maintain.py`, the argv the cadence row's `run` names, reading its key from `GOV_CADENCE_KEY`
 - **hands-off** `TOOL-dTendedCadence-16` — `item.maintain.lease` and `maintain.py`'s walk, whose node-scoped half, the node pass and `lease-holder`, that unit adds
 - **consumes-from** external — dDeclaredLoop's `order_by_needs`, dWellOiledMachine's `run_cadence_period` with ask TOOL-dTendedCadence-27, and dWitnessedBar's `level` key and selection record, each specced and unbuilt at base
+- **hands-off** `TOOL-dTendedCadence-36` — `run_maintain`, whose first act that unit makes the record-key family test (review id 39)
+- **consumes-from** `TOOL-dTendedCadence-37` — the stdin `route` set and the rule that a `held` reading's `keys` are the keys the route held, which `item.maintain.record`'s input carries (review id 2)
+- **hands-off** `TOOL-dTendedCadence-48` — the `outside` rows, the walk's order, the landing intake's payload and the re-run contract, which the minors batch repairs (review ids 3, 6, 46, 51)
 
 ## 4. Design
 
@@ -306,6 +310,7 @@ New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · 
 ## 9. Revision log
 
 - rev-1 · 2026-11-01 · initial draft.
+- rev-2 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (units 36, 37, 48); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 
