@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-01-build-TOOL-dSafePassage-95-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-95-ledger.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dSafePassage-91-close-arms-g-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-91-close-arms-g-brief.md) | research | TOOL-dSafePassage-91 TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-96 |
 | [2026-11-01-prompt-TOOL-dSafePassage-95-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-95-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-95-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-95-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-95-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-95-audit-fold-brief.md) | research | — |

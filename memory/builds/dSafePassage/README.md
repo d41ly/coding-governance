@@ -262,7 +262,7 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-98 — the round-9 closing review's one low: 97's S3 narrowed to what its AC3 reads](spec/2026-11-01-spec-TOOL-dSafePassage-98.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 481 bound to this build, across 4 record folder(s).
+Records: 483 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
