@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · TOOL-dFurnishedOrders-21 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dFurnishedOrders-21 · until TOOL-dFurnishedOrders-61 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dFurnishedOrders-61 at order 33 today, closes it (README rule 1)

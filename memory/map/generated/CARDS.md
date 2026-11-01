@@ -359,5 +359,5 @@ The unattended run's stops: HELD, the lease and the process ledger
 
 - status `building` · streams `tooling` · dossier `memory/map/features/unattended-stops.md`
 - decisions 2: `TOOL-dDerivedDocket-4`, `TOOL-dDerivedDocket-28`
-- gotcha-classes 2: `liveness-negative-from-another-population.md`, `orchestrator-hand-off-owed-a-disposition.md`
+- gotcha-classes 4: `liveness-negative-from-another-population.md`, `orchestrator-hand-off-owed-a-disposition.md`, `an-attested-count-must-count-what-the-grader-counts.md`, `a-spec-run-close-owes-the-closing-review-override.md`
 - globs 4: `tools/unattended/unattended.sh`, `tools/unattended/STOPS.template.md`, `memory/guides/UNATTENDED-STOPS.md`, `.unattended.conf`

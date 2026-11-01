@@ -1,0 +1,153 @@
+# TOOL-dTotalRecall-57 — a path-keyed keep row is admitted only for a file no pass may edit, so every editable file is kept by the one marker
+
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base 462d20f3 · streams tooling · order 30 · advances TOOL-dTotalRecall-27
+
+**Derived:** PLAY-dClosedLoop-2
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dTotalRecall-1-agent-ledger.md) | journal | TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-36 TOOL-dTotalRecall-37 TOOL-dTotalRecall-38 TOOL-dTotalRecall-39 TOOL-dTotalRecall-40 TOOL-dTotalRecall-41 TOOL-dTotalRecall-42 TOOL-dTotalRecall-43 TOOL-dTotalRecall-44 TOOL-dTotalRecall-45 TOOL-dTotalRecall-46 TOOL-dTotalRecall-47 TOOL-dTotalRecall-48 TOOL-dTotalRecall-49 TOOL-dTotalRecall-50 TOOL-dTotalRecall-51 TOOL-dTotalRecall-52 TOOL-dTotalRecall-53 TOOL-dTotalRecall-54 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-58 TOOL-dTotalRecall-59 TOOL-dTotalRecall-60 TOOL-dTotalRecall-61 TOOL-dTotalRecall-62 TOOL-dTotalRecall-63 TOOL-dTotalRecall-64 TOOL-dTotalRecall-65 TOOL-dTotalRecall-66 TOOL-dTotalRecall-67 TOOL-dTotalRecall-68 TOOL-dTotalRecall-69 TOOL-dTotalRecall-70 TOOL-dTotalRecall-71 TOOL-dTotalRecall-72 TOOL-dTotalRecall-73 TOOL-dTotalRecall-74 TOOL-dTotalRecall-75 TOOL-dTotalRecall-76 TOOL-dTotalRecall-77 TOOL-dTotalRecall-78 TOOL-dTotalRecall-79 TOOL-dTotalRecall-80 TOOL-dTotalRecall-81 TOOL-dTotalRecall-82 TOOL-dTotalRecall-83 TOOL-dTotalRecall-84 TOOL-dTotalRecall-85 TOOL-dTotalRecall-86 TOOL-dTotalRecall-87 TOOL-dTotalRecall-88 TOOL-dTotalRecall-89 TOOL-dTotalRecall-90 TOOL-dTotalRecall-91 TOOL-dTotalRecall-92 TOOL-dTotalRecall-93 TOOL-dTotalRecall-94 TOOL-dTotalRecall-95 TOOL-dTotalRecall-96 TOOL-dTotalRecall-97 TOOL-dTotalRecall-98 TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 |
+| [2026-10-26-build-TOOL-dTotalRecall-57-deviation-571.md](../build/2026-10-26-build-TOOL-dTotalRecall-57-deviation-571.md) | deviation | — |
+| [2026-10-26-build-TOOL-dTotalRecall-57-deviation-572.md](../build/2026-10-26-build-TOOL-dTotalRecall-57-deviation-572.md) | deviation | — |
+| [2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md](../reviews/2026-10-26-review-TOOL-dTotalRecall-54-spec-audit-round1.md) | spec-audit | TOOL-dTotalRecall-54 TOOL-dTotalRecall-59 TOOL-dTotalRecall-55 TOOL-dTotalRecall-56 TOOL-dTotalRecall-58 TOOL-dTotalRecall-60 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+The round-1 spec audit of units 44 to 53
+(`memory/builds/dTotalRecall/reviews/2026-10-26-review-TOOL-dTotalRecall-44-spec-audit-round1.md`)
+confirmed finding **id 4 at HIGH**. It shares item **H1** with ids 15, 24 and 37, which
+`TOOL-dTotalRecall-56`, `TOOL-dTotalRecall-58` and `TOOL-dTotalRecall-55` close.
+`TOOL-dTotalRecall-53` S34 makes one in-file marker the keep for the three code censuses, and its
+AC34 reds any remaining file-keyed exemption. Nothing in S34 exempts a file that cannot carry the
+marker, so the unit must either move pinned blobs or fail AC34. `TOOL-dTotalRecall-55` gives those
+files a path-keyed row outside their bytes. A path-keyed row is the very exemption S34 retired,
+though, and with no bound on it any file could be kept by a row again. This unit bounds the table to
+the files the marker cannot reach and re-observes AC34 under that carve-out. It repairs
+`TOOL-dTotalRecall-53`.
+
+## 2. Scope (IN)
+
+- **S1** — The domain rule. `read_kept_path` in `tools/memory-tree/tree_lib.py` refuses, by name, any
+  `CENSUS_KEPT_PATHS` row whose path does not match `memory/builds/*/build/*`, the files the README's
+  write rule (README:50) and the packet's non-goals put outside every pass of this build. The refusal
+  reaches both censuses as a red finding naming the row and the remedy `mark the kept line with
+  # census: kept`. Observed by AC1.
+- **S2** — AC34 under the carve-out. At the tip no constant named `ALIAS_COMPARE_KEPT` or
+  `CAUSE_WRITER_KEPT` exists under `tools`, and every row of `CENSUS_KEPT_PATHS` names a file under
+  `memory/builds/*/build/`. So a file under `tools/` is kept by S34's marker only. Observed by AC2.
+
+## 3. Non-goals (OUT)
+
+- The table and its eight cause rows: `TOOL-dTotalRecall-55`'s; the alias row: `TOOL-dTotalRecall-56`'s.
+- A marker written into a build-folder file: `TOOL-dTotalRecall-58`'s refusal.
+- `CAUSE_WRITER_PINNED`, unit 50's draining row, whose ask the batch `TOOL-dTotalRecall-60` resolves
+  for id 25.
+
+### Edges
+
+- **consumes-from** `TOOL-dTotalRecall-55` — `CENSUS_KEPT_PATHS` and `read_kept_path`, whose rows this
+  unit bounds
+- **consumes-from** `TOOL-dTotalRecall-53` — S34's marker and AC34's retirement of the two constants,
+  which this unit re-observes under the carve-out
+- **consumes-from** `TOOL-dTotalRecall-61` — the edge to unit 56 that unit writes in step 19, since AC2 reads both constants gone (the round-1 audit of units 54 to 60, id 1)
+- **hands-off** `TOOL-dTotalRecall-65` — `KEPT_PATH_DOMAIN`, which that unit keeps over its registry's rows (the round-1 audit of units 54 to 60, id 27)
+- **hands-off** `TOOL-dTotalRecall-66` — `KEPT_PATH_DOMAIN` and its refusal, which that unit derives from the memory root, anchors by segment and reports in the alias census (the round-1 audit of units 54 to 60, ids 5, 8, 14, 18, 29 and 42)
+- **consumes-from** `TOOL-dTotalRecall-67` — its edge to unit 56 and its sequencing line as unit 61 amends them, read by their own text at step 20 and written there if absent (the round-1 audit of units 61 to 66, id 1)
+- **consumes-from** `TOOL-dTotalRecall-72` — its consumes-from edge to unit 56, read by that unit at step 21 by a probe no shell quotes and written there if absent (the round-1 audit of units 67 to 70, id 10)
+
+## 4. Design
+
+### The rule
+
+```python
+KEPT_PATH_DOMAIN = "memory/builds/*/build/*"
+
+def read_kept_path(census, path):
+    for c, p, reason in CENSUS_KEPT_PATHS:
+        if not fnmatch.fnmatchcase(p, KEPT_PATH_DOMAIN):
+            raise ValueError(f"CENSUS_KEPT_PATHS row {p}: an editable file is kept by "
+                             "marking its line `# census: kept`")
+        ...
+```
+
+The refusal is raised on every call, so either census reds on the first bad row whatever hit it was
+asked about, and the census reports it as a finding rather than aborting its walk.
+
+### Inventory
+
+Minted: `KEPT_PATH_DOMAIN` in `tools/memory-tree/tree_lib.py`; the fixture plant
+`kept-row-editable`. Naming cell: none, no function being minted.
+
+### Files touched (estimate)
+
+- `tools/memory-tree/tree_lib.py`
+- `tools/memory-tree/record_causes.py`
+
+`TOOL-dTotalRecall-55`, `-56` and `-58` also write these modules at order 30, so BUILD-METHOD M6
+sequences the passes; this one follows unit 55.
+
+### Alternatives rejected
+
+- **Bound the rows by a list of pinned instruments.** Five of the eight files are unpinned and still
+  outside this build's write set; the folder glob is the rule the README states.
+- **Leave the table unbounded.** A row would again keep an editable file without a marker, the
+  two-grammar state S34 removed.
+
+## 5. Production-readiness checklist
+
+- security — no new surface.
+- perf / scale — one glob match per row per call; the table holds nine rows.
+- error / empty / loading states — a row outside the domain is a red finding naming it.
+- observability — the finding prints the row's path and the remedy.
+- risks — an adopter's own build-folder scripts are admitted by the same glob, which is the folder
+  shape the memory tree declares for every build.
+- testing — AC1 and AC2 by the pass; the arm of §7 at the close.
+- migration — none.
+- user docs — none under `help/`.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `python record_causes.py --fixture --plant kept-row-editable` runs from
+  `tools/memory-tree/` and builds a fixture whose table holds a row naming a Python file directly
+  under the fixture's `tools/` folder, `--check` exits 1 naming that row and the marker remedy.
+  Red when: a row naming an editable file keeps it.
+- **AC2** — When `git grep -nE "ALIAS_COMPARE_KEPT|CAUSE_WRITER_KEPT" -- tools` runs at the pass tip it
+  prints nothing, and a `python -c` probe over `tree_lib.CENSUS_KEPT_PATHS` finds every path matching
+  `memory/builds/*/build/*`.
+  Red when: either retired constant survives, or a row names a file under `tools/`.
+
+## 7. Gates
+
+`memory hygiene` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
+
+New arm: tools/memory-tree/record_causes.py · covers AC1 · the plant `kept-row-editable`, staged by skipping the domain match · none
+
+## 8. Open questions
+
+- **F1 — Which binding line does a unit the spec audit promoted carry?** The carries join reds a chain
+  spec carrying nothing and derived from nothing. Options: (a) `**Derived:**` naming
+  `PLAY-dClosedLoop-2`, the ruling that a chain spec run carries the units it adds; (b) a `part k/n`
+  carry of `TOOL-dTotalRecall-19`'s clause, which would split a clause that unit carries whole. (b)
+  reds the parts join; veto 1 discards it. RESOLVED (agent, 2026-10-26, delegated): (a), rung 3, the
+  precedent `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
+
+## 9. Revision log
+
+- rev-1 · 2026-10-26 · initial draft, promoted from the round-1 spec audit of units 44 to 53, id 4
+  (HIGH, item H1 shared with ids 15, 24 and 37).
+- rev-2 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-61, TOOL-dTotalRecall-65, TOOL-dTotalRecall-66, each the other end of an edge a unit the round-1 spec audit of units 54 to 60 promoted wrote; nothing else moved.
+- rev-3 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-67, the other end of an edge a unit the round-1 spec audit of units 61 to 66 promoted wrote; nothing else moved.
+- rev-4 · 2026-10-26 · §3 · the Edges block gains the mirror of TOOL-dTotalRecall-72, the other end of an edge a unit the round-1 spec audit of units 67 to 70 promoted wrote; nothing else moved.
+
+## 10. Reuse audit
+
+The seam extended is `read_kept_path` (`TOOL-dTotalRecall-55` S1), the one reader of the keep table,
+so the bound lives once and both censuses inherit it. `python tools/codebase-map/reuse_lookup.py "keep a census hit in a file that cannot be edited"`
+ranked name-stem neighbours and no existing bound on an exemption list; no existing seam fits for the
+domain rule beyond the accessor it sits in.
+
+Recall terms used: `python tools/memory-recall/query.py "how is a record written by a pinned instrument given its cause and kept green by the causes check" --terms "Caused-by causes legacy-records backfill instrument pinned repin departures record_causes census kept"`

@@ -32,5 +32,15 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-30](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | THE CARRIES INSTRUMENT AND THE PRODUCT CARRIES JOIN DISAGREE ON EVERY… |
 | [PLAY-dClosedLoop-31](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | THE CHAIN READMES ARE OPENED WITH A STATUS KEY THE INDEX REFUSES ONCE A… |
 | [PLAY-dClosedLoop-32](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | AN ASK FILED IN ANOTHER BUILD'S FAMILY CAN TAKE AN ID THAT BUILD HAS… |
+| [PLAY-dClosedLoop-33](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE CLOSE'S BAR IS THE FIRST GRADER OF HYGIENE CHECKS 15 AND 21. The… |
+| [PLAY-dClosedLoop-34](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE PREPARED MERGE OWES RENDERS THE LANDER DOES NOT WRITE. Each chain… |
+| [PLAY-dClosedLoop-35](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | GENERATED TEXT STOPS THE LANDER ON A CONFLICT. dKeptSession's --prepare… |
+| [PLAY-dClosedLoop-36](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SURFACED-DECISIONS ATTESTATION IS A TYPED COUNT. --attest… |
+| [PLAY-dClosedLoop-37](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | A SPEC RUN'S CLOSE OWES TWO STEPS THE CLOSE SECTION DOES NOT STATE. A… |
+| [PLAY-dClosedLoop-38](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE PACKET OWNS NO TRANSPORT POINT. cl-dClosedLoop-0333 names a lease… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | DEFERRED | MED | PLAY-dOrderedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [PLAY-dOrderedCharter-56](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE SLOTS NAME dBoundRoles AS THEIR RENDERER. PLAY-dOrderedCharter-17's… |
+| [PLAY-dOrderedCharter-57](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-26 | THE LOAD SET TAKES NO FEATURE SELECTION. TOOL-dFurnishedOrders-18… |
+| [PLAY-dOrderedCharter-58](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE FEATURE SELECTOR NAMES THE WRONG ARMING BUILD.… |
+| [PLAY-dOrderedCharter-59](../builds/dOrderedCharter/BACKLOG.md) | OPEN | LOW | — | 2026-10-26 | THE TYPED-KIND FILE-NAME JOIN READS A LOOSE STEM. The typed-kind join… |

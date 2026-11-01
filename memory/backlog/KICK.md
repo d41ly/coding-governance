@@ -19,4 +19,4 @@ Cite ids, never line numbers.
 | [KICK-aHonedRuleset-1](../builds/aHonedRuleset/BACKLOG.md) | OPEN | — | — | 2026-09-06 | charter §1's merge exception still names the merge-base otherwise while… |
 | [KICK-aReplayedCard-4](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | KICK-aReplayedCard-3 AC1/AC2 and TOOL-aReplayedCard-3 AC2 are owed at… |
 | [KICK-aReplayedCard-5](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | the engine is 63 B under its gate; the next engine edit splits Steps… |
-| [KICK-dKeptSession-29](../builds/dKeptSession/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [KICK-dKeptSession-29](../builds/dKeptSession/BACKLOG.md) | DEFERRED | MED | KICK-dKeptSession-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
