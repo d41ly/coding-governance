@@ -64,3 +64,9 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T12:58:45Z rescope · item add TOOL-dScopedBuild-39 · reason spec-audit round1 of units 25-35 minors batch, MEDIUM ids 1 2 3 4 5 6 7 12 13 14 15 23 27 28 30 31 and LOW ids 8 9 10 16 17 18 19 20 21 24 25 29 32
 
 2026-11-01T13:20:37Z review · item dScopedBuild-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 29 · disposition promote
+
+2026-11-01T14:41:51Z rescope · item add TOOL-dScopedBuild-40 · reason spec-audit round1 of units 36-39 finding id 24 at HIGH, report item H1
+
+2026-11-01T14:41:53Z rescope · item add TOOL-dScopedBuild-41 · reason spec-audit round1 of units 36-39 minors batch, MEDIUM ids 1 2 3 10 17 18 19 21 25 26 and LOW ids 4 5 6 7 8 9 11 13 14 15 22 23
+
+2026-11-01T15:04:10Z review · item dScopedBuild-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 22 · disposition promote

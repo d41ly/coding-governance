@@ -66,7 +66,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `1d0f0b0dc4ce8633dced25ef7d366e5247f8f048`
+- rendered at: `62d7511a658d3df53ef303da368b371af79ce216`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -188,12 +188,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dScopedBuild`:
 
-Coverage of dScopedBuild's 15 clauses and 23 owned nodes, over 30 specs:
+Coverage of dScopedBuild's 15 clauses and 23 owned nodes, over 32 specs:
 - carried whole: 15; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0407, cl-dClosedLoop-0408, cl-dClosedLoop-0410; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-25.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-26.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-27.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-28.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-29.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-30.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-31.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-32.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-33.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-34.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-35.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-36.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-37.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-38.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-39.md (PLAY-dClosedLoop-2)
+- specs derived from no clause: memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-25.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-26.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-27.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-28.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-29.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-30.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-31.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-32.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-33.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-34.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-35.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-36.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-37.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-38.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-39.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-40.md (PLAY-dClosedLoop-2), memory/builds/dScopedBuild/spec/2026-11-01-spec-TOOL-dScopedBuild-41.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0399, cl-dClosedLoop-0401, cl-dClosedLoop-0403, cl-dClosedLoop-0404, cl-dClosedLoop-0405, cl-dClosedLoop-0409, cl-dClosedLoop-0411
 
 ### Reading order

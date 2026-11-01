@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-5 — a write gate reading derived state: the routed unit's step from the position engine and its lease's write set, never its status line
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 7 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 7 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0403@3c89f2a1 whole
 **Carries:** node:item.build.unit-lease
@@ -9,7 +9,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-40 TOOL-dScopedBuild-41 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md](../build/2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md) | research | TOOL-dScopedBuild-3 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
@@ -106,6 +106,7 @@ meet the same verdict through dBoundRoles' shell check, and the main loop's meet
 - **consumes-from** external — TOOL-dDeclaredLoop-7 S7's `position.py <slug> --json`, TOOL-dBoundRoles-7 S3's `checkShellWrites`, and dGroundRules' landed `policy-mirror.js` and `policy-shim.sh`
 - **hands-off** `TOOL-dScopedBuild-35` — S2's and §4's lease word and S4's `readUnitLease` arity, S3; S4's spawn bound, S25; and AC8's per-file grep, S35 (ids 6, 43, 9)
 - **consumes-from** `TOOL-dScopedBuild-38` — S2's `read_unit_writes(unit, spec_text, run_rows, tracked, entries)`, which S2's lease read calls with `check_conf`'s entries (id 26)
+- **hands-off** `TOOL-dScopedBuild-41` — S2's `read_unit_writes` call, spelled with five parameters as TOOL-dScopedBuild-38 S2 states, whose ledger line for AC3 this unit's builder writes naming that unit's S14 (id 5)
 
 ## 4. Design
 
@@ -313,6 +314,8 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-35, promoted by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-38,
   the promotions of the round-1 spec audit of units 25 to 35 (id 26).
+- rev-4 · 2026-11-01 · §3 · the Edges block gains the bullet mirroring the edges of TOOL-dScopedBuild-41,
+  the promotions of the round-1 spec audit of units 36 to 39 (id 5).
 
 ## 10. Reuse audit
 

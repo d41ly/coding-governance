@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-37 — the bar scrub is the hook's `BAR_SCRUBBED_KNOBS` plus the driver's two, so `GATE_REGEN_CHECK` is scrubbed too
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-40 TOOL-dScopedBuild-41 |
+| [2026-11-01-review-TOOL-dScopedBuild-36-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-36-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-38 TOOL-dScopedBuild-36 TOOL-dScopedBuild-39 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,7 @@ hook's own line. It repairs `TOOL-dScopedBuild-32` and builds one step after it 
 ### Edges
 
 - **consumes-from** `TOOL-dScopedBuild-32` — S1's `derive_bar_scrub` knob line and AC1's and AC2's knob sets, which S1 and S2 restate with `GATE_REGEN_CHECK` (id 22)
+- **hands-off** `TOOL-dScopedBuild-41` — S1's comment and S3's `gates-green` line, which this unit's builder observes in the driver suite's TOOL-aFrugalTurnstile-12 AC1/AC2 arm with `GATE_REGEN_CHECK=0` exported, AC2's hook cut, which that unit's AC9 requires non-empty, and §3, which its S22 completes with `PM_SCRUB` (ids 6, 25, 22)
 
 ## 4. Design
 
@@ -157,6 +159,8 @@ in this unit's acceptance ledger.
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the round-1 spec audit of units 25 to 35, id 22
   (HIGH, item H2).
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullet mirroring the edges of TOOL-dScopedBuild-41,
+  the promotions of the round-1 spec audit of units 36 to 39 (ids 6, 25, 22).
 
 ## 10. Reuse audit
 

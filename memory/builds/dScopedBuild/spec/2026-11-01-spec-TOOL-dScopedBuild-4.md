@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-4 — the closing review recorded as `review.build.when` says: per build, per unit or per landing, in both modes
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0402@19e9688b whole
 **Carries:** node:policy-key.review.build.when
@@ -10,7 +10,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-40 TOOL-dScopedBuild-41 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-2-reuse-scout-c.md](../build/2026-11-01-build-TOOL-dScopedBuild-2-reuse-scout-c.md) | research | TOOL-dScopedBuild-2 TOOL-dScopedBuild-13 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
@@ -122,6 +122,7 @@ both of dDeclaredLoop, a parent of dIndexedDesign and dWitnessedBar.
 - **hands-off** `TOOL-dScopedBuild-25` — S7's `resolve_policy_cli` and its `review.build.when` read, S8's `decisions.major` read, and AC8's grep clause, which that unit respells in the counted shape and supersedes (id 1)
 - **hands-off** `TOOL-dScopedBuild-35` — S1's arm against the earlier exits' fixtures, S2; S3's per-unit commits by I8, S10; S7's and S8's reads failing closed, S30; and §4's sentence on the two DoD items, S36 (ids 5, 25, 48, 10)
 - **hands-off** `TOOL-dScopedBuild-39` — S3's per-unit commit read, for which this unit's builder mints `--unit-commits` in TOOL-dScopedBuild-35 S10's spelling, as that unit's S9 rules (id 6)
+- **hands-off** `TOOL-dScopedBuild-41` — S3's `--unit-commits` write to `tools/memory-tree/routed_commits.py`, which this unit's builder adds to its Files touched by a rev bump before building, as that unit's S9 rules (id 18)
 
 ## 4. Design
 
@@ -314,6 +315,8 @@ New arm: tools/unattended/check-unattended.test.sh · covers AC5 · a run-state 
 - rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-25, TOOL-dScopedBuild-35, promoted by the round-1 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-39,
   the promotions of the round-1 spec audit of units 25 to 35 (id 6).
+- rev-4 · 2026-11-01 · §3 · the Edges block gains the bullet mirroring the edges of TOOL-dScopedBuild-41,
+  the promotions of the round-1 spec audit of units 36 to 39 (id 18).
 
 ## 10. Reuse audit
 
