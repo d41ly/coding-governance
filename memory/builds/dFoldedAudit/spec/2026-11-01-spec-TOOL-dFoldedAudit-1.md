@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
+**Status:** OPEN · rev-4 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,7 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
+| [2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md) | journal | TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-1-reuse-scout.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-1-reuse-scout.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-2-orienter.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-2-orienter.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
@@ -19,6 +20,7 @@
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-spec-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md) | research | TOOL-dFoldedAudit-5 |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md) | research | TOOL-dFoldedAudit-8 |
 
 <!-- /gen:spec-records -->
 
@@ -155,7 +157,7 @@ refuses the round and names this route.
 **The bytes.** The render measured 29354 at BASE and 30565 with this text, leaving 155 of 30720.
 PINNED at 2026-11-01 over the render, CR-stripped, by applying these edits to the BASE render.
 Should a name run long, the builder shortens the new paragraphs and never touches M1's ceiling.
-TOOL-dDeclaredLoop-20's unbuilt S9 will need about 60 more of those bytes, so the builder leaves them.
+The unbuilt S9 of TOOL-dDeclaredLoop-20 will need about 60 more of those bytes, so the builder leaves them.
 
 ### The review protocol
 
@@ -450,6 +452,9 @@ none
 - rev-3 · 2026-11-01 · §6 · AC5 · the fix brief's item 1. AC5 spelled the sha and the template path
   as one word, which the spec-tokens paths join read as an untracked path, so `--dispatch` refused the
   unit. The sha is now `<base>`, pinned under the criterion. The observation does not move.
+- rev-4 · 2026-11-01 · §4 · the unit 8 fix brief's item 2. The bytes paragraph's last sentence no longer
+  opens on another build's id. The sentence never met the anchor grammar, so check 13's hit on that id
+  was unit 8's heading alone. The byte figures do not move.
 
 ## 10. Reuse audit
 

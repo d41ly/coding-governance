@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-8 — dClosedLoop's unbuilt specs and its frozen design take the same rules
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 80
+**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 80
 
 <!-- gen:spec-records -->
 
@@ -9,8 +9,11 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
+| [2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md) | journal | TOOL-dFoldedAudit-1 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-8-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-build-brief.md) | research | — |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md) | research | TOOL-dFoldedAudit-1 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -85,7 +88,7 @@ parks that spec's edit with the reason. Edits below match on their old text, nev
 an old text is gone, the pass parks that edit and does not adapt it. Each new rev is the file's current
 rev plus one, and the header's date moves to the pass's date.
 
-### `TOOL-dDeclaredLoop-32`
+### The revision of `TOOL-dDeclaredLoop-32`
 
 `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md`, rev-2 to rev-3.
 
@@ -171,7 +174,7 @@ E13:
   `<the record's stem>`; follow-ups and fix passes keep the rule.
 ```
 
-### `TOOL-dDeclaredLoop-20`
+### The revision of `TOOL-dDeclaredLoop-20`
 
 `memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md`, rev-2 to rev-3.
 
@@ -205,7 +208,7 @@ E3, §9:
 
 AC9 stands. Its `wc -c` still bounds the guide, and TOOL-dFoldedAudit-1 leaves room for S9's pointer.
 
-### `TOOL-dFairHearing-17`
+### The revision of `TOOL-dFairHearing-17`
 
 `memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-17.md`, rev-3 to rev-4. The §3 bullet
 at `:64-65` becomes the text below, and the §9 line follows it.
@@ -362,6 +365,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-01 · initial draft, from the design record's [closedloop] tag and the brief's item 8.
+- rev-2 · 2026-11-01 · §4 · the unit 8 fix brief's item 1. Three §4 headings opened with another build's
+  id, which the anchor grammar reads as this folder's claim, so check 13 named each id claimed by two
+  build folders. Each heading now opens "The revision of"; no text cited them, and no edit moves.
 
 ## 10. Reuse audit
 

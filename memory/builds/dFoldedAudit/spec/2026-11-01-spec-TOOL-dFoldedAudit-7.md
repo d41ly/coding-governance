@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-7 — policy keys switch the disposal, the stop and the ceiling
 
-**Status:** INPROGRESS · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 10
+**Status:** INPROGRESS · rev-4 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -11,10 +11,13 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 |
 | [2026-11-01-build-TOOL-dFoldedAudit-7-2-stopped-dispatches.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-2-stopped-dispatches.md) | journal | — |
+| [2026-11-01-build-TOOL-dFoldedAudit-7-3-fixture-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-3-fixture-fold-return.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-7-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-1-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-7-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-7-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-build-brief.md) | research | — |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-7-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-fix-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-7-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-7-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -31,14 +34,15 @@ later unit of this build reads one switch instead of coding one rule.
   `review.spec-audit.chain-stop` and `review.spec-audit.chain-ceiling`, each with `summary` and
   `usage`, the ceiling row with `direction`. Observed by AC1 and AC6.
 - **S2** — `read_spec_audit_switch` in `tools/unattended/unattended.sh`, the driver's one reader of
-  the three keys, called on demand and never by `load_driver_conf`. Observed by AC2, AC3 and AC8.
+  the three keys, called on demand and never by `load_driver_conf`. Observed by AC2, AC3, AC8 and
+  AC10.
 - **S3** — Three kit-default constants beside `SPEC_COUNTS_CUTOFF`, which the reader answers with
   when no policy kit resolves, held to the catalogue's defaults. Observed by AC4 and AC5.
 - **S4** — The conf key `SPEC_FOLD_CUTOFF`, declared blank in `.unattended.conf` and in
   `tools/unattended/.unattended.conf.example`, initialised in the driver's conf block and refused at
   load when it is not an ISO date. Observed by AC6 and AC7.
-- **S5** — `.governance/policy.json` re-rendered in a commit of its own after the catalogue commit.
-  Observed by AC9.
+- **S5** — `.governance/policy.json` re-rendered in a second commit after the catalogue commit, under
+  its own `--dispatch`, as §4's Rollout states. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -212,9 +216,29 @@ It exits 2, so it is no refusal site for `check-arms`, whose signature reads `ex
 ### Rollout
 
 Dark by construction: nothing calls the reader until `TOOL-dFoldedAudit-2`, and the cutoff stays blank
-until the close. The pass makes two commits. `tools/policy/guard.py` refuses a mirror staged beside
-an input it records, so the catalogue commits first and `policy.py mirror --write` commits second
+until the close.
+
+The pass makes two commits. `tools/policy/guard.py` refuses a mirror staged beside an input it records,
+so the catalogue commits first and `policy.py mirror --write` renders what that commit landed
 (`tools/policy/README.md:352-353`).
+
+| Commit | Declared by | Trailer | Holds | Spec status after |
+|---|---|---|---|---|
+| first | the unit's `--dispatch` | `Pass: TOOL-dFoldedAudit-7` | every §4 file but the mirror | INPROGRESS |
+| second | a new `--dispatch`, anchored at the first commit, naming this commit's paths | `Pass: TOOL-dFoldedAudit-7` | `.governance/policy.json`, this spec's CLOSED flip, `memory/builds/dFoldedAudit/README.md` and `memory/LIVE.md` re-rendered, and the unit's ledger record | CLOSED |
+
+`d7e8a027a` is the precedent for the second row and its trailer: it sits under a dispatch of its own
+anchored at `f6674a6a`, with a `Pass:` line of its own. It is not the precedent for the flip, because
+that unit went CLOSED in its first commit, `f6674a6a2`. This unit flips in the second because the
+ledger gate asks a line of every criterion a closed spec numbers (`memory/HYGIENE.md:713`), and AC9
+has nothing to observe until the mirror is written. The flip still lands in a pass commit, which is
+what `tools/unattended/unattended.sh:13659-13660` assumes. The harness's "that same commit"
+(`tools/workflows/unattended-unit.js:314`) therefore means the second commit here.
+
+The flip moves the build README and `memory/LIVE.md`, as `9c40ec3b4` shows for the flip to INPROGRESS,
+so `python tools/memory-tree/gen_build_index.py --write` runs before the second commit. A first row
+that also names the mirror, as both rows already in `memory/builds/dFoldedAudit/RUN.md` do, needs no
+repair: a declared path left unused is conservative (`tools/unattended/check-unattended.sh:4246-4247`).
 
 ### Files touched (estimate)
 
@@ -234,6 +258,8 @@ an input it records, so the catalogue commits first and `policy.py mirror --writ
 - **The read inside `load_driver_conf`.** Three spawns on every verb, against the spawn budget leg.
 - **A driver constant for the cutoff, as `SPEC_COUNTS_CUTOFF` is.** The design rules a conf key, and a
   constant would move every adopter on a kit update.
+- **The CLOSED flip in the first commit, as `f6674a6a2` did.** Its ledger would have to answer AC9
+  before the mirror AC9 reads exists.
 
 ## 5. Production-readiness checklist
 
@@ -267,9 +293,12 @@ an input it records, so the catalogue commits first and `policy.py mirror --writ
 Each fixture is a scratch git repository under `%TEMP%` with a short name, on branch `main`, with no
 remote, so `policy.py get` reads the local `main` (`tools/policy/README.md:220-223`). Fixture K holds
 copies of `tools/unattended/unattended.sh`, `tools/unattended/lib-unattended.sh`,
-`tools/policy/policy.py` and `tools/policy/catalogue.toml` at those paths, and a `.unattended.conf`
-holding `MEMORY_ROOT=memory`, all committed. Fixture N is K without `tools/policy/`. The probe, run with
-the fixture as its working directory and `$F` its absolute path:
+`tools/policy/policy.py`, `tools/policy/budgets.py` and `tools/policy/catalogue.toml` at those paths,
+and a `.unattended.conf` holding `MEMORY_ROOT=memory`, all committed. `tools/policy/budgets.py` is
+there because `validate` runs whenever a policy file is committed and imports it
+(`tools/policy/policy.py:599`), so without it AC2 and AC3 print a traceback. `tools/policy/caps.toml`
+is not needed. Fixture N is K without `tools/policy/`. The probe, run with the fixture as its working
+directory and `$F` its absolute path:
 
 ```bash
 bash -c '. "$1"; load_driver_conf; read_spec_audit_switch "$2"' _ "$F/tools/unattended/unattended.sh" <key>
@@ -312,9 +341,21 @@ The `_` keeps `$0` apart from the sourced path: the source guard at
   runs, it prints 0, and `grep -c 'policy.py" get review.spec-audit\.' tools/unattended/unattended.sh`
   prints 3.
   Red when: the read moves into the loader, or a key reaches `get` through a variable.
-- **AC9** — When `python tools/policy/policy.py mirror --check` runs after the second commit, it prints
-  `policy: mirror fresh`, and `grep -c '"review.spec-audit\.' .governance/policy.json` prints 3.
-  Red when: the mirror is not re-rendered, which prints `mirror stale`.
+- **AC9** — When `python tools/policy/policy.py mirror --check` runs after `policy.py mirror --write`
+  over the first commit, it prints `policy: mirror fresh`, and
+  `grep -c '"review.spec-audit\.' .governance/policy.json` prints 3.
+  Red when: the mirror is not re-rendered, which prints `mirror stale`. The check compares the file in
+  the tree with the render at HEAD (`tools/policy/policy.py:1404`, `:1411-1416`), so the second commit
+  moves neither side, and the ledger that commit carries can answer this criterion.
+- **AC10** — When K's copy of `tools/policy/catalogue.toml` adds `fold-all` to the `allowed` of the
+  `review.spec-audit.disposal` row and K commits `.governance/policy.toml` setting
+  `disposal = "fold-all"`, the probe for `disposal` exits 1 and its stdout names `disposal` and
+  `fold-all`, with no line that is `fold-all` alone. When the probe runs in K with `bogus` for its key,
+  it exits 1 and its stdout names `disposal`, `chain-stop` and `chain-ceiling`.
+  Red when: the closed-set check is absent, so `get`'s `fold-all` prints alone with exit 0, or the
+  argument `case` has no default arm, so `bogus` exits 0 naming nothing.
+  fixture: `policy.py get` answers `fold-all` with exit 0 over that catalogue and policy file, measured
+  on 2026-11-01 without the reader, so the case reaches the fourth row of §4's table and not the third.
 
 ## 7. Gates
 
@@ -329,6 +370,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 · a fixture with no 
 New arm: tools/unattended/unattended.test.sh · covers AC5 · `SPEC_AUDIT_DISPOSAL_DEFAULT` staged to `promote-all` · none
 New arm: tools/unattended/unattended.test.sh · covers AC7 · a `PARITY_ROWS` conf-refusal row with `SPEC_FOLD_CUTOFF="soon"`, and beside it, after the table's loop in the same shard, `run --version` over that conf held by `hit` on `SPEC_FOLD_CUTOFF is declared as 'soon', which is not an ISO date` and `same` on exit 2, and over a blank and a dated key by `miss` on that text and `same` on exit 0; staged with the shape case deleted, which reds the `hit` and the `same` and leaves the row green · none
 New arm: tools/unattended/unattended.test.sh · covers AC8 · the source read of `load_driver_conf`'s body, staged with the reader called from it · none
+New arm: tools/unattended/unattended.test.sh · covers AC10 · a catalogue copy widened with `fold-all` and a policy file setting it, beside a `bogus` argument, staged with the closed-set check deleted and then the argument `case`'s default arm deleted; the catalogue half needs the policy kit beside this one, so its assertions are counted either way on the `_da_home` shape (`tools/unattended/unattended.test.sh:12355-12358`) · none
 
 ## 8. Open questions
 
@@ -347,6 +389,14 @@ none
   (`tools/unattended/unattended.test.sh:2361-2366`), so deleting the shape case changes both sides
   alike. The row stays, a positive assertion of the refusal text and exit status now sits beside
   it, and AC7 names that text. The driver's design does not move.
+- rev-4 · 2026-11-01 · §2 §4 §6 §7 · S2 S5 · AC9 AC10 · the fix brief's three items. Fixture K gains
+  `tools/policy/budgets.py`, because `validate` imports it (`tools/policy/policy.py:599`) and AC2 and
+  AC3 printed a traceback without it. AC10 and its arm observe the reader's closed-set and
+  bad-argument rows, which had no criterion. §4's Rollout states the two commits, and AC9 now reads
+  before the second, because that commit carries the CLOSED flip and the ledger. The brief credited
+  the flip's place to `d7e8a027a`, which carries only the row and the trailer: the flip sat in
+  `f6674a6a2`. §4 therefore records the placement as this unit's own, with its reason. The reader and
+  the catalogue rows do not move.
 
 ## 10. Reuse audit
 

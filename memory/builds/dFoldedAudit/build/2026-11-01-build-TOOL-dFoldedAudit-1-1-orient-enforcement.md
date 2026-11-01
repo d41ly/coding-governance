@@ -114,7 +114,7 @@ All cites are relative to `C:\projects\coding-governance\.claude\worktrees\gov-b
 
 - **Log ids** (the orientation names spec ids; the decision rows are these):
   - TOOL-aProbedUnit-9, 2026-09-14: mediums and lows FOLDED (`memory/DECISIONS.md:114`).
-  - TOOL-dGatedProse-4: precision bound (:216).
+  - Row TOOL-dGatedProse-4: precision bound (:216).
   - TOOL-aBatchedMinors-5, DIFF 2026-10-04 (:219).
   - TOOL-aEvidencedLens-17, SPEC 2026-10-05, "Supersedes the fold half" of aProbedUnit-9 (:220). The new ruling supersedes this one for spec audits.
 - **Specs:**
