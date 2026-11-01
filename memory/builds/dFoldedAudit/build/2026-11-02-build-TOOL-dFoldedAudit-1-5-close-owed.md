@@ -20,4 +20,8 @@ Every unit's own return is recorded under `build/`. This record lists only what 
 - `two-answers-to-one-question` again: the `DONE` prefix test is spelled twice in the harness, at row 16 and the attended grading.
 - The `spec-tokens` dossier's `title` still says "Seven joins", stale before this build.
 - Unit 4's §4 shape for the supersede report line is short of the code: the line also prints ` · of <N> live spec(s) · no waiver reaches a hit`.
+- `two-answers-to-one-question` a third time: the id grammar and the severity and nature lists are spelled in both `write_chain_round` and `derive_chain_verdict`, beside `_ids_of`.
+- `amendment-leaves-its-other-half-standing`: the terminal-subject throw in `writeRound` still says a re-invoke passes `promotedIds` as `auditIds`. Under a declared `disposal` the ids are the ones `--chain-verdict` names.
+- Unit 5 owes seven arms, recorded in its ledger. `unattended kit gate` may red until unit 1 writes the verbs' entries.
+- Pre-existing, preserved by unit 5's S11: with an empty `BYPASS_BAN`, `${BYPASS_BAN:+x}$r` does not guard the glob, so every waiver is refused.
 - Three check 2 branches about the rescope acts carry no literal arm line in a `check-arms.py` probe. Unit 2 did not touch them; the `harness arms` leg judges them.
