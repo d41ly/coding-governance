@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-40 — `derive_kit_dir` never reduces a path to a directory that holds a routed entry, so a nested routed root stays out of an unrouted sibling's write set
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 7 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 7 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-41 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-41 TOOL-dScopedBuild-42 TOOL-dScopedBuild-43 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-40-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-40-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-40-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-40-promoted-fix-brief.md) | research | TOOL-dScopedBuild-39 TOOL-dScopedBuild-41 |
+| [2026-11-01-review-TOOL-dScopedBuild-40-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-40-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-41 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,7 @@ This unit adds one guard to the rule and states its class as "covers no entry". 
 
 - **consumes-from** `TOOL-dScopedBuild-38` — S1's rule, S3's class and AC2, which S1 guards and S2 restates as covering no entry (id 24)
 - **hands-off** `TOOL-dScopedBuild-41` — S1's guard, which closes the nested-entry case that unit's S13 observes (id 4)
+- **hands-off** `TOOL-dScopedBuild-43` — S1's directory case, S2's class and S4's ledger clause, which that unit's S1 to S3 complete: a declared directory's own grant stands, and the class holds over results that differ from their path (ids 1, 8, 15)
 
 ## 4. Design
 
@@ -175,6 +177,7 @@ New arm: tools/memory-tree/routed_commits.py · covers AC3 · the `src/app/` fix
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the round-1 spec audit of units 36 to 39, id 24
   (HIGH, item H1).
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullet mirroring the edges of TOOL-dScopedBuild-43, the minors batch of the round-1 spec audit of units 40 and 41 (ids 1, 8, 15).
 
 ## 10. Reuse audit
 

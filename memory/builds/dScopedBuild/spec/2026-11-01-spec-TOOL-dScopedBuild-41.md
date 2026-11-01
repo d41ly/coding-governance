@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-41 — the round-1 audit of units 36 to 39, its 22 minors batched: 10 MEDIUM and 12 LOW findings, each its own scope item
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 18 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 18 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-40 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-40 TOOL-dScopedBuild-42 TOOL-dScopedBuild-43 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-40-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-40-promoted-fix-brief.md) | research | TOOL-dScopedBuild-39 TOOL-dScopedBuild-40 |
+| [2026-11-01-review-TOOL-dScopedBuild-40-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-40-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-40 |
 
 <!-- /gen:spec-records -->
 
@@ -169,6 +170,8 @@ clause with a note naming this unit's scope item.
 - **consumes-from** `TOOL-dScopedBuild-5` — S2's `read_unit_writes` call and the ledger line answering it, which S14 supersedes and AC3 reads (id 5)
 - **consumes-from** `TOOL-dScopedBuild-29` — the ledger note on §3's first bullet, which S19 respells and AC3 reads (id 11)
 - **consumes-from** `TOOL-dScopedBuild-30` — the ledger note on §4's last Evidence command, which AC3 reads for S3 to S5 (ids 2, 14, 23)
+- **hands-off** `TOOL-dScopedBuild-42` — S1's cached-diff read and AC2's rerun half, which that unit supersedes with a count of the staged ask rows joined to the findings (id 14)
+- **hands-off** `TOOL-dScopedBuild-43` — §1, §4, §5, §10, S1, S11, S19, S22, F3, AC9 and AC14, which that unit's S4 to S11 complete, and S22's `PM_SCRUB` word, which its arm holds (ids 3, 4, 9, 5, 7, 10, 11, 13)
 
 ## 4. Design
 
@@ -390,6 +393,8 @@ New arm: tools/codebase-map/reuse_check.py · covers AC10 · the syntax-error an
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the round-1 spec audit of units 36 to 39, its 22
   minors: MEDIUM ids 1 2 3 10 17 18 19 21 25 26 and LOW ids 4 5 6 7 8 9 11 13 14 15 22 23.
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-42 and TOOL-dScopedBuild-43, the promotions of the round-1 spec audit of units 40
+  and 41 (ids 14, 3, 4, 9, 5, 7, 10, 11, 13).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-39 — the round-1 audit of units 25 to 35, its 29 minors batched: 16 MEDIUM and 13 LOW findings, each its own scope item
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 17 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 17 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-40 TOOL-dScopedBuild-41 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-40 TOOL-dScopedBuild-41 TOOL-dScopedBuild-42 TOOL-dScopedBuild-43 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-39-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-39-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-39-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-39-promoted-fix-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-40-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-40-promoted-fix-brief.md) | research | TOOL-dScopedBuild-40 TOOL-dScopedBuild-41 |
@@ -199,6 +199,7 @@ clause with a note naming this unit's scope item.
 - **consumes-from** `TOOL-dScopedBuild-32` — S1's scrub, S2's `run_gate_bar` and AC2, which S10, S11, S14 and S15 complete (ids 7, 16, 15, 31)
 - **consumes-from** `TOOL-dScopedBuild-35` — AC18, S10, S21 and S26, which S2 to S4, S9, S12, S13 and S19 complete (ids 2, 13, 29, 6, 14, 20, 28)
 - **hands-off** `TOOL-dScopedBuild-41` — S22's two trees, which this unit's builder builds with `build_fixture(..., checkout=True)` and reads by `git diff --cached --name-only`; AC10's first plant, a `.cmd` stub on Windows asserting no `GOV_BASH is set to` line; S18's load failure as the class, any exception or a module lacking `read_policy_value`; and S8, S9, S15, S16, S27 to S29, §4 and AC4, AC5, AC13, AC20 and AC21, which that unit's S1 to S9, S12, S16 and S18 to S20 complete (ids 1, 21, 2, 14, 23, 3, 10, 17, 18, 26, 7, 9, 11, 13)
+- **hands-off** `TOOL-dScopedBuild-42` — S22's two trees and AC17's driver-suite arm, which that unit's pass extends with a count of the staged ask rows after each run (id 14)
 
 ## 4. Design
 
@@ -433,6 +434,7 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC18 · the de
   24 25 29 32.
 - rev-2 · 2026-11-01 · §3 · the Edges block gains the bullet mirroring the edges of TOOL-dScopedBuild-41,
   the promotions of the round-1 spec audit of units 36 to 39 (ids 1, 21, 2, 14, 23, 3, 10, 17, 18, 26, 7, 9, 11, 13).
+- rev-3 · 2026-11-01 · §3 · the Edges block gains the bullet mirroring the edges of TOOL-dScopedBuild-42, the promotion of the round-1 spec audit of units 40 and 41 (id 14).
 
 ## 10. Reuse audit
 
