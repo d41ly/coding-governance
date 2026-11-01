@@ -171,7 +171,10 @@ function chunk(a, n) {
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
 //            closes,                               //   optional: [<ask id>], the asks this unit answers
-//            planState }],                         //   REQUIRED in attended mode, from --plan
+//            planState }],                         //   REQUIRED in attended mode, from --plan, and under
+//                                                  //   `disposal: by-nature` on every unit a disposal return
+//                                                  //   names: an absent state would read as unbuilt, so the
+//                                                  //   frozen join refuses it rather than defaulting
 //   mode: "unattended" | "attended",              // DEFAULTS to "unattended"
 //   runStateExists: <bool>,                         // caller-supplied; this script cannot detect it
 //   specAudit: "<YYYY-MM-DD>",                      // the README front-matter `spec-audit:` override the
@@ -867,6 +870,11 @@ const SPEC_COMMIT_SCHEMA = {
 // asks for it, and absence is refused by `deriveDispositionFault`, as `edges === null` is below. It
 // binds what the stage SAYS it wrote for the same reason the pair above does: TOOL-dFoldedAudit-6's
 // deviation join is what reads a rev move against the tree.
+//
+// `siblingEdits` IS THE LIST OF SPECS A REPAIR REWROTE (TOOL-dFoldedAudit-4 S2), `{unit, rev}` and no
+// more, which is why it stays out of `dispositions`: an entry there needs a finding id and a severity
+// this list does not hold. It sits out of `required` for `dispositions`' reason, and only `by-nature`
+// asks for it. It binds what the stage SAYS as well: whether a sibling was edited is read from the tree.
 const DISPOSAL_SCHEMA = {
   type: 'object',
   required: ['disposed', 'standing', 'promoted', 'folded', 'promotedIds', 'edges', 'placements', 'summary'],
@@ -912,6 +920,17 @@ const DISPOSAL_SCHEMA = {
           severity: { type: 'string', enum: ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'] },
           nature: { type: 'string', enum: ['local', 'new-mechanism'] },
           specs: { type: 'array', items: { type: 'string' } },
+          unit: { type: 'string' },
+          rev: { type: 'integer', minimum: 1 },
+        },
+      },
+    },
+    siblingEdits: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['unit', 'rev'],
+        properties: {
           unit: { type: 'string' },
           rev: { type: 'integer', minimum: 1 },
         },
@@ -2099,6 +2118,16 @@ function deriveReadRev(unit) {
 // justification and `au` holds that adjudication.
 // WHAT THIS DOES NOT CHECK: that a named spec moved or that its section 9 line exists. This runtime has
 // no filesystem, as `edges` says of itself, and TOOL-dFoldedAudit-6's deviation join reads the tree.
+//
+// TOOL-dFoldedAudit-4 S3 and S4 - THE SIBLING ROWS AND THE FROZEN JOIN, spec rows 11 to 16, under
+// `by-nature` alone and after the ten above, whose reasons the arms read first. A sibling edit is a rev
+// bump on a spec of this roster beside a repair unit. `planState` is the one fact here about what a unit
+// is, read by the `DONE` prefix the attended grading matches, so `DONE (THIN)` is as frozen as `DONE`, and
+// WONTDO reads as `DONE` too. A unit this invocation authored reads `MISSING` and passes. The state is
+// current because this stage runs before any unit is dispatched. An absent state refuses and never reads
+// as unbuilt, and only on a unit the stage named, so a caller passing none and folding nothing is not
+// touched. This is a refusal AFTER the write: a frozen spec a stage edited stays edited until the caller
+// reverts it, and the empty roster is what stops anything building on it.
 function deriveDispositionFault(d, promotedIds) {
   const list = d.dispositions
   if (!Array.isArray(list)) {
@@ -2189,6 +2218,40 @@ function deriveDispositionFault(d, promotedIds) {
       return 'finding ' + e.id + ' addresses ' + stray.join(', ') + ', which neither this roster nor `promotedIds` carries'
     }
   }
+  if (!byNature) return ''
+  const edits = d.siblingEdits
+  if (!Array.isArray(edits)) {
+    return 'the stage returned no `siblingEdits` list — an absent list and a declared empty one are different answers'
+  }
+  for (const e of edits) {
+    if (!e || typeof e !== 'object' || typeof e.unit !== 'string' || !e.unit || !Number.isInteger(e.rev)) {
+      return 'a `siblingEdits` entry is outside the {unit, rev} shape, so it names no spec and no rev: ' + JSON.stringify(e)
+    }
+    if (e.rev <= deriveReadRev(e.unit)) {
+      return 'sibling ' + e.unit + ' was edited at rev ' + e.rev + ', not above the rev ' +
+        deriveReadRev(e.unit) + ' the audit read — a sibling edit is a rev bump'
+    }
+    if (rosterIds.indexOf(e.unit) === -1) {
+      return 'sibling edit ' + e.unit + ' is outside this roster — a promoted unit\'s own spec is no sibling, ' +
+        'and a stray names no spec of this build'
+    }
+  }
+  if (edits.length && !promotedIds.length) {
+    return '`siblingEdits` names ' + edits.map(function (e) { return e.unit }).join(', ') + ' beside an empty ' +
+      '`promotedIds` — a correction with no repair unit is a fold, and it belongs in `dispositions`'
+  }
+  const foldTargets = list.filter(function (e) { return e.nature === 'local' }).map(function (e) { return e.unit })
+  for (const id of edits.map(function (e) { return e.unit }).concat(foldTargets)) {
+    const state = ordered.find(function (u) { return u.id === id }).planState
+    if (typeof state !== 'string' || !state) {
+      return 'unit ' + id + ' carries no `planState` — it is the only fact here about what a unit is, and an ' +
+        'absent state cannot read as unbuilt, so the caller copies it from `' + DRIVER + ' --plan ' + slug + ' --paths`'
+    }
+    if (state.indexOf('DONE') === 0) {
+      return 'unit ' + id + ' is frozen at `planState` ' + state + ' — a built spec is never edited, and a ' +
+        'correction to it is a new unit built on top'
+    }
+  }
   return ''
 }
 
@@ -2233,7 +2296,9 @@ phase('Disposal')
 // is the hoist's third rider: the units the promotions became, which the caller passes back as
 // `auditIds` so the next invocation audits them before anything builds them. `dispositions` is the
 // fourth, a stated `[]` on a skip and on the absent path, where the stage's list is not read.
-let stood = [], promoted = 0, folded = 0, refuted = 0, promotedIds = [], dispositions = []
+// `siblingEdits` is the fifth, a stated `[]` wherever the stage's list is not read, which is everywhere
+// but `by-nature` (TOOL-dFoldedAudit-4 S2).
+let stood = [], promoted = 0, folded = 0, refuted = 0, promotedIds = [], dispositions = [], siblingEdits = []
 // TWO SKIPS, TWO REASONS, said apart: "confirmed no finding" is a fact about a round that ran, and
 // saying it over a round that did not would be the audit-that-never-ran reading as a clean one.
 if (!specAudit) {
@@ -2300,7 +2365,16 @@ if (!specAudit) {
       'reason naming every report id it closes. A finding is not an ask, so it is named in scope ' +
       'and never through the `closes` verb, which joins a spec to a `BACKLOG.md` ask. In ' +
       '`placements`, `repairs` names the one unit every minor in the batch lands on, or `none` ' +
-      'when they land on several. ' + (byNature ? '' : 'Nothing is folded: return `folded` as 0. ') +
+      'when they land on several. ' +
+      (byNature
+        ? 'WHERE A PROMOTED UNIT CORRECTS TEXT IN A SIBLING SPEC, REWRITE THE SIBLING\'S TEXT ITSELF: bump that ' +
+          'spec\'s rev and add a section 9 line naming the repair unit and `' + reportStem + '`. Do not state in ' +
+          'the repair spec that the sibling\'s text stands overridden. Only an UNBUILT sibling: a spec at CLOSED ' +
+          'or WONTDO stays frozen, a finding whose fix would change one is never folded there, and it is PROMOTED ' +
+          'to a new unit built on top, its `dispositions` entry reading `new-mechanism`. Return every spec so ' +
+          'edited in `siblingEdits` as {unit, rev}, and `siblingEdits: []` when you edited none. Every section 9 ' +
+          'line this stage writes names `' + reportStem + '`. '
+        : 'Nothing is folded: return `folded` as 0. ') +
       'EVERY §3 EDGE YOU WRITE GETS BOTH OF ITS ENDS, in the same pass: a **consumes-from** `X` in ' +
       'one spec is a **hands-off** back in X\'s own §3, amended there as a rev-N bump with its ' +
       'section 9 line. ' +
@@ -2378,6 +2452,7 @@ if (!specAudit) {
   refuted = d && d.refuted !== undefined ? d.refuted : 0
   promotedIds = Array.isArray(d && d.promotedIds) ? d.promotedIds : []
   dispositions = disposalDeclared && d && Array.isArray(d.dispositions) ? d.dispositions : []
+  siblingEdits = byNature && d && Array.isArray(d.siblingEdits) ? d.siblingEdits : []
   // AN EDGE IS A PAIR AND A REPAIR SITS BESIDE WHAT IT REPAIRS (TOOL-cMendedVintage-19). A bullet
   // whose mirror is missing from the stage's OWN list is a bullet it wrote at one end; the malformed
   // entry joins that bucket rather than getting a bucket of its own, because an edge naming no verb
@@ -2521,6 +2596,7 @@ if (!specAudit) {
       refuted: refuted,
       promotedIds: promotedIds,
       dispositions: dispositions,
+      siblingEdits: siblingEdits,
       note: 'DEGRADED — findings were not disposed: ' + why + '. No roster is handed out: a ' +
         'roster minus the units a finding touches is a judgement this runtime cannot make.' +
         // THE RECORD-AFTER-DISPOSAL PATH HAS NOTHING TO RECORD YET, and says so rather than writing a
@@ -2673,6 +2749,7 @@ if (attended && !buildUnits.length) {
     refuted: refuted,
     promotedIds: promotedIds,
     dispositions: dispositions,
+    siblingEdits: siblingEdits,
     // THE DEGRADED TERM IS NOT SKIPPED HERE. This return was written with a hard-coded clean note,
     // which bypasses the composition the main return performs — and `specRefused` is live on this
     // path, so a run that refused specs and then found nothing to build reported 'complete'.
@@ -2722,12 +2799,14 @@ const handOut = {
   // promoted spec is audited by re-invoking this harness with them as `auditIds` BEFORE it is
   // built, and a caller re-reading `--plan` for them would find them READY and build them unaudited.
   // `dispositions` joins each finding to its unit and rev, so a caller never infers what a fold touched.
+  // `siblingEdits` names the specs a repair rewrote, which a chain counts as folded and this file does not.
   standing: stood,
   promoted: promoted,
   folded: folded,
   refuted: refuted,
   promotedIds: promotedIds,
   dispositions: dispositions,
+  siblingEdits: siblingEdits,
   nextAction: promotedIds.length
     ? 'AUDIT the promoted specs before any of them is dispatched: re-invoke this harness with round: ' +
       (roundNo + 1) + ', auditIds: ' + JSON.stringify(promotedIds) + ' and no subjectRound and no ' +

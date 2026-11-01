@@ -49,7 +49,11 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # bare code span, each top-level. Counted by reading; OWED: observed at the close.
 # RAISED 197 -> 199 by TOOL-dGroundRules-63: its two packet-join arms, the live run's hit and the
 # landed run's silence, each top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=199
+# RAISED 199 -> 211 by TOOL-dFoldedAudit-4: its twelve supersede-join arms, the phrase in prose, wrapped
+# and opening a sentence, in double quotes, a code span and a fence, the hit past the fence, the day
+# before, the blank key, and the waiver's hit, report line and --list row, each top-level. Counted by
+# reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=211
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1740,6 +1744,50 @@ arm "TOOL-dGroundRules-63 a live chain run whose packet check exits 1 REDS as [p
 printf 'phase: LANDED\n' >> "$d/memory/builds/tChain/RUN.md"
 git -C "$d" add -A >/dev/null; git -C "$d" commit -qm landed --no-verify
 arm "TOOL-dGroundRules-63 the same run once LANDED is not graded, and the join says so" 0 "$d" "packet join · 0 live chain run(s) · 0 packet(s) checked" "[packet]"
+
+# TOOL-dFoldedAudit-4: the supersede join, one scratch repo per case. Each case appends to scratch()'s
+# own spec, dated 2026-09-02, past one blank line, so its first appended line is line 13, and the checker
+# reads that tracked file's working-tree bytes. The break each arm's RED-first observation stages, at the
+# close: the search run per line, which misses the wrap, and the exemption cut from the filter, which
+# silences the hit. The wrap is the house width's, because a planted token would prove the regex over
+# nothing a spec writes. The backticks are octal escapes, so this file's shell scanner reads no quote.
+SU_SPEC=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md
+SU_PROSE='A one-line correction left the first spec wrong, and its text now stands superseded by name.'
+seed_supersede() {   # $1 dir · $2 the key's value · rest: the lines appended
+  local d=$1 cut=$2; shift 2
+  scratch "$d"
+  printf 'SPEC_SUPERSEDE_CUTOFF="%s"\n' "$cut" > "$d/.memory-tree.conf"
+  { printf '\n'; printf '%s\n' "$@"; } >> "$d/$SU_SPEC"
+}
+d=$base/su-prose; seed_supersede "$d" 2026-09-02 "$SU_PROSE"
+arm "TOOL-dFoldedAudit-4 the phrase in prose REDS as [supersede] naming its line" 1 "$d" '[supersede] `supersede <- line 13`'
+d=$base/su-wrap; seed_supersede "$d" 2026-09-02 \
+  'A one-line correction left the first spec wrong, and the text it carries now stands superseded by' \
+  'name in the second spec, where nobody reads it.'
+arm "TOOL-dFoldedAudit-4 the phrase wrapped at the house width is one hit naming its first line" 1 "$d" '[supersede] `supersede <- line 13`'
+d=$base/su-case; seed_supersede "$d" 2026-09-02 'Superseded by name, it opens a sentence.'
+arm "TOOL-dFoldedAudit-4 the case fold reads the phrase opening a sentence" 1 "$d" '[supersede] `supersede <- line 13`'
+d=$base/su-quote; seed_supersede "$d" 2026-09-02 'It names "superseded by name" in double quotes.'
+arm "TOOL-dFoldedAudit-4 the phrase in double quotes is no hit" 0 "$d" "1 live spec(s) at/after SPEC_SUPERSEDE_CUTOFF 2026-09-02 · 0 hit(s)" "[supersede]"
+printf -v _tick -- 'It names \140superseded by name\140 in a code span.'
+d=$base/su-tick; seed_supersede "$d" 2026-09-02 "$_tick"
+arm "TOOL-dFoldedAudit-4 the phrase in a code span is no hit" 0 "$d" "1 live spec(s) at/after SPEC_SUPERSEDE_CUTOFF 2026-09-02 · 0 hit(s)" "[supersede]"
+printf -v _fence -- '\140\140\140'
+d=$base/su-fence; seed_supersede "$d" 2026-09-02 "${_fence}text" 'superseded by name' "$_fence"
+arm "TOOL-dFoldedAudit-4 the phrase in a fence is no hit" 0 "$d" "1 live spec(s) at/after SPEC_SUPERSEDE_CUTOFF 2026-09-02 · 0 hit(s)" "[supersede]"
+printf '%s\n' "$SU_PROSE" >> "$d/$SU_SPEC"
+arm "TOOL-dFoldedAudit-4 the blanking moves no line: the prose past that fence names line 16" 1 "$d" '[supersede] `supersede <- line 16`'
+d=$base/su-before; seed_supersede "$d" 2026-09-03 "$SU_PROSE"
+arm "TOOL-dFoldedAudit-4 a spec dated the day before is counted and not graded" 0 "$d" "0 hit(s) · 1 pre-cutoff live spec(s) carry it and are not graded" "[supersede]"
+d=$base/su-off; seed_supersede "$d" '' "$SU_PROSE"
+arm "TOOL-dFoldedAudit-4 a blank key turns the join off and still counts the carrier" 0 "$d" "SPEC_SUPERSEDE_CUTOFF blank (arm off) · 1 live spec(s) carry it" "[supersede]"
+d=$base/su-waiver; seed_supersede "$d" 2026-09-02 "$SU_PROSE"
+printf 'supersede <- line 13\t[supersede] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+arm "TOOL-dFoldedAudit-4 a waiver row beside a hit does not silence it" 1 "$d" '[supersede] `supersede <- line 13`' "STALE WAIVER"
+arm "TOOL-dFoldedAudit-4 the join's line prints with the text --dispatch filters on" 1 "$d" "supersede join · 1 live spec(s) at/after SPEC_SUPERSEDE_CUTOFF 2026-09-02 · 1 hit(s) · 0 pre-cutoff live spec(s) carry it and are not graded · of 1 live spec(s) · "
+ARM_ARGS=(--list)
+arm "TOOL-dFoldedAudit-4 --list reads the waived token as a HIT" 0 "$d" 'HIT    [supersede]' 'WAIVED [supersede]'
+ARM_ARGS=()
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

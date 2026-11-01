@@ -130,6 +130,21 @@ COUNTED on the report line, which prints its bullet, token and silent counts whe
 or off. Like its three dated siblings the key is a RELATION and not a constant, re-derived at the
 build commit and again at landing, so it grades zero tracked specs on its landing day.
 
+**A repair rewrites its sibling, and the idiom that overrides one from outside reds
+(TOOL-dFoldedAudit-4).** A one-line correction to one spec became a second unit overriding that text
+while the first stayed wrong, and 39 tracked specs carried `superseded by name` when the class was
+measured. The disposal now rewrites an unbuilt sibling itself, with a rev bump and a §9 line, and the
+`supersede` join keeps the phrase from returning: it reds a live spec dated at or after
+`SPEC_SUPERSEDE_CUTOFF` (`.memory-tree.conf`, blank = off; the same relation as its dated siblings)
+that carries the phrase in its prose, in any case and across a line wrap, one hit per instance under
+the token `supersede <- line <n>`. Fenced blocks, then code spans and double-quoted spans, are blanked
+first, so a spec may name the class it forbids, and no blanking moves a line. The join lives here and
+not in the hygiene engine because the phrase is this repo's own, and an arm there would reach every
+adopter's bar. NO WAIVER REACHES A HIT: the class exempts by date and never by list, and a waiver is a
+list, so `--list` reads the token as a hit and a row naming it silences nothing. The report line
+prints on every run, off included, with the pre-cutoff carriers counted, because the join grades no
+tracked spec on its landing day.
+
 **Terminal specs are outside the population by construction.** This repo cites a landed decision
 verbatim and never rewrites one, so grading a CLOSED spec would demand editing a frozen record to
 clear a hit. The population is the specs a build can still change.
@@ -219,3 +234,9 @@ Tier-1 accommodation.
   the ACT, which the hook of `TOOL-aDeferredBar-3` refuses. The relation's first clause — the
   cutoff past the newest spec date on ANY ref — has no tree-side form either; the checker mechanises
   only the commit-date clause.
+- **The supersede join reads one phrase.** A synonym passes, so "overridden here" or "reads as" do,
+  and a future spec can reword around it, which no phrase gate can close. It grades a live spec and
+  no other, so a DEFERRED or terminal one is frozen text, and a code span or a double-quoted span is
+  blanked on purpose. A double-quoted span ends on its own line, so a quote wrapped across two lines
+  reads as prose and reds, the loud way to be wrong. Whether a sibling was actually edited is not
+  here: that is the prompt, the `siblingEdits` return, and the rev move the deviation join reads.

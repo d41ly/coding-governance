@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-4 — a repair unit edits its unbuilt sibling's spec with a rev bump
 
-**Status:** INPROGRESS · rev-3 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 40
+**Status:** CLOSED · rev-3 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 40
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
+| [2026-11-02-build-TOOL-dFoldedAudit-4-ledger.md](../build/2026-11-02-build-TOOL-dFoldedAudit-4-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-4-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-4-build-brief.md) | research | — |

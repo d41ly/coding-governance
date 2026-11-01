@@ -3030,6 +3030,8 @@ has    "OC27 AC15 audit OFF: ...and the hand-out leads with it" "$(printf '%s\n'
 #   AC5            the floor reading `au.highs`, which refuses AC1
 #   AC6 to AC8     the `disposal` branch inverted, which folds under `promote-all`
 FA3_NAT=${UNITS/'"slug":"tB",'/'"slug":"tB","disposal":"by-nature",'}
+# TOOL-dFoldedAudit-4's frozen join reads the `planState` of every unit a by-nature return names.
+FA3_NAT=${FA3_NAT//'"briefPath":'/'"planState":"READY","briefPath":'}
 FA3_ALL=${UNITS/'"slug":"tB",'/'"slug":"tB","disposal":"promote-all",'}
 FA3_BAD=${UNITS/'"slug":"tB",'/'"slug":"tB","disposal":"fold",'}
 FA3_L7='{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":2}'
@@ -3044,21 +3046,21 @@ FA3_P5='{"unit":"A-tB-5","repairs":"none","order":3}'
 FA3_HELD='{"terminalExit":true,"exitState":"BOUNDED"}'
 # `review_out` with the callee's confirmed ids, left in `_fa3_review`: blockers · confirmed · highs · ids.
 build_review_fa3() { review_out "$1" "$2" "$3" >/dev/null; _fa3_review="${_review_out%\}},\"confirmedFindings\":$4}"; }
-# The disposal double, left in `_fa3_d`: folded · promoted · promotedIds · placements · dispositions,
-# the last one left out when no fifth argument is given.
-build_dispose_fa3() { printf -v _fa3_d '{"disposed":true,"standing":[],"folded":%s,"promoted":%s,"promotedIds":%s,"edges":[],"placements":%s,%s"summary":"d"}' \
-  "$1" "$2" "$3" "$4" "${5:+\"dispositions\":$5,}"; }
+# The disposal double, left in `_fa3_d`: folded · promoted · promotedIds · placements · dispositions ·
+# siblingEdits. The fifth is left out when not given, and the sixth reads `[]`, because `by-nature` owes it.
+build_dispose_fa3() { printf -v _fa3_d '{"disposed":true,"standing":[],"folded":%s,"promoted":%s,"promotedIds":%s,"edges":[],"placements":%s,%s"siblingEdits":%s,"summary":"d"}' \
+  "$1" "$2" "$3" "$4" "${5:+\"dispositions\":$5,}" "${6:-[]}"; }
 # One strict run: args · the `record` double · the `record-exit` double, spelled first because the
 # stub matches a label by prefix, so `record` would answer it.
 run_strict_fa3() { local recexit=''; [ -z "${3:-}" ] || recexit="\"record-exit\":$3,"
   RUN_WF_SCHEMA=strict run_wf "$1" "$(printf '{"spec-write":%s,"workflow":%s,%s"record":%s,"dispose":%s}' "$SPEC_OK" "$_fa3_review" "$recexit" "$2" "$_fa3_d")"; }
 # A return the guard refuses: args · a name · the reason the trace must hold.
 check_refused_fa3() { o=$(run_strict_fa3 "$1" "$_rec")
-  has    "FA3 $2: disposal NOT done" "$o" "disposal: NOT done"
-  has    "FA3 $2: an empty roster" "$o" '"roster":[]'
-  has    "FA3 $2: a DEGRADED note" "$o" 'DEGRADED'
-  hasnt_ "FA3 $2: no record agent ran" "$o" "agent:record"
-  has    "FA3 $2: the reason" "$o" "$3"; }
+  has    "$2: disposal NOT done" "$o" "disposal: NOT done"
+  has    "$2: an empty roster" "$o" '"roster":[]'
+  has    "$2: a DEGRADED note" "$o" 'DEGRADED'
+  hasnt_ "$2: no record agent ran" "$o" "agent:record"
+  has    "$2: the reason" "$o" "$3"; }
 
 # AC1: a local HIGH folds, and the row, the hand-out and the prompt all say so.
 build_review_fa3 0 1 1 '[{"id":7}]'; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"; rec CONVERGED >/dev/null
@@ -3087,21 +3089,21 @@ has    "FA3 S8 ...and a skip states the list empty" "$o" '"dispositions":[]'
 # AC2: four returns with no target. AC4: three that hide a HIGH behind a return the sum alone passes.
 build_review_fa3 0 1 1 '[{"id":7}]'
 build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":[],"unit":"A-tB-1","rev":2}]'
-check_refused_fa3 "$FA3_NAT" 'AC2 specs empty' 'names no spec'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC2 specs empty' 'names no spec'
 build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"rev":2}]'
-check_refused_fa3 "$FA3_NAT" 'AC2 unit absent' 'outside the {id, severity, nature, specs, unit, rev} shape'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC2 unit absent' 'outside the {id, severity, nature, specs, unit, rev} shape'
 build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":1}]'
-check_refused_fa3 "$FA3_NAT" 'AC2 rev not bumped' 'a fold is a rev bump'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC2 rev not bumped' 'a fold is a rev bump'
 has    "FA3 S6 a held record's note spells the counted row" "$o" '--folded <folded> --promoted <promoted>'
 build_dispose_fa3 1 0 '[]' '[]'
-check_refused_fa3 "$FA3_NAT" 'AC2 dispositions absent' 'no `dispositions` list'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC2 dispositions absent' 'no `dispositions` list'
 build_review_fa3 0 2 2 '[{"id":7},{"id":8}]'
 build_dispose_fa3 2 0 '[]' '[]' "[$FA3_L7,$FA3_L8]"
-check_refused_fa3 "$FA3_NAT" 'AC4 one HIGH graded MEDIUM' 'a grade cannot be lowered to hide a HIGH'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC4 one HIGH graded MEDIUM' 'a grade cannot be lowered to hide a HIGH'
 build_dispose_fa3 2 0 '[]' '[]' "[$FA3_L7]"
-check_refused_fa3 "$FA3_NAT" 'AC4 folded 2 beside one entry' 'the integers and the list are one fact'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC4 folded 2 beside one entry' 'the integers and the list are one fact'
 build_dispose_fa3 2 0 '[]' '[]' "[$FA3_L7,$FA3_L99]"
-check_refused_fa3 "$FA3_NAT" 'AC4 one confirmed id unnamed' 'confirmed finding(s) 8 have no `dispositions` entry'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC4 one confirmed id unnamed' 'confirmed finding(s) 8 have no `dispositions` entry'
 
 # AC3: a local BLOCKER at a BOUNDED exit. The driver's refusal is the probe, so the record waits for
 # the stage and `verdict` holds the exit through it.
@@ -3132,7 +3134,7 @@ o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
 has    "FA3 AC5 one HIGH and a batch of two reconcile" "$o" "disposal: done — promoted 3 · folded 0"
 has    "FA3 AC5 ...and the row derives promote" "$(printf '%s\n' "$o" | grep '^prompt:record:')" "--highs 1 --minors 2 --folded 0 --promoted 3 --disposition promote"
 build_dispose_fa3 0 3 '["A-tB-5"]' "[$FA3_P5]" "[${FA3_N7//A-tB-4/A-tB-5},$FA3_N8,$FA3_N9]"
-check_refused_fa3 "$FA3_NAT" 'AC5 the HIGH sharing the batch unit' '1 unit(s) for 0 blocker(s), 1 high(s) and 2 minor(s), below the floor of 2'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC5 the HIGH sharing the batch unit' '1 unit(s) for 0 blocker(s), 1 high(s) and 2 minor(s), below the floor of 2'
 build_review_fa3 0 5 0 '[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]'
 fa3_i=''; fa3_p=''; fa3_e=''
 for i in 1 2 3 4 5; do
@@ -3141,7 +3143,7 @@ for i in 1 2 3 4 5; do
   fa3_e="$fa3_e${fa3_e:+,}{\"id\":$i,\"severity\":\"MEDIUM\",\"nature\":\"new-mechanism\",\"specs\":[\"A-tB-p$i\"],\"unit\":\"A-tB-p$i\",\"rev\":1}"
 done
 build_dispose_fa3 0 5 "[$fa3_i]" "[$fa3_p]" "[$fa3_e]"
-check_refused_fa3 "$FA3_NAT" 'AC5 five minors in five units' '5 unit(s) where at most 2 fit'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC5 five minors in five units' '5 unit(s) where at most 2 fit'
 
 # AC6: `promote-all` keeps today's rule and refuses a fold by name, whatever the entries say.
 build_review_fa3 0 1 1 '[{"id":7}]'; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
@@ -3170,6 +3172,65 @@ o=$(run_wf "$FA3_BAD" '{}')
 has    "FA3 AC8 a value outside the pair refuses by name" "$o" 'THROW unattended-build: `disposal` must be one of by-nature, promote-all'
 hasnt_ "FA3 AC8 ...before any agent spawns" "$o" "agent:"
 same   "FA3 AC9 the render states the rule on one line" "$(grep -c 'disposes a spec audit BY NATURE' "$F")" "1"
+
+# ================================================== TOOL-dFoldedAudit-4 — A REPAIR EDITS ITS UNBUILT SIBLING
+# The FA3 doubles, so every run is strict and a schema that loses `siblingEdits` loses it here. The staged
+# break of each arm, observed RED at the close and not by the pass that wrote it:
+#   AC1 and AC3    the `siblingEdits` rows cut from `deriveDispositionFault`, which hands the roster out
+#   AC2 and AC4    the `DONE` prefix test changed to equality, which admits `DONE (THIN)`
+FA4_E1='{"unit":"A-tB-1","rev":2}'
+# FA3_NAT with A-tB-1 at the state given, left in `_fa4_args`; no argument drops its `planState`.
+build_args_fa4() { local st="\"specPath\":\"s1\",${1:+\"planState\":\"$1\",}"
+  _fa4_args=${FA3_NAT/'"specPath":"s1","planState":"READY",'/$st}; }
+
+# AC1: one new-mechanism HIGH to its repair unit, and the sibling it rewrote at rev 2.
+build_review_fa3 0 1 1 '[{"id":7}]'; rec CONVERGED >/dev/null
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" "[$FA4_E1]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA4 AC1 a sibling edit beside a repair unit is disposed" "$o" "disposal: done"
+has    "FA4 AC1 ...the hand-out carries the list" "$(printf '%s\n' "$o" | grep '^RESULT ')" "\"siblingEdits\":[$FA4_E1]"
+p=$(printf '%s\n' "$o" | grep '^prompt:dispose:')
+for fa4 in "REWRITE THE SIBLING'S TEXT ITSELF" 'naming the repair unit and `r`' 'Do not state in the repair spec' \
+  'a new unit built on top' '`siblingEdits: []` when you edited none' 'Every section 9 line this stage writes names `r`.'; do
+  has  "FA4 AC1 the by-nature prompt carries: $fa4" "$p" "$fa4"
+done
+# S2: the same list on the DEGRADED return, and `promote-all` neither asks for one nor reads one.
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" '[{"unit":"A-tB-1","rev":1}]'
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA4 S2 the DEGRADED return carries what the stage said" "$(printf '%s\n' "$o" | grep '^RESULT ')" '"siblingEdits":[{"unit":"A-tB-1","rev":1}]'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" "[$FA4_E1]"
+o=$(run_strict_fa3 "$FA3_ALL" "$_rec")
+has    "FA4 S2 promote-all states the list empty" "$(printf '%s\n' "$o" | grep '^RESULT ')" '"siblingEdits":[]'
+hasnt_ "FA4 S2 ...and its prompt carries no clause" "$(printf '%s\n' "$o" | grep '^prompt:dispose:')" "REWRITE THE SIBLING"
+
+# AC3: the five malformed returns, each on the AC1 shape but for the one thing named.
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"; _fa3_d=${_fa3_d/'"siblingEdits":[],'/}
+check_refused_fa3 "$FA3_NAT" 'FA4 AC3 siblingEdits absent' 'no `siblingEdits` list'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" '[{"unit":"A-tB-1","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA4 AC3 rev not above the rev the audit read' 'a sibling edit is a rev bump'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" '[{"unit":"A-tB-4","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA4 AC3 naming the repair unit itself' 'outside this roster'
+build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]" "[$FA4_E1]"
+check_refused_fa3 "$FA3_NAT" 'FA4 AC3 beside an empty promotedIds' 'a correction with no repair unit is a fold'
+build_args_fa4; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" "[$FA4_E1]"
+check_refused_fa3 "$_fa4_args" 'FA4 AC3 naming a unit with no planState' 'carries no `planState`'
+
+# AC2: a built sibling stays frozen, at the plain state and at the graded form `--plan` prints. The
+# prompt spells `frozen` too, so each reason read here is the refusal's own and never the bare word.
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" "[$FA4_E1]"
+for fa4 in 'DONE' 'DONE (THIN)'; do
+  build_args_fa4 "$fa4"
+  check_refused_fa3 "$_fa4_args" "FA4 AC2 a sibling at $fa4" 'unit A-tB-1 is frozen'
+done
+
+# AC4: the same join over the other list, and the route the prompt names for it.
+build_args_fa4 'DONE'; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+check_refused_fa3 "$_fa4_args" 'FA4 AC4 a fold into a built spec' 'unit A-tB-1 is frozen'
+has    "FA4 AC4 ...and the prompt names the route" "$(printf '%s\n' "$o" | grep '^prompt:dispose:')" 'a new unit built on top'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"
+o=$(run_strict_fa3 "$_fa4_args" "$_rec")
+has    "FA4 AC4 the same finding promoted is disposed" "$o" "disposal: done"
+hasnt_ "FA4 AC4 ...on a roster not refused" "$o" '"roster":[]'
 
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
@@ -3274,7 +3335,11 @@ same   "FA3 AC9 the render states the rule on one line" "$(grep -c 'disposes a s
 # FA3 block — the refusal helper (5), AC1 (7, one in a loop run seven times), the row and skip arms S6
 # to S8 (6), AC3 (9), AC5 (2), AC6 (7), AC7 (4), AC8 (2) and AC9 (1). The helper runs nine times, so
 # the block executes 89. Not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=747
+# RAISED 747 -> 756 by TOOL-dFoldedAudit-4: its 9 static sites, counted with the grep above off the FA4
+# block — AC1 (3, one in a loop run six times), S2 (3) and AC4 (3). Its eight calls of the FA3 refusal
+# helper add no static site and execute 40, so the block executes 54. Not measured by a run: the pass
+# that wrote it runs no suite.
+FLOOR_ASSERTIONS=756
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

@@ -1543,6 +1543,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "build_args_fa4",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "build_arm_env",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -17548,6 +17553,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "render_unfenced",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "render_view",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -22073,6 +22083,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "scan_supersede",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "scan_temp_file",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -22511,6 +22526,11 @@
       "id": "seed_summary_new_key",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_supersede",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "seed_transition",
