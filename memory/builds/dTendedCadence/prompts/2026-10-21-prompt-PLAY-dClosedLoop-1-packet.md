@@ -18,7 +18,7 @@ Every unit of dTendedCadence specced and built, so that each of the 18 clauses o
 
 Each clause of the row, in its order: its id at its baseline hash, its hash now in the as-built view with the record behind any change, its tokens as `carries.py`'s token arm reads them, and its text.
 
-1. `cl-dClosedLoop-0442@53466888` · now `53466888`, as at the baseline · tokens: none, so the token arm cannot see this clause — the Maintain run as its step checklist on the flow's executor, never a recipe-mode playbook
+1. `cl-dClosedLoop-0442@53466888` · now `d7b64b62` by deviation `2026-11-01-build-TOOL-dTendedCadence-1-deviation-11` · tokens: none, so the token arm cannot see this clause — the Maintain run as its step checklist, `[[item]]` rows in the flow's item schema, launched and leased by the executor's cadence (`run_cadence_period`) and walked in their `needs` order by `tools/drift-audit/maintain.py` until the flow's executor walks a cadence program keyed by (cadence, period), never a recipe-mode playbook
 2. `cl-dClosedLoop-0443@06da9bab` · now `06da9bab`, as at the baseline · tokens: `maintain.cadence`, `maintain.events`, `maintain.host`, `release-verify-failed` — the cadence, on Runtime's hosts: Maintain run on `maintain.host` per `maintain.cadence`, and its event runs for the events `maintain.events` names, `release-verify-failed` rendered not installed where integrations is not installed, each value seen on its planted case
 3. `cl-dClosedLoop-0444@f4079d73` · now `f4079d73`, as at the baseline · tokens: none, so the token arm cannot see this clause — the safe-fix set
 4. `cl-dClosedLoop-0445@768c9f5b` · now `768c9f5b`, as at the baseline · tokens: `maintain.reading-admission: refuse-unowned`, `report-unowned` — detectors with owners, a reading with no derivable owner or no pin refused at registration under `maintain.reading-admission: refuse-unowned` and admitted and reported unowned under `report-unowned`, nothing filed for it until an owner is derived, each value seen on a planted ownerless reading
@@ -30,7 +30,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 10. `cl-dClosedLoop-0451@8cb0a7a7` · now `8cb0a7a7`, as at the baseline · tokens: none, so the token arm cannot see this clause — the maintainer's definition, Maintain's filings, registered through dBoundRoles's layer contract
 11. `cl-dClosedLoop-0452@6c0e77f7` · now `6c0e77f7`, as at the baseline · tokens: `repeat` — a cyclic playbook's cadence item, filing `repeat` intakes (night pass, point 1)
 12. `cl-dClosedLoop-0453@42f1bc0c` · now `42f1bc0c`, as at the baseline · tokens: none, so the token arm cannot see this clause — a detector for bundle members whose code changed while their head line did not (night pass, point 4)
-13. `cl-dClosedLoop-0454@ef9a7f8a` · now `ef9a7f8a`, as at the baseline · tokens: `maintain.security-review` — the recurring security review, a cadence item running dFairHearing's security lens over the landed tree as `maintain.security-review` says, weekly by default (NP-19)
+13. `cl-dClosedLoop-0454@ef9a7f8a` · now `3bb6c0f8` by deviation `2026-11-01-build-TOOL-dTendedCadence-13-deviation-131` · tokens: `maintain.security-review` — the recurring security review, a cadence item running dFairHearing's security lens over each period's landed range, from the last reviewed head to the landed tip, as `maintain.security-review` says, weekly by default (NP-19)
 14. `cl-dClosedLoop-0455@238dcec0` · now `238dcec0`, as at the baseline · tokens: `maintain.file`, `maintain.fixes`, `maintain.tiers: bands`, `probe.trigger` — readings tiered by their deviation from their pins under `maintain.tiers: bands`, to log, to diagnose read-only or to act within `maintain.fixes`, each reading declaring its band edges beside its pin at registration and admission refusing one without them, the log band a journal line and a count in the maintenance record with nothing filed, the diagnose band a read-only probe through `probe.trigger` with the reading as its observation, its record attached to the ask `maintain.file` files, and the act band routed by its fix, each band seen on its planted reading and a reading registered without edges refused (NP-21, the owner's FK-5-5)
 15. `cl-dClosedLoop-0509@9b0389cc` · now `9b0389cc`, as at the baseline · tokens: `file-ask`, `maintain.file`, `maintain.on-breach`, `red-leg`, `report` — `maintain.on-breach`'s three values at `maintain.file`: `file-ask` filing the ask into Plan's triage, `red-leg` filing nothing and registering a leg at Test's leg-pack point that reads the newest maintenance record offline, as distribution's currency leg reads its own record, red while an offender stands over its pin, and `report` filing nothing and sending the maintenance record through the notification adapter, each value seen on its planted offender (the owner's FK-5-5, the whole-design audit's B5-F11)
 16. `cl-dClosedLoop-0456@a3633e7f` · now `a3633e7f`, as at the baseline · tokens: `[gates]`, `runtime.act-ceiling` — readings for an act launched with no outcome past `runtime.act-ceiling`, a node's run left unrecorded, a pushed commit missing a required key, over commits from the commit-key leg's registration on, the earlier history outside its population, and a standing directive found in the node's auto-memory and not promoted, a node-scoped reading filed as an ask and never a bar or push leg (P35, the memory plan's `[gates]`)
@@ -69,7 +69,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
 - repinned inside a live chain run: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `cab3bff165a1bb61a5854f58d350912e79a7b34b` at `399ec42de36b47647ccd0a03a6fdcc1e361a40c7` by an owner at a console, over memory/builds/dGroundRules/RUN.md (phase HELD)
-- rendered at: `f4597719e4b1ff0f0f779998bd7b8c2ce5213088`
+- rendered at: `7e48dac37d0c4e7f93cba2ef22e6e4fa518d16c5`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `cab3bff165a1bb61a5854f58d350912e79a7b34b`, its blob at HEAD
 
 ### Owned nodes
@@ -162,24 +162,24 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dTendedCa
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dTendedCadence-1` · README:61 | 1 | `TOOL-dTendedCadence-1` | `cl-dClosedLoop-0442@53466888` | the Maintain run as its step checklist on the flow's executor |
-- unit id `TOOL-dTendedCadence-2` · README:62 | 2 | `TOOL-dTendedCadence-2` | `cl-dClosedLoop-0443@06da9bab` | the cadence |
-- unit id `TOOL-dTendedCadence-3` · README:63 | 3 | `TOOL-dTendedCadence-3` | `cl-dClosedLoop-0444@f4079d73` | the safe-fix set |
-- unit id `TOOL-dTendedCadence-4` · README:64 | 4 | `TOOL-dTendedCadence-4` | `cl-dClosedLoop-0445@768c9f5b` | detectors with owners |
-- unit id `TOOL-dTendedCadence-5` · README:65 | 5 | `TOOL-dTendedCadence-5` | `cl-dClosedLoop-0446@617f13e8` | map freshness |
-- unit id `TOOL-dTendedCadence-6` · README:66 | 6 | `TOOL-dTendedCadence-6` | `cl-dClosedLoop-0447@d34b1bee` | the maintenance record |
-- unit id `TOOL-dTendedCadence-7` · README:67 | 7 | `TOOL-dTendedCadence-7` | `cl-dClosedLoop-0448@6053b724` | a detector for dead pointers |
-- unit id `TOOL-dTendedCadence-8` · README:68 | 8 | `TOOL-dTendedCadence-8` | `cl-dClosedLoop-0449@503e50af` | Maintain delivered as a cadence step of the observability expansion |
-- unit id `TOOL-dTendedCadence-9` · README:69 | 9 | `TOOL-dTendedCadence-9` | `cl-dClosedLoop-0450@ff08f57f` | `maintain.retrofit-heat` |
-- unit id `TOOL-dTendedCadence-10` · README:70 | 10 | `TOOL-dTendedCadence-10` | `cl-dClosedLoop-0451@8cb0a7a7` | the maintainer's definition |
-- unit id `TOOL-dTendedCadence-11` · README:71 | 11 | `TOOL-dTendedCadence-11` | `cl-dClosedLoop-0452@6c0e77f7` | a cyclic playbook's cadence item |
-- unit id `TOOL-dTendedCadence-12` · README:72 | 12 | `TOOL-dTendedCadence-12` | `cl-dClosedLoop-0453@42f1bc0c` | a detector for bundle members whose code changed while their head line did not (night pass |
-- unit id `TOOL-dTendedCadence-13` · README:73 | 13 | `TOOL-dTendedCadence-13` | `cl-dClosedLoop-0454@ef9a7f8a` | the recurring security review |
-- unit id `TOOL-dTendedCadence-14` · README:74 | 14 | `TOOL-dTendedCadence-14` | `cl-dClosedLoop-0455@238dcec0` | readings tiered by their deviation from their pins under `maintain.tiers: bands` |
-- unit id `TOOL-dTendedCadence-15` · README:75 | 15 | `TOOL-dTendedCadence-15` | `cl-dClosedLoop-0509@9b0389cc` | `maintain.on-breach`'s three values at `maintain.file`: `file-ask` filing the ask into Plan's triage |
-- unit id `TOOL-dTendedCadence-16` · README:76 | 16 | `TOOL-dTendedCadence-16` | `cl-dClosedLoop-0456@a3633e7f` | readings for an act launched with no outcome past `runtime.act-ceiling` |
-- unit id `TOOL-dTendedCadence-17` · README:77 | 17 | `TOOL-dTendedCadence-17` | `cl-dClosedLoop-0457@2214ebfb` | a detector filing an intake six months before the interpreter floor's end of life |
-- unit id `TOOL-dTendedCadence-18` · README:78 | 18 | `TOOL-dTendedCadence-18` | `cl-dClosedLoop-0499@2480b868` | drift-audit's five gateable drift signals moved to core legs at Test's leg-pack point |
+- unit id `TOOL-dTendedCadence-1` · README:60 | 1 | `TOOL-dTendedCadence-1` | `cl-dClosedLoop-0442@53466888` | the Maintain run as its step checklist on the flow's executor |
+- unit id `TOOL-dTendedCadence-2` · README:61 | 2 | `TOOL-dTendedCadence-2` | `cl-dClosedLoop-0443@06da9bab` | the cadence |
+- unit id `TOOL-dTendedCadence-3` · README:62 | 3 | `TOOL-dTendedCadence-3` | `cl-dClosedLoop-0444@f4079d73` | the safe-fix set |
+- unit id `TOOL-dTendedCadence-4` · README:63 | 4 | `TOOL-dTendedCadence-4` | `cl-dClosedLoop-0445@768c9f5b` | detectors with owners |
+- unit id `TOOL-dTendedCadence-5` · README:64 | 5 | `TOOL-dTendedCadence-5` | `cl-dClosedLoop-0446@617f13e8` | map freshness |
+- unit id `TOOL-dTendedCadence-6` · README:65 | 6 | `TOOL-dTendedCadence-6` | `cl-dClosedLoop-0447@d34b1bee` | the maintenance record |
+- unit id `TOOL-dTendedCadence-7` · README:66 | 7 | `TOOL-dTendedCadence-7` | `cl-dClosedLoop-0448@6053b724` | a detector for dead pointers |
+- unit id `TOOL-dTendedCadence-8` · README:67 | 8 | `TOOL-dTendedCadence-8` | `cl-dClosedLoop-0449@503e50af` | Maintain delivered as a cadence step of the observability expansion |
+- unit id `TOOL-dTendedCadence-9` · README:68 | 9 | `TOOL-dTendedCadence-9` | `cl-dClosedLoop-0450@ff08f57f` | `maintain.retrofit-heat` |
+- unit id `TOOL-dTendedCadence-10` · README:69 | 10 | `TOOL-dTendedCadence-10` | `cl-dClosedLoop-0451@8cb0a7a7` | the maintainer's definition |
+- unit id `TOOL-dTendedCadence-11` · README:70 | 11 | `TOOL-dTendedCadence-11` | `cl-dClosedLoop-0452@6c0e77f7` | a cyclic playbook's cadence item |
+- unit id `TOOL-dTendedCadence-12` · README:71 | 12 | `TOOL-dTendedCadence-12` | `cl-dClosedLoop-0453@42f1bc0c` | a detector for bundle members whose code changed while their head line did not (night pass |
+- unit id `TOOL-dTendedCadence-13` · README:72 | 13 | `TOOL-dTendedCadence-13` | `cl-dClosedLoop-0454@ef9a7f8a` | the recurring security review |
+- unit id `TOOL-dTendedCadence-14` · README:73 | 14 | `TOOL-dTendedCadence-14` | `cl-dClosedLoop-0455@238dcec0` | readings tiered by their deviation from their pins under `maintain.tiers: bands` |
+- unit id `TOOL-dTendedCadence-15` · README:74 | 15 | `TOOL-dTendedCadence-15` | `cl-dClosedLoop-0509@9b0389cc` | `maintain.on-breach`'s three values at `maintain.file`: `file-ask` filing the ask into Plan's triage |
+- unit id `TOOL-dTendedCadence-16` · README:75 | 16 | `TOOL-dTendedCadence-16` | `cl-dClosedLoop-0456@a3633e7f` | readings for an act launched with no outcome past `runtime.act-ceiling` |
+- unit id `TOOL-dTendedCadence-17` · README:76 | 17 | `TOOL-dTendedCadence-17` | `cl-dClosedLoop-0457@2214ebfb` | a detector filing an intake six months before the interpreter floor's end of life |
+- unit id `TOOL-dTendedCadence-18` · README:77 | 18 | `TOOL-dTendedCadence-18` | `cl-dClosedLoop-0499@2480b868` | drift-audit's five gateable drift signals moved to core legs at Test's leg-pack point |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -209,11 +209,11 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dTendedCadence`:
 
-Coverage of dTendedCadence's 18 clauses and 24 owned nodes, over 0 specs:
-- carried whole: 0; carried in parts: 0 (none)
+Coverage of dTendedCadence's 18 clauses and 24 owned nodes, over 18 specs:
+- carried whole: 18; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: cl-dClosedLoop-0442, cl-dClosedLoop-0443, cl-dClosedLoop-0444, cl-dClosedLoop-0445, cl-dClosedLoop-0446, cl-dClosedLoop-0447, cl-dClosedLoop-0448, cl-dClosedLoop-0449, cl-dClosedLoop-0450, cl-dClosedLoop-0451, cl-dClosedLoop-0452, cl-dClosedLoop-0453, cl-dClosedLoop-0454, cl-dClosedLoop-0455, cl-dClosedLoop-0509, cl-dClosedLoop-0456, cl-dClosedLoop-0457, cl-dClosedLoop-0499; stale: none; ambiguous: none
-- owned nodes no spec names: item.maintain.direct, item.maintain.file, item.maintain.lease, item.maintain.levels, item.maintain.patch, item.maintain.read, item.maintain.record, policy-key.maintain.cadence, policy-key.maintain.dead-after, policy-key.maintain.events, policy-key.maintain.fixes, policy-key.maintain.host, policy-key.maintain.interpreter-eol, policy-key.maintain.node-readings, policy-key.maintain.on-breach, policy-key.maintain.reading-admission, policy-key.maintain.reading-tree, policy-key.maintain.record-when, policy-key.maintain.security-review, policy-key.maintain.tiers, policy-key.observability.run-record, policy-key.retrofit.cadence, record-kind.maintenance-record, record-kind.run-record
+- uncarried: none; stale: cl-dClosedLoop-0442, cl-dClosedLoop-0454; ambiguous: none
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0442, cl-dClosedLoop-0444, cl-dClosedLoop-0446, cl-dClosedLoop-0449, cl-dClosedLoop-0451, cl-dClosedLoop-0453
 

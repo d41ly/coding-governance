@@ -4,8 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-19 TOOL-dTendedCadence-20
-status: OPEN
+ids: TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-19 TOOL-dTendedCadence-20 TOOL-dTendedCadence-21 TOOL-dTendedCadence-22 TOOL-dTendedCadence-23 TOOL-dTendedCadence-24 TOOL-dTendedCadence-25 TOOL-dTendedCadence-26 TOOL-dTendedCadence-27 TOOL-dTendedCadence-28 TOOL-dTendedCadence-29 TOOL-dTendedCadence-30 TOOL-dTendedCadence-31 TOOL-dTendedCadence-32 TOOL-dTendedCadence-33 TOOL-dTendedCadence-34
 spec-audit: 2026-10-21
 parents: dWitnessedBar dRankedPlan dWellOiledMachine dIndexedDesign dFurnishedOrders
 may: PLAY-dClosedLoop-3
@@ -79,44 +78,81 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 18 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13
-ids TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-19 TOOL-dTendedCadence-20
+ids TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-19 TOOL-dTendedCadence-20 TOOL-dTendedCadence-21 TOOL-dTendedCadence-22 TOOL-dTendedCadence-23 TOOL-dTendedCadence-24 TOOL-dTendedCadence-25
+ids TOOL-dTendedCadence-26 TOOL-dTendedCadence-27 TOOL-dTendedCadence-28 TOOL-dTendedCadence-29 TOOL-dTendedCadence-30 TOOL-dTendedCadence-31 TOOL-dTendedCadence-32 TOOL-dTendedCadence-33 TOOL-dTendedCadence-34
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dTendedCadence-10 — the maintainer's definition, registered through the observability layer's contract](spec/2026-11-01-spec-TOOL-dTendedCadence-10.md) | 1 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-6 — the maintenance record and the run record written by the journal reader](spec/2026-11-01-spec-TOOL-dTendedCadence-6.md) | 2 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-8 — Maintain's readings registered by layer, keyed, and filed as patch intakes, with event runs keyed by event](spec/2026-11-01-spec-TOOL-dTendedCadence-8.md) | 3 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-4 — reading admission: an ownerless or pinless reading refused at registration, or reported unowned](spec/2026-11-01-spec-TOOL-dTendedCadence-4.md) | 4 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-14 — reading bands: log, diagnose read-only or act, by a reading's deviation from its pin](spec/2026-11-01-spec-TOOL-dTendedCadence-14.md) | 5 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-18 — five gateable drift signals as core legs, the reading tree, and the remote-CI reading's liveness](spec/2026-11-01-spec-TOOL-dTendedCadence-18.md) | 6 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-15 — `maintain.file`: an offender over its pin filed as an ask, held by a red leg, or reported, as `maintain.on-breach` says](spec/2026-11-01-spec-TOOL-dTendedCadence-15.md) | 7 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-1 — the Maintain run as its step checklist: `[[item]]` rows walked in `needs` order by `maintain.py` under the period lease, never a recipe-mode playbook](spec/2026-11-01-spec-TOOL-dTendedCadence-1.md) | 8 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-3 — the safe-fix set: `maintain.fixes` read as a literal set, each fix routed direct, patch or owner-gated, and `maintain.direct` reaping and pruning](spec/2026-11-01-spec-TOOL-dTendedCadence-3.md) | 9 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-7 — one dead-pointer detector over auto-memory and served text, its merge-bar leg kept in the maintain pack](spec/2026-11-01-spec-TOOL-dTendedCadence-7.md) | 10 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-5 — map freshness on the caller map, each stale dossier one keyed `regenerate stale` patch](spec/2026-11-01-spec-TOOL-dTendedCadence-5.md) | 11 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-12 — bundle members whose code moved under an unchanged head line, and the body-moved test extracted at its second caller](spec/2026-11-01-spec-TOOL-dTendedCadence-12.md) | 12 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-17 — the interpreter floor's end-of-life reading, filing an intake six months before it as `maintain.interpreter-eol` says](spec/2026-11-01-spec-TOOL-dTendedCadence-17.md) | 13 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-16 — four readings over what one node and its pushes leave behind, each filed as an ask and never a bar or push leg, read on the nodes `maintain.node-readings` names](spec/2026-11-01-spec-TOOL-dTendedCadence-16.md) | 14 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-9 — `maintain.retrofit-heat`: the share of reads on untouched legacy, each period's sweep filed as a patch build under `retrofit.cadence: hot-first`, and the progress cell's share of reads](spec/2026-11-01-spec-TOOL-dTendedCadence-9.md) | 15 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-11 — a cyclic playbook's cadence item, filing one repeat intake per cycle](spec/2026-11-01-spec-TOOL-dTendedCadence-11.md) | 16 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-13 — the recurring security review over each period's landed range](spec/2026-11-01-spec-TOOL-dTendedCadence-13.md) | 17 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dTendedCadence-2 — the cadence: Maintain's row on Runtime's hosts, its period, its event runs and the session-start host](spec/2026-11-01-spec-TOOL-dTendedCadence-2.md) | 18 | 2 | OPEN | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 2 record folder(s).
+Records: 16 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dTendedCadence-1 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-2
+TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 18 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dTendedCadence's 18 clause(s) and 24 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dTendedCadence's 18 clause(s) and 24 owned node(s), over 18 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 18
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 18 (cl-dClosedLoop-0442, cl-dClosedLoop-0443, cl-dClosedLoop-0444, cl-dClosedLoop-0445, cl-dClosedLoop-0446, cl-dClosedLoop-0447, cl-dClosedLoop-0448, cl-dClosedLoop-0449, cl-dClosedLoop-0450, cl-dClosedLoop-0451, cl-dClosedLoop-0452, cl-dClosedLoop-0453, cl-dClosedLoop-0454,
-  cl-dClosedLoop-0455, cl-dClosedLoop-0509, cl-dClosedLoop-0456, cl-dClosedLoop-0457, cl-dClosedLoop-0499)
+- uncarried: 0 (none)
 - stale: 0 (none)
 - ambiguous: 0 (none)
-- owned nodes no spec names: item.maintain.direct, item.maintain.file, item.maintain.lease, item.maintain.levels, item.maintain.patch, item.maintain.read, item.maintain.record, policy-key.maintain.cadence, policy-key.maintain.dead-after, policy-key.maintain.events, policy-key.maintain.fixes,
-  policy-key.maintain.host, policy-key.maintain.interpreter-eol, policy-key.maintain.node-readings, policy-key.maintain.on-breach, policy-key.maintain.reading-admission, policy-key.maintain.reading-tree, policy-key.maintain.record-when, policy-key.maintain.security-review, policy-key.maintain.tiers,
-  policy-key.observability.run-record, policy-key.retrofit.cadence, record-kind.maintenance-record, record-kind.run-record
+- owned nodes no spec names: none
 - specs derived from no clause: none
-- clauses the token arm cannot see: cl-dClosedLoop-0442, cl-dClosedLoop-0444, cl-dClosedLoop-0446, cl-dClosedLoop-0449, cl-dClosedLoop-0451, cl-dClosedLoop-0453
+- clauses the token arm cannot see: cl-dClosedLoop-0444, cl-dClosedLoop-0446, cl-dClosedLoop-0449, cl-dClosedLoop-0451, cl-dClosedLoop-0453
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dTendedCadence-10` | no |
+| 2 | `TOOL-dTendedCadence-6` | no |
+| 3 | `TOOL-dTendedCadence-8` | no |
+| 4 | `TOOL-dTendedCadence-4` | no |
+| 5 | `TOOL-dTendedCadence-14` | no |
+| 6 | `TOOL-dTendedCadence-18` | no |
+| 7 | `TOOL-dTendedCadence-15` | no |
+| 8 | `TOOL-dTendedCadence-1` | no |
+| 9 | `TOOL-dTendedCadence-3` | no |
+| 10 | `TOOL-dTendedCadence-7` | no |
+| 11 | `TOOL-dTendedCadence-5` | no |
+| 12 | `TOOL-dTendedCadence-12` | no |
+| 13 | `TOOL-dTendedCadence-17` | no |
+| 14 | `TOOL-dTendedCadence-16` | no |
+| 15 | `TOOL-dTendedCadence-9` | no |
+| 16 | `TOOL-dTendedCadence-11` | no |
+| 17 | `TOOL-dTendedCadence-13` | no |
+| 18 | `TOOL-dTendedCadence-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
