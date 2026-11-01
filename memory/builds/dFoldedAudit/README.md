@@ -5,7 +5,6 @@ opened: 2026-11-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-status: OPEN
 ids: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8
 ---
 
@@ -69,25 +68,43 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-11-01 · streams tooling
+**Build status:** OPEN · 8 unit(s) · node d · opened 2026-11-01 · streams tooling
 ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dFoldedAudit-7 — policy keys switch the disposal, the stop and the ceiling](spec/2026-11-01-spec-TOOL-dFoldedAudit-7.md) | 10 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dFoldedAudit-2 — --review and check 2 record and grade a spec exit that folds](spec/2026-11-01-spec-TOOL-dFoldedAudit-2.md) | 20 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dFoldedAudit-3 — the DISPOSAL stage disposes by nature and reconciles folds to their specs](spec/2026-11-01-spec-TOOL-dFoldedAudit-3.md) | 30 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dFoldedAudit-4 — a repair unit edits its unbuilt sibling's spec with a rev bump](spec/2026-11-01-spec-TOOL-dFoldedAudit-4.md) | 40 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dFoldedAudit-5 — each HIGH records its specs and a verb derives the chain's stop verdict](spec/2026-11-01-spec-TOOL-dFoldedAudit-5.md) | 50 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dFoldedAudit-6 — an audit's own fold owes no hand `spec-revised` deviation record](spec/2026-11-01-spec-TOOL-dFoldedAudit-6.md) | 60 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop](spec/2026-11-01-spec-TOOL-dFoldedAudit-1.md) | 70 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dFoldedAudit-8 — dClosedLoop's unbuilt specs and its frozen design take the same rules](spec/2026-11-01-spec-TOOL-dFoldedAudit-8.md) | 80 | 2 | OPEN | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 2 record folder(s).
+Records: 15 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 10 | `TOOL-dFoldedAudit-7` | no |
+| 20 | `TOOL-dFoldedAudit-2` | no |
+| 30 | `TOOL-dFoldedAudit-3` | no |
+| 40 | `TOOL-dFoldedAudit-4` | no |
+| 50 | `TOOL-dFoldedAudit-5` | no |
+| 60 | `TOOL-dFoldedAudit-6` | no |
+| 70 | `TOOL-dFoldedAudit-1` | no |
+| 80 | `TOOL-dFoldedAudit-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
