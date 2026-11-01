@@ -12,6 +12,7 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 |
 | [2026-11-01-build-TOOL-dFoldedAudit-7-2-stopped-dispatches.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-2-stopped-dispatches.md) | journal | — |
 | [2026-11-01-build-TOOL-dFoldedAudit-7-3-fixture-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-3-fixture-fold-return.md) | journal | — |
+| [2026-11-01-build-TOOL-dFoldedAudit-7-4-builder-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-4-builder-return.md) | journal | — |
 | [2026-11-01-build-TOOL-dFoldedAudit-7-ledger.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 |

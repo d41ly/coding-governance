@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-2 — --review and check 2 record and grade a spec exit that folds
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 20
+**Status:** INPROGRESS · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 20
 
 <!-- gen:spec-records -->
 
