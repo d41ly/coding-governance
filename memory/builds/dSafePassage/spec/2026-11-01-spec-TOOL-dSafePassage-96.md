@@ -14,6 +14,7 @@
 | [2026-11-01-prompt-TOOL-dSafePassage-96-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-96-spec-brief.md) | research | — |
 | [2026-11-01-review-TOOL-dSafePassage-96-closing-diff-round8.md](../reviews/2026-11-01-review-TOOL-dSafePassage-96-closing-diff-round8.md) | diff-review | — |
 | [2026-11-01-review-TOOL-dSafePassage-96-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dSafePassage-96-spec-audit-round1.md) | spec-audit | — |
+| [2026-11-01-review-TOOL-dSafePassage-97-closing-diff-round9.md](../reviews/2026-11-01-review-TOOL-dSafePassage-97-closing-diff-round9.md) | diff-review | TOOL-dSafePassage-97 |
 
 <!-- /gen:spec-records -->
 
