@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-16 — the unattended `kits.offer`: an update run in a mode that runs nothing from the adopter's tree, pushed through the adopter's own scoped grant
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 20 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 20 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0426@a52a5e6d whole
 **Carries:** node:item.kits.offer

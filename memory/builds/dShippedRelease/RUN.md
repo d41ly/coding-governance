@@ -245,3 +245,255 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T18:04:58Z rescope · item add DEPL-dShippedRelease-145 · reason closes 2026-11-01-review-DEPL-dShippedRelease-126-spec-audit-round1.md id 3 (HIGH, item H1): unit 128's mint-regenerate-kits arm never enters cmd_mint, so its stated failing case cannot red it
 
 2026-11-01T18:23:30Z review · item dShippedRelease-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 43 · disposition promote
+
+2026-11-01T19:13:57Z rescope · item defer DEPL-dShippedRelease-1 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:13:58Z rescope · item defer DEPL-dShippedRelease-2 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:13:58Z rescope · item defer DEPL-dShippedRelease-3 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:13:59Z rescope · item defer DEPL-dShippedRelease-4 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:00Z rescope · item defer DEPL-dShippedRelease-5 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:01Z rescope · item defer DEPL-dShippedRelease-6 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:01Z rescope · item defer DEPL-dShippedRelease-7 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:02Z rescope · item defer DEPL-dShippedRelease-8 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:03Z rescope · item defer DEPL-dShippedRelease-9 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:03Z rescope · item defer DEPL-dShippedRelease-10 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:04Z rescope · item defer DEPL-dShippedRelease-11 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:05Z rescope · item defer DEPL-dShippedRelease-12 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:06Z rescope · item defer DEPL-dShippedRelease-13 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:06Z rescope · item defer DEPL-dShippedRelease-14 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:07Z rescope · item defer DEPL-dShippedRelease-15 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:08Z rescope · item defer DEPL-dShippedRelease-16 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:09Z rescope · item defer DEPL-dShippedRelease-17 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:10Z rescope · item defer DEPL-dShippedRelease-18 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:10Z rescope · item defer DEPL-dShippedRelease-19 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:11Z rescope · item defer DEPL-dShippedRelease-20 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:12Z rescope · item defer DEPL-dShippedRelease-21 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:12Z rescope · item defer DEPL-dShippedRelease-22 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:13Z rescope · item defer DEPL-dShippedRelease-23 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:14Z rescope · item defer DEPL-dShippedRelease-24 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:15Z rescope · item defer DEPL-dShippedRelease-25 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:15Z rescope · item defer DEPL-dShippedRelease-26 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:16Z rescope · item defer DEPL-dShippedRelease-27 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:17Z rescope · item defer DEPL-dShippedRelease-28 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:17Z rescope · item defer DEPL-dShippedRelease-29 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:18Z rescope · item defer DEPL-dShippedRelease-30 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:19Z rescope · item defer DEPL-dShippedRelease-31 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:20Z rescope · item defer DEPL-dShippedRelease-49 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:20Z rescope · item defer DEPL-dShippedRelease-50 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:21Z rescope · item defer DEPL-dShippedRelease-51 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:22Z rescope · item defer DEPL-dShippedRelease-52 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:22Z rescope · item defer DEPL-dShippedRelease-53 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:23Z rescope · item defer DEPL-dShippedRelease-54 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:24Z rescope · item defer DEPL-dShippedRelease-55 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:25Z rescope · item defer DEPL-dShippedRelease-56 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:26Z rescope · item defer DEPL-dShippedRelease-57 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:27Z rescope · item defer DEPL-dShippedRelease-58 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:27Z rescope · item defer DEPL-dShippedRelease-59 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:28Z rescope · item defer DEPL-dShippedRelease-60 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:29Z rescope · item defer DEPL-dShippedRelease-61 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:30Z rescope · item defer DEPL-dShippedRelease-62 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:30Z rescope · item defer DEPL-dShippedRelease-63 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:31Z rescope · item defer DEPL-dShippedRelease-64 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:32Z rescope · item defer DEPL-dShippedRelease-65 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:33Z rescope · item defer DEPL-dShippedRelease-66 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:33Z rescope · item defer DEPL-dShippedRelease-67 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:34Z rescope · item defer DEPL-dShippedRelease-68 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:35Z rescope · item defer DEPL-dShippedRelease-69 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:36Z rescope · item defer DEPL-dShippedRelease-70 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:37Z rescope · item defer DEPL-dShippedRelease-71 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:37Z rescope · item defer DEPL-dShippedRelease-72 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:38Z rescope · item defer DEPL-dShippedRelease-73 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:39Z rescope · item defer DEPL-dShippedRelease-74 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:40Z rescope · item defer DEPL-dShippedRelease-75 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:40Z rescope · item defer DEPL-dShippedRelease-76 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:41Z rescope · item defer DEPL-dShippedRelease-77 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:42Z rescope · item defer DEPL-dShippedRelease-78 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:42Z rescope · item defer DEPL-dShippedRelease-79 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:43Z rescope · item defer DEPL-dShippedRelease-80 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:44Z rescope · item defer DEPL-dShippedRelease-81 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:45Z rescope · item defer DEPL-dShippedRelease-82 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:45Z rescope · item defer DEPL-dShippedRelease-83 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:46Z rescope · item defer DEPL-dShippedRelease-84 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:47Z rescope · item defer DEPL-dShippedRelease-85 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:48Z rescope · item defer DEPL-dShippedRelease-86 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:48Z rescope · item defer DEPL-dShippedRelease-87 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:49Z rescope · item defer DEPL-dShippedRelease-88 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:50Z rescope · item defer DEPL-dShippedRelease-89 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:51Z rescope · item defer DEPL-dShippedRelease-90 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:51Z rescope · item defer DEPL-dShippedRelease-91 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:52Z rescope · item defer DEPL-dShippedRelease-92 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:53Z rescope · item defer DEPL-dShippedRelease-93 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:54Z rescope · item defer DEPL-dShippedRelease-94 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:54Z rescope · item defer DEPL-dShippedRelease-95 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:55Z rescope · item defer DEPL-dShippedRelease-96 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:56Z rescope · item defer DEPL-dShippedRelease-97 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:57Z rescope · item defer DEPL-dShippedRelease-98 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:57Z rescope · item defer DEPL-dShippedRelease-99 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:58Z rescope · item defer DEPL-dShippedRelease-100 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:14:59Z rescope · item defer DEPL-dShippedRelease-101 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:00Z rescope · item defer DEPL-dShippedRelease-102 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:00Z rescope · item defer DEPL-dShippedRelease-103 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:01Z rescope · item defer DEPL-dShippedRelease-104 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:02Z rescope · item defer DEPL-dShippedRelease-105 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:03Z rescope · item defer DEPL-dShippedRelease-106 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:03Z rescope · item defer DEPL-dShippedRelease-108 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:04Z rescope · item defer DEPL-dShippedRelease-109 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:05Z rescope · item defer DEPL-dShippedRelease-110 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:06Z rescope · item defer DEPL-dShippedRelease-111 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:06Z rescope · item defer DEPL-dShippedRelease-112 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:07Z rescope · item defer DEPL-dShippedRelease-113 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:08Z rescope · item defer DEPL-dShippedRelease-114 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:09Z rescope · item defer DEPL-dShippedRelease-115 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:09Z rescope · item defer DEPL-dShippedRelease-116 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:10Z rescope · item defer DEPL-dShippedRelease-117 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:11Z rescope · item defer DEPL-dShippedRelease-118 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:12Z rescope · item defer DEPL-dShippedRelease-119 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:12Z rescope · item defer DEPL-dShippedRelease-120 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:13Z rescope · item defer DEPL-dShippedRelease-121 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:14Z rescope · item defer DEPL-dShippedRelease-122 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:15Z rescope · item defer DEPL-dShippedRelease-123 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:15Z rescope · item defer DEPL-dShippedRelease-124 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:16Z rescope · item defer DEPL-dShippedRelease-125 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:17Z rescope · item defer DEPL-dShippedRelease-126 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:18Z rescope · item defer DEPL-dShippedRelease-127 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:18Z rescope · item defer DEPL-dShippedRelease-128 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:19Z rescope · item defer DEPL-dShippedRelease-129 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:20Z rescope · item defer DEPL-dShippedRelease-130 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:21Z rescope · item defer DEPL-dShippedRelease-131 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:21Z rescope · item defer DEPL-dShippedRelease-132 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:22Z rescope · item defer DEPL-dShippedRelease-133 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:23Z rescope · item defer DEPL-dShippedRelease-134 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:24Z rescope · item defer DEPL-dShippedRelease-135 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:24Z rescope · item defer DEPL-dShippedRelease-136 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:25Z rescope · item defer DEPL-dShippedRelease-137 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:26Z rescope · item defer DEPL-dShippedRelease-138 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:27Z rescope · item defer DEPL-dShippedRelease-140 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:27Z rescope · item defer DEPL-dShippedRelease-141 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:28Z rescope · item defer DEPL-dShippedRelease-142 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:29Z rescope · item defer DEPL-dShippedRelease-143 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:30Z rescope · item defer DEPL-dShippedRelease-144 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T19:15:30Z rescope · item defer DEPL-dShippedRelease-145 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 5 by the owner's ruling of 2026-11-01 (memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md), carried forward to the build run

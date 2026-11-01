@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-141 — the `deploy items` leg carries `guard = []`, so an edit to the engine it drives never reuses its green
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 37 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 37 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

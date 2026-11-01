@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-136 — the table rule keys on confirmed rows, so a header with no rows disposes nothing
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 15 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 15 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

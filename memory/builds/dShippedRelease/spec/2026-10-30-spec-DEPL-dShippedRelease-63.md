@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-63 — `derive_public_remote` strips the whole userinfo of a non-ssh remote
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 19 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 19 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

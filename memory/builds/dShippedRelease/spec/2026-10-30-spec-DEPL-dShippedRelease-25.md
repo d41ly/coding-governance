@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-25 — the receipt's schema 5: `release`, `source_remote` and the step that raises it
 
-**Status:** OPEN · rev-5 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 18 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-5 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 18 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0435@e8f82801 whole
 **Carries:** node:record-kind.receipt

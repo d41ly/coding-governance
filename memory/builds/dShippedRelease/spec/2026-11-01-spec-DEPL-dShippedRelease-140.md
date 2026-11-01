@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-140 — the `mint-` cases move to `tools/govkit/matrix.py`, so no gov-only fact sits in a shipped kit file
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 32 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 32 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

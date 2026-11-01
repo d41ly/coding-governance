@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-120 — the `ci-not-declared` stop names a file that exists, so the acceptance matrix passes it
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 30 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 30 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

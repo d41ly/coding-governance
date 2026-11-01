@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-26 — the platform matrix verified per release: runner rows for `platforms.supported` under `platforms.verify`, generalizing `run-held-wsl.sh`, and a Linux job in emitted CI at the floor
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 28 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 28 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0436@57841d5d whole
 **Carries:** node:policy-key.platforms.supported

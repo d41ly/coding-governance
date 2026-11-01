@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-29 — the update's report over every kind: each row's state, every repository row, every widening, and a lost change told from an unrelated hole
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 24 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 24 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0439@1aecad6a whole
 

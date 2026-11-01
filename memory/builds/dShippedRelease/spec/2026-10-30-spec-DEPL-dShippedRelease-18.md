@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-18 — every release updates gov's own install first: `kits.cut` refuses a tag at a SHA with no green gov-first record
 
-**Status:** OPEN · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 25 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 25 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0428@e9fcd4a6 whole
 

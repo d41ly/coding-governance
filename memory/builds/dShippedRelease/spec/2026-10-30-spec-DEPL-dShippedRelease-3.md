@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-3 — `kits.cut`: the annotated release tag and its generated notes
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 17 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 17 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0414@d9d47e83 whole
 **Carries:** node:item.kits.cut

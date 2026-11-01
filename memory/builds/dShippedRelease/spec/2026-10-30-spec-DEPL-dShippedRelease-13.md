@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-13 — `deploy.core`: the core checks read on the landed tree, the per-SHA verdict and the patch a red files
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 9 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 9 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0423@a0a019f7 whole
 **Carries:** node:item.deploy.core

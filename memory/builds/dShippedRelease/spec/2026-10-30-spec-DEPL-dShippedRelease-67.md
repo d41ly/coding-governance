@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-67 — `install --all` selects through `resolve_selection`, the one selection `cmd_apply` already calls
 
-**Status:** OPEN · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 23 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 23 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

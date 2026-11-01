@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-19 — the integrations `import` of an adopter's CI jobs as legs: only a job ruled `import`, test jobs only, each through an adapter row
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 29 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 29 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0429@78bd7623 whole
 

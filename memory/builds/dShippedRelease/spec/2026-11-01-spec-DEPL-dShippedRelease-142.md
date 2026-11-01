@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-142 — `record-clean` compares the return's `key` with this landing, so a stale clean return is refused
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 16 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 16 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

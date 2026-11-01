@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-4 — the deploy engine: `deploy.current` to `deploy.close`, `deploy.unlease` and the mailbox it closes
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 10 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 10 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0415@032149c3 whole
 **Carries:** node:item.deploy.current

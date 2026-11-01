@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-15 — promotion through environments: the `integrations` kit, the seven `release.*` items and a compare-and-swap on every promote
 
-**Status:** OPEN · rev-6 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 12 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-6 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 12 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0425@3b7313d6 whole
 **Carries:** node:item.release.pick

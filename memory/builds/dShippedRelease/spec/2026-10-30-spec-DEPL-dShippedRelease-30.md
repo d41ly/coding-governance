@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-30 — the patch build's shared budget: one red, one patch, a draw on the root's lease and the third keep-waiting
 
-**Status:** OPEN · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 16 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 16 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0440@a7f19c9e whole
 

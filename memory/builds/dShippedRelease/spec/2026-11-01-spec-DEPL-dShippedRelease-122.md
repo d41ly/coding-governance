@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-122 — `mint` reads a regenerate exit through the accepted-outcome rule, so a declared stop lands
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 30 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 30 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

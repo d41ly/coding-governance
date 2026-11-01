@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-1 — the landing record, one ref per landed SHA and its one reader
 
-**Status:** OPEN · rev-6 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 7 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-6 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 7 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0413@7914d7c9 whole
 **Carries:** node:record-kind.landing
@@ -22,7 +22,9 @@
 | [2026-11-01-prompt-DEPL-dShippedRelease-1-1-spec-writer.md](../prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-DEPL-dShippedRelease-1-2-spec-writer.md](../prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-DEPL-dShippedRelease-1-3-spec-writer.md](../prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-3-spec-writer.md) | journal | — |
+| [2026-11-01-prompt-DEPL-dShippedRelease-1-4-spec-writer.md](../prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-4-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-DEPL-dShippedRelease-1-owner-round-3.md](../prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-round-3.md) | research | — |
+| [2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md](../prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md) | research | — |
 | [2026-10-30-review-DEPL-dShippedRelease-1-spec-audit-round1.md](../reviews/2026-10-30-review-DEPL-dShippedRelease-1-spec-audit-round1.md) | spec-audit | DEPL-dShippedRelease-10 DEPL-dShippedRelease-21 DEPL-dShippedRelease-23 DEPL-dShippedRelease-31 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-2 DEPL-dShippedRelease-13 DEPL-dShippedRelease-4 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-6 DEPL-dShippedRelease-27 DEPL-dShippedRelease-5 DEPL-dShippedRelease-30 DEPL-dShippedRelease-3 DEPL-dShippedRelease-25 DEPL-dShippedRelease-7 DEPL-dShippedRelease-16 DEPL-dShippedRelease-20 DEPL-dShippedRelease-17 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-18 DEPL-dShippedRelease-24 DEPL-dShippedRelease-8 DEPL-dShippedRelease-26 DEPL-dShippedRelease-19 DEPL-dShippedRelease-22 DEPL-dShippedRelease-9 |
 
 <!-- /gen:spec-records -->

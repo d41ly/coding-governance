@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-24 — `install.guards`: the core guards in the project's settings, or in managed settings where the operator opts in
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 26 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 26 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0434@f8425815 whole
 **Carries:** node:policy-key.install.guards

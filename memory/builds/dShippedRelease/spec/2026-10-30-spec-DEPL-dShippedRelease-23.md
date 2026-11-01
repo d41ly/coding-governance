@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-23 — the deployer's definition, registered as an expansion's item role
 
-**Status:** OPEN · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 3 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 3 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0433@ff09e77e whole
 

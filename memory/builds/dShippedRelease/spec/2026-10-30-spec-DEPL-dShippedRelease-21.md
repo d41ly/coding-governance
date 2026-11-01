@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-21 — a purpose on every kit, descriptors for govkit and lib, and inline copies generated
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 2 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 2 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0431@56a21084 whole
 

@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-87 — `ci_emit.py render` exits a reserved code when no table is declared
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 29 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 29 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

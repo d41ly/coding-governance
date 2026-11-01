@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-27 — `carries` on the landing record, the `landing` class, publications, `commits.squash` and Codex targets
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 14 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 14 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0437@bb284003 whole
 **Carries:** node:policy-key.commits.squash

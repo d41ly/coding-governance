@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-125 — the round-3 spec audit's 45 MEDIUM and 7 LOW findings, one batch
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 34 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 34 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

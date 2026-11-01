@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-80 — `run_deploy_review` branches on `unfired` before it reads a row, so a first walk fires or says not placed
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 13 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 13 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-20 — an offered update runs neither `adopt` nor `test.seed`, its order names the adopter's own run of each, and outbox orders are graded
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 21 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 21 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0430@25fe9858 whole
 

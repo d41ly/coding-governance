@@ -41,6 +41,7 @@
 - SEV · DEPL-dShippedRelease-46 · HIGH · two draws on one closed root can both pass where the budget admits one
 - SEV · DEPL-dShippedRelease-47 · HIGH · the clause's one-push draw is unreachable and a pre-lease root has no draw
 - SEV · DEPL-dShippedRelease-48 · MED · gov's own receipt reds at receipt integrity under schema 5
+- DEFERRED · DEPL-dShippedRelease-32 · until DEPL-dShippedRelease-144 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order carries `closes` for it
 - DEFERRED · DEPL-dShippedRelease-33 · until DEPL-dShippedRelease-3 · DEPL-dShippedRelease-3's build run needs it from dWellOiledMachine, which holds this ask until its own build takes it
 - DEFERRED · DEPL-dShippedRelease-34 · until DEPL-dShippedRelease-4 · DEPL-dShippedRelease-4's build run needs it from dPlacedRequest, which holds this ask until its own build takes it
 - DEFERRED · DEPL-dShippedRelease-35 · until DEPL-dShippedRelease-4 · DEPL-dShippedRelease-4's build run needs it from dWellOiledMachine, which holds this ask until its own build takes it

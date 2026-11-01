@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-96 — `derive_public_remote` strips the whole userinfo whenever the predicate says credential-bearing
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 20 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 20 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

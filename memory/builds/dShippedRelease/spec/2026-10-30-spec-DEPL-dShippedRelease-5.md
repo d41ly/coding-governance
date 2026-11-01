@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-5 — the `deploy.released` wait: `build.release-ceiling` as its deadline and the release hold's one owner item
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 15 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 15 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0508@68f388b5 whole
 **Carries:** node:item.deploy.released

@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-106 — The round-2 spec audit's 79 minors, batched: the rules units 49 to 78 left unstated, their failure states, and the records that named the wrong seam
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 33 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 33 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

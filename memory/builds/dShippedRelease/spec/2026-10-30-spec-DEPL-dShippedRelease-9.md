@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-9 — a derived runbook: the operator order for install and update, rendered from the kit descriptors, a hand edit red at render parity
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 31 · closes DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 31 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0419@c78ef1a4 whole
 
@@ -12,6 +12,8 @@
 | [2026-10-30-build-DEPL-dShippedRelease-1-spec-stage-returns.md](../build/2026-10-30-build-DEPL-dShippedRelease-1-spec-stage-returns.md) | research | DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-3 DEPL-dShippedRelease-4 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-7 DEPL-dShippedRelease-8 DEPL-dShippedRelease-10 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-16 DEPL-dShippedRelease-17 DEPL-dShippedRelease-18 DEPL-dShippedRelease-19 DEPL-dShippedRelease-20 DEPL-dShippedRelease-21 DEPL-dShippedRelease-22 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24 DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 |
 | [2026-10-30-build-DEPL-dShippedRelease-9-deviation-91.md](../build/2026-10-30-build-DEPL-dShippedRelease-9-deviation-91.md) | deviation | — |
 | [2026-10-30-build-DEPL-dShippedRelease-9-reuse-scout-e.md](../build/2026-10-30-build-DEPL-dShippedRelease-9-reuse-scout-e.md) | research | DEPL-dShippedRelease-10 DEPL-dShippedRelease-21 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24 |
+| [2026-11-01-build-DEPL-dShippedRelease-9-close-verb-brief.md](../build/2026-11-01-build-DEPL-dShippedRelease-9-close-verb-brief.md) | research | — |
+| [2026-11-01-build-DEPL-dShippedRelease-9-close-verb-return.md](../build/2026-11-01-build-DEPL-dShippedRelease-9-close-verb-return.md) | research | — |
 | [2026-10-30-prompt-DEPL-dShippedRelease-1-spec-brief.md](../prompts/2026-10-30-prompt-DEPL-dShippedRelease-1-spec-brief.md) | research | DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-3 DEPL-dShippedRelease-4 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-7 DEPL-dShippedRelease-8 DEPL-dShippedRelease-10 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-16 DEPL-dShippedRelease-17 DEPL-dShippedRelease-18 DEPL-dShippedRelease-19 DEPL-dShippedRelease-20 DEPL-dShippedRelease-21 DEPL-dShippedRelease-22 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24 DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 |
 | [2026-10-30-review-DEPL-dShippedRelease-1-spec-audit-round1.md](../reviews/2026-10-30-review-DEPL-dShippedRelease-1-spec-audit-round1.md) | spec-audit | DEPL-dShippedRelease-10 DEPL-dShippedRelease-21 DEPL-dShippedRelease-23 DEPL-dShippedRelease-31 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-13 DEPL-dShippedRelease-4 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-6 DEPL-dShippedRelease-27 DEPL-dShippedRelease-5 DEPL-dShippedRelease-30 DEPL-dShippedRelease-3 DEPL-dShippedRelease-25 DEPL-dShippedRelease-7 DEPL-dShippedRelease-16 DEPL-dShippedRelease-20 DEPL-dShippedRelease-17 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-18 DEPL-dShippedRelease-24 DEPL-dShippedRelease-8 DEPL-dShippedRelease-26 DEPL-dShippedRelease-19 DEPL-dShippedRelease-22 |
 
@@ -25,8 +27,9 @@ does not grade prose (`:14-17`), so the order an operator installs and updates k
 nowhere a machine grades (`gap-deploy-08`). This unit renders that order from the kit descriptors into
 one region of the runbook, through dOrderedCharter's renderer as a new scope, so a hand edit to the
 region is red at render parity, and it lets the rendered rows answer the population check, whose
-ratchet of 18 entries with no section falls to 0. It is the last unit in build order, so its header
-closes DEPL-dShippedRelease-32.
+ratchet of 18 entries with no section falls to 0. Units the audit rounds added follow it in build
+order, so its header advances DEPL-dShippedRelease-32, which stays open until the last unit in build
+order.
 
 ## 2. Scope (IN)
 
@@ -350,6 +353,7 @@ New arm: tools/govkit/selftest.py · covers AC6 · a scratch repository holding 
 - rev-1 · 2026-10-30 · initial draft, from the packet's Items 9, `gap-deploy-08`, the spec brief's unit row
   and shared interfaces, scout E's row and its disagreements 8 and 9.
 - rev-2 · 2026-10-30 · §3 · the Edges gain the mirror of each edge the round-1 spec audit's promoted units declare toward this unit (units 78); no scope, design or criterion moved.
+- rev-3 · 2026-11-01 · §1 · the header's verb on DEPL-dShippedRelease-32 becomes `advances` and §1 stops calling this the last unit in build order, because the audit rounds put units after it (owner's stop ruling, `memory/builds/dShippedRelease/prompts/2026-11-01-prompt-DEPL-dShippedRelease-1-owner-stop-chain.md`); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 

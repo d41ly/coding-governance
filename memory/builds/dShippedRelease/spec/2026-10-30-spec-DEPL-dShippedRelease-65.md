@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-65 — every failure line of `check-kit-versions.sh` gets a home in `derive_version_findings` or a named retirement
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 2 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 2 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

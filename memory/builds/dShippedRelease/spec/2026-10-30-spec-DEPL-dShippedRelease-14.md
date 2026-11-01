@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-14 — the landing review, blocking the build's close and never the push
 
-**Status:** OPEN · rev-6 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 11 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-6 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 11 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0424@2fe22720 whole
 

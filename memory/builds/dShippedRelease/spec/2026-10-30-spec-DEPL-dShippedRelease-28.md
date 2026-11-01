@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-28 — `adopt.declarations`: today's flow and role customizations proposed as overlay rows, each ruled once
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 23 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 23 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0438@088c545a whole
 **Carries:** node:item.adopt.declarations

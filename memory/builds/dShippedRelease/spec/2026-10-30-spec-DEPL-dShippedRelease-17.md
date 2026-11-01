@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-17 — `kits.install` and `kits.update`: the walk that closes on dSafePassage's outcomes, the attended hooks, the backlog step, and a fresh install in one pass
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 22 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 22 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0427@e593e6b1 whole
 **Carries:** node:item.kits.install

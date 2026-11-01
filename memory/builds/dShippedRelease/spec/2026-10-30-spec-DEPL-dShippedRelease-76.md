@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-76 — the offer spells two environments: the grant for clone and push, and none for `update`
 
-**Status:** OPEN · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 21 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 21 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

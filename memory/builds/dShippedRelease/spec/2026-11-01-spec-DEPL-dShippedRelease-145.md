@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-145 — `mint-regenerate-kits` runs every kit through `cmd_mint`, so the break its arm names reaches it
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 32 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 32 · advances DEPL-dShippedRelease-32
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-12 — the landing queue, the landing turn, and the lander's outcome record
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 6 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 6 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0422@c488c531 whole
 **Carries:** node:item.deploy.land

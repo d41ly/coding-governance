@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-6 — the first engine adapter, `compose-systemd`, for signed container images
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 13 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 13 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0416@7154a42c whole
 

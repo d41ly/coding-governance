@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-7 — the adopter register read and the currency watch: `kits.currency` in each adopter, `kits.adopters` in gov
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 19 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 19 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0417@3e86117a whole
 **Carries:** node:item.kits.currency

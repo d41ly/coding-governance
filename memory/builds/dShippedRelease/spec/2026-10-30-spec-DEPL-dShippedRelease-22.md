@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-22 — the ask tracker's one-way mirror, the adapter `integrations.tracker: mirror-out` selects
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 30 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 30 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0432@e42728b4 whole
 **Carries:** node:policy-key.integrations.tracker

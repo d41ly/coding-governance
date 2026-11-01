@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-8 — optional emitted CI: every `uses:` pinned by sha from one declaration gov's own workflow also uses, under least-privilege `permissions:`
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 27 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 27 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0418@0096c2c8 whole
 

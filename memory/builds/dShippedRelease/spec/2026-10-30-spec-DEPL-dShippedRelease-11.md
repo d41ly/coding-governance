@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-11 — a dependent's landing held until its parent lands
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 5 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 5 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0421@62dc6590 whole
 **Carries:** node:item.deploy.parents

@@ -42,7 +42,7 @@ Cite ids, never line numbers.
 | [DEPL-dSealedTally-6](../builds/dSealedTally/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE _decided LOOP EXISTS TWICE and only an arm keeps the copies honest:… |
 | [DEPL-dSettledRoster-1](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | govkit apply appends its eol=lf pins LAST to a target's .gitattributes… |
 | [DEPL-dSettledRoster-2](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | a govkit apply against a kind = "manifest" target runs that target's… |
-| [DEPL-dShippedRelease-32](../builds/dShippedRelease/BACKLOG.md) | SPECCED | MED | DEPL-dShippedRelease-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [DEPL-dShippedRelease-32](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [DEPL-dShippedRelease-33](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | LOW | DEPL-dShippedRelease-3 | 2026-10-30 | A CADENCE ROW CANNOT WAKE ON AN EVENT OR PER SESSION.… |
 | [DEPL-dShippedRelease-34](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | HIGH | DEPL-dShippedRelease-4 | 2026-10-30 | THE LANDED WRITE ENDS THE LEASE TOO SOON. TOOL-dPlacedRequest-16 S2… |
 | [DEPL-dShippedRelease-35](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-4 | 2026-10-30 | THE WITHDRAW PATH HAS A SECOND CLOSER. TOOL-dWellOiledMachine-58 S9… |

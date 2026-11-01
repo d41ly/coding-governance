@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-31 — the adopter register, and the word fleet left to node units
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 4 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node d · Tier-2 · base f4597719 · streams deployer · order 4 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0441@1aab6ce8 whole
 **Carries:** node:record-kind.adopter-register

@@ -1,6 +1,6 @@
 # DEPL-dShippedRelease-2 — `deploy.distill` unarmed, recording that it measured nothing
 
-**Status:** OPEN · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 8 · advances DEPL-dShippedRelease-32
+**Status:** DEFERRED · rev-2 · 2026-10-30 · node d · Tier-2 · base f4597719 · streams deployer · order 8 · advances DEPL-dShippedRelease-32
 
 **Carries:** cl-dClosedLoop-0507@e74286a1 whole
 **Carries:** node:item.deploy.distill
