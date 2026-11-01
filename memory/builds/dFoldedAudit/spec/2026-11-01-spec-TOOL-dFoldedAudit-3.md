@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-3 — the DISPOSAL stage disposes by nature and reconciles folds to their specs
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 30
+**Status:** INPROGRESS · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
