@@ -21,20 +21,20 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · handoff · 145 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: d507ab9d0210228b80fc85261ec39451ea3f8729
-phase: HELD
+witness: 4f7ba0a3019e904f7cc404c60c1ceb90ecdeccdc
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dsafepassage-567339
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-11-01T04:44:38Z
+lease-utc: 2026-11-01T16:44:31Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 18428
 session: c5f50d22-89c6-41d7-84e5-2382dcd49faa
-keepalive: 3740de71
+keepalive: e7f5ef83
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 anchor-ref: refs/heads/main
@@ -631,3 +631,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T16:37:37Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dSafePassage && bash tools/push-main.sh --land --slug dSafePassage && bash tools/unattended/unattended.sh --settle dSafePassage
 
 2026-11-01T16:37:37Z hold · item owner-decision · reason until owner · reaped 3740de71 · resume none(owner)
+
+2026-11-01T16:44:37Z resume · item dSafePassage · reason held · keepalive e7f5ef83 · manual
