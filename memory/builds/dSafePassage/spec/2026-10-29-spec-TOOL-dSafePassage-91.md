@@ -13,6 +13,7 @@
 | [2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-90-spec-brief.md) | research | TOOL-dSafePassage-90 |
 | [2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md](../prompts/2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md) | journal | — |
 | [2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md](../reviews/2026-10-29-review-TOOL-dSafePassage-90-91-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-90 |
+| [2026-11-01-review-TOOL-dSafePassage-90-91-closing-diff-round4.md](../reviews/2026-11-01-review-TOOL-dSafePassage-90-91-closing-diff-round4.md) | diff-review | TOOL-dSafePassage-90 |
 
 <!-- /gen:spec-records -->
 

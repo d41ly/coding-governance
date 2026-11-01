@@ -535,3 +535,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T04:50:29Z dispatch · item cef70e87 TOOL-dSafePassage-91 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-91.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
 
 2026-11-01T05:01:34Z dispatch · item cef70e87 TOOL-dSafePassage-91 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-91.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/LIVE.md
+
+2026-11-01T05:13:09Z review · item dSafePassage-r3-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 3 · disposition promote
+
+2026-11-01T05:41:54Z rescope · item add TOOL-dSafePassage-92 · reason the round-4 closing review's promotions (M4), specs at 2e6d48453
+
+2026-11-01T05:41:58Z rescope · item add TOOL-dSafePassage-93 · reason the round-4 closing review's promotions (M4), specs at 2e6d48453
