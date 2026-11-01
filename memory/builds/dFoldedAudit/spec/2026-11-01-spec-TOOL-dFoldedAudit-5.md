@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-5 — each HIGH records its specs and a verb derives the chain's stop verdict
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 50 · ratified 2026-11-01
+**Status:** INPROGRESS · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 50 · ratified 2026-11-01
 
 <!-- gen:spec-records -->
 
