@@ -203,3 +203,31 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T14:18:37Z rescope · item add DEPL-dShippedRelease-124 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 67 (HIGH, item H10): derive_pick_stop has no third answer, so a dead read looks like a new environment
 
 2026-11-01T14:18:38Z rescope · item add DEPL-dShippedRelease-125 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md the 52 minors by raw id, MEDIUM ids 36 63 51 10 24 41 11 26 15 25 33 64 16 43 8 32 14 57 7 9 12 13 17 18 72 31 34 37 44 52 53 54 55 56 58 60 61 62 65 66 68 69 70 71 73 and LOW ids 19 35 20 27 28 45 46
+
+2026-11-01T15:54:11Z review · item dShippedRelease-spec-set-r4 · reason verdict BLOCKED · blockers 3 · BOUNDED · highs 9 · minors 51 · disposition promote
+
+2026-11-01T16:05:28Z rescope · item add DEPL-dShippedRelease-126 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 1 (BLOCKER, item B1, shared with ids 21, 54): unit 122's target_context refuses every kit in gov's root, so mint still fails on the state the unit exists to accept
+
+2026-11-01T16:05:28Z rescope · item add DEPL-dShippedRelease-127 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 21 (BLOCKER, item B1, shared with ids 1, 54): AC1 and AC3 cannot pass on gov's tracked deploy.toml, and section 5 prices a permanent refusal as an edge
+
+2026-11-01T16:05:29Z rescope · item add DEPL-dShippedRelease-128 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 54 (BLOCKER, item B1, shared with ids 1, 21): all 11 regenerate kits die on the answers loop, and no criterion runs that population
+
+2026-11-01T16:05:30Z rescope · item add DEPL-dShippedRelease-129 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 2 (HIGH, item H1): no criterion plants a value only the chain read can refuse, so unit 123 S4's exit 1 is never observed
+
+2026-11-01T16:05:31Z rescope · item add DEPL-dShippedRelease-130 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 4 (HIGH, item H2): unit 116 AC4 forbids the heading dispose-with-reason must write, so the way out of a refused disposal is dead
+
+2026-11-01T16:05:31Z rescope · item add DEPL-dShippedRelease-131 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 5 (HIGH, item H3): unit 125 S31's only disposal for a refused pin is itself refused by unit 110 S2
+
+2026-11-01T16:05:32Z rescope · item add DEPL-dShippedRelease-132 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 22 (HIGH, item H4): seven tracked reports hold two ranges in the opening unit 109 S1 reads, so honest reports read ambiguous
+
+2026-11-01T16:05:33Z rescope · item add DEPL-dShippedRelease-133 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 23 (HIGH, item H5): unit 114 passes the harness's absolute report path straight to dispose-landing, so an honest review prints forged path
+
+2026-11-01T16:05:34Z rescope · item add DEPL-dShippedRelease-134 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 55 (HIGH, item H6): unit 124 never states rows off the local first-parent line, so a stale clone promotes over what an environment runs
+
+2026-11-01T16:05:34Z rescope · item add DEPL-dShippedRelease-135 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 56 (HIGH, item H7): record-clean admits on three keys that do not mean a clean review
+
+2026-11-01T16:05:35Z rescope · item add DEPL-dShippedRelease-136 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 57 (HIGH, item H8): unit 115 keys on whether a table exists, so a header with no rows passes as present and disposes 0 findings
+
+2026-11-01T16:05:36Z rescope · item add DEPL-dShippedRelease-137 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md id 58 (HIGH, item H9): read_appendix_table promises every row, but the reused loop drops rows it cannot place
+
+2026-11-01T16:05:37Z rescope · item add DEPL-dShippedRelease-138 · reason closes 2026-11-01-review-DEPL-dShippedRelease-108-spec-audit-round1.md the 51 minors by raw id, MEDIUM ids 3 25 33 7 48 63 8 9 44 59 10 26 40 11 42 12 13 14 15 50 16 17 24 31 32 64 35 36 41 45 46 52 60 61 62 65 66 68 69 70 71 and LOW ids 19 67 20 27 28 34 37 38 47 53

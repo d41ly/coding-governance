@@ -60,3 +60,4 @@ Cite ids, never line numbers.
 | [DEPL-dShippedRelease-47](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | HIGH | DEPL-dShippedRelease-30 | 2026-10-30 | A DRAW IS THREE PUSHES AND MEETS NO ABSENT REF. TOOL-dPlacedRequest-16… |
 | [DEPL-dShippedRelease-48](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-25 | 2026-10-30 | A SOURCE RECEIPT STAYS AT THE OLD FIELDS. TOOL-dSafePassage-8's source… |
 | [DEPL-dShippedRelease-107](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | LOW | DEPL-dShippedRelease-106 | 2026-11-01 | A DISPOSAL KILLED BY A LIMIT HAS NO WAY BACK INTO THE HARNESS.… |
+| [DEPL-dShippedRelease-139](../builds/dShippedRelease/BACKLOG.md) | DEFERRED | MED | DEPL-dShippedRelease-138 | 2026-11-01 | THE ROLE GUARD SEES AN EDIT OF A SPEC AND NOT A SCRIPT'S WRITE OF ONE.… |
