@@ -165,3 +165,41 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T10:17:28Z hold · item host-owner-action · reason until owner · reaped cf38fa37 · resume none(owner)
 
 2026-11-01T13:12:59Z resume · item dShippedRelease · reason held · keepalive fdbc3631 · manual
+
+2026-11-01T14:03:05Z review · item dShippedRelease-spec-set-r3 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 16 · minors 52 · disposition promote
+
+2026-11-01T14:18:26Z rescope · item add DEPL-dShippedRelease-108 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 1 (BLOCKER, item B1): under the default policy the walk never fires --deploy review, so every default landing holds at the close
+
+2026-11-01T14:18:26Z rescope · item add DEPL-dShippedRelease-109 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 2 (HIGH, item H1, shared with ids 29, 38, 48): the range binding fixes one exact spelling, so an honest report fails
+
+2026-11-01T14:18:27Z rescope · item add DEPL-dShippedRelease-110 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 29 (HIGH, item H1, shared with ids 2, 38, 48): the stamp lets the landing term grade the disposal's own write, so a foreign report passes
+
+2026-11-01T14:18:28Z rescope · item add DEPL-dShippedRelease-111 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 38 (HIGH, item H1, shared with ids 2, 29, 48): every landing report goes through the harness prompt and no plant renders its opening
+
+2026-11-01T14:18:28Z rescope · item add DEPL-dShippedRelease-112 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 48 (HIGH, item H1, shared with ids 2, 29, 38): a HEAD spelling and a report with no binding line have no stated reading
+
+2026-11-01T14:18:29Z rescope · item add DEPL-dShippedRelease-113 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 3 (HIGH, item H2, shared with id 22): a clean landing review returns report null and no writer of its record exists
+
+2026-11-01T14:18:30Z rescope · item add DEPL-dShippedRelease-114 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 22 (HIGH, item H2, shared with id 3): a clean review can only be recorded as blocked, and no case drives a harness return
+
+2026-11-01T14:18:30Z rescope · item add DEPL-dShippedRelease-115 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 4 (HIGH, item H3, shared with ids 30, 49): a report with no appendix counts 0 at both ends, so the guard shares its input
+
+2026-11-01T14:18:31Z rescope · item add DEPL-dShippedRelease-116 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 30 (HIGH, item H3, shared with ids 4, 49): unit 85 rebuilds review_replay's appendix read without its refusals
+
+2026-11-01T14:18:32Z rescope · item add DEPL-dShippedRelease-117 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 49 (HIGH, item H3, shared with ids 4, 30): nothing compares the rows with the count the report itself states
+
+2026-11-01T14:18:33Z rescope · item add DEPL-dShippedRelease-118 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 50 (HIGH, item H4): uncertain and unverified rows are neither counted nor filed, so a degraded review certifies the landing
+
+2026-11-01T14:18:33Z rescope · item add DEPL-dShippedRelease-119 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 5 (HIGH, item H5): the census predicate is undefined for a list argv and neither reading works
+
+2026-11-01T14:18:34Z rescope · item add DEPL-dShippedRelease-120 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 21 (HIGH, item H6): unit 88's outcome row is one the govkit acceptance matrix leg refuses
+
+2026-11-01T14:18:35Z rescope · item add DEPL-dShippedRelease-121 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 39 (HIGH, item H7): GOVKIT_INSTALL_FROM is inherited, so source-update cannot fail
+
+2026-11-01T14:18:35Z rescope · item add DEPL-dShippedRelease-122 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 47 (HIGH, item H8): render's new exit 3 breaks mint, the third caller, so gov can land no change to the integrations kit
+
+2026-11-01T14:18:36Z rescope · item add DEPL-dShippedRelease-123 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 59 (HIGH, item H9): a typed handover-epoch skips every unit lease and mail ref
+
+2026-11-01T14:18:37Z rescope · item add DEPL-dShippedRelease-124 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md id 67 (HIGH, item H10): derive_pick_stop has no third answer, so a dead read looks like a new environment
+
+2026-11-01T14:18:38Z rescope · item add DEPL-dShippedRelease-125 · reason closes 2026-11-01-review-DEPL-dShippedRelease-79-spec-audit-round1.md the 52 minors by raw id, MEDIUM ids 36 63 51 10 24 41 11 26 15 25 33 64 16 43 8 32 14 57 7 9 12 13 17 18 72 31 34 37 44 52 53 54 55 56 58 60 61 62 65 66 68 69 70 71 73 and LOW ids 19 35 20 27 28 45 46
