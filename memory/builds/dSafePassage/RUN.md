@@ -23,8 +23,8 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · handoff · 145 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 02030bc97
-phase: VERIFYING
+witness: b9543af4bb170be57ac3df161557fcb0945b9cce
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -653,3 +653,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T21:10:32Z dispatch · item cfe5405c TOOL-dSafePassage-103 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-103-ledger.md memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-103.md
 
 2026-11-01T21:25:08Z dispatch · item cfe5405c TOOL-dSafePassage-103 · reason memory/backlog/TOOL.md memory/builds/dSafePassage/README.md
+
+2026-11-01T23:50:32Z rescope · item add TOOL-dSafePassage-104 · reason the close's bar on the landing merge 9f8812d80 reds memory hygiene check 12 on 103's edge onto 8 and both lexicon legs on 103's second ask
+
+2026-11-01T23:50:35Z brief · item TOOL-dSafePassage-104 · reason 714005088178 memory/builds/dSafePassage/prompts/2026-11-02-prompt-TOOL-dSafePassage-104-build-brief.md
