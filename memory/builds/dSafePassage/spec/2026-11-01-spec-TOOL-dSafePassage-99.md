@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process
 
-**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base f519c1934 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-87
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-99-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-99-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md) | research | TOOL-dSafePassage-100 |

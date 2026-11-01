@@ -264,10 +264,10 @@ ids TOOL-dSafePassage-99 TOOL-dSafePassage-100
 | [TOOL-dSafePassage-96 — the round-7 closing review's three minors: each restore check reads the path its label names, and a reused tmp stages afresh](spec/2026-11-01-spec-TOOL-dSafePassage-96.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
 | [TOOL-dSafePassage-97 — the round-8 closing review's five wording lows: spec 96's text corrected in one table](spec/2026-11-01-spec-TOOL-dSafePassage-97.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
 | [TOOL-dSafePassage-98 — the round-9 closing review's one low: 97's S3 narrowed to what its AC3 reads](spec/2026-11-01-spec-TOOL-dSafePassage-98.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
-| [TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process](spec/2026-11-01-spec-TOOL-dSafePassage-99.md) | 16 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process](spec/2026-11-01-spec-TOOL-dSafePassage-99.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 494 bound to this build, across 4 record folder(s).
+Records: 495 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

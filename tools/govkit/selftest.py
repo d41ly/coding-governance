@@ -124,9 +124,7 @@ def govkit_steps() -> tuple:
     A second copy of this vocabulary in the harness is the two-spellings class inside the arm that
     exists to grade it: the harness would keep passing against its own idea of the order.
     """
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
-    return govkit.STEPS
+    return govkit_module().STEPS
 
 
 def govkit_kind_marks() -> dict:
@@ -135,23 +133,38 @@ def govkit_kind_marks() -> dict:
     The harness used to spell one of these (`SKIP`) itself, and the engine's table never contained
     it — so the arm reading plan rows matched nothing and reported vacuously green.
     """
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
-    return govkit.KIND_MARKS
+    return govkit_module().KIND_MARKS
 
 
 def govkit_update_role() -> dict:
     """The engine's OWN update dispatch table, for the reason `govkit_kind_marks` gives."""
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
-    return govkit.UPDATE_ROLE
+    return govkit_module().UPDATE_ROLE
+
+
+GOVKIT_HELD: list = []   # the one engine at GOVKIT this process took first
 
 
 def govkit_module():
-    """The engine module itself, for arms that call a resolver directly rather than a verb."""
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
-    return govkit
+    """The engine module itself, for arms that call a resolver directly rather than a verb.
+
+    It HOLDS the first engine at `GOVKIT` and re-binds the module table to it on every call
+    (TOOL-dSafePassage-99): a staged copy loaded in process runs its own `load_govkit()`, which
+    writes the copy's engine to `sys.modules["govkit"]`, and an `import` would answer that copy,
+    whose `Refusal` is not the class the suite's catchers name. Loading `GOVKIT` afresh on a miss
+    would mint a third `Refusal`, so the held object is the answer.
+    """
+    if not GOVKIT_HELD:
+        sys.path.insert(0, str(HERE))
+        mod = sys.modules.get("govkit")
+        if mod is None or pathlib.Path(getattr(mod, "__file__", "") or "").resolve() != GOVKIT:
+            spec = importlib.util.spec_from_file_location("govkit", GOVKIT)
+            mod = importlib.util.module_from_spec(spec)
+            sys.modules["govkit"] = mod
+            spec.loader.exec_module(mod)
+        GOVKIT_HELD.append(mod)
+    sys.modules["govkit"] = GOVKIT_HELD[0]
+    sys.modules["upgrade_steps"] = GOVKIT_HELD[0].upgrade_steps
+    return GOVKIT_HELD[0]
 GOVKIT = HERE / "govkit.py"
 FAILURES: list[str] = []
 
@@ -3680,6 +3693,36 @@ def check_staged_copies(tmp: pathlib.Path) -> None:
     check("[dSP-71] AC3 build_staged_copy leaves the kit directory's file set, outside __pycache__",
           rel(d) == rel(HERE), f"missing: {sorted(rel(HERE) - rel(d))}; extra: {sorted(rel(d) - rel(HERE))}")
 
+    # TOOL-dSafePassage-99 S3: a staged copy's own `load_govkit()` writes the copy's engine to the
+    # module table, and `govkit_module()` still answers the one engine at GOVKIT afterwards.
+    held99 = govkit_module()
+    shutil.rmtree(tmp / "dsp99-copy", ignore_errors=True)
+    spec99 = importlib.util.spec_from_file_location("us99_copy", build_staged_copy(
+        tmp / "dsp99-copy", (HERE / "upgrade_steps.py").read_text(encoding="utf-8")))
+    us99_copy = importlib.util.module_from_spec(spec99)
+    spec99.loader.exec_module(us99_copy)
+    copy99 = us99_copy.load_govkit()
+    file99 = lambda m: pathlib.Path(getattr(m, "__file__", "") or "").resolve()  # noqa: E731
+    check("[dSP-99] a staged copy's load_govkit() displaces the engine in sys.modules",
+          sys.modules.get("govkit") is copy99 and file99(copy99) != GOVKIT, str(file99(copy99)))
+    gk99 = govkit_module()
+    check("[dSP-99] govkit_module() answers the held engine at GOVKIT after the staged load, "
+          "and re-binds govkit and upgrade_steps to it",
+          gk99 is held99 and file99(gk99) == GOVKIT and sys.modules.get("govkit") is gk99
+          and sys.modules.get("upgrade_steps") is gk99.upgrade_steps
+          and gk99.Refusal is gk99.upgrade_steps.Refusal, str(file99(gk99)))
+    imports99 = [n.lineno for n in _ast.walk(_ast.parse(own))
+                 if (isinstance(n, _ast.Import) and any(a.name == "govkit" for a in n.names))
+                 or (isinstance(n, _ast.ImportFrom) and n.module == "govkit")]
+    check("[dSP-99] no import statement in selftest.py names the engine, so every reader goes "
+          "through govkit_module()", imports99 == [], f"lines: {imports99}")
+    # The window this bounds: before govkit_module() re-binds the table, the same call finds copy99
+    # there, whose file is not the govkit.py beside the held step module, and loads a third engine
+    # by path (upgrade_steps.py load_govkit). This grades the window's closing edge, not the window.
+    got99 = held99.upgrade_steps.load_govkit()
+    check("[dSP-99] the held step module's own load_govkit() answers the held engine once "
+          "govkit_module() has re-bound the table", got99 is held99, str(file99(got99)))
+
 
 def check_step_isolation(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-7 AC1 to AC7 — `upgrade_steps.py fixture isolation` with every plant: each
@@ -5788,8 +5831,7 @@ def main() -> int:
         # because destination last-wins already elects the seed template. So on gov's tree this arm
         # has no red state at all, and a fixture built from a real descriptor would pass by finding
         # nothing — inside the arm written to close the data-loss path.
-        sys.path.insert(0, str(HERE))
-        import govkit as _G
+        _G = govkit_module()
         _root = _G.repo_root()
         CARVED = {"id": "scratch", "home": f"{PFX}memory-tree", "files": [
             {"include": "**", "role": "engine"},
@@ -9095,8 +9137,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("a pin row naming a leg the manifest no longer declares REDS",
               _r4.returncode == 1 and "pins 'demo two'" in _r4.stdout, _r4.stdout + _r4.stderr)
 
-        sys.path.insert(0, str(HERE))
-        import govkit  # noqa: E402
+        govkit = govkit_module()
 
         # ---- L1: THE REFUSAL BRANCHES THIS BUILD ADDED, each reached by an arm ----------------
         # Six of twelve were unverified text — any of them could be misspelled, unreachable, or emit
@@ -9183,8 +9224,7 @@ user_skills = "/tmp/gk-fake-skills"
         # appears dozens of times across this tree in docs, arms and refusal strings.
         # THE KEYS ARE govkit's OWN `POLICY_KEYS` (TOOL-dDerivedDocket-24 S14), imported rather than
         # restated, so this arm grades the alternation the engine compiles and not a copy of it.
-        sys.path.insert(0, str(HERE))
-        import govkit as _gk_mod  # noqa: E402
+        _gk_mod = govkit_module()
         # THE ENGINE'S OWN OBJECT (TOOL-dThriftyLanding-11). This arm compiled a hand copy of the
         # pattern, so a defect in the engine's could pass here; it now grades `build_policy_re()`.
         _pol_re = _gk_mod.build_policy_re()
@@ -9558,8 +9598,7 @@ user_skills = "/tmp/gk-fake-skills"
             # used to assert it was riding the playbook's role and died when that role was corrected.
             # Keyed on `derive_rule_kind` directly, it cannot be redefined out from under itself by
             # an entry edit, and it still reds if `order` ever stops being the answer.
-            sys.path.insert(0, str(HERE))
-            import govkit as _gk  # noqa: E402
+            _gk = govkit_module()
             _rep = _gk.Report()
             _po = {"role": "project-owned"}
             check("an un-covered project-owned rule derives ORDER",
@@ -18390,8 +18429,7 @@ user_skills = "/tmp/gk-fake-skills"
     # kit-subject leg invisible to `read_gate_verdicts`, so an upgrading adopter's apply saw a leg
     # that was green before, holding NO state after, and tripped "a leg that vanished is not a leg
     # that passed" on every one of them.
-    sys.path.insert(0, str(HERE))
-    import govkit as _GK
+    _GK = govkit_module()
     _OBS_KEYS = _GK.OBSERVED_KEYS
     check("OBSERVED_KEYS is derived from OBSERVED_STATES rather than re-typed",
           _OBS_KEYS == tuple(k for _s, k in _GK.OBSERVED_STATES), str(_OBS_KEYS))
@@ -18495,8 +18533,7 @@ user_skills = "/tmp/gk-fake-skills"
     # own python3 (3.10.12, no tomllib). Every arm below is the difference between a fix and a
     # line anyone can delete: without them nothing reds until a node with WSL runs a FULL bar,
     # and the leg is GUARDED, so a scoped bar never would.
-    sys.path.insert(0, str(HERE))
-    import govkit  # noqa: E402
+    govkit = govkit_module()
 
     rb = govkit.resolve_bash()
     low = rb.replace(chr(92), "/").lower()
