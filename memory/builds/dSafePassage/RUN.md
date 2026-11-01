@@ -635,3 +635,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T16:44:37Z resume · item dSafePassage · reason held · keepalive e7f5ef83 · manual
 
 2026-11-01T17:03:36Z rescope · item add TOOL-dSafePassage-102 · reason the owner ruled ask TOOL-dSafePassage-85 in chat on 2026-11-01: raise the five fork ceilings, and the three evidence rows are respelled under gate-guard's rule
+
+2026-11-01T17:09:54Z brief · item TOOL-dSafePassage-102 · reason a876e0eb4095 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-102-build-brief.md
