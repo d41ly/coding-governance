@@ -9,18 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dSafePassage-14=DEFERRED TOOL-dSafePassage-60=OPEN TOOL-dSafePassage-79=CLOSED TOOL-dSafePassage-85=OPEN
+units-at-landing: TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-16 TOOL-dSafePassage-2 TOOL-dSafePassage-20 TOOL-dSafePassage-4 TOOL-dSafePassage-43 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-21 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-5 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-26 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-67 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-35 TOOL-dSafePassage-41 TOOL-dSafePassage-70 TOOL-dSafePassage-38 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-71 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-50 TOOL-dSafePassage-49 TOOL-dSafePassage-52 TOOL-dSafePassage-51 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-59 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafePassage-61 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePassage-88 TOOL-dSafePassage-89 TOOL-dSafePassage-90 TOOL-dSafePassage-91 TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-95 TOOL-dSafePassage-96 TOOL-dSafePassage-97 TOOL-dSafePassage-98 TOOL-dSafePassage-99
 hold-run: 
-hold-streak: 1 · at 96e9dd87
+hold-streak: 1 · at d507ab9d
 resume-owed: none · owner
-held-at: 2026-10-26T17:36:43Z
-hold-reason: TOOL-dSafePassage-11 raises the interpreter floor to Python 3.15 and node a resolves only 3.14.6; provisioning (AP-31) is the owner's. Units 8 and 12 consume 11, and --dispatch's order gate refuses every order-4+ unit while order-3 units stand, so no carried unit can build. 13 of 59 units built; 61 waits on TOOL-dGroundRules-13
+held-at: 2026-11-01T16:37:31Z
+hold-reason: two bar legs stay red on ask TOOL-dSafePassage-85's owner rows (five fork ceilings, three ceiling-evidence lines), and TOOL-dSafePassage-61 waits on TOOL-dGroundRules-13, another build's ask, so build-complete cannot carry it
 hold-until: owner
-hold-code: host-owner-action
-held-from: BUILDING
-refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · park · 145 touching
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · handoff · 145 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 6d6fe589b
-phase: VERIFYING
+witness: d507ab9d0210228b80fc85261ec39451ea3f8729
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -625,3 +627,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T15:41:18Z dispatch · item 3bd912e0 TOOL-dSafePassage-101 · reason memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-101.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-101-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-80-ledger.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-88-ledger.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-89-ledger.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-95-ledger.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-96-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-59-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-77-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-82-ledger.md memory/builds/dSafePassage/BACKLOG.md tools/push-main.test.sh tools/lib/resolve-python.test.sh tools/govkit/selftest.py tools/govkit/upgrade_walk.py
 
 2026-11-01T16:31:32Z decision · item Land dSafePassage with TOOL-dSafePassage-61 carried forward, and rule ask TOOL-dSafePassage-85 first · reason the bar at 5fe2c7e34 reds only the two legs ask TOOL-dSafePassage-85 holds as the owner's rows: the spawn budget (five shrink-only memory/project/fork-ceilings.txt rows, +1 or +2 each) and install-prefix (three tools/run-gates/ceiling-evidence.txt lines); every own red is cleared by TOOL-dSafePassage-99, 100 and 101. TOOL-dSafePassage-61 waits on another build's ask, TOOL-dGroundRules-13, so build-complete cannot carry it and VERBS 9 routes the build to --handoff owner-decision. Options: rule 85 (raise the five ceilings with evidence, or retire the three evidence lines) then land with 61 deferred; or hold until TOOL-dGroundRules-13 lands and build 61 first. The run refused both: each moves an owner's shrink-only or ruled record.
+
+2026-11-01T16:37:37Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dSafePassage && bash tools/push-main.sh --land --slug dSafePassage && bash tools/unattended/unattended.sh --settle dSafePassage
+
+2026-11-01T16:37:37Z hold · item owner-decision · reason until owner · reaped 3740de71 · resume none(owner)
