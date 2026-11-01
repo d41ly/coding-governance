@@ -1813,6 +1813,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "build_dispose_fa3",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "build_dispose_units",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -2641,6 +2646,11 @@
       "id": "build_rerun",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_review_fa3",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
     },
     {
       "id": "build_role_pair",
@@ -5188,6 +5198,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "check_refused_fa3",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "check_registered",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
@@ -6758,6 +6773,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveDispositionFault",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "deriveDispositionFault",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "deriveFnv1a",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -6796,6 +6821,16 @@
       "id": "deriveLiveness",
       "kind": "function",
       "file": "tools/workflows/drift-audit-state.template.js"
+    },
+    {
+      "id": "deriveReadRev",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "deriveReadRev",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "deriveRepoPath",
@@ -21136,6 +21171,11 @@
       "id": "run_stop",
       "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
+    },
+    {
+      "id": "run_strict_fa3",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
     },
     {
       "id": "run_su",
