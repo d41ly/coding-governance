@@ -557,7 +557,15 @@ Cite ids, never line numbers.
 | [TOOL-dScaffoldedMirror-15](../builds/dScaffoldedMirror/BACKLOG.md) | OPEN | — | — | 2026-08-24 | nothing tells an adopter this kit exists, and it is upstream of the… |
 | [TOOL-dScaffoldedMirror-20](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | nothing checks this repo's own .gitattributes against the [[lf_pin]]s… |
 | [TOOL-dScaffoldedMirror-21](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | check-unattended.sh check 29 has no grandfathering, so any run already… |
-| [TOOL-dScopedBuild-16](../builds/dScopedBuild/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dScopedBuild-16](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | MED | TOOL-dScopedBuild-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dScopedBuild-17](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | LOW | TOOL-dScopedBuild-5 | 2026-11-01 | THE HAND-OFF'S STATUS-AND-TIER VALUE LOSES ITS GRADER WHEN THE WRITE… |
+| [TOOL-dScopedBuild-18](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | MED | TOOL-dScopedBuild-7 | 2026-11-01 | THE BUILD-DISTILL APPENDER HAS NO UNIT. item.build.distill appends a… |
+| [TOOL-dScopedBuild-19](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | LOW | TOOL-dScopedBuild-10 | 2026-11-01 | A PATCH BUILD PLACED FROM A BUG REPORT FILES NO ASK THE FIX CLOSES.… |
+| [TOOL-dScopedBuild-20](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | LOW | TOOL-dScopedBuild-3 | 2026-11-01 | THE KIT-DIRECTORY RULE WOULD HAVE TWO IMPLEMENTATIONS.… |
+| [TOOL-dScopedBuild-21](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | LOW | TOOL-dScopedBuild-8 | 2026-11-01 | THE LEDGER STATES NO SITE-LINE CONVENTION FOR A HUNK DRAIN.… |
+| [TOOL-dScopedBuild-22](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | LOW | TOOL-dScopedBuild-12 | 2026-11-01 | THE CHAIN'S BUILD.REUSE-CHECK AND TOOL-aScoutedSeam-3 ARE ONE DIFF… |
+| [TOOL-dScopedBuild-23](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | LOW | TOOL-dScopedBuild-13 | 2026-11-01 | THE UPSTREAM RECORD'S WRITER TAKES ONLY ITEM RETURNS.… |
+| [TOOL-dScopedBuild-24](../builds/dScopedBuild/BACKLOG.md) | DEFERRED | MED | TOOL-dScopedBuild-14 | 2026-11-01 | GOV'S POLICY FILE DECLARES NO deviation.gate. TOOL-dScopedBuild-14… |
 | [TOOL-dScrubbedConduit-3](../builds/dScrubbedConduit/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-23 | [[hole]] discharge probes are run by nothing on the bar.… |
 | [TOOL-dSealedTally-2](../builds/dSealedTally/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE UNATTENDED --checks RUNNER REDS EVERY RUN HERE: all four checks… |
 | [TOOL-dSettledRoster-1](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | AGENTS.md, the one file every session is pointed at, is reachable by no… |
