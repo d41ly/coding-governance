@@ -645,3 +645,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T17:54:25Z dispatch · item 699d6376 TOOL-dSafePassage-102 · reason memory/project/fork-ceilings.txt tools/run-gates/ceiling-evidence.txt memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-102-ledger.md memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-102.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md
 
 2026-11-01T19:41:32Z rescope · item add TOOL-dSafePassage-103 · reason the close's bar on the prepared landing merge f14f0f72c reds policy check: derive_census_tree reads TOOL-dSafePassage-8's source-mode receipt as an adopter's
+
+2026-11-01T19:52:59Z brief · item TOOL-dSafePassage-103 · reason 079f9f15cb89 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-103-build-brief.md
