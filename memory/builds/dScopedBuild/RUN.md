@@ -9,7 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: yes, 0 surfaced
+gates-run: unattended-17935639408748478388-366387 b0b9f801
+parked-surfaced: yes, 34 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: ebbf7802cb091b9bc22a6d50cdb6f03221cb3e25

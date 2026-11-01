@@ -1,4 +1,4 @@
-**Serves:** research TOOL-dScopedBuild-43
+**Serves:** research TOOL-dScopedBuild-42 TOOL-dScopedBuild-43
 
 # Fix brief — dScopedBuild, the round-4 promotions' token reds
 
