@@ -37,3 +37,7 @@ base: 94188878323ef3b20e96b769791de73453b09909
 2026-11-01T22:53:47Z dispatch · item cf564da6 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md
 
 2026-11-01T22:56:49Z dispatch · item cf564da6 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md
+
+2026-11-01T22:57:43Z dispatch · item c9f8c488 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md
+
+2026-11-01T22:57:54Z dispatch · item c9f8c488 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md

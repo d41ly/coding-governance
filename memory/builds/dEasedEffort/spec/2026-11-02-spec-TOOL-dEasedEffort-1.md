@@ -1,11 +1,12 @@
 # TOOL-dEasedEffort-1 — the orienter and builder run at high, the closing review's finders and skeptics at medium
 
-**Status:** INPROGRESS · rev-1 · 2026-11-02 · node d · Tier-2 · base 2a6f3975 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-11-02 · node d · Tier-2 · base 2a6f3975 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md](../build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dEasedEffort-1-brief.md](../prompts/2026-11-02-prompt-TOOL-dEasedEffort-1-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
