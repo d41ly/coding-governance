@@ -11,6 +11,7 @@
 | [2026-11-01-prompt-TOOL-dSafePassage-99-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-audit-fold-brief.md) | research | TOOL-dSafePassage-100 |
+| [2026-11-01-prompt-TOOL-dSafePassage-99-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-build-brief.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-99-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-99-spec-brief.md) | research | — |
 | [2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dSafePassage-99-100-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-100 |
 

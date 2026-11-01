@@ -267,7 +267,7 @@ ids TOOL-dSafePassage-99 TOOL-dSafePassage-100
 | [TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process](spec/2026-11-01-spec-TOOL-dSafePassage-99.md) | 17 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 492 bound to this build, across 4 record folder(s).
+Records: 494 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
