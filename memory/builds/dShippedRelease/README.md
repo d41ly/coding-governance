@@ -198,7 +198,7 @@ ids DEPL-dShippedRelease-97 DEPL-dShippedRelease-98 DEPL-dShippedRelease-99 DEPL
 | [DEPL-dShippedRelease-106 — The round-2 spec audit's 79 minors, batched: the rules units 49 to 78 left unstated, their failure states, and the records that named the wrong seam](spec/2026-10-30-spec-DEPL-dShippedRelease-106.md) | 33 | 2 | OPEN | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 34 bound to this build, across 4 record folder(s).
+Records: 35 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

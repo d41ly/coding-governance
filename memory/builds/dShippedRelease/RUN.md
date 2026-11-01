@@ -19,20 +19,20 @@ hold-code: host-owner-action
 held-from: REVIEWING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 865267adf6f3defec2f19e2ccc29a967e3deade9
-phase: HELD
+witness: e68d4ed72cf0abde8c5a1b9499969ea184449759
+phase: REVIEWING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dshipped-release-1a351d
 anchor-kind: default-branch
 cli-version: 2.1.309
-lease-utc: 2026-11-01T09:07:33Z
+lease-utc: 2026-11-01T13:12:56Z
 pid-image: claude.exe
 host: compeeto
 pid: 27284
 session: 3b045209-e7b3-481f-972c-10cfbdeab2b1
-keepalive: cf38fa37
+keepalive: fdbc3631
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 anchor-ref: refs/heads/main
@@ -163,3 +163,5 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T10:17:10Z decision · item The spec-audit chain does not converge: confirmed findings ran 106, 106, blockers 7, 8 and highs 22, 19 over two rounds (precision 0.97, 0.93), and round 2's blockers land on mechanisms round 1's promotions added (the landing review's disposed and pending passes, spec-run admission, release.pick's walk), with 28 promotions (DEPL-dShippedRelease-79 to -106) still unaudited and 89 units in the roster. Keep auditing, stop the chain as for dKeptSession, dLinkedLibrary, dIndexedDesign and dMindYourWords, or re-scope? · reason options (a) round 3 over units 79-106, about 3 hours and about 4.5M subagent tokens, each round so far promoting as many units as it closed (30, 28) and round 2 ending on the weekly usage limit; (b) stop as for those builds: units 79-106 close under a recorded specs-audited override, closing-review-recorded overridden, every unit deferred to the build run, the run closes and lands; (c) re-scope the landing-review and records-landing units (14, 51, 52, 73, 79 to 85, 90) into fewer mechanisms before more rounds. Refused to pick: the owner's standing rule stops a chain without asking only at a no-HIGH round, and on a plateau holds for the owner's ruling
 
 2026-11-01T10:17:28Z hold · item host-owner-action · reason until owner · reaped cf38fa37 · resume none(owner)
+
+2026-11-01T13:12:59Z resume · item dShippedRelease · reason held · keepalive fdbc3631 · manual
