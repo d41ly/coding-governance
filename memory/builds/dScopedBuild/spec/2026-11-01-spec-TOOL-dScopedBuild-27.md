@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-27 — the push leg under `warn-and-ask` prints its ask lines and writes no `BACKLOG.md`; the Build exit files them
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 6 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 6 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
+| [2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-30 TOOL-dScopedBuild-28 TOOL-dScopedBuild-34 TOOL-dScopedBuild-29 TOOL-dScopedBuild-31 TOOL-dScopedBuild-26 TOOL-dScopedBuild-25 TOOL-dScopedBuild-35 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,8 @@ lands on units 3 and 9, and builds one step after the later of them, unit 9 (ord
 - **consumes-from** `TOOL-dScopedBuild-3` — AC2's fixture and its `warn-and-ask` clause, and AC9's slice of `check_build_exit`, which S1 and S2 restate (id 3)
 - **consumes-from** `TOOL-dScopedBuild-9` — AC3's map-adopting fixture and its `warn-and-ask` clause, which S1 and S2 restate (id 3)
 - **consumes-from** `TOOL-dScopedBuild-14` — S6's `write_gate_asks`, the one exit-time filer S2 observes, and S2's `render_gate_outcome`, whose `ask ·` lines S1 reads
+- **hands-off** `TOOL-dScopedBuild-36` — S1's no-write read, AC1's and AC2's fixtures and §7's planted red, which that unit's S1 to S3 restate with `read_backlog_state` (id 11)
+- **hands-off** `TOOL-dScopedBuild-39` — S2's and AC3's fixture, which that unit's S22 makes the two trees `routed_commits.build_fixture` builds (id 9)
 
 ## 4. Design
 
@@ -159,6 +162,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 · the sliced exit ov
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the round-1 spec audit of units 1 to 15, id 3
   (HIGH, item H3).
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-36 and TOOL-dScopedBuild-39,
+  the promotions of the round-1 spec audit of units 25 to 35 (ids 9, 11).
 
 ## 10. Reuse audit
 

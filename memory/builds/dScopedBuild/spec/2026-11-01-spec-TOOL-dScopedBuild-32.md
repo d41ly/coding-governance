@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-32 — one bar call, `run_gate_bar`, carrying `gates-green`'s knob scrub, for the Build exit and the core run
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-25-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-25-promoted-fix-brief.md) | research | TOOL-dScopedBuild-25 TOOL-dScopedBuild-28 TOOL-dScopedBuild-31 TOOL-dScopedBuild-33 TOOL-dScopedBuild-35 |
+| [2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-33 TOOL-dScopedBuild-30 TOOL-dScopedBuild-28 TOOL-dScopedBuild-34 TOOL-dScopedBuild-27 TOOL-dScopedBuild-29 TOOL-dScopedBuild-31 TOOL-dScopedBuild-26 TOOL-dScopedBuild-25 TOOL-dScopedBuild-35 |
 
 <!-- /gen:spec-records -->
 
@@ -67,6 +68,8 @@ another, which both new callers use, so neither can run the bar unscrubbed. It r
 
 - **consumes-from** `TOOL-dScopedBuild-1` — S5's `run_build_exit` bar call, which S2 and S3 give the scrub (id 22)
 - **hands-off** `TOOL-dScopedBuild-7` — S3's `run_build_core` bar call, spelled `run_gate_bar "build-core" "$R" "<core legs file>" -- GATE_FULL=1`, its core manifest an argument rather than an inherited `GATE_LEGS` (id 22)
+- **hands-off** `TOOL-dScopedBuild-37` — S1's `derive_bar_scrub` knob line and AC1's and AC2's knob sets, which that unit restates with `GATE_REGEN_CHECK` (id 22)
+- **hands-off** `TOOL-dScopedBuild-39` — S2's `run_gate_bar`, which this unit's builder builds with the slug argument and the backstop `RB_BOUND` that unit's S14 and S15 state, and AC2, which its S10 and S11 complete (ids 7, 16, 15, 31)
 
 ## 4. Design
 
@@ -177,6 +180,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 · the exit and t
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the round-1 spec audit of units 1 to 15, id 22
   (HIGH, item H8).
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-37 and TOOL-dScopedBuild-39,
+  the promotions of the round-1 spec audit of units 25 to 35 (ids 7, 15, 16, 22, 31).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-14 — the deviation gate under `deviation.gate`, at the commit and at the Build exit
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0412@021fa28b whole
 **Carries:** node:policy-key.deviation.gate
@@ -9,7 +9,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-reuse-scout-a.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-reuse-scout-a.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-15 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-fix-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-3 TOOL-dScopedBuild-6 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-13 TOOL-dScopedBuild-15 |
@@ -126,6 +126,8 @@ verb, and at the Build exit beside `build.scope`, each value seen on its planted
 - **hands-off** `TOOL-dScopedBuild-28` — S8's check 32 and S7's `--staged` verb, which that unit's widened pre-commit trigger reaches on a deletion-only commit (id 14)
 - **hands-off** `TOOL-dScopedBuild-30` — S1's `read_gate_value`, which that unit answers with `read_policy_value`, `check_gate_value` and the `PolicyRefused` exit 2, superseding AC1 and AC10's third clause (id 19)
 - **hands-off** `TOOL-dScopedBuild-35` — AC7's fixture, S2; §5's commit-time cost, S4; AC9's command, S8; the core asks S6 files, S11; S7's staged population, S19; S6's dedupe key, S32; and the asks' log prefix, S34 (ids 5, 15, 12, 26, 37, 50, 8)
+- **hands-off** `TOOL-dScopedBuild-36` — S6's `write_gate_asks` and AC7's slug fixture with `ASKS_CMD` declared, over which that unit's S4 shows the filer stages a row (id 11)
+- **hands-off** `TOOL-dScopedBuild-39` — S1's `read_gate_value`, which this unit's builder does not mint, reading through `read_policy_value` and minting `check_gate_value` in TOOL-dScopedBuild-30 S2's spelling, as that unit's S8 rules (id 5)
 
 ## 4. Design
 
@@ -328,6 +330,8 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC9 · a scrat
   A's row for this unit and its disagreements 2 and 3, scout C's disagreement 3, and the spec brief's
   I4, I5 and I11.
 - rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-27, TOOL-dScopedBuild-28, TOOL-dScopedBuild-30, TOOL-dScopedBuild-35, promoted by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-36 and TOOL-dScopedBuild-39,
+  the promotions of the round-1 spec audit of units 25 to 35 (ids 5, 11).
 
 ## 10. Reuse audit
 

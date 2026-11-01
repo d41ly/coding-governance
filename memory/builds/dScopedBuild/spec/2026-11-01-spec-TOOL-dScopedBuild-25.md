@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-25 — unit 4's `review.build.when` read spelled `policy.py get`, so the reader-coverage arm counts it
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 15 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 15 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-25-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-25-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-25-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-25-promoted-fix-brief.md) | research | TOOL-dScopedBuild-28 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-35 |
+| [2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-30 TOOL-dScopedBuild-28 TOOL-dScopedBuild-34 TOOL-dScopedBuild-27 TOOL-dScopedBuild-29 TOOL-dScopedBuild-31 TOOL-dScopedBuild-26 TOOL-dScopedBuild-35 |
 
 <!-- /gen:spec-records -->
 
@@ -58,6 +59,7 @@ the arm's own reader. It repairs `TOOL-dScopedBuild-4` and builds one step after
 
 - **consumes-from** `TOOL-dScopedBuild-4` — S7's `resolve_policy_cli` and its `review.build.when` read, S8's `decisions.major` read, and AC8's grep clause, which S1 to S3 respell and supersede (id 1)
 - **hands-off** `TOOL-dScopedBuild-35` — the two reads S2 spells, whose refused `get` and out-of-set value that unit's S30 makes a refusal of the exit (id 48)
+- **hands-off** `TOOL-dScopedBuild-39` — AC1's reader scan, which that unit's S5 restricts to `unattended.sh` (id 3)
 
 ## 4. Design
 
@@ -153,6 +155,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC2 · the sliced `resolv
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the round-1 spec audit of units 1 to 15, id 1
   (HIGH, item H1).
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-39,
+  the promotions of the round-1 spec audit of units 25 to 35 (id 3).
 
 ## 10. Reuse audit
 

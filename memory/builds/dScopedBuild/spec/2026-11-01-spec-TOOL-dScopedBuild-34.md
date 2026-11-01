@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-34 — `derive_kit_dir` reduces a file directly under `tools/` or `skills/` to itself, never to the whole root
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 5 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 5 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-35 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
+| [2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-30 TOOL-dScopedBuild-28 TOOL-dScopedBuild-27 TOOL-dScopedBuild-29 TOOL-dScopedBuild-31 TOOL-dScopedBuild-26 TOOL-dScopedBuild-25 TOOL-dScopedBuild-35 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,7 @@ holds, and adds the scope-arm case. It repairs `TOOL-dScopedBuild-3` and builds 
 ### Edges
 
 - **consumes-from** `TOOL-dScopedBuild-3` — S1's `derive_kit_dir`, whose fall-through S1 narrows, AC1's inputs, and AC2's scope-arm fixture, which S3 extends (id 36)
+- **hands-off** `TOOL-dScopedBuild-38` — S1's rule and S2's class over the tree, which that unit restates over `ROUTED_PATHS` (id 26)
 
 ## 4. Design
 
@@ -147,6 +149,8 @@ New arm: tools/memory-tree/routed_commits.py · covers AC3 · the scope fixture 
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the round-1 spec audit of units 1 to 15, id 36
   (HIGH, item H10).
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-38,
+  the promotions of the round-1 spec audit of units 25 to 35 (id 26).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-1 — one exit contract with a history-derived base
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 1 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 1 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0399@182b9f2d whole
 **Carries:** node:item.build.base
@@ -10,7 +10,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-reuse-scout-a.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-reuse-scout-a.md) | research | TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-1-reuse-scout.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-1-reuse-scout.md) | journal | — |
@@ -124,6 +124,7 @@ commits introduced stands.
 - **hands-off** `TOOL-dScopedBuild-32` — S5's `run_build_exit` bar call, which that unit runs through `run_gate_bar` with `gates-green`'s knob scrub (id 22)
 - **hands-off** `TOOL-dScopedBuild-33` — S1's move of `read_first_passes` and `read_commit_times`, which that unit supersedes: the readers stay in `deviation_join.py` and `read_build_base` imports them lazily (id 30)
 - **hands-off** `TOOL-dScopedBuild-35` — S4's exit body, split by that unit's S1; AC5's and AC7's fixture, S2; S5's verb in the unattended Skill, S12; S6's fallback, S21; and S2's base by ancestry, S22 (ids 4, 5, 27, 39, 40)
+- **hands-off** `TOOL-dScopedBuild-39` — S1's move of `read_first_passes`, `read_commit_times` and `derive_pass_units`, which this unit's builder does not make, building TOOL-dScopedBuild-33 S1 and S2's form instead, as that unit's S8 rules (id 5)
 
 ## 4. Design
 
@@ -309,6 +310,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC4 AC5 AC6 AC7 · the sl
 - rev-1 · 2026-11-01 · initial draft, from the packet's Items 1, flow-steps:283-299, research-build:77-79
   and :120, scout A's row 1 and its disagreement 1, and the spec brief's I1, I2 and I3.
 - rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-32, TOOL-dScopedBuild-33, TOOL-dScopedBuild-35, promoted by the round-1 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-39,
+  the promotions of the round-1 spec audit of units 25 to 35 (id 5).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-28 — the pre-commit hook runs the hygiene leg on a deletion-only memory commit, so check 32's freeze reaches a deleted landed spec
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 4 · advances TOOL-dScopedBuild-16
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 4 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,8 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 |
+| [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 |
 | [2026-11-01-prompt-TOOL-dScopedBuild-25-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-25-promoted-fix-brief.md) | research | TOOL-dScopedBuild-25 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-35 |
+| [2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-25-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-30 TOOL-dScopedBuild-34 TOOL-dScopedBuild-27 TOOL-dScopedBuild-29 TOOL-dScopedBuild-31 TOOL-dScopedBuild-26 TOOL-dScopedBuild-25 TOOL-dScopedBuild-35 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ freeze, whose arm the observation needs, so it builds one step after unit 2 (ord
 
 - **consumes-from** `TOOL-dScopedBuild-14` — S8's check 32 under `--staged`, the hook-reached host whose trigger S1 widens, and S7's `--staged` verb, whose name-status read lists the deletion (id 14)
 - **consumes-from** `TOOL-dScopedBuild-2` — S2's frozen arm, which counts a deletion as a revision and refuses one on a landed unit, observed through the hook by AC2 (id 14)
+- **hands-off** `TOOL-dScopedBuild-39` — S1's trigger in the adopter snippets, read as `--diff-filter=ACMRD`, §4's Evidence and §5's cost and docs lines, which that unit's S16, S17 and S23 to S26 complete (ids 23, 30, 10, 24, 32, 17)
 
 ## 4. Design
 
@@ -146,6 +148,8 @@ New arm: .githooks/pre-commit.test.sh · covers AC1 · a deletion-only memory co
 
 - rev-1 · 2026-11-01 · initial draft, promoted from the round-1 spec audit of units 1 to 15, id 14
   (HIGH, item H4).
+- rev-2 · 2026-11-01 · §3 · the Edges block gains the bullets mirroring the edges of TOOL-dScopedBuild-39,
+  the promotions of the round-1 spec audit of units 25 to 35 (ids 10, 17, 23, 24, 30, 32).
 
 ## 10. Reuse audit
 

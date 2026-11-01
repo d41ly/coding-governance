@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-16 TOOL-dScopedBuild-17 TOOL-dScopedBuild-18 TOOL-dScopedBuild-19 TOOL-dScopedBuild-20 TOOL-dScopedBuild-21 TOOL-dScopedBuild-22 TOOL-dScopedBuild-23 TOOL-dScopedBuild-24 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35
+ids: TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-16 TOOL-dScopedBuild-17 TOOL-dScopedBuild-18 TOOL-dScopedBuild-19 TOOL-dScopedBuild-20 TOOL-dScopedBuild-21 TOOL-dScopedBuild-22 TOOL-dScopedBuild-23 TOOL-dScopedBuild-24 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39
 spec-audit: 2026-10-21
 parents: dIndexedDesign dWitnessedBar dWellOiledMachine dFurnishedOrders
 may: PLAY-dClosedLoop-3
@@ -75,55 +75,60 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 26 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 30 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-5 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14
 ids TOOL-dScopedBuild-15 TOOL-dScopedBuild-16 TOOL-dScopedBuild-17 TOOL-dScopedBuild-18 TOOL-dScopedBuild-19 TOOL-dScopedBuild-20 TOOL-dScopedBuild-21 TOOL-dScopedBuild-22 TOOL-dScopedBuild-23 TOOL-dScopedBuild-24 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28
-ids TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35
+ids TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dScopedBuild-1 — one exit contract with a history-derived base](spec/2026-11-01-spec-TOOL-dScopedBuild-1.md) | 1 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-14 — the deviation gate under `deviation.gate`, at the commit and at the Build exit](spec/2026-11-01-spec-TOOL-dScopedBuild-14.md) | 2 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-32 — one bar call, `run_gate_bar`, carrying `gates-green`'s knob scrub, for the Build exit and the core run](spec/2026-11-01-spec-TOOL-dScopedBuild-32.md) | 2 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dScopedBuild-1 — one exit contract with a history-derived base](spec/2026-11-01-spec-TOOL-dScopedBuild-1.md) | 1 | 2 | OPEN | rev-3 | 2026-11-01 |
+| [TOOL-dScopedBuild-14 — the deviation gate under `deviation.gate`, at the commit and at the Build exit](spec/2026-11-01-spec-TOOL-dScopedBuild-14.md) | 2 | 2 | OPEN | rev-3 | 2026-11-01 |
+| [TOOL-dScopedBuild-32 — one bar call, `run_gate_bar`, carrying `gates-green`'s knob scrub, for the Build exit and the core run](spec/2026-11-01-spec-TOOL-dScopedBuild-32.md) | 2 | 2 | OPEN | rev-2 | 2026-11-01 |
 | [TOOL-dScopedBuild-33 — `read_first_passes` stays in `deviation_join.py` as two landed ancestors leave it, and `read_build_base` reaches it by the lazy import the leg already makes](spec/2026-11-01-spec-TOOL-dScopedBuild-33.md) | 2 | 2 | OPEN | rev-1 | 2026-11-01 |
 | [TOOL-dScopedBuild-2 — built specs frozen, and every closing-review finding disposed as new units](spec/2026-11-01-spec-TOOL-dScopedBuild-2.md) | 3 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-30 — the gate keys read through the memory-tree kit's one policy adapter, `read_policy_value`, not a second reader in `routed_commits.py`](spec/2026-11-01-spec-TOOL-dScopedBuild-30.md) | 3 | 2 | OPEN | rev-1 | 2026-11-01 |
-| [TOOL-dScopedBuild-28 — the pre-commit hook runs the hygiene leg on a deletion-only memory commit, so check 32's freeze reaches a deleted landed spec](spec/2026-11-01-spec-TOOL-dScopedBuild-28.md) | 4 | 2 | OPEN | rev-1 | 2026-11-01 |
-| [TOOL-dScopedBuild-3 — scope at the push: each commit's routed paths inside its unit's write set, graded by `build.scope`](spec/2026-11-01-spec-TOOL-dScopedBuild-3.md) | 4 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-34 — `derive_kit_dir` reduces a file directly under `tools/` or `skills/` to itself, never to the whole root](spec/2026-11-01-spec-TOOL-dScopedBuild-34.md) | 5 | 2 | OPEN | rev-1 | 2026-11-01 |
-| [TOOL-dScopedBuild-9 — the touch join as `build.scope`'s one check: the unit's own hunks, the map's grace shrink behind a point, and the claim arm `not-installed` where the map is absent](spec/2026-11-01-spec-TOOL-dScopedBuild-9.md) | 5 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-27 — the push leg under `warn-and-ask` prints its ask lines and writes no `BACKLOG.md`; the Build exit files them](spec/2026-11-01-spec-TOOL-dScopedBuild-27.md) | 6 | 2 | OPEN | rev-1 | 2026-11-01 |
-| [TOOL-dScopedBuild-29 — the claim arm and the grace writer launch `map_diff.py` under the running interpreter, and read a non-zero exit as `not-installed`](spec/2026-11-01-spec-TOOL-dScopedBuild-29.md) | 6 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dScopedBuild-30 — the gate keys read through the memory-tree kit's one policy adapter, `read_policy_value`, not a second reader in `routed_commits.py`](spec/2026-11-01-spec-TOOL-dScopedBuild-30.md) | 3 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-37 — the bar scrub is the hook's `BAR_SCRUBBED_KNOBS` plus the driver's two, so `GATE_REGEN_CHECK` is scrubbed too](spec/2026-11-01-spec-TOOL-dScopedBuild-37.md) | 3 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dScopedBuild-28 — the pre-commit hook runs the hygiene leg on a deletion-only memory commit, so check 32's freeze reaches a deleted landed spec](spec/2026-11-01-spec-TOOL-dScopedBuild-28.md) | 4 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-3 — scope at the push: each commit's routed paths inside its unit's write set, graded by `build.scope`](spec/2026-11-01-spec-TOOL-dScopedBuild-3.md) | 4 | 2 | OPEN | rev-3 | 2026-11-01 |
+| [TOOL-dScopedBuild-34 — `derive_kit_dir` reduces a file directly under `tools/` or `skills/` to itself, never to the whole root](spec/2026-11-01-spec-TOOL-dScopedBuild-34.md) | 5 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-9 — the touch join as `build.scope`'s one check: the unit's own hunks, the map's grace shrink behind a point, and the claim arm `not-installed` where the map is absent](spec/2026-11-01-spec-TOOL-dScopedBuild-9.md) | 5 | 2 | OPEN | rev-3 | 2026-11-01 |
+| [TOOL-dScopedBuild-27 — the push leg under `warn-and-ask` prints its ask lines and writes no `BACKLOG.md`; the Build exit files them](spec/2026-11-01-spec-TOOL-dScopedBuild-27.md) | 6 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-29 — the claim arm and the grace writer launch `map_diff.py` under the running interpreter, and read a non-zero exit as `not-installed`](spec/2026-11-01-spec-TOOL-dScopedBuild-29.md) | 6 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-38 — `derive_kit_dir` reduces over the routed roots `ROUTED_PATHS` declares, so an adopter's `src/` file is never its whole root](spec/2026-11-01-spec-TOOL-dScopedBuild-38.md) | 6 | 2 | OPEN | rev-1 | 2026-11-01 |
 | [TOOL-dScopedBuild-8 — `build.unit-pass` and `build.scope` draining the legacy a unit touches as `retrofit.drain` says, and claiming the baselined map keys its write set holds as `retrofit.claim-on-touch` says](spec/2026-11-01-spec-TOOL-dScopedBuild-8.md) | 6 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-5 — a write gate reading derived state: the routed unit's step from the position engine and its lease's write set, never its status line](spec/2026-11-01-spec-TOOL-dScopedBuild-5.md) | 7 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-36 — the no-ask arm reads a checked-out fixture's index, status and bytes, and its planted red really stages a row](spec/2026-11-01-spec-TOOL-dScopedBuild-36.md) | 7 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dScopedBuild-5 — a write gate reading derived state: the routed unit's step from the position engine and its lease's write set, never its status line](spec/2026-11-01-spec-TOOL-dScopedBuild-5.md) | 7 | 2 | OPEN | rev-3 | 2026-11-01 |
 | [TOOL-dScopedBuild-6 — the per-pass checklist's retirement witnessed at Build: a pass whose prompt calls the lookup by its write set's paths refused before it spawns](spec/2026-11-01-spec-TOOL-dScopedBuild-6.md) | 8 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-7 — the core checks run by the executor at Build's exit: the exit's graded legs narrowed to the core set, a core-only run of its own, its result recorded](spec/2026-11-01-spec-TOOL-dScopedBuild-7.md) | 9 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-7 — the core checks run by the executor at Build's exit: the exit's graded legs narrowed to the core set, a core-only run of its own, its result recorded](spec/2026-11-01-spec-TOOL-dScopedBuild-7.md) | 9 | 2 | OPEN | rev-3 | 2026-11-01 |
 | [TOOL-dScopedBuild-15 — `build.acceptance` writing the seen-red record: each gate a unit adds or changes re-run on its planted red beside the unit's acceptance commands](spec/2026-11-01-spec-TOOL-dScopedBuild-15.md) | 10 | 2 | OPEN | rev-2 | 2026-11-01 |
 | [TOOL-dScopedBuild-31 — `core-result` registered as a typed record kind through the registry factory, its records bound `**Serves:** core-result`](spec/2026-11-01-spec-TOOL-dScopedBuild-31.md) | 10 | 2 | OPEN | rev-1 | 2026-11-01 |
 | [TOOL-dScopedBuild-11 — a playbook's pieces built as units, each piece record joined to its unit's build commit by hash, and a proposal to amend the playbook filed as an ask](spec/2026-11-01-spec-TOOL-dScopedBuild-11.md) | 11 | 2 | OPEN | rev-2 | 2026-11-01 |
 | [TOOL-dScopedBuild-10 — a red-first `reproduction` before the fix of a reported bug: `--dispatch` refusing a unit that closes a bug report until a confirmed reproduction serves it](spec/2026-11-01-spec-TOOL-dScopedBuild-10.md) | 12 | 2 | OPEN | rev-2 | 2026-11-01 |
 | [TOOL-dScopedBuild-12 — `build.reuse-check`: the reuse scout over the units a unit's commits add, before the closing review](spec/2026-11-01-spec-TOOL-dScopedBuild-12.md) | 13 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-26 — `reuse_check.py` reads its two policy keys through the memory-tree adapter, a call the `.py` reader shape counts](spec/2026-11-01-spec-TOOL-dScopedBuild-26.md) | 14 | 2 | OPEN | rev-1 | 2026-11-01 |
-| [TOOL-dScopedBuild-4 — the closing review recorded as `review.build.when` says: per build, per unit or per landing, in both modes](spec/2026-11-01-spec-TOOL-dScopedBuild-4.md) | 14 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-26 — `reuse_check.py` reads its two policy keys through the memory-tree adapter, a call the `.py` reader shape counts](spec/2026-11-01-spec-TOOL-dScopedBuild-26.md) | 14 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-4 — the closing review recorded as `review.build.when` says: per build, per unit or per landing, in both modes](spec/2026-11-01-spec-TOOL-dScopedBuild-4.md) | 14 | 2 | OPEN | rev-3 | 2026-11-01 |
 | [TOOL-dScopedBuild-13 — the closing review handed each unit's acceptance criteria and MUST seams as rows every finder answers, recorded, gating once measured](spec/2026-11-01-spec-TOOL-dScopedBuild-13.md) | 15 | 2 | OPEN | rev-2 | 2026-11-01 |
-| [TOOL-dScopedBuild-25 — unit 4's `review.build.when` read spelled `policy.py get`, so the reader-coverage arm counts it](spec/2026-11-01-spec-TOOL-dScopedBuild-25.md) | 15 | 2 | OPEN | rev-1 | 2026-11-01 |
-| [TOOL-dScopedBuild-35 — the round-1 spec audit's 38 minors, batched: 32 MEDIUM and 6 LOW findings, each its own scope item](spec/2026-11-01-spec-TOOL-dScopedBuild-35.md) | 16 | 2 | OPEN | rev-1 | 2026-11-01 |
+| [TOOL-dScopedBuild-25 — unit 4's `review.build.when` read spelled `policy.py get`, so the reader-coverage arm counts it](spec/2026-11-01-spec-TOOL-dScopedBuild-25.md) | 15 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-35 — the round-1 spec audit's 38 minors, batched: 32 MEDIUM and 6 LOW findings, each its own scope item](spec/2026-11-01-spec-TOOL-dScopedBuild-35.md) | 16 | 2 | OPEN | rev-2 | 2026-11-01 |
+| [TOOL-dScopedBuild-39 — the round-1 audit of units 25 to 35, its 29 minors batched: 16 MEDIUM and 13 LOW findings, each its own scope item](spec/2026-11-01-spec-TOOL-dScopedBuild-39.md) | 17 | 2 | OPEN | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35.
+Ids no `spec-audit` record has ever named: TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39.
 
-Ids whose spec moved past its audited revision: TOOL-dScopedBuild-1@rev-1 TOOL-dScopedBuild-10@rev-1 TOOL-dScopedBuild-11@rev-1 TOOL-dScopedBuild-12@rev-1 TOOL-dScopedBuild-13@rev-1 TOOL-dScopedBuild-14@rev-1 TOOL-dScopedBuild-15@rev-1 TOOL-dScopedBuild-2@rev-1 TOOL-dScopedBuild-3@rev-1
-TOOL-dScopedBuild-4@rev-1 TOOL-dScopedBuild-5@rev-1 TOOL-dScopedBuild-6@rev-1 TOOL-dScopedBuild-7@rev-1 TOOL-dScopedBuild-8@rev-1 TOOL-dScopedBuild-9@rev-1.
+Ids whose spec moved past its audited revision: TOOL-dScopedBuild-1@rev-1 TOOL-dScopedBuild-10@rev-1 TOOL-dScopedBuild-11@rev-1 TOOL-dScopedBuild-12@rev-1 TOOL-dScopedBuild-13@rev-1 TOOL-dScopedBuild-14@rev-1 TOOL-dScopedBuild-15@rev-1 TOOL-dScopedBuild-2@rev-1 TOOL-dScopedBuild-25@rev-1
+TOOL-dScopedBuild-26@rev-1 TOOL-dScopedBuild-27@rev-1 TOOL-dScopedBuild-28@rev-1 TOOL-dScopedBuild-29@rev-1 TOOL-dScopedBuild-3@rev-1 TOOL-dScopedBuild-30@rev-1 TOOL-dScopedBuild-32@rev-1 TOOL-dScopedBuild-34@rev-1 TOOL-dScopedBuild-35@rev-1 TOOL-dScopedBuild-4@rev-1 TOOL-dScopedBuild-5@rev-1
+TOOL-dScopedBuild-6@rev-1 TOOL-dScopedBuild-7@rev-1 TOOL-dScopedBuild-8@rev-1 TOOL-dScopedBuild-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dScopedBuild's 15 clause(s) and 23 owned node(s), over 26 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dScopedBuild's 15 clause(s) and 23 owned node(s), over 30 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 15
 - carried in parts: 0 (none)
@@ -134,7 +139,8 @@ Coverage of dScopedBuild's 15 clause(s) and 23 owned node(s), over 26 spec(s) at
 - owned nodes no spec names: none
 - specs derived from no clause: `spec/2026-11-01-spec-TOOL-dScopedBuild-25.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-26.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-27.md` (PLAY-dClosedLoop-2),
   `spec/2026-11-01-spec-TOOL-dScopedBuild-28.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-29.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-30.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-31.md` (PLAY-dClosedLoop-2),
-  `spec/2026-11-01-spec-TOOL-dScopedBuild-32.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-33.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-34.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-35.md` (PLAY-dClosedLoop-2)
+  `spec/2026-11-01-spec-TOOL-dScopedBuild-32.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-33.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-34.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-35.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-TOOL-dScopedBuild-36.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-37.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-38.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-TOOL-dScopedBuild-39.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0399, cl-dClosedLoop-0401, cl-dClosedLoop-0403, cl-dClosedLoop-0404, cl-dClosedLoop-0405, cl-dClosedLoop-0409, cl-dClosedLoop-0411
 <!-- /gen:build-coverage -->
 
@@ -144,11 +150,11 @@ Coverage of dScopedBuild's 15 clause(s) and 23 owned node(s), over 26 spec(s) at
 |---|---|---|
 | 1 | `TOOL-dScopedBuild-1` | no |
 | 2 | `TOOL-dScopedBuild-14`, `TOOL-dScopedBuild-32`, `TOOL-dScopedBuild-33` | no |
-| 3 | `TOOL-dScopedBuild-2`, `TOOL-dScopedBuild-30` | no |
+| 3 | `TOOL-dScopedBuild-2`, `TOOL-dScopedBuild-30`, `TOOL-dScopedBuild-37` | no |
 | 4 | `TOOL-dScopedBuild-28`, `TOOL-dScopedBuild-3` | yes |
 | 5 | `TOOL-dScopedBuild-34`, `TOOL-dScopedBuild-9` | no |
-| 6 | `TOOL-dScopedBuild-27`, `TOOL-dScopedBuild-29`, `TOOL-dScopedBuild-8` | no |
-| 7 | `TOOL-dScopedBuild-5` | no |
+| 6 | `TOOL-dScopedBuild-27`, `TOOL-dScopedBuild-29`, `TOOL-dScopedBuild-38`, `TOOL-dScopedBuild-8` | no |
+| 7 | `TOOL-dScopedBuild-36`, `TOOL-dScopedBuild-5` | no |
 | 8 | `TOOL-dScopedBuild-6` | no |
 | 9 | `TOOL-dScopedBuild-7` | no |
 | 10 | `TOOL-dScopedBuild-15`, `TOOL-dScopedBuild-31` | yes |
@@ -158,6 +164,7 @@ Coverage of dScopedBuild's 15 clause(s) and 23 owned node(s), over 26 spec(s) at
 | 14 | `TOOL-dScopedBuild-26`, `TOOL-dScopedBuild-4` | yes |
 | 15 | `TOOL-dScopedBuild-13`, `TOOL-dScopedBuild-25` | no |
 | 16 | `TOOL-dScopedBuild-35` | no |
+| 17 | `TOOL-dScopedBuild-39` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
