@@ -43,3 +43,5 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-01T21:44:11Z dispatch · item fc922138 TOOL-dFoldedAudit-7 · reason tools/policy/catalogue.toml .unattended.conf tools/unattended/.unattended.conf.example tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFoldedAudit-7.md
 
 2026-11-01T21:46:17Z dispatch · item fc922138 TOOL-dFoldedAudit-7 · reason tools/policy/catalogue.toml .unattended.conf tools/unattended/.unattended.conf.example tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/LIVE.md memory/guides/SESSION-KICKOFF.md memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFoldedAudit-7.md
+
+2026-11-01T21:48:29Z dispatch · item 3e6336b0 TOOL-dFoldedAudit-7 · reason .governance/policy.json tools/unattended/unattended.test.sh memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFoldedAudit-7.md memory/builds/dFoldedAudit/README.md memory/LIVE.md memory/builds/dFoldedAudit/build/2026-11-01-build-TOOL-dFoldedAudit-7-ledger.md

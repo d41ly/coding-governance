@@ -2408,6 +2408,8 @@ same "AC8 each of the three keys reaches get as a literal" "$(grep -c 'policy.py
 # ---- the policy kit or beside nothing, sitting at the <home> its resolver asks for, held once so no
 # ---- line spells a kit path. The fixture holds budgets.py because `validate` imports it whenever a
 # ---- policy file is committed. The reader's stderr lands in a file, so stdout is the answer alone.
+# ---- The probe clears the ambient ladder, because a push's bar can carry GOV_REMOTE and a fixture with
+# ---- no remote refuses that name on every read: 16 of these arms red on it, observed on a scratch copy.
 _sw_home=policy
 _sw_rel=$(resolve_kit_dir "$_rkd_py" "$_sw_home" policy.py "$HERE" 2>/dev/null) || _sw_rel=""
 _sw_tmp=$(mktemp -d)
@@ -2424,7 +2426,7 @@ write_switch_fixture() { # dir · 1 for the policy kit beside the driver, 0 for 
     && git config core.autocrlf false && git add -A >/dev/null && git commit -q -m fixture --no-verify )
 }
 run_switch_probe() { # fixture · switch -> the reader's stdout and status, its stderr in $_sw_tmp/err
-  ( cd "$1" && bash -c '. "$1"; load_driver_conf; read_spec_audit_switch "$2"' _ "$1/u/unattended.sh" "$2" ) 2>"$_sw_tmp/err"
+  ( cd "$1" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash -c '. "$1"; load_driver_conf; read_spec_audit_switch "$2"' _ "$1/u/unattended.sh" "$2" ) 2>"$_sw_tmp/err"
 }
 # AC4: with no policy kit each switch takes its kit default and says so. AC10's bad argument sits here
 # too, because the reader's first `case` refuses it before it resolves anything, so no kit is needed.
