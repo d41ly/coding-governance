@@ -4467,14 +4467,40 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
         crashed = ("Traceback" in tail or 'File "' in tail) and not spawn_failed
         return not crashed and not any(s in tail for s in ("python_floor.py:", "upgrade_steps.Refusal", "Set GOV_BASH"))
 
+    def read_fallback_argv(steps: types.ModuleType) -> object:
+        # TOOL-dSafePassage-94: what `steps` hands the stub for a bare bash, read in this process with
+        # its cached bash cleared, or the exception the call raised. A spawn crash's tail cannot show
+        # which spawn crashed, so this read is what proves the call reaches its fallback.
+        held = steps._BASH
+        steps._BASH = None
+        try:
+            return steps.resolve_shell_argv(["bash", "x"])
+        except Exception as e:  # noqa: BLE001 - a crash inside resolve_bash is what this reads
+            return e
+        finally:
+            steps._BASH = held
+
+    # TOOL-dSafePassage-94: the regression that read must see, check_runs no longer catching a spawn's
+    # OSError, staged in a copy of upgrade_steps.py, so the read is seen red on every run.
+    steps94 = types.ModuleType("dsp94_upgrade_steps")
+    steps94.__file__ = str(HERE / "upgrade_steps.py")
+    exec(compile((HERE / "upgrade_steps.py").read_text(encoding="utf-8").replace(
+        "returncode == 0\n        except OSError:", "returncode == 0\n        except ValueError:"),
+        steps94.__file__, "exec"), steps94.__dict__)
+
     # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
     # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. What bare
     # `bash` resolves to (on Windows the loader's System32 WSL launcher, elsewhere PATH or nothing), and
     # so the rc, is the node's, so only the tail is graded, by `test_floor_fallback`.
     with set_environ({"PATH": path87, "GOV_BASH": None, "GOV_PYTHON": sys.executable}):
         got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
+        argv94, cut94 = read_fallback_argv(us), read_fallback_argv(steps94)
     check("[dSP-91 L2] the floor row's witness, no bash resolving and GOV_BASH unset, falls back to bare bash",
           test_floor_fallback(got["tail"]), str(got))
+    check("[dSP-94] resolve_shell_argv on that PATH, GOV_BASH unset and no bash cached, hands back bare bash",
+          argv94 == ["bash", "x"], repr(argv94))
+    check("[dSP-94] the same read, check_runs narrowed to catch ValueError, reads the spawn's OSError",
+          isinstance(cut94, OSError), repr(cut94))
 
     # TOOL-dSafePassage-92: the same predicate over every host shape the bar runs on, so a node with a
     # WSL distribution still grades the hosts without one. The five tracebacks are the real stub's, run
@@ -4491,11 +4517,14 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     text92.chmod(0o755)
 
     def read_stub_tail(resolve_src: str | None) -> str:
+        # TOOL-dSafePassage-94: no shape runs the last one's bytecode, which the stub's loader writes
+        shutil.rmtree(stub92 / "__pycache__", ignore_errors=True)
         if resolve_src is None:
             (stub92 / "upgrade_steps.py").unlink(missing_ok=True)
         else:
             (stub92 / "upgrade_steps.py").write_text("def resolve_kit_dir(home, script, gov):\n    return gov\n\n\n"
                                                      + resolve_src, encoding="utf-8", newline="\n")
+            os.utime(stub92 / "upgrade_steps.py", ns=(0, 0))  # one mtime for every stand-in: only size parts two
         return us.run_step_isolated(floor_row, "witness", GOV_ROOT, root92)["tail"]
 
     wsl92 = "Windows Subsystem for Linux has no installed distributions.\r\n"
@@ -4515,6 +4544,15 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
             ("an OSError raised before the spawn, no step module to load", read_stub_tail(None), False)):
         check(f"[dSP-92] the fallback predicate reads {what} as {'the fallback' if want else 'a crash'}",
               test_floor_fallback(tail92) is want, repr(tail92[-600:]))
+
+    # TOOL-dSafePassage-94: two stand-ins of one size in a row, so the first's bytecode, if left,
+    # would run in place of the second.
+    absent94 = 'def resolve_shell_argv(argv):\n    return ["dsp92-absent"] + argv[1:]\n'
+    second94 = 'def resolve_shell_argv(argv):\n    raise RuntimeError("dsp94-second")\n'
+    read_stub_tail(absent94)
+    tail94 = read_stub_tail(second94)
+    check("[dSP-94] a stand-in the size of the one before it runs its own source, not that one's bytecode",
+          len(second94) == len(absent94) and "dsp94-second" in tail94, repr(tail94[-600:]))
 
 
 def check_step_gate_fixture() -> None:

@@ -557,3 +557,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T07:03:24Z review · item dSafePassage-r4-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition promote
 
 2026-11-01T07:20:16Z rescope · item add TOOL-dSafePassage-94 · reason the round-5 closing review's two minors batched (M4)
+
+2026-11-01T07:30:47Z brief · item TOOL-dSafePassage-94 · reason 6d627b3cd7a6 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-94-build-brief.md
+
+2026-11-01T07:36:32Z dispatch · item 682d170b TOOL-dSafePassage-94 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-94.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-94-ledger.md
+
+2026-11-01T07:42:17Z dispatch · item 682d170b TOOL-dSafePassage-94 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-94.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-94-ledger.md memory/map/generated/symbols.json
