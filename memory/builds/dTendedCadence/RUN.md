@@ -84,3 +84,35 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T13:30:23Z rescope · item add TOOL-dTendedCadence-58 · reason closes report id 18 HIGH (item H4) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-35-to-48-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 35 to 48
 
 2026-11-01T13:30:31Z rescope · item add TOOL-dTendedCadence-59 · reason closes the 19 MEDIUM and 21 LOW findings of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-35-to-48-spec-audit-round1.md batched as one unit: MEDIUM ids 5 24 6 29 19 50 7 8 30 31 33 34 41 44 45 46 47 48 49 and LOW ids 3 9 10 36 11 12 13 51 14 20 21 53 22 23 25 26 27 37 38 39 52
+
+2026-11-01T15:20:40Z rescope · item add TOOL-dTendedCadence-60 · reason closes report id 1 HIGH (item H1) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:41Z rescope · item add TOOL-dTendedCadence-61 · reason closes report id 14 HIGH (item H1) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:43Z rescope · item add TOOL-dTendedCadence-62 · reason closes report id 27 HIGH (item H1) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:44Z rescope · item add TOOL-dTendedCadence-63 · reason closes report id 35 HIGH (item H1) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:45Z rescope · item add TOOL-dTendedCadence-64 · reason closes report id 5 HIGH (item H2) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:47Z rescope · item add TOOL-dTendedCadence-65 · reason closes report id 26 HIGH (item H2) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:48Z rescope · item add TOOL-dTendedCadence-66 · reason closes report id 37 HIGH (item H2) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:50Z rescope · item add TOOL-dTendedCadence-67 · reason closes report id 13 HIGH (item H4) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:51Z rescope · item add TOOL-dTendedCadence-68 · reason closes report id 21 HIGH (item H5) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:53Z rescope · item add TOOL-dTendedCadence-69 · reason closes report id 4 HIGH (item H3) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:54Z rescope · item add TOOL-dTendedCadence-70 · reason closes report id 36 HIGH (item H3) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:55Z rescope · item add TOOL-dTendedCadence-71 · reason closes report id 28 HIGH (item H7) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:57Z rescope · item add TOOL-dTendedCadence-72 · reason closes report id 24 HIGH (item H6) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:20:58Z rescope · item add TOOL-dTendedCadence-73 · reason closes report id 29 HIGH (item H8) of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md, promoted at the round-1 spec audit exit of units 49 to 59
+
+2026-11-01T15:21:05Z rescope · item add TOOL-dTendedCadence-74 · reason closes the 19 MEDIUM and 7 LOW findings of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md batched as one unit: MEDIUM ids 2 3 6 40 7 8 9 33 15 16 42 18 32 20 23 25 31 41 43 and LOW ids 11 12 17 19 34 39 44
+
+2026-11-01T15:48:07Z review · item dTendedCadence-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 14 · minors 26 · disposition promote

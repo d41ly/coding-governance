@@ -1,6 +1,6 @@
 # TOOL-dTendedCadence-49 — the written maintenance record carried unchanged to its landing, a parentless commit pushed under `refs/gov/maintain-record/<key>` and named by the landing intake
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
+**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 21 · advances TOOL-dTendedCadence-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-35 TOOL-dTendedCadence-36 TOOL-dTendedCadence-37 TOOL-dTendedCadence-38 TOOL-dTendedCadence-39 TOOL-dTendedCadence-40 TOOL-dTendedCadence-41 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-46 TOOL-dTendedCadence-47 TOOL-dTendedCadence-48 TOOL-dTendedCadence-50 TOOL-dTendedCadence-51 TOOL-dTendedCadence-52 TOOL-dTendedCadence-53 TOOL-dTendedCadence-54 TOOL-dTendedCadence-55 TOOL-dTendedCadence-56 TOOL-dTendedCadence-57 TOOL-dTendedCadence-58 TOOL-dTendedCadence-59 |
+| [2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dTendedCadence-1-agent-ledger.md) | journal | TOOL-dTendedCadence-1 TOOL-dTendedCadence-2 TOOL-dTendedCadence-3 TOOL-dTendedCadence-4 TOOL-dTendedCadence-5 TOOL-dTendedCadence-6 TOOL-dTendedCadence-7 TOOL-dTendedCadence-8 TOOL-dTendedCadence-9 TOOL-dTendedCadence-10 TOOL-dTendedCadence-11 TOOL-dTendedCadence-12 TOOL-dTendedCadence-13 TOOL-dTendedCadence-14 TOOL-dTendedCadence-15 TOOL-dTendedCadence-16 TOOL-dTendedCadence-17 TOOL-dTendedCadence-18 TOOL-dTendedCadence-35 TOOL-dTendedCadence-36 TOOL-dTendedCadence-37 TOOL-dTendedCadence-38 TOOL-dTendedCadence-39 TOOL-dTendedCadence-40 TOOL-dTendedCadence-41 TOOL-dTendedCadence-42 TOOL-dTendedCadence-43 TOOL-dTendedCadence-44 TOOL-dTendedCadence-45 TOOL-dTendedCadence-46 TOOL-dTendedCadence-47 TOOL-dTendedCadence-48 TOOL-dTendedCadence-50 TOOL-dTendedCadence-51 TOOL-dTendedCadence-52 TOOL-dTendedCadence-53 TOOL-dTendedCadence-54 TOOL-dTendedCadence-55 TOOL-dTendedCadence-56 TOOL-dTendedCadence-57 TOOL-dTendedCadence-58 TOOL-dTendedCadence-59 TOOL-dTendedCadence-60 TOOL-dTendedCadence-61 TOOL-dTendedCadence-62 TOOL-dTendedCadence-63 TOOL-dTendedCadence-64 TOOL-dTendedCadence-65 TOOL-dTendedCadence-66 TOOL-dTendedCadence-67 TOOL-dTendedCadence-68 TOOL-dTendedCadence-69 TOOL-dTendedCadence-70 TOOL-dTendedCadence-71 TOOL-dTendedCadence-72 TOOL-dTendedCadence-73 TOOL-dTendedCadence-74 |
 | [2026-11-01-prompt-TOOL-dTendedCadence-49-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-49-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dTendedCadence-49-promoted-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dTendedCadence-49-promoted-fix-brief.md) | research | TOOL-dTendedCadence-59 |
+| [2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md) | spec-audit | TOOL-dTendedCadence-56 TOOL-dTendedCadence-55 TOOL-dTendedCadence-57 TOOL-dTendedCadence-53 TOOL-dTendedCadence-54 TOOL-dTendedCadence-50 TOOL-dTendedCadence-51 TOOL-dTendedCadence-52 TOOL-dTendedCadence-58 TOOL-dTendedCadence-59 |
 
 <!-- /gen:spec-records -->
 
@@ -67,6 +68,12 @@ digest.
 - **hands-off** `TOOL-dTendedCadence-51` — `write_record_landing`, the walk half of the round trip that unit's arm drives end to end
 - **hands-off** `TOOL-dTendedCadence-52` — `write_record_landing`, through which the security review files its record's landing
 - **hands-off** `TOOL-dTendedCadence-59` — `write_record_landing`, through which that unit lands one record of every family and documents the one grammar (review ids 5, 24)
+- **hands-off** `TOOL-dTendedCadence-64` — `write_record_landing`'s push, which that unit wraps in the claim-push lock and the lander's marker test (review id 5)
+- **hands-off** `TOOL-dTendedCadence-65` — the push, which that unit makes by remote name with the hook's refusal token read (review id 26)
+- **hands-off** `TOOL-dTendedCadence-66` — §6's scratch repository, which that unit equips with the tracked hooks (review id 37)
+- **hands-off** `TOOL-dTendedCadence-67` — the blob and tree lines of §4, which that unit builds through a scratch index over an unfiltered blob (review id 13)
+- **hands-off** `TOOL-dTendedCadence-68` — S2's remote rule, which that unit answers with the kit's remote ladder (review id 21)
+- **hands-off** `TOOL-dTendedCadence-74` — the security claim, its precondition edge, AC3's fixture, the push citation and the ref-name check, repaired by the minors batch (review ids 18, 32, 31, 19, 39)
 
 ## 4. Design
 
@@ -204,6 +211,7 @@ New arm: tools/drift-audit/selftest.py · covers AC1 AC2 AC3 · a scratch reposi
 
 - rev-1 · 2026-11-01 · initial draft, promoted from review id 1 (BLOCKER, item B1) of the round-1
   spec audit of units 35 to 48.
+- rev-2 · 2026-11-01 · §3 · the Edges gain the mirror of each edge the promoted units of the round-1 spec audit of units 49 to 59 declare toward this unit (units 64, 65, 66, 67, 68, 74); no scope, design or criterion moved.
 
 ## 10. Reuse audit
 
