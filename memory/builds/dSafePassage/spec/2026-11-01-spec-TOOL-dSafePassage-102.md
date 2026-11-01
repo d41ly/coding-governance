@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-102 — ask 85's two red legs, by the owner's ruling: five fork ceilings raised to their measured counts, three evidence how texts respelled through the prefix token
 
-**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base 4f7ba0a30 · streams tooling · order 16 · closes TOOL-dSafePassage-85
+**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base 4f7ba0a30 · streams tooling · order 16 · closes TOOL-dSafePassage-85
 
 **Derived:** TOOL-dSafePassage-85
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-102-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-102-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-102-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-102-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-102-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-102-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-102-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-102-audit-fold-brief.md) | research | — |
