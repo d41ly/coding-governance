@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 63ca805ed6cff7c3102009a3275d00dddc10602b
 phase: REVIEWING
@@ -150,3 +151,5 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T09:23:12Z rescope · item add DEPL-dShippedRelease-105 · reason closes 2026-10-30-review-DEPL-dShippedRelease-49-spec-audit-round1.md id 95 (HIGH, item H13): read-current's exit 2 reuses refused after the host has changed
 
 2026-11-01T09:23:13Z rescope · item add DEPL-dShippedRelease-106 · reason closes 2026-10-30-review-DEPL-dShippedRelease-49-spec-audit-round1.md the 79 minors by raw id, MEDIUM ids 9 71 10 31 55 90 11 12 34 101 13 68 14 102 15 16 39 56 73 17 113 18 74 19 40 20 21 38 23 92 32 99 37 76 41 50 53 54 57 59 110 75 77 78 79 80 106 82 97 98 100 103 104 105 107 108 109 111 112 114 and LOW ids 25 26 81 85 27 42 43 44 45 46 84 51 58 60 61 62 63 64 65
+
+2026-11-01T10:17:10Z decision · item The spec-audit chain does not converge: confirmed findings ran 106, 106, blockers 7, 8 and highs 22, 19 over two rounds (precision 0.97, 0.93), and round 2's blockers land on mechanisms round 1's promotions added (the landing review's disposed and pending passes, spec-run admission, release.pick's walk), with 28 promotions (DEPL-dShippedRelease-79 to -106) still unaudited and 89 units in the roster. Keep auditing, stop the chain as for dKeptSession, dLinkedLibrary, dIndexedDesign and dMindYourWords, or re-scope? · reason options (a) round 3 over units 79-106, about 3 hours and about 4.5M subagent tokens, each round so far promoting as many units as it closed (30, 28) and round 2 ending on the weekly usage limit; (b) stop as for those builds: units 79-106 close under a recorded specs-audited override, closing-review-recorded overridden, every unit deferred to the build run, the run closes and lands; (c) re-scope the landing-review and records-landing units (14, 51, 52, 73, 79 to 85, 90) into fewer mechanisms before more rounds. Refused to pick: the owner's standing rule stops a chain without asking only at a no-HIGH round, and on a plateau holds for the owner's ruling
