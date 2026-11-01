@@ -253,15 +253,15 @@ ids TOOL-dSafePassage-85 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePas
 | [TOOL-dSafePassage-92 — the floor stub's fallback check grades a crash, not the word bash, over every host shape the bar runs on](spec/2026-11-01-spec-TOOL-dSafePassage-92.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
 | [TOOL-dSafePassage-93 — the round-4 closing review's two minors: an arm that triggers the link-or-alias refusal, and the set_environ claim narrowed](spec/2026-11-01-spec-TOOL-dSafePassage-93.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
 | [TOOL-dSafePassage-94 — the round-5 closing review's two minors: the floor stub's fallback read in process, and each stand-in shape run from its own source](spec/2026-11-01-spec-TOOL-dSafePassage-94.md) | 16 | 2 | CLOSED | rev-1 | 2026-11-01 |
-| [TOOL-dSafePassage-95 — the round-6 closing review's nine minors: the floor-bash arms of 94 made self-consistent](spec/2026-11-01-spec-TOOL-dSafePassage-95.md) | 16 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [TOOL-dSafePassage-95 — the round-6 closing review's nine minors: the floor-bash arms of 94 made self-consistent](spec/2026-11-01-spec-TOOL-dSafePassage-95.md) | 16 | 2 | DEFERRED | rev-2 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 461 bound to this build, across 4 record folder(s).
+Records: 464 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65
-TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-95.
+TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71.
 
 Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-15@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1
 TOOL-dSafePassage-19@rev-1 TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1
@@ -269,7 +269,7 @@ TOOL-dSafePassage-29@rev-1 TOOL-dSafePassage-3@rev-1 TOOL-dSafePassage-30@rev-1 
 TOOL-dSafePassage-39@rev-1 TOOL-dSafePassage-4@rev-1 TOOL-dSafePassage-40@rev-1 TOOL-dSafePassage-41@rev-1 TOOL-dSafePassage-42@rev-1 TOOL-dSafePassage-43@rev-1 TOOL-dSafePassage-44@rev-1 TOOL-dSafePassage-45@rev-1 TOOL-dSafePassage-46@rev-1 TOOL-dSafePassage-47@rev-1 TOOL-dSafePassage-48@rev-1
 TOOL-dSafePassage-49@rev-2 TOOL-dSafePassage-5@rev-1 TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-51@rev-1 TOOL-dSafePassage-52@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1 TOOL-dSafePassage-72@rev-3 TOOL-dSafePassage-73@rev-3
 TOOL-dSafePassage-74@rev-2 TOOL-dSafePassage-75@rev-2 TOOL-dSafePassage-76@rev-3 TOOL-dSafePassage-77@rev-3 TOOL-dSafePassage-78@rev-1 TOOL-dSafePassage-80@rev-4 TOOL-dSafePassage-81@rev-3 TOOL-dSafePassage-82@rev-3 TOOL-dSafePassage-83@rev-4 TOOL-dSafePassage-84@rev-2 TOOL-dSafePassage-87@rev-3
-TOOL-dSafePassage-88@rev-1 TOOL-dSafePassage-89@rev-2 TOOL-dSafePassage-90@rev-1 TOOL-dSafePassage-91@rev-1 TOOL-dSafePassage-92@rev-1 TOOL-dSafePassage-93@rev-1.
+TOOL-dSafePassage-88@rev-1 TOOL-dSafePassage-89@rev-2 TOOL-dSafePassage-90@rev-1 TOOL-dSafePassage-91@rev-1 TOOL-dSafePassage-92@rev-1 TOOL-dSafePassage-93@rev-1 TOOL-dSafePassage-95@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
