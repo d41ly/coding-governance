@@ -9,6 +9,9 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dTendedCadence-19=DEFERRED TOOL-dTendedCadence-20=DEFERRED TOOL-dTendedCadence-21=DEFERRED TOOL-dTendedCadence-22=DEFERRED TOOL-dTendedCadence-23=DEFERRED TOOL-dTendedCadence-24=DEFERRED TOOL-dTendedCadence-25=DEFERRED TOOL-dTendedCadence-26=DEFERRED TOOL-dTendedCadence-27=DEFERRED TOOL-dTendedCadence-28=DEFERRED TOOL-dTendedCadence-29=DEFERRED TOOL-dTendedCadence-30=DEFERRED TOOL-dTendedCadence-31=DEFERRED TOOL-dTendedCadence-32=DEFERRED TOOL-dTendedCadence-33=DEFERRED TOOL-dTendedCadence-34=DEFERRED
+units-at-landing: TOOL-dTendedCadence-10 TOOL-dTendedCadence-6 TOOL-dTendedCadence-35 TOOL-dTendedCadence-37 TOOL-dTendedCadence-8 TOOL-dTendedCadence-4 TOOL-dTendedCadence-56 TOOL-dTendedCadence-14 TOOL-dTendedCadence-60 TOOL-dTendedCadence-61 TOOL-dTendedCadence-62 TOOL-dTendedCadence-63 TOOL-dTendedCadence-18 TOOL-dTendedCadence-15 TOOL-dTendedCadence-42 TOOL-dTendedCadence-1 TOOL-dTendedCadence-43 TOOL-dTendedCadence-47 TOOL-dTendedCadence-3 TOOL-dTendedCadence-36 TOOL-dTendedCadence-55 TOOL-dTendedCadence-46 TOOL-dTendedCadence-7 TOOL-dTendedCadence-40 TOOL-dTendedCadence-5 TOOL-dTendedCadence-12 TOOL-dTendedCadence-17 TOOL-dTendedCadence-16 TOOL-dTendedCadence-38 TOOL-dTendedCadence-9 TOOL-dTendedCadence-11 TOOL-dTendedCadence-44 TOOL-dTendedCadence-13 TOOL-dTendedCadence-45 TOOL-dTendedCadence-57 TOOL-dTendedCadence-2 TOOL-dTendedCadence-39 TOOL-dTendedCadence-53 TOOL-dTendedCadence-54 TOOL-dTendedCadence-41 TOOL-dTendedCadence-48 TOOL-dTendedCadence-49 TOOL-dTendedCadence-50 TOOL-dTendedCadence-51 TOOL-dTendedCadence-52 TOOL-dTendedCadence-58 TOOL-dTendedCadence-67 TOOL-dTendedCadence-68 TOOL-dTendedCadence-59 TOOL-dTendedCadence-64 TOOL-dTendedCadence-65 TOOL-dTendedCadence-66 TOOL-dTendedCadence-69 TOOL-dTendedCadence-70 TOOL-dTendedCadence-71 TOOL-dTendedCadence-72 TOOL-dTendedCadence-73 TOOL-dTendedCadence-74
+gates-run: unattended-17935622443436168570-297235 40831afe
 parked-surfaced: yes
 keepalive-reaped: yes
 hold-run: 
@@ -22,7 +25,7 @@ held-from: REVIEWING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: a12929c7413470c4f1a2cd0c26fce0bd3193feb1
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -249,3 +252,7 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T16:46:20Z rescope · item defer TOOL-dTendedCadence-8 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
 
 2026-11-01T16:46:22Z rescope · item defer TOOL-dTendedCadence-9 · reason spec run (README rule 1): specced here, the spec audit's chain ended at round 3 by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), carried forward to the build run
+
+2026-11-01T20:21:19Z override · item specs-audited · reason the owner stopped the spec-audit chain at round 3 (2026-11-01, memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), as for dIndexedDesign, dLinkedLibrary and dMindYourWords; TOOL-dTendedCadence-60 to -74, the round-3 promotions, close unaudited under this override and are deferred to the build run
+
+2026-11-01T20:21:19Z override · item closing-review-recorded · reason the audit chain is the review of this spec-only diff, by the owner's ruling of 2026-11-01 (memory/builds/dTendedCadence/prompts/2026-11-01-prompt-TOOL-dTendedCadence-1-owner-stop-chain.md), as for dIndexedDesign, dLinkedLibrary and dMindYourWords; the build run's closing diff review is unaffected
