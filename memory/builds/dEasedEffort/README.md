@@ -54,17 +54,17 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 2 unit(s) · node d · opened 2026-11-02 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-11-02 · streams tooling
 ids TOOL-dEasedEffort-1 TOOL-dEasedEffort-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dEasedEffort-1 — the orienter and builder run at high, the closing review's finders and skeptics at medium](spec/2026-11-02-spec-TOOL-dEasedEffort-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-11-02 |
-| [TOOL-dEasedEffort-2 — the ledger's AC1 and AC3 lines record their observations at a named commit, and the class names the form](spec/2026-11-02-spec-TOOL-dEasedEffort-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-11-02 |
+| [TOOL-dEasedEffort-2 — the ledger's AC1 and AC3 lines record their observations at a named commit, and the class names the form](spec/2026-11-02-spec-TOOL-dEasedEffort-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

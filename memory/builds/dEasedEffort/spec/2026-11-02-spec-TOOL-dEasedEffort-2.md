@@ -1,11 +1,12 @@
 # TOOL-dEasedEffort-2 — the ledger's AC1 and AC3 lines record their observations at a named commit, and the class names the form
 
-**Status:** SPECCED · rev-1 · 2026-11-02 · node d · Tier-1 · base 2a6f3975 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-11-02 · node d · Tier-1 · base 2a6f3975 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-build-TOOL-dEasedEffort-2-1-acceptance-ledger.md](../build/2026-11-02-build-TOOL-dEasedEffort-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dEasedEffort-2-round1-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dEasedEffort-2-round1-fix-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
