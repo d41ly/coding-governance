@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md](../build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md) | journal | — |
+| [2026-11-02-build-TOOL-dEasedEffort-1-agent-ledger.md](../build/2026-11-02-build-TOOL-dEasedEffort-1-agent-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dEasedEffort-1-brief.md](../prompts/2026-11-02-prompt-TOOL-dEasedEffort-1-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
