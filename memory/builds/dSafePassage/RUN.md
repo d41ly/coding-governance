@@ -647,3 +647,9 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T19:41:32Z rescope · item add TOOL-dSafePassage-103 · reason the close's bar on the prepared landing merge f14f0f72c reds policy check: derive_census_tree reads TOOL-dSafePassage-8's source-mode receipt as an adopter's
 
 2026-11-01T19:52:59Z brief · item TOOL-dSafePassage-103 · reason 079f9f15cb89 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-103-build-brief.md
+
+2026-11-01T20:51:53Z dispatch · item cfe5405c TOOL-dSafePassage-103 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-103.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-103-ledger.md
+
+2026-11-01T21:10:32Z dispatch · item cfe5405c TOOL-dSafePassage-103 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-103-ledger.md memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-103.md
+
+2026-11-01T21:25:08Z dispatch · item cfe5405c TOOL-dSafePassage-103 · reason memory/backlog/TOOL.md memory/builds/dSafePassage/README.md

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-103 — the census tree reads gov's source-mode receipt as gov's own tree, by the registry search it makes with no receipt
 
-**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f25d719e4 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base f25d719e4 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-8
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-103-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-103-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-103-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-103-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-103-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-103-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-103-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-103-audit-fold-brief.md) | research | — |

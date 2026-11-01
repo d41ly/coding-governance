@@ -8338,6 +8338,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_registry_tree",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "derive_relation_base",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -21099,6 +21104,11 @@
     },
     {
       "id": "run_census_default_adopter",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_census_source_receipt",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
