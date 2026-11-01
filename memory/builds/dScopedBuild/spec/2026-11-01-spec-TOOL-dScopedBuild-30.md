@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-30 — the gate keys read through the memory-tree kit's one policy adapter, `read_policy_value`, not a second reader in `routed_commits.py`
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

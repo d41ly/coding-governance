@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-37 — the bar scrub is the hook's `BAR_SCRUBBED_KNOBS` plus the driver's two, so `GATE_REGEN_CHECK` is scrubbed too
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

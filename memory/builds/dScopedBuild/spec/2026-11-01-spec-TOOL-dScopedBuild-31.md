@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-31 — `core-result` registered as a typed record kind through the registry factory, its records bound `**Serves:** core-result`
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 10 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 10 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

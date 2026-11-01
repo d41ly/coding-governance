@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-10 — a red-first `reproduction` before the fix of a reported bug: `--dispatch` refusing a unit that closes a bug report until a confirmed reproduction serves it
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 12 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 12 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0408@9fd076d5 whole
 

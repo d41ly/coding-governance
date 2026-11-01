@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-15 — `build.acceptance` writing the seen-red record: each gate a unit adds or changes re-run on its planted red beside the unit's acceptance commands
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 10 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 10 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0506@2200c4c7 whole
 **Carries:** node:item.build.acceptance

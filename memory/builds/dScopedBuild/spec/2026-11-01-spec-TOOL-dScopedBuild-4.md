@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-4 — the closing review recorded as `review.build.when` says: per build, per unit or per landing, in both modes
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0402@19e9688b whole
 **Carries:** node:policy-key.review.build.when

@@ -76,3 +76,71 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T16:28:28Z rescope · item add TOOL-dScopedBuild-43 · reason spec-audit round1 of units 40-41 minors batch, MEDIUM ids 1 3 7 8 10 11 15 and LOW ids 4 5 9 13
 
 2026-11-01T16:47:16Z review · item dScopedBuild-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 11 · disposition promote
+
+2026-11-01T17:28:50Z rescope · item defer TOOL-dScopedBuild-1 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:28:51Z rescope · item defer TOOL-dScopedBuild-2 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:28:53Z rescope · item defer TOOL-dScopedBuild-3 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:28:55Z rescope · item defer TOOL-dScopedBuild-4 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:28:57Z rescope · item defer TOOL-dScopedBuild-5 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:28:59Z rescope · item defer TOOL-dScopedBuild-6 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:00Z rescope · item defer TOOL-dScopedBuild-7 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:02Z rescope · item defer TOOL-dScopedBuild-8 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:04Z rescope · item defer TOOL-dScopedBuild-9 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:06Z rescope · item defer TOOL-dScopedBuild-10 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:08Z rescope · item defer TOOL-dScopedBuild-11 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:09Z rescope · item defer TOOL-dScopedBuild-12 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:11Z rescope · item defer TOOL-dScopedBuild-13 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:12Z rescope · item defer TOOL-dScopedBuild-14 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:14Z rescope · item defer TOOL-dScopedBuild-15 · reason the spec run carries the roster unit forward DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:16Z rescope · item defer TOOL-dScopedBuild-25 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:18Z rescope · item defer TOOL-dScopedBuild-26 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:19Z rescope · item defer TOOL-dScopedBuild-27 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:20Z rescope · item defer TOOL-dScopedBuild-28 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:22Z rescope · item defer TOOL-dScopedBuild-29 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:23Z rescope · item defer TOOL-dScopedBuild-30 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:25Z rescope · item defer TOOL-dScopedBuild-31 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:26Z rescope · item defer TOOL-dScopedBuild-32 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:28Z rescope · item defer TOOL-dScopedBuild-33 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:29Z rescope · item defer TOOL-dScopedBuild-34 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:31Z rescope · item defer TOOL-dScopedBuild-35 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:32Z rescope · item defer TOOL-dScopedBuild-36 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:34Z rescope · item defer TOOL-dScopedBuild-37 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:35Z rescope · item defer TOOL-dScopedBuild-38 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:37Z rescope · item defer TOOL-dScopedBuild-39 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:38Z rescope · item defer TOOL-dScopedBuild-40 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:40Z rescope · item defer TOOL-dScopedBuild-41 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:41Z rescope · item defer TOOL-dScopedBuild-42 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)
+
+2026-11-01T17:29:43Z rescope · item defer TOOL-dScopedBuild-43 · reason added by this spec run's audit and carried once, DEFERRED, its spec header advancing TOOL-dScopedBuild-16, for the build run to build (README rule 1)

@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-12 — `build.reuse-check`: the reuse scout over the units a unit's commits add, before the closing review
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 13 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 13 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0410@869f06dd whole
 **Carries:** node:item.build.reuse-check

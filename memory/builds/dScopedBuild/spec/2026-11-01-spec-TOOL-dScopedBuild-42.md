@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-42 — the exit arm's rerun witness counts the staged ask rows, so a duplicated row turns it red
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 19 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 19 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-7 — the core checks run by the executor at Build's exit: the exit's graded legs narrowed to the core set, a core-only run of its own, its result recorded
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 9 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-4 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 9 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0405@431edacd whole
 **Carries:** node:item.build.core

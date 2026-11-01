@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-40 — `derive_kit_dir` never reduces a path to a directory that holds a routed entry, so a nested routed root stays out of an unrouted sibling's write set
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 7 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 7 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

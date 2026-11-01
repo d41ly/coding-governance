@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-33 — `read_first_passes` stays in `deviation_join.py` as two landed ancestors leave it, and `read_build_base` reaches it by the lazy import the leg already makes
 
-**Status:** OPEN · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

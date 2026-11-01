@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-26 — `reuse_check.py` reads its two policy keys through the memory-tree adapter, a call the `.py` reader shape counts
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 14 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

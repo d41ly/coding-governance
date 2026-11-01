@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-1 — one exit contract with a history-derived base
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 1 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 1 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0399@182b9f2d whole
 **Carries:** node:item.build.base

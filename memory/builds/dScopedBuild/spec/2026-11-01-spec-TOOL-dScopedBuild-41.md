@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-41 — the round-1 audit of units 36 to 39, its 22 minors batched: 10 MEDIUM and 12 LOW findings, each its own scope item
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 18 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 18 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

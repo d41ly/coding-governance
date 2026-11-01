@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-28 — the pre-commit hook runs the hygiene leg on a deletion-only memory commit, so check 32's freeze reaches a deleted landed spec
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 4 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 4 · advances TOOL-dScopedBuild-16
 
 **Derived:** PLAY-dClosedLoop-2
 

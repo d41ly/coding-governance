@@ -23,3 +23,12 @@
 - SEV · TOOL-dScopedBuild-22 · LOW · two specs describe one diff-time reuse check, and building both leaves two joins answering one question
 - SEV · TOOL-dScopedBuild-23 · LOW · the closing review's row answers have no writer that takes them, so they are recorded nowhere or by a second writer
 - SEV · TOOL-dScopedBuild-24 · MED · once TOOL-dScopedBuild-14 lands, gov runs the deviation gate at `refuse`, against the chain's ruled `report`
+- DEFERRED · TOOL-dScopedBuild-16 · until TOOL-dScopedBuild-43 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order carries `closes` for it
+- DEFERRED · TOOL-dScopedBuild-17 · until TOOL-dScopedBuild-5 · TOOL-dScopedBuild-5's build run moves the write gate to the derived step, so dIndexedDesign's `status-and-tier` must name its grader by then
+- DEFERRED · TOOL-dScopedBuild-18 · until TOOL-dScopedBuild-7 · TOOL-dScopedBuild-7's build run covers the decision-log rows at the core run, so the build run owes a unit that appends them, minted by its own rescope
+- DEFERRED · TOOL-dScopedBuild-19 · until TOOL-dScopedBuild-10 · TOOL-dScopedBuild-10's build run gates a reported bug's fix on a reproduction, which a placed patch build reaches only once it files its report as an ask
+- DEFERRED · TOOL-dScopedBuild-20 · until TOOL-dScopedBuild-3 · TOOL-dScopedBuild-3's build run lands `design_lib.py --kit-dir`, the one kit-directory rule dPlacedRequest's reduction then reads
+- DEFERRED · TOOL-dScopedBuild-21 · until TOOL-dScopedBuild-8 · TOOL-dScopedBuild-8's build run reads each site's line through `--sites`, so dWitnessedBar's ledger convention must state it by then
+- DEFERRED · TOOL-dScopedBuild-22 · until TOOL-dScopedBuild-12 · TOOL-dScopedBuild-12's build run builds the diff lister under TOOL-aScoutedSeam-3 S8's spelling, so aScoutedSeam's unit retires or rebases once it lands
+- DEFERRED · TOOL-dScopedBuild-23 · until TOOL-dScopedBuild-13 · TOOL-dScopedBuild-13's build run records the closing review's row answers through dDeclaredLoop's upstream writer, which must take caller-supplied rows by then
+- DEFERRED · TOOL-dScopedBuild-24 · until TOOL-dScopedBuild-14 · TOOL-dScopedBuild-14's build run reads `deviation.gate` at the landed revision, so gov's policy file must declare `report` before it lands

@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-2 — built specs frozen, and every closing-review finding disposed as new units
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 3 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0400@d5dcbafa whole
 

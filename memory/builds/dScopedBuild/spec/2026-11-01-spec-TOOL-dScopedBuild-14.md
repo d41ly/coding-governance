@@ -1,6 +1,6 @@
 # TOOL-dScopedBuild-14 — the deviation gate under `deviation.gate`, at the commit and at the Build exit
 
-**Status:** OPEN · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dScopedBuild-16
+**Status:** DEFERRED · rev-3 · 2026-11-01 · node a · Tier-2 · base f4597719 · streams tooling · order 2 · advances TOOL-dScopedBuild-16
 
 **Carries:** cl-dClosedLoop-0412@021fa28b whole
 **Carries:** node:policy-key.deviation.gate
