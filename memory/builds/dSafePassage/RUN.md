@@ -23,8 +23,8 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · handoff · 145 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 50852889a
-phase: VERIFYING
+witness: 934578e53ef1da280de59b6de49f1c4022f8ee4b
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -643,3 +643,5 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T17:43:53Z dispatch · item 699d6376 TOOL-dSafePassage-102 · reason memory/project/fork-ceilings.txt tools/run-gates/ceiling-evidence.txt memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-102.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-102-ledger.md
 
 2026-11-01T17:54:25Z dispatch · item 699d6376 TOOL-dSafePassage-102 · reason memory/project/fork-ceilings.txt tools/run-gates/ceiling-evidence.txt memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-102-ledger.md memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-102.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md
+
+2026-11-01T19:41:32Z rescope · item add TOOL-dSafePassage-103 · reason the close's bar on the prepared landing merge f14f0f72c reds policy check: derive_census_tree reads TOOL-dSafePassage-8's source-mode receipt as an adopter's
