@@ -4,8 +4,7 @@ node: d
 opened: 2026-10-21
 streams: deployer
 roster: DEPL
-ids: DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-3 DEPL-dShippedRelease-4 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-7 DEPL-dShippedRelease-8 DEPL-dShippedRelease-9 DEPL-dShippedRelease-10 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-16 DEPL-dShippedRelease-17 DEPL-dShippedRelease-18 DEPL-dShippedRelease-19 DEPL-dShippedRelease-20 DEPL-dShippedRelease-21 DEPL-dShippedRelease-22 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24 DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 DEPL-dShippedRelease-32
-status: OPEN
+ids: DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-3 DEPL-dShippedRelease-4 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-7 DEPL-dShippedRelease-8 DEPL-dShippedRelease-9 DEPL-dShippedRelease-10 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12 DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-16 DEPL-dShippedRelease-17 DEPL-dShippedRelease-18 DEPL-dShippedRelease-19 DEPL-dShippedRelease-20 DEPL-dShippedRelease-21 DEPL-dShippedRelease-22 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24 DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 DEPL-dShippedRelease-32 DEPL-dShippedRelease-33 DEPL-dShippedRelease-34 DEPL-dShippedRelease-35 DEPL-dShippedRelease-36 DEPL-dShippedRelease-37 DEPL-dShippedRelease-38 DEPL-dShippedRelease-39 DEPL-dShippedRelease-40 DEPL-dShippedRelease-41 DEPL-dShippedRelease-42 DEPL-dShippedRelease-43 DEPL-dShippedRelease-44 DEPL-dShippedRelease-45 DEPL-dShippedRelease-46 DEPL-dShippedRelease-47 DEPL-dShippedRelease-48 DEPL-dShippedRelease-49 DEPL-dShippedRelease-50 DEPL-dShippedRelease-51 DEPL-dShippedRelease-52 DEPL-dShippedRelease-53 DEPL-dShippedRelease-54 DEPL-dShippedRelease-55 DEPL-dShippedRelease-56 DEPL-dShippedRelease-57 DEPL-dShippedRelease-58 DEPL-dShippedRelease-59 DEPL-dShippedRelease-60 DEPL-dShippedRelease-61 DEPL-dShippedRelease-62 DEPL-dShippedRelease-63 DEPL-dShippedRelease-64 DEPL-dShippedRelease-65 DEPL-dShippedRelease-66 DEPL-dShippedRelease-67 DEPL-dShippedRelease-68 DEPL-dShippedRelease-69 DEPL-dShippedRelease-70 DEPL-dShippedRelease-71 DEPL-dShippedRelease-72 DEPL-dShippedRelease-73 DEPL-dShippedRelease-74 DEPL-dShippedRelease-75 DEPL-dShippedRelease-76 DEPL-dShippedRelease-77 DEPL-dShippedRelease-78 DEPL-dShippedRelease-79 DEPL-dShippedRelease-80 DEPL-dShippedRelease-81 DEPL-dShippedRelease-82 DEPL-dShippedRelease-83 DEPL-dShippedRelease-84 DEPL-dShippedRelease-85 DEPL-dShippedRelease-86 DEPL-dShippedRelease-87 DEPL-dShippedRelease-88 DEPL-dShippedRelease-89 DEPL-dShippedRelease-90 DEPL-dShippedRelease-91 DEPL-dShippedRelease-92 DEPL-dShippedRelease-93 DEPL-dShippedRelease-94 DEPL-dShippedRelease-95 DEPL-dShippedRelease-96 DEPL-dShippedRelease-97 DEPL-dShippedRelease-98 DEPL-dShippedRelease-99 DEPL-dShippedRelease-100 DEPL-dShippedRelease-101 DEPL-dShippedRelease-102 DEPL-dShippedRelease-103 DEPL-dShippedRelease-104 DEPL-dShippedRelease-105 DEPL-dShippedRelease-106 DEPL-dShippedRelease-107 DEPL-dShippedRelease-108 DEPL-dShippedRelease-109 DEPL-dShippedRelease-110 DEPL-dShippedRelease-111 DEPL-dShippedRelease-112 DEPL-dShippedRelease-113 DEPL-dShippedRelease-114 DEPL-dShippedRelease-115 DEPL-dShippedRelease-116 DEPL-dShippedRelease-117 DEPL-dShippedRelease-118 DEPL-dShippedRelease-119 DEPL-dShippedRelease-120 DEPL-dShippedRelease-121 DEPL-dShippedRelease-122 DEPL-dShippedRelease-123 DEPL-dShippedRelease-124 DEPL-dShippedRelease-125 DEPL-dShippedRelease-126 DEPL-dShippedRelease-127 DEPL-dShippedRelease-128 DEPL-dShippedRelease-129 DEPL-dShippedRelease-130 DEPL-dShippedRelease-131 DEPL-dShippedRelease-132 DEPL-dShippedRelease-133 DEPL-dShippedRelease-134 DEPL-dShippedRelease-135 DEPL-dShippedRelease-136 DEPL-dShippedRelease-137 DEPL-dShippedRelease-138 DEPL-dShippedRelease-139 DEPL-dShippedRelease-140 DEPL-dShippedRelease-141 DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 DEPL-dShippedRelease-145
 spec-audit: 2026-10-21
 parents: dWitnessedBar dTotalRecall dBoundRoles dWellOiledMachine dLinkedLibrary dFurnishedOrders
 may: PLAY-dClosedLoop-3
@@ -94,49 +93,252 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams deployer
+**Build status:** DEFERRED · 126 unit(s) · node d · opened 2026-10-21 · streams deployer
 ids DEPL-dShippedRelease-1 DEPL-dShippedRelease-2 DEPL-dShippedRelease-3 DEPL-dShippedRelease-4 DEPL-dShippedRelease-5 DEPL-dShippedRelease-6 DEPL-dShippedRelease-7 DEPL-dShippedRelease-8 DEPL-dShippedRelease-9 DEPL-dShippedRelease-10 DEPL-dShippedRelease-11 DEPL-dShippedRelease-12
 ids DEPL-dShippedRelease-13 DEPL-dShippedRelease-14 DEPL-dShippedRelease-15 DEPL-dShippedRelease-16 DEPL-dShippedRelease-17 DEPL-dShippedRelease-18 DEPL-dShippedRelease-19 DEPL-dShippedRelease-20 DEPL-dShippedRelease-21 DEPL-dShippedRelease-22 DEPL-dShippedRelease-23 DEPL-dShippedRelease-24
-ids DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 DEPL-dShippedRelease-32
+ids DEPL-dShippedRelease-25 DEPL-dShippedRelease-26 DEPL-dShippedRelease-27 DEPL-dShippedRelease-28 DEPL-dShippedRelease-29 DEPL-dShippedRelease-30 DEPL-dShippedRelease-31 DEPL-dShippedRelease-32 DEPL-dShippedRelease-33 DEPL-dShippedRelease-34 DEPL-dShippedRelease-35 DEPL-dShippedRelease-36
+ids DEPL-dShippedRelease-37 DEPL-dShippedRelease-38 DEPL-dShippedRelease-39 DEPL-dShippedRelease-40 DEPL-dShippedRelease-41 DEPL-dShippedRelease-42 DEPL-dShippedRelease-43 DEPL-dShippedRelease-44 DEPL-dShippedRelease-45 DEPL-dShippedRelease-46 DEPL-dShippedRelease-47 DEPL-dShippedRelease-48
+ids DEPL-dShippedRelease-49 DEPL-dShippedRelease-50 DEPL-dShippedRelease-51 DEPL-dShippedRelease-52 DEPL-dShippedRelease-53 DEPL-dShippedRelease-54 DEPL-dShippedRelease-55 DEPL-dShippedRelease-56 DEPL-dShippedRelease-57 DEPL-dShippedRelease-58 DEPL-dShippedRelease-59 DEPL-dShippedRelease-60
+ids DEPL-dShippedRelease-61 DEPL-dShippedRelease-62 DEPL-dShippedRelease-63 DEPL-dShippedRelease-64 DEPL-dShippedRelease-65 DEPL-dShippedRelease-66 DEPL-dShippedRelease-67 DEPL-dShippedRelease-68 DEPL-dShippedRelease-69 DEPL-dShippedRelease-70 DEPL-dShippedRelease-71 DEPL-dShippedRelease-72
+ids DEPL-dShippedRelease-73 DEPL-dShippedRelease-74 DEPL-dShippedRelease-75 DEPL-dShippedRelease-76 DEPL-dShippedRelease-77 DEPL-dShippedRelease-78 DEPL-dShippedRelease-79 DEPL-dShippedRelease-80 DEPL-dShippedRelease-81 DEPL-dShippedRelease-82 DEPL-dShippedRelease-83 DEPL-dShippedRelease-84
+ids DEPL-dShippedRelease-85 DEPL-dShippedRelease-86 DEPL-dShippedRelease-87 DEPL-dShippedRelease-88 DEPL-dShippedRelease-89 DEPL-dShippedRelease-90 DEPL-dShippedRelease-91 DEPL-dShippedRelease-92 DEPL-dShippedRelease-93 DEPL-dShippedRelease-94 DEPL-dShippedRelease-95 DEPL-dShippedRelease-96
+ids DEPL-dShippedRelease-97 DEPL-dShippedRelease-98 DEPL-dShippedRelease-99 DEPL-dShippedRelease-100 DEPL-dShippedRelease-101 DEPL-dShippedRelease-102 DEPL-dShippedRelease-103 DEPL-dShippedRelease-104 DEPL-dShippedRelease-105 DEPL-dShippedRelease-106 DEPL-dShippedRelease-107 DEPL-dShippedRelease-108
+ids DEPL-dShippedRelease-109 DEPL-dShippedRelease-110 DEPL-dShippedRelease-111 DEPL-dShippedRelease-112 DEPL-dShippedRelease-113 DEPL-dShippedRelease-114 DEPL-dShippedRelease-115 DEPL-dShippedRelease-116 DEPL-dShippedRelease-117 DEPL-dShippedRelease-118 DEPL-dShippedRelease-119
+ids DEPL-dShippedRelease-120 DEPL-dShippedRelease-121 DEPL-dShippedRelease-122 DEPL-dShippedRelease-123 DEPL-dShippedRelease-124 DEPL-dShippedRelease-125 DEPL-dShippedRelease-126 DEPL-dShippedRelease-127 DEPL-dShippedRelease-128 DEPL-dShippedRelease-129 DEPL-dShippedRelease-130
+ids DEPL-dShippedRelease-131 DEPL-dShippedRelease-132 DEPL-dShippedRelease-133 DEPL-dShippedRelease-134 DEPL-dShippedRelease-135 DEPL-dShippedRelease-136 DEPL-dShippedRelease-137 DEPL-dShippedRelease-138 DEPL-dShippedRelease-139 DEPL-dShippedRelease-140 DEPL-dShippedRelease-141
+ids DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 DEPL-dShippedRelease-145
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [DEPL-dShippedRelease-10 — the kit factory, its conformance gate, and one version and one wiring verdict](spec/2026-10-30-spec-DEPL-dShippedRelease-10.md) | 1 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-21 — a purpose on every kit, descriptors for govkit and lib, and inline copies generated](spec/2026-10-30-spec-DEPL-dShippedRelease-21.md) | 2 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-65 — every failure line of `check-kit-versions.sh` gets a home in `derive_version_findings` or a named retirement](spec/2026-10-30-spec-DEPL-dShippedRelease-65.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-66 — a retired leg stays resolvable for a live spec older than its retirement, by a row naming its successor](spec/2026-10-30-spec-DEPL-dShippedRelease-66.md) | 2 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-100 — The ended-leg record holds a deleted path too, so the `[path]` arm reads what the `[leg]` arm reads](spec/2026-10-30-spec-DEPL-dShippedRelease-100.md) | 3 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-23 — the deployer's definition, registered as an expansion's item role](spec/2026-10-30-spec-DEPL-dShippedRelease-23.md) | 3 | 2 | DEFERRED | rev-1 | 2026-10-30 |
+| [DEPL-dShippedRelease-31 — the adopter register, and the word fleet left to node units](spec/2026-10-30-spec-DEPL-dShippedRelease-31.md) | 4 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-11 — a dependent's landing held until its parent lands](spec/2026-10-30-spec-DEPL-dShippedRelease-11.md) | 5 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-12 — the landing queue, the landing turn, and the lander's outcome record](spec/2026-10-30-spec-DEPL-dShippedRelease-12.md) | 6 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-49 — `read_parent_state` reads `landed` only for a parent whose units shipped](spec/2026-10-30-spec-DEPL-dShippedRelease-49.md) | 6 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-50 — a carried parent reads `held`, only a terminal disposition reads `withdrawn`, and a spec-run landing is exempt from the hold](spec/2026-10-30-spec-DEPL-dShippedRelease-50.md) | 6 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-1 — the landing record, one ref per landed SHA and its one reader](spec/2026-10-30-spec-DEPL-dShippedRelease-1.md) | 7 | 2 | DEFERRED | rev-6 | 2026-11-01 |
+| [DEPL-dShippedRelease-70 — a second node reads a landed SHA by containment, and an unlanded SHA by its own class](spec/2026-10-30-spec-DEPL-dShippedRelease-70.md) | 7 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-71 — a queue entry leaves by a written exit, so a refused or held head blocks no other landing](spec/2026-10-30-spec-DEPL-dShippedRelease-71.md) | 7 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-72 — only an admission exit 0 lands, and every other exit stops with nothing pushed](spec/2026-10-30-spec-DEPL-dShippedRelease-72.md) | 7 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-81 — A queue entry carries its own parents' answer, so the skip and `deploy.parents` read one rule](spec/2026-10-30-spec-DEPL-dShippedRelease-81.md) | 7 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-82 — A spec run lands past an unbuilt parent end to end, its rows read after the defer flip](spec/2026-10-30-spec-DEPL-dShippedRelease-82.md) | 7 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-93 — A landing writes its queue exit from the lander, on either caller](spec/2026-10-30-spec-DEPL-dShippedRelease-93.md) | 7 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-103 — An exit row is keyed by slug and tree, and an exited tree can queue again](spec/2026-10-30-spec-DEPL-dShippedRelease-103.md) | 8 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-2 — `deploy.distill` unarmed, recording that it measured nothing](spec/2026-10-30-spec-DEPL-dShippedRelease-2.md) | 8 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-13 — `deploy.core`: the core checks read on the landed tree, the per-SHA verdict and the patch a red files](spec/2026-10-30-spec-DEPL-dShippedRelease-13.md) | 9 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-4 — the deploy engine: `deploy.current` to `deploy.close`, `deploy.unlease` and the mailbox it closes](spec/2026-10-30-spec-DEPL-dShippedRelease-4.md) | 10 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-53 — `deploy.record` copies the core verdict at its write, and `deploy.core` never writes to an absent ref](spec/2026-10-30-spec-DEPL-dShippedRelease-53.md) | 10 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-14 — the landing review, blocking the build's close and never the push](spec/2026-10-30-spec-DEPL-dShippedRelease-14.md) | 11 | 2 | DEFERRED | rev-6 | 2026-11-01 |
+| [DEPL-dShippedRelease-56 — a `running` core passes to `deploy.record`, so a landing record exists for the length of the bar](spec/2026-10-30-spec-DEPL-dShippedRelease-56.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-58 — every `step.deploy` item has a verb and an adapter row, and the documented order reaches `run_deploy_land`](spec/2026-10-30-spec-DEPL-dShippedRelease-58.md) | 11 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-59 — the records landing takes the turn and skips the queue's order, and a slug with no entry is enqueued at the call](spec/2026-10-30-spec-DEPL-dShippedRelease-59.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-68 — the late records landing passes the lander after the tombstone, from a tree of its own](spec/2026-10-30-spec-DEPL-dShippedRelease-68.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-69 — a landing that closes by carry-forward hands its lease back, so a second run of one slug can acquire it](spec/2026-10-30-spec-DEPL-dShippedRelease-69.md) | 11 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-15 — promotion through environments: the `integrations` kit, the seven `release.*` items and a compare-and-swap on every promote](spec/2026-10-30-spec-DEPL-dShippedRelease-15.md) | 12 | 2 | DEFERRED | rev-6 | 2026-11-01 |
+| [DEPL-dShippedRelease-51 — the landing review's base is the recorded tip before the push](spec/2026-10-30-spec-DEPL-dShippedRelease-51.md) | 12 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-52 — a landing with no outcome record derives its prior tip from the nearest first-parent merge](spec/2026-10-30-spec-DEPL-dShippedRelease-52.md) | 12 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-60 — `--deploy review` reads its own field first, so a re-walk neither re-fires nor overwrites a disposal](spec/2026-10-30-spec-DEPL-dShippedRelease-60.md) | 12 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-73 — `check_landing_review` re-derives its pass from sources the field does not control](spec/2026-10-30-spec-DEPL-dShippedRelease-73.md) | 12 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-92 — `test_records_landing` reads the range, so the card snapshot rides the records landing](spec/2026-10-30-spec-DEPL-dShippedRelease-92.md) | 12 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-94 — The late records route admits a released lease, and one another run holds, on a carry-forward landing](spec/2026-10-30-spec-DEPL-dShippedRelease-94.md) | 12 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-95 — `check_unleased` reads the hand-over's epoch, so a spec run's close survives its build run](spec/2026-10-30-spec-DEPL-dShippedRelease-95.md) | 12 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-123 — `handover-epoch` is no settable field, and the term asks the lease chain for it](spec/2026-11-01-spec-DEPL-dShippedRelease-123.md) | 13 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-55 — `release.pick` stops at what an environment already runs, so a re-tick promotes nothing older](spec/2026-10-30-spec-DEPL-dShippedRelease-55.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-6 — the first engine adapter, `compose-systemd`, for signed container images](spec/2026-10-30-spec-DEPL-dShippedRelease-6.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-79 — `review` starts `unfired`, so `pending` means fired and still open](spec/2026-10-30-spec-DEPL-dShippedRelease-79.md) | 13 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [DEPL-dShippedRelease-80 — `run_deploy_review` branches on `unfired` before it reads a row, so a first walk fires or says not placed](spec/2026-10-30-spec-DEPL-dShippedRelease-80.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-83 — `disposed` reads its report from this build's reviews folder alone](spec/2026-10-30-spec-DEPL-dShippedRelease-83.md) | 13 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-84 — `disposed` reads one verdict from the closed set, and `BLOCKED` with no finding is forged](spec/2026-10-30-spec-DEPL-dShippedRelease-84.md) | 13 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-85 — `disposed` re-derives its finding count from the report it names](spec/2026-10-30-spec-DEPL-dShippedRelease-85.md) | 13 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-90 — `disposed` names this landing: `dispose-landing` stamps the reviewed range and the term compares it with the pin](spec/2026-10-30-spec-DEPL-dShippedRelease-90.md) | 13 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-108 — `run_deploy_items` runs `--deploy review` at one fixed step, so a default landing reaches `not-placed`](spec/2026-11-01-spec-DEPL-dShippedRelease-108.md) | 14 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-109 — the landing term reads the range the report's own opening states](spec/2026-11-01-spec-DEPL-dShippedRelease-109.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-110 — `dispose-landing` writes nothing into a report and refuses one stating another range](spec/2026-11-01-spec-DEPL-dShippedRelease-110.md) | 14 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-111 — the fixture renders a planted review report from the harness's real opening](spec/2026-11-01-spec-DEPL-dShippedRelease-111.md) | 14 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-112 — a report with no binding line or a symbolic range end is refused as unreadable](spec/2026-11-01-spec-DEPL-dShippedRelease-112.md) | 14 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-113 — `record-clean` writes the landing review's record when the harness returned none](spec/2026-11-01-spec-DEPL-dShippedRelease-113.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-114 — a deferred review writes no record, and the walk is driven from a harness return](spec/2026-11-01-spec-DEPL-dShippedRelease-114.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-115 — no appendix is valid only on a clean verdict, so the guard reads what the count does not](spec/2026-11-01-spec-DEPL-dShippedRelease-115.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-116 — one read of a report's appendix, reached through `review_replay.py`'s `--facts` door](spec/2026-11-01-spec-DEPL-dShippedRelease-116.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-117 — a report's shape line is compared with its rows where that line exists](spec/2026-11-01-spec-DEPL-dShippedRelease-117.md) | 14 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-118 — a row left unadjudicated stops the disposal, so a degraded review certifies nothing](spec/2026-11-01-spec-DEPL-dShippedRelease-118.md) | 14 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-129 — a planted `handover-epoch` reaches the chain read, so unit 123 S4's exit 1 is observed](spec/2026-11-01-spec-DEPL-dShippedRelease-129.md) | 14 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-27 — `carries` on the landing record, the `landing` class, publications, `commits.squash` and Codex targets](spec/2026-10-30-spec-DEPL-dShippedRelease-27.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-77 — the engine answers an empty environment, a named service and a failed restart](spec/2026-10-30-spec-DEPL-dShippedRelease-77.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-86 — `release.pick` stops at the newest SHA carrying any record for E](spec/2026-10-30-spec-DEPL-dShippedRelease-86.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-91 — A frozen environment says why, and a new environment takes the newest SHA once](spec/2026-10-30-spec-DEPL-dShippedRelease-91.md) | 14 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-105 — A swap written and not running exits 5, and `release.promote` routes it as a red](spec/2026-10-30-spec-DEPL-dShippedRelease-105.md) | 15 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-124 — a read of E's release records answers a stop, none, or dead, and dead promotes nothing](spec/2026-11-01-spec-DEPL-dShippedRelease-124.md) | 15 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-130 — `dispose-with-reason`'s report has one home and one set of bytes, and a parser test replaces AC4's grep](spec/2026-11-01-spec-DEPL-dShippedRelease-130.md) | 15 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-132 — two spellings of one range read as one pair, and what stays ambiguous is priced](spec/2026-11-01-spec-DEPL-dShippedRelease-132.md) | 15 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-133 — `dispose-landing` reduces the harness's absolute `report` path to its repo-relative form](spec/2026-11-01-spec-DEPL-dShippedRelease-133.md) | 15 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-135 — `record-clean` admits only a return that says it reviewed this landing clean](spec/2026-11-01-spec-DEPL-dShippedRelease-135.md) | 15 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-136 — the table rule keys on confirmed rows, so a header with no rows disposes nothing](spec/2026-11-01-spec-DEPL-dShippedRelease-136.md) | 15 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-137 — `read_appendix_table` reads `malformed` on a row it cannot place](spec/2026-11-01-spec-DEPL-dShippedRelease-137.md) | 15 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-5 — the `deploy.released` wait: `build.release-ceiling` as its deadline and the release hold's one owner item](spec/2026-10-30-spec-DEPL-dShippedRelease-5.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-134 — a release record off the local first-parent line reads as dead, so a stale clone promotes nothing](spec/2026-11-01-spec-DEPL-dShippedRelease-134.md) | 16 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-142 — `record-clean` compares the return's `key` with this landing, so a stale clean return is refused](spec/2026-11-01-spec-DEPL-dShippedRelease-142.md) | 16 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [DEPL-dShippedRelease-143 — `read_appendix_table` reads `malformed` on a table with no separator line](spec/2026-11-01-spec-DEPL-dShippedRelease-143.md) | 16 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [DEPL-dShippedRelease-30 — the patch build's shared budget: one red, one patch, a draw on the root's lease and the third keep-waiting](spec/2026-10-30-spec-DEPL-dShippedRelease-30.md) | 16 | 2 | DEFERRED | rev-1 | 2026-10-30 |
+| [DEPL-dShippedRelease-3 — `kits.cut`: the annotated release tag and its generated notes](spec/2026-10-30-spec-DEPL-dShippedRelease-3.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-25 — the receipt's schema 5: `release`, `source_remote` and the step that raises it](spec/2026-10-30-spec-DEPL-dShippedRelease-25.md) | 18 | 2 | DEFERRED | rev-5 | 2026-11-01 |
+| [DEPL-dShippedRelease-61 — gov's own harnesses declare `install.from`, so the default refuses no suite once a tag exists](spec/2026-10-30-spec-DEPL-dShippedRelease-61.md) | 19 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-62 — the `release-tag` refusal runs before the first write, on `apply` and on `update`](spec/2026-10-30-spec-DEPL-dShippedRelease-62.md) | 19 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-63 — `derive_public_remote` strips the whole userinfo of a non-ssh remote](spec/2026-10-30-spec-DEPL-dShippedRelease-63.md) | 19 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-64 — `check_release_field` reds any userinfo a shipped receipt holds, through a block the run-gates kit carries](spec/2026-10-30-spec-DEPL-dShippedRelease-64.md) | 19 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-7 — the adopter register read and the currency watch: `kits.currency` in each adopter, `kits.adopters` in gov](spec/2026-10-30-spec-DEPL-dShippedRelease-7.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-101 — `update` runs the install check on the resolved commit, exempt by source target alone](spec/2026-10-30-spec-DEPL-dShippedRelease-101.md) | 20 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-102 — A harness census runs on the real tree as a leg, so a harness added later is seen before the first tag](spec/2026-10-30-spec-DEPL-dShippedRelease-102.md) | 20 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-104 — Every receipt-writing verb runs `check_install_from`, a preview included](spec/2026-10-30-spec-DEPL-dShippedRelease-104.md) | 20 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-16 — the unattended `kits.offer`: an update run in a mode that runs nothing from the adopter's tree, pushed through the adopter's own scoped grant](spec/2026-10-30-spec-DEPL-dShippedRelease-16.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-96 — `derive_public_remote` strips the whole userinfo whenever the predicate says credential-bearing](spec/2026-10-30-spec-DEPL-dShippedRelease-96.md) | 20 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [DEPL-dShippedRelease-97 — `test_remote_userinfo` ends the ssh exemption on a `:`, as the predicate does](spec/2026-10-30-spec-DEPL-dShippedRelease-97.md) | 20 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-98 — One table of remote shapes drives the predicate, the strip and the block, and fails on a disagreement](spec/2026-10-30-spec-DEPL-dShippedRelease-98.md) | 20 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-99 — `derive_public_remote` re-reads its own output, and a credential that survives records `null`](spec/2026-10-30-spec-DEPL-dShippedRelease-99.md) | 20 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-119 — the census states its predicate for a list argv, so a subprocess spawn is read and a non-spawn is not](spec/2026-11-01-spec-DEPL-dShippedRelease-119.md) | 21 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-121 — a fixture case grading `install.from` runs its child with no inherited override](spec/2026-11-01-spec-DEPL-dShippedRelease-121.md) | 21 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-20 — an offered update runs neither `adopt` nor `test.seed`, its order names the adopter's own run of each, and outbox orders are graded](spec/2026-10-30-spec-DEPL-dShippedRelease-20.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-76 — the offer spells two environments: the grant for clone and push, and none for `update`](spec/2026-10-30-spec-DEPL-dShippedRelease-76.md) | 21 | 2 | DEFERRED | rev-1 | 2026-10-30 |
+| [DEPL-dShippedRelease-17 — `kits.install` and `kits.update`: the walk that closes on dSafePassage's outcomes, the attended hooks, the backlog step, and a fresh install in one pass](spec/2026-10-30-spec-DEPL-dShippedRelease-17.md) | 22 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-75 — the `codex-retrust` orders row carries the shape its readers consume](spec/2026-10-30-spec-DEPL-dShippedRelease-75.md) | 22 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-28 — `adopt.declarations`: today's flow and role customizations proposed as overlay rows, each ruled once](spec/2026-10-30-spec-DEPL-dShippedRelease-28.md) | 23 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-67 — `install --all` selects through `resolve_selection`, the one selection `cmd_apply` already calls](spec/2026-10-30-spec-DEPL-dShippedRelease-67.md) | 23 | 2 | DEFERRED | rev-1 | 2026-10-30 |
+| [DEPL-dShippedRelease-29 — the update's report over every kind: each row's state, every repository row, every widening, and a lost change told from an unrelated hole](spec/2026-10-30-spec-DEPL-dShippedRelease-29.md) | 24 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-18 — every release updates gov's own install first: `kits.cut` refuses a tag at a SHA with no green gov-first record](spec/2026-10-30-spec-DEPL-dShippedRelease-18.md) | 25 | 2 | DEFERRED | rev-1 | 2026-10-30 |
+| [DEPL-dShippedRelease-24 — `install.guards`: the core guards in the project's settings, or in managed settings where the operator opts in](spec/2026-10-30-spec-DEPL-dShippedRelease-24.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-8 — optional emitted CI: every `uses:` pinned by sha from one declaration gov's own workflow also uses, under least-privilege `permissions:`](spec/2026-10-30-spec-DEPL-dShippedRelease-8.md) | 27 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-26 — the platform matrix verified per release: runner rows for `platforms.supported` under `platforms.verify`, generalizing `run-held-wsl.sh`, and a Linux job in emitted CI at the floor](spec/2026-10-30-spec-DEPL-dShippedRelease-26.md) | 28 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-54 — `emitted ci pins` grades row use only over a `--workflow`, so an adopter's base argv is green](spec/2026-10-30-spec-DEPL-dShippedRelease-54.md) | 28 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-57 — `ci_emit.py check`'s fixture states its green baseline, so unit 8's row criteria can fail](spec/2026-10-30-spec-DEPL-dShippedRelease-57.md) | 28 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-74 — a non-opting install of the integrations kit reads an accepted stop, not a missing render](spec/2026-10-30-spec-DEPL-dShippedRelease-74.md) | 28 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-19 — the integrations `import` of an adopter's CI jobs as legs: only a job ruled `import`, test jobs only, each through an adapter row](spec/2026-10-30-spec-DEPL-dShippedRelease-19.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-87 — `ci_emit.py render` exits a reserved code when no table is declared](spec/2026-10-30-spec-DEPL-dShippedRelease-87.md) | 29 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-88 — The `ci-not-declared` row keys on the reserved code, so exit 0 is a render again](spec/2026-10-30-spec-DEPL-dShippedRelease-88.md) | 29 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-89 — A render that writes nothing fails `apply`, and a stale workflow says so](spec/2026-10-30-spec-DEPL-dShippedRelease-89.md) | 29 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-120 — the `ci-not-declared` stop names a file that exists, so the acceptance matrix passes it](spec/2026-11-01-spec-DEPL-dShippedRelease-120.md) | 30 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-122 — `mint` reads a regenerate exit through the accepted-outcome rule, so a declared stop lands](spec/2026-11-01-spec-DEPL-dShippedRelease-122.md) | 30 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-22 — the ask tracker's one-way mirror, the adapter `integrations.tracker: mirror-out` selects](spec/2026-10-30-spec-DEPL-dShippedRelease-22.md) | 30 | 2 | DEFERRED | rev-2 | 2026-10-30 |
+| [DEPL-dShippedRelease-126 — `mint` classifies a regenerate exit in the context that resolved its argv](spec/2026-11-01-spec-DEPL-dShippedRelease-126.md) | 31 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-127 — the proof of `mint`'s route runs on a clone carrying gov's tracked `.governance/deploy.toml`](spec/2026-11-01-spec-DEPL-dShippedRelease-127.md) | 31 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-128 — every kit with a `[[regenerate]]` row reads accepted, and a token outside the context reds](spec/2026-11-01-spec-DEPL-dShippedRelease-128.md) | 31 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-9 — a derived runbook: the operator order for install and update, rendered from the kit descriptors, a hand edit red at render parity](spec/2026-10-30-spec-DEPL-dShippedRelease-9.md) | 31 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-140 — the `mint-` cases move to `tools/govkit/matrix.py`, so no gov-only fact sits in a shipped kit file](spec/2026-11-01-spec-DEPL-dShippedRelease-140.md) | 32 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [DEPL-dShippedRelease-145 — `mint-regenerate-kits` runs every kit through `cmd_mint`, so the break its arm names reaches it](spec/2026-11-01-spec-DEPL-dShippedRelease-145.md) | 32 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [DEPL-dShippedRelease-78 — the round-1 spec audit's 77 minors, batched: the Readers of what unit 10 retires, the legs and rows each unit owes, honest failure states, and the observations that read the wrong thing](spec/2026-10-30-spec-DEPL-dShippedRelease-78.md) | 32 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-106 — The round-2 spec audit's 79 minors, batched: the rules units 49 to 78 left unstated, their failure states, and the records that named the wrong seam](spec/2026-10-30-spec-DEPL-dShippedRelease-106.md) | 33 | 2 | DEFERRED | rev-4 | 2026-11-01 |
+| [DEPL-dShippedRelease-125 — the round-3 spec audit's 45 MEDIUM and 7 LOW findings, one batch](spec/2026-11-01-spec-DEPL-dShippedRelease-125.md) | 34 | 2 | DEFERRED | rev-3 | 2026-11-01 |
+| [DEPL-dShippedRelease-131 — a refused pin has one way out, and `dispose-landing` admits it](spec/2026-11-01-spec-DEPL-dShippedRelease-131.md) | 35 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-138 — the round-4 spec audit's 41 MEDIUM and 10 LOW findings, one batch](spec/2026-11-01-spec-DEPL-dShippedRelease-138.md) | 36 | 2 | DEFERRED | rev-2 | 2026-11-01 |
+| [DEPL-dShippedRelease-141 — the `deploy items` leg carries `guard = []`, so an edit to the engine it drives never reuses its green](spec/2026-11-01-spec-DEPL-dShippedRelease-141.md) | 37 | 2 | DEFERRED | rev-1 | 2026-11-01 |
+| [DEPL-dShippedRelease-144 — the round-5 spec audit's 32 MEDIUM and 11 LOW findings, batched](spec/2026-11-01-spec-DEPL-dShippedRelease-144.md) | 38 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 51 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: DEPL-dShippedRelease-140 DEPL-dShippedRelease-141 DEPL-dShippedRelease-142 DEPL-dShippedRelease-143 DEPL-dShippedRelease-144 DEPL-dShippedRelease-145.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: DEPL-dShippedRelease-1@rev-1 DEPL-dShippedRelease-10@rev-1 DEPL-dShippedRelease-100@rev-1 DEPL-dShippedRelease-101@rev-1 DEPL-dShippedRelease-102@rev-1 DEPL-dShippedRelease-103@rev-1 DEPL-dShippedRelease-104@rev-1 DEPL-dShippedRelease-105@rev-1
+DEPL-dShippedRelease-106@rev-1 DEPL-dShippedRelease-11@rev-1 DEPL-dShippedRelease-12@rev-1 DEPL-dShippedRelease-13@rev-1 DEPL-dShippedRelease-14@rev-1 DEPL-dShippedRelease-15@rev-1 DEPL-dShippedRelease-16@rev-1 DEPL-dShippedRelease-17@rev-1 DEPL-dShippedRelease-19@rev-1 DEPL-dShippedRelease-2@rev-1
+DEPL-dShippedRelease-20@rev-1 DEPL-dShippedRelease-21@rev-1 DEPL-dShippedRelease-22@rev-1 DEPL-dShippedRelease-24@rev-1 DEPL-dShippedRelease-25@rev-1 DEPL-dShippedRelease-26@rev-1 DEPL-dShippedRelease-27@rev-1 DEPL-dShippedRelease-28@rev-1 DEPL-dShippedRelease-29@rev-1 DEPL-dShippedRelease-3@rev-1
+DEPL-dShippedRelease-31@rev-1 DEPL-dShippedRelease-4@rev-1 DEPL-dShippedRelease-49@rev-1 DEPL-dShippedRelease-5@rev-1 DEPL-dShippedRelease-50@rev-1 DEPL-dShippedRelease-51@rev-1 DEPL-dShippedRelease-52@rev-1 DEPL-dShippedRelease-53@rev-1 DEPL-dShippedRelease-54@rev-1 DEPL-dShippedRelease-55@rev-1
+DEPL-dShippedRelease-56@rev-1 DEPL-dShippedRelease-57@rev-1 DEPL-dShippedRelease-58@rev-1 DEPL-dShippedRelease-59@rev-1 DEPL-dShippedRelease-6@rev-1 DEPL-dShippedRelease-60@rev-1 DEPL-dShippedRelease-61@rev-1 DEPL-dShippedRelease-62@rev-1 DEPL-dShippedRelease-63@rev-1 DEPL-dShippedRelease-64@rev-1
+DEPL-dShippedRelease-65@rev-1 DEPL-dShippedRelease-66@rev-1 DEPL-dShippedRelease-68@rev-1 DEPL-dShippedRelease-69@rev-1 DEPL-dShippedRelease-7@rev-1 DEPL-dShippedRelease-70@rev-1 DEPL-dShippedRelease-71@rev-1 DEPL-dShippedRelease-72@rev-1 DEPL-dShippedRelease-73@rev-1 DEPL-dShippedRelease-74@rev-1
+DEPL-dShippedRelease-75@rev-1 DEPL-dShippedRelease-77@rev-1 DEPL-dShippedRelease-78@rev-1 DEPL-dShippedRelease-8@rev-1 DEPL-dShippedRelease-80@rev-1 DEPL-dShippedRelease-81@rev-1 DEPL-dShippedRelease-82@rev-1 DEPL-dShippedRelease-83@rev-1 DEPL-dShippedRelease-84@rev-1 DEPL-dShippedRelease-85@rev-1
+DEPL-dShippedRelease-86@rev-1 DEPL-dShippedRelease-87@rev-1 DEPL-dShippedRelease-88@rev-1 DEPL-dShippedRelease-89@rev-1 DEPL-dShippedRelease-9@rev-1 DEPL-dShippedRelease-90@rev-1 DEPL-dShippedRelease-91@rev-1 DEPL-dShippedRelease-92@rev-1 DEPL-dShippedRelease-93@rev-1 DEPL-dShippedRelease-94@rev-1
+DEPL-dShippedRelease-95@rev-1 DEPL-dShippedRelease-97@rev-1 DEPL-dShippedRelease-98@rev-1 DEPL-dShippedRelease-99@rev-1 DEPL-dShippedRelease-108@rev-1 DEPL-dShippedRelease-109@rev-1 DEPL-dShippedRelease-110@rev-1 DEPL-dShippedRelease-111@rev-1 DEPL-dShippedRelease-112@rev-1
+DEPL-dShippedRelease-113@rev-1 DEPL-dShippedRelease-114@rev-1 DEPL-dShippedRelease-115@rev-1 DEPL-dShippedRelease-116@rev-1 DEPL-dShippedRelease-117@rev-1 DEPL-dShippedRelease-118@rev-1 DEPL-dShippedRelease-119@rev-1 DEPL-dShippedRelease-120@rev-1 DEPL-dShippedRelease-121@rev-1
+DEPL-dShippedRelease-122@rev-1 DEPL-dShippedRelease-123@rev-1 DEPL-dShippedRelease-124@rev-1 DEPL-dShippedRelease-125@rev-1 DEPL-dShippedRelease-126@rev-1 DEPL-dShippedRelease-127@rev-1 DEPL-dShippedRelease-128@rev-1 DEPL-dShippedRelease-129@rev-1 DEPL-dShippedRelease-130@rev-1
+DEPL-dShippedRelease-131@rev-1 DEPL-dShippedRelease-132@rev-1 DEPL-dShippedRelease-133@rev-1 DEPL-dShippedRelease-134@rev-1 DEPL-dShippedRelease-135@rev-1 DEPL-dShippedRelease-136@rev-1 DEPL-dShippedRelease-137@rev-1 DEPL-dShippedRelease-138@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dShippedRelease's 31 clause(s) and 60 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dShippedRelease's 31 clause(s) and 60 owned node(s), over 126 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 31
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 31 (cl-dClosedLoop-0413, cl-dClosedLoop-0507, cl-dClosedLoop-0414, cl-dClosedLoop-0415, cl-dClosedLoop-0508, cl-dClosedLoop-0416, cl-dClosedLoop-0417, cl-dClosedLoop-0418, cl-dClosedLoop-0419, cl-dClosedLoop-0420, cl-dClosedLoop-0421, cl-dClosedLoop-0422, cl-dClosedLoop-0423,
-  cl-dClosedLoop-0424, cl-dClosedLoop-0425, cl-dClosedLoop-0426, cl-dClosedLoop-0427, cl-dClosedLoop-0428, cl-dClosedLoop-0429, cl-dClosedLoop-0430, cl-dClosedLoop-0431, cl-dClosedLoop-0432, cl-dClosedLoop-0433, cl-dClosedLoop-0434, cl-dClosedLoop-0435, cl-dClosedLoop-0436, cl-dClosedLoop-0437,
-  cl-dClosedLoop-0438, cl-dClosedLoop-0439, cl-dClosedLoop-0440, cl-dClosedLoop-0441)
+- uncarried: 0 (none)
 - stale: 0 (none)
 - ambiguous: 0 (none)
-- owned nodes no spec names: item.adopt.declarations, item.deploy.close, item.deploy.core, item.deploy.current, item.deploy.distill, item.deploy.land, item.deploy.mandate, item.deploy.notify, item.deploy.parents, item.deploy.record, item.deploy.released, item.deploy.snapshot, item.deploy.unlease,
-  item.kits.adopters, item.kits.currency, item.kits.cut, item.kits.install, item.kits.install-attended, item.kits.offer, item.kits.update, item.kits.update-attended, item.kits.version, item.release.approve-auto, item.release.approve-owner, item.release.pick, item.release.promote,
-  item.release.record, item.release.route, item.release.verify, policy-key.build.closes, policy-key.build.release-ceiling, policy-key.build.release-hold, policy-key.commits.squash, policy-key.currency.max-behind, policy-key.currency.on-behind, policy-key.deploy.currency,
-  policy-key.deploy.on-verify-fail, policy-key.deploy.promotion, policy-key.deploy.runs, policy-key.deps.landing, policy-key.install.from, policy-key.install.guards, policy-key.install.steps, policy-key.integrations.tracker, policy-key.kits.cadence, policy-key.kits.host,
-  policy-key.kits.watch-cadence, policy-key.landing.order, policy-key.platforms.supported, policy-key.platforms.verify, policy-key.release.environments, record-kind.adopter-register, record-kind.adopters, record-kind.comparison, record-kind.currency, record-kind.kit-release, record-kind.landing,
-  record-kind.receipt, record-kind.release, record-kind.release-exit
-- specs derived from no clause: none
+- owned nodes no spec names: none
+- specs derived from no clause: `spec/2026-10-30-spec-DEPL-dShippedRelease-100.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-101.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-102.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-103.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-104.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-105.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-106.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-49.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-52.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-56.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-57.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-60.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-64.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-65.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-66.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-68.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-69.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-70.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-72.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-73.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-74.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-76.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-77.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-78.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-80.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-81.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-82.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-84.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-85.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-86.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-88.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-89.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-90.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-91.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-92.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-93.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-94.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-95.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-96.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-30-spec-DEPL-dShippedRelease-97.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-98.md` (PLAY-dClosedLoop-2), `spec/2026-10-30-spec-DEPL-dShippedRelease-99.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-108.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-109.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-110.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-111.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-112.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-113.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-114.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-115.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-116.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-117.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-118.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-119.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-120.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-121.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-122.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-123.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-124.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-125.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-126.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-127.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-128.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-129.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-130.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-131.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-132.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-133.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-134.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-135.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-136.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-137.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-138.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-140.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-141.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-01-spec-DEPL-dShippedRelease-142.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-143.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-144.md` (PLAY-dClosedLoop-2), `spec/2026-11-01-spec-DEPL-dShippedRelease-145.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0413, cl-dClosedLoop-0416, cl-dClosedLoop-0419, cl-dClosedLoop-0420, cl-dClosedLoop-0433
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `DEPL-dShippedRelease-10` | no |
+| 2 | `DEPL-dShippedRelease-21`, `DEPL-dShippedRelease-65`, `DEPL-dShippedRelease-66` | no |
+| 3 | `DEPL-dShippedRelease-100`, `DEPL-dShippedRelease-23` | yes |
+| 4 | `DEPL-dShippedRelease-31` | no |
+| 5 | `DEPL-dShippedRelease-11` | no |
+| 6 | `DEPL-dShippedRelease-12`, `DEPL-dShippedRelease-49`, `DEPL-dShippedRelease-50` | no |
+| 7 | `DEPL-dShippedRelease-1`, `DEPL-dShippedRelease-70`, `DEPL-dShippedRelease-71`, `DEPL-dShippedRelease-72`, `DEPL-dShippedRelease-81`, `DEPL-dShippedRelease-82`, `DEPL-dShippedRelease-93` | no |
+| 8 | `DEPL-dShippedRelease-103`, `DEPL-dShippedRelease-2` | no |
+| 9 | `DEPL-dShippedRelease-13` | no |
+| 10 | `DEPL-dShippedRelease-4`, `DEPL-dShippedRelease-53` | no |
+| 11 | `DEPL-dShippedRelease-14`, `DEPL-dShippedRelease-56`, `DEPL-dShippedRelease-58`, `DEPL-dShippedRelease-59`, `DEPL-dShippedRelease-68`, `DEPL-dShippedRelease-69` | no |
+| 12 | `DEPL-dShippedRelease-15`, `DEPL-dShippedRelease-51`, `DEPL-dShippedRelease-52`, `DEPL-dShippedRelease-60`, `DEPL-dShippedRelease-73`, `DEPL-dShippedRelease-92`, `DEPL-dShippedRelease-94`, `DEPL-dShippedRelease-95` | no |
+| 13 | `DEPL-dShippedRelease-123`, `DEPL-dShippedRelease-55`, `DEPL-dShippedRelease-6`, `DEPL-dShippedRelease-79`, `DEPL-dShippedRelease-80`, `DEPL-dShippedRelease-83`, `DEPL-dShippedRelease-84`, `DEPL-dShippedRelease-85`, `DEPL-dShippedRelease-90` | no |
+| 14 | `DEPL-dShippedRelease-108`, `DEPL-dShippedRelease-109`, `DEPL-dShippedRelease-110`, `DEPL-dShippedRelease-111`, `DEPL-dShippedRelease-112`, `DEPL-dShippedRelease-113`, `DEPL-dShippedRelease-114`, `DEPL-dShippedRelease-115`, `DEPL-dShippedRelease-116`, `DEPL-dShippedRelease-117`, `DEPL-dShippedRelease-118`, `DEPL-dShippedRelease-129`, `DEPL-dShippedRelease-27`, `DEPL-dShippedRelease-77`, `DEPL-dShippedRelease-86`, `DEPL-dShippedRelease-91` | no |
+| 15 | `DEPL-dShippedRelease-105`, `DEPL-dShippedRelease-124`, `DEPL-dShippedRelease-130`, `DEPL-dShippedRelease-132`, `DEPL-dShippedRelease-133`, `DEPL-dShippedRelease-135`, `DEPL-dShippedRelease-136`, `DEPL-dShippedRelease-137`, `DEPL-dShippedRelease-5` | no |
+| 16 | `DEPL-dShippedRelease-134`, `DEPL-dShippedRelease-142`, `DEPL-dShippedRelease-143`, `DEPL-dShippedRelease-30` | no |
+| 17 | `DEPL-dShippedRelease-3` | no |
+| 18 | `DEPL-dShippedRelease-25` | no |
+| 19 | `DEPL-dShippedRelease-61`, `DEPL-dShippedRelease-62`, `DEPL-dShippedRelease-63`, `DEPL-dShippedRelease-64`, `DEPL-dShippedRelease-7` | no |
+| 20 | `DEPL-dShippedRelease-101`, `DEPL-dShippedRelease-102`, `DEPL-dShippedRelease-104`, `DEPL-dShippedRelease-16`, `DEPL-dShippedRelease-96`, `DEPL-dShippedRelease-97`, `DEPL-dShippedRelease-98`, `DEPL-dShippedRelease-99` | no |
+| 21 | `DEPL-dShippedRelease-119`, `DEPL-dShippedRelease-121`, `DEPL-dShippedRelease-20`, `DEPL-dShippedRelease-76` | no |
+| 22 | `DEPL-dShippedRelease-17`, `DEPL-dShippedRelease-75` | no |
+| 23 | `DEPL-dShippedRelease-28`, `DEPL-dShippedRelease-67` | no |
+| 24 | `DEPL-dShippedRelease-29` | no |
+| 25 | `DEPL-dShippedRelease-18` | no |
+| 26 | `DEPL-dShippedRelease-24` | no |
+| 27 | `DEPL-dShippedRelease-8` | no |
+| 28 | `DEPL-dShippedRelease-26`, `DEPL-dShippedRelease-54`, `DEPL-dShippedRelease-57`, `DEPL-dShippedRelease-74` | no |
+| 29 | `DEPL-dShippedRelease-19`, `DEPL-dShippedRelease-87`, `DEPL-dShippedRelease-88`, `DEPL-dShippedRelease-89` | no |
+| 30 | `DEPL-dShippedRelease-120`, `DEPL-dShippedRelease-122`, `DEPL-dShippedRelease-22` | no |
+| 31 | `DEPL-dShippedRelease-126`, `DEPL-dShippedRelease-127`, `DEPL-dShippedRelease-128`, `DEPL-dShippedRelease-9` | no |
+| 32 | `DEPL-dShippedRelease-140`, `DEPL-dShippedRelease-145`, `DEPL-dShippedRelease-78` | no |
+| 33 | `DEPL-dShippedRelease-106` | no |
+| 34 | `DEPL-dShippedRelease-125` | no |
+| 35 | `DEPL-dShippedRelease-131` | no |
+| 36 | `DEPL-dShippedRelease-138` | no |
+| 37 | `DEPL-dShippedRelease-141` | no |
+| 38 | `DEPL-dShippedRelease-144` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
