@@ -53,13 +53,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node d · opened 2026-11-02 · streams tooling
+**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-11-02 · streams tooling
 ids TOOL-dEasedEffort-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dEasedEffort-1 — the orienter and builder run at high, the closing review's finders and skeptics at medium](spec/2026-11-02-spec-TOOL-dEasedEffort-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-11-02 |
+| [TOOL-dEasedEffort-1 — the orienter and builder run at high, the closing review's finders and skeptics at medium](spec/2026-11-02-spec-TOOL-dEasedEffort-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

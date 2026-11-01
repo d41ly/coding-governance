@@ -29,3 +29,11 @@ anchor-ref: refs/heads/main
 base: 94188878323ef3b20e96b769791de73453b09909
 
 ## Parked
+
+2026-11-01T22:51:57Z brief · item TOOL-dEasedEffort-1 · reason 01c014342c4e memory/builds/dEasedEffort/prompts/2026-11-02-prompt-TOOL-dEasedEffort-1-brief.md
+
+2026-11-01T22:52:13Z dispatch · item cf564da6 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md
+
+2026-11-01T22:53:47Z dispatch · item cf564da6 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md
+
+2026-11-01T22:56:49Z dispatch · item cf564da6 TOOL-dEasedEffort-1 · reason tools/roles/house/policy.toml tools/roles/README.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-1.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md
