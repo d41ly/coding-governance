@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 0cde7925d5e0e1353579e99d3b4bd50e6e17b8f9
 phase: REVIEWING
@@ -116,3 +117,5 @@ base: f4597719e4b1ff0f0f779998bd7b8c2ce5213088
 2026-11-01T15:21:05Z rescope · item add TOOL-dTendedCadence-74 · reason closes the 19 MEDIUM and 7 LOW findings of memory/builds/dTendedCadence/reviews/2026-11-01-review-TOOL-dTendedCadence-49-to-59-spec-audit-round1.md batched as one unit: MEDIUM ids 2 3 6 40 7 8 9 33 15 16 42 18 32 20 23 25 31 41 43 and LOW ids 11 12 17 19 34 39 44
 
 2026-11-01T15:48:07Z review · item dTendedCadence-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 14 · minors 26 · disposition promote
+
+2026-11-01T16:40:06Z decision · item The spec-audit chain does not converge: high finding ids ran 13, 5 (with 5 blockers), 14 over three rounds (precision 1.00, 0.94, 0.91), and round 3's highs land mostly on the record transport round 2's promotions added (units 49 to 52: the parentless record commit under refs/gov/maintain-record/<key>, its claim guards, git mktree, the remote rule, the landing grammar), with 15 promotions (TOOL-dTendedCadence-60 to -74) still unaudited and 58 units in the roster. Keep auditing, stop the chain as for dIndexedDesign, dLinkedLibrary and dMindYourWords, or re-scope? · reason options (a) round 4 over units 60 to 74, about 1h10m and 2M subagent tokens a round, each round promoting 11 to 15 units; (b) stop as for dIndexedDesign, dLinkedLibrary and dMindYourWords: units 60 to 74 close under a recorded specs-audited override, closing-review-recorded overridden with the audit chain as this spec-only diff's review, every unit deferred to the build run, the run closes and lands; (c) re-scope the record-transport units 49 to 52 and their promotions. Refused to choose: the owner's standing rule stops a chain without asking only at a round confirming no BLOCKER and no HIGH, M4 ends it only below the precision floor, neither is in reach, and the owner ruled each sibling in this state from a hold
