@@ -25,7 +25,7 @@ Owed at the close: AC2 (`derive-ceilings.py --check`, G1 for a role agent), AC6'
 
 **Evidences:** TOOL-dSafePassage-80
 - AC1 — `python <scratch>/ceiling_probe.py` — printed `step-gate 130 4.4 124.4 5.6 ok least`, `docs 130 2.7 122.7 7.3 ok least`, `upgrade-walk 14360 7177.0 14354.0 6.0 ok least`, `routed commits name a specced unit 510 253.0 506.0 4.0 ok least`, `spec tokens (a spec's own names resolve) 740 366.0 732.0 8.0 ok least`, `ALL-SHORT []`.
-- AC2 — owed to the main loop: a role agent may not run the checker (G1).
+- AC2 — `python tools/run-gates/derive-ceilings.py --check`, not observed in 80's own pass (a role agent may not run the checker, G1), run by the main loop at `6d6fe589b`: it exited 0, every ceiling clearing its evidence by the declared margin, and printed `derive-ceilings: 7 ceiling(s) backed by a reading taken OUTSIDE the runner`.
 - AC3 — `git diff --cached -U0 -- tools/gate-legs.json` — five hunks, each one `-` and one `+` `"ceiling":` line: 300 to 510, 60 to 130, 60 to 130, 7200 to 14360, 390 to 740.
 - AC4 — `python <scratch>/budget_probe.py` — printed `unbudgeted []` and `upgrade-walk 10770 10770 argv-empty`.
 - AC5 — `git diff --cached -U0 -- tools/run-gates/ceiling-evidence.txt` — three hunks: `@@ -114,0 +115 @@` adds `routed commits name a specced unit` at `253.0`, node `a`; `@@ -133 +134 @@` replaces `spec tokens (a spec's own names resolve)` `195.0` with `366.0`, node `a`; `@@ -144,0 +146 @@` adds `upgrade-walk` at `7177.0`, node `a`. No other line removed.
