@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-97 — the round-8 closing review's five wording lows: spec 96's text corrected in one table
 
-**Status:** DEFERRED · rev-1 · 2026-11-01 · node a · Tier-2 · base ab71837da · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-1 · 2026-11-01 · node a · Tier-2 · base ab71837da · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-1
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-97-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-97-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-97-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-97-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-97-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-97-build-brief.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-97-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-97-spec-brief.md) | research | — |

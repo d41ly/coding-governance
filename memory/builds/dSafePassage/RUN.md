@@ -587,3 +587,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T09:56:15Z review · item dSafePassage-r7-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 5 · disposition promote
 
 2026-11-01T10:14:02Z rescope · item add TOOL-dSafePassage-97 · reason the round-8 closing review's five wording lows batched (M4); records only
+
+2026-11-01T10:24:14Z brief · item TOOL-dSafePassage-97 · reason 68da1b34e672 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-97-build-brief.md
+
+2026-11-01T10:29:32Z dispatch · item 83931ecb TOOL-dSafePassage-97 · reason memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-97.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-97-ledger.md
