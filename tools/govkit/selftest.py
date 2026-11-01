@@ -4430,7 +4430,8 @@ def check_step_isolation(tmp: pathlib.Path) -> None:
 def check_floor_bash(tmp: pathlib.Path) -> None:
     """TOOL-dSafePassage-87 AC5 and TOOL-dSafePassage-91 S3, the floor row's witness on one PATH whose
     every bash is unusable: with GOV_BASH the parent's bash it holds, and with GOV_BASH unset the
-    floor stub reaches its fallback to bare `bash`. Called from `check_step_isolation`."""
+    floor stub reaches its fallback to bare `bash`, its tail graded by `test_floor_fallback`, which
+    TOOL-dSafePassage-92 grades over every host shape the bar runs on. Called from `check_step_isolation`."""
     us = govkit_module().upgrade_steps
     floor_row = next(r for r in us.read_steps(GOV_ROOT, None, None) if r.id == "lib/python-floor-3.15")
     # TOOL-dSafePassage-87 S4: PATH's first bash a text file that does not run, every other PATH entry
@@ -4454,17 +4455,66 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     check("[dSP-87 AC5] the floor row's witness, PATH's bash unusable and GOV_BASH the parent's bash, is ok",
           got["verdict"] == "ok" and got["rc"] == 0, str(got))
 
+    def test_floor_fallback(tail: str) -> bool:
+        # TOOL-dSafePassage-92: the stub reached its spawn unless the tail shows a crash, its own early
+        # exit or the Refusal. A crash is a traceback, its header or a frame line, unless it is a failed
+        # spawn: its last line an OSError, by class, under a subprocess.py frame. The word bash is never
+        # required: the WSL launcher with no distribution answers in UTF-16 or on stdout, and a failed
+        # spawn's frames fill the 20-line tail on Windows.
+        last = next((ln for ln in reversed(tail.splitlines()) if ln.strip()), "")
+        spawn_failed = 'subprocess.py"' in tail and last.split(":", 1)[0] in {
+            c.__name__ for c in (OSError, *OSError.__subclasses__())}
+        crashed = ("Traceback" in tail or 'File "' in tail) and not spawn_failed
+        return not crashed and not any(s in tail for s in ("python_floor.py:", "upgrade_steps.Refusal", "Set GOV_BASH"))
+
     # TOOL-dSafePassage-91: the same PATH with GOV_BASH unset, so no bash resolves and the stub falls
     # back to bare `bash` (python_floor.py:36) rather than dying on resolve_bash's Refusal. What bare
     # `bash` resolves to (on Windows the loader's System32 WSL launcher, elsewhere PATH or nothing), and
-    # so the rc, is the node's, so only the tail is graded: it names bash or the floor script, and it
-    # carries neither the stub's own early exit nor the Refusal.
+    # so the rc, is the node's, so only the tail is graded, by `test_floor_fallback`.
     with set_environ({"PATH": path87, "GOV_BASH": None, "GOV_PYTHON": sys.executable}):
         got = us.run_step_isolated(floor_row, "witness", GOV_ROOT, GOV_ROOT)
-    tail = got["tail"]
     check("[dSP-91 L2] the floor row's witness, no bash resolving and GOV_BASH unset, falls back to bare bash",
-          ("bash" in tail or "python-floor.sh" in tail) and "python_floor.py:" not in tail
-          and "upgrade_steps.Refusal" not in tail and "Set GOV_BASH" not in tail, str(got))
+          test_floor_fallback(got["tail"]), str(got))
+
+    # TOOL-dSafePassage-92: the same predicate over every host shape the bar runs on, so a node with a
+    # WSL distribution still grades the hosts without one. The five tracebacks are the real stub's, run
+    # from a copy beside a stand-in step module, or none, whose resolve_shell_argv fails as each shape
+    # needs. Each is run as the witness is, by run_step_isolated, so it is spawned, decoded and cut as
+    # the [dSP-91 L2] tail is.
+    root92 = tmp / "dsp92"
+    stub92 = root92 / "govkit"
+    (stub92 / "steps").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(HERE / "steps" / "python_floor.py", stub92 / "steps" / "python_floor.py")
+    (stub92 / "registry.toml").write_text("", encoding="utf-8")  # derive_tool_root's one tool root
+    text92 = root92 / "dsp92-text.exe"  # a program that is a text file, as fake87's bash is
+    text92.write_bytes(b"not a program\n")
+    text92.chmod(0o755)
+
+    def read_stub_tail(resolve_src: str | None) -> str:
+        if resolve_src is None:
+            (stub92 / "upgrade_steps.py").unlink(missing_ok=True)
+        else:
+            (stub92 / "upgrade_steps.py").write_text("def resolve_kit_dir(home, script, gov):\n    return gov\n\n\n"
+                                                     + resolve_src, encoding="utf-8", newline="\n")
+        return us.run_step_isolated(floor_row, "witness", GOV_ROOT, root92)["tail"]
+
+    wsl92 = "Windows Subsystem for Linux has no installed distributions.\r\n"
+    for what, tail92, want in (
+            ("the WSL launcher's no-distribution text in UTF-16", wsl92.encode("utf-16-le").decode("utf-8", "replace"), True),
+            ("that text on stdout, so the tail is empty", "", True),
+            ("a spawn that finds no bash", read_stub_tail(
+                'def resolve_shell_argv(argv):\n    return ["dsp92-absent"] + argv[1:]\n'), True),
+            ("a spawn of a bash that is a text file", read_stub_tail(
+                f'def resolve_shell_argv(argv):\n    return [{str(text92)!r}] + argv[1:]\n'), True),
+            ("a raise on python_floor.py:36, which the traceback echoes", read_stub_tail(
+                'def resolve_shell_argv(argv):\n    raise RuntimeError("none")\n'), False),
+            ("a raise deep enough to push the Traceback line out of the tail", read_stub_tail(
+                'def resolve0():\n    raise RuntimeError("none")\n'
+                + "".join(f"def resolve{i}():\n    return resolve{i - 1}()\n" for i in range(1, 9))
+                + 'def resolve_shell_argv(argv):\n    return [resolve8()] + argv[1:]\n'), False),
+            ("an OSError raised before the spawn, no step module to load", read_stub_tail(None), False)):
+        check(f"[dSP-92] the fallback predicate reads {what} as {'the fallback' if want else 'a crash'}",
+              test_floor_fallback(tail92) is want, repr(tail92[-600:]))
 
 
 def check_step_gate_fixture() -> None:
