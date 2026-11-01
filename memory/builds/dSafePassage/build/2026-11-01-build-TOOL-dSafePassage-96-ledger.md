@@ -21,9 +21,9 @@ legs at the bar.
 
 **Evidences:** TOOL-dSafePassage-96
 - AC1 — both runs on one `tmp` printed `ok` for `[dSP-87 AC5]`, `[dSP-91 L2]`, both `[dSP-94]` reads, both `[dSP-95]` restore checks, seven `[dSP-92]` lines and the last `[dSP-94]` line, each run then `[]`.
-- AC2 — owed at the close, not run in this pass.
-- AC3 — owed at the close, not run in this pass.
-- AC4 — owed at the close, not run in this pass.
+- AC2 — `steps._BASH = None` cut, observed at the close in batch g in a scratch clone of `390033278`, as the paragraph below records: all four checks red, both `[dSP-94]` and both `[dSP-95]`, the details naming `argv94` and `cut94 ['dsp95-sentinel', 'x']`.
+- AC3 — `except OSError:` replacement, observed at the close in the same batch, as the paragraph below records: the raise-path `[dSP-95]` red naming `cut94 ['bash', 'x']`, beside the second `[dSP-94]`, and the return-path `[dSP-95]` reading `ok`.
+- AC4 — `finally` cut, observed at the close in the same batch, as the paragraph below records: the `finally` cut reds both restore checks; not recorded: whether every other line read `ok`.
 - AC5 — the grep printed one line, `tools/govkit/selftest.py:4494`, above the `try` at `:4495`; `git diff --numstat 744d2551 -- tools` printed one line, `5	2	tools/govkit/selftest.py`. Beside it, `read_handpicked_copies` over the edited selftest printed `([], 1)`.
 
 The `New arm:` lines of this unit were observed at the close, each RED on its staged break and GREEN restored; a line counts observed when its break reds at least one of its arms. Observed by a researcher in a scratch clone of `390033278` (batch g, `2026-11-01-prompt-TOOL-dSafePassage-91-1-researcher.md`), each break staged alone and restored. tools/govkit/selftest.py `check_floor_bash`: `steps._BASH = None` cut reds all four, both `[dSP-94]` and both `[dSP-95]` (`argv94 ['C:\\Program Files\\Git\\usr\\bin\\bash.exe', 'x']` and `cut94 ['dsp95-sentinel', 'x']; 'dsp95-sentinel'`), as AC2 states; the `except OSError:` replacement reds the raise-path `[dSP-95]` (`cut94 ['bash', 'x']; 'dsp95-sentinel'`) with the second `[dSP-94]`, the return-path `[dSP-95]` reading ok, as AC3 states; AC4's `finally` cut reds both restore checks. GREEN restored after each: `FAILURES []`.

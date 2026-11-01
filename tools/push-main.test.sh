@@ -912,9 +912,10 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
   case "$out25" in *"no govkit deployer beside this lander"*) g25=1 ;; *) g25=0 ;; esac
   case "$out25" in *"DEAD PROBE"*|*"REFUSED"*) x25=1 ;; *) x25=0 ;; esac
   # TOOL-dSafePassage-8 AC6: the same prepare names the skipped gov-first walk once, with its reason.
+  printf '%s\n' "$out25" >"$tmp/out25.txt"
   f25=0; while IFS= read -r ln25; do
     [[ $ln25 == *'steps were NOT run on gov first — no govkit deployer beside this lander'* ]] && f25=$((f25 + 1))
-  done <<<"$out25"
+  done <"$tmp/out25.txt"
   [ "$l25$g25$x25$f25" = 1101 ] \
     && ok "25 a tree without the lexicon and govkit files skips both checks and the gov-first walk by name, with no DEAD PROBE or REFUSED" \
     || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 gov-first-skip-lines=$f25 $out25"
@@ -1372,9 +1373,10 @@ out35=$(
   resolve_python() { return 1; }
   printf 'nopy-present=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
 )
+printf '%s\n' "$out35" >"$tmp/out35.txt"
 n35=0; while IFS= read -r ln35; do
   [[ $ln35 == *'steps were NOT run on gov first — no govkit deployer beside this lander'* ]] && n35=$((n35 + 1))
-done <<<"$out35"
+done <"$tmp/out35.txt"
 case "$out35" in
   *"nopy-absent=["*"rc=0]"*"py-absent=["*"rc=0]"*"nopy-present=["*"no usable python launcher"*"rc=1]"*)
     [ "$n35" = 2 ] && ok "35 no deployer beside the lander is one skip line and exit 0; a deployer with no python refuses" \

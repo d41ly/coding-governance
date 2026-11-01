@@ -1083,12 +1083,14 @@ def check_graders() -> list[str]:
         return "; ".join(seen)
 
     def check_grade_release_engine() -> str:
-        for pre in ("tools", "scripts", ""):
-            c = scratch / f"pin-{pre or 'root'}"
-            for f in ("govkit/registry.toml", "govkit/govkit.py"):
-                (c / pre / f).parent.mkdir(parents=True, exist_ok=True)
-                (c / pre / f).write_text("x", encoding="utf-8")
-            got, want = derive_release_engine(c), c / pre / "govkit" / "govkit.py"
+        gk = load_engine()[2]
+        gkn = gk.GOVKIT_DIR.name
+        for n, pre in enumerate((gk.derive_tool_root(gk.repo_root()), "scripts", "")):
+            c = scratch / f"pin-{n}"
+            for f in (gk.REGISTRY_NAME, "govkit.py"):
+                (c / pre / gkn / f).parent.mkdir(parents=True, exist_ok=True)
+                (c / pre / gkn / f).write_text("x", encoding="utf-8")
+            got, want = derive_release_engine(c), c / pre / gkn / "govkit.py"
             if got != want:
                 return f"a pin at {pre or 'the repo root'} derived {got}, not {want}"
         return ""
@@ -1108,7 +1110,8 @@ def check_graders() -> list[str]:
 
     def check_grade_plant_root() -> str:
         gk, pfx = load_engine()[2], read_target_prefix()
-        t = build_repo("plant-root-target", {f"{pfx}/policy/adopt-policy.sh": ""})
+        poln = gk.resolve_kit_dir("policy", "adopt-policy.sh", HERE).name
+        t = build_repo("plant-root-target", {f"{pfx}/{poln}/adopt-policy.sh": ""})
         real = gk.derive_tool_root
         gk.derive_tool_root = lambda root: "moved"
         try:
@@ -1151,7 +1154,7 @@ def check_graders() -> list[str]:
                             ("plant-root", check_grade_plant_root)):
             try:
                 why = grade()
-            except (Stop, OSError, KeyError, ValueError) as e:
+            except (Stop, OSError, LookupError, ValueError, RuntimeError) as e:
                 why = f"it raised {type(e).__name__}: {e}"
             print_line(f"grader · {name} · " + (f"RED · {why}" if why else "ok"))
             if why:

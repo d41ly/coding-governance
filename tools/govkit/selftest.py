@@ -4569,7 +4569,7 @@ def check_floor_bash(tmp: pathlib.Path) -> None:
     # needs. Each is run as the witness is, by run_step_isolated, so it is spawned, decoded and cut as
     # the [dSP-91 L2] tail is.
     root92 = tmp / "dsp92"
-    stub92 = root92 / "govkit"
+    stub92 = root92 / HERE.name
     stand94 = stub92.joinpath("upgrade_steps.py")  # TOOL-dSafePassage-95: the stand-in, one name
     (stub92 / "steps").mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / "steps" / "python_floor.py", stub92 / "steps" / "python_floor.py")

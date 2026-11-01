@@ -26,7 +26,7 @@ observation inside the selftest.
 
 **Evidences:** TOOL-dSafePassage-88
 - AC1 — `python <scratch>/p88_probe.py` — its second line printed `update exit 0 | refused in place: False | bytes: FOUR | source: moved/demo/keep.txt | moved dir in target: False`. Against a scratch engine holding HEAD's (`ed22e3ef4`) `govkit.py` it printed `update exit 1 | refused in place: True | bytes: four | source: pinned/demo/keep.txt`, the red side. `update`'s output as built carried `  in place         [engine] pinned/demo/keep.txt · source moved/demo/keep.txt · bytes gov` and `wrote 2, moved 0`.
-- AC2 — owed at the close (above); not observed in this pass.
+- AC2 — `FOREIGN_PREFIX_PROBE=1 python upgrade_walk.py --case up` — not observed in this pass; observed at the close by the main loop at `112e587ea`, printing `upgrade-walk: GREEN` and exiting 0 in 335 s, as the paragraph below records.
 - AC3 — the same run's last line printed `occupied refused: True | own file kept: True`, as built and against HEAD's engine.
 - AC4 — `git grep -n -F "[dSP-88]" -- tools/govkit/selftest.py` — printed two lines, the two checks' labels, inside the `DEPL-dCarriedReceipt-11` block.
 - AC5 — the same run's third line printed `case-only: update exit 0 | refused as its own occupant: False | receipt: ['pinned/demo/Keep.txt']`. With `own_file` reduced to the bare string test in a scratch engine copy it printed `case-only: update exit 1 | refused as its own occupant: True | receipt: ['pinned/demo/keep.txt']`, the red side; against HEAD's engine the same.

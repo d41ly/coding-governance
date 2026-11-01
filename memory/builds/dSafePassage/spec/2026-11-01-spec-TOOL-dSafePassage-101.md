@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-101 — the three bar legs this build's diff turns red at `70273a468`, each cleared by the remedy its own message names
 
-**Status:** DEFERRED · rev-2 · 2026-11-01 · node a · Tier-2 · base 70273a468 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-11-01 · node a · Tier-2 · base 70273a468 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-82
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-01-build-TOOL-dSafePassage-101-ledger.md](../build/2026-11-01-build-TOOL-dSafePassage-101-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-101-1-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-101-1-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-101-2-spec-writer.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-101-2-spec-writer.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dSafePassage-101-audit-fold-brief.md](../prompts/2026-11-01-prompt-TOOL-dSafePassage-101-audit-fold-brief.md) | research | — |

@@ -22,7 +22,7 @@ process and edited no file, so it does not discharge the arm's staged-break obse
 
 **Evidences:** TOOL-dSafePassage-89
 - AC1 — `python <scratch>/root_probe.py <scratch>` — printed `before the move -> ('tools', 'tools/govkit/registry.toml')` and `after the move -> ('scripts', 'scripts/govkit/registry.toml')`.
-- AC2 — owed at the close (above); not observed in this pass.
+- AC2 — `FOREIGN_PREFIX_PROBE=1 python upgrade_walk.py --case up` — not observed in this pass; observed at the close by the main loop at `ed22e3ef4`, printing an `upgrade-walk: pin` line ending `step(s)` and no line holding `no registry at`, then exiting 2 in 222 s, as the paragraph below records.
 - AC3 — `python -c "import sys; sys.path.insert(0, 'tools/govkit'); import govkit; print(hasattr(govkit.derive_tool_root, 'cache_info'))"` — printed `False`. HEAD's `govkit.py` (`be00fcf48`) still holds `@functools.lru_cache(maxsize=None)` directly above `def derive_tool_root`, the red side.
 - AC4 — `git grep -n -F "[dSP-89]" -- tools/govkit/selftest.py` — printed one line, `tools/govkit/selftest.py:3356:    check("[dSP-89] a root whose tool root moved between two reads reads the moved registry",`, inside `check_upgrade_steps`.
 - Arm body probe — `python <scratch>/arm_probe.py <scratch>`, the `[dSP-89]` check's body over a scratch dir — as built printed `(True, [('pinned', 'pinned/govkit/registry.toml'), ('moved', 'moved/govkit/registry.toml')], '')`; with `derive_tool_root` re-wrapped in `functools.lru_cache(maxsize=None)` in process it printed `(False, [('pinned', 'pinned/govkit/registry.toml')], 'pinned/govkit/registry.toml: no registry at the working tree, and the rows are read from no other population')`.

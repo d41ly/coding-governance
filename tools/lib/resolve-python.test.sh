@@ -262,7 +262,8 @@ out=$(cd "$ROOT" && "$REALPY" -I "$HERE/python_floor.py" check 2>&1); rc=$?
 [ "$rc" = 0 ] && [ -z "$out" ] || bad "python_floor.py check on this tree is not clean: rc=$rc $out"; ok
 out=$(cd "$ROOT" && "$REALPY" -I "$HERE/python_floor.py" check --rev 3708a705 2>&1 | tr -d '\r')
 # The statements counted with no fork, each matched by a path assembled from this suite's own names.
-n1c=0; while IFS= read -r l1c; do [ -n "$l1c" ] && n1c=$((n1c + 1)); done <<<"$out"
+printf '%s\n' "$out" >"$TMP/floor-rev.txt"
+n1c=0; while IFS= read -r l1c; do [ -n "$l1c" ] && n1c=$((n1c + 1)); done <"$TMP/floor-rev.txt"
 lx1c=lexicon
 { [ "$n1c" = 7 ] && [[ $out == *"${PFX}settings-merge.py:3: "*"py>="*"3.10"* ]] && [[ $out == *"${PFX}$lx1c/selftest.py:109: "* ]]; } \
   || bad "python_floor.py check --rev 3708a705 did not print the seven pinned statements: $out"; ok
