@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-build-TOOL-dEasedEffort-1-agent-ledger.md](../build/2026-11-02-build-TOOL-dEasedEffort-1-agent-ledger.md) | journal | TOOL-dEasedEffort-1 |
 | [2026-11-02-build-TOOL-dEasedEffort-2-1-acceptance-ledger.md](../build/2026-11-02-build-TOOL-dEasedEffort-2-1-acceptance-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dEasedEffort-2-round1-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dEasedEffort-2-round1-fix-brief.md) | research | — |
 
