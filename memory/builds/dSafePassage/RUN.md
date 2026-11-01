@@ -19,8 +19,8 @@ hold-code: host-owner-action
 held-from: BUILDING
 refreshed-at: 0c0f3a18370405a51f97df5d1d12bf1a0da2cf74 · park · 135 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 390033278090746036df38b8945a98ed29ac1d8e
-phase: VERIFYING
+witness: 1d97c92327e6c71556ef09df225eae9a8815682e
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -599,3 +599,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T11:03:15Z brief · item TOOL-dSafePassage-98 · reason 43050f971eab memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-98-build-brief.md
 
 2026-11-01T11:08:13Z dispatch · item f51d88ae TOOL-dSafePassage-98 · reason memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-98.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-98-ledger.md
+
+2026-11-01T11:59:50Z rescope · item add TOOL-dSafePassage-99 · reason the close's arm observation found check_upgrade_steps crashing at [dSP-72] after 87 AC6's staged copy rebinds sys.modules[govkit]: the govkit selftest bar leg reds at 390033278
+
+2026-11-01T11:59:54Z rescope · item add TOOL-dSafePassage-100 · reason the close's AC11 observation found the resolver suite's launcher ban naming tools/push-main.test.sh:1409 at 390033278: the python resolver bar leg reds
