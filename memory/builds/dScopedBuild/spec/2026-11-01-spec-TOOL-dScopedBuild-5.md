@@ -12,6 +12,9 @@
 | [2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-agent-ledger.md) | journal | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-25 TOOL-dScopedBuild-26 TOOL-dScopedBuild-27 TOOL-dScopedBuild-28 TOOL-dScopedBuild-29 TOOL-dScopedBuild-30 TOOL-dScopedBuild-31 TOOL-dScopedBuild-32 TOOL-dScopedBuild-33 TOOL-dScopedBuild-34 TOOL-dScopedBuild-35 TOOL-dScopedBuild-36 TOOL-dScopedBuild-37 TOOL-dScopedBuild-38 TOOL-dScopedBuild-39 TOOL-dScopedBuild-40 TOOL-dScopedBuild-41 TOOL-dScopedBuild-42 TOOL-dScopedBuild-43 |
 | [2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dScopedBuild-1-spec-stage-returns.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md](../build/2026-11-01-build-TOOL-dScopedBuild-3-reuse-scout-b.md) | research | TOOL-dScopedBuild-3 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 |
+| [2026-11-01-build-TOOL-dScopedBuild-5-deviation-51.md](../build/2026-11-01-build-TOOL-dScopedBuild-5-deviation-51.md) | deviation | — |
+| [2026-11-01-build-TOOL-dScopedBuild-5-deviation-52.md](../build/2026-11-01-build-TOOL-dScopedBuild-5-deviation-52.md) | deviation | — |
+| [2026-11-01-build-TOOL-dScopedBuild-5-deviation-53.md](../build/2026-11-01-build-TOOL-dScopedBuild-5-deviation-53.md) | deviation | — |
 | [2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dScopedBuild-1-spec-brief.md) | research | TOOL-dScopedBuild-1 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 |
 | [2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md](../reviews/2026-11-01-review-TOOL-dScopedBuild-1-spec-audit-round1.md) | spec-audit | TOOL-dScopedBuild-1 TOOL-dScopedBuild-10 TOOL-dScopedBuild-11 TOOL-dScopedBuild-12 TOOL-dScopedBuild-13 TOOL-dScopedBuild-14 TOOL-dScopedBuild-15 TOOL-dScopedBuild-2 TOOL-dScopedBuild-3 TOOL-dScopedBuild-4 TOOL-dScopedBuild-6 TOOL-dScopedBuild-7 TOOL-dScopedBuild-8 TOOL-dScopedBuild-9 |
 
@@ -279,8 +282,8 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   typed reading, named `not-installed: <why>` on every verdict; (b) refuse every product write; (c)
   admit every product write. (c) widens the write surface (veto 3); (b) leaves an adopter without the
   loop kit no product write at all, which no criterion asks; (a) keeps the base gate where nothing
-  better can run and says so. Rung 3. RESOLVED (agent, 2026-11-01, delegated): (a). widens: none ·
-  relaxes: none
+  better can run and says so. Rung 3. RESOLVED (agent, 2026-11-01, delegated): (a).
+  widens: none · relaxes: none
 - **FACT-QUESTION · F4 — Do dDeclaredLoop and dBoundRoles, which this unit calls and the packet does
   not list as parents, land before this build?** Probe: `grep -m1 "^parents:"` over the READMEs of
   dWitnessedBar and dFurnishedOrders. Observation that decides: each build named on a parent's

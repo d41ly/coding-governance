@@ -120,7 +120,7 @@ ids TOOL-dScopedBuild-43
 | [TOOL-dScopedBuild-43 — the round-1 audit of units 40 and 41, its 11 minors batched: 7 MEDIUM and 4 LOW findings, each its own scope item](spec/2026-11-01-spec-TOOL-dScopedBuild-43.md) | 20 | 2 | DEFERRED | rev-1 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 30 bound to this build, across 4 record folder(s).
+Records: 79 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
