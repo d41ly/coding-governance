@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4b94aa6a0ed636c3801d559b402e3cfcca720358
-phase: BUILDING
+witness: e74ef35e8b990bc19ad9d6f4b63678931d91587a
+phase: REVIEWING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/agent-effort-levels-062fb2
