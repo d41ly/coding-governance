@@ -19,8 +19,8 @@ hold-code: host-owner-action
 held-from: REVIEWING
 refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 62118c754c50207c374eee524a398448b30f1d44
-phase: REVIEWING
+witness: a12929c7413470c4f1a2cd0c26fce0bd3193feb1
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
