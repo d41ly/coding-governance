@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.112 -->
+<!-- gov:kit unattended@1.113 -->
 
 # Unattended runs
 
@@ -118,6 +118,8 @@ unattended.sh --claims  # RUN_CLAIMS on
 unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
+unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <N> --highs <N>
+unattended.sh --chain-verdict <slug>
 python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
 ```
 

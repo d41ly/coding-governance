@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 31 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-11-02 · node d · Tier-2 · base ed497191 · streams tooling · order 31 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0105@cab8e16c whole
 
@@ -83,9 +83,10 @@ take the opt-in and the unclassed values as arguments a caller types (AF-1, FM4)
 - **S8** — `review.fold`, the in-loop fold of an unbuilt spec, keeps its mechanism: the build harness's fold
   instruction (`tools/workflows/unattended-build.template.js:1990-1997`) gains the item's tag and its
   NON-CONVERGENT and CEILING route, findings promoted as `review.dispose` promotes them. Observed by AC1.
-- **S9** — BUILD-METHOD M4's disposal sentence (`tools/memory-tree/BUILD-METHOD.template.md`, rendered at
-  `memory/guides/BUILD-METHOD.md:144`) points at `review.findings` and `review.unverified` for the count and
-  the unverified route, its default reading unchanged. Observed by AC9.
+- **S9** — BUILD-METHOD M4's disposal paragraphs (`tools/memory-tree/BUILD-METHOD.template.md`, rendered
+  at `memory/guides/BUILD-METHOD.md`, as TOOL-dFoldedAudit-1 rewrote them) point at `review.findings` and
+  `review.unverified` for the count and the unverified route, their default reading unchanged: a spec
+  exit still disposes by nature, and `review.findings` counts what that rule promotes. Observed by AC9.
 - **S10** — The suite arms the `New arm:` lines in §7 declare. Observed by AC2, AC4, AC5, AC7, AC8 through
   those lines, RED first at the close.
 
@@ -124,7 +125,7 @@ take the opt-in and the unclassed values as arguments a caller types (AF-1, FM4)
 | Tag | Actor | Needs | Witness | Routes | Reads |
 |---|---|---|---|---|---|
 | `item.review.trigger` | command | none | the trigger line `--trigger` prints, joined to the review record's `trigger=` field | fired to `item.review.pin`; a round past `review.max-rounds` or `flow.route-backs` refused, its open findings to `item.review.dispose`; not fired, the flow continues | `review.blocks`, `review.opt-in`, `review.unclassed`, `review.max-rounds`, `flow.route-backs` |
-| `item.review.dispose` | command | `item.review.report` | each confirmed finding joined to its fold, unit or ask | unbuilt to `item.review.fold`; built to new units or asks by `review.findings`; NON-CONVERGENT or CEILING promoted to units while budget remains and to asks after; an unverified finding under `block` to a verification round | `review.findings`, `review.unverified`, `review.left-shift`, `flow.rework-budget` |
+| `item.review.dispose` | command | `item.review.report` | each confirmed finding joined to its fold, unit or ask | a local finding on an unbuilt spec to `item.review.fold`; built work and a new mechanism to new units or asks by `review.findings`; NON-CONVERGENT or CEILING on built work or for a new mechanism promoted to units while budget remains and to asks after; an unverified finding under `block` to a verification round | `review.findings`, `review.unverified`, `review.left-shift`, `flow.rework-budget` |
 | `item.review.fold` | spec writer | `item.review.dispose` | each confirmed finding joined to its fold at the spec's new blob, which the re-invoke's `prevSubjects` pins | the next round as `review.design.rounds` says, or released; NON-CONVERGENT or CEILING promoted as `item.review.dispose` promotes | `review.design.rounds` |
 | `item.review.cost` | command | `item.review.report` | the `review-shape` line's cost fields | done | none |
 
@@ -357,6 +358,8 @@ here and read by the owner's run PLAY-dClosedLoop-13 names.
   FL-R2, the stand-ins of dFairHearing-3 and -8, and the driver and harness read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-50, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-11-02 · §4 · S9 · the dispose row is limited to built work or a new mechanism and S9 rebases
+  on M4 as rewritten, for the owner's 2026-11-01 ruling (TOOL-dFoldedAudit-8).
 
 ## 10. Reuse audit
 

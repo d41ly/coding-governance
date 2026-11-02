@@ -351,7 +351,11 @@ PINS: dict[str, int] = {
     # SPEC_CARRIES_CUTOFF and TOOL-dTrueNorth-5 SPEC_AUDIT_PIN_CUTOFF in .memory-tree.conf; no key stopped being armed.
     # 36 -> 37 at TOOL-dSafePassage-34's pass, under ER:388 (TOOL-dSafePassage-42 section 8 F1 (a)): it arms
     # SPEC_AC_ORDER_CUTOFF in .memory-tree.conf; no key stopped being armed.
-    "cutoff_keys_armed": 37,
+    # 37 -> 39 at dFoldedAudit's close, 2026-11-02, under decision TOOL-dFoldedAudit-16, whose 36 -> 38 was
+    # written before this branch took origin/main's 37: TOOL-dFoldedAudit-4 arms SPEC_SUPERSEDE_CUTOFF in
+    # .memory-tree.conf and TOOL-dFoldedAudit-7 SPEC_FOLD_CUTOFF in .unattended.conf, armed at the close; no key
+    # stopped being armed.
+    "cutoff_keys_armed": 39,
     # 26 - MEASURED at TOOL-aMendedFleet-37, which added the signal, at its own commit: 26 of 27
     # feature dossiers older than their paths, every one but the codebase-map dossier that unit
     # refreshed. Report-only; the pin is a declared DRAIN, one dossier re-read at a time, and the

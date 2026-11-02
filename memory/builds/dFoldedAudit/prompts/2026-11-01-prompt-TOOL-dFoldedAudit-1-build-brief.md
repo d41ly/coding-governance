@@ -1,0 +1,18 @@
+# Build brief — TOOL-dFoldedAudit-1
+
+**Serves:** research TOOL-dFoldedAudit-1
+
+Build this unit from `memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFoldedAudit-1.md`, its latest rev, and nothing else. The design it derives from is `memory/builds/dFoldedAudit/build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md`; where the two differ the spec wins.
+
+- Run no gate leg, no suite and no bar. Stage a new refusal's RED with the one test file you write, directly, only if the spec's arm is yours to observe; every `New arm:` is otherwise owed to the main loop at the close.
+- Closing DIFF review behaviour stays byte-identical. Every change sits on the spec subject's branch.
+- Temp files go in the run's scratch root, never under the repo.
+- A divergence from the spec stops the unit: return `DIVERGENCE:`, never improvise.
+- Describe what units 2 to 7 shipped: read their code, not their specs, wherever a name could have moved. The method stays under its 30720-byte ceiling.
+- One more carrier reads short after TOOL-dFoldedAudit-6 and joins this unit's write set, by this spec's latest rev: `tools/memory-tree/README.md:27`, which lists what is no member and omits a cited fold. `memory/HYGIENE.md` stays untouched, as §3 says; that question is parked for the owner.
+- `writeRound`'s terminal-subject throw belongs to no prose carrier and stays out of this unit.
+- This unit's name for the verbs is what `tools/unattended/unattended.sh` ships: `--record-round` and `--chain-verdict`.
+- Leave `memory/DECISIONS.md` out of `--writes`: the row is already landed, and that file's token in the spec reads as declared only because the parser cannot read the marking.
+- An earlier stopped dispatch built everything and saved it as `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-build-m4-spec-audit-694e7b/728ed75b-dc6d-443b-b1e2-72cabd3e91a1/scratchpad/TOOL-dFoldedAudit-1-wip.patch`. Apply it, change the two lines that hold the banned literal (the template and its render), apply this spec's latest rev to the parity block's Budget clause, and verify against the latest rev before relying on it. Declare `memory/guides/SESSION-KICKOFF.md` in the first `--dispatch`.
+- Beyond those two lines the saved patch also owes, by rev-7: the Budget clause wrapped in §4's predicate, `last-audit` stamped, and the delta line in the commit message.
+- The parity block must open on a `method_ship=` line, because AC15 extracts it from that line.

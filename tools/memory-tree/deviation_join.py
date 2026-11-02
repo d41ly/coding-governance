@@ -45,6 +45,11 @@ generated region are stripped, the strip being the unattended kit's `GEN_REGION_
 caller injects (`read_gen_region_awk`, TOOL-dTrueNorth-12). The strip resolves as the population's
 first act, once per process, so a kit that does not resolve is nothing measured whatever the history
 holds: a population read without it would count a status-only revision as a member.
+Both revision arms also exempt an audit's own fold, asked of `design_lib.check_audit_fold` once per
+material revision before either arm appends a member, so a fold joins neither (TOOL-dFoldedAudit-6
+S2): a commit moving the header, every revision it moved holding a §9 entry citing, by file stem, a
+`spec-audit` record of the unit's build whose text names the unit. The record may be pinned or not,
+because a scoped round pins no sibling its repair moves. A material edit moving no header is no fold.
 
 THE FIRST PASS is the oldest commit, by committer date, among those `routed_commits.read_routed_commits`
 returns for HEAD that carry a `Pass:` trailer naming the unit (`Pass: none` names none), or carry no
@@ -99,9 +104,9 @@ on each cause alone (S23): the unattended kit does not resolve; the baseline nam
 commit holding the record, whatever the specs; or the pin reads and no chain-build spec exists.
 COST, armed: one read of the kit's library, the two git spawns of `design_lib.read_spec_revisions`
 over every chain-build spec, the one revision reader the carries join reads too (S12), one strip per
-revision past a pass or a pin, one blob batch for the rescope and hand-back rows, and one pickaxe log
-per ledger line and rescope row; it grows with the chain-build specs' revisions, where the host's own
-leg is constant.
+revision past a pass or a pin, one read per record a §9 entry cites, one blob batch for the rescope and
+hand-back rows, and one pickaxe log per ledger line and rescope row; it grows with the chain-build
+specs' revisions, where the host's own leg is constant.
 
 What it does not read: whether a record's reason is true or its risk class honest, which the
 approver and the closing review judge; a departure in code that changes no spec; a hand edit inside a
@@ -133,8 +138,8 @@ if str(KIT) not in sys.path:
 import row_grammar  # noqa: E402  the kit's decision-row grammar
 import routed_commits  # noqa: E402  the host: its log pass, its routed-path test and its pinned git runner
 from design_lib import (  # noqa: E402  the one parser of the design, and its clause-id grammar
-    _CL, DESIGN_KEYS, DesignRefusal, read_chain_clauses, read_design_keys, read_design_view, read_spec_revisions,
-    read_tracked_builds, scan_chain_specs, write_design_fixture)
+    _CL, DESIGN_KEYS, DesignRefusal, check_audit_fold, read_chain_clauses, read_design_keys, read_design_view,
+    read_spec_revisions, read_tracked_builds, scan_chain_specs, write_design_fixture)
 from tree_lib import (  # noqa: E402
     GIT_ENV_LEAKS, HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at)
 
@@ -447,6 +452,15 @@ def read_header_rev(text, hdr):
     return None
 
 
+def read_header_token(text, hdr):
+    """The status word of a spec's `**Status:**` header, as the units table reads it, or None."""
+    for ln in (text or "").split("\n"):
+        m = hdr.match(ln)
+        if m:
+            return m.group("token")
+    return None
+
+
 def read_baseline_line(text):
     """The sha the record's `[clause-ids]` section records as `Baseline:`, or None."""
     section = text.split("\n## [clause-ids]", 1)[1].split("\n## ", 1)[0] if "\n## [clause-ids]" in text else ""
@@ -558,8 +572,15 @@ def read_population(root, conf, commits):
             texts[rel] = (root / rel).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         return texts[rel]
 
-    audits = [r for r in rels if "/reviews/" in r and binds.get(r, {}).get("state") == "bound"
-              and binds[r]["kind"] == "spec-audit" and binds[r]["pins"]]
+    # ONE AUDIT POPULATION (TOOL-dFoldedAudit-15 S25), so a pinned record and a citable one cannot part.
+    spec_audits = [r for r in rels if "/reviews/" in r and binds.get(r, {}).get("state") == "bound"
+                   and binds[r]["kind"] == "spec-audit"]
+    audits = [r for r in spec_audits if binds[r]["pins"]]
+    # What a §9 entry may cite, per build (TOOL-dFoldedAudit-6 S2): `audits` above drops an unpinned record,
+    # and a scoped round's record pins no sibling its repair moves.
+    by_build = {}
+    for r in spec_audits:
+        by_build.setdefault(derive_slug(r), []).append(r)
     handbacks = [r for r in rels if "/prompts/" in r and DIVERGENCE.search(read_text(r))]
     # THE ONE ADDING-COMMIT READER (TOOL-dTrueNorth-20 S32), the audit-writer test's too: the oldest add
     # of each record, one glob pathspec per folder and the records never on argv.
@@ -595,6 +616,14 @@ def read_population(root, conf, commits):
         if before is None or not check_material(before, after or ""):
             continue                                    # its creation, or no material change
         rev = read_header_rev(before, HDR_RE)
+        now = read_header_rev(after, HDR_RE)
+        moved = range(rev + 1, now + 1) if rev is not None and now is not None else ()
+        # THE EXEMPTION IS NEVER ASKED OF A FROZEN SPEC (TOOL-dFoldedAudit-15 S6): a CLOSED or WONTDO spec takes
+        # no fold, so a cited bump on one is a rewrite. The `before` header answers, because the status a
+        # fold moves off is the fact, and `check_audit_fold` holds only the current text.
+        if (read_header_token(before, HDR_RE) not in ("CLOSED", "WONTDO")
+                and check_audit_fold(after or "", unit, moved, by_build.get(b, ()), read_text)):
+            continue                                    # an audit's own fold, cited by its §9 entries
         address = f"{unit}@rev-{rev if rev is not None else '?'}"
         if after_pass:
             members.append({"kind": "revision", "build": b, "address": address, "hand": "spec-revised", "sha": sha,
@@ -848,11 +877,16 @@ PLANTS = ("baseline", "clause", "subject-pass", "pass-none", "status-flip", "two
           "malformed-follow", "malformed-supersedes", "duplicate-n", "record-late",
           "subject-trailer", "pipe-after",                   # with UNMEASURED_PLANTS, TOOL-dTrueNorth-16's four
           "rotated",                                         # TOOL-dTrueNorth-24's
-          "spec-notes") + UNMEASURED_PLANTS                  # TOOL-dTrueNorth-26's
+          "spec-notes",                                      # TOOL-dTrueNorth-26's
+          "audit-fold", "audit-fold-pass", "audit-fold-stranger", "audit-fold-foreign",
+          "audit-fold-norev",                                # TOOL-dFoldedAudit-6's
+          "audit-fold-closed") + UNMEASURED_PLANTS           # TOOL-dFoldedAudit-15's
 # The subject-trailer plant's second unit, Y, whose `Pass:` trailer rides a commit whose subject names X.
 SUBJECT_TRAILER_Y = "FIX-dTrueNorth-97"
 # The successor the rotated plant's supersede row names; no spec carries it, as none carries the base's.
 ROTATED_SUCCESSOR = "FIX-dTrueNorth-96"
+# The unit the audit-fold-stranger plant's cited record audits, so that record never names the plant's own.
+AUDIT_STRANGER = "FIX-dTrueNorth-95"
 # The role map (TOOL-dTrueNorth-12 §4): every clause-moving role moves its own clause of the fixture design,
 # so plants compose. The base's owner amendment, which `quote` reads, and the `baseline` and `clause` plants:
 CLAUSE_ROLES = {"base": "cl-dFix-0001", "baseline": "cl-dFix-0002", "clause": "cl-dFix-0003"}
@@ -876,7 +910,8 @@ PLANT_UNITS = {p: f"FIX-dTrueNorth-{n}" for n, p in enumerate(
      "quote", "amended", "amended-joined", "owner-row1-added", "add", "handback", "audit-pin", "defer",
      "fix-record", "audit-nopin", "record-late", "pass-revision", "status-only", "malformed-field",
      "malformed-risk", "malformed-follow", "duplicate-n", "malformed-supersedes", "subject-trailer",
-     "pipe-after", "rotated", "spec-notes"), 10)}
+     "pipe-after", "rotated", "spec-notes", "audit-fold", "audit-fold-pass", "audit-fold-stranger",
+     "audit-fold-foreign", "audit-fold-norev", "audit-fold-closed"), 10)}
 DECISIONS_TEXT = "\n".join([
     "# Decisions", "",
     "- FIX-dClosedLoop-2 · the spec-run close by carry-forward, and dTrueNorth's extra unit FIX-dTrueNorth-99 approved "
@@ -1224,6 +1259,30 @@ def add_plant(fx, plant):
         # refuses any path outside its pathspec, is never handed it and the join stays measured.
         fx.write_commit({f"{TN}spec/notes.md": f"# {u} — notes beside the specs, named as no spec is\n\nA note.\n"},
                         "records(dTrueNorth): notes in the spec folder", ["Pass: none"])
+    elif plant.startswith("audit-fold"):
+        # TOOL-dFoldedAudit-6 S4: rev-1 audited and pinned, then rev-2 with a §9 entry citing a record, the
+        # citation wrapped onto the entry's continuation line. `audit-fold` cites the pin's record and
+        # `audit-fold-pass` does it past a first pass. `audit-fold-stranger` cites a record of this build
+        # that never names the unit, and `audit-fold-foreign` one of the other chain build that does, which
+        # is why each commits a second record. `audit-fold-norev` is the cited fold, then a material edit
+        # at rev-2: an older entry cites the record, and the edit moved no header. `audit-fold-closed` is
+        # `audit-fold-pass` with the spec at CLOSED before the cited fold (TOOL-dFoldedAudit-15 S6).
+        pin = f"{TN}reviews/2026-10-21-review-{u}.md"
+        stranger = f"{TN}reviews/2026-10-21-review-{AUDIT_STRANGER}.md"
+        foreign = f"memory/builds/{FIXTURE_BUILDS[1]}/reviews/2026-10-21-review-{u}-foreign.md"
+        cited, other = {"audit-fold-stranger": (stranger, {stranger: fx.render_audit(AUDIT_STRANGER, None)}),
+                        "audit-fold-foreign": (foreign, {foreign: fx.render_audit(u, None)})}.get(plant, (pin, {}))
+        log = ("\n## 9. Revision log\n\n- rev-2 · 2026-10-21 · §6 · the audit's fold, from\n  "
+               + pathlib.PurePosixPath(cited).stem)
+        fx.write_spec(u, 1)
+        fx.write_commit({pin: fx.render_audit(u, 1), **other}, f"review(dTrueNorth): {u}'s spec audit", ["Pass: none"])
+        if plant in ("audit-fold-pass", "audit-fold-closed"):
+            fx.write_pass(u)
+        if plant == "audit-fold-closed":
+            fx.write_commit({fx.derive_spec_path(u): fx.render_spec(u, 1, status="CLOSED")}, f"{u} closes")
+        fx.write_spec(u, 2, line="the fixture line, folded", extra=log)
+        if plant == "audit-fold-norev":
+            fx.write_spec(u, 2, line="the fixture line, edited in place", extra=log)
 
 
 def build_fixture(root, plants):
@@ -1352,11 +1411,13 @@ PLANT_EXITS = dict({p: 1 for p in ("baseline", "clause", "subject-pass", "two-br
                                    "approver-none", "owner-bare", "owner-er", "owner-row5", "owner-row1-added",
                                    "owner-unknown-id", "add", "handback", "audit-pin", "pass-revision",
                                    "malformed-field", "malformed-risk", "malformed-follow",
-                                   "malformed-supersedes", "duplicate-n", "record-late", "pipe-after")},
+                                   "malformed-supersedes", "duplicate-n", "record-late", "pipe-after",
+                                   "audit-fold-stranger", "audit-fold-foreign", "audit-fold-norev",
+                                   "audit-fold-closed")},
                    **{p: 0 for p in ("pass-none", "status-flip", "header-rev", "gen", "status-gen", "quote",
                                      "amended-joined", "approver", "defer", "fix-record", "audit-nopin",
                                      "below-risk", "owner-cause", "status-only", "subject-trailer", "rotated",
-                                     "spec-notes")},
+                                     "spec-notes", "audit-fold", "audit-fold-pass")},
                    **{p: 2 for p in UNMEASURED_PLANTS})
 
 
@@ -1372,6 +1433,10 @@ def derive_plant_needle(plant):
             "two-branch": f"at {u}@rev-1 (spec-revised): {nobody}", "gen-text": f"at {u}@rev-1 (spec-revised): {nobody}",
             "amended": f"at {u}@rev-2 (spec-revised): {nobody}", "add": f"at new unit {u} (design-to-spec): {nobody}",
             "handback": f"at {u}@rev-1 (spec-to-code): {nobody}", "audit-pin": "past its audited revision rev-1",
+            "audit-fold-stranger": "past its audited revision rev-1",
+            "audit-fold-foreign": "past its audited revision rev-1",
+            "audit-fold-norev": "past its audited revision rev-1",
+            "audit-fold-closed": f"at {u}@rev-1 (spec-revised): {nobody}",
             "audit-nopin": f"no audit pin: ", "approver-none": "it records no approver",
             "owner-bare": "names the owner and cites no decision id", "owner-er": "names the owner and cites no decision id",
             "owner-row5": f"whose row does not name {APPROVER_PLANTS['owner-row5'][0]}",

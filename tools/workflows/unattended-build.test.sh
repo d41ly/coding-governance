@@ -2077,7 +2077,7 @@ has    "BT3 attended, OFF, every unit terminal: the exit carries the audit objec
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
 # ---- AC7: both carriers read 1.8 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.12" "$(sed -n '3p' "$F")" "version: '1.12', // gov:kit unattended-build@1.12"
+has    "BT3-AC7 the render carries the engine version 1.13" "$(sed -n '3p' "$F")" "version: '1.13', // gov:kit unattended-build@1.13"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -3140,6 +3140,465 @@ o=$(run_wf "$OFF_UNITS" "$(printf '{"spec-write":%s}' "$SPEC_C")")
 same   "OC27 AC15 audit OFF: the identity names no audit stage" "$(printf '%s\n' "$o" | grep -m1 -E '^(log|phase):')" "log:tB · unattended round 1 · spec, hand-out"
 has    "OC27 AC15 audit OFF: ...and the hand-out leads with it" "$(printf '%s\n' "$o" | grep '^RESULT ')" 'RESULT {"identity":"tB · unattended round 1 · spec, hand-out",'
 
+# ================================================== TOOL-dFoldedAudit-3 — THE DISPOSAL STAGE DISPOSES BY NATURE
+# Every run is strict, so a schema that loses `dispositions` loses it here, and the review double
+# carries the callee's `confirmedFindings`, which rule 5 joins by raw id. The staged break of each arm,
+# observed RED at the close and not by the pass that wrote it:
+#   AC1            the `d.folded !== 0` arm left ungated, which refuses the fold
+#   AC2 and AC4    `deriveDispositionFault` stubbed to return '', which hands the roster out
+#   AC3            the record prompt's retry sentence restored, which records before the stage
+#   AC5            the floor reading `au.highs`, which refuses AC1
+#   AC6 to AC8     the `disposal` branch inverted, which folds under `promote-all`
+FA3_NAT=${UNITS/'"slug":"tB",'/'"slug":"tB","disposal":"by-nature",'}
+# TOOL-dFoldedAudit-4's frozen join reads the `planState` of every unit a by-nature return names.
+FA3_NAT=${FA3_NAT//'"briefPath":'/'"planState":"READY","briefPath":'}
+FA3_ALL=${UNITS/'"slug":"tB",'/'"slug":"tB","disposal":"promote-all",'}
+FA3_BAD=${UNITS/'"slug":"tB",'/'"slug":"tB","disposal":"fold",'}
+FA3_L7='{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":2}'
+FA3_L8='{"id":8,"severity":"MEDIUM","nature":"local","specs":["A-tB-2"],"unit":"A-tB-2","rev":2}'
+FA3_L99='{"id":99,"severity":"HIGH","nature":"local","specs":["A-tB-2"],"unit":"A-tB-2","rev":2}'
+FA3_B3='{"id":3,"severity":"BLOCKER","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":2}'
+FA3_N7='{"id":7,"severity":"HIGH","nature":"new-mechanism","specs":["A-tB-4"],"unit":"A-tB-4","rev":1}'
+FA3_N8='{"id":8,"severity":"MEDIUM","nature":"new-mechanism","specs":["A-tB-5"],"unit":"A-tB-5","rev":1}'
+FA3_N9='{"id":9,"severity":"MEDIUM","nature":"new-mechanism","specs":["A-tB-5"],"unit":"A-tB-5","rev":1}'
+FA3_P4='{"unit":"A-tB-4","repairs":"none","order":3}'
+FA3_P5='{"unit":"A-tB-5","repairs":"none","order":3}'
+FA3_HELD='{"terminalExit":true,"exitState":"BOUNDED"}'
+# The callee's `addresses`, which TOOL-dFoldedAudit-5's row 17 holds each BLOCKER's and HIGH's entry to.
+FA3_A7='[{"ids":[7],"severity":"HIGH","specs":["A-tB-1"]}]'
+FA3_A7N='[{"ids":[7],"severity":"HIGH","specs":["A-tB-4"]}]'
+FA3_A3='[{"ids":[3],"severity":"BLOCKER","specs":["A-tB-1"]}]'
+# `review_out` with the callee's confirmed ids, left in `_fa3_review`: blockers · confirmed · highs · ids ·
+# addresses, which reads `[]` when not given.
+build_review_fa3() { review_out "$1" "$2" "$3" >/dev/null; _fa3_review="${_review_out%\}},\"confirmedFindings\":$4,\"addresses\":${5:-[]}}"; }
+# The disposal double, left in `_fa3_d`: folded · promoted · promotedIds · placements · dispositions ·
+# siblingEdits. The fifth is left out when not given, and the sixth reads `[]`, because `by-nature` owes it.
+build_dispose_fa3() { printf -v _fa3_d '{"disposed":true,"standing":[],"folded":%s,"promoted":%s,"promotedIds":%s,"edges":[],"placements":%s,%s"siblingEdits":%s,"summary":"d"}' \
+  "$1" "$2" "$3" "$4" "${5:+\"dispositions\":$5,}" "${6:-[]}"; }
+# One strict run: args · the `record` double · the `record-exit` double, spelled first because the
+# stub matches a label by prefix, so `record` would answer it.
+run_strict_fa3() { local recexit='' runners; [ -z "${3:-}" ] || recexit="\"record-exit\":$3,"
+  printf -v runners '{"spec-write":%s,"workflow":%s,%s"record":%s,"dispose":%s}' "$SPEC_OK" "$_fa3_review" "$recexit" "$2" "$_fa3_d"
+  RUN_WF_SCHEMA=strict run_wf "$1" "$runners"; }
+# A return the guard refuses: args · a name · the reason the trace must hold.
+check_refused_fa3() { o=$(run_strict_fa3 "$1" "$_rec")
+  has    "$2: disposal NOT done" "$o" "disposal: NOT done"
+  has    "$2: an empty roster" "$o" '"roster":[]'
+  has    "$2: a DEGRADED note" "$o" 'DEGRADED'
+  hasnt_ "$2: no record agent ran" "$o" "agent:record"
+  has    "$2: the reason" "$o" "$3"; }
+
+# AC1: a local HIGH folds, and the row, the hand-out and the prompt all say so.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"; rec CONVERGED >/dev/null
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA3 AC1 a local HIGH folds under by-nature" "$o" "disposal: done — promoted 0 · folded 1"
+has    "FA3 AC1 ...the hand-out carries its entry" "$(printf '%s\n' "$o" | grep '^RESULT ')" "\"dispositions\":[$FA3_L7]"
+has    "FA3 AC1 ...beside a non-empty roster" "$o" '"roster":[{'
+has    "FA3 AC1 ...and the row counts the fold" "$(printf '%s\n' "$o" | grep '^prompt:record:')" "--highs 1 --minors 0 --folded 1 --promoted 0 --disposition fold"
+has    "FA3 AC1 ...and the log names the rule" "$o" "disposing by nature, on CONVERGED too"
+p=$(printf '%s\n' "$o" | grep '^prompt:dispose:')
+for fa3 in 'BY NATURE, independent of severity' 'a section 9 line naming `r` and the finding id.' \
+  'PROMOTE every NEW MECHANISM finding:' 'Each NEW MECHANISM BLOCKER or HIGH id is its own unit' \
+  'PROMOTE every NEW MECHANISM MEDIUM and LOW too, BATCHED:' 'Return in `dispositions` one entry per finding per spec' \
+  '`**Specs:**` line'; do
+  has  "FA3 AC1 the by-nature prompt carries: $fa3" "$p" "$fa3"
+done
+hasnt_ "FA3 AC1 ...and no longer says nothing folds" "$p" "Nothing is folded"
+# A declared round with nothing standing spawns no stage, so its zero counts ride the first call.
+build_review_fa3 0 0 0 '[]'
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+p=$(printf '%s\n' "$o" | grep '^prompt:record:')
+has    "FA3 S7 nothing stood: the row counts zero" "$p" "--blockers 0 --highs 0 --minors 0 --folded 0 --promoted 0"
+hasnt_ "FA3 S7 ...with no disposition" "$p" "--disposition"
+has    "FA3 S8 ...and a skip states the list empty" "$o" '"dispositions":[]'
+
+# AC2: four returns with no target. AC4: three that hide a HIGH behind a return the sum alone passes.
+build_review_fa3 0 1 1 '[{"id":7}]'
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":[],"unit":"A-tB-1","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC2 specs empty' 'names no spec'
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC2 unit absent' 'outside the {id, severity, nature, specs, unit, rev} shape'
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC2 rev not bumped' 'a fold is a rev bump'
+has    "FA3 S6 a held record's note spells the counted row" "$o" '--folded <folded> --promoted <promoted>'
+build_dispose_fa3 1 0 '[]' '[]'
+check_refused_fa3 "$FA3_NAT" 'FA3 AC2 dispositions absent' 'no `dispositions` list'
+build_review_fa3 0 2 2 '[{"id":7},{"id":8}]'
+build_dispose_fa3 2 0 '[]' '[]' "[$FA3_L7,$FA3_L8]"
+check_refused_fa3 "$FA3_NAT" 'FA3 AC4 one HIGH graded MEDIUM' 'a grade cannot be lowered to hide a HIGH'
+build_dispose_fa3 2 0 '[]' '[]' "[$FA3_L7]"
+check_refused_fa3 "$FA3_NAT" 'FA3 AC4 folded 2 beside one entry' 'the integers and the list are one fact'
+build_dispose_fa3 2 0 '[]' '[]' "[$FA3_L7,$FA3_L99]"
+check_refused_fa3 "$FA3_NAT" 'FA3 AC4 one confirmed id unnamed' 'confirmed finding(s) 8 have no `dispositions` entry'
+
+# AC3: a local BLOCKER at a BOUNDED exit. The driver's refusal is the probe, so the record waits for
+# the stage and `verdict` holds the exit through it.
+build_review_fa3 1 1 0 '[{"id":3}]' "$FA3_A3"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_B3]"; rec BOUNDED >/dev/null
+o=$(run_strict_fa3 "$FA3_NAT" "$FA3_HELD" "$_rec")
+same   "FA3 AC3 the stage precedes the record of the exit" "$(printf '%s\n' "$o" | grep -E '^agent:(record|dispose)')" "agent:record
+agent:dispose
+agent:record-exit"
+has    "FA3 AC3 ...the hand-out holds the exit" "$(printf '%s\n' "$o" | grep '^RESULT ')" '"verdict":"BOUNDED"'
+has    "FA3 AC3 ...and the row counts the fold" "$(printf '%s\n' "$o" | grep '^prompt:record-exit:')" "--blockers 1 --highs 0 --minors 0 --folded 1 --promoted 0 --disposition fold"
+p=$(printf '%s\n' "$o" | grep '^prompt:record:')
+has    "FA3 AC3 the first command is bare" "$p" "--blockers 1  Return"
+has    "FA3 AC3 ...and it reports the exit" "$p" "Return terminalExit: true and exitState"
+hasnt_ "FA3 AC3 ...rather than retrying before the counts exist" "$p" "run the SAME command once more"
+rec CEILING >/dev/null; o=$(run_strict_fa3 "$FA3_NAT" "$FA3_HELD" "$_rec")
+has    "FA3 AC3 a row at another exit throws by name" "$o" "THROW unattended-build: the driver recorded CEILING"
+rec BOUNDED >/dev/null; o=$(run_strict_fa3 "$FA3_NAT" '{"terminalExit":true,"exitState":"DONE"}' "$_rec")
+has    "FA3 AC3 a state word outside the three throws by name" "$o" 'reported a terminal exit in state "DONE"'
+hasnt_ "FA3 AC3 ...before the stage" "$o" "agent:dispose"
+_fa3_d=null; o=$(run_strict_fa3 "$FA3_NAT" "$FA3_HELD" "$_rec")
+has    "FA3 S6 a dead stage leaves the exit unrecorded, its note spelling the row" "$o" '--verdict \"BLOCKED\" --blockers 1 --highs 0 --minors 0 --folded <folded> --promoted <promoted>'
+hasnt_ "FA3 S6 ...with no record-exit agent" "$o" "agent:record-exit"
+
+# AC5: the bounds count the new-mechanism entries. The HIGH takes its own unit and the minors batch.
+build_review_fa3 0 3 1 '[{"id":7},{"id":8},{"id":9}]' "$FA3_A7N"; rec CONVERGED >/dev/null
+build_dispose_fa3 0 3 '["A-tB-4","A-tB-5"]' "[$FA3_P4,$FA3_P5]" "[$FA3_N7,$FA3_N8,$FA3_N9]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA3 AC5 one HIGH and a batch of two reconcile" "$o" "disposal: done — promoted 3 · folded 0"
+has    "FA3 AC5 ...and the row derives promote" "$(printf '%s\n' "$o" | grep '^prompt:record:')" "--highs 1 --minors 2 --folded 0 --promoted 3 --disposition promote"
+build_review_fa3 0 3 1 '[{"id":7},{"id":8},{"id":9}]' "${FA3_A7N//A-tB-4/A-tB-5}"
+build_dispose_fa3 0 3 '["A-tB-5"]' "[$FA3_P5]" "[${FA3_N7//A-tB-4/A-tB-5},$FA3_N8,$FA3_N9]"
+check_refused_fa3 "$FA3_NAT" 'FA3 AC5 the HIGH sharing the batch unit' '1 unit(s) for 0 blocker(s), 1 high(s) and 2 minor(s), below the floor of 2'
+build_review_fa3 0 5 0 '[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]'
+fa3_i=''; fa3_p=''; fa3_e=''
+for i in 1 2 3 4 5; do
+  fa3_i="$fa3_i${fa3_i:+,}\"A-tB-5$i\""
+  fa3_p="$fa3_p${fa3_p:+,}{\"unit\":\"A-tB-5$i\",\"repairs\":\"none\",\"order\":3}"
+  fa3_e="$fa3_e${fa3_e:+,}{\"id\":$i,\"severity\":\"MEDIUM\",\"nature\":\"new-mechanism\",\"specs\":[\"A-tB-5$i\"],\"unit\":\"A-tB-5$i\",\"rev\":1}"
+done
+build_dispose_fa3 0 5 "[$fa3_i]" "[$fa3_p]" "[$fa3_e]"
+check_refused_fa3 "$FA3_NAT" 'FA3 AC5 five minors in five units' '5 unit(s) where at most 2 fit'
+
+# AC6: `promote-all` keeps today's rule and refuses a fold by name, whatever the entries say.
+build_review_fa3 0 1 1 '[{"id":7}]'; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+o=$(run_strict_fa3 "$FA3_ALL" "$_rec")
+has    "FA3 AC6 promote-all refuses a fold by name" "$o" "a spec audit's MEDIUM and LOW are PROMOTED"
+has    "FA3 AC6 ...with an empty roster" "$o" '"roster":[]'
+build_review_fa3 0 2 1 '[{"id":7},{"id":8}]' "$FA3_A7N"; build_dispose_fa3 0 2 '["A-tB-4","A-tB-5"]' "[$FA3_P4,$FA3_P5]" "[$FA3_N7,$FA3_N8]"
+o=$(run_strict_fa3 "$FA3_ALL" "$_rec")
+has    "FA3 AC6 every finding promoted: disposal done" "$o" "disposal: done — promoted 2 · folded 0"
+has    "FA3 AC6 ...on the new row" "$(printf '%s\n' "$o" | grep '^prompt:record:')" "--highs 1 --minors 1 --folded 0 --promoted 2 --disposition promote"
+p=$(printf '%s\n' "$o" | grep '^prompt:dispose:')
+has    "FA3 AC6 ...the prompt stays by severity" "$p" "disposes BY SEVERITY"
+has    "FA3 AC6 ...and still says nothing folds" "$p" "Nothing is folded: return \`folded\` as 0."
+has    "FA3 AC6 ...plus the return sentence" "$p" "Return in \`dispositions\`"
+
+# AC7: no `disposal` is today's path: no list is asked for, none is read, and the row is today's.
+build_review_fa3 1 1 0 '[{"id":3}]'; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]"; rec BOUNDED >/dev/null
+o=$(run_strict_fa3 "$UNITS" "$_rec")
+has    "FA3 AC7 undeclared: a return with no list is disposed" "$o" "disposal: done"
+hasnt_ "FA3 AC7 ...and no prompt carries the new row" "$(printf '%s\n' "$o" | grep '^prompt:')" "--folded"
+has    "FA3 AC7 ...the prompt is today's" "$(printf '%s\n' "$o" | grep '^prompt:dispose:')" "disposes BY SEVERITY"
+has    "FA3 AC7 ...the retry is today's" "$(printf '%s\n' "$o" | grep '^prompt:record:')" "--disposition promote appended"
+
+# AC8 and AC9: a value outside the pair refuses before any agent, and the render says the rule once.
+o=$(run_wf "$FA3_BAD" '{}')
+has    "FA3 AC8 a value outside the pair refuses by name" "$o" 'THROW unattended-build: `disposal` must be one of by-nature, promote-all'
+hasnt_ "FA3 AC8 ...before any agent spawns" "$o" "agent:"
+same   "FA3 AC9 the render states the rule on one line" "$(grep -c 'disposes a spec audit BY NATURE' "$F")" "1"
+
+# ================================================== TOOL-dFoldedAudit-4 — A REPAIR EDITS ITS UNBUILT SIBLING
+# The FA3 doubles, so every run is strict and a schema that loses `siblingEdits` loses it here. The staged
+# break of each arm, observed RED at the close and not by the pass that wrote it:
+#   AC1 and AC3    the `siblingEdits` rows cut from `deriveDispositionFault`, which hands the roster out
+#   AC2 and AC4    the `DONE` prefix test changed to equality, which admits `DONE (THIN)`
+FA4_E1='{"unit":"A-tB-1","rev":2}'
+# FA3_NAT with A-tB-1 at the state given, left in `_fa4_args`; no argument drops its `planState`.
+build_args_fa4() { local st="\"specPath\":\"s1\",${1:+\"planState\":\"$1\",}"
+  _fa4_args=${FA3_NAT/'"specPath":"s1","planState":"READY",'/$st}; }
+
+# AC1: one new-mechanism HIGH to its repair unit, and the sibling it rewrote at rev 2.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7N"; rec CONVERGED >/dev/null
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" "[$FA4_E1]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA4 AC1 a sibling edit beside a repair unit is disposed" "$o" "disposal: done"
+has    "FA4 AC1 ...the hand-out carries the list" "$(printf '%s\n' "$o" | grep '^RESULT ')" "\"siblingEdits\":[$FA4_E1]"
+p=$(printf '%s\n' "$o" | grep '^prompt:dispose:')
+for fa4 in "REWRITE THE SIBLING'S TEXT ITSELF" 'naming the repair unit and `r`' 'Do not state in the repair spec' \
+  'a new unit built on top' '`siblingEdits: []` when you edited none' 'Every section 9 line this stage writes names `r`.'; do
+  has  "FA4 AC1 the by-nature prompt carries: $fa4" "$p" "$fa4"
+done
+# S2: the same list on the DEGRADED return, and `promote-all` neither asks for one nor reads one.
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" '[{"unit":"A-tB-1","rev":1}]'
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA4 S2 the DEGRADED return carries what the stage said" "$(printf '%s\n' "$o" | grep '^RESULT ')" '"siblingEdits":[{"unit":"A-tB-1","rev":1}]'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" "[$FA4_E1]"
+o=$(run_strict_fa3 "$FA3_ALL" "$_rec")
+has    "FA4 S2 promote-all states the list empty" "$(printf '%s\n' "$o" | grep '^RESULT ')" '"siblingEdits":[]'
+hasnt_ "FA4 S2 ...and its prompt carries no clause" "$(printf '%s\n' "$o" | grep '^prompt:dispose:')" "REWRITE THE SIBLING"
+
+# AC3: the five malformed returns, each on the AC1 shape but for the one thing named.
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"; _fa3_d=${_fa3_d/'"siblingEdits":[],'/}
+check_refused_fa3 "$FA3_NAT" 'FA4 AC3 siblingEdits absent' 'no `siblingEdits` list'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" '[{"unit":"A-tB-1","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA4 AC3 rev not above the rev the audit read' 'a sibling edit is a rev bump'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" '[{"unit":"A-tB-4","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA4 AC3 naming the repair unit itself' 'outside this roster'
+build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]" "[$FA4_E1]"
+check_refused_fa3 "$FA3_NAT" 'FA4 AC3 beside an empty promotedIds' 'a correction with no repair unit is a fold'
+build_args_fa4; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" "[$FA4_E1]"
+check_refused_fa3 "$_fa4_args" 'FA4 AC3 naming a unit with no planState' 'carries no `planState`'
+
+# AC2: a built sibling stays frozen, at the plain state and at the graded form `--plan` prints. The
+# prompt spells `frozen` too, so each reason read here is the refusal's own and never the bare word.
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" "[$FA4_E1]"
+for fa4 in 'DONE' 'DONE (THIN)'; do
+  build_args_fa4 "$fa4"
+  check_refused_fa3 "$_fa4_args" "FA4 AC2 a sibling at $fa4" 'unit A-tB-1 is frozen'
+done
+
+# AC4: the same join over the other list, and the route the prompt names for it.
+build_args_fa4 'DONE'; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+check_refused_fa3 "$_fa4_args" 'FA4 AC4 a fold into a built spec' 'unit A-tB-1 is frozen'
+has    "FA4 AC4 ...and the prompt names the route" "$(printf '%s\n' "$o" | grep '^prompt:dispose:')" 'a new unit built on top'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"
+o=$(run_strict_fa3 "$_fa4_args" "$_rec")
+has    "FA4 AC4 the same finding promoted is disposed" "$o" "disposal: done"
+hasnt_ "FA4 AC4 ...on a roster not refused" "$o" '"roster":[]'
+
+# ================================================== TOOL-dFoldedAudit-5 — THE ROUND'S COMMAND AND THE ROUTE
+# The FA3 doubles, so every run is strict. The staged break, observed RED at the close and not by the
+# pass that wrote this: row 17 returning no reason, which lets the narrowed address through. The verdict
+# lives in the driver, so nothing here reads a set: its arms are the driver suite's.
+read_result_fa5() { printf '%s\n' "$o" | grep '^RESULT '; }
+# AC11: a declared round hands out the one command that records it, and dispatches nothing yet.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"; rec CONVERGED >/dev/null
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_result_fa5)
+for fa5 in '"chainRecord":"' '--record-round tB ' '--subject tB-spec-set-r1 ' '--audited \"A-tB-1 A-tB-2\" ' \
+  '--blockers 0 --highs 1' '--finding 7/HIGH/local/A-tB-1/A-tB-1/2' 'RECORD this round: commit the disposal' \
+  '--chain-verdict tB' 'CONTINUE: re-invoke this harness with round: 2, auditIds: the ids it names' \
+  'STOP: dispatch the roster below, one main-loop Workflow call per unit; any units its line names after `override specs-audited`' \
+  'HOLD: run the recipe it prints'; do
+  has  "FA5 AC11 the hand-out carries: $fa5" "$r" "$fa5"
+done
+hasnt_ "FA5 AC11 ...and dispatches nothing ahead of the verdict" "$r" "dispatch the roster below for every unit that is not one of them"
+hasnt_ "FA5 AC11 ...and renders no flag it has no row for" "$r" "--sibling"
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7N"; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]" '[{"unit":"A-tB-2","rev":3}]'
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_result_fa5)
+has    "FA5 AC11 a sibling edit enters the command" "$r" "--sibling A-tB-2@rev-3"
+o=$(run_strict_fa3 "$FA3_ALL" "$_rec"); r=$(read_result_fa5)
+has    "FA5 AC11 promote-all carries the command" "$r" "--record-round tB "
+hasnt_ "FA5 AC11 ...and reads no sibling list" "$r" "--sibling"
+# S5: nothing stood, and the clean round, whose callee wrote no report. A round with no row is still a round.
+build_review_fa3 0 0 0 '[]'; _fa3_d=null
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_result_fa5)
+has    "FA5 S5 nothing stood: the command still rides" "$r" "--blockers 0 --highs 0"
+hasnt_ "FA5 S5 ...with no row" "$r" "--finding"
+_fa3_review='{"confirmed":[],"blockers":null,"highs":null,"lensesDead":0,"report":null,"note":"clean"}'
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_result_fa5)
+has    "FA5 S5 the clean round orders its record first" "$r" "WRITE the spec-audit record"
+has    "FA5 S5 ...then the two commands" "$r" "Commit the record, then run \`bash "
+has    "FA5 S5 ...then the verdict" "$r" "--chain-verdict tB"
+has    "FA5 S5 ...its own dispatch clause under STOP" "$r" "STOP: dispatch every unit \`"
+
+# AC12: no `disposal` keeps today's hand-out, a promoted case and a no-promotion case, spelled whole.
+build_review_fa3 1 1 0 '[{"id":3}]'; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]"; rec BOUNDED >/dev/null
+o=$(run_strict_fa3 "$UNITS" "$_rec"); r=$(read_result_fa5)
+hasnt_ "FA5 AC12 undeclared, promoted: no command" "$r" "chainRecord"
+has    "FA5 AC12 ...and today's sentence" "$r" '"nextAction":"AUDIT the promoted specs before any of them is dispatched: re-invoke this harness with round: 2, auditIds: [\"A-tB-4\"] and no subjectRound and no `subjects`, so they take a fresh subject and the resolver scopes to them; dispatch the roster below for every unit that is not one of them."'
+build_review_fa3 0 0 0 '[]'; _fa3_d=null; rec CONVERGED >/dev/null
+o=$(run_strict_fa3 "$UNITS" "$_rec"); r=$(read_result_fa5)
+hasnt_ "FA5 AC12 undeclared, no promotion: no command" "$r" "chainRecord"
+has    "FA5 AC12 ...and today's sentence" "$r" '"nextAction":"dispatch the roster below, one main-loop Workflow call per unit"'
+
+# AC13: row 17 holds a retyped address to the review's, and row 18 refuses what would reach a shell. Each
+# RESULT is the helper's, so the `hasnt_` reads the run that helper just made.
+build_review_fa3 0 1 1 '[{"id":7}]' '[{"ids":[7],"severity":"HIGH","specs":["A-tB-1","A-tB-2"]}]'
+build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+check_refused_fa3 "$FA3_NAT" 'FA5 AC13 a narrowed address' 'finding 7 addresses A-tB-1 where the review addressed A-tB-1, A-tB-2'
+hasnt_ "FA5 AC13 ...reaches no command" "$(read_result_fa5)" "chainRecord"
+build_review_fa3 0 1 1 '[{"id":7}]' '[{"ids":[7],"severity":"HIGH","specs":["A-tB-9;x"]}]'
+build_dispose_fa3 0 1 '["A-tB-9;x"]' '[{"unit":"A-tB-9;x","repairs":"none","order":3}]' '[{"id":7,"severity":"HIGH","nature":"new-mechanism","specs":["A-tB-9;x"],"unit":"A-tB-9;x","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA5 AC13 a unit outside the grammar' 'outside the unit id grammar'
+hasnt_ "FA5 AC13 ...reaches no command" "$(read_result_fa5)" "chainRecord"
+build_review_fa3 0 1 1 '[{"id":7}]'
+build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+check_refused_fa3 "$FA3_NAT" 'FA5 row 17 a HIGH with no address' 'the review addressed nothing'
+_fa3_review=${_fa3_review/,\"addresses\":\[\]/}
+check_refused_fa3 "$FA3_NAT" 'FA5 row 17 a review with no addresses' 'no `addresses` array'
+build_review_fa3 0 1 1 '[{"id":7}]' '[{"ids":[7],"severity":"HIGH","specs":["A-tB-4","A-tB-1"]}]'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"
+check_refused_fa3 "$FA3_ALL" 'FA5 row 17 under promote-all' 'finding 7 addresses A-tB-4 where the review addressed A-tB-1, A-tB-4'
+# ...and an UNVERIFIED finding adjudicated to HIGH has no address to read, so it passes.
+review_out 0 1 1 1 >/dev/null; _fa3_review="${_review_out%\}},\"confirmedFindings\":[{\"id\":7}],\"addresses\":$FA3_A7}"
+build_dispose_fa3 2 0 '[]' '[]' "[$FA3_L7,$FA3_L99]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA5 row 17 an adjudicated UNVERIFIED HIGH is disposed" "$o" "disposal: done"
+has    "FA5 row 17 ...and reaches the command" "$(read_result_fa5)" "--finding 99/HIGH/local/A-tB-2/A-tB-2/2"
+
+# AC16: the verdict has one home.
+same   "FA5 AC16 the harness spells neither stop value" "$(grep -c 'own-work\|clean-only' "$F")" "0"
+same   "FA5 AC16 the driver reads each switch once" "$(grep -c 'read_spec_audit_switch chain-' "$DRV")" "2"
+
+# ================================================== TOOL-dFoldedAudit-12 — THE BY-HAND ROUTE ENDS ON THE VERDICT
+# The FA3 doubles, so every run is strict. A `note` or `nextAction` is read parsed off the RESULT, so an
+# absence reads that field alone and a quote reads as the caller reads it. The staged break of each arm,
+# observed RED at the close and not by the pass that wrote it:
+#   AC1 to AC4    the ` — and dispatch from ` ending restored under `disposalDeclared`
+#   AC5           the declared branch taken unconditionally
+#   AC6 to AC8    `renderChainStep` returning no commit clause
+read_field_fa12() { read_result_fa5 | node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(0, "utf8").slice(7))[process.argv[1]])' "$1"; }
+# Each needle stands past the one before it, because the text is cut behind every match.
+check_order_fa12() { local name=$1 rest=$2 want; shift 2
+  for want in "$@"; do
+    has  "$name: $want" "$rest" "$want"
+    rest=${rest#*"$want"}
+  done; }
+
+# AC1 and AC3: a held exit over a dead stage. A join left below the stage throws here.
+build_review_fa3 1 1 0 '[{"id":3}]' "$FA3_A3"; rec BOUNDED >/dev/null; _fa3_d=null
+o=$(run_strict_fa3 "$FA3_NAT" "$FA3_HELD" "$_rec"); r=$(read_field_fa12 note)
+has    "FA12 AC1 a dead stage at a held exit is named" "$o" "disposal: NOT done"
+hasnt_ "FA12 AC1 ...and the run returns" $'\n'"$o" $'\nTHROW '
+for fa12 in '--record-round tB --subject tB-spec-set-r1 --audited "A-tB-1 A-tB-2"' '--blockers 1 --highs 0' \
+  '--chain-verdict tB' '--finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>' \
+  'CONTINUE: re-invoke this harness with round: 2' 'STOP: dispatch every unit' 'HOLD: run the recipe it prints'; do
+  has  "FA12 AC1 the note carries: $fa12" "$r" "$fa12"
+done
+check_order_fa12 "FA12 AC3 the note orders" "$r" "commit the disposal's folds and specs" '--record-round' \
+  'commit the chain record it staged' '--chain-verdict'
+
+# AC2 and AC4: a return the reconciliation refuses with a row and a sibling edit on it, so each absence
+# reads a note that had both in reach.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]" "[$FA4_E1]"; rec CONVERGED >/dev/null
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_field_fa12 note); p=$(read_result_fa5)
+has    "FA12 AC2 the stage is refused" "$o" "disposal: NOT done"
+has    "FA12 AC2 the note spells the review's counts" "$r" "--blockers 0 --highs 1"
+has    "FA12 AC2 ...and ends on the verdict" "$r" "--chain-verdict tB"
+hasnt_ "FA12 AC2 ...not on the resume route" "$r" "the resume route"
+hasnt_ "FA12 AC2 ...and orders no dispatch" "$r" "and dispatch from"
+has    "FA12 AC4 the return carries the refused row" "$p" "\"dispositions\":[$FA3_L7]"
+has    "FA12 AC4 ...and the refused sibling edit" "$p" "\"siblingEdits\":[$FA4_E1]"
+hasnt_ "FA12 AC4 ...the note renders neither: the row" "$r" "--finding 7/"
+hasnt_ "FA12 AC4 ...the sibling edit" "$r" "--sibling A-tB-"
+hasnt_ "FA12 AC4 ...and no command rides the return" "$p" "chainRecord"
+
+# AC5: no `disposal` keeps its note, the resume route included.
+build_review_fa3 0 1 1 '[{"id":7}]'; _fa3_d=null
+o=$(run_strict_fa3 "$UNITS" "$_rec"); r=$(read_field_fa12 note)
+has    "FA12 AC5 undeclared: the stage is dead" "$o" "disposal: NOT done"
+has    "FA12 AC5 ...the note dispatches from the plan" "$r" "--plan tB --paths"
+same   "FA12 AC5 ...and ends on the resume route" "${r: -17}" "the resume route."
+hasnt_ "FA12 AC5 ...with no round to record" "$r" "--record-round"
+hasnt_ "FA12 AC5 ...and no verdict to read" "$r" "--chain-verdict"
+
+# AC6 and AC7: both sentences commit the record ahead of the verdict, and AC8 reads the one step they share.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_field_fa12 nextAction)
+check_order_fa12 "FA12 AC6 the hand-out orders" "$r" "RECORD this round: commit the disposal's folds and specs, run \`" \
+  '--record-round tB --subject tB-spec-set-r1' '`, then commit the chain record it staged. Then run `' '--chain-verdict tB'
+_fa3_d=null; _fa3_review='{"confirmed":[],"blockers":null,"highs":null,"lensesDead":0,"report":null,"note":"clean"}'
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_field_fa12 nextAction)
+check_order_fa12 "FA12 AC7 the clean round orders" "$r" 'Commit the record, then run `' \
+  'commit the chain record it staged' '--chain-verdict tB'
+same   "FA12 AC8 the render spells the sentence once" "$(grep -c 'commit the chain record it staged' "$F")" "1"
+same   "FA12 AC8 ...and every site reaches it" "$([ "$(grep -c 'renderChainStep(' "$F")" -ge 4 ] && echo floor)" "floor"
+
+# ---- TOOL-dFoldedAudit-15: THE BATCH'S HARNESS ARMS. The failing cases, observed at the close and not by the
+# ---- pass that wrote this: the attended return dropping `nextAction` reds AC9; deleting each row of the
+# ---- reconciliation in turn reds its own `check_refused_fa3`; and `deriveReadRev` ignoring `rev` reds AC17.
+FA15_T="$HERE/unattended-build.template.js"
+FA15_A=${A_UNITS/'"slug":"tB",'/'"slug":"tB","disposal":"by-nature",'}
+FA15_SPEC='{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"}'
+run_attended_fa15() { local _r; printf -v _r '{"spec-write":%s,"workflow":%s,"dispose":%s}' "$FA15_SPEC" "$_fa3_review" "$_fa3_d"
+  RUN_WF_SCHEMA=strict run_wf "$1" "$_r"; }
+# AC9: the attended return holds a route beside its command, wherever it carries one.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+o=$(run_attended_fa15 "$FA15_A"); r=$(read_result_fa5)
+has    "FA15 AC9 a local fold returns its chainRecord" "$r" '"chainRecord":"'
+has    "FA15 AC9 ...its dispositions" "$r" "\"dispositions\":[$FA3_L7]"
+has    "FA15 AC9 ...and the route" "$(read_field_fa12 nextAction)" '--chain-verdict tB'
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7N"; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"
+o=$(run_attended_fa15 "$FA15_A"); r=$(read_result_fa5)
+has    "FA15 AC9 a promotion returns its chainRecord" "$r" '"chainRecord":"'
+has    "FA15 AC9 ...its dispositions" "$r" "\"dispositions\":[$FA3_N7]"
+has    "FA15 AC9 ...and the route" "$(read_field_fa12 nextAction)" '--chain-verdict tB'
+o=$(run_attended_fa15 "${FA15_A/'"planState":"READY"'/'"planState":"DONE"'}"); r=$(read_result_fa5)
+has    "FA15 AC9 an all-terminal roster is empty" "$r" '"roster":[]'
+has    "FA15 AC9 ...and still returns its chainRecord" "$r" '"chainRecord":"'
+has    "FA15 AC9 ...saying nothing awaits dispatch" "$(read_field_fa12 nextAction)" 'no unit awaits dispatch'
+has    "FA15 AC9 ...on the same route" "$(read_field_fa12 nextAction)" '--chain-verdict tB'
+build_review_fa3 0 1 1 '[{"id":7}]'; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]"
+o=$(run_attended_fa15 "${A_UNITS/'"planState":"READY"'/'"planState":"DONE"'}"); r=$(read_result_fa5)
+has    "FA15 AC9 the undeclared return is that return" "$r" '"roster":[]'
+hasnt_ "FA15 AC9 ...and keeps its keys" "$r" '"nextAction"'
+hasnt_ "FA15 AC9 ...with no command" "$r" '"chainRecord"'
+# AC10's half here: the callee learns the declaration, and an undeclared call holds no key.
+rec CONVERGED >/dev/null
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA15 AC10 a declared call forwards disposal" "$(grep '^wargs:' <<<"$o")" '"disposal":"by-nature"'
+o=$(run_strict_fa3 "$UNITS" "$_rec")
+hasnt_ "FA15 AC10 an undeclared call holds no such key" "$(grep '^wargs:' <<<"$o")" '"disposal"'
+# AC13: each row of the reconciliation no arm read, by its own reason.
+build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7,"'{"id":7,"severity":"HIGH","nature":"new-mechanism","specs":["A-tB-1"],"unit":"A-tB-4","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 3 two natures for one id' 'carries two severities'
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"unit":"A-tB-2","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 7 a unit outside its specs' 'which is outside its address or this roster'
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1","A-tB-2"],"unit":"A-tB-1","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 7 two specs folded into one' 'stopped short of its address'
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7N"
+build_dispose_fa3 0 1 '[]' '[]' "[$FA3_N7]"
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 9 a unit promotedIds lacks' 'which `promotedIds` does not name'
+build_dispose_fa3 0 1 '["A-tB-4","A-tB-5"]' "[$FA3_P4,$FA3_P5]" "[$FA3_N7]"
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 9 a promotedIds entry no finding names' 'name no finding'
+build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" '[{"id":7,"severity":"HIGH","nature":"new-mechanism","specs":["A-tB-4","A-tB-9"],"unit":"A-tB-4","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC13 rule 10 a stray member of specs' 'neither this roster nor'
+# AC20: one spelling each, and the shared constant is still what reads the row.
+same   "FA15 AC20 the severities are spelled once" "$(grep -c "'BLOCKER', 'HIGH', 'MEDIUM', 'LOW'" "$FA15_T")" "1"
+same   "FA15 AC20 the natures are spelled once" "$(grep -c "'local', 'new-mechanism'" "$FA15_T")" "1"
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"CRITICAL","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":2}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC20 an off-list severity' 'outside the {id, severity, nature, specs, unit, rev} shape'
+# AC22: one prefix test, and both its callers keep it.
+same   "FA15 AC22 the prefix test is spelled once" "$(grep -c "indexOf('DONE')" "$FA15_T")" "1"
+build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+check_refused_fa3 "${FA3_NAT/'"planState":"READY"'/'"planState":"DONE (THIN)"'}" 'FA15 AC22 a fold into DONE (THIN)' 'is frozen at'
+FA15_THIN='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","base":"5eed5eed5eed5eed5eed5eed5eed5eed5eed5eed","mode":"attended","subjects":[{"path":"s1","blob":"abc1234","id":"A-tB-1","rev":1},{"path":"s2","blob":"def5678","id":"A-tB-2","rev":1}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"DONE (THIN)"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2","planState":"READY"}]}'
+o=$(RUN_WF_SCHEMA=strict run_wf "$FA15_THIN" '{"spec-write":{"authored":[],"alreadyPresent":["A-tB-1","A-tB-2"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md","precision":1,"note":"n","confirmedFindings":[],"addresses":[]}}')
+r=$(read_result_fa5)
+has    "FA15 AC22 an attended roster skips DONE (THIN)" "$r" '"skippedTerminal":["A-tB-1"]'
+has    "FA15 AC22 ...and hands out the live unit" "$r" '"roster":[{"id":"A-tB-2"'
+# AC17: a fold into a unit no audit read compares against the best fact held, and its sentence claims no
+# read that did not happen.
+FA15_F3='{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-3"],"unit":"A-tB-3","rev":REV}'
+FA15_R5=${FA3_NAT/'"id":"A-tB-3",'/'"id":"A-tB-3","rev":5,'}
+build_review_fa3 0 1 1 '[{"id":7}]' '[{"ids":[7],"severity":"HIGH","specs":["A-tB-3"]}]'
+build_dispose_fa3 1 0 '[]' '[]' "[${FA15_F3/REV/5}]"
+check_refused_fa3 "$FA15_R5" 'FA15 AC17 a claim at the rev --plan reads' 'not above the rev 5 `--plan` reads'
+build_dispose_fa3 1 0 '[]' '[]' "[${FA15_F3/REV/6}]"
+o=$(run_strict_fa3 "$FA15_R5" "$_rec")
+has    "FA15 AC17 a claim above it passes" "$o" "disposal: done"
+build_dispose_fa3 1 0 '[]' '[]' "[${FA15_F3/REV/1}]"
+check_refused_fa3 "$FA3_NAT" 'FA15 AC17 no rev and a claim of 1' 'rev 1, the lowest a spec carries'
+build_dispose_fa3 1 0 '[]' '[]' "[${FA15_F3/REV/2}]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec")
+has    "FA15 AC17 no rev and a claim of 2 passes" "$o" "disposal: done"
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"
+build_dispose_fa3 1 0 '[]' '[]' '[{"id":7,"severity":"HIGH","nature":"local","specs":["A-tB-1"],"unit":"A-tB-1","rev":1}]'
+check_refused_fa3 "$FA3_NAT" 'FA15 AC17 a unit with a subject' 'not above the rev 1 the audit read'
+# AC21: the sentence reaches the `promote-all` prompt alone, and each absence reads a prompt that was there.
+FA15_ALL_SAYS='`new-mechanism`, because nothing folds'
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7N"; build_dispose_fa3 0 1 '["A-tB-4"]' "[$FA3_P4]" "[$FA3_N7]"
+o=$(run_strict_fa3 "$FA3_ALL" "$_rec")
+has    "FA15 AC21 the promote-all prompt says it" "$(grep '^prompt:dispose:' <<<"$o")" "$FA15_ALL_SAYS"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(grep '^prompt:dispose:' <<<"$o")
+has    "FA15 AC21 a by-nature prompt was read" "$r" 'Return in `edges`'
+hasnt_ "FA15 AC21 ...and does not say it" "$r" "$FA15_ALL_SAYS"
+o=$(run_strict_fa3 "$UNITS" "$_rec"); r=$(grep '^prompt:dispose:' <<<"$o")
+has    "FA15 AC21 an undeclared prompt was read" "$r" 'Return in `edges`'
+hasnt_ "FA15 AC21 ...and does not say it" "$r" "$FA15_ALL_SAYS"
+# AC25: a declared run's terminal-subject throw names the ids the chain named, and an undeclared one keeps
+# its bytes.
+build_review_fa3 0 0 0 '[]'
+o=$(run_strict_fa3 "$FA3_NAT" '{"terminalSubject":true,"stderr":"x"}')
+has    "FA15 AC25 the declared throw" "$o" 'a disposal passes the ids `--chain-verdict` names as `auditIds`'
+o=$(run_strict_fa3 "$UNITS" '{"terminalSubject":true,"stderr":"x"}')
+has    "FA15 AC25 the undeclared throw" "$o" "a disposal passes the hand-out's \`promotedIds\` as \`auditIds\`"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -3239,7 +3698,27 @@ has    "OC27 AC15 audit OFF: ...and the hand-out leads with it" "$(printf '%s\n'
 # the liveness arm (1), the old hook's exit, two stderr lines and three harness spans (6), and the
 # denying hook's exit, two lines and the unchanged harness (4). Each runs once. Not measured by a run:
 # the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=704
+# RAISED 704 -> 747 by TOOL-dFoldedAudit-3: its 43 static sites, counted with the grep above off the
+# FA3 block — the refusal helper (5), AC1 (7, one in a loop run seven times), the row and skip arms S6
+# to S8 (6), AC3 (9), AC5 (2), AC6 (7), AC7 (4), AC8 (2) and AC9 (1). The helper runs nine times, so
+# the block executes 89. Not measured by a run: the pass that wrote it runs no suite.
+# RAISED 747 -> 756 by TOOL-dFoldedAudit-4: its 9 static sites, counted with the grep above off the FA4
+# block — AC1 (3, one in a loop run six times), S2 (3) and AC4 (3). Its eight calls of the FA3 refusal
+# helper add no static site and execute 40, so the block executes 54. Not measured by a run: the pass
+# that wrote it runs no suite.
+# RAISED 756 -> 778 by TOOL-dFoldedAudit-5: its 22 static sites, counted with the grep above off the FA5
+# block — AC11 (6, one in a loop run eleven times), S5 (6), AC12 (4), AC13's two absences (2), row 17's two
+# passes (2) and AC16 (2). Its five calls of the FA3 refusal helper add no static site and execute 25, so
+# the block executes 57. Not measured by a run: the pass that wrote it runs no suite.
+# RAISED 778 -> 815 by TOOL-dFoldedAudit-12: the 37 its block executes, as its New arm lines state, from
+# 21 static sites counted with the grep above — AC1 (9, a loop run seven times), AC3 (4, the order helper's
+# one site), AC2 (5), AC4 (5), AC5 (5), AC6 (4), AC7 (3) and AC8 (2). Not measured by a run: the pass that
+# wrote it runs no suite.
+# RAISED 815 -> 899 by TOOL-dFoldedAudit-15: the 84 its block executes, as its New arm lines state — AC9 (13),
+# AC10 (2), AC13's six calls of the FA3 refusal helper (30), AC20 (2 and one call, 7), AC22 (1, one call and
+# 2, 8), AC17 (2 and three calls, 17), AC21 (5) and AC25 (2). Not measured by a run: the pass that wrote it
+# runs no suite.
+FLOOR_ASSERTIONS=899
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

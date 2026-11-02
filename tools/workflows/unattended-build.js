@@ -1,12 +1,12 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.12', // gov:kit unattended-build@1.12 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.13', // gov:kit unattended-build@1.13 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
     { title: 'Spec', detail: 'author every missing spec, in the declared order, no code; then ONE agent commits the authored specs' },
-    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit, passing `context` (the build README and run mandate), `specs` (the spec format and every sibling spec), `checklist` (a caller\'s, else the resolver\'s gotchas.py --for-paths output, merged with the spec commit\'s checklist items, its by-design block left out; that checklist reads its invariants at the pinned `base` when one is passed, else at the spec commit\'s parent, which is the block the audit-OFF hand-out carries) and `scratch`, plus `priorFindings` and a per-subject `prevBlob` on a fold re-invoke; record the round, after the disposal at zero blockers so the disposition field is what was promoted. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
-    { title: 'Disposal', detail: 'dispose every confirmed and unverified finding by severity over the whole spec set, then hand out the roster, withheld on a clean round until its spec-audit record exists' },
+    { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit, passing `context` (the build README and run mandate), `specs` (the spec format and every sibling spec), `checklist` (a caller\'s, else the resolver\'s gotchas.py --for-paths output, merged with the spec commit\'s checklist items, its by-design block left out; that checklist reads its invariants at the pinned `base` when one is passed, else at the spec commit\'s parent, which is the block the audit-OFF hand-out carries) and `scratch`, plus `priorFindings` and a per-subject `prevBlob` on a fold re-invoke; record the round, after the disposal at zero blockers so the disposition field is what was promoted, and under a declared `disposal` after it at every exit so the row counts what the disposal did. Only when `specAudit` is declared: absent, the stage logs OFF by declaration and delegates nothing' },
+    { title: 'Disposal', detail: 'dispose every confirmed and unverified finding over the whole spec set, by nature under `disposal: by-nature` and by severity under `promote-all` or with no `disposal`, join each finding to a unit and a rev under either declared value, then hand out the roster, withheld on a clean round until its spec-audit record exists' },
   ],
 }
 
@@ -63,7 +63,9 @@ export const meta = {
 // from the blocker count and reaches the hand-out only at zero blockers, the CONVERGED one — still
 // reaches the stage whenever highs, mediums or lows stand confirmed. What it loses there is the
 // `--rescope` row: a promotion in this mode is a README roster row and a spec, with no amendment
-// record behind it.
+// record behind it. TOOL-dFoldedAudit-3 leaves that predicate alone: `disposal: by-nature` folds a
+// LOCAL finding and promotes one that needs a new mechanism, and `promote-all` or no `disposal` keeps
+// the severity rule, all three on the same count.
 //
 // THE S7 WARNING DEPENDS ON THE CALLER AND NOT ON DETECTION. A workflow script has no filesystem,
 // so this file cannot see whether a run-state file exists; `runStateExists` is a fact the caller
@@ -169,12 +171,23 @@ function chunk(a, n) {
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
 //            closes,                               //   optional: [<ask id>], the asks this unit answers
-//            planState }],                         //   REQUIRED in attended mode, from --plan
+//            planState,                            //   REQUIRED in attended mode, from --plan, and under
+//                                                  //   `disposal: by-nature` on every unit a disposal return
+//                                                  //   names: an absent state would read as unbuilt, so the
+//                                                  //   frozen join refuses it rather than defaulting
+//            rev }],                               //   optional: the header rev `--plan --paths` prints in
+//                                                  //   its fifth field, which a fold into a unit no audit
+//                                                  //   read compares against. Absent reads as 1
 //   mode: "unattended" | "attended",              // DEFAULTS to "unattended"
 //   runStateExists: <bool>,                         // caller-supplied; this script cannot detect it
 //   specAudit: "<YYYY-MM-DD>",                      // the README front-matter `spec-audit:` override the
 //                                                   //   driver's preflight pinned; ABSENT = the audit is
 //                                                   //   OFF by declaration and the roster follows SPEC
+//   disposal: "by-nature" | "promote-all",          // optional: the `spec-disposal:` line of `--plan --paths`,
+//                                                   //   which this runtime cannot read. ABSENT = a run
+//                                                   //   preflighted before SPEC_FOLD_CUTOFF: today's prompt,
+//                                                   //   today's row and no `dispositions`. Not audit-shaped:
+//                                                   //   with the audit off the stage never reads it
 //   briefDir: "memory/builds/<slug>/prompts",
 //   reviewDir: "memory/builds/<slug>/reviews",
 //   round: <integer>,                               // which audit round this invocation is
@@ -183,8 +196,10 @@ function chunk(a, n) {
 //                                                   //   whose spec is at `path`, `rev` the integer N of the
 //                                                   //   rev-N its status header carries at `blob`
 //   auditIds: [<unit id>],                          // AFTER A DISPOSAL: the `promotedIds` the previous
-//                                                   //   hand-out returned — the specs no spec-audit record
-//                                                   //   names yet; the audit is scoped to them
+//                                                   //   hand-out returned, or under a declared `disposal`
+//                                                   //   the ids `--chain-verdict` names, which may hold a
+//                                                   //   unit a round folded as well as one it promoted;
+//                                                   //   the audit is scoped to them
 //   subjectRound: <integer>                         // ON A FOLD RE-INVOKE: the round the current subject
 //                                                   //   set was first audited at, copied from the CONVERGING
 //                                                   //   return; keeps the driver's sequence on ONE subject
@@ -318,12 +333,14 @@ if (!units.length) {
 // never fire; a string `auditIds` became the whole set, re-auditing the subject a terminal round closed.
 // `specAudit` joins the table (TOOL-aBlindedTrial-3): a truthy non-string — `true`, `1`, the
 // `"later"` a README typo produces — must refuse rather than switch the audit ON, and a string that is
-// not a date is the same class; the driver refuses the same shape at preflight.
+// not a date is the same class; the driver refuses the same shape at preflight. `disposal` joins it
+// (TOOL-dFoldedAudit-3 S1): the value selects a rule, so one outside the pair refuses, never defaults.
 const TYPED = [
   ['round', Number.isInteger(a.round) && a.round > 0, 'a positive integer'],
   ['subjectRound', Number.isInteger(a.subjectRound) && a.subjectRound > 0, 'a positive integer'],
   ['auditIds', Array.isArray(a.auditIds), 'an array of unit ids'],
   ['specAudit', typeof a.specAudit === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(a.specAudit), 'a YYYY-MM-DD date string'],
+  ['disposal', a.disposal === 'by-nature' || a.disposal === 'promote-all', 'one of by-nature, promote-all'],
 ]
 for (const t of TYPED) {
   if (a[t[0]] !== undefined && !t[1]) {
@@ -354,6 +371,14 @@ const roundNo = a.round === undefined ? 1 : a.round
 const subjectRound = a.subjectRound === undefined ? roundNo : a.subjectRound
 const subject = slug + '-spec-set-r' + subjectRound
 const auditIds = a.auditIds === undefined ? [] : a.auditIds
+// TOOL-dFoldedAudit-3 S1 - THREE STATES, and absent is today's path byte for byte, because a run
+// preflighted before SPEC_FOLD_CUTOFF finishes under the old rule and a caller that predates this arg
+// composes none. That default fails loud the right way round: a post-cutoff run that forgets the arg
+// writes the old row, and `--review` refuses it before any spec is wrong. `by-nature` folds what needs
+// no new mechanism. `promote-all` keeps today's rule and refuses a fold, and both declared values write
+// the counted row and return `dispositions`.
+const disposalDeclared = a.disposal !== undefined
+const byNature = a.disposal === 'by-nature'
 // THE AUDIT IS OPT-IN, and absent means OFF (TOOL-aBlindedTrial-3, F1 resolved). Every audit-shaped
 // argument beside no declaration is an IMPOSSIBLE PAIRING, refused by name like the others below: a
 // caller-pinned subject set, a post-disposal scope and a fold re-invoke each presuppose a round that,
@@ -729,7 +754,10 @@ const SPEC_SCHEMA = {
 // the prompt says verbatim and the enum is re-checked on this side regardless. `terminalSubject` is
 // the ONE refusal that comes back as its own outcome rather than as stderr: the driver refusing a
 // round on a subject that already exited means the harness re-keyed nothing, and the throw must say
-// that, not "the round was not recorded" (closing review round 1, cluster B).
+// that, not "the round was not recorded" (closing review round 1, cluster B). `terminalExit` and
+// `exitState` are the HELD EXIT (TOOL-dFoldedAudit-3 S6): under a declared `disposal` a refusal naming
+// an exit writes no row, so the agent reports the state word and the record waits for the stage. Like
+// `token`, `exitState` is re-checked on this side, and it carries no enum here for the same reason.
 const REVIEW_RECORD_SCHEMA = {
   type: 'object',
   properties: {
@@ -737,6 +765,8 @@ const REVIEW_RECORD_SCHEMA = {
     exitCode: { type: 'integer' },
     stderr: { type: 'string' },
     terminalSubject: { type: 'boolean' },
+    terminalExit: { type: 'boolean' },
+    exitState: { type: 'string' },
   },
   // `token` is no longer REQUIRED by the schema, because the terminal-subject refusal has none to
   // return; the check on this side refuses a missing token by name, so nothing is weaker.
@@ -838,6 +868,22 @@ const SPEC_COMMIT_SCHEMA = {
 // into a spec and left out of `edges` is invisible here and is caught at the push boundary by the
 // hygiene join, which reads the specs themselves. The value bought here is that the pair is what
 // the stage must produce to get a roster at all.
+//
+// `dispositions` IS THE JOIN FROM A FINDING TO A UNIT AND A REV (TOOL-dFoldedAudit-3 S3): one entry per
+// finding per spec, so a fold into two specs is two entries with one `id`, and a refuted finding has
+// none. It sits under `properties` and out of `required` because an undeclared run's prompt never
+// asks for it, and absence is refused by `deriveDispositionFault`, as `edges === null` is below. It
+// binds what the stage SAYS it wrote for the same reason the pair above does: TOOL-dFoldedAudit-6's
+// deviation join is what reads a rev move against the tree.
+//
+// `siblingEdits` IS THE LIST OF SPECS A REPAIR REWROTE (TOOL-dFoldedAudit-4 S2), `{unit, rev}` and no
+// more, which is why it stays out of `dispositions`: an entry there needs a finding id and a severity
+// this list does not hold. It sits out of `required` for `dispositions`' reason, and only `by-nature`
+// asks for it. It binds what the stage SAYS as well: whether a sibling was edited is read from the tree.
+//
+// TOOL-dFoldedAudit-15 S17 - ONE SPELLING EACH, read by this schema and by `deriveDispositionFault`.
+const SEVERITIES = ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW']
+const NATURES = ['local', 'new-mechanism']
 const DISPOSAL_SCHEMA = {
   type: 'object',
   required: ['disposed', 'standing', 'promoted', 'folded', 'promotedIds', 'edges', 'placements', 'summary'],
@@ -870,6 +916,32 @@ const DISPOSAL_SCHEMA = {
           unit: { type: 'string' },
           repairs: { type: 'string' },
           order: { type: 'integer', minimum: 1 },
+        },
+      },
+    },
+    dispositions: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['id', 'severity', 'nature', 'specs', 'unit', 'rev'],
+        properties: {
+          id: { type: 'integer' },
+          severity: { type: 'string', enum: SEVERITIES },
+          nature: { type: 'string', enum: NATURES },
+          specs: { type: 'array', items: { type: 'string' } },
+          unit: { type: 'string' },
+          rev: { type: 'integer', minimum: 1 },
+        },
+      },
+    },
+    siblingEdits: {
+      type: 'array',
+      items: {
+        type: 'object',
+        required: ['unit', 'rev'],
+        properties: {
+          unit: { type: 'string' },
+          rev: { type: 'integer', minimum: 1 },
         },
       },
     },
@@ -1555,9 +1627,10 @@ if (badSubject !== -1) {
 }
 // TOOL-dTrueNorth-5 S2 - the pin fields, under the grammar `tier2-review.js` refuses them by, so a
 // caller-supplied set is refused here, naming the field and the stage, before the callee is spawned.
+const UNIT_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
 const unpinned = !specAudit ? null : subjects.reduce(function (hit, s, i) {
   if (hit) return hit
-  if (typeof s.id !== 'string' || !/^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/.test(s.id)) return { i: i, field: 'id', got: s.id }
+  if (typeof s.id !== 'string' || !UNIT_ID.test(s.id)) return { i: i, field: 'id', got: s.id }
   if (!Number.isInteger(s.rev) || s.rev < 1) return { i: i, field: 'rev', got: s.rev }
   return null
 }, null)
@@ -1649,6 +1722,9 @@ const auRaw = !specAudit ? null : await workflow(
     reviewDir: reviewDir,
     scratch: scratch,
     subjects: subjects,
+    // TOOL-dFoldedAudit-15 S8 - the callee asks for an address only under this, so an undeclared audit
+    // keeps today's synthesis. No key when none.
+    ...(disposalDeclared ? { disposal: a.disposal } : {}),
     // TOOL-aMendedFleet-111 S7 - `none`, so every judge writes its lens or verify file and the
     // deferred `next` below, which promises the re-run reuses them, is true. The callee's absent
     // default is Plan, under which no judge writes one and a re-run dispatches every judge again.
@@ -1852,7 +1928,17 @@ const auUnverified = !specAudit ? null : cleanRound ? 0 : auRaw.unverified
 // UNVERIFIED findings the disposal promoted (`adjudicated`) on the record that follows a disposal;
 // a record before the disposal cannot know those and omits them, which understates check 2's floor
 // and never overstates it.
-async function writeRound(disposition, adjudicated) {
+//
+// TOOL-dFoldedAudit-3 S6/S7 - UNDER A DECLARED `disposal` THE DISPOSAL PRECEDES THE RECORD AT EVERY
+// EXIT, because the row counts what it folded and promoted, and the retry above recorded before those
+// counts existed. The driver's refusal is already a side-effect-free probe of whether the round ended:
+// it returns before the row is written. So a first call at a positive count runs bare, a CONVERGING
+// round writes its row as ever, and a refusal naming an exit comes back as `terminalExit` with the
+// state word, which `verdict` holds through the stage. `tally` is the row's ` --folded <f> --promoted
+// <p>`, a third argument because `folded` and `promoted` are in their temporal dead zone when `verdict`
+// first calls this. A non-empty one carries the `--highs` and `--minors` counts at any blocker count,
+// and at a positive count it spawns as `record-exit`, so a trace tells the two spawns apart.
+async function writeRound(disposition, adjudicated, tally) {
   const minorsCount = au.confirmed - au.blockers - au.highs + (adjudicated || 0)
   const counts = ' --highs ' + au.highs + ' --minors ' + minorsCount
   const rv = attended
@@ -1862,19 +1948,23 @@ async function writeRound(disposition, adjudicated) {
       'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
       'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
       ' --verdict ' + (au.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
-      ' --blockers ' + au.blockers + (au.blockers === 0 ? counts : '') + disposition + '\n\n' +
+      ' --blockers ' + au.blockers + (au.blockers === 0 || tally ? counts : '') + (tally || '') + disposition + '\n\n' +
       'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
       'CEILING, BOUNDED — verbatim, and the command\'s exit code. Do not infer the token from the ' +
       'blocker count: it is a property of the SEQUENCE of rounds, which only the driver can see. ' +
-      (au.blockers === 0
+      (au.blockers === 0 || tally
         ? ''
-        : 'If the command REFUSES naming --disposition, --highs or --minors, this round is a terminal ' +
-          'exit: run the SAME command once more with' + counts + ' --disposition promote appended, ' +
-          'and return THAT run\'s token and exit code. ') +
+        : disposalDeclared
+          ? 'If the command REFUSES naming --disposition, --highs or --minors, this round is a terminal ' +
+            'exit and the disposal records it afterwards: do NOT retry. Return terminalExit: true and ' +
+            'exitState, the state word of the refusal\'s `exits <state>` clause, with no token. '
+          : 'If the command REFUSES naming --disposition, --highs or --minors, this round is a terminal ' +
+            'exit: run the SAME command once more with' + counts + ' --disposition promote appended, ' +
+            'and return THAT run\'s token and exit code. ') +
       'If the command REFUSES saying the subject already carries a terminal review ' +
       'round, return terminalSubject: true with its stderr and no token — do not retry under another ' +
       'subject. If the command fails for any other reason, return its stderr rather than a token.',
-    { label: renderAgentLabel('audit round ' + roundNo, 'record'), phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
+    { label: renderAgentLabel('audit round ' + roundNo, au.blockers > 0 && tally ? 'record-exit' : 'record'), phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
   )
   if (attended) log('attended mode: verdict computed from the blocker count; no round was recorded')
   // THE TERMINAL-SUBJECT REFUSAL IS ITS OWN THROW. It used to surface as "the round was not
@@ -1884,10 +1974,26 @@ async function writeRound(disposition, adjudicated) {
     throw new Error(
       'unattended-build: the driver refused round ' + roundNo + ' because the subject is terminal, ' +
         're-key it: `' + subject + '` already carries a terminal review round. A re-invocation after ' +
-        'a disposal passes the hand-out\'s `promotedIds` as `auditIds`, no `subjectRound` and no ' +
+        'a disposal passes ' + (disposalDeclared ? 'the ids `--chain-verdict` names' : 'the hand-out\'s `promotedIds`') +
+        ' as `auditIds`, no `subjectRound` and no ' +
         '`subjects`, so the promoted specs are audited under a fresh subject; a fold re-invoke passes ' +
         'the `subjectRound` the CONVERGING return handed back (driver said: ' + JSON.stringify(rv.stderr) + ').',
     )
+  }
+  // THE HELD EXIT. Only a first call at a positive count under a declared value can hold one, because
+  // the row is unwritten there; a held exit on a `tally` call would read as recorded. A state word
+  // outside the three throws by name: a reworded driver sentence that drops `exits` lands here.
+  if (disposalDeclared && !tally && au.blockers > 0 && rv && rv.terminalExit === true) {
+    const HELD_EXITS = ['NON-CONVERGENT', 'CEILING', 'BOUNDED']
+    if (HELD_EXITS.indexOf(rv.exitState) === -1) {
+      throw new Error(
+        'unattended-build: the record agent reported a terminal exit in state ' + JSON.stringify(rv.exitState) +
+          ' at round ' + roundNo + ', which is not one of ' + HELD_EXITS.join(', ') + '. Every refusal naming ' +
+          'an exit carries its `exits <state>` clause, so a word outside the three means that sentence moved ' +
+          'and nothing here can say which exit this round took.',
+      )
+    }
+    return rv.exitState
   }
   if (!rv || typeof rv.token !== 'string') {
     throw new Error(
@@ -1935,11 +2041,20 @@ const disposeFirst = au.blockers === 0 && outstanding > 0
 // `NOT-OWED` IS THE OFF PATH'S VERDICT, and it is deliberately NOT in `REVIEW_TOKENS`: the driver
 // never prints it, because no round was recorded for it to grade. It is a harness word for "no audit
 // was declared", distinct from every terminal token so nothing downstream can read it as CONVERGED.
-const verdict = !specAudit ? 'NOT-OWED' : disposeFirst ? 'CONVERGED' : await writeRound('')
+// A DECLARED ROUND WITH NOTHING TO DISPOSE (TOOL-dFoldedAudit-3 S7) records its zero counts here, since
+// no stage will; at a positive count the first call stays bare, because a CONVERGING row carries none.
+const verdict = !specAudit ? 'NOT-OWED' : disposeFirst ? 'CONVERGED'
+  : await writeRound('', 0, disposalDeclared && au.blockers === 0 ? ' --folded 0 --promoted 0' : '')
+// WHETHER THE RECORD WAITS FOR THE STAGE. A held exit joins `disposeFirst` here. Attended mode never
+// reaches the second half, because `writeRound` answers CONVERGING at any positive count there.
+const recordAfter = disposeFirst || (disposalDeclared && au.blockers > 0 && verdict !== 'CONVERGING')
 log(!specAudit
   ? 'audit round ' + roundNo + ': NOT-OWED — off by declaration, so no round was recorded and no count exists'
   : 'audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers + ' · unverified ' + au.unverified +
-    (disposeFirst ? ' — the driver records this exit AFTER the disposal, so its disposition field is what was promoted' : ''))
+    (recordAfter
+      ? ' — the driver records this exit AFTER the disposal, so ' +
+        (disposalDeclared ? 'its row counts what the disposal did' : 'its disposition field is what was promoted')
+      : ''))
 // THE AUDIT OBJECT EVERY NON-THROWING RETURN CARRIES (TOOL-aBlindedTrial-3). `ran` is the fact the
 // top-level `verdict` and `blockers` used to leave implicit, and it is what a caller reads to tell a
 // declared audit from an undeclared one; the counts beside it are the callee's integers, or the
@@ -1995,10 +2110,248 @@ if (verdict === 'CONVERGING') {
       ', and copy this return\'s prevSubjects' + (handPrior ? ' and priorFindings' : '') + ' as those args. Do not build. ' +
       // TOOL-aEvidencedLens-8 S7 - the boundary, stated where the fold is ordered.
       'This in-loop fold is the review loop\'s own fix step and not the exit\'s disposition: only a ' +
-      'terminal exit disposes, and it PROMOTES whatever stands.',
+      'terminal exit disposes, and it ' + (byNature ? 'disposes by nature.' : 'PROMOTES whatever stands.'),
     note: 'HELD AT AUDIT — the review loop has not ended, so no unit was built' +
       (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
   }
+}
+
+// TOOL-dFoldedAudit-3 S4 - THE REV THE AUDIT READ, joined by `specPath` as the clean round's binding line
+// joins it. A scoped round holds no subject for a sibling, so that unit answers its `units[]` `rev` where
+// the caller copied one from `--plan --paths` (TOOL-dFoldedAudit-15 S14), and 1 where it did not, so a fold
+// into it still has to name a rev above 1. A `rev` that is no integer of at least 1 reads as absent.
+function deriveReadRev(unit) {
+  const u = ordered.find(function (x) { return x.id === unit })
+  const s = u ? subjects.find(function (x) { return x.path === u.specPath }) : null
+  if (s) return s.rev
+  return u && Number.isInteger(u.rev) && u.rev >= 1 ? u.rev : 1
+}
+// WHAT `deriveReadRev` COMPARED, IN WORDS, so a refusal claims no read that did not happen. With no subject
+// the `rev` it answered equals the entry's only where the entry held a usable one: an absent or malformed
+// `rev` reads 1, which no such entry can equal.
+function renderReadRev(unit) {
+  const u = ordered.find(function (x) { return x.id === unit })
+  const n = deriveReadRev(unit)
+  if (u && subjects.some(function (x) { return x.path === u.specPath })) return 'the rev ' + n + ' the audit read'
+  return u && u.rev === n ? 'the rev ' + n + ' `--plan` reads' : 'rev 1, the lowest a spec carries'
+}
+// TOOL-dFoldedAudit-15 S19 - THE ONE TEST OF A `planState`. `--plan` prints `DONE (<grade>)` for a terminal
+// unit whose grade is not READY, so this is a prefix and never a closed set.
+function checkPlanDone(state) {
+  return state.indexOf('DONE') === 0
+}
+// TOOL-dFoldedAudit-3 S4 - THE RECONCILIATION, `''` or the reason a declared return does not join, its
+// tests in the spec's ten rules' order. The integers and the list must be one fact, and each finding
+// must reach a spec and a rev: a fold return naming no target is the shape `promoted 0, folded 10` took
+// before the sum was split, and the entries are what stop a HIGH leaving the count that names it. The
+// grades are compared to `au` and not to `confirmedFindings`, because the synthesis may regrade with a
+// justification and `au` holds that adjudication.
+// WHAT THIS DOES NOT CHECK: that a named spec moved or that its section 9 line exists. This runtime has
+// no filesystem, as `edges` says of itself, and TOOL-dFoldedAudit-6's deviation join reads the tree.
+//
+// TOOL-dFoldedAudit-4 S3 and S4 - THE SIBLING ROWS AND THE FROZEN JOIN, spec rows 11 to 16, under
+// `by-nature` alone and after the ten above, whose reasons the arms read first. A sibling edit is a rev
+// bump on a spec of this roster beside a repair unit. `planState` is the one fact here about what a unit
+// is, read by the `DONE` prefix the attended grading matches, so `DONE (THIN)` is as frozen as `DONE`, and
+// WONTDO reads as `DONE` too. A unit this invocation authored reads `MISSING` and passes. The state is
+// current because this stage runs before any unit is dispatched. An absent state refuses and never reads
+// as unbuilt, and only on a unit the stage named, so a caller passing none and folding nothing is not
+// touched. This is a refusal AFTER the write: a frozen spec a stage edited stays edited until the caller
+// reverts it, and the empty roster is what stops anything building on it.
+//
+// TOOL-dFoldedAudit-5 S4 - THE ADDRESS AND THE SHAPE, rows 17 and 18, under either declared value and
+// after the sixteen above. The chain's stop reads the address, so an agent retyping it could stop a chain
+// by narrowing it: row 17 holds each confirmed BLOCKER or HIGH to the review's `addresses`, in both
+// directions, confirmed ids only, because an UNVERIFIED finding adjudicated up has no address to read.
+// These strings reach a shell through `chainRecord`, so row 18 is the write boundary, and only a sibling
+// list `by-nature` read is tested. A review cannot test an id against the roster; rule 10 does that here.
+function deriveDispositionFault(d, promotedIds) {
+  const list = d.dispositions
+  if (!Array.isArray(list)) {
+    return 'the stage returned no `dispositions` list — every finding is disposed by id, and an absent ' +
+      'list and a declared empty one are different answers'
+  }
+  const rosterIds = ordered.map(function (u) { return u.id })
+  const byId = new Map()
+  for (const e of list) {
+    if (!e || typeof e !== 'object' || !Number.isInteger(e.id)) {
+      return 'a `dispositions` entry carries no integer `id`: ' + JSON.stringify(e)
+    }
+    if (!Array.isArray(e.specs) || !e.specs.length) {
+      return 'finding ' + e.id + ' names no spec — a disposition\'s address is the non-empty set of units its fix changes'
+    }
+    if (SEVERITIES.indexOf(e.severity) === -1 ||
+        NATURES.indexOf(e.nature) === -1 ||
+        !e.specs.every(function (s) { return typeof s === 'string' && !!s }) ||
+        typeof e.unit !== 'string' || !e.unit || !Number.isInteger(e.rev) || e.rev < 1) {
+      return 'finding ' + e.id + ' is outside the {id, severity, nature, specs, unit, rev} shape, so it names ' +
+        'no target to join: ' + JSON.stringify(e)
+    }
+    const first = byId.get(e.id)
+    if (!first) byId.set(e.id, e)
+    else if (first.severity !== e.severity || first.nature !== e.nature ||
+        String(first.specs.slice().sort()) !== String(e.specs.slice().sort())) {
+      return 'finding ' + e.id + ' carries two severities, natures or addresses — one finding has one disposition'
+    }
+  }
+  const ids = Array.from(byId.keys())
+  const localIds = ids.filter(function (id) { return byId.get(id).nature === 'local' })
+  const mechanismIds = ids.filter(function (id) { return byId.get(id).nature === 'new-mechanism' })
+  if (localIds.length !== d.folded || mechanismIds.length !== d.promoted) {
+    return '`dispositions` holds ' + localIds.length + ' local and ' + mechanismIds.length + ' new-mechanism id(s) ' +
+      'beside folded ' + d.folded + ' and promoted ' + d.promoted + ' — the integers and the list are one fact'
+  }
+  if (!Array.isArray(auRaw.confirmedFindings)) {
+    return 'the review returned no `confirmedFindings` array, so no confirmed finding can be joined to its ' +
+      'disposition by id'
+  }
+  const confirmedIds = Array.from(new Set(auRaw.confirmedFindings.map(function (f) { return f && f.id })))
+  const unnamed = confirmedIds.filter(function (id) { return !byId.has(id) })
+  if (unnamed.length) {
+    return 'confirmed finding(s) ' + unnamed.join(', ') + ' have no `dispositions` entry — every confirmed ' +
+      'finding is disposed by id'
+  }
+  const grades = confirmedIds.map(function (id) { return byId.get(id).severity })
+  const blockerGrades = grades.filter(function (g) { return g === 'BLOCKER' }).length
+  const highGrades = grades.filter(function (g) { return g === 'HIGH' }).length
+  if (blockerGrades !== au.blockers || highGrades !== au.highs) {
+    return '`dispositions` grades ' + blockerGrades + ' blocker(s) and ' + highGrades + ' high(s) over the confirmed ' +
+      'ids where the review counted ' + au.blockers + ' and ' + au.highs + ' — a grade cannot be lowered to hide a HIGH'
+  }
+  for (const e of list) {
+    if (e.nature === 'local' && (e.specs.indexOf(e.unit) === -1 || rosterIds.indexOf(e.unit) === -1)) {
+      return 'finding ' + e.id + ' folded into ' + e.unit + ', which is outside its address or this roster'
+    }
+  }
+  for (const id of localIds) {
+    const short = byId.get(id).specs.filter(function (s) {
+      return !list.some(function (e) { return e.id === id && e.unit === s })
+    })
+    if (short.length) {
+      return 'finding ' + id + ' stopped short of its address, with no fold into ' + short.join(', ') +
+        ' — a fold short of its address leaves a spec wrong'
+    }
+  }
+  for (const e of list) {
+    if (e.nature === 'local' && e.rev <= deriveReadRev(e.unit)) {
+      return 'finding ' + e.id + ' folded into ' + e.unit + ' at rev ' + e.rev + ', not above ' +
+        renderReadRev(e.unit) + ' — a fold is a rev bump'
+    }
+  }
+  for (const e of list) {
+    if (e.nature === 'new-mechanism' && promotedIds.indexOf(e.unit) === -1) {
+      return 'finding ' + e.id + ' was promoted to ' + e.unit + ', which `promotedIds` does not name'
+    }
+  }
+  const unclaimed = promotedIds.filter(function (id) {
+    return !list.some(function (e) { return e.nature === 'new-mechanism' && e.unit === id })
+  })
+  if (unclaimed.length) {
+    return 'promoted unit(s) ' + unclaimed.join(', ') + ' name no finding — a unit names the finding that made it'
+  }
+  for (const e of list) {
+    const stray = e.specs.filter(function (s) { return rosterIds.indexOf(s) === -1 && promotedIds.indexOf(s) === -1 })
+    if (stray.length) {
+      return 'finding ' + e.id + ' addresses ' + stray.join(', ') + ', which neither this roster nor `promotedIds` carries'
+    }
+  }
+  const edits = byNature ? d.siblingEdits : []
+  if (byNature) {
+    if (!Array.isArray(edits)) {
+      return 'the stage returned no `siblingEdits` list — an absent list and a declared empty one are different answers'
+    }
+    for (const e of edits) {
+      if (!e || typeof e !== 'object' || typeof e.unit !== 'string' || !e.unit || !Number.isInteger(e.rev)) {
+        return 'a `siblingEdits` entry is outside the {unit, rev} shape, so it names no spec and no rev: ' + JSON.stringify(e)
+      }
+      if (e.rev <= deriveReadRev(e.unit)) {
+        return 'sibling ' + e.unit + ' was edited at rev ' + e.rev + ', not above ' +
+          renderReadRev(e.unit) + ' — a sibling edit is a rev bump'
+      }
+      if (rosterIds.indexOf(e.unit) === -1) {
+        return 'sibling edit ' + e.unit + ' is outside this roster — a promoted unit\'s own spec is no sibling, ' +
+          'and a stray names no spec of this build'
+      }
+    }
+    if (edits.length && !promotedIds.length) {
+      return '`siblingEdits` names ' + edits.map(function (e) { return e.unit }).join(', ') + ' beside an empty ' +
+        '`promotedIds` — a correction with no repair unit is a fold, and it belongs in `dispositions`'
+    }
+    const foldTargets = list.filter(function (e) { return e.nature === 'local' }).map(function (e) { return e.unit })
+    for (const id of edits.map(function (e) { return e.unit }).concat(foldTargets)) {
+      const state = ordered.find(function (u) { return u.id === id }).planState
+      if (typeof state !== 'string' || !state) {
+        return 'unit ' + id + ' carries no `planState` — it is the only fact here about what a unit is, and an ' +
+          'absent state cannot read as unbuilt, so the caller copies it from `' + DRIVER + ' --plan ' + slug + ' --paths`'
+      }
+      if (checkPlanDone(state)) {
+        return 'unit ' + id + ' is frozen at `planState` ' + state + ' — a built spec is never edited, and a ' +
+          'correction to it is a new unit built on top'
+      }
+    }
+  }
+  if (!Array.isArray(auRaw.addresses) && au.blockers + au.highs > 0) {
+    return 'the review returned no `addresses` array beside ' + au.blockers + ' blocker(s) and ' + au.highs +
+      ' high(s), so no BLOCKER or HIGH can be held to its address'
+  }
+  const addressById = new Map()
+  for (const item of Array.isArray(auRaw.addresses) ? auRaw.addresses : []) {
+    for (const id of item && Array.isArray(item.ids) ? item.ids : []) addressById.set(id, item.specs)
+  }
+  for (const id of confirmedIds) {
+    const entry = byId.get(id)
+    if (!addressById.has(id) && entry.severity !== 'BLOCKER' && entry.severity !== 'HIGH') continue
+    const address = Array.from(new Set(Array.isArray(addressById.get(id)) ? addressById.get(id) : [])).sort()
+    if (String(address) !== String(Array.from(new Set(entry.specs)).sort())) {
+      return 'finding ' + id + ' addresses ' + entry.specs.join(', ') + ' where the review addressed ' +
+        (address.join(', ') || 'nothing') + ' — the stop reads the address, so a disposition never retypes it'
+    }
+  }
+  for (const e of list) {
+    const off = [e.unit].concat(e.specs).filter(function (s) { return !UNIT_ID.test(s) })
+    if (off.length) {
+      return 'finding ' + e.id + ' names ' + JSON.stringify(off) + ', outside the unit id grammar — these strings ' +
+        'reach a shell through the recording command'
+    }
+  }
+  for (const e of edits) {
+    if (!UNIT_ID.test(e.unit)) {
+      return 'sibling edit ' + JSON.stringify(e.unit) + ' is outside the unit id grammar — these strings reach a ' +
+        'shell through the recording command'
+    }
+  }
+  return ''
+}
+
+// TOOL-dFoldedAudit-5 S5 - THE ONE COMMAND THAT RECORDS THIS ROUND, rendered and never run: this runtime
+// has no shell, and the round is recorded after the caller commits the folds it joins to, then committed
+// itself, because the verb stages its record and commits nothing. Every token passed
+// `deriveDispositionFault`'s shape rows, so a `--finding` row is one shell word. `audited` is the units
+// whose `specPath` is among `subjects`, the clean round's join.
+function renderChainRecord(subject, audited, dispositions, siblingEdits) {
+  return DRIVER + ' --record-round ' + slug + ' --subject ' + subject + ' --audited "' + audited.join(' ') + '"' +
+    ' --blockers ' + au.blockers + ' --highs ' + au.highs +
+    dispositions.map(function (e) {
+      return ' --finding ' + [e.id, e.severity, e.nature, e.specs.join(','), e.unit, e.rev].join('/')
+    }).join('') +
+    siblingEdits.map(function (e) { return ' --sibling ' + e.unit + '@rev-' + e.rev }).join('')
+}
+// TOOL-dFoldedAudit-12 S2 - THE ONE SENTENCE THAT RUNS A ROUND'S COMMAND AND COMMITS THE RECORD. The verb
+// leaves that record staged, so a caller going straight to the verdict carries it into the next pass's
+// commit. The route below opens `Then run`, so each caller's sentence reads in order.
+function renderChainStep(command) {
+  return 'run `' + command + '`, then commit the chain record it staged. '
+}
+// THE ROUTE ON THE VERDICT, and the harness spells no stop value: the driver derives the verdict from the
+// record and the roster, so this file renders two commands and reads no set. It dispatches nothing until
+// STOP, because a folded spec is audited again and dispatching it would build a spec that round may still
+// move. The re-invocation's roster holds every unit, so nothing is lost. Both verbs answer with no
+// run-state file, so the sentence is the same in both modes.
+function renderChainRoute(stopClause) {
+  return 'Then run `' + DRIVER + ' --chain-verdict ' + slug + '` and take what it prints. CONTINUE: re-invoke ' +
+    'this harness with round: ' + (roundNo + 1) + ', auditIds: the ids it names, no subjectRound and no `subjects`, ' +
+    'and dispatch nothing. STOP: ' + stopClause + '; any units its line names after `override specs-audited` close ' +
+    'under that recorded override. HOLD: run the recipe it prints; an attended run asks the owner.'
 }
 
 // ============================================================== STAGE 3 — DISPOSAL
@@ -2026,15 +2379,38 @@ if (verdict === 'CONVERGING') {
 // round 1, cluster F). On a count of zero across both it announces the skip. A skip that looks like
 // a pass is indistinguishable from coverage, and an absent `agent:dispose:` line alone would read
 // the same over a stage that was never written.
+//
+// THREE STATES SINCE TOOL-dFoldedAudit-3. Absent and `promote-all` dispose by severity as above.
+// `by-nature` promotes a finding that needs a new mechanism and folds every other one, a BLOCKER
+// included, into the specs it touches. It answers why the stage left nature in the first place: the
+// stage still runs on the outstanding count and never on the verdict, so a round that converged over
+// eight highs still reaches it, and each disposition joins to a unit and a rev in
+// `deriveDispositionFault`, so no HIGH can vanish into prose. Either declared value returns that list.
 phase('Disposal')
+// WHAT THE CALLEE READ, never the roster. `subjects` is what `tier2-review.js` was handed — caller-supplied,
+// or resolver-returned only for units whose spec path resolves at HEAD — and a unit the spec stage authored
+// carries its committed `specPath` only where the commit stage ran (the comment above the hand-out says
+// when it did not), so the roster minus the refused set can name units no audit opened. A record over
+// those would certify an audit that never read them. Round-3 cluster B of aProbedUnit. The clean round's
+// binding line and the chain's `audited` row are this one join. TOOL-dFoldedAudit-12 S1 - it sits above
+// the stage because the DEGRADED return reads it, and nothing it reads moves past this line.
+const auditedIds = !specAudit ? [] : auditUnits
+  .filter(function (u) {
+    return specRefused.indexOf(u.id) === -1 && u.specPath &&
+      subjects.some(function (s) { return s.path === u.specPath })
+  })
+  .map(function (u) { return u.id })
 // WHAT STOOD IS HOISTED OUT OF THE STAGE so the hand-out can report it. It never reached the return
 // at all, which is `degradation-known-but-unreported` — the class this file names three times in
 // its own comments and then committed one screen below. `promoted` and `folded` ride the same
 // hoist: honest zeros on the skip path, the stage's own integers past it, `null` where the stage
 // returned no integer — a stated absence, never a zero, the audit adapter's own rule. `promotedIds`
 // is the hoist's third rider: the units the promotions became, which the caller passes back as
-// `auditIds` so the next invocation audits them before anything builds them.
-let stood = [], promoted = 0, folded = 0, refuted = 0, promotedIds = []
+// `auditIds` so the next invocation audits them before anything builds them. `dispositions` is the
+// fourth, a stated `[]` on a skip and on the absent path, where the stage's list is not read.
+// `siblingEdits` is the fifth, a stated `[]` wherever the stage's list is not read, which is everywhere
+// but `by-nature` (TOOL-dFoldedAudit-4 S2).
+let stood = [], promoted = 0, folded = 0, refuted = 0, promotedIds = [], dispositions = [], siblingEdits = []
 // TWO SKIPS, TWO REASONS, said apart: "confirmed no finding" is a fact about a round that ran, and
 // saying it over a round that did not would be the audit-that-never-ran reading as a clean one.
 if (!specAudit) {
@@ -2043,8 +2419,11 @@ if (!specAudit) {
   log('disposal: skipped — round ' + roundNo + ' confirmed no finding and left none unverified, so nothing stands to dispose')
 } else {
   log('disposal: ' + au.confirmed + ' confirmed and ' + au.unverified + ' unverified finding(s) stand at a ' +
-    verdict + ' exit · blockers ' + au.blockers + ' · highs ' + au.highs + ' — disposing by severity' +
-    (verdict === 'CONVERGED' ? ', on CONVERGED too' : ''))
+    verdict + ' exit · blockers ' + au.blockers + ' · highs ' + au.highs + ' — disposing by ' +
+    (byNature ? 'nature' : 'severity') + (verdict === 'CONVERGED' ? ', on CONVERGED too' : ''))
+  // `<report stem>`, the whole token TOOL-dFoldedAudit-6's predicate joins a section 9 entry to a record
+  // by. A caller renaming a free-named report under M8 renames this citation in the same commit.
+  const reportStem = lastReport.replace(/\\/g, '/').split('/').pop().replace(/\.md$/, '')
   // MODE-AWARE IN ONE CLAUSE, on the same `attended` the file already branches GROUND on: `--rescope`
   // `fail 48`s without a run-state file, which is the state attended mode is DEFINED by, so the
   // attended promotion is a README roster row. Until the predicate moved off the verdict this stage
@@ -2060,13 +2439,20 @@ if (!specAudit) {
       ' unverified. Open the report and take each confirmed finding at the severity the report ' +
       'gives it. Every count above is of RAW findings by report id and never of the items a report ' +
       'may merge them into, so a finding merged into an item takes that item\'s severity and still ' +
-      'counts once, by its own id. Each BLOCKER or HIGH id is its own unit even where the report merged ' +
+      'counts once, by its own id. Each ' + (byNature ? 'NEW MECHANISM ' : '') + 'BLOCKER or HIGH id is its own unit even where the report merged ' +
       'several ids into one item, because the unit floor, the driver\'s owed count and check 2 all count ' +
       'raw ids: ids sharing an item each take a unit, and each unit\'s spec names its id and the item it ' +
       'shares. An UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
       'not cleared — read the code yourself and take it at the severity you adjudicate. ' +
-      'BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
-      'route. PROMOTE every BLOCKER and every HIGH: ' +
+      (byNature
+        ? 'BUILD-METHOD M4 disposes a spec audit BY NATURE, independent of severity. A finding NEEDS A NEW ' +
+          'MECHANISM when its fix adds a document, gate, adopter, generated artifact, verb or write path that ' +
+          'no unit\'s Scope names; every other finding is LOCAL: a wording or citation, a missing witness, an ' +
+          'edge mirror, a criterion\'s reach, any small fix. FOLD every LOCAL finding, a BLOCKER included, into ' +
+          'the spec or specs it touches: bump each spec\'s rev and add a section 9 line naming `' + reportStem +
+          '` and the finding id. PROMOTE every NEW MECHANISM finding: '
+        : 'BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
+          'route. PROMOTE every BLOCKER and every HIGH: ') +
       (attended
         ? 'add its row to the build README\'s authored Units table, because the recording verbs are ' +
           'unavailable with no run-state file, '
@@ -2082,7 +2468,8 @@ if (!specAudit) {
       'IS RENUMBERED. A promotion that repairs no unit in particular takes an order ABOVE EVERY ' +
       'unit in this build — the honest append-past-the-end default, and the only case in which a ' +
       'promotion may land there. Never guess a position for one. ' +
-      'PROMOTE every MEDIUM and every LOW too, BATCHED: all of them go into ONE unit whose spec ' +
+      (byNature ? 'PROMOTE every NEW MECHANISM MEDIUM and LOW too, BATCHED: ' : 'PROMOTE every MEDIUM and every LOW too, BATCHED: ') +
+      'all of them go into ONE unit whose spec ' +
       'names every finding by report id in its §1 and gives each its own §2 item. Use TWO units ' +
       'only when the minors split into two disjoint write sets by BUILD-METHOD M6\'s clauses, so ' +
       'the halves build concurrently — never one unit per minor. Add each batch unit by the same ' +
@@ -2090,7 +2477,16 @@ if (!specAudit) {
       'reason naming every report id it closes. A finding is not an ask, so it is named in scope ' +
       'and never through the `closes` verb, which joins a spec to a `BACKLOG.md` ask. In ' +
       '`placements`, `repairs` names the one unit every minor in the batch lands on, or `none` ' +
-      'when they land on several. Nothing is folded: return `folded` as 0. ' +
+      'when they land on several. ' +
+      (byNature
+        ? 'WHERE A PROMOTED UNIT CORRECTS TEXT IN A SIBLING SPEC, REWRITE THE SIBLING\'S TEXT ITSELF: bump that ' +
+          'spec\'s rev and add a section 9 line naming the repair unit and `' + reportStem + '`. Do not state in ' +
+          'the repair spec that the sibling\'s text stands overridden. Only an UNBUILT sibling: a spec at CLOSED ' +
+          'or WONTDO stays frozen, a finding whose fix would change one is never folded there, and it is PROMOTED ' +
+          'to a new unit built on top, its `dispositions` entry reading `new-mechanism`. Return every spec so ' +
+          'edited in `siblingEdits` as {unit, rev}, and `siblingEdits: []` when you edited none. Every section 9 ' +
+          'line this stage writes names `' + reportStem + '`. '
+        : 'Nothing is folded: return `folded` as 0. ') +
       'EVERY §3 EDGE YOU WRITE GETS BOTH OF ITS ENDS, in the same pass: a **consumes-from** `X` in ' +
       'one spec is a **hands-off** back in X\'s own §3, amended there as a rev-N bump with its ' +
       'section 9 line. ' +
@@ -2109,7 +2505,15 @@ if (!specAudit) {
       'Return in `placements` one `{unit, repairs, order}` per promoted unit: `repairs` names the ' +
       'unit that promotion repairs, or the bare string `none`, and `order` is the integer you ' +
       'wrote into its status header. Both fields are REQUIRED, and `edges: []` is a declared ' +
-      'absence rather than a missing key.',
+      'absence rather than a missing key.' +
+      (disposalDeclared
+        ? ' Return in `dispositions` one entry per finding per spec as {id, severity, nature, specs, unit, rev}: ' +
+          '`id` the integer raw id, `nature` exactly `local` or `new-mechanism`, `specs` the unit ids on the ' +
+          'finding\'s `**Specs:**` line, or where none is printed the non-empty unit ids the fix would change, ' +
+          '`unit` the spec folded into or the unit promoted to, and `rev` that spec\'s rev now. A refuted finding ' +
+          'has no entry.' +
+          (byNature ? '' : ' Every entry\'s `nature` is `new-mechanism`, because nothing folds under this rule.')
+        : ''),
     renderStageOpts('disposal', { label: renderAgentLabel('audit round ' + roundNo, 'dispose'), phase: 'Disposal', schema: DISPOSAL_SCHEMA }),
   )
   // NO PARTIAL HAND-OUT. Deciding which units a standing finding touches needs the tree, which this
@@ -2127,7 +2531,8 @@ if (!specAudit) {
   // AND THE COUNTS MUST RECONCILE, IN SUM AND IN SPLIT. Every outstanding finding is promoted,
   // refuted or named standing — the prompt says so — so a return whose numbers do not add to
   // confirmed + unverified is the same self-contradiction with the contradiction moved into the
-  // integers. `folded` stays in the sum so the reconciliation keeps its shape, and it must be 0. The
+  // integers. `folded` stays in the sum so the reconciliation keeps its shape, and under `promote-all`
+  // and the absent path it must be 0; under `by-nature` a fold is legal and the sum still holds it. The
   // sum alone was `containment-tested-one-way` (closing review round 1, cluster D): `promoted 0,
   // folded 10` reconciled against confirmed 10 with two blockers and three highs in it, and the
   // roster went out over two blockers folded into prose. TOOL-aEvidencedLens-8 S2/S3 - the
@@ -2147,12 +2552,20 @@ if (!specAudit) {
   // nothing else; a `refuted` above `unverified` has refuted a CONFIRMED finding, which is the
   // re-review M4 forbids. It joins the sum and leaves the promotion floors alone: every confirmed
   // finding is still promoted.
+  //
+  // AND UNDER A DECLARED VALUE THE INTEGERS JOIN THEIR LIST (TOOL-dFoldedAudit-3 S4). The sum says how
+  // many findings were disposed; `deriveDispositionFault` says which, into what, at which rev, and that
+  // no grade moved to get there. Its reason sits after the sum and ahead of the unit bounds, which read
+  // the same array. `by-nature` lifts the `folded` and `promoted < confirmed` arms and no other, and
+  // `promote-all` keeps both with their text, because that refusal is the rule that value restores.
   stood = Array.isArray(d && d.standing) ? d.standing : []
   const counted = Number.isInteger(d && d.promoted) && Number.isInteger(d && d.folded)
   promoted = counted ? d.promoted : null
   folded = counted ? d.folded : null
   refuted = d && d.refuted !== undefined ? d.refuted : 0
   promotedIds = Array.isArray(d && d.promotedIds) ? d.promotedIds : []
+  dispositions = disposalDeclared && d && Array.isArray(d.dispositions) ? d.dispositions : []
+  siblingEdits = byNature && d && Array.isArray(d.siblingEdits) ? d.siblingEdits : []
   // AN EDGE IS A PAIR AND A REPAIR SITS BESIDE WHAT IT REPAIRS (TOOL-cMendedVintage-19). A bullet
   // whose mirror is missing from the stage's OWN list is a bullet it wrote at one end; the malformed
   // entry joins that bucket rather than getting a bucket of its own, because an edge naming no verb
@@ -2206,19 +2619,32 @@ if (!specAudit) {
   // each item lists, and returns null when an id is placed in no item or in two.
   const confirmedMinors = au.confirmed - au.blockers - au.highs
   const adjudicated = counted ? Math.max(d.promoted - au.confirmed, 0) : 0  // UNVERIFIED findings promoted
-  const minors = confirmedMinors + adjudicated
-  const unitFloor = au.blockers + au.highs + (minors > 0 ? 1 : 0)
-  const unitCeiling = au.blockers + au.highs + adjudicated + (confirmedMinors > 0 ? 2 : 0)
+  // TOOL-dFoldedAudit-3 S5 - UNDER `by-nature` THE BOUNDS COUNT THE NEW-MECHANISM FINDINGS, one entry per
+  // id, so a folded HIGH demands no unit. The refusal below keeps its shape over these counts. With rule
+  // 9's set equality, two HIGHs sharing a unit fall below the floor and five minors in five units rise
+  // past the ceiling, so neither needs a rule of its own.
+  const mechanism = dispositions.filter(function (e, i) {
+    return !!e && e.nature === 'new-mechanism' && dispositions.findIndex(function (o) { return !!o && o.id === e.id }) === i
+  })
+  const boundBlockers = byNature ? mechanism.filter(function (e) { return e.severity === 'BLOCKER' }).length : au.blockers
+  const boundHighs = byNature ? mechanism.filter(function (e) { return e.severity === 'HIGH' }).length : au.highs
+  const minors = byNature ? mechanism.length - boundBlockers - boundHighs : confirmedMinors + adjudicated
+  const unitFloor = boundBlockers + boundHighs + (minors > 0 ? 1 : 0)
+  const unitCeiling = boundBlockers + boundHighs +
+    (byNature ? (minors > 0 ? 2 : 0) : adjudicated + (confirmedMinors > 0 ? 2 : 0))
   const refutedOk = Number.isInteger(refuted) && refuted >= 0 && refuted <= au.unverified
+  const dispositionFault = disposalDeclared && d && counted ? deriveDispositionFault(d, promotedIds) : ''
   // TWO ARMS BELOW ARE UNREACHABLE TODAY, kept on purpose and said so (guard-above-a-fold class).
   // `d.promoted < au.confirmed` is settled by the sum, `folded` 0 and `refuted <= unverified`, which
   // leave `promoted = confirmed + unverified - refuted`. The `promoted`/`promotedIds` pairing is
   // settled by the unit bounds: a positive `promoted` has a floor of one, a zero one a ceiling of
   // zero. Each stays as its own NAMED refusal should the arm above it ever loosen; neither is a
-  // redundant guard to delete, and the bounds and sum above them are not either.
+  // redundant guard to delete, and the bounds and sum above them are not either. Both stay true under
+  // `by-nature`: the first does not apply there, and the second is the same arithmetic over the entries,
+  // because `deriveDispositionFault` makes `promoted` the count of distinct new-mechanism ids.
   if (!d || d.disposed !== true || stood.length || !counted || !refutedOk ||
       d.promoted + d.folded + refuted + stood.length !== outstanding ||
-      d.folded !== 0 || d.promoted < au.confirmed ||
+      (!byNature && (d.folded !== 0 || d.promoted < au.confirmed)) || dispositionFault ||
       promotedIds.length < unitFloor || promotedIds.length > unitCeiling ||
       (d.promoted > 0) !== (promotedIds.length > 0) ||
       edges === null || oneWay.length || unplaced.length || misplaced.length) {
@@ -2233,14 +2659,16 @@ if (!specAudit) {
         ? 'the counts do not reconcile — promoted ' + d.promoted + ' + folded ' + d.folded +
           ' + refuted ' + refuted + ' + standing ' + stood.length + ' is not confirmed ' + au.confirmed +
           ' + unverified ' + au.unverified
-      : d.folded !== 0
+      : !byNature && d.folded !== 0
         ? 'folded ' + d.folded + ' — a spec audit\'s MEDIUM and LOW are PROMOTED, batched, never ' +
           'folded (owner, 2026-10-05)'
-      : d.promoted < au.confirmed
+      : !byNature && d.promoted < au.confirmed
         ? 'promoted ' + d.promoted + ' is below the ' + au.confirmed + ' confirmed — every confirmed ' +
           'finding is promoted'
+      : dispositionFault
+        ? dispositionFault
       : promotedIds.length < unitFloor
-        ? promotedIds.length + ' unit(s) for ' + au.blockers + ' blocker(s), ' + au.highs +
+        ? promotedIds.length + ' unit(s) for ' + boundBlockers + ' blocker(s), ' + boundHighs +
           ' high(s) and ' + minors + ' minor(s), below the floor of ' + unitFloor + ' — one unit per ' +
           'RAW blocker and high id, merged items included, plus one for the minors'
       : promotedIds.length > unitCeiling
@@ -2280,19 +2708,44 @@ if (!specAudit) {
       folded: folded,
       refuted: refuted,
       promotedIds: promotedIds,
+      dispositions: dispositions,
+      siblingEdits: siblingEdits,
       note: 'DEGRADED — findings were not disposed: ' + why + '. No roster is handed out: a ' +
         'roster minus the units a finding touches is a judgement this runtime cannot make.' +
         // THE RECORD-AFTER-DISPOSAL PATH HAS NOTHING TO RECORD YET, and says so rather than writing a
         // CONVERGED row with no disposition over findings nobody disposed — the blindness the ordering
         // exists to end. The subject is not terminal, so the caller's route back is the driver's own verb.
-        (disposeFirst
-          ? ' The round was NOT recorded: at zero blockers the driver\'s row follows the disposal so its ' +
-            'disposition field is what was promoted. Dispose the findings by hand under BUILD-METHOD M4, ' +
+        // A HELD EXIT IS THE SAME CASE (TOOL-dFoldedAudit-3), so the by-hand command spells that row's
+        // verdict and blocker count, and the two counts only the hand that disposes can supply.
+        // TOOL-dFoldedAudit-12 S3 - UNDER A DECLARED `disposal` THE ROUTE ENDS ON THE VERDICT, never a
+        // dispatch, so a hand disposal cannot build around the chain. The lists are empty on purpose:
+        // on this return they are what a refused stage said, so the hand that disposes writes the rows.
+        (recordAfter
+          ? ' The round was NOT recorded: ' +
+            (disposalDeclared
+              ? 'under a declared `disposal` the driver\'s row follows the disposal at every exit, so it ' +
+                'counts what the disposal did. '
+              : 'at zero blockers the driver\'s row follows the disposal so its ' +
+                'disposition field is what was promoted. ') +
+            'Dispose the findings by hand under BUILD-METHOD M4, ' +
             'then record it yourself — `' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
-            ' --verdict "CLEAN" --blockers 0 --highs ' + au.highs + ' --minors ' + confirmedMinors +
-            '`, adding to `--minors` every promoted UNVERIFIED finding, with ` --disposition promote` ' +
-            'appended iff any finding became a unit — and dispatch from `' + DRIVER + ' --plan ' + slug +
-            ' --paths`, the resume route.'
+            ' --verdict ' + (au.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') + ' --blockers ' + au.blockers +
+            ' --highs ' + au.highs + ' --minors ' + confirmedMinors +
+            (disposalDeclared
+              ? ' --folded <folded> --promoted <promoted>`, each the count of findings you disposed that ' +
+                'way, adding to `--minors` every UNVERIFIED finding folded or promoted, with ` --disposition ' +
+                'promote` appended where `--promoted` is above 0 and ` --disposition fold` where it is 0 and ' +
+                '`--folded` is above 0'
+              : '`, adding to `--minors` every promoted UNVERIFIED finding, with ` --disposition promote` ' +
+                'appended iff any finding became a unit') +
+            (disposalDeclared
+              ? ' — then commit the disposal\'s folds and specs, ' +
+                renderChainStep(renderChainRecord(subject, auditedIds, [], []) +
+                  ' --finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>') +
+                'One `--finding` per finding you disposed, and one `--sibling <unit>@rev-<n>` per sibling edit. ' +
+                renderChainRoute('dispatch every unit `' + DRIVER + ' --plan ' + slug + ' --paths` lists as READY, ' +
+                  'one main-loop Workflow call each')
+              : ' — and dispatch from `' + DRIVER + ' --plan ' + slug + ' --paths`, the resume route.')
           : ''),
     }
   }
@@ -2306,7 +2759,38 @@ if (!specAudit) {
 }
 // THE RECORD FOLLOWS THE DISPOSAL AT ZERO BLOCKERS (cluster B, above): the field is derived from what
 // was actually promoted, so a unit the stage made out of an UNVERIFIED finding reaches check 2.
-if (disposeFirst) await writeRound(promotedIds.length ? ' --disposition promote' : '', Math.max(promoted - au.confirmed, 0))
+// TOOL-dFoldedAudit-3 S7 - AND AT EVERY EXIT UNDER A DECLARED VALUE, the disposition derived from the
+// counts: `promote` where anything was promoted, `fold` where only folds stood, none where nothing did.
+// `adjudicated` takes the folds too, so `folded + promoted` stays `blockers + highs + minors` when an
+// UNVERIFIED finding folds. The held `verdict` already reached the log and `audit`, so the row's token
+// must equal it.
+if (recordAfter) {
+  const recorded = await writeRound(
+    !disposalDeclared
+      ? (promotedIds.length ? ' --disposition promote' : '')
+      : promoted > 0 ? ' --disposition promote' : folded > 0 ? ' --disposition fold' : '',
+    Math.max(promoted + (disposalDeclared ? folded : 0) - au.confirmed, 0),
+    disposalDeclared ? ' --folded ' + folded + ' --promoted ' + promoted : '',
+  )
+  if (recorded !== verdict) {
+    throw new Error(
+      'unattended-build: the driver recorded ' + recorded + ' at round ' + roundNo + ' where the first call held ' +
+        verdict + '. The refusal that named the exit and the row that recorded it are one fact, and this stage ' +
+        'disposed under the first; the row now on the record says otherwise.',
+    )
+  }
+}
+// TOOL-dFoldedAudit-5 S5 - PAST THE STAGE ONLY: a dead disposal returned above with no command, so nothing
+// is recorded over findings nobody disposed, and the by-hand shape in that note is no command: its rows
+// are placeholders. `''` on the absent path and with the audit off, which is how a run preflighted before
+// the cutoff keeps today's hand-out.
+const chainRecord = specAudit && disposalDeclared ? renderChainRecord(subject, auditedIds, dispositions, siblingEdits) : ''
+// TOOL-dFoldedAudit-15 S7 - THE ACTION BESIDE `chainRecord`, one expression for both returns that carry it,
+// so an attended run with every unit terminal holds a route as well as a command.
+function renderChainAction(stopClause) {
+  return 'RECORD this round: commit the disposal\'s folds and specs, ' + renderChainStep(chainRecord) +
+    renderChainRoute(stopClause)
+}
 // ==================================================== THE HAND-OUT, and what is graded before it
 // S4/S4b - THE PER-UNIT REFUSAL, and in attended mode it happens HERE rather than at `--dispatch`.
 // IT DID NOT LEAVE WITH THE BUILD AGENT (TOOL-aHoistedPass-6): it grades which units may be
@@ -2350,7 +2834,7 @@ if (attended) {
         'value nobody supplied.'
       break
     }
-    if (st.indexOf('DONE') === 0) { skippedDone.push(u.id); continue }
+    if (checkPlanDone(st)) { skippedDone.push(u.id); continue }
     if (st === 'READY') continue
     if (st === 'MISSING' || st === 'THIN' || st === 'FORKED') {
       planRefusal =
@@ -2398,6 +2882,11 @@ if (attended && !buildUnits.length) {
     folded: folded,
     refuted: refuted,
     promotedIds: promotedIds,
+    dispositions: dispositions,
+    siblingEdits: siblingEdits,
+    ...(chainRecord
+      ? { chainRecord: chainRecord, nextAction: renderChainAction('no unit awaits dispatch, because every one is terminal') }
+      : {}),
     // THE DEGRADED TERM IS NOT SKIPPED HERE. This return was written with a hard-coded clean note,
     // which bypasses the composition the main return performs — and `specRefused` is live on this
     // path, so a run that refused specs and then found nothing to build reported 'complete'.
@@ -2446,12 +2935,19 @@ const handOut = {
   // UNITS those promotions became, carried here because the caller's next act depends on them: a
   // promoted spec is audited by re-invoking this harness with them as `auditIds` BEFORE it is
   // built, and a caller re-reading `--plan` for them would find them READY and build them unaudited.
+  // `dispositions` joins each finding to its unit and rev, so a caller never infers what a fold touched.
+  // `siblingEdits` names the specs a repair rewrote, which a chain counts as folded and this file does not.
   standing: stood,
   promoted: promoted,
   folded: folded,
   refuted: refuted,
   promotedIds: promotedIds,
-  nextAction: promotedIds.length
+  dispositions: dispositions,
+  siblingEdits: siblingEdits,
+  ...(chainRecord ? { chainRecord: chainRecord } : {}),
+  nextAction: chainRecord
+    ? renderChainAction('dispatch the roster below, one main-loop Workflow call per unit')
+    : promotedIds.length
     ? 'AUDIT the promoted specs before any of them is dispatched: re-invoke this harness with round: ' +
       (roundNo + 1) + ', auditIds: ' + JSON.stringify(promotedIds) + ' and no subjectRound and no ' +
       '`subjects`, so they take a fresh subject and the resolver scopes to them; dispatch the roster ' +
@@ -2527,18 +3023,8 @@ if (!specAudit && specCommit) handOut.specCommit = specCommit
 // prescribes, which is why `dispatch` stays on this return. Unattended only: an attended run has an
 // owner in the loop and no DoD term reading it.
 if (cleanRound && !attended) {
-  // OWED IS WHAT THE CALLEE READ, never the roster. `subjects` is what `tier2-review.js` was handed
-  // — caller-supplied, or resolver-returned only for units whose spec path resolves at HEAD — and a
-  // unit the spec stage authored carries its committed `specPath` only where the commit stage ran
-  // (the comment above the hand-out says when it did not), so the roster minus the refused set can
-  // name units no audit opened. A binding line over
-  // those would certify an audit that never read them. Round-3 cluster B of aProbedUnit.
-  const owed = auditUnits
-    .filter(function (u) {
-      return specRefused.indexOf(u.id) === -1 && u.specPath &&
-        subjects.some(function (s) { return s.path === u.specPath })
-    })
-    .map(function (u) { return u.id })
+  // OWED IS WHAT THE CALLEE READ, never the roster: `auditedIds`, above the hand-out.
+  const owed = auditedIds
   if (!owed.length) {
     throw new Error(
       'unattended-build: the clean round at ' + roundNo + ' covered NO unit — none of the audit ' +
@@ -2561,6 +3047,8 @@ if (cleanRound && !attended) {
     const s = subjects.find(function (x) { return x.path === u.specPath })
     return id + '@rev-' + s.rev
   }).join(' ')
+  const cleanDispatch = 'dispatch every unit `' + DRIVER + ' --plan ' + slug + ' --paths` lists as READY, ' +
+    'one main-loop Workflow call each, with `dispatch` below'
   handOut.roster = []
   handOut.nextAction =
     'WRITE the spec-audit record this clean round left unwritten, BEFORE any unit is dispatched: the ' +
@@ -2576,9 +3064,10 @@ if (cleanRound && !attended) {
       ? 'NOT covered by this round and NOT to be named on that line: ' + uncovered.join(', ') +
         ' — each owes a later audit once its spec is committed. '
       : '') +
-    'Commit the record, then dispatch every unit `' + DRIVER + ' --plan ' + slug + ' --paths` lists as READY, ' +
-    'one main-loop Workflow call each, with `dispatch` below. No roster is handed out here: a roster ' +
-    'over an unrecorded audit is the build `specs-audited` cannot close.'
+    (chainRecord
+      ? 'Commit the record, then ' + renderChainStep(chainRecord) + renderChainRoute(cleanDispatch) + ' '
+      : 'Commit the record, then ' + cleanDispatch + '. ') +
+    'No roster is handed out here: a roster over an unrecorded audit is the build `specs-audited` cannot close.'
   handOut.note = 'HELD AT HAND-OUT — a clean round with no tracked spec-audit record; the roster is ' +
     'withheld until one names ' + owed.join(', ') +
     (specRefused.length ? ' · DEGRADED — ' + specRefused.length + ' spec(s) refused' : '')

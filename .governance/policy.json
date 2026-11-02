@@ -1,5 +1,5 @@
 {
-  "catalogue_blob": "5621dad016c850fa6fcb8a2e0614a77694d0341d",
+  "catalogue_blob": "bb2074823940e61af13e2340132e4e16bbbe6bf6",
   "keys": {
     "actions.free": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -990,6 +990,21 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "scored-signals-and-reasoning"
+    },
+    "review.spec-audit.chain-ceiling": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": 4
+    },
+    "review.spec-audit.chain-stop": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "own-work"
+    },
+    "review.spec-audit.disposal": {
+      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
+      "source": "default",
+      "value": "by-nature"
     },
     "review.twin": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",

@@ -161,13 +161,10 @@ Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dFurnishedOrders-61.
 
-Ids whose spec moved past its audited revision: TOOL-dFurnishedOrders-1@rev-1 TOOL-dFurnishedOrders-10@rev-1 TOOL-dFurnishedOrders-11@rev-1 TOOL-dFurnishedOrders-12@rev-1 TOOL-dFurnishedOrders-13@rev-1 TOOL-dFurnishedOrders-14@rev-1 TOOL-dFurnishedOrders-15@rev-1 TOOL-dFurnishedOrders-16@rev-1
-TOOL-dFurnishedOrders-17@rev-1 TOOL-dFurnishedOrders-18@rev-1 TOOL-dFurnishedOrders-19@rev-1 TOOL-dFurnishedOrders-2@rev-1 TOOL-dFurnishedOrders-20@rev-1 TOOL-dFurnishedOrders-22@rev-1 TOOL-dFurnishedOrders-23@rev-1 TOOL-dFurnishedOrders-24@rev-1 TOOL-dFurnishedOrders-25@rev-1
-TOOL-dFurnishedOrders-26@rev-1 TOOL-dFurnishedOrders-27@rev-1 TOOL-dFurnishedOrders-28@rev-1 TOOL-dFurnishedOrders-29@rev-1 TOOL-dFurnishedOrders-3@rev-1 TOOL-dFurnishedOrders-30@rev-1 TOOL-dFurnishedOrders-31@rev-1 TOOL-dFurnishedOrders-32@rev-1 TOOL-dFurnishedOrders-34@rev-1
-TOOL-dFurnishedOrders-35@rev-1 TOOL-dFurnishedOrders-36@rev-1 TOOL-dFurnishedOrders-37@rev-1 TOOL-dFurnishedOrders-4@rev-1 TOOL-dFurnishedOrders-5@rev-1 TOOL-dFurnishedOrders-6@rev-1 TOOL-dFurnishedOrders-7@rev-1 TOOL-dFurnishedOrders-8@rev-1 TOOL-dFurnishedOrders-9@rev-1
-TOOL-dFurnishedOrders-38@rev-1 TOOL-dFurnishedOrders-39@rev-1 TOOL-dFurnishedOrders-40@rev-1 TOOL-dFurnishedOrders-41@rev-1 TOOL-dFurnishedOrders-42@rev-1 TOOL-dFurnishedOrders-43@rev-1 TOOL-dFurnishedOrders-44@rev-1 TOOL-dFurnishedOrders-45@rev-1 TOOL-dFurnishedOrders-46@rev-1
-TOOL-dFurnishedOrders-47@rev-1 TOOL-dFurnishedOrders-48@rev-1 TOOL-dFurnishedOrders-49@rev-1 TOOL-dFurnishedOrders-50@rev-1 TOOL-dFurnishedOrders-51@rev-1 TOOL-dFurnishedOrders-52@rev-1 TOOL-dFurnishedOrders-53@rev-1 TOOL-dFurnishedOrders-54@rev-1 TOOL-dFurnishedOrders-56@rev-1
-TOOL-dFurnishedOrders-57@rev-1 TOOL-dFurnishedOrders-58@rev-1 TOOL-dFurnishedOrders-59@rev-1 TOOL-dFurnishedOrders-60@rev-1.
+Ids whose spec moved past its audited revision: TOOL-dFurnishedOrders-10@rev-1 TOOL-dFurnishedOrders-11@rev-1 TOOL-dFurnishedOrders-12@rev-1 TOOL-dFurnishedOrders-14@rev-1 TOOL-dFurnishedOrders-15@rev-1 TOOL-dFurnishedOrders-16@rev-1 TOOL-dFurnishedOrders-17@rev-1 TOOL-dFurnishedOrders-18@rev-1
+TOOL-dFurnishedOrders-2@rev-1 TOOL-dFurnishedOrders-20@rev-1 TOOL-dFurnishedOrders-22@rev-1 TOOL-dFurnishedOrders-23@rev-1 TOOL-dFurnishedOrders-24@rev-1 TOOL-dFurnishedOrders-25@rev-1 TOOL-dFurnishedOrders-26@rev-1 TOOL-dFurnishedOrders-27@rev-1 TOOL-dFurnishedOrders-28@rev-1
+TOOL-dFurnishedOrders-29@rev-1 TOOL-dFurnishedOrders-3@rev-1 TOOL-dFurnishedOrders-30@rev-1 TOOL-dFurnishedOrders-37@rev-1 TOOL-dFurnishedOrders-5@rev-1 TOOL-dFurnishedOrders-6@rev-1 TOOL-dFurnishedOrders-7@rev-1 TOOL-dFurnishedOrders-8@rev-1 TOOL-dFurnishedOrders-42@rev-1
+TOOL-dFurnishedOrders-43@rev-1 TOOL-dFurnishedOrders-46@rev-1 TOOL-dFurnishedOrders-48@rev-1 TOOL-dFurnishedOrders-50@rev-1 TOOL-dFurnishedOrders-51@rev-1 TOOL-dFurnishedOrders-52@rev-1 TOOL-dFurnishedOrders-57@rev-1 TOOL-dFurnishedOrders-58@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->

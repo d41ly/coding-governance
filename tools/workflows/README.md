@@ -269,6 +269,11 @@ the run, and a unit placed by path whose committed spec, found by its H1, is ano
 after the commit. Every refusal that asks for a commit names a fresh
 re-invoke, never a `resumeFromRunId` resume, because a resume replays the cached answer that refused.
 
+Under a declared `disposal`, every hand-out past the disposal carries `chainRecord`, the one command
+that records the round through the driver's `--record-round`. The harness renders it and never runs
+it, because the round is recorded after the caller commits the folds it joins to. A dead disposal
+returns before it, and with no `disposal` or no audit the key is absent.
+
 `intensity` is `'full'` or `'light'`, and absent it is `'full'`. Only the caller picks it; the harness
 never chooses light for itself, whatever the diff's size or history:
 
@@ -287,7 +292,9 @@ trust boundary is not one to review light: the `security` lens is one of the two
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
-it as `lens=<key>`. Every return carries five fields beside the counts:
+it as `lens=<key>`. On a spec subject under a declared `disposal` a complete return also carries
+`addresses`, one `{ids, severity, specs}` per BLOCKER or HIGH item; with no `disposal` that list is
+empty and an item owes no `specs`. Every return carries five fields beside the counts:
 
 - `shape` — one record line, also logged, in this fixed grammar:
   `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.

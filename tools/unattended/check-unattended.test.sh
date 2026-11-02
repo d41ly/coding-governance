@@ -244,6 +244,9 @@ RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 # and therefore the same announcement on every bar. Whether it should fire there is dFoldedVerdict's
 # question, not this fixture's, and it is untouched.
 DISPOSITION_CUTOFF="2099-01-01"
+# THE SAME REASON, TOOL-dFoldedAudit-2: a blank key announces on every run, and a date ahead of every
+# fixture record moves no arm's verdict. The blank-cutoff arm strips this line.
+SPEC_FOLD_CUTOFF="2099-01-01"
 UNDECLARED_WRITE_BUDGET="${UWB_OVERRIDE:-0}"
 EOF
 }
@@ -480,13 +483,14 @@ add_local_scope() { printf 'ANCHOR_SCOPE="local"\n' >> .unattended.conf; }
 # ---- `UEND`) still reads one the calling block sets first — a definition crossing a cut is safe,
 # ---- its caller's block crossing one is what the variable scan is for.
 dispconf() { mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf; printf 'DISPOSITION_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
+set_fold_conf() { sed -i '/^SPEC_FOLD_CUTOFF=/d' .unattended.conf; printf 'SPEC_FOLD_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
 mkdisp() { # base-region-rows · head-region-rows · run rows
   mkdir -p memory/builds/tDisp
   printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$1" > memory/builds/tDisp/README.md
   git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m dispbase --no-verify
   DISPBASE=$(git rev-parse HEAD)
   printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$2" > memory/builds/tDisp/README.md
-  printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n%b' "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
+  printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: %s\nwitness: abc\nbase: %s\n\n%b' "${DISPPHASE:-RUNNING}" "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
   # COMMITTED, not merely staged. The cutoff grades the record's own FIRST-COMMIT date; a staged
   # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
   # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
@@ -496,6 +500,75 @@ mkdisp() { # base-region-rows · head-region-rows · run rows
   # population, and the red arm has to commit AT the cutoff to be graded by the rule.
   git add -A >/dev/null 2>&1
   GIT_COMMITTER_DATE="${DISPDATE:-2026-09-01T12:00:00 +0000}" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
+}
+# ---- TOOL-dFoldedAudit-14: A ROTATED FOLDER'S HISTORY, on top of `mkdisp`'s record. DISPPHASE sets that
+# ---- record's phase. Every commit is pinned at noon and every honest archive carries its true blob
+# ---- name. Each tenant keeps twenty filler lines of its own, or `--follow` has no rename worth
+# ---- detecting and the plain read would stay at the archive's own add.
+ROT_R=memory/builds/tDisp/RUN.md
+ROT_ROW='review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 2 · folded 3 · promoted 0 · disposition fold'
+ROT_FILLER=""
+for _rf_i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do ROT_FILLER="${ROT_FILLER}filler first line $_rf_i\n"; done
+write_rot_commit() { # YYYY-MM-DD · message
+  git add -A >/dev/null 2>&1
+  GIT_COMMITTER_DATE="$1T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m "$2" --no-verify >/dev/null 2>&1
+}
+write_rot_archive() { # archive phase · new phase · filler word · YYYY-MM-DD · message -> leaves the archive in ROT_A
+  local _ra_b
+  _ra_b=$(git hash-object "$ROT_R")
+  ROT_A=${ROT_R%/*}/RUN.$1.${_ra_b:0:8}.md
+  git mv "$ROT_R" "$ROT_A"
+  sed -e "s/^phase: .*/phase: $2/" -e "s/^filler [a-z]* /filler $3 /" -e '/ review · item /d' "$ROT_A" > "$ROT_R"
+  write_rot_commit "$4" "$5"
+}
+write_rot_history() { # the last two commits' date, or nothing for History H's own · 1 when the FIRST run holds the fold row
+  DISPPHASE=LANDED DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" "$ROT_FILLER"
+  if [ "${2:-}" = 1 ]; then printf '2026-10-21T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"; write_rot_commit 2026-10-21 row; fi
+  write_rot_archive LANDED LANDED second 2026-11-20 rotate1; ROT_1=$ROT_A
+  if [ "${2:-}" != 1 ]; then printf '2026-11-21T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"; write_rot_commit "${1:-2026-11-21}" row; fi
+  write_rot_archive LANDED RUNNING third "${1:-2026-11-25}" rotate2; ROT_2=$ROT_A
+}
+write_rot_stub() { # phase in the name -> writes a stub under its true blob name, uncommitted, and leaves it in ROT_A
+  local _rs_b
+  _rs_b=$(printf 'stub\n' | git hash-object --stdin)
+  ROT_A=${ROT_R%/*}/RUN.$1.${_rs_b:0:8}.md
+  printf 'stub\n' > "$ROT_A"
+}
+read_rot_lib() { ( . "$TMP/$KIT_REL/lib-unattended.sh"; "$@" ); } # a library call in its own shell, as a sourcer makes it
+seed_spc() { # the authored pair's body, or `absent` for no pair at all
+  reset_tree
+  build tSpc
+  if [ "$1" != absent ]; then
+    printf '\n<!-- roster:units -->\n%s\n<!-- /roster:units -->\n' "$1" >> memory/builds/tSpc/README.md
+  fi
+  sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tSpc/RUN.md
+  git add -A && git commit -q -m "tSpc baseline" --no-verify
+  sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tSpc/RUN.md
+  git add -A && git commit -q -m "tSpc baseline pin" --no-verify
+  awk -v e="$UEND" '$0 == e { for (i = 1; i <= 3; i++) print "| [ARCH-tSpc-" i " — a unit](spec/u" i ".md) | DEFERRED | rev-1 | 2026-08-01 |" } { print }' \
+    memory/builds/tSpc/README.md > /tmp/tspc.$$ && mv /tmp/tspc.$$ memory/builds/tSpc/README.md
+  git add -A && git commit -q -m "three units specced, the third beyond the authored roster" --no-verify
+}
+# ---- TOOL-dFoldedAudit-10: ONE CHAIN ROUND WRITTEN BY THE REAL VERB, committed beside `mkdisp`'s record and
+# ---- a tracked spec-audit record, so a drift in the round's grammar reds the join's arms. The ids need
+# ---- no roster, because neither the verb nor the join reads one. A refused round is a FAIL by name, or
+# ---- a green arm would stand on a record that was never written.
+CR_REC=memory/builds/tDisp/reviews/2026-11-02-review-FIX-tFix-1-spec-audit.md
+write_round_fixture() { # run rows · the binding line, or nothing · the flags after --subject S1
+  local _cr_rows=$1 _cr_bind=$2; shift 2
+  reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+  DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$_cr_rows"
+  if [ -n "$_cr_bind" ]; then mkdir -p "${CR_REC%/*}"; printf '%s\n' "$_cr_bind" > "$CR_REC"; fi
+  env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash "$TMP/$KIT_REL/unattended.sh" --record-round tDisp --subject S1 "$@" >/dev/null 2>&1 \
+    || { echo "FAIL the fixture round refused: $*"; st=1; }
+  write_rot_commit 2026-11-02 round
+}
+# ---- TOOL-dFoldedAudit-9: ONE FOLD ROW IN A RECORD WHOSE KEY A RUN COMMIT MOVED ABOVE BASE. `FR_DATED`,
+# ---- `D_ONE` and `FR_FOLD` are the calling block's.
+write_moved_disp() { # SPEC_FOLD_CUTOFF at BASE · a later run commit's value
+  reset_tree; dispconf 2000-01-01; set_fold_conf "$1"
+  DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+  set_fold_conf "$2"; write_rot_commit 2026-11-02 "run key"
 }
 drop_readme()  { rm -f memory/builds/tRun/README.md; }
 break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
@@ -1153,6 +1226,24 @@ reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh
 mkconf; sed -i 's/^HALT_CODES_CORE=.*/HALT_CODES_CORE=""/' $KIT_REL/unattended.sh
 hit "$(run)" "the driver declares no HALT_CODES_CORE vocabulary, so the abort verb would validate against an empty set and accept anything"
 
+# ---- TOOL-dFoldedAudit-15 AC29: THE THREE RESCOPE-ACT BRANCHES, one `mutate` each, every one of which reds
+# ---- the bar if it misses its line. The unmutated driver is the control, and the failing case, observed
+# ---- at the close and not by the pass that wrote this, is a mutation that misses its line.
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
+out=$(run)
+miss "$out" "the driver declares no readable PARK_ACTS_OWED"
+miss "$out" "the parked-ACT taxonomy names an act"
+miss "$out" "cannot find the closed act alternation"
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
+mutate $KIT_REL/unattended.sh 's/^PARK_ACTS_OWED=.*/PARK_ACTS_OWED=""/'
+hit "$(run)" "UNATTENDED check 2 FAILED — the driver declares no readable PARK_ACTS_OWED, so the act axis of the surfaced count would range over an empty set and a retirement would silently stop being owed"
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
+mutate $KIT_REL/unattended.sh 's/^PARK_ACTS_OWED=.*/PARK_ACTS_OWED="retire supersede ghostact"/'
+hit "$(run)" "UNATTENDED check 2 FAILED — the parked-ACT taxonomy names an act --rescope's own closed case cannot accept, so no row can ever carry it and the surfaced count is silently narrower than the set says"
+reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
+mutate $KIT_REL/unattended.sh 's/^    retire|supersede|add|defer) ;;/    retire|supersede|add|defer|park) ;;/'
+hit "$(run)" "UNATTENDED check 2 FAILED — the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing"
+
 # ---- and the two record-level refusals. The population is every TRACKED run-state file, archived ones
 # ---- included, so the fixture has to be committed for the check to see it at all.
 reset_tree; mkdir -p $KIT_REL && cp "$HERE/unattended.sh" $KIT_REL/unattended.sh; mkconf
@@ -1422,8 +1513,8 @@ hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a recor
 
 # ...and a FOLD_CUTOFF the leg cannot read is named, not defaulted: empty sorts before every date
 # and reds the whole grandfathered population, malformed sorts after and disarms the clause. Named
-# inside check 2's own failure rather than at a `fail` site of its own, because the pinned check-2
-# ordinals in memory/project/unarmed-branches.txt sit below the read.
+# inside check 2's own failure rather than at a `fail` site of its own, because three pinned check-2
+# ordinals sat below the read until TOOL-dFoldedAudit-15 armed them.
 reset_tree; mkconf
 mutate $KIT_REL/unattended.sh 's|^FOLD_CUTOFF=.*|FOLD_CUTOFF=2026-09-15|'
 hit "$(run)" "the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none"
@@ -1547,6 +1638,314 @@ reset_tree; mkconf
 mutate $KIT_REL/unattended.sh 's|^SPEC_COUNTS_CUTOFF=.*|SPEC_COUNTS_CUTOFF=2026-10-06|'
 hit "$(run)" "the driver declares no readable ISO-date SPEC_COUNTS_CUTOFF, so the counted-spec-row clause cannot tell"
 
+# ---- TOOL-dFoldedAudit-2 S7 to S9: A SPEC EXIT ROW PAST SPEC_FOLD_CUTOFF COUNTS ITS FOLDS AND PROMOTIONS,
+# ---- graded on the record's own first commit either side of the cutoff, so no arm depends on the day
+# ---- it runs. Hand-written rows stand for what the driver refuses to write, and each red row has a
+# ---- green control beside it, so no arm passes by finding nothing.
+FR_DATED="2026-11-02T12:00:00 +0000"; FR_EARLY="2026-10-30T12:00:00 +0000"
+FR_BAD="record an exit row past SPEC_FOLD_CUTOFF whose folded and promoted counts are absent, fall short of the findings it counted, or disagree with its disposition, so a confirmed finding cannot be traced to a fold or a unit"
+FR_FOLD='2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 2 · folded 3 · promoted 0 · disposition fold\n'
+# AC1 and AC2: one fold row, either side of the cutoff. Past it the row owes no unit and leaves
+# `specbad` and `closefold`; before it the old clause reads it, so a landed record keeps its grading.
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_EARLY" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+# AC3: the closing review is no spec subject, so the same counts on the slug still fold nothing.
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 3 · folded 3 · promoted 0 · disposition fold\n'
+hit "$(run)" "record disposition fold on a row carrying highs and minors, and a counted exit folds nothing on any subject"
+# AC5: the clause reads the counts and never the verdict word, so `verdict CLEAN` hides nothing...
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 0 · folded 1 · promoted 0 · disposition fold\n'
+hit "$(run)" "spec subject(s) S1 $FR_BAD"
+# ...AC6: a disposition the counts do not derive reds...
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 2 · folded 1 · promoted 2 · disposition fold\n'
+hit "$(run)" "spec subject(s) S1 $FR_BAD"
+# ...and so does a row past the cutoff that counts neither, the shape an old driver writes.
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_TWO" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · disposition promote\n'
+hit "$(run)" "spec subject(s) S1 $FR_BAD"
+# ...and a sum above the findings is legal, because an adjudicated UNVERIFIED finding counts there.
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · folded 3 · promoted 0 · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+# TOOL-dFoldedAudit-15 AC2: the least any honest split of the folds can build, which supersedes this unit's
+# `max(1, p - m)` in behaviour. Each promoted high is its own unit and the promoted minor one more.
+FR_PROM='2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 1 · folded 0 · promoted 3 · disposition promote\n'
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_TWO" "$FR_PROM"
+hit "$(run)" "against a floor of 3"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_FOUR" "$FR_PROM"
+miss "$(run)" "check 2 FAILED"
+# ...and a fold lowers the floor by what it can account for: highs · minors · folded · promoted · owe · the
+# region one id short of it · the region at it. The failing case, observed at the close and not by the pass
+# that wrote this: `owe = pp[it] - mm[it]` restored reads the first row at 2.
+for _fl_row in '3 1 1 3 3 D_TWO D_FOUR' '2 2 1 3 2 D_TWO D_THREE' '1 2 1 2 1 D_ONE D_TWO'; do
+  read -r _fl_h _fl_m _fl_f _fl_p _fl_o _fl_short _fl_full <<<"$_fl_row"
+  _fl_line="2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs $_fl_h · minors $_fl_m · folded $_fl_f · promoted $_fl_p · disposition promote\n"
+  reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+  DISPDATE="$FR_DATED" mkdisp "$D_ONE" "${!_fl_short}" "$_fl_line"
+  out=$(run)
+  hit "$out" "against a floor of $_fl_o"
+  hit "$out" "on a row past SPEC_FOLD_CUTOFF, one per blocker and high its folds cannot account for, plus one for its minors"
+  reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+  DISPDATE="$FR_DATED" mkdisp "$D_ONE" "${!_fl_full}" "$_fl_line"
+  miss "$(run)" "check 2 FAILED"
+done
+# TOOL-dFoldedAudit-15 AC5: a closing row keeps today's bytes, and a row with no counts names the fold rule's
+# real extent instead of saying every finding is promoted.
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_TWO" '2026-11-02T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 1 · disposition promote\n'
+out=$(run)
+hit "$out" "one per subject, or on a row carrying highs and minors counts, on any subject, one per blocker and high plus one for its minors"
+miss "$out" "its folds cannot account for"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN · blockers 0 · CONVERGED\n'
+out=$(run)
+hit "$out" "in a record begun before SPEC_FOLD_CUTOFF, refuses fold at all of them)"
+miss "$(grep -F 'spec subject(s)' <<<"$out")" "so every confirmed finding is promoted)"
+# ...a promoted row with every promotion a minor still owes the one unit
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · folded 0 · promoted 2 · disposition promote\n'
+hit "$(run)" "against a floor of 1"
+# ...and a fold owes none with DISPOSITION_CUTOFF stripped too, which is why the branch precedes `graded`.
+reset_tree; mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+out=$(run)
+miss "$out" "check 2 FAILED"
+hit "$out" "DISPOSITION_CUTOFF is blank or undeclared"
+# AC8 and AC11: the key's two other shapes. A blank one is announced, because a clause turned off reads
+# like one finding nothing. A malformed one is named inside check 2 and grades no row as past it.
+reset_tree; mkconf; sed -i '/^SPEC_FOLD_CUTOFF=/d' .unattended.conf
+hit "$(run)" "SPEC_FOLD_CUTOFF is blank or undeclared, so a run preflighted from this tree keeps the old rule, and a record is graded by the conf at its own BASE"
+reset_tree; mkconf; set_fold_conf 2026-11-01
+miss "$(run)" "SPEC_FOLD_CUTOFF is blank or undeclared"
+reset_tree; mkconf; set_fold_conf soon
+out=$(run)
+hit "$out" ".unattended.conf declares SPEC_FOLD_CUTOFF as no ISO date, so the exit-row clause cannot tell"
+hit "$out" "'soon'"
+reset_tree
+
+# ---- TOOL-dFoldedAudit-14: A ROTATED RECORD DATES TO THE RUN THAT WROTE IT, read through the library over
+# ---- a twice-rotated folder. The first archive keeps the `--follow` date, the second floors at the first
+# ---- one's first touch, and the plain read moves for nobody, which AC5 holds under the graded read too.
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+write_rot_history
+same "AC1 the second archive floors at the first one's first touch" "$(read_rot_lib read_first_commit_date "$ROT_2" tenancy)" "2026-11-20"
+same "AC1 the plain read keeps the oldest add" "$(read_rot_lib read_first_commit_date "$ROT_2")" "2026-10-20"
+same "AC1 the first archive has no earlier sibling" "$(read_rot_lib read_first_commit_date "$ROT_1" tenancy)" "2026-10-20"
+read_rot_lib check_landed_facts_due "$ROT_2" 2026-11-02; same "AC5 the default read grandfathers the archive" "$?" "1"
+read_rot_lib check_landed_facts_due "$ROT_2" 2026-11-02 tenancy; same "AC5 the opt-in grades it" "$?" "0"
+same "AC5 the driver holds one opted-in call" "$(grep -cE '^[^#]*check_landed_facts_due .*tenancy' "$HERE/unattended.sh")" "1"
+same "AC5 the leg holds one opted-in call" "$(grep -cE '^[^#]*check_landed_facts_due .*tenancy' "$HERE/check-unattended.sh")" "1"
+# AC2: both rotations on one day, which `%cs` cannot order, so the first archive floors on nothing.
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+write_rot_history 2026-11-20
+same "AC2 same-day rotations still order the second archive" "$(read_rot_lib read_first_commit_date "$ROT_2" tenancy)" "2026-11-20"
+same "AC2 the first archive does not floor itself on the second" "$(read_rot_lib read_first_commit_date "$ROT_1" tenancy)" "2026-10-20"
+# ---- H6's left-shift gate: a legal fold row stays green once its record rotates, and a row in a record
+# ---- begun before the cutoff keeps the old rule, so the floor cannot be read as a grant.
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+write_rot_history
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+write_rot_history "" 1
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+# ---- M3's left-shift gate: a stub moves the record beside it across the cutoff unless check 2 reds it.
+# ---- One stub per way a file can pass for a rotation, the row dated past the cutoff in a record begun
+# ---- before it. The green controls beside them are an archive edited after it rotated, a stub dated
+# ---- before the cutoff, and a blank cutoff; a stub's failure text is hit whole so no arm passes on a name.
+ROT_STUB="an archive added on or after SPEC_FOLD_CUTOFF that no rotation wrote"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf '2026-11-05T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"
+printf 'stub\n' > "${ROT_R%/*}/RUN.ABORTED.deadbeef.md"
+write_rot_commit 2026-11-05 stub
+hit "$(run)" "${ROT_R%/*}/RUN.ABORTED.deadbeef.md ($ROT_STUB"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf '2026-11-05T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"
+write_rot_stub ABORTED
+write_rot_commit 2026-11-05 stub
+hit "$(run)" "$ROT_A ($ROT_STUB"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+DISPPHASE=HELD DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf '2026-11-05T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"
+write_rot_commit 2026-11-05 row
+write_rot_stub ABORTED
+write_rot_commit 2026-11-05 stub
+hit "$(run)" "$ROT_A ($ROT_STUB"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+write_rot_history
+printf 'edited after it rotated\n' >> "$ROT_2"
+write_rot_commit 2026-11-26 edit
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-02
+DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf 'stub\n' > "${ROT_R%/*}/RUN.ABORTED.deadbeef.md"
+write_rot_commit 2026-10-30 stub
+miss "$(run)" "$ROT_STUB"
+reset_tree; dispconf 2000-01-01; set_fold_conf ""
+DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf 'stub\n' > "${ROT_R%/*}/RUN.ABORTED.deadbeef.md"
+write_rot_commit 2026-11-05 stub
+miss "$(run)" "$ROT_STUB"
+reset_tree
+
+# ---- TOOL-dFoldedAudit-10: A CHAIN ROUND JOINS TO THE TERMINAL REVIEW ROW AND THE SPEC-AUDIT RECORDS IT
+# ---- CLAIMS. Each red sits beside a green control over the same round, so no arm passes by finding
+# ---- nothing. Every `--finding` is `new-mechanism`, because the round's counts do not read nature and a
+# ---- `local` row owes a spec once TOOL-dFoldedAudit-11 lands. The failing cases, observed at the close and
+# ---- not by the pass that wrote this: the exceeds test forced false greens AC1 and AC2; the attended
+# ---- count forced to 0 reds AC4; the whole-key test turned into `index` reds AC5; the join's file list
+# ---- narrowed to the live RUN.md reds AC6.
+CR_ROW1='2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · folded 1 · promoted 0 · disposition fold\n'
+CR_ROW0='2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 0 · folded 0 · promoted 0\n'
+CR_BIND='**Serves:** spec-audit FIX-tFix-1@rev-1 FIX-tFix-2@rev-1'
+CR_ONE="FIX-tFix-1 FIX-tFix-2"
+CR_H4=4/HIGH/new-mechanism/FIX-tFix-1/FIX-tFix-4/1
+CR_COUNTS="counts 0 blocker(s) and 1 high(s), and the round disposes 0 and 0"
+CR_ATT="took each as attended"
+CR_LOST="audited FIX-tFix-3 named by no tracked spec-audit record"
+# AC1: a forged clean round beside a row carrying a HIGH, and the sentence names the record's own path.
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 0
+out=$(run)
+hit "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$(git ls-files '*-chain-rounds.md') (round 1, subject S1: its first terminal review row $CR_COUNTS, so a confirmed finding reached no row the chain verdict reads)"
+# AC2: the blockers half, and one HIGH id on two rows counts once, as the verb counts it.
+write_round_fixture '2026-11-02T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · highs 0 · minors 0 · folded 2 · promoted 0 · disposition fold\n' "$CR_BIND" \
+  --audited "$CR_ONE" --blockers 1 --highs 0 --finding 5/BLOCKER/new-mechanism/FIX-tFix-1/FIX-tFix-4/1
+hit "$(run)" "counts 2 blocker(s) and 0 high(s), and the round disposes 1 and 0"
+write_round_fixture '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 0 · folded 2 · promoted 0 · disposition fold\n' "$CR_BIND" \
+  --audited "$CR_ONE" --blockers 0 --highs 1 --finding 5/HIGH/new-mechanism/FIX-tFix-1/FIX-tFix-4/1 --finding 5/HIGH/new-mechanism/FIX-tFix-2/FIX-tFix-4/1
+hit "$(run)" "counts 0 blocker(s) and 2 high(s), and the round disposes 0 and 1"
+# AC3: the green control, and a second HIGH id above the row's count stays legal: "exceeds", never "differs".
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 1 --finding "$CR_H4"
+miss "$(run)" "UNATTENDED check 2 FAILED"
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 1 --finding "$CR_H4" --finding 6/HIGH/new-mechanism/FIX-tFix-2/FIX-tFix-5/1
+miss "$(run)" "UNATTENDED check 2 FAILED"
+# AC4: no row at all, then a mid-loop row, both attended, and neither silent.
+write_round_fixture "" "" --audited "$CR_ONE" --blockers 0 --highs 0
+out=$(run)
+miss "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$CR_ATT"
+write_round_fixture '2026-11-02T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 1 · CONVERGING\n' "" --audited "$CR_ONE" --blockers 0 --highs 0
+out=$(run)
+miss "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$CR_ATT"
+# AC5: an id no record names, a substring of one a record names, a line past the window, a range that
+# does name it, and a round with no terminal row, which joins nothing.
+write_round_fixture "$CR_ROW0" "$CR_BIND" --audited "FIX-tFix-1 FIX-tFix-3" --blockers 0 --highs 0
+hit "$(run)" "$CR_LOST"
+printf '%s FIX-tFix-31@rev-1\n' "$CR_BIND" > "$CR_REC"; write_rot_commit 2026-11-02 substring
+hit "$(run)" "$CR_LOST"
+{ printf '%s\n' "$CR_BIND"; printf 'filler\n%.0s' 1 2 3 4 5 6 7 8 9 10 11; printf '**Serves:** spec-audit FIX-tFix-3@rev-1\n'; } > "$CR_REC"
+write_rot_commit 2026-11-02 line13
+hit "$(run)" "$CR_LOST"
+printf '**Serves:** spec-audit FIX-tFix-1..3\n' > "$CR_REC"; write_rot_commit 2026-11-02 range
+miss "$(run)" "UNATTENDED check 2 FAILED"
+write_round_fixture "" "" --audited "FIX-tFix-1 FIX-tFix-3" --blockers 0 --highs 0
+miss "$(run)" "UNATTENDED check 2 FAILED"
+# AC6: AC1's row in an archive beside a record holding none, so a rotation hides no forged round. The
+# name is no rotation's, so check 2 names that too, and this arm reads the join's own sentence.
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 0
+git mv "$ROT_R" "${ROT_R%/*}/RUN.LANDED.0bd0bd00.md"
+sed '/ review · item /d' "${ROT_R%/*}/RUN.LANDED.0bd0bd00.md" > "$ROT_R"
+write_rot_commit 2026-11-03 rotate
+hit "$(run)" "$CR_COUNTS"
+# AC7: an honest rotation, because a stub would red check 2 by name, and a later row for one subject. The
+# earlier stamp answers either way round, wherever it sits, so a run after the rotation cannot red a chain.
+CR_ROW3='review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 3 · minors 0 · folded 3 · promoted 0 · disposition fold'
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 1 --finding "$CR_H4"
+sed -i 's/^phase: .*/phase: LANDED/' "$ROT_R"; write_rot_commit 2026-11-03 landed
+write_rot_archive LANDED RUNNING second 2026-11-20 rotate
+printf '2026-11-20T01:00:00Z %s\n' "$CR_ROW3" >> "$ROT_R"; write_rot_commit 2026-11-20 row
+miss "$(run)" "UNATTENDED check 2 FAILED"
+write_round_fixture "${CR_ROW1/2026-11-02T/2026-11-20T}" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 1 --finding "$CR_H4"
+sed -i 's/^phase: .*/phase: LANDED/' "$ROT_R"; write_rot_commit 2026-11-03 landed
+write_rot_archive LANDED RUNNING second 2026-11-20 rotate
+printf '2026-11-02T01:00:00Z %s\n' "$CR_ROW3" >> "$ROT_R"; write_rot_commit 2026-11-20 row
+hit "$(run)" "counts 0 blocker(s) and 3 high(s), and the round disposes 0 and 1"
+reset_tree
+
+# ---- TOOL-dFoldedAudit-15 AC7: A CHAIN RECORD EXTENDS EVERY EARLIER COMMITTED STATE OF ITSELF. An appended
+# ---- round is the green control, then a row cut from the tail in a commit, its bytes restored, line endings
+# ---- that differ and an uncommitted edit of an earlier row. The failing case, observed at the close and not
+# ---- by the pass that wrote this: the loop comparing no revision reds the deleted row's `hit`. The cut is
+# ---- the tail's, because a commit cutting a MIDDLE row leaves a revision no restored record extends.
+CA_F=memory/builds/tDisp/build/2026-11-02-build-FIX-tFix-1-chain-rounds.md
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" ""
+mkdir -p "${CA_F%/*}"
+printf '# tDisp — the rounds\n\n**Serves:** journal FIX-tFix-1\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\nround 1 · subject s1 · audited FIX-tFix-1\n' > "$CA_F"
+write_rot_commit 2026-11-02 round1
+printf 'round 2 · subject s2 · audited FIX-tFix-1\nround 2 · finding 1 · LOW · local · specs FIX-tFix-1 · unit FIX-tFix-1 · rev 2\n' >> "$CA_F"
+write_rot_commit 2026-11-02 round2
+CA_KEEP=$(<"$CA_F")
+miss "$(run)" "UNATTENDED check 2 FAILED"
+sed -i '$d' "$CA_F"; write_rot_commit 2026-11-02 cut
+hit "$(run)" "no longer extends what commit"
+printf '%s\n' "$CA_KEEP" > "$CA_F"; write_rot_commit 2026-11-02 restored
+miss "$(run)" "UNATTENDED check 2 FAILED"
+sed -i 's/$/\r/' "$CA_F"
+miss "$(run)" "no longer extends what commit"
+printf '%s\n' "$CA_KEEP" > "$CA_F"
+sed -i 's/^round 1 · subject s1/round 1 · subject s9/' "$CA_F"
+hit "$(run)" "no longer extends what commit"
+reset_tree
+
+# ---- TOOL-dFoldedAudit-9: A RECORD ANSWERS TO THE CONF AT ITS OWN BASE. `mkdisp` commits the conf it finds as
+# ---- BASE, and a commit above it is the run moving the key, so each arm reads a working copy that disagrees
+# ---- with BASE. The driver's own suite holds the same populations at `--review` and `--dispatch`. The
+# ---- failing case, observed at the close and not by the pass that wrote this: `rv_foldpast` reading the
+# ---- sourced key reds AC10, AC11 and AC12.
+FB_UNKNOWN="$ROT_R (the conf at the default-branch side of this record's BASE ends before SPEC_FOLD_CUTOFF can be read"
+# AC10: one fold row under a moved date, each side, so the working copy decides neither.
+write_moved_disp "" 2026-11-01
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+write_moved_disp 2026-11-01 ""
+miss "$(run)" "check 2 FAILED"
+# AC11: a run commit above the anchor is not BASE's side, whatever `anchor-kind` the record claims, and an
+# anchor above a dated BASE answers BASE.
+write_moved_disp "" 2026-11-01
+sed -i "s/^base: .*/anchor-kind: local\nanchor-sha: $DISPBASE\nbase: $(git rev-parse HEAD)/" "$ROT_R"; write_rot_commit 2026-11-02 facts
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+sed -i "s/^base: .*/anchor-sha: $(git rev-parse HEAD)\n&/" "$ROT_R"; write_rot_commit 2026-11-02 facts
+miss "$(run)" "check 2 FAILED"
+# AC12: each unknown shape names the record, over a working copy a later commit restored, and the last arm
+# is the population that reads no conf at all: one row, on the record's own slug, over the same bad BASE.
+write_moved_disp soon 2026-11-01
+out=$(run)
+hit "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$FB_UNKNOWN"
+hit "$out" "unknown, and unknown is not off"
+reset_tree; dispconf 2000-01-01; sed -i '1i return 0' .unattended.conf
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+sed -i 1d .unattended.conf; write_rot_commit 2026-11-02 restored
+out=$(run)
+hit "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$FB_UNKNOWN"
+hit "$out" "unknown, and unknown is not off"
+reset_tree; dispconf 2000-01-01; set_fold_conf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+sed -i '/^base: /d' "$ROT_R"; write_rot_commit 2026-11-02 bare
+out=$(run)
+hit "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$FB_UNKNOWN"
+hit "$out" "unknown, and unknown is not off"
+reset_tree; dispconf 2000-01-01; sed -i '1i return 0' .unattended.conf
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item tDisp · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0\n'
+sed -i 1d .unattended.conf; write_rot_commit 2026-11-02 restored
+miss "$(run)" "$FB_UNKNOWN"
+reset_tree
+
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
 # ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`
 # ---- regex did not know the token, so a bounded promote owed nothing and the exit was green by
@@ -1585,7 +1984,7 @@ reset_tree; mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf
 hit "$(run)" "DISPOSITION_CUTOFF is blank or undeclared, so check 2 clause 3 grades EVERY record on the id-delta proxy"
 
 # A MALFORMED CUTOFF is a REFUSAL, never a defaulted value — S6's one new branch, and the reason the
-# three pinned check-2 ordinals moved by one in memory/project/unarmed-branches.txt.
+# three check-2 ordinals pinned then moved by one.
 reset_tree; dispconf "last tuesday"
 hit "$(run)" "DISPOSITION_CUTOFF is declared and is not an ISO date, and a cutoff nothing can compare grades every record or none"
 reset_tree
@@ -3802,20 +4201,6 @@ reset_tree
 # ---- specced any, and the ADD arm used to skip it whole. The baseline now FALLS BACK to the authored
 # ---- roster:units pair at the same commit. `seed_spc` pins a run live over an empty generated region
 # ---- beside that pair, then specs three units, the third beyond the authored roster, with no row.
-seed_spc() { # the authored pair's body, or `absent` for no pair at all
-  reset_tree
-  build tSpc
-  if [ "$1" != absent ]; then
-    printf '\n<!-- roster:units -->\n%s\n<!-- /roster:units -->\n' "$1" >> memory/builds/tSpc/README.md
-  fi
-  sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tSpc/RUN.md
-  git add -A && git commit -q -m "tSpc baseline" --no-verify
-  sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tSpc/RUN.md
-  git add -A && git commit -q -m "tSpc baseline pin" --no-verify
-  awk -v e="$UEND" '$0 == e { for (i = 1; i <= 3; i++) print "| [ARCH-tSpc-" i " — a unit](spec/u" i ".md) | DEFERRED | rev-1 | 2026-08-01 |" } { print }' \
-    memory/builds/tSpc/README.md > /tmp/tspc.$$ && mv /tmp/tspc.$$ memory/builds/tSpc/README.md
-  git add -A && git commit -q -m "three units specced, the third beyond the authored roster" --no-verify
-}
 # ---- AC11 — the fallback names units 1 and 2, so unit 3 owes its `add` row and the two planned units
 # ---- owe none (RED at base: the arm skipped with "the baseline roster names no unit").
 seed_spc "1. ARCH-tSpc-1 — the first
@@ -6870,13 +7255,34 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- LOWERED 1046 -> 1041 by TOOL-aSparedSpawn-14 (row 15 of the first retirement batch): check 47's
 # ---- sixteen assertions and check 23's tombstone arm left, check 52's twelve arrived, counted off the
 # ---- diff; region 3 carries -1 and region 7 -4. This pass runs no suite. OWED: observed at VERIFYING.
-FLOOR_ASSERTIONS=1041
+# ---- RAISED 1041 -> 1057 by exactly the arms, TOOL-dFoldedAudit-2: check 2's exit-row arms, eleven `hit`
+# ---- and five `miss`, all beside the counted-spec-row block in region 2, so FLOOR_SHARD_2 carries the
+# ---- same +16 and the other seven are untouched. COUNTED off the block's own lines; this pass runs no
+# ---- suite, and their RED-first observation is the close's.
+# ---- RAISED 1057 -> 1074 by exactly the arms, TOOL-dFoldedAudit-14: the rotated record's arms, nine
+# ---- `same`, four `hit` and four `miss`, all after the exit-row block in region 2, so FLOOR_SHARD_2
+# ---- carries the same +17 and the other seven are untouched. COUNTED off the block's own lines; this
+# ---- pass runs no suite, and their RED-first observation is the close's.
+# ---- RAISED 1074 -> 1092 by exactly the arms, TOOL-dFoldedAudit-10: the chain round's joins, eleven `hit`
+# ---- and seven `miss`, all after the rotated record's block in region 2, so FLOOR_SHARD_2 carries the
+# ---- same +18 and the other seven are untouched. COUNTED off the block's own lines; this pass runs no
+# ---- suite, and their RED-first observation is the close's.
+# ---- RAISED 1092 -> 1106 by exactly the arms, TOOL-dFoldedAudit-9: a record's date from the conf at its own
+# ---- BASE, eleven `hit` and three `miss`, all after the chain round's block in region 2, so FLOOR_SHARD_2
+# ---- carries the same +14 and the other seven are untouched. COUNTED off the block's own lines; this pass
+# ---- runs no suite, and their RED-first observation is the close's.
+# ---- RAISED 1106 -> 1133 by exactly the arms, TOOL-dFoldedAudit-15: 18 in region 2, the fold floor's nine,
+# ---- the closing row's and the countless row's four and the append-only record's five, so FLOOR_SHARD_2
+# ---- carries +18, and 9 in region 1 beside the HALT arms, three `miss` and three `hit` with the three
+# ---- `mutate` counts, so FLOOR_SHARD_1 carries +9. COUNTED off the block's own lines; this pass runs no
+# ---- suite, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=1133
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
-FLOOR_SHARD_1=159
-FLOOR_SHARD_2=67
+FLOOR_SHARD_1=168
+FLOOR_SHARD_2=150
 FLOOR_SHARD_3=127
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133

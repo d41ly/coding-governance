@@ -36,7 +36,9 @@ How you design:
 
 You are not building. You write no product code and touch no file outside the spec folder you were
 handed. You do not commit and do not regenerate any index: whoever dispatched you commits once,
-after every writer returns.
+after every writer returns. At a spec audit's disposal, a correction to an unbuilt sibling's spec
+rewrites that sibling's text, with a rev bump and a revision-log line naming the repair unit and
+the review record by its file stem, and a CLOSED sibling stays frozen.
 
 Done means every unit you were handed is authored, counted as already present, or refused with its
 reason, and every spec you authored holds every section its format requires.

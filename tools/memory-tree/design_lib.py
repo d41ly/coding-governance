@@ -47,6 +47,10 @@ as-built view's fixtures both write their designs with (S19). ONE SPEC FILE PRED
 TRACKED READ of the build folders, `read_tracked_builds`, which `--chain-specs` and the deviation
 join's records and specs read (TOOL-dTrueNorth-26 S5, S7).
 
+ONE FOLD PREDICATE, `check_audit_fold` over `read_rev_log`, which the deviation population and the
+generator's past-pin line both ask, so a spec revision an audit folded reads alike in each
+(TOOL-dFoldedAudit-6 S1).
+
 THE `[chain]` ROWS of a design record are read by `read_chain_clauses` (TOOL-dTrueNorth-4 S9), the
 one reader the deviation population's clause-move arm and the as-built generator share; it takes the
 record's text, so a caller reads it at whichever commit it measures.
@@ -523,6 +527,12 @@ EDGE_BULLET = re.compile(r"^(?:-|\*)[ \t]*\*\*([^*]+)\*\*[ \t]+(.*)$")
 # A deploy-time token or an env assignment is never a path or a leg: the spec-token checker binds
 # this one, read here by `derive_dir_segments` (TOOL-dGroundRules-32 S9).
 NOT_A_TOKEN = re.compile(r"^(GATE_|\{\{|\$|~|'|\"|<)")
+# A spec's revision log (TOOL-dFoldedAudit-6 S1): its heading at any ordinal and an entry's opening line,
+# the two patterns check 12's REV_SCOPE_CUTOFF arm reads. The list marker is what stops an indented
+# continuation opening a phantom entry. WHOLE_TOKEN is the boundary `deviation_join.check_approver` tests.
+REV_LOG_HEAD = re.compile(r"^## [0-9]+[.] Revision log")
+REV_ENTRY = re.compile(r"^(?:[ \t]*[-*][ \t]*)?(?:\*\*)?rev-([0-9]+)")
+WHOLE_TOKEN = r"(?<![A-Za-z0-9-])%s(?![A-Za-z0-9-])"
 
 
 def read_spec_writes(text):
@@ -562,6 +572,43 @@ def read_spec_edges(text, verb):
             cur = [t[1] if t[1] is not None else t[2], line]
             out.append(cur)
     return [tuple(x) for x in out]
+
+
+def read_rev_log(text):
+    """`{N: entry}` from the section headed by the text `Revision log`, at any ordinal. An entry is a
+    `- rev-<N>` line plus every non-blank line after it, REV_SCOPE_CUTOFF's own definition, so a citation
+    wrapped onto a continuation line is the entry's. A spec with no such section reads `{}`, and a
+    revision logged twice holds both entries."""
+    out, inside, cur = {}, False, None
+    for line in text.replace("\r", "").split("\n"):
+        if line.startswith("## "):
+            inside, cur = bool(REV_LOG_HEAD.match(line)), None
+        elif inside and (m := REV_ENTRY.match(line)):
+            cur = int(m[1])
+            out[cur] = f"{out[cur]}\n{line}" if cur in out else line
+        elif cur is not None and line.strip():
+            out[cur] += "\n" + line
+    return out
+
+
+def check_audit_fold(spec_text, unit, revs, audits, read):
+    """True when `revs` is non-empty and every N in it has an entry citing a record of `audits`
+    (TOOL-dFoldedAudit-6 S1): the entry holds the record's file stem as a whole token, and the record's
+    text holds `unit` as a whole token. An empty `revs` is False, so a material edit that moved no header
+    is never a fold, whatever an older entry cites.
+
+    `audits` holds the repo-relative paths of one build's `spec-audit` records and `read(path)` returns a
+    record's text. Each stem is tested against the entry first and `read` asked only for a record an
+    entry cites, so an id with no citing entry costs no record read. "Names" reads the record's whole
+    text, not its `**Serves:**` line, because a scoped round pins no sibling its repair moves; what it
+    does not read is whether the cited finding caused the edit, which the closing review judges.
+    """
+    if not revs:
+        return False
+    entries = read_rev_log(spec_text)
+    named = re.compile(WHOLE_TOKEN % re.escape(unit))
+    cites = [(re.compile(WHOLE_TOKEN % re.escape(pathlib.PurePosixPath(p).stem)), p) for p in audits]
+    return all(any(cited.search(entries.get(n, "")) and named.search(read(p)) for cited, p in cites) for n in revs)
 
 
 def derive_dir_segments(tok):

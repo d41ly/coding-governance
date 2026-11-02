@@ -1609,7 +1609,7 @@ def render_region(build: dict) -> str:
                    else ["Ids no `spec-audit` record has ever named: none — every unit id has one."])
     # UNCONDITIONAL, as both joins above are, and the none branch COUNTS the units a pin judged, so a
     # build no pinned record covers reads `0 of <n>` and never as a build whose specs are all audited.
-    past = derive_past_pin_ids(build["units"], recs)
+    past = derive_past_pin_ids(build["units"], recs, build.get("root"))
     pinned = {i for r in recs if r.get("kind") == "spec-audit" for i in (r.get("pins") or {})}
     out += [""] + (_render_wrapped_ids("Ids whose spec moved past its audited revision:", past) if past else
                    [f"Ids whose spec moved past its audited revision: none — "
@@ -1618,21 +1618,34 @@ def render_region(build: dict) -> str:
     return "\n".join(out)
 
 
-def derive_past_pin_ids(units: list, records: list) -> list:
+def derive_past_pin_ids(units: list, records: list, root: str) -> list:
     """`<id>@rev-<N>` for each unit whose header revision exceeds `N`, the highest pin any of the
     build's `spec-audit` records gives it (TOOL-dTrueNorth-5 S5), in unit order.
 
     The token names the PIN; the current revision is the units table's `rev` column, so it is not
     typed twice. A unit no record pins is not judged and is not returned.
+
+    A unit every one of whose revisions past the pin is an audit's own fold is left out, by the
+    predicate the deviation join asks, `design_lib.check_audit_fold` (TOOL-dFoldedAudit-6 S3): each
+    such revision holds a §9 entry citing, by file stem, a `spec-audit` record of this build that names
+    the unit. It cites only from `reviews/`, the population the join cites from (TOOL-dFoldedAudit-15
+    S26), and every record's pins still count. `root` is what a record's path joins to, because it is
+    repo-relative and a unit's is absolute.
     """
     top: dict = {}
+    audits = []
     for r in records:
         if r.get("kind") != "spec-audit":
             continue
+        if "/reviews/" in r["path"]:
+            audits.append(r["path"])
         for i, n in (r.get("pins") or {}).items():
             top[i] = max(top.get(i, 0), n)
     return [f"{u['id']}@rev-{top[u['id']]}" for u in units
-            if u["id"] in top and int(u["rev"]) > top[u["id"]]]
+            if u["id"] in top and int(u["rev"]) > top[u["id"]]
+            and not design_lib.check_audit_fold(read_text(u["path"]), u["id"],
+                                                 range(top[u["id"]] + 1, int(u["rev"]) + 1), audits,
+                                                 lambda p: read_text(os.path.join(root, p)))]
 
 
 IDS_WRAP = 300
@@ -2713,6 +2726,7 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
         binds_all = {}
     for b in builds:
         pre = f"{m}/builds/{b['slug']}/"
+        b["root"] = root        # what a record's repo-relative path joins to (TOOL-dFoldedAudit-6 S3)
         b["records"] = [dict(rec, path=p) for p, rec in binds_all.items()
                         if p.startswith(pre) and rec["state"] in ("bound", "unbound")]
     # TOOL-dTrueNorth-3 — THE COVERAGE, READ ONCE for the whole render and attached per build before
@@ -6073,6 +6087,79 @@ def cmd_selftest() -> int:
         arm("TOOL-dTrueNorth-5 AC6 — a spec whose header moved past its highest pin is named at the pin",
             "Ids whose spec moved past its audited revision: ARCH-tOne-1@rev-2.",
             lambda: plan(t5r, conf5r)[0]["memory/builds/tOne/README.md"])
+        # TOOL-dFoldedAudit-6 AC7 — AN AUDIT'S OWN FOLD LEAVES THE PAST-PIN LINE, and only when EVERY revision
+        # past the pin is one. A unit at rev-3 pinned at rev-1: both entries citing the record clears it,
+        # through `plan`, so `root` reaches the read, and the rev-3 entry citing nothing keeps it at its pin.
+        # Against a generator clearing a unit on its first citing entry the second arm reds.
+        t6f = os.path.join(base, "auditfold"); os.makedirs(t6f)
+        conf6f = _fixture(t6f)
+        stem6f = "2026-08-02-review-ARCH-tOne-1-spec-audit"
+        spec6f = os.path.join(t6f, "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md")
+        body6f = read_text(spec6f).replace(" · rev-1 · ", " · rev-3 · ")
+        rec6f = os.path.join(t6f, rv5 + stem6f + ".md")
+        os.makedirs(os.path.dirname(rec6f), exist_ok=True)
+        write_text(rec6f, "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")
+
+        def _set_fold_log(rev3):
+            write_text(spec6f, body6f + f"\n## 9. Revision log\n\n- rev-2 · 2026-08-02 · §6 · folded from {stem6f}\n"
+                                        f"- rev-3 · 2026-08-03 · §6 · {rev3}\n")
+            run("git", "add", "-A", cwd=t6f)
+            return plan(t6f, conf6f)[0]["memory/builds/tOne/README.md"]
+
+        arm("TOOL-dFoldedAudit-6 AC7 — a unit whose every revision past its pin cites the audit leaves the line",
+            "Ids whose spec moved past its audited revision: none — 1 of 1 unit id(s) carry a pin.",
+            lambda: _set_fold_log(f"folded from {stem6f}"))
+        arm("TOOL-dFoldedAudit-6 AC7 — one revision past the pin citing nothing keeps the unit, named at the pin",
+            "Ids whose spec moved past its audited revision: ARCH-tOne-1@rev-1.",
+            lambda: _set_fold_log("an edit no audit asked for"))
+
+        # TOOL-dFoldedAudit-15 AC28 — THE GENERATOR CITES FROM THE JOIN'S POPULATION. One cited record clears
+        # the unit under `reviews/` and clears nothing outside it, where its pin still counts. Against a
+        # generator citing every `spec-audit` record the first arm reds.
+        def _read_cited_past_pin(folder):
+            _set_fold_log(f"folded from {stem6f}")
+            rel = f"memory/builds/tOne/{folder}/{stem6f}.md"
+            os.makedirs(os.path.join(t6f, os.path.dirname(rel)), exist_ok=True)
+            write_text(os.path.join(t6f, rel), "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")
+            return str(derive_past_pin_ids([{"id": "ARCH-tOne-1", "rev": "3", "path": spec6f}],
+                                           [{"kind": "spec-audit", "path": rel, "pins": {"ARCH-tOne-1": 1}}], t6f))
+
+        arm("TOOL-dFoldedAudit-15 AC28 — a cited record outside reviews/ clears nothing, and its pin still counts",
+            "['ARCH-tOne-1@rev-1']", lambda: _read_cited_past_pin("build"))
+        arm("TOOL-dFoldedAudit-15 AC28 — the same record under reviews/ clears the unit", "[]",
+            lambda: _read_cited_past_pin("reviews"))
+        # TOOL-dFoldedAudit-6 AC5 — THE PREDICATE'S CASES, each over one record, its text naming FIX-x-1. The
+        # two prefix arms red against either match dropping its boundary, the heading arm against a reader
+        # finding the section by ordinal, and the continuation arm against a line-oriented entry.
+        import design_lib as _dl6f
+
+        def _check_fold(rev2, unit="FIX-x-1", revs=(2,), heading="## 9. Revision log",
+                        stem="2026-10-21-review-FIX-x-2", text="names FIX-x-1"):
+            return _dl6f.check_audit_fold(f"# s\n\n{heading}\n\n- rev-1 · initial\n- rev-2 · 2026-10-21 · §6 ·{rev2}\n",
+                                          unit, revs, [f"memory/builds/b/reviews/{stem}.md"], lambda _p: text)
+
+        arm("TOOL-dFoldedAudit-6 AC5 — a citation wrapped onto a continuation line is the entry's", "True",
+            lambda: _check_fold(" a fold,\n  2026-10-21-review-FIX-x-2"))
+        arm("TOOL-dFoldedAudit-6 AC5 — the section is found by its text, at any ordinal", "True",
+            lambda: _check_fold(" 2026-10-21-review-FIX-x-2", heading="## 8. Revision log"))
+        arm("TOOL-dFoldedAudit-6 AC5 — an empty revs is False", "False",
+            lambda: _check_fold(" 2026-10-21-review-FIX-x-2", revs=range(3, 3)))
+        arm("TOOL-dFoldedAudit-6 AC5 — a stem that is a prefix of the cited stem is no citation", "False",
+            lambda: _check_fold(" 2026-10-21-review-FIX-x-26"))
+        arm("TOOL-dFoldedAudit-6 AC5 — an id that is a prefix of the named id is no naming", "False",
+            lambda: _check_fold(" 2026-10-21-review-FIX-x-2", text="names FIX-x-10"))
+        # TOOL-dFoldedAudit-6 AC6 — ONE PREDICATE: the join holds design_lib's own object, and the past-pin
+        # reader CALLS it, read from the function's tree because this arm's own text spells the name too.
+        import deviation_join as _dj6f
+
+        def _read_fold_callers():
+            fn = next(node for node in ast.walk(ast.parse(read_text(os.path.abspath(__file__))))
+                      if isinstance(node, ast.FunctionDef) and node.name == "derive_past_pin_ids")
+            return any(isinstance(n, ast.Call) and getattr(n.func, "attr", None) == "check_audit_fold"
+                       for n in ast.walk(fn))
+
+        arm("TOOL-dFoldedAudit-6 AC6 — the join's predicate is design_lib's, and the past-pin reader calls it",
+            "True True", lambda: f"{_dj6f.check_audit_fold is _dl6f.check_audit_fold} {_read_fold_callers()}")
         # TOOL-dTrueNorth-9 S4 — `_expand_ids` RETURNS A PAIR to all four callers, and the pins come
         # from `read_id_pins`. One arm per caller that unpacks two values: a spec header carrying both
         # backlog verbs, an ids list, and a record pinning one id twice beside a range. Against a

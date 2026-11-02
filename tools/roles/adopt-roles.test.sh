@@ -78,7 +78,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # floor by the SKIP that announces the arm unrun, so a skip still cannot red it.
 # +2 for arm 13 (TOOL-dRedressedBar-6). +3 for arm 14 (TOOL-dRenderedAnchor-2). +1 for arm 14, +3
 # for arm 15 and +2 for arm 16 (TOOL-dRenderedAnchor-3). +1 for arm 17 (TOOL-dRenderedAnchor-4).
-FLOOR_ASSERTIONS=50
+# +1 for arm 18 (TOOL-dFoldedAudit-15).
+FLOOR_ASSERTIONS=51
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""; FXK="$KREL"
@@ -718,6 +719,14 @@ _v17=$([[ $KREL == */* ]] && [ "$_rc17" = 0 ] && [ "$rc" = 0 ] && [ "${#_p17[@]}
    && [ ! -e "$FX/.governance/install.json" ] && [ "$_ok" = 1 ] && echo 1 || echo 0)
 check_arm "arm 17 a harness held only above the tool root is named there by the Skill and by roles.json" "$_v17"
 [ "$_v17" = 1 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
+
+# ---- arm 18 (TOOL-dFoldedAudit-15 AC19): the render's ATTENDED bullet names every driver verb an attended
+# ---- run uses. The failing case, observed at the close and not by the pass that wrote this: the old
+# ---- sentence restored to the template and the render.
+_v18=$(! grep -qF 'the one driver verb used' "$SK17" \
+   && grep -qF 'so this run is ATTENDED: the driver verbs used are' "$SK17" \
+   && grep -qF -- 'plus `--record-round` and `--chain-verdict` where a' "$SK17" && echo 1 || echo 0)
+check_arm "arm 18 the render's ATTENDED bullet names the chain's two verbs" "$_v18"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

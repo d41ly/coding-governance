@@ -19,7 +19,7 @@
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
-#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--disposition fold|promote]
+#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--folded <N> --promoted <N>] [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
 #   unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason <text> --reaped <id>|--keepalive-unreachable <node>   # HELD for an owner to land or decide
@@ -28,6 +28,8 @@
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
+#   unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h> [--finding <row>]... [--sibling <unit>@rev-<n>]...   # append one spec-audit round, no run-state file needed
+#   unattended.sh --chain-verdict <slug>                           # CONTINUE, STOP or HOLD, derived from that record and the roster; writes nothing
 #   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --claims                                         # every run claim on the remote: slug, node, status, beat-age-s, verdict
 #   unattended.sh --beat <slug>                                    # the tick's heartbeat: renew a LIVE run's own claim when due
@@ -63,7 +65,7 @@ set -u
 if [ -n "${EPOCHREALTIME:-}" ]; then DRIVER_T0_US=${EPOCHREALTIME//[!0-9]/}
 else printf -v DRIVER_T0_US '%(%s)T' -1; DRIVER_T0_US="${DRIVER_T0_US}000000"; fi
 readonly DRIVER_T0_US
-KIT_UNATTENDED_VERSION=1.112 # gov:kit unattended@1.112 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.113 # gov:kit unattended@1.113 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -108,7 +110,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief --beat"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --authorization --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --record-round --chain-verdict --rescope --dispatch --review --brief --beat"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --check-commit --claims --overlaps --version"
@@ -683,7 +685,7 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI="";
 ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""; RUN_CLAIMS=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
-DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; PROMPT_BRIEF_SKELETON_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+DISPOSITION_CUTOFF=""; SPEC_FOLD_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUTOFF=""; PROMPT_BRIEF_SKELETON_CUTOFF=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
 # is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
@@ -733,6 +735,13 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; PROMPT_BRIEF_CUT
 #   * PROMPT_BRIEF_SKELETON_CUTOFF (TOOL-aRoutedQuill-7 S5) - the README `opened:` date from which
 #     that brief's sub-heads are the kickoff kit's `--brief-skeleton` at BASE, not the five. Blank is
 #     off, announced; re-read beside PROMPT_BRIEF_CUTOFF, and read only for a record that key grades.
+#   * SPEC_FOLD_CUTOFF (TOOL-dFoldedAudit-7 S4) - the date from which a run takes the rules the three
+#     spec-audit policy keys answer. Blank keeps every run on the old rule. A conf key, unlike
+#     SPEC_COUNTS_CUTOFF, because a kit update must not move an adopter onto a new disposal. This load
+#     grades its shape alone, in the case under RUN_CLAIMS; which runs are past it is check 2's reading.
+#     Where a run-state file exists the value this source binds decides nothing: `read_fold_cutoff`
+#     re-reads the key at the default-branch side of the pinned BASE (TOOL-dFoldedAudit-9), for
+#     LANDING_NODES' reason.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -795,6 +804,14 @@ case "$RUN_CLAIMS" in
   *) echo "unattended: REFUSING - RUN_CLAIMS is declared as '$RUN_CLAIMS', which is outside the closed set 'on off'. A switch that cannot be resolved is a claim policy nobody declared." >&2
      RUNLOG_CLEAN=1; exit 2 ;;
 esac
+# TOOL-dFoldedAudit-7 S4 - THE SPEC-AUDIT CUTOFF'S SHAPE, refused here because this load runs before any
+# record is read against it and the first refusal must not arrive at a spec exit. A pattern and no
+# spawn, so no verb pays for it. Blank or absent is the old rule and passes.
+case "$SPEC_FOLD_CUTOFF" in
+  ""|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+  *) echo "unattended: REFUSING - SPEC_FOLD_CUTOFF is declared as '$SPEC_FOLD_CUTOFF', which is not an ISO date, and a cutoff nothing can compare grades every run or none." >&2
+     RUNLOG_CLEAN=1; exit 2 ;;
+esac
 # `read_bound_key` — a bound key DEFAULTED, VALIDATED and ANNOUNCED — lives in `lib-unattended.sh`,
 # sourced above: TOOL-aWokenSentinel-5 hoisted it there verbatim, because the resume tick reads
 # `RESUME_ATTEMPTS` and `RESUME_TURNS` through the same function, and a bound read spelled twice is
@@ -855,7 +872,7 @@ PLAN_PATHS=""
 # beside the unit rows; the UNDECIDED `next:` input is derived either way, because that is an
 # input to the rung ladder rather than a property of this output mode.
 PLAN_ASKS=""
-RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""; RV_HIGHS=""; RV_MINORS=""
+RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""; RV_HIGHS=""; RV_MINORS=""; RV_FOLDED=""; RV_PROMOTED=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
@@ -941,6 +958,7 @@ VERB_REQUIRES="--abort --reason --code
 --brief --unit --path
 --record-set --leg --verdict
 --record-piece --path --leg --verdict
+--record-round --subject --audited --blockers --highs
 --dispatch --writes"
 check_verb_flag() { # verb · flag · value -> 0 when the value is non-empty, else check 112 and 1
   local verb="$1" flag="$2"
@@ -1141,6 +1159,19 @@ FOLD_CUTOFF="2026-09-15"
 # reading). Dated by FOLD_CUTOFF's idiom, strictly past the newest record any branch could still
 # write under the old contract: the newest spec-subject `review` row on any ref was 2026-10-05.
 SPEC_COUNTS_CUTOFF="2026-10-06"
+# THE THREE SPEC-AUDIT SWITCHES' KIT DEFAULTS (TOOL-dFoldedAudit-7 S3), which `read_spec_audit_switch`
+# answers when no policy kit resolves. They repeat the catalogue's defaults because a copy-installed
+# kit cannot read a kit that is not there, and the suite's AC5 arm compares the two. File constants
+# assigned after the conf is sourced, so a conf cannot preset them.
+SPEC_AUDIT_DISPOSAL_DEFAULT="by-nature"
+SPEC_AUDIT_CHAIN_STOP_DEFAULT="own-work"
+SPEC_AUDIT_CHAIN_CEILING_DEFAULT="4"
+# THE CHAIN RECORD'S GRAMMAR, ONE SPELLING EACH (TOOL-dFoldedAudit-15 S22): `_ids_of`, `write_chain_round`
+# and `derive_chain_verdict` read these, the awk through `-v` and dynamic regexes. Which two severities
+# are major stays in that awk, because it asks a different question from which four exist.
+UNIT_ID_ERE='[A-Z]+-[A-Za-z0-9]+-[0-9]+'
+CHAIN_SEVERITIES='BLOCKER|HIGH|MEDIUM|LOW'
+CHAIN_NATURES='local|new-mechanism'
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope claim-lost"
 # THE HOLD VOCABULARY, a SECOND closed set beside the halt one and never an extension of it. Each
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
@@ -1216,7 +1247,6 @@ scope_of() { # handle -> its declared scope; `all` when the entry carries no thi
 # one. The better refusal is worth having and is `TOOL-aScouredKit-34`, which carries what was
 # learned about the fixture so the next attempt does not re-derive it.
 is_auth_mode(){ case " $AUTH_MODES " in *" $1 "*) return 0;; esac; return 1; }
-is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 # The EFFECTIVE halt vocabulary: kit core plus whatever the project appended. Same shape as the phase
 # and Definition-of-Done sets, so a project can extend it and cannot delete from it.
 halt_codes() { printf '%s %s\n' "$HALT_CODES_CORE" "$HALT_CODES_EXTRA"; }
@@ -1391,6 +1421,49 @@ print_drift_delta() { # run-state file
   fi
   "$py" "$d/drift_report.py" --delta "$base" HEAD || true
   return 0
+}
+# TOOL-dFoldedAudit-7 S2 - THE SPEC-AUDIT SWITCHES, the driver's ONE reader of the three policy keys.
+# CALLED ON DEMAND and never by `load_driver_conf`, which runs on every verb: a spec exit, the chain
+# verdict, `--plan --paths` and a folding `--record-round` are the only readers, so no other verb pays a
+# Python start.
+#
+# IT CARRIES NO `fail`: each caller turns status 1 into its own refusal under its own check number,
+# because `check-arms` finds a branch by its literal number. Only an absent kit reads a default. A
+# `get` that refuses keeps its line, because an invalid file never reads defaults, and a policy kit
+# older than these rows lands there too, its refusal naming the catalogue. A value outside the closed
+# set refuses for LANDER_MODE's reason: one from a newer catalogue must not fall through to a
+# behaviour nobody declared.
+#
+# EACH KEY IS SPELLED ON A LINE OF ITS OWN in the second `case`, because the policy kit's reader
+# coverage greps a literal key on its `get` shape, so a key passed in a variable reads as unread.
+# `$d` is repo-relative, which is sound because `load_driver_conf` has `cd`'d to the root.
+read_spec_audit_switch() { # disposal|chain-stop|chain-ceiling -> the value on stdout; 1 and the refusal on stdout
+  local key def py d out
+  case "${1:-}" in
+    disposal) key=review.spec-audit.disposal; def=$SPEC_AUDIT_DISPOSAL_DEFAULT ;;
+    chain-stop) key=review.spec-audit.chain-stop; def=$SPEC_AUDIT_CHAIN_STOP_DEFAULT ;;
+    chain-ceiling) key=review.spec-audit.chain-ceiling; def=$SPEC_AUDIT_CHAIN_CEILING_DEFAULT ;;
+    *) echo "unattended: read_spec_audit_switch reads disposal, chain-stop or chain-ceiling, and was asked for '${1:-}'."
+       return 1 ;;
+  esac
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" policy policy.py "$KIT_DIR" 2>/dev/null) || [ -z "$d" ]; then
+    echo "unattended: NOTE - no policy kit resolves beside this kit, so $key takes the kit default '$def'." >&2
+    printf '%s\n' "$def"
+    return 0
+  fi
+  case "$1" in
+    disposal) out=$("$py" "$d/policy.py" get review.spec-audit.disposal 2>&1) ;;
+    chain-stop) out=$("$py" "$d/policy.py" get review.spec-audit.chain-stop 2>&1) ;;
+    chain-ceiling) out=$("$py" "$d/policy.py" get review.spec-audit.chain-ceiling 2>&1) ;;
+  esac || { printf '%s\n' "$out"; return 1; }
+  case "$1:$out" in
+    disposal:by-nature|disposal:promote-all|chain-stop:own-work|chain-stop:clean-only) ;;
+    chain-ceiling:|chain-ceiling:0*|chain-ceiling:*[!0-9]*|disposal:*|chain-stop:*)
+      echo "unattended: $key answered '$out', which is outside the closed set this driver branches on, and a value nobody declared here takes no behaviour."
+      return 1 ;;
+  esac
+  printf '%s\n' "$out"
 }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -3342,13 +3415,13 @@ check_waivers() { # run-state file
     # carrying one forges a second, well-formed entry the owner never granted.
     # GUARDED on non-empty. An empty BYPASS_BAN makes this glob `*""*`, which matches every
     # string — so an undeclared bypass flag would refuse every waiver ever offered.
-    case "${BYPASS_BAN:+x}$r" in "") ;; *"$BYPASS_BAN"*)
-      fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
-      return 1 ;;
-    esac
     # A CARRIAGE RETURN with it (closing review round 2 M1): park() now refuses one, and it is
     # reached only after --preflight has written its facts, so the refusal belongs here, before them.
-    if [ "$(printf '%s' "$r" | wc -l | tr -d ' ')" != "0" ] || case "$r" in *$'\r'*) true ;; *) false ;; esac; then
+    # ONE `if` OVER THE THREE (TOOL-dFoldedAudit-5 S11): the two branches printed the same line, so the
+    # merge retires no refusal, and the conditions keep their order.
+    if { [ -n "$BYPASS_BAN" ] && case "$r" in *"$BYPASS_BAN"*) true ;; *) false ;; esac; } \
+       || [ "$(printf '%s' "$r" | wc -l | tr -d ' ')" != "0" ] \
+       || case "$r" in *$'\r'*) true ;; *) false ;; esac; then
       fail 41 "a waiver reason may not spell the declared bypass flag or contain a newline; park writes it verbatim into a line-oriented region that the leg greps whole, so either one corrupts a record no verb rewrites"
       return 1
     fi
@@ -3713,28 +3786,6 @@ read_brief_items() {
       }
       print n, kind, args
     }'
-}
-# TOOL-aQuotedBrief-4 S1 - PROMPT_BRIEF_CUTOFF AS THE CONF AT A COMMIT DECLARES IT, read the
-# SPEC_AUDIT_DEFAULT way in check_authorization and for its reasons: the working copy is a file the run
-# commits itself, so a run that blanked the key, or moved it past its README's `opened:`, turned off
-# the grading of its own brief (closing review round 1, H1 and M1). The key is BLANKED first, so a
-# conf predating it cannot inherit the working copy's value through the environment; the sentinel is
-# printed FROM INSIDE the eval'd text, on a descriptor the blob's own redirect does not cover, so it
-# appears iff evaluation reached the end whatever the last statement's status. The TWO newlines of
-# glue are that read's: without the first a blob ending in a comment swallows the printf, without the
-# second a last line ending in a backslash continuation joins the sentinel as a temp-env prefix.
-# Prints the value and returns 0, prints nothing for an ABSENT blob (off), and returns 2 for a blob
-# that ends before the read - a return, an exit, an unbound reference, a syntax error - or for no
-# commit at all, since an unknown side is not an absent key.
-# TOOL-aRoutedQuill-7 S1 - the optional second argument names a sibling date key read the same way,
-# PROMPT_BRIEF_SKELETON_CUTOFF; it is only ever a literal from this file, never a conf value.
-read_brief_cutoff() { # commit · key -> the value on stdout · 2 when it cannot be known
-  local _cf _v _k=${2:-PROMPT_BRIEF_CUTOFF}
-  [ -n "${1:-}" ] || return 2
-  _cf=$(GIT show "$1:.unattended.conf" 2>/dev/null) || return 0
-  _v=$( eval "$_k=''"; exec 3>&1
-        eval "$_cf"$'\n\n''printf "OK %s" "${'"$_k"':-}" >&3' >/dev/null 2>&1 )
-  case "$_v" in "OK "*) printf '%s' "${_v#OK }" ;; *) return 2 ;; esac
 }
 # Set by check_brief_items when term 7 is OFF, for the build-complete arm to carry on its met return.
 BI_NOTE=""
@@ -4935,7 +4986,7 @@ unit_rows() { # build README -> unit rows; rc 3 = no single well-formed pair
 nonterminal_units() { unit_rows "$1" | grep -vE '\| (CLOSED|WONTDO) \|'; }
 # TOOL-aBoundedVerdict-11 S6 - ids out of whatever row text it is handed, sorted and deduplicated so
 # two callers cannot disagree about order. Reads stdin, so it composes with either side of the compare.
-_ids_of() { grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u; }
+_ids_of() { grep -oE "$UNIT_ID_ERE" | sort -u; }
 # The FIRST id on each row, which is the row's OWN id: a generated unit row leads with its link label
 # and may mention another id in the title text. `_ids_of` over a row SET cannot tell the two apart,
 # and a foreign id there would put a unit into a population it is not in. Measured over this corpus:
@@ -5947,14 +5998,21 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
 }
 
 # ONE EMITTER FOR EVERY ROW THAT NAMES A UNIT ID, so the two modes cannot disagree about which rows
-# are units. PATHS mode swaps the shape and nothing else: four TAB-separated fields, id, status,
-# state and the spec's repo-relative path, the fourth EMPTY for a unit no tracked spec defines. A
-# caller splits on TAB and skips any line with fewer than four fields - which is how the two
-# `NOT A UNIT` diagnostics, keyed on a FILENAME rather than an id, stay skippable: they keep their
-# padded shape in both modes and carry no TAB at all.
-plan_row() { # id · status · state · specPath
-  if [ -n "$PLAN_PATHS" ]; then printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"
+# are units. PATHS mode swaps the shape and nothing else: five TAB-separated fields, id, status,
+# state, the spec's repo-relative path and that spec's header rev, the last two EMPTY for a unit no
+# tracked spec defines. A caller splits on TAB and skips any line with fewer than four fields - which
+# is how the two `NOT A UNIT` diagnostics, keyed on a FILENAME rather than an id, stay skippable: they
+# keep their padded shape in both modes and carry no TAB at all.
+plan_row() { # id · status · state · specPath · specRev
+  if [ -n "$PLAN_PATHS" ]; then printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "${5:-}"
   else printf '%-34s %-11s %s\n' "$1" "$2" "$3"; fi
+}
+
+# THE REV `--plan --paths` PRINTS (TOOL-dFoldedAudit-15 S14). Asked under PATHS mode alone, so the human
+# table and check 30's many-build read spawn nothing new, and apart from `spec_facts`, whose status action
+# is what that check selects by. The harness compares a fold into a unit no audit read against this.
+read_spec_rev() { # spec path -> the N of its header's rev-N, empty when it has none
+  awk '/^\*\*Status:\*\* [A-Z]+ / { if (match($0, / rev-[0-9]+/)) print substr($0, RSTART + 5, RLENGTH - 5); exit }' "$1"
 }
 
 # ------------------------------------------------------------------- THE `next:` LADDER, DECLARED
@@ -6040,7 +6098,7 @@ derive_next_shape() { # live-unit shape . first MISSING id . undecided-ask shape
 }
 
 verb_plan() { # slug
-  local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum
+  local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum _rev
   # THE LADDER'S INPUTS, collected by the two loops below and read ONCE at the bottom. They
   # are not the line: `_live` and `_miss1` are first-wins captures of data each loop already
   # has, `_ask1` is the undecided-ask rung's input and stays EMPTY here until
@@ -6189,7 +6247,8 @@ verb_plan() { # slug
     # a complete spec, and the one predicate that knew otherwise was discarded at the moment the
     # answer mattered. `build-complete`'s sixth term is the refusal; this is the human half.
     case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
-    plan_row "$id" "${st:-?}" "$state" "$spec"
+    _rev=""; [ -z "$PLAN_PATHS" ] || _rev=$(read_spec_rev "$spec")
+    plan_row "$id" "${st:-?}" "$state" "$spec" "$_rev"
     _graded=1
     # FIRST WINS, and what wins is an INPUT rather than the line. The guarded assignments to
     # `next` that stood here and in the loop below settled the precedence between the shapes
@@ -6238,6 +6297,15 @@ ASKROWS
     echo "roster: the README roster region, $(printf '%s\n' "$_rids" | grep -c .) id(s); $nmiss with no tracked spec"
   else
     echo "roster: the generated units region, in build order (the authored pair names no id of this build)"
+  fi
+  # THE LINE A CALLER COPIES AS `disposal` (TOOL-dFoldedAudit-13), under `--paths` alone, because check 30
+  # runs the framed table over every build and this read costs a `git log` per build. It carries no TAB,
+  # so a four-field caller skips it, and a refused read still exits 0: this verb is the resume route, and
+  # a copied `refused - ...` meets the harness's own type check.
+  if [ -n "$PLAN_PATHS" ]; then
+    runmd_of "$slug" >/dev/null
+    read_spec_disposal "$_runmd" "$slug"
+    printf 'spec-disposal: %s\n' "$_sd_value${_se_why:+ - ${_se_why%%$'\n'*}}"
   fi
   # R3-B1 — THE TERMINAL WORDING IS EARNED, not defaulted. "every tracked spec is terminal" was
   # printed at exit 0 over builds where no spec graded as a unit at all, one line below the NOT A
@@ -8257,33 +8325,8 @@ read_pinned_base() { # run-state file -> 0 with RPB_BASE · 1 when no committed 
   done
   return 1
 }
-# AN HONEST ROTATION: <commit> adds only archives named `RUN.<PHASE>.<8 hex>.md`, each hex the prefix
-# of the blob it adds, and its parent's committed record is one `--preflight` retires.
-check_honest_rotation() { # commit · run-state file -> 0 when it is one
-  local c=$1 rel=$2 dir p n=0 blob
-  dir=${rel%/RUN.md}
-  while IFS= read -r p; do
-    [ -n "$p" ] || continue
-    n=$((n + 1))
-    [[ "${p##*/}" =~ ^RUN\.[A-Z]+\.([0-9a-f]{8})\.md$ ]] || return 1
-    blob=$(GIT rev-parse -q --verify "$c:$p" 2>/dev/null) || return 1
-    [ "${blob:0:8}" = "${BASH_REMATCH[1]}" ] || return 1
-  done < <(GIT diff-tree --root --no-commit-id --no-renames -r --diff-filter=A --name-only "$c" -- "$dir/RUN.*.md" 2>/dev/null)
-  [ "$n" -gt 0 ] && check_retired_blob "$c^:$rel"
-}
-# A RECORD `--preflight` RETIRES, read from a committed blob: a terminal phase; a LANDING or a HELD
-# hand-off, each retired once it derives LANDED, its archive then reading LANDED; or `abandoned`
-# beside `work-landed-at`. A shape, not a derivation: the derivation needs the tip it was made at.
-check_retired_blob() { # rev:path -> 0 when that blob is one
-  local ph
-  ph=$(read_blob_fact "$1" phase)
-  [ -n "$ph" ] || return 1
-  if is_terminal "$ph" || [ "$ph" = LANDING ] || [ "$ph" = HELD ]; then return 0; fi
-  [ -n "$(read_blob_fact "$1" abandoned)" ] && [ -n "$(read_blob_fact "$1" work-landed-at)" ]
-}
-read_blob_fact() { # rev:path · key -> that key's value in the blob's Run facts section
-  GIT show "$1" 2>/dev/null | extract_run_facts | K="$2:" awk 'index($0, ENVIRON["K"]) == 1 { v = substr($0, length(ENVIRON["K"]) + 1); sub(/\r$/, "", v); sub(/^ +/, "", v); print v; exit }'
-}
+# `check_honest_rotation`, `check_retired_blob` and `read_blob_fact` are in `lib-unattended.sh`, beside
+# `check_landed_facts_due`, because check 2's archive clause reads them too.
 print_landing_line() { # -> the one line naming what resolve_landing_node decided
   case "$LN_STATE" in
     lander) echo "unattended: landing — lander · node $LN_TAG" ;;
@@ -12038,7 +12081,7 @@ $_bcopen"
       # OVERRIDABLE, deliberately, unlike `authorization-reachable`: a genuinely thin Tier-1 unit
       # becomes a recorded decision rather than an invisible skip.
       DOD_OUT=""
-      local _sa_rows _sa_ids _sa_id _sa_f _sa_named _sa_fact _sa_miss=""
+      local _sa_rows _sa_ids _sa_id _sa_named _sa_fact _sa_miss=""
       # TERM ZERO, the `pieces-complete` shape: MET, and it ANNOUNCES the skip, because a silent pass
       # is indistinguishable from coverage. Keyed on the BASE-DERIVED value (closing review of units
       # 2-5, F3): `authorization-reachable` is graded earlier in this same shell, is not overridable,
@@ -12080,21 +12123,8 @@ $_bcopen"
         DOD_OUT="specs-audited — no unit of this build is CLOSED, so no spec audit is owed yet"
         return 0
       fi
-      # THE INDEX, not the worktree, and the first twelve UNFENCED lines, not the whole file. The
-      # index is this kit's stated per-run population and the reason --preflight stages the run-state
-      # file; the twelve-line window is the binding grammar's own, and without it a review record
-      # QUOTING another record's binding line satisfies the join for a unit nobody audited. Through
-      # GIT() so the object-substitution lever stays inert.
-      _sa_named=$(
-        for _sa_f in $(GIT ls-files -- "$M/builds/$slug/" 2>/dev/null); do
-          case "$_sa_f" in *.md) ;; *) continue ;; esac
-          GIT show ":$_sa_f" 2>/dev/null | awk '
-            /^```/ { fence = !fence; next }
-            fence  { next }
-            { n++ }
-            n > 12 { exit }
-            /^\*\*Serves:\*\*[ \t]*spec-audit([ \t]|$)/ { print }'
-        done | expand_id_runs)
+      # The library's reader says why the index and why the twelve-line window (TOOL-dFoldedAudit-10).
+      _sa_named=$(read_spec_audit_ids "$M/builds/$slug")
       for _sa_id in $_sa_ids; do
         printf '%s\n' "$_sa_named" | grep -qxF -- "$_sa_id" || _sa_miss="$_sa_miss $_sa_id"
       done
@@ -12777,21 +12807,140 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
 }
 
 # The sentence a TERMINAL round prints, per disposition. Defined once because four exits share it and
-# a second copy is a second thing to keep true. It keeps the word PROMOTED: existing suite arms assert
-# that literal. Every subject's exit promotes every confirmed finding, the MEDIUMs and LOWs batched
-# (TOOL-aBatchedMinors-2 for the closing review, TOOL-aEvidencedLens-7 for a spec audit), so `promote`
-# and `closing` are one sentence. `fold` is recordable at NO exit, so it falls to the final branch, as an
-# empty value does: that branch is UNREACHABLE, because the verb refuses `fold` at every terminal exit and an
-# empty disposition beside anything standing, and it says so loudly rather than printing something
-# reassuring.
+# a second copy is a second thing to keep true. `promote|closing` keeps the word PROMOTED: existing suite
+# arms assert that literal. TWO RULES (TOOL-dFoldedAudit-2). The closing review, and a spec audit under
+# `old` or `counted`, promote every confirmed finding, the MEDIUMs and LOWs batched (TOOL-aBatchedMinors-2
+# for the closing review, TOOL-aEvidencedLens-7 for a spec audit), so `promote` and `closing` are one
+# sentence and `fold` falls to the final branch. A spec audit under `folds` disposes by nature, and
+# `spec-fold` and `spec-promote` are that rule's two sentences, used only there. The final branch is
+# UNREACHABLE, because the verb refuses `fold` at every exit that rule does not admit and an empty
+# disposition beside anything standing, and it says so loudly rather than printing something reassuring.
+# It leaves its sentence in `_exitnote` too, the convention `runmd_of` follows, so the `folds` callers
+# read it with no fork (TOOL-dFoldedAudit-16).
 review_exit_note() { # disposition -> the sentence
   case "$1" in
-    promote|closing) printf '%s' "every finding confirmed at this exit is PROMOTED to a unit of this build: one per BLOCKER and HIGH, and the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. Not folded, not parked, not waived, not re-reviewed" ;;
-    *)       printf '%s' "NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
+    promote|closing) _exitnote="every finding confirmed at this exit is PROMOTED to a unit of this build: one per BLOCKER and HIGH, and the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. Not folded, not parked, not waived, not re-reviewed" ;;
+    spec-fold) _exitnote="every finding confirmed at this exit FOLDS into the spec it names, rev bumped, and none needs a new mechanism" ;;
+    spec-promote) _exitnote="a finding that needs a new mechanism is PROMOTED to a unit of this build, a BLOCKER or HIGH to its own, the MEDIUMs and LOWs batched into one unit or two across disjoint write sets, and every other finding FOLDS into the spec it names" ;;
+    *)       _exitnote="NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
+  esac
+  printf '%s' "$_exitnote"
+}
+
+# WHICH RULE A SPEC AUDIT'S EXIT TAKES (TOOL-dFoldedAudit-2). `_se_rule` answers `old`, `counted` or
+# `folds` and `_se_why` holds a refused switch read, the out-variable idiom of `runmd_of` and `fact`.
+# The closing diff review is `old` whatever else holds. A spec subject is `old` under a blank
+# SPEC_FOLD_CUTOFF or in a record that began before it, and past it the disposal switch picks: both
+# values write the counted row, and only `by-nature` admits a fold.
+#
+# THE DATE IS THE PREFLIGHT'S, never the README's `opened:`, because the chain builds opened in October
+# and not yet started must inherit the new rule. `check_landed_facts_due` is named for its first cutoff
+# and reads any record cutoff: 0 past it, 1 before it, 2 on a blank one. Check 2 calls it with the same
+# `tenancy` read, so a rotated record dates to its own run on both sides. The two agree on one record
+# but for one case: a never-committed record or a staged rotation reads past a cutoff dated ahead of
+# it, and reads grandfathered if its first commit lands before that cutoff. Every cutoff at or before
+# the first commit gives one answer.
+#
+# THE VALUE THE SOURCE BOUND DECIDES NOTHING where a run-state file exists: `read_fold_cutoff` re-reads
+# the key at the default-branch side of the pinned BASE (TOOL-dFoldedAudit-9), below the subject test,
+# so a closing review reads nothing new. An unknown reading leaves `_se_rule` at `old` and sets `_se_why`,
+# which every caller refuses, so a conf nothing can read never reads as off.
+#
+# The switch is read only when the cutoff admits the record, so a run under `old` spawns no Python. A
+# refused read leaves `_se_rule` at `counted`.
+read_spec_exit_rule() { # run-state file · slug · subject -> sets _se_rule and _se_why
+  local out cut
+  _se_rule=old; _se_why=""
+  [ "$3" != "$2" ] || return 0
+  if ! cut=$(read_fold_cutoff "$1"); then
+    _se_why="the conf at the default-branch side of this run's BASE ends before SPEC_FOLD_CUTOFF can be read or declares it as no ISO date, or the record names no base:, so which rule this run takes is unknown, and unknown is not off: $1"
+    return 0
+  fi
+  check_landed_facts_due "$1" "$cut" tenancy || return 0
+  _se_rule=counted
+  if out=$(read_spec_audit_switch disposal); then
+    [ "$out" != by-nature ] || _se_rule=folds
+  else
+    _se_why=$out
+  fi
+  return 0
+}
+
+# THE ONE ANSWER A CALLER COPIES (TOOL-dFoldedAudit-13). `_sd_value` is by-nature, promote-all, absent
+# or refused, and `_se_why` holds a refused read, as `read_spec_exit_rule` leaves it. Read-only, and
+# called in the caller's shell, because a refusal in `$( )` loses its status.
+#
+# NO RUN-STATE FILE IS AN ATTENDED RUN, WHICH BEGINS TODAY. `read_spec_exit_rule` reads a path with no
+# history as past any cutoff, which is right for a record nothing has committed yet and wrong for a
+# run with no record at all under a cutoff dated ahead of it. A blank cutoff sorts below every date, so
+# it falls through and answers `absent` with no Python, and an unavailable clock leaves the read on
+# `read_spec_exit_rule`'s answer. The third argument is any subject that is not the slug, and this one
+# spells the stem of the harness's own. Any `_se_why` reads as refused, whatever `_se_rule` holds.
+read_spec_disposal() { # run-state file · slug -> sets _sd_value
+  local now
+  _se_why=""
+  if [ ! -f "$1" ]; then
+    now=$(read_utc_now)
+    if [ -n "$now" ] && [[ "${now%%T*}" < "$SPEC_FOLD_CUTOFF" ]]; then _sd_value=absent; return 0; fi
+  fi
+  read_spec_exit_rule "$1" "$2" "$2-spec-set"
+  case "$_se_rule:$_se_why" in
+    old:) _sd_value=absent ;;
+    folds:) _sd_value=by-nature ;;
+    counted:) _sd_value=promote-all ;;
+    *) _sd_value=refused ;;
   esac
 }
-verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors
-  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" rel prior state note disp bound counts owe exitnote rkind rround rexit
+
+# ONE SITE FOR EVERY REFUSAL OF A COUNTED EXIT (TOOL-dFoldedAudit-2), because `REFUSAL_CEILINGS` holds
+# this file at its ceiling and the way up is the owner's review; `check_exit_fold` below pays for it.
+# Called once, straight after the state is computed. It reads the rule on a terminal state only and
+# leaves `old` on every other, so the flags on a mid-loop round refuse here. Past `old`, a call with no
+# counts, or a fold under `counted`, RETURNS: the refusals below answer those with today's sentences,
+# which name `exits <state>`, and that is the word a harness's bare first call reads. A disposition is
+# DERIVED from the counts and the flag has to agree, so a row cannot say fold beside a promotion.
+check_spec_exit() { # run-state file · slug · subject · state · blockers · disposition · highs · minors · folded · promoted -> 1 on a refusal
+  local b="$5" d="$6" h="$7" m="$8" f="$9" p="${10}" want=""
+  _se_rule=old; _se_why=""
+  case "$4" in CONVERGED|NON-CONVERGENT|CEILING|BOUNDED) read_spec_exit_rule "$1" "$2" "$3" ;; esac
+  if [ -z "$_se_why" ]; then
+    if [ "$_se_rule" = old ]; then
+      [ -n "$f$p" ] || return 0
+      _se_why="--folded and --promoted are counted only at a spec audit's terminal exit past SPEC_FOLD_CUTOFF"
+    elif [ -z "$h" ] || [ -z "$m" ]; then
+      return 0
+    elif [ "$_se_rule" = counted ] && [ "$d" = fold ]; then
+      return 0
+    elif [ -z "$f" ] || [ -z "$p" ]; then
+      _se_why="the exit requires both --folded and --promoted, because every confirmed finding is folded or promoted and a row that does not count them cannot be graded"
+    elif [ "$(( f + p ))" -lt "$(( b + h + m ))" ]; then
+      _se_why="--folded $f and --promoted $p fall short of the $(( b + h + m )) finding(s) this exit counts, so a confirmed finding has no disposition"
+    elif [ "$_se_rule" = counted ] && [ "$f" -gt 0 ]; then
+      _se_why="a spec exit under promote-all folds nothing, and --folded is $f"
+    else
+      if [ "$p" -gt 0 ]; then want=promote; elif [ "$f" -gt 0 ]; then want=fold; fi
+      [ "$d" != "$want" ] || return 0
+      _se_why="--folded $f and --promoted $p derive ${want:+--disposition }${want:-no disposition}, and this call names ${d:-none}"
+    fi
+  fi
+  fail 37 "--review cannot record this spec audit exit: $_se_why"
+  return 1
+}
+
+# THE ONE FOLD REFUSAL, called from the state gate and the counted block in that order. It names the
+# state and the review kind as locals, because a `fail` line reads as armed through its literal text
+# and check-arms drops only named interpolations. A helper naming its literal check number stays
+# visible to that tool, and a helper taking the code as a parameter would not.
+check_exit_fold() { # state · review kind · disposition -> 1 on a fold the exit's rule refuses
+  local state="$1" rkind="$2"
+  [ "$3" = fold ] || return 0
+  [ "$_se_rule" != folds ] || return 0
+  fail 37 "--review exits $state on $rkind, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+  return 1
+}
+
+verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors · folded · promoted
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" folded="${8:-}" promoted="${9:-}" rel prior state note disp bound counts owe exitnote rkind rround rexit route dby dword
   check_slug "$slug" || return 1
   runmd_of "$slug" >/dev/null; rel=$_runmd
   check_run_state "$rel" "run to record a review round against" || return 1
@@ -12807,10 +12956,12 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # THE EXIT'S COUNTS, ON EVERY SUBJECT. The owner ruled on 2026-10-04 that every finding the closing
   # diff review confirms is PROMOTED — one unit per BLOCKER and HIGH, the MEDIUMs and LOWs batched
   # into one unit or two (TOOL-aBatchedMinors-2) — and answered on 2026-10-05 that a spec audit's are
-  # promoted the same way (TOOL-aEvidencedLens-7). A row recording only the blocker count could not
-  # say what else stood, so both counts are required at every terminal exit of every subject. The
-  # subject's KIND only names the review in the refusals: the closing review's subject IS the build
-  # slug, the equality the bound below makes, and every other subject is a spec audit.
+  # promoted the same way (TOOL-aEvidencedLens-7). A record past SPEC_FOLD_CUTOFF takes a spec audit's
+  # rule from `read_spec_exit_rule`, whose `by-nature` value folds what needs no new mechanism
+  # (TOOL-dFoldedAudit-2); the closing review keeps the first rule. A row recording only the blocker
+  # count could not say what else stood, so both counts are required at every terminal exit of every
+  # subject. The subject's KIND only names the review in the refusals: the closing review's subject IS
+  # the build slug, the equality the bound below makes, and every other subject is a spec audit.
   if [ "$subj" = "$slug" ]; then
     rkind="the closing diff review"; rround="a closing round"; rexit="the closing review's exit"
   else
@@ -12825,11 +12976,13 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # ONE INTEGER FOR TWO READERS (closing review round 1, L1). The counts reach bash arithmetic below,
   # which reads a leading zero as OCTAL (`08` aborts the driver, `010` is 8) and wraps past 2^63,
   # while check 2's awk reads the same row field as decimal. A canonical decimal of at most nine
-  # digits is the one spelling both read alike, so anything else is refused before either does.
-  for _rv_n in "blockers $blockers" "highs $highs" "minors $minors"; do
+  # digits is the one spelling both read alike, so anything else is refused before either does. The
+  # `*[!0-9]*` alternative only --folded and --promoted can reach, the other three being refused above,
+  # and they join this site rather than adding one, because the census stands at its ceiling.
+  for _rv_n in "blockers $blockers" "highs $highs" "minors $minors" "folded $folded" "promoted $promoted"; do
     _rv_flag=${_rv_n%% *}
     case "${_rv_n#* }" in
-      0[0-9]*|??????????*) fail 37 "--review requires --$_rv_flag as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
+      0[0-9]*|??????????*|*[!0-9]*) fail 37 "--review requires --$_rv_flag as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
     esac
   done
   # THE CLOSED SET, checked HERE and not below with the state gate. S3a decides the order and the
@@ -12883,8 +13036,13 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # subject matched, and an exit token appearing anywhere on the line counted - including inside a
   # subject or a park reason that merely quotes one. Both are restored, with -F still doing the
   # subject comparison so the subject is never a pattern.
+  # ONE SUBJECT STILL TAKES NO FURTHER ROUND under either rule, and the route names the rule that
+  # applied: a chain's later round is a fresh subject `<slug>-spec-set-r<N>`, never this one again.
   if grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rel" 2>/dev/null      | grep -F -- " · item $subj · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)'; then
-    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded: $subj"
+    read_spec_exit_rule "$rel" "$slug" "$subj"
+    route="is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
+    [ "$_se_rule" != folds ] || route="is DISPOSED under the build method's M4 by its nature, through the chain's next subject, and never re-rounded"
+    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now $route: $subj"
     return 1
   fi
   # THE BOUND IS THE SUBJECT'S. The closing diff review's subject IS the build slug and keeps the
@@ -12892,30 +13050,30 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # takes the declared REVIEW_ROUNDS. The same equality `review_last_reason` and the --close term make.
   bound=$RUNAWAY_CEILING; [ "$subj" = "$slug" ] || bound=$REVIEW_ROUNDS
   state=$(review_state "$prior" "$blockers" "$bound")
+  check_spec_exit "$rel" "$slug" "$subj" "$state" "$blockers" "$disposition" "$highs" "$minors" "$folded" "$promoted" || return 1
   # THE STATE GATE. Keyed on the COMPUTED state and never on --verdict, whose closed set holds none
   # of the state tokens. A terminal exit must say which disposition it took: M4 disposes by
   # SEVERITY and the field records which value the exit took, and check 2 could otherwise only ever
   # observe promotion — so a run that folded correctly had no way to say so and was graded as
   # though it had promoted. TOOL-dBriefedPass-9 measured that.
   #
-  # THE FIELD'S LEGAL SET FOLLOWS THE SEVERITY RULE AT BOTH ENDS (closing review of aProbedUnit,
-  # cluster C). `review_state` returns CONVERGED for count 0 unconditionally, so every
-  # NON-CONVERGENT, CEILING or BOUNDED exit stands on at least one BLOCKER, and the severity rule
-  # promotes every blocker: `fold` cannot be that exit's disposition, and accepting it wrote
-  # `blockers 3 · disposition fold`, a row the gate read as demanding nothing. A converged round is
-  # decided by its counts, in the block below.
+  # THE FIELD'S LEGAL SET FOLLOWS THE EXIT'S RULE AT BOTH ENDS (closing review of aProbedUnit, cluster
+  # C). `review_state` returns CONVERGED for count 0 unconditionally, so every NON-CONVERGENT, CEILING or
+  # BOUNDED exit stands on at least one BLOCKER. Under the severity rule, every subject but a spec audit
+  # under `folds`, every blocker is promoted: `fold` cannot be that exit's disposition, and accepting it
+  # wrote `blockers 3 · disposition fold`, a row the gate read as demanding nothing. Under `folds` a
+  # LOCAL blocker folds and `check_spec_exit` has derived the value, so an absent one is its row 3 or
+  # row 8 to answer. A converged round is decided by its counts, in the block below.
   case "$state" in
     NON-CONVERGENT|CEILING|BOUNDED)
-      if [ -z "$disposition" ]; then
+      if [ -z "$disposition" ] && [ "$_se_rule" != folds ]; then
         fail 37 "--review exits $state with $blockers blocker(s) standing and requires --disposition promote, because the severity rule promotes every blocker and a record naming no disposition leaves the gate inferring one from ids"
         return 1
       fi
-      if [ "$disposition" = fold ]; then
-        # ...and fold is legal at NO exit of ANY subject (closing review round 1, L3, and
-        # TOOL-aEvidencedLens-7 for a spec audit), so the sentence never points at another exit.
-        fail 37 "--review exits $state on $rkind, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
-        return 1
-      fi ;;
+      # ...and fold is legal at NO exit of ANY subject but a spec audit under `folds` (closing review
+      # round 1, L3, TOOL-aEvidencedLens-7 and TOOL-dFoldedAudit-2), so the sentence never points at
+      # another exit.
+      check_exit_fold "$state" "$rkind" "$disposition" || return 1 ;;
     CONVERGED) ;;
     *)
       if [ -n "$disposition" ]; then
@@ -12923,33 +13081,46 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
         return 1
       fi ;;
   esac
-  # EVERY TERMINAL EXIT PROMOTES EVERY STANDING FINDING, on every subject (TOOL-aBatchedMinors-2 for
-  # the closing review, TOOL-aEvidencedLens-7 for a spec audit). Spelled after the state gate above,
-  # which has already refused fold and an absent value beside a standing blocker, so the refusals below
-  # are the ones only the counts can decide: a converged round standing on a high or a minor, and a
-  # promotion of nothing. BOUNDED is reachable on a spec subject only: the slug's bound is the
-  # ceiling, which `review_state` tests first.
+  # A TERMINAL EXIT DISPOSES EVERY STANDING FINDING, on every subject (TOOL-aBatchedMinors-2 for the
+  # closing review, TOOL-aEvidencedLens-7 for a spec audit), by promotion under `old`. Spelled after the
+  # state gate above, which has already refused fold and an absent value beside a standing blocker, so
+  # the refusals below are the ones only the counts can decide: a converged round standing on a high or
+  # a minor, and a promotion of nothing. Past `old`, `check_spec_exit` has derived the disposition from
+  # `folded` and `promoted`, so those two refusals are skipped, and `owe` is the note's floor, the one
+  # check 2 grades, on a row with a positive `promoted`. A row names no severity per fold, so the floor is
+  # the least any honest split of `folded` can build: each promoted BLOCKER and HIGH its own unit, the
+  # promoted minors one. A fold spent on a major lowers the first term and cannot also leave no minor, so
+  # past the folds' reach the minors still owe their one, and inside it one unit stands for all
+  # (TOOL-dFoldedAudit-15 S2). Under `counted` `folded` is 0, so this is the severity rule's own count.
+  # BOUNDED is reachable on a spec subject only: the slug's bound is the ceiling, which `review_state`
+  # tests first.
   counts=""; owe=0
+  # THE WORD NAMES THE RULE THAT APPLIED (TOOL-dFoldedAudit-15 S3): under `folds` a finding may fold, so
+  # `promoted` would be false. The `exits <state>` clause never moves, because a harness's bare first
+  # call reads it.
+  dword=promoted; [ "$_se_rule" != folds ] || dword=disposed
   case "$state" in
     CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)
       if [ -z "$highs" ] || [ -z "$minors" ]; then
-        fail 37 "--review exits $state on $rkind and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is promoted and a row that does not count them cannot be graded"
+        fail 37 "--review exits $state on $rkind and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is $dword and a row that does not count them cannot be graded"
         return 1
       fi
-      if [ "$disposition" = fold ]; then
-        fail 37 "--review exits $state on $rkind, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
-        return 1
-      fi
-      owe=$(( blockers + highs + (minors > 0 ? 1 : 0) ))
-      if [ "$owe" -gt 0 ] && [ "$disposition" != promote ]; then
-        fail 37 "--review exits $state on $rkind with $blockers blocker(s), $highs high(s) and $minors minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
-        return 1
-      fi
-      if [ "$owe" -eq 0 ] && [ -n "$disposition" ]; then
-        fail 37 "--review exits $state on $rkind with nothing standing, so --disposition $disposition promotes nothing, and the gate would read the row as owing a unit"
-        return 1
-      fi
-      counts=" · highs $highs · minors $minors" ;;
+      check_exit_fold "$state" "$rkind" "$disposition" || return 1
+      counts=" · highs $highs · minors $minors"
+      if [ "$_se_rule" = old ]; then
+        owe=$(( blockers + highs + (minors > 0 ? 1 : 0) ))
+        if [ "$owe" -gt 0 ] && [ "$disposition" != promote ]; then
+          fail 37 "--review exits $state on $rkind with $blockers blocker(s), $highs high(s) and $minors minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
+          return 1
+        fi
+        if [ "$owe" -eq 0 ] && [ -n "$disposition" ]; then
+          fail 37 "--review exits $state on $rkind with nothing standing, so --disposition $disposition promotes nothing, and the gate would read the row as owing a unit"
+          return 1
+        fi
+      else
+        counts="$counts · folded $folded · promoted $promoted"
+        [ "$promoted" -le 0 ] || owe=$(( blockers + highs > folded ? blockers + highs - folded + (minors > 0 ? 1 : 0) : 1 ))
+      fi ;;
     *)
       if [ -n "$highs$minors" ]; then
         fail 37 "--review names --highs or --minors on $rround that is not a terminal exit, and a count of what stands at the exit is a claim about an exit that has not happened yet: state $state"
@@ -12971,6 +13142,14 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   stage_or_fail "$rel" || return 1
   exitnote=$(review_exit_note "$disposition")
   [ -n "$counts" ] && [ "$disposition" = promote ] && exitnote="$(review_exit_note closing); this exit owes at least $owe new unit(s), one per blocker and high plus one for the minors when any stood"
+  dby=SEVERITY
+  if [ "$_se_rule" = folds ]; then
+    dby=NATURE
+    case "$disposition" in
+      fold)    review_exit_note spec-fold >/dev/null; exitnote=$_exitnote ;;
+      promote) review_exit_note spec-promote >/dev/null; exitnote="$_exitnote; this exit owes at least $owe new unit(s), the floor check 2 grades" ;;
+    esac
+  fi
   case "$state" in
     CONVERGED)      if [ -n "$disposition" ]; then
                       echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED$counts · disposition $disposition — the loop is done for this subject, and $exitnote"
@@ -12979,7 +13158,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
                     fi ;;
     NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT$counts · disposition $disposition — the count did not shrink, so the loop STOPS here and $exitnote" ;;
     CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING$counts · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $exitnote; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
-    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY: $exitnote" ;;
+    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY $dby: $exitnote" ;;
     *)              if [ -z "${prior//[[:space:]]/}" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else
@@ -13400,6 +13579,359 @@ verb_record_piece() { # slug · piece · leg · verdict
   record_piece "$rr_root" "$piece" "$leg" "$verdict" \
     "$(GIT rev-parse "$_rp_base:$_rp_pb" 2>/dev/null)" "$slug"
 }
+# TOOL-dFoldedAudit-5 - THE SPEC-AUDIT CHAIN'S RECORD AND ITS VERDICT. Each promotion is a fresh review
+# subject, so no `--review` row can say a chain is done: a row names no spec, an attended run writes
+# none, and `REVIEW_ROUNDS` bounds one subject and no chain of them. `--record-round` appends what a
+# round audited and how it disposed to one tracked file under the build's `build/` folder, and
+# `--chain-verdict` derives CONTINUE, STOP or HOLD from that file and the roster alone. BOTH ANSWER WITH
+# NO RUN-STATE FILE, so an attended run takes the same route, and the verdict lives here and nowhere
+# else: the build harness renders the recording command and reads no set.
+#
+# ONE REFUSAL SITE FOR BOTH VERBS, because the driver's census sits at its ceiling and the way up is the
+# owner's retirement review. Each reason is a value of `why`, so one arm quotes the signature and each
+# reason is observed by its own criterion. BOUND TO A NAME, never `$1`: check-arms reads a bare
+# positional as literal text, so it would land in the signature and nothing could arm the branch.
+check_chain_fault() { # why -> 0 when empty, else check 118 and 1
+  local why="$1"
+  [ -z "$why" ] && return 0
+  fail 118 "the spec-audit chain record refuses this: $why"
+  return 1
+}
+# THE RECORD, found and never named: `git ls-files` reads the index, so a round staged and not yet
+# committed is found by the next one. Two files split the rounds across two readers, and a tracked path
+# gone from the worktree would read as a chain with no rounds, so each refuses. An empty `_chain_rec`
+# is a chain no round has reached. Called in the caller's shell: a refusal in `$( )` loses its status.
+read_chain_record() { # slug -> 0 with _chain_rec the tracked record or empty, else check 118 and 1
+  local slug="$1"
+  _chain_rec=$(git ls-files "$M/builds/$slug/build/*-chain-rounds.md" 2>/dev/null)
+  case "$_chain_rec" in
+    *$'\n'*) check_chain_fault "two -chain-rounds.md files would split the rounds across two readers: ${_chain_rec//$'\n'/ }"
+             return 1 ;;
+  esac
+  [ -z "$_chain_rec" ] || [ -f "$_chain_rec" ] || {
+    check_chain_fault "the tracked record is gone from the worktree, and it would read as a chain with no rounds: $_chain_rec"
+    return 1; }
+}
+# A FOLD JOINS TO THE TREE (TOOL-dFoldedAudit-11). A `local` or `--sibling` row is only its grammar until
+# this reads it: with every spec at rev-1, two claimed folds printed `STOP · reason own-work` and no spec
+# had changed. The unit's spec must stand at the row's rev or above, never exactly at it, because a second
+# fold moves the header past the first and the first row stays true, and its Revision log must hold an
+# entry at that rev. A rev below 2 refuses as well: a fold bumps a rev, and rev-1 is a spec's first draft.
+#
+# THE AWK COMPARES, because a `[0-9]+` token can overflow `[ -lt ]`. The grammar is the kit's, spelled here
+# because the driver spawns no Python at this read and this kit copy-installs without the memory-tree kit:
+# the status anchor is `spec_facts`'s and the entry is `REV_ENTRY` of `design_lib.py`. The heading admits no
+# ordinal as well, where `REV_LOG_HEAD` requires one, because a Tier-1 spec's numbering is free. A header
+# with no rev reads 0, so it takes the header refusal.
+#
+# WHAT THE JOIN DOES NOT CHECK. A rev the spec already held: a row claiming rev-2 on a spec whose rev-2 was
+# an older fold passes, so this proves that the rev exists and never that this finding made it. Bytes in
+# the index: it reads the worktree, as `print_chain_verdict` does, so an uncommitted fold passes, and the
+# caller's order commits it first. That the entry names the finding. A `new-mechanism` row's unit, because
+# a promoted unit has no spec yet, so `write_chain_round` hands this no such row.
+check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already read -> 0 when the tree holds that rev, else check 118 and 1
+  local unit="$1" rev="$2" spec="${SPEC_PATH[$1]:-}" out
+  [ -n "$spec" ] || { check_chain_fault "a fold names $unit, and no tracked spec carries that id, so its rev joins to nothing"; return 1; }
+  out=$(awk -v claim="$rev" '
+    function revof(s) { match(s, /rev-[0-9]+/); return substr(s, RSTART + 4, RLENGTH - 4) }
+    { sub(/\r$/, "") }
+    head == "" && /^\*\*Status:\*\* [A-Z]+ · rev-[0-9]+ / { head = revof($0) }
+    /^## / { inlog = ($0 ~ /^## ([0-9]+[.] )?Revision log/); next }
+    inlog && /^([ \t]*[-*][ \t]*)?(\*\*)?rev-[0-9]+/ && revof($0) + 0 == claim + 0 { logged = 1 }
+    END {
+      if (claim + 0 < 2) print "draft"
+      else if (head + 0 < claim + 0) print "below " (head == "" ? 0 : head)
+      else if (!logged) print "unlogged"
+      else print "joined"
+    }' "$spec") || print_env_failure 118 "awk could not read the spec, so no fold can be joined: $spec"
+  case "$out" in
+    joined) return 0 ;;
+    draft) check_chain_fault "a fold claims rev-$rev on $unit, and rev-1 is a spec's first draft, so no fold produced it" ;;
+    below\ *) check_chain_fault "$unit's spec stands at rev-${out#below }, below the rev-$rev this row claims, so the fold never reached the tree" ;;
+    *) check_chain_fault "$unit's spec has no Revision log entry at rev-$rev, so the fold left no line to read" ;;
+  esac
+  return 1
+}
+# THE ROUND IS THE RECORD'S OWN ORDINAL, the last round plus one and never the harness's `round`: under
+# `REVIEW_ROUNDS` above 1 one generation spends several invocation rounds, which would burn the ceiling
+# faster than generations pass. `--subject` is the generation key, which is what refuses a replay.
+#
+# EVERY REFUSAL RUNS BEFORE ANY BYTE IS WRITTEN. These tokens reach a tracked record the verdict parses,
+# so each is held to its grammar here as well as in the harness, because the verb is callable by hand: a
+# separator or a newline would forge a row. The counts are the review's: read from rows alone "every
+# confirmed BLOCKER and HIGH was disposed somewhere" could not fail, because a row at HIGH always names
+# a nature and a unit. A finding the disposal adjudicated from UNVERIFIED may add a row above the count,
+# so the test is "fewer", never "differs". THE VERB MOVES NO RUN STATE, so a terminal record does not
+# refuse it (TOOL-dFoldedAudit-15 S9): it writes a separate record, the caller commits that beside the
+# disposal's folds, and an attended chain on a finished build still records its round.
+write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS
+  local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5"
+  local id="$UNIT_ID_ERE" rec now tok rows="" last=0 seen=0 round folds=()
+  local f_id f_sev f_nat f_specs f_unit f_rev
+  local re_ids="^$id( $id)*\$" re_sibling="^$id@rev-[0-9]+\$"
+  local re_finding="^[0-9]+/($CHAIN_SEVERITIES)/($CHAIN_NATURES)/$id(,$id)*/$id/[0-9]+\$"
+  local -A b_ids=() h_ids=()
+  check_slug "$slug" || return 1
+  check_verb_flag --record-round --subject "$subj" || return 1
+  check_verb_flag --record-round --audited "$audited" || return 1
+  check_verb_flag --record-round --blockers "$blockers" || return 1
+  check_verb_flag --record-round --highs "$highs" || return 1
+  [ -d "$M/builds/$slug" ] || { check_chain_fault "no build folder holds this slug, so a round has nothing to bind to: $slug"; return 1; }
+  [[ $subj =~ ^[A-Za-z0-9-]+$ ]] || { check_chain_fault "--subject is outside [A-Za-z0-9-]+, and a row nothing can parse is prose in a record the verdict reads: $subj"; return 1; }
+  [[ $audited =~ $re_ids ]] || { check_chain_fault "--audited holds a token that is no unit id, or two spaces, and a row nothing can parse is prose in a record the verdict reads: $audited"; return 1; }
+  [[ "$blockers:$highs" =~ ^[0-9]{1,6}:[0-9]{1,6}$ ]] || { check_chain_fault "--blockers and --highs are the review's two integers: $blockers and $highs"; return 1; }
+  read_chain_record "$slug" || return 1
+  if [ -n "$_chain_rec" ]; then
+    read -r last seen < <(awk -v subj="$subj" '
+      { sub(/\r$/, "") }
+      /^round [0-9]+ · subject / {
+        split($0, f, " · "); split(f[1], w, " ")
+        if (w[2] + 0 > last) last = w[2] + 0
+        if (f[2] == "subject " subj) seen = 1
+      }
+      END { print last + 0, seen + 0 }' "$_chain_rec")
+  fi
+  [ "$seen" = 0 ] || { check_chain_fault "an earlier round of the record already carries this --subject, and a replay would count one generation twice: $subj"; return 1; }
+  round=$((last + 1))
+  for tok in ${RR_FINDINGS[@]+"${RR_FINDINGS[@]}"}; do
+    [[ $tok =~ $re_finding ]] || { check_chain_fault "a --finding is outside <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>: $tok"; return 1; }
+    IFS=/ read -r f_id f_sev f_nat f_specs f_unit f_rev <<<"$tok"
+    rows+="round $round · finding $f_id · $f_sev · $f_nat · specs ${f_specs//,/ } · unit $f_unit · rev $f_rev"$'\n'
+    case "$f_sev" in BLOCKER) b_ids[$f_id]=1 ;; HIGH) h_ids[$f_id]=1 ;; esac
+    [ "$f_nat" != local ] || folds+=("$f_unit $f_rev")
+  done
+  for tok in ${RR_SIBLINGS[@]+"${RR_SIBLINGS[@]}"}; do
+    [[ $tok =~ $re_sibling ]] || { check_chain_fault "a --sibling is outside <id>@rev-<N>: $tok"; return 1; }
+    rows+="round $round · sibling · unit ${tok%@rev-*} · rev ${tok##*@rev-}"$'\n'
+    folds+=("${tok%@rev-*} ${tok##*@rev-}")
+  done
+  # A FOLD ANSWERS TO THE RUN'S RULE, because the value a caller passes was its own copy of it
+  # (TOOL-dFoldedAudit-13). A sibling edit is a fold too, and this read is lazy, so a round of
+  # `new-mechanism` rows spawns nothing and passes under every answer.
+  if [ "${#folds[@]}" -gt 0 ]; then
+    runmd_of "$slug" >/dev/null
+    read_spec_disposal "$_runmd" "$slug"
+    [ "$_sd_value" = by-nature ] || { check_chain_fault "a local or --sibling row folds, and this run's spec disposal reads $_sd_value${_se_why:+, $_se_why}, which folds nothing"; return 1; }
+  fi
+  if [ "${#b_ids[@]}" -lt "$blockers" ] || [ "${#h_ids[@]}" -lt "$highs" ]; then
+    check_chain_fault "the rows dispose ${#b_ids[@]} BLOCKER and ${#h_ids[@]} HIGH id(s) where the review counted $blockers and $highs, and every confirmed one is disposed somewhere"
+    return 1
+  fi
+  # THE JOIN RUNS LAST, behind every grammar and count test and ahead of the first byte, and a round with
+  # no fold reads no spec. Every severity joins, because a minor's fold bumps a rev too.
+  if [ "${#folds[@]}" -gt 0 ]; then
+    load_spec_facts $(git ls-files "$M/builds/$slug/spec/*.md" 2>/dev/null | drop_working_specs) \
+      || print_env_failure 118 "the build's specs could not be read, so no fold can be joined: $M/builds/$slug"
+    for tok in "${folds[@]}"; do check_chain_fold "${tok% *}" "${tok#* }" || return 1; done
+  fi
+  rec=$_chain_rec
+  if [ -z "$rec" ]; then
+    now=$(read_utc_now)
+    [ -n "$now" ] || print_env_failure 118 "the clock answered nothing, so the record cannot be named and no round was written"
+    rec="$M/builds/$slug/build/${now%%T*}-build-${audited%% *}-chain-rounds.md"
+    mkdir -p "${rec%/*}" 2>/dev/null || print_env_failure 118 "cannot create the build's record folder, so no round was written: ${rec%/*}"
+  fi
+  {
+    [ -n "$_chain_rec" ] || printf '# %s — the spec-audit chain'\''s rounds\n\n**Serves:** journal %s\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\n' "$slug" "${audited%% *}"
+    printf 'round %s · subject %s · audited %s\n%s' "$round" "$subj" "$audited" "$rows"
+  } >> "$rec" || print_env_failure 118 "cannot append to the record, so this round is not recorded: $rec"
+  stage_runmd "$rec" || print_env_failure 118 "the round is written and git could not stage it, so the next call cannot find the record: $rec"
+  echo "unattended: chain round recorded — $slug · round $round · $rec"
+}
+# THE SETS, COMPUTED ONCE, in one awk over the record, in the design's order. For round N the last the
+# record holds, 0 when it holds none: H is the BLOCKER and HIGH ids with their specs, P the unit of every
+# `new-mechanism` row whatever its severity, and F the unit of every `local` row at BLOCKER or HIGH and of
+# every `sibling` row, because M4 already counts a review's own fold of a minor as reviewed. U is the
+# live roster less every audited id and less P(N): a unit round N just promoted is named by no audit yet,
+# so a U holding it would answer CONTINUE before the stop or the ceiling is read. U also holds every live
+# id of P(N-1) and F(N-1) that round N's OWN `audited` row lacks (TOOL-dFoldedAudit-10), because `aud` is
+# cumulative, which keeps a spec round 1 audited reviewed, and alone it let a round stop clean over a fold
+# the next round never read. Live is what ends that test: a CLOSED or WONTDO id is in no walk here.
+#   1. U non-empty: CONTINUE, unreviewed, auditing U, P(N) and F(N).
+#   2. H(N) and P(N) empty: STOP, clean.
+#   3. own-work, N >= 2, H(N) NON-EMPTY, every high's specs inside P(N-1) and F(N-1): STOP, own-work.
+#   4. N at the ceiling: HOLD. 5. Otherwise CONTINUE, open, auditing P(N) and F(N).
+# THE POPULATION IN STEP 3 IS THE POINT: an empty H is a subset of anything, so without it a clean round
+# would read as R5, and step 2 answers a clean round first anyway. POSIX awk, for the reason `spec_facts`
+# gives, so the lists sort by hand, as strings. A row outside the grammar was hand-edited: the file is
+# append-only, so one no reader can parse is a fault to name, never a question for the owner. A blank
+# line is skipped anywhere and the three header lines only before the first row, so a body row wearing a
+# header's prefix reaches that fault instead of leaving the sets (TOOL-dFoldedAudit-15 S4).
+derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -> 0 with _cv_* set, else check 118 and 1
+  local out
+  out=$(awk -v live="$2" -v stop="$3" -v ceiling="$4" -v idre="^$UNIT_ID_ERE\$" -v sevre="^($CHAIN_SEVERITIES)\$" -v natre="^($CHAIN_NATURES)\$" '
+    function isid(s) { return s ~ idre }
+    function isids(s,   a, k, i) {
+      k = split(s, a, " ")
+      for (i = 1; i <= k; i++) if (!isid(a[i])) return 0
+      return k > 0
+    }
+    function toset(s, set,   a, k, i) { k = split(s, a, " "); for (i = 1; i <= k; i++) set[a[i]] = 1 }
+    function joined(set,   id, v, n, i, j, o, s) {
+      n = 0
+      for (id in set) v[++n] = id
+      for (i = 2; i <= n; i++) {
+        o = v[i]
+        for (j = i - 1; j >= 1 && (v[j] "") > (o ""); j--) v[j + 1] = v[j]
+        v[j + 1] = o
+      }
+      s = ""
+      for (i = 1; i <= n; i++) s = s (i > 1 ? " " : "") v[i]
+      return s
+    }
+    function inside(s, set,   a, k, i) {
+      k = split(s, a, " ")
+      for (i = 1; i <= k; i++) if (!(a[i] in set)) return 0
+      return 1
+    }
+    { sub(/\r$/, "") }
+    /^$/ { next }
+    !body && (/^# / || /^\*\*Serves:\*\* journal / || /^Appended by /) { next }
+    {
+      body = 1
+      k = split($0, f, " · "); c = split(f[1], w, " ")
+      if (c != 2 || w[1] != "round" || w[2] !~ /^[1-9][0-9]*$/) { bad = $0; exit }
+      r = w[2] + 0
+      if (k == 3 && f[2] ~ /^subject [A-Za-z0-9-]+$/ && f[3] ~ /^audited / && isids(substr(f[3], 9))) {
+        toset(substr(f[3], 9), aud)
+        audn[r] = substr(f[3], 9)
+      } else if (k == 4 && f[2] == "sibling" && f[3] ~ /^unit / && isid(substr(f[3], 6)) && f[4] ~ /^rev [0-9]+$/) {
+        fold[r] = fold[r] " " substr(f[3], 6)
+      } else if (k == 7 && f[2] ~ /^finding [0-9]+$/ && f[3] ~ sevre &&
+                 f[4] ~ natre && f[5] ~ /^specs / && isids(substr(f[5], 7)) &&
+                 f[6] ~ /^unit / && isid(substr(f[6], 6)) && f[7] ~ /^rev [0-9]+$/) {
+        major = (f[3] == "BLOCKER" || f[3] == "HIGH")
+        if (major) high[r] = high[r] " " substr(f[5], 7)
+        if (f[4] == "new-mechanism") prom[r] = prom[r] " " substr(f[6], 6)
+        else if (major) fold[r] = fold[r] " " substr(f[6], 6)
+      } else { bad = $0; exit }
+      if (r > last) last = r
+    }
+    END {
+      if (bad != "") { print "BAD|" bad; exit }
+      N = last + 0
+      toset(prom[N], P); toset(fold[N], F); toset(prom[N - 1] " " fold[N - 1], prior); toset(audn[N], own)
+      c = split(live, L, " ")
+      for (i = 1; i <= c; i++) if ((!(L[i] in aud) && !(L[i] in P)) || ((L[i] in prior) && !(L[i] in own))) { U[L[i]] = 1; unreviewed = 1 }
+      pn = joined(P)
+      word = "CONTINUE"; reason = "open"; override = ""
+      if (unreviewed) reason = "unreviewed"
+      else if (high[N] == "" && pn == "") { word = "STOP"; reason = "clean" }
+      else if (stop == "own-work" && N >= 2 && high[N] != "" && inside(high[N], prior)) { word = "STOP"; reason = "own-work"; override = pn }
+      else if (N >= ceiling + 0) { word = "HOLD"; reason = "ceiling" }
+      audit = ""
+      if (word == "CONTINUE") {
+        for (i in P) U[i] = 1
+        for (i in F) U[i] = 1
+        audit = joined(U)
+      }
+      print N "|" word "|" reason "|" audit "|" override
+    }' "${1:-/dev/null}") || print_env_failure 118 "awk could not read the record, so no verdict exists: ${1:-(none)}"
+  case "$out" in
+    BAD\|*) check_chain_fault "a body row is outside the grammar, and the record is append-only, so it was edited by hand: ${out#BAD|}"
+            return 1 ;;
+  esac
+  IFS='|' read -r _cv_round _cv_word _cv_reason _cv_audit _cv_override <<<"$out"
+}
+# A verdict of each of the three exits 0: the verb answered, and the caller acts on the word. The roster
+# is the specs and the authored plan together, so a promoted unit counts once its spec is tracked. CLOSED
+# and WONTDO are terminal, because a frozen spec cannot take a fold and a retired one is never audited,
+# so either would hold U non-empty for ever. A HOLD stays the answer until the owner moves the ceiling or
+# rules, because a re-read of one record derives one verdict, and it prints a recipe because the main
+# loop owns the keepalive: `--hold` refuses `owner-decision`, `--handoff` being that code's only producer.
+# ONE DERIVATION, TWO READERS (TOOL-dFoldedAudit-9): `--chain-verdict` prints what this leaves in `_cv_*`,
+# and `--dispatch` acts on it. Called in the caller's shell: a refusal in `$( )` loses its status.
+# AN EMPTY LIVE SET WITH NO ROUND REFUSES (TOOL-dFoldedAudit-15 S15), because a verdict over it is `N=0 STOP
+# clean` over nothing, the vacuous selector M4's rule names. A record beside that roster still answers.
+read_chain_verdict() { # slug -> 0 with _cv_* set, _cv_ceiling among them, else check 118 and 1
+  local slug="$1" dir ids planned stop specs id st live=""
+  dir="$M/builds/$slug"
+  ids=$(spec_ids "$dir")
+  planned=$(roster_ids "$slug") || { check_chain_fault "the build README's roster pair is malformed, so no roster can be read: $slug"; return 1; }
+  [ -n "$ids$planned" ] || { check_chain_fault "the roster yields no id, and a verdict over nothing is the vacuous-selector shape: $slug"; return 1; }
+  read_chain_record "$slug" || return 1
+  stop=$(read_spec_audit_switch chain-stop) || { check_chain_fault "$stop"; return 1; }
+  _cv_ceiling=$(read_spec_audit_switch chain-ceiling) || { check_chain_fault "$_cv_ceiling"; return 1; }
+  specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null | drop_working_specs)
+  load_spec_facts $specs || print_env_failure 118 "the build's specs could not be read, so no status can be taken: $dir"
+  for id in $ids $planned; do
+    st=""; [ -z "${SPEC_PATH[$id]:-}" ] || st=${SPEC_ST[${SPEC_PATH[$id]}]:-}
+    case "$st" in CLOSED|WONTDO) ;; *) live="$live${live:+ }$id" ;; esac
+  done
+  [ -n "$live$_chain_rec" ] || { check_chain_fault "every unit of the roster is CLOSED or WONTDO and no round is recorded, so a verdict would stop a chain nothing audited: $slug"; return 1; }
+  derive_chain_verdict "$_chain_rec" "$live" "$stop" "$_cv_ceiling" || return 1
+}
+print_chain_verdict() { # slug -> the verdict line, then the recipe line on a HOLD
+  local slug="$1" line
+  check_slug "$slug" || return 1
+  read_chain_verdict "$slug" || return 1
+  line="unattended: chain $slug · round $_cv_round · $_cv_word · reason $_cv_reason"
+  [ -z "$_cv_audit" ] || line="$line · audit $_cv_audit"
+  [ -z "$_cv_override" ] || line="$line · override specs-audited $_cv_override"
+  printf '%s\n' "$line"
+  [ "$_cv_word" != HOLD ] || printf 'unattended: chain %s holds for the owner at the ceiling of %s round(s): bash %s --park %s --item spec-audit-chain-ceiling --reason <what stands>, then reap the keepalive and bash %s --handoff %s --code owner-decision --reason <what the owner decides> --reaped <the keepalive id you deleted>; an attended run asks the owner.\n' \
+    "$slug" "$_cv_ceiling" "$DRIVER_ARGV0" "$slug" "$DRIVER_ARGV0" "$slug"
+}
+# EACH TERMINAL SPEC EXIT NO ROUND RECORDS (TOOL-dFoldedAudit-9). The verdict reads the record alone, so
+# round 1's STOP would stand over a later exit nobody recorded. The row test is check 2's: a `review · item`
+# row on a subject that is not the slug, whose reason carries an exit token. The harness passes one subject
+# to `--review` and to the record, so the join is exact. FILENAME tells the two files apart, because
+# `NR == FNR` reads the run-state file as the record when the record is empty.
+#
+# WHAT IT DOES NOT CHECK: a subject outside `[A-Za-z0-9-]+` on a by-hand `--review` row can reach no round,
+# because `--record-round` refuses it, so such a row holds the gate. The harness's subject always fits.
+read_unrecorded_exits() { # run-state file · slug · the chain record, or nothing -> those subjects on stdout, one space apart
+  awk -v slug="$2" -v rec="${3:-/dev/null}" '
+    { sub(/\r$/, "") }
+    FILENAME == rec {
+      if ($0 ~ /^round [0-9]+ · subject /) { split($0, f, " · "); seen[substr(f[2], 9)] = 1 }
+      next
+    }
+    /^[0-9][0-9-]*T[0-9:]*Z review · item / {
+      rest = substr($0, index($0, " · item ") + length(" · item "))
+      j = index(rest, " · reason "); if (j == 0) next
+      it = substr(rest, 1, j - 1)
+      if (it == slug || (it in seen) || substr(rest, j) !~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) next
+      seen[it] = 1
+      printf "%s%s", (n++ ? " " : ""), it
+    }' "${3:-/dev/null}" "$1"
+}
+# THE RE-AUDIT THAT PAYS FOR A FOLD IS ENFORCED HERE (TOOL-dFoldedAudit-9, H1). Past the cutoff a spec audit
+# folds on the promise that the chain re-audits the fold, and nothing refused a pass while the verdict was
+# not STOP. The rule reads first, so an `old` or `counted` run keeps today's bytes, silently. The gate arms
+# on the declaration as well as on a record or a row, because a run skipping `--review` and `--record-round`
+# leaves neither: N is then 0, and the verdict reads unreviewed. Each refusal is a value of `why`, because
+# the driver's census sits at its ceiling and the way up is the owner's retirement review.
+#
+# NOTHING A RUN WRITES PASSES A HOLD: `--park` writes the question and `--handoff` the stop, and both are the
+# run's own rows. The owner moves `review.spec-audit.chain-ceiling` in the guarded policy file, the verdict
+# leaves HOLD for CONTINUE, and the chain takes the round the raised ceiling asks for.
+#
+# WHAT IT DOES NOT CHECK: that a run calls `--dispatch` at all, the limit M2's floor already has; a round's
+# truth, so a forged STOP passes; and an uncommitted edit of the policy file, which the verdict reads from
+# the working copy and the path guard refuses at the commit.
+check_chain_dispatch() { # run-state file · slug -> 0 when the chain admits this dispatch, else check 118 and 1
+  local rel="$1" slug="$2" unrec
+  read_spec_exit_rule "$rel" "$slug" "$slug-spec-set"
+  check_chain_fault "$_se_why" || return 1
+  [ "$_se_rule" = folds ] || return 0
+  read_chain_record "$slug" || return 1
+  unrec=$(read_unrecorded_exits "$rel" "$slug" "$_chain_rec") || print_env_failure 118 "awk could not read the run-state file, so no spec exit can be joined to a round: $rel"
+  fact "$rel" spec-audit >/dev/null
+  if [ -z "$_fact$_chain_rec$unrec" ]; then
+    echo "unattended: dispatch — no spec audit is declared or recorded, so no chain verdict gates this dispatch: an announced skip, not a pass"
+    return 0
+  fi
+  [ -z "$unrec" ] || { check_chain_fault "--dispatch reads a terminal spec exit no chain round records, so the verdict would be read without it: $unrec; run that round's --record-round and commit the record"; return 1; }
+  read_chain_verdict "$slug" || return 1
+  case "$_cv_word" in
+    STOP) echo "unattended: dispatch — chain $slug · round $_cv_round · STOP · reason $_cv_reason"
+          return 0 ;;
+    HOLD) check_chain_fault "--dispatch builds nothing while the chain reads HOLD: round $_cv_round stands at the ceiling of $_cv_ceiling round(s), and only the owner moves review.spec-audit.chain-ceiling; a parked decision or a hand-off row is the question, never the answer" ;;
+    *)    check_chain_fault "--dispatch builds nothing while the chain reads $_cv_word: round $_cv_round, reason $_cv_reason; re-invoke the build harness with auditIds: $_cv_audit" ;;
+  esac
+  return 1
+}
 # TOOL-dUnstalledConvoy-5 - the amendment record. M2's AMEND acts are legal in code and were
 # undocumented; M3 now delegates the build's own scope. An authority with no record is
 # indistinguishable from a run doing whatever it likes, so every amendment leaves a row here.
@@ -13751,6 +14283,9 @@ verb_dispatch() { # slug · unit · writes...
   [ "$shaped" = "$unit" ] && [ -n "$unit" ] || { local _u=${unit:-(none)}
     fail 49 "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id: $_u"; return 1; }
   check_verb_flag --dispatch --writes "${1+set}" || return 1
+  # ABOVE `load_spec_facts`, because `read_chain_verdict` reloads those maps through `drop_working_specs`
+  # and the order gate below reads them. A refusal here writes no row, as every refusal above the row does.
+  check_chain_dispatch "$rel" "$slug" || return 1
   # ------------------------------------------------------------------ TOOL-dBriefedPass-3 S1/S2
   # THE M2 HARD FLOOR, MOVED FROM A RULE AN AGENT REMEMBERS TO A REFUSAL A MACHINE MAKES. Never
   # build a MISSING or THIN unit is stated by the build method and was enforced by nothing: before
@@ -14516,6 +15051,7 @@ HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
+RR_AUDITED=""; RR_FINDINGS=(); RR_SIBLINGS=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
 # TOOL-cBriefedPilot-3 - the owner's waiver pairs, through unit 1's accumulator rather than a second
 # one. Same reason for parallel arrays: the reason is free text an owner types, and a record
@@ -14594,6 +15130,11 @@ while [ $# -gt 0 ]; do
     --disposition)  RV_DISPOSITION="${2:-}"; shift 2 || shift ;;
     --highs)        RV_HIGHS="${2:-}"; shift 2 || shift ;;
     --minors)       RV_MINORS="${2:-}"; shift 2 || shift ;;
+    --folded)       RV_FOLDED="${2:-}"; shift 2 || shift ;;
+    --promoted)     RV_PROMOTED="${2:-}"; shift 2 || shift ;;
+    --audited)      RR_AUDITED="${2:-}"; shift 2 || shift ;;
+    --finding)      RR_FINDINGS+=("${2:-}"); shift 2 || shift ;;
+    --sibling)      RR_SIBLINGS+=("${2:-}"); shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is
@@ -14690,10 +15231,12 @@ case "$VERB" in
   --park)    verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
-  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" ;;
+  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" "$RV_FOLDED" "$RV_PROMOTED" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
+  --record-round) write_chain_round "$SLUG" "$RV_SUBJECT" "$RR_AUDITED" "$RV_BLOCKERS" "$RV_HIGHS" ;;
+  --chain-verdict) print_chain_verdict "$SLUG" ;;
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
   --beat)      write_claim_beat "$SLUG" ;;

@@ -36,7 +36,9 @@ spec's hands-off bullets, joined to the text of the sibling each one names. The 
 reads the live specs' own bytes and the two size sidecars, and no token at all. The ninth,
 `carries`, reads none of the live populations: its own is every tracked chain-build spec, at any
 status but WONTDO, with its history. The tenth, `packet`, reads no spec: its own is the chain
-builds whose run is live in the tree, each graded by the packet instrument it already ships.
+builds whose run is live in the tree, each graded by the packet instrument it already ships. The
+eleventh, `supersede`, reads no token: its own is the prose of the live specs dated at or after its
+key, read across their line wraps.
 
   legs   backticked tokens on a `## 7. Gates` LINE THAT IS THE LIST -> a `name` in the manifest.
          A section 7 line carrying prose is not graded: measured, that predicate produced 270
@@ -193,6 +195,23 @@ builds whose run is live in the tree, each graded by the packet instrument it al
          because deriving LANDED asks the remote and a join on an unguarded leg reads no network; a
          run whose `RUN.md` this tree does not hold, or whose `RUN.md` carries no phase line; and
          anything the instrument itself does not check, which its own docstring lists.
+  supersede the supersede join: every instance of this repo's idiom for overriding a sibling's text
+         from outside, `SUPERSEDE_PHRASE`, in the prose of a LIVE spec dated at or after
+         SPEC_SUPERSEDE_CUTOFF (`.memory-tree.conf`, blank = off) -> a hit whose token is
+         `supersede <- line <n>`, n the line the instance opens on (TOOL-dFoldedAudit-4). A repair
+         rewrites its unbuilt sibling instead, with a rev bump and a section 9 line. The search folds
+         case and reads any whitespace between the words, so a wrapped instance is one hit. Fenced
+         blocks are blanked first and code spans and double-quoted spans after them, so a spec may
+         name the class it forbids. NO WAIVER REACHES A HIT: this class exempts by cutoff and never
+         by list, and a waiver is a list, so the filter skips this join's hits and a row naming one
+         reads as used and silences nothing. Live specs before the key that carry it are COUNTED and
+         not graded, and the join's line prints on every run, off included, because the join grades
+         no tracked spec on its landing day. What it does NOT see: a synonym, since it reads one
+         phrase; a DEFERRED or terminal spec, since a spec is graded while it is authored and frozen
+         once it lands; an instance in a code span or double quotes, which is the point of the
+         blanking; and whether a sibling was actually edited, which the deviation join reads. A
+         double-quoted span ends on its own line, so an instance quoted across a wrap is a hit, a
+         loud miss where a span reaching the next stray quote would hide a real one silently.
   ac-order the criterion-order join: every LIVE spec dated at or after SPEC_AC_ORDER_CUTOFF
          (`.memory-tree.conf`, blank = off) -> a hit when its section 6 labels, read with `AC_LABEL`
          inside `AC_HEAD`'s section, descend; it names the first label listed before a lower one
@@ -422,6 +441,14 @@ UNIT_ID = re.compile(r"^[A-Z][A-Za-z0-9]*-[A-Za-z]+-[0-9]+$")
 HANDOFF_WHY = ("this bullet hands the token to that sibling and the sibling's own spec never names "
                "it: name it there, or correct the bullet — the join proves the sibling NAMES the "
                "token, never that it does the work")
+# TOOL-dFoldedAudit-4: the supersede join's key, phrase and refusal. The phrase is this repo's own idiom,
+# measured over every tracked spec at dccdeaa8. The `\s+` is what reads one the house width wrapped, and
+# the case fold what reads one opening a sentence; each caught a real instance there.
+SUPERSEDE_KEY = "SPEC_SUPERSEDE_CUTOFF"
+SUPERSEDE_PHRASE = re.compile(r"superseded\s+by\s+name", re.I)
+SUPERSEDE_WHY = ("this overrides a sibling's text from outside and leaves the sibling wrong: rewrite the "
+                 "sibling itself, with a rev bump and a section 9 line naming the repair unit, or where "
+                 "it is terminal build a new unit on top; no waiver row reaches this hit")
 # TOOL-dTrueNorth-2: the carries join's key, the two arms only a Design exit grades, and the parser.
 # The parser is the memory-tree kit's `design_lib.py`, loaded by path from the kit beside this file.
 # Since TOOL-dTrueNorth-16 S32 it is loaded on every run, its date pattern being `SPEC_DATE`, so a
@@ -1142,16 +1169,12 @@ def check_bare_shaped(tok, exts):
     return pathlib.PurePosixPath(tok).suffix in exts
 
 
-def scan_claims(text):
-    """The claims join over one spec's text (TOOL-dGatedProse-2). Returns `(runs, hits, clears)`:
-    `runs` counts the distinct matched runs, each hit is `(line, object, class, arms, cite)` and each
-    clear is `(line, object, arms, why)`, where `arms` names every arm that reached the object's run,
-    so a run two arms reach is ONE run carrying both. Fenced blocks are blanked line for line first,
-    by the machine the hygiene engine's `_unfenced` reads a spec with: a backtick or a tilde marker
-    opens a fence, only the marker that opened it closes it, and the other marker inside is content.
-    A spec may therefore exhibit the refused sentence as a worked example, in either fence, and every
-    line number still holds. A private boolean toggle was the first spelling, and it answered the
-    fence question differently from the engine in both directions (closing review, round 1, R3).
+def render_unfenced(text):
+    """`text` with its fenced blocks blanked line for line, so every line number still holds, by the
+    machine the hygiene engine's `_unfenced` reads a spec with: a backtick or a tilde marker opens a
+    fence, only the marker that opened it closes it, and the other marker inside is content. A private
+    boolean toggle was the first spelling, and it answered the fence question differently from the
+    engine in both directions (closing review of dGatedProse, round 1, R3).
     """
     lines, fence = [], ""
     for ln in text.split("\n"):
@@ -1162,7 +1185,42 @@ def scan_claims(text):
             lines.append("")
             continue
         lines.append("" if fence else ln)
-    body = "\n".join(lines)
+    return "\n".join(lines)
+
+
+def scan_supersede(root, specs, cutoff):
+    """The supersede join over `specs` (TOOL-dFoldedAudit-4). Returns `(hits, examined, carriers)`:
+    `examined` counts the specs dated at or after `cutoff`, each instance of the phrase in one of them
+    is a hit on the line it opens, and `carriers` counts every other spec holding the phrase, which a
+    blank cutoff leaves as all of them. The blanking is section 8's rule for a mark, read over the
+    whole text: fences by `render_unfenced`, then code spans and double-quoted spans, none of which
+    moves a newline. A span leaves a `_` and not nothing, so removing one forges no phrase out of the
+    words either side of it.
+    """
+    hits, examined, carriers = [], 0, 0
+    for f in specs:
+        m = SPEC_DATE.search("/" + f)
+        graded = bool(cutoff) and bool(m) and m.group(1) >= cutoff
+        examined += 1 if graded else 0
+        text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+        body = re.sub(r'"[^"\n]*"', "_", TICK.sub("_", render_unfenced(text)))
+        lines = [body.count("\n", 0, p.start()) + 1 for p in SUPERSEDE_PHRASE.finditer(body)]
+        if graded:
+            hits += [(f, "supersede", f"supersede <- line {n}", SUPERSEDE_WHY) for n in lines]
+        elif lines:
+            carriers += 1
+    return hits, examined, carriers
+
+
+def scan_claims(text):
+    """The claims join over one spec's text (TOOL-dGatedProse-2). Returns `(runs, hits, clears)`:
+    `runs` counts the distinct matched runs, each hit is `(line, object, class, arms, cite)` and each
+    clear is `(line, object, arms, why)`, where `arms` names every arm that reached the object's run,
+    so a run two arms reach is ONE run carrying both. Fenced blocks are blanked first, by
+    `render_unfenced`, so a spec may exhibit the refused sentence as a worked example, in either
+    fence, and every line number still holds.
+    """
+    body = render_unfenced(text)
     starts = [m.start() for m in TICK.finditer(body)]
     found = {}
     for name, arm in CLAIM_ARMS:
@@ -1491,13 +1549,14 @@ def main(argv):
     direct_cut = read_cutoff_key(root, DIRECT_KEY)
     handoff_cut = read_cutoff_key(root, HANDOFF_KEY)
     guards_cut = read_cutoff_key(root, GUARDS_KEY)
+    supersede_cut = read_cutoff_key(root, SUPERSEDE_KEY)
     ac_order_cut = read_cutoff_key(root, AC_ORDER_KEY)
-    if (legline_cut is None or direct_cut is None or handoff_cut is None or guards_cut is None
-            or ac_order_cut is None):
+    if None in (legline_cut, direct_cut, handoff_cut, guards_cut, supersede_cut, ac_order_cut):
         return 1
     relation = check_cutoff_relation(root, DIRECT_KEY, direct_cut) if direct_cut else ""
     grelation = check_cutoff_relation(root, GUARDS_KEY, guards_cut) if guards_cut else ""
-    if relation is None or grelation is None:
+    srelation = check_cutoff_relation(root, SUPERSEDE_KEY, supersede_cut) if supersede_cut else ""
+    if relation is None or grelation is None or srelation is None:
         return 1
     # The claims join's LIVENESS ASSERTION, before the population loop: an entry that does not hold
     # means an arm, the case fold or the space clause is broken, and the loop's zero would then be
@@ -1743,7 +1802,13 @@ def main(argv):
     if pk is not None:
         hits += pk[0]
 
-    live = [h for h in hits if h[2] not in waivers]
+    # The eleventh join (TOOL-dFoldedAudit-4), the prose of the live specs at/after its key. Its hits join
+    # `hits` for --list, and the filter below passes every one, because this class exempts by cutoff and
+    # never by list and a waiver is a list.
+    su_hits, su_examined, su_carriers = scan_supersede(root, specs, supersede_cut)
+    hits += su_hits
+
+    live = [h for h in hits if h[1] == "supersede" or h[2] not in waivers]
     for h in hits:
         if h[2] in waivers:
             seen_waived.add(h[2])
@@ -1758,7 +1823,8 @@ def main(argv):
 
     if listing:
         for f, kind, tok, why in hits:
-            print(f"spec-tokens: {'WAIVED' if tok in waivers else 'HIT   '} [{kind}] {f} :: {tok} — {why}")
+            waived = tok in waivers and kind != "supersede"
+            print(f"spec-tokens: {'WAIVED' if waived else 'HIT   '} [{kind}] {f} :: {tok} — {why}")
         for f, kind, tok, where in near:
             print(f"spec-tokens: NEAR   [{kind}] {f} :: {tok} — {where}")
 
@@ -1847,6 +1913,16 @@ def main(argv):
         print("spec-tokens: packet join · off · no packet instrument")
     else:
         print(f"spec-tokens: packet join · {pk[1]} live chain run(s) · {pk[2]} packet(s) checked")
+    # The supersede join's line, on every run, off included: it grades no tracked spec on its landing day,
+    # so this line is what keeps that zero from reading as coverage. Its tail carries `live spec(s) ·` for
+    # the hands-off line's reason: `--dispatch` filters its refusal diagnosis on that text.
+    su_tail = f" · of {len(specs)} live spec(s) · no waiver reaches a hit{srelation}"
+    if supersede_cut:
+        print(f"spec-tokens: supersede join · {su_examined} live spec(s) at/after {SUPERSEDE_KEY} {supersede_cut} · "
+              f"{len(su_hits)} hit(s) · {su_carriers} pre-cutoff live spec(s) carry it and are not graded{su_tail}")
+    else:
+        print(f"spec-tokens: supersede join · {SUPERSEDE_KEY} blank (arm off) · {su_carriers} live spec(s) "
+              f"carry it and are not graded{su_tail}")
 
     if listing:
         return 0

@@ -726,6 +726,34 @@ default = 3
 owner = "dDeclaredLoop"
 direction = "raise-loosens"
 
+# TOOL-dFoldedAudit-7: the three spec-audit switches, the new rules as their defaults and the old
+# rule an allowed value. They are no row of the design's [policies] table, so the header's order does
+# not place them; they bind a chain of subjects, where the rows above count one subject's rounds.
+[[key]]
+name = "review.spec-audit.disposal"
+allowed = ["by-nature", "promote-all"]
+default = "by-nature"
+summary = "How a spec audit disposes a confirmed finding: fold local fixes and promote new mechanisms, or promote every finding."
+usage = 'review.spec-audit.disposal = "promote-all"'
+owner = "dFoldedAudit"
+
+[[key]]
+name = "review.spec-audit.chain-stop"
+allowed = ["own-work", "clean-only"]
+default = "own-work"
+summary = "When a spec-audit chain stops: on a clean round or a round whose highs all sit in the prior round's own work, or on a clean round alone."
+usage = 'review.spec-audit.chain-stop = "clean-only"'
+owner = "dFoldedAudit"
+
+[[key]]
+name = "review.spec-audit.chain-ceiling"
+allowed = { type = "round-count", min = 1 }
+default = 4
+summary = "The chain round at which a spec-audit chain neither stop has ended holds for the owner."
+usage = 'review.spec-audit.chain-ceiling = 6'
+owner = "dFoldedAudit"
+direction = "raise-loosens"
+
 [[key]]
 name = "review.design-audit.runs"
 allowed = [1, 2, 3]

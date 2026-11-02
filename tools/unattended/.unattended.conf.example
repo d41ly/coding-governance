@@ -487,6 +487,16 @@ PASS_ORDER_WAIVER=""
 # announces that it did.
 DISPOSITION_CUTOFF=""
 
+# SPEC_FOLD_CUTOFF - the date from which a run takes the rules the three `review.spec-audit.` policy
+# keys answer, and a run before it keeps the old rule. Graded on the day the run's record began.
+# Anything but an ISO date refuses at load.
+#
+# BLANK in the example, like every sibling cutoff here, and for the same reason: a date is a
+# per-adopter fact, and a kit update must not move an adopter onto a new disposal. Blank keeps every
+# run on the old rule and the leg announces that it did. An adopter without the policy kit chooses
+# here: blank for the old rule, a date for the kit's defaults.
+SPEC_FOLD_CUTOFF=""
+
 # BRIEF_RECORDED_CUTOFF - the date from which the `brief-recorded` leg grades a CLOSED unit on
 # whether its BUILD COMMIT carries a `brief · item <id>` row whose hash still joins to a tracked file
 # at that commit. Graded on the build README's `opened:` date. The anchor is the build commit itself

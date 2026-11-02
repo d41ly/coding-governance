@@ -1,8 +1,8 @@
-# TOOL-dDeclaredLoop-32 — the convergence routing: every until and while loop ends on a non-decrease of its blocker and high count, its findings promoted by budget
+# TOOL-dDeclaredLoop-32 — the convergence routing: every closing-review and fix-pass loop ends on a non-decrease of its blocker and high count, its findings promoted by budget
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-11-02 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
 
-**Carries:** cl-dClosedLoop-0117@166df103 whole
+**Carries:** cl-dClosedLoop-0117@afb50a20 whole
 
 <!-- gen:spec-records -->
 
@@ -18,10 +18,12 @@
 
 ## 1. Goal
 
-Every iterative loop a build runs, spec audits under `review.design.rounds`' `until-*` values, closing-review
-follow-ups under `review.follow-up`'s `while-*` value and fix passes against one acceptance red, ends at the
-first round whose blocker and high count does not strictly fall, or at whichever of `review.max-rounds` and
-`flow.route-backs` it reaches first. Its open findings are promoted to units while the build's rework budget
+Every closing-review follow-up under `review.follow-up`'s `while-*` value and every fix pass against one
+acceptance red ends at the first round whose blocker and high count does not strictly fall, or at
+whichever of `review.max-rounds` and `flow.route-backs` it reaches first. A spec audit under
+`review.design.rounds`' `until-*` values ends at its target or its bound, and BUILD-METHOD M4's
+spec-audit rule disposes its findings and stops its chain.
+A follow-up's or a fix pass's open findings are promoted to units while the build's rework budget
 remains and to asks after it, never folded into another round, and a blocking item's open work past the
 budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
 (`tools/unattended/unattended.sh:12610-12618`) counts blockers alone, promotes without reading any budget
@@ -38,7 +40,7 @@ budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
 - **S2** — The route-back bound. `review_state` takes a fourth argument, the loop's `flow.route-backs`
   value, tested after its four existing tests: a round whose returns, the rounds before it, reach that value
   reads `NON-CONVERGENT`, which is `TOOL-dDeclaredLoop-30`'s `count_returns` for a subject each of whose
-  later rounds drew `review-round`. `verb_review` passes it for every subject, so a loop ends at whichever
+  later rounds drew `review-round`. `verb_review` passes it for the build slug and for no spec subject, so a loop ends at whichever
   of its round bound and `flow.route-backs` it reaches first. The value is read through dGroundRules-2's
   `policy.py get` (I10), as `TOOL-dDeclaredLoop-30` reads it, with v2's catalogue default of 3 until that
   reader lands. Observed by AC3.
@@ -47,13 +49,18 @@ budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
   `until-no-blocker` targets the blockers, `until-no-high` and `after-high` the blockers and highs, and
   `until-clean` and `while-finding` every finding. `verb_review` derives it from the subject's value,
   `review.design.rounds` on a spec subject and `review.follow-up` on the build slug. The non-decrease test
-  keeps reading the blocker and high count under every value. Observed by AC10.
+  keeps reading the blocker and high count on the build slug and on a fix pass. A spec subject takes no
+  non-decrease test: `verb_review` passes `review_state` a sixth argument, `no-fall`, so an `until-*`,
+  `one` or `fixed-count` subject ends at its target or its bound, and whether another generation runs is
+  the chain's verdict, not this loop's. Observed by AC10, AC11.
 - **S4** — The promotion target. Every exit row that records `disposition promote` also records the target
   in a field before it, ` · to units` or ` · to asks`, from `TOOL-dDeclaredLoop-30`'s
   `promotion_target(build, subject, blocking)` called with the subject blocking: its `unit` answer is
   ` · to units`, and its `on-exhausted` answer, the budget spent, is ` · to asks`, because a review loop's
   findings go to asks after the budget (flow-steps.md:47-49). `review_exit_note` names the target. No
-  target rule of this unit's own. Observed by AC4.
+  target rule of this unit's own. A spec subject's target is always ` · to units`: `promotion_target` is
+  not called for it, because a budget does not outrank a spec audit's chain stop (dFoldedAudit's README,
+  owner, 2026-11-01). Observed by AC4, AC11.
 - **S5** — The fix-pass loop. A verb `--fix-pass <slug> --unit <id> --reds <N>` records one fix pass against
   a unit's acceptance, `<N>` the count of the unit's criteria red after that pass, as a `fix-pass` row
   through `park()`, keyed by the unit, its state computed by the same `review_state` with the reds as count
@@ -90,7 +97,7 @@ budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
   replacing it with an executor's re-run is a later build's (v2:2014 `[owed]`).
 - A change to `deriveRoundState` in `tools/workflows/tier2-review.js`. It already counts blockers and highs
   and takes no route-back bound, and its parity arm with `review_state` holds over the domain where the
-  fourth argument is unset.
+  fourth and sixth arguments are unset.
 - No help page: `help/` documents neither the driver's verbs nor the review loop.
 
 ### Edges
@@ -100,6 +107,8 @@ budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
   end at
 - **consumes-from** `TOOL-dDeclaredLoop-30` — `flow.rework-budget`: `promotion_target` and `count_returns`,
   the promotion answer every exit records and the returns the route-back test equals
+- **consumes-from** external — BUILD-METHOD M4's spec-audit rule, which owns a spec subject's disposal
+  and its chain stop; TOOL-dFoldedAudit-1 states it
 - **hands-off** `TOOL-dDeclaredLoop-20` — `flow.route-backs`: `review.trigger` refuses a round past it and
   `review.dispose` promotes by the ` · to units` or ` · to asks` target this unit writes
 - **hands-off** `TOOL-dDeclaredLoop-31` — `flow.route-backs`: a fix-pass loop past it with the budget spent
@@ -111,9 +120,9 @@ budget ends as `flow.on-exhausted` says. Today the driver's `review_state`
 ### The predicate
 
 ```
-review_state <prior counts> <count> <bound> [<route-backs>] [<target>]   round = prior counts + 1
+review_state <prior counts> <count> <bound> [<route-backs>] [<target>] [<no-fall>]   round = prior counts + 1
   (target, default count) == 0                  -> CONVERGED                (target new)
-  prior non-empty and count >= last prior        -> NON-CONVERGENT
+  no-fall unset, prior non-empty and count >= last prior -> NON-CONVERGENT
   round past max-rounds (TOOL-dDeclaredLoop-21)   -> CEILING
   round >= bound                                -> BOUNDED
   route-backs given and round - 1 >= route-backs -> NON-CONVERGENT          (new)
@@ -136,9 +145,10 @@ keeps the `tools/workflows/tier2-review.test.sh` parity arm's domain unchanged.
 | `while-finding` | `review.follow-up` | blockers + round-highs + round-minors |
 | `one`, `fixed-count`, `never` | either | the count; their bound alone ends them (`TOOL-dDeclaredLoop-21`) |
 
-Under `until-clean` and `while-finding` a round standing on minors alone is not converged; its blocker and
+Under `while-finding` a round standing on minors alone is not converged; its blocker and
 high count of 0 does not fall below the round before's 0, so the next such round is `NON-CONVERGENT` and its
-minors are promoted, which keeps the clause's count and still ends the loop.
+minors are promoted, which keeps the clause's count and still ends the loop. A spec subject under
+`until-clean` takes no such exit: it runs to its target or its bound.
 
 ### The count
 
@@ -214,7 +224,7 @@ flight when this lands records its next round with `--round-highs`.
 
 ### Rollout
 
-The landing turns the rule on for every subject at once. A spec audit or closing review whose rounds fall
+The landing turns the rule on for every subject at once. A closing review whose rounds fall
 in blockers but not in blockers plus highs ends one round earlier than it would have.
 
 ### Files touched (estimate)
@@ -317,12 +327,19 @@ copy.
   prints `CONVERGED`, while under `until-no-high` the same round prints `CONVERGING`.
   Red when: the CONVERGED test keeps reading the count, so `until-no-blocker` never converges with highs
   standing.
+- **AC11** — When the sliced `review_state` runs `review_state "3" 3 3 "" 3 no-fall` it prints
+  `CONVERGING`, `review_state "3 3" 3 3 "" 3 no-fall` prints `BOUNDED`, and the same flat call with no
+  sixth argument prints `NON-CONVERGENT`; and on the fixture with the budget spent, a spec subject's
+  terminal row carrying `disposition promote` carries ` · to units`, where the build slug's carries
+  ` · to asks`.
+  Red when: `verb_review` passes `no-fall` to no subject, so a flat spec audit ends NON-CONVERGENT and
+  a spent budget sends its new mechanism to an ask no chain audits.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `drift-audit selftest` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC10 · the planted flat follow-up, the route-back-first sequence, the spent-budget target and the never-greening fix pass, each staged against the base driver, which counts blockers alone and has no fix-pass verb · none
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC3 AC4 AC5 AC10 AC11 · the planted flat follow-up, the route-back-first sequence, the spent-budget target and the never-greening fix pass, each staged against the base driver, which counts blockers alone and has no fix-pass verb · none
 
 New arm: tools/unattended/check-unattended.test.sh · covers AC7 · a `to asks` exit with no ask filed, staged against the base check, which counts unit ids · none
 
@@ -358,6 +375,9 @@ here and read by the owner's run PLAY-dClosedLoop-13 names.
   `review_state`, `review_counts`, `verb_review` and check 2 read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-11-02 · §1 §3 §4 §6 §7 · S2 S3 S4 AC11 · spec subjects leave the strict-fall exit, for the
+  owner's 2026-11-01 ruling (TOOL-dFoldedAudit-8), and the `**Carries:**` pin follows the amends row of
+  `2026-11-01-build-TOOL-dFoldedAudit-8-deviation-81`; follow-ups and fix passes keep the rule.
 
 ## 10. Reuse audit
 

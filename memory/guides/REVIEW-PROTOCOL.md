@@ -164,6 +164,7 @@ synthesis pass**; three phases, find → verify → synthesize. The ready-made h
 `tools/workflows/tier2-review.js` (`Workflow` with `{name:'tier2-review'}` or `{scriptPath}`); it
 takes a structured `args` object and REFUSES a prose string, because defaulting the review root to
 the process cwd twice made it audit a repository nobody had briefed it on.
+On a spec subject each BLOCKER or HIGH item also lists the unit ids its fix would change.
 
 **Results are durable only on request.** By default every finder and skeptic batch spawns as the
 read-only `Plan` type, which holds no Write tool, so it writes no result file and a resume reuses
@@ -178,6 +179,8 @@ re-run it once, and hold on a second.
 
 - **Precision — confirmed / (confirmed + refuted) — is the #1 token lever.** Below 0.5, tighten the
   scope before adding agents. Measured on the review that produced this document: 18 / 20.
+  It tunes a review and ends no chain: a spec audit's chain stops on the derived verdict the build
+  method states.
 - **Match intensity to target richness.** Heavy multi-lens review earns its tokens on fresh, complex
   write paths; over already-hardened code it manufactures defence-in-depth noise. Review light, or
   skip.

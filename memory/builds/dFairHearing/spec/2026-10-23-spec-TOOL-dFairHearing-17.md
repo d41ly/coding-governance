@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-11-02 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0084@b793fdd5 whole
 
@@ -61,8 +61,8 @@ chain or a follow-up round has no rule (`gap-review-21`).
   round on it; routing on the state is dDeclaredLoop's convergence routing.
 - No read of `review.max-rounds` or any other dDeclaredLoop key. The limit is the caller's
   `roundLimit` argument, and a later build's key is used as a stand-in nowhere here.
-- No reading of the precision floor, which `gap-review-21` also names. The clause states the round
-  state only, and the floor's chain rule is BUILD-METHOD M4's.
+- No reading of a chain stop, which `gap-review-21` also names as a precision floor. The clause states
+  the round state only, and a chain's stop is BUILD-METHOD M4's derived verdict.
 - No change to what `tools/workflows/unattended-build.js` passes its callee. An unattended run records
   its rounds through the driver, as today; only the stale comment of S7 moves.
 - No hygiene check grading the `review-round` line. The synthesis copy is unverified, as the
@@ -376,6 +376,8 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
   the `amends cl-dClosedLoop-0084@5c5896a3` row of this spec's own deviation record,
   `2026-10-23-build-TOOL-dFairHearing-17-deviation-171`; nothing else changed.
 - rev-3 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-20 and TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-4 · 2026-11-02 · §3 · the chain rule points at M4's derived verdict, the precision floor having left
+  M4, for the owner's 2026-11-01 ruling (TOOL-dFoldedAudit-8).
 
 ## 10. Reuse audit
 

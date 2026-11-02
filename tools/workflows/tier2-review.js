@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.55', // gov:kit tier2-review@1.55 // gov:kit review-harness@1.55 — BOTH ids: the
+  version: '1.56', // gov:kit tier2-review@1.56 // gov:kit review-harness@1.56 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -95,6 +95,8 @@ function readOutputTokens() {
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
 //   reviewDir: "where synth writes the report (repo-relative)",
 //   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
+//   disposal: "by-nature" | "promote-all", // spec-audit ONLY: the caller's declared `spec-disposal:` value.
+//                                         // Present, each BLOCKER or HIGH item owes its `specs`; absent, none does
 //   subjects: [{ path, blob, id, rev, prevBlob }], // spec-audit ONLY; blob is 7-40 hex, per subject; id,
 //                                         // REQUIRED at every round, is the unit id the spec defines and
 //                                         // rev the integer N of the rev-N its status header carries at
@@ -197,6 +199,10 @@ if (KINDS.indexOf(kind) === -1) {
   )
 }
 const isSpec = kind === 'spec-audit'
+// TOOL-dFoldedAudit-15 S8 - THE ADDRESS IS OWED ON A DECLARED `disposal` ALONE, the caller's own copy of the
+// `spec-disposal:` line. Only the chain reads an address, so an undeclared spec audit keeps today's
+// synthesis and meets no tally fault it was never told about.
+const addressOwed = isSpec && a.disposal !== undefined
 // TOOL-dLadderedRemote-4 - a DIFF review's base is REQUIRED, and refused before any agent when absent.
 // It defaulted to a literal remote ref, which names nothing on a node whose remote is not called
 // that, and this runtime has no git to resolve the right one. A spec audit has no range and owes none.
@@ -370,6 +376,8 @@ const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulat
 // copies of one regex is the drift this build spent a unit on. Both the per-subject blob and the
 // `base` sha are "an immutable 7-40 hex object id", which is one question with one answer.
 const PINNED_SHA = /^[0-9a-f]{7,40}$/
+// `expand_id_runs`' id grammar, anchored: a subject's pin below and a finding's address in the tally.
+const PIN_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
 const subjects = Array.isArray(a.subjects) ? a.subjects : []
 if (isSpec) {
   // D6 - `find(pred) || null` collapsed a FALSY offender back onto the pass sentinel, so the `!x`
@@ -412,8 +420,7 @@ if (isSpec) {
   // it read as `<id>@rev-<N>` (`renderAuditBinding`), so a subject with no well-formed `id`, or a spec
   // subject with no well-formed `rev`, leaves the record nothing to pin. Round 1 refuses too, unlike a malformed blob: the record is the
   // point of the run, and an unpinned one is what this refusal exists to stop. The id grammar is
-  // `expand_id_runs`', anchored, which also keeps a newline out of the prompt line the id reaches.
-  const PIN_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
+  // `PIN_ID`, hoisted above, which also keeps a newline out of the prompt line the id reaches.
   const pinWhy = ' The pin is what makes a revision of that spec past it read as unaudited.'
   const pinnedIds = []
   for (let i = 0; i < subjects.length; i++) {
@@ -1897,6 +1904,17 @@ const synth = await agent(
     `id out or names one twice returns neither count. In the review shape, state the adjudicated ` +
     `tally BOTH ways, by item and by raw confirmed finding, so the table you wrote and the ids you ` +
     `return agree. ` +
+    // TOOL-dFoldedAudit-5 S1 - THE ADDRESS, on a spec subject alone. A spec audit's chain stops when every
+    // high sits in the previous round's own work, which cannot be derived from a record naming no spec a
+    // high would change. A diff review has no such chain, so its prompt holds no byte of this, and neither
+    // does an undeclared spec audit's (TOOL-dFoldedAudit-15 S8).
+    (addressOwed
+      ? `On each BLOCKER or HIGH item also return \`specs\`, the unit ids whose spec the item's fix would ` +
+        `change, naming every one of them, because a narrower list can stop the audit's chain early. In the ` +
+        `report, put one line directly under each BLOCKER or HIGH item, exactly \`**Specs:** <unit id> <unit id>\`, ` +
+        `listing the same ids. A BLOCKER or HIGH item holding a confirmed id with no well-formed \`specs\` ` +
+        `returns neither count. `
+      : '') +
     // TOOL-aSightedSkeptic-8 S7 - the harness renders the appendix and the agent only copies it: a
     // table composed from these lines would miss every refuted finding, which no line above shows.
     // The copy is NOT verified here (spec F2); the return's `appendix` holds the exact text.
@@ -1930,6 +1948,9 @@ const synth = await agent(
             properties: {
               severity: { type: 'string', enum: ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'] },
               ids: { type: 'array', items: { type: 'integer' } },
+              // TOOL-dFoldedAudit-5 S1 - optional, because this object is shared with the diff kind, whose
+              // schema stays as it was. The tally below is what requires it, on a BLOCKER or HIGH item.
+              ...(addressOwed ? { specs: { type: 'array', items: { type: 'string' } } } : {}),
             },
           },
         },
@@ -1946,14 +1967,24 @@ const synth = await agent(
 // nobody graded. Both counts are then null, the stated absence the callers already refuse, and the
 // note below names the ids. An id that is not confirmed is ignored: the prompt permits UNVERIFIED
 // ones, and neither count is defined over anything else.
+//
+// TOOL-dFoldedAudit-5 S2 and S3 - ON A SPEC SUBJECT UNDER A DECLARED `disposal`, A BLOCKER OR HIGH ITEM
+// HOLDING A CONFIRMED ID CARRIES ITS ADDRESS, and one with no well-formed `specs` is a tally fault: the path
+// a misplaced id takes, so both counts go null and the build harness refuses the stated absence. Only the
+// SHAPE is tested, the id grammar, because this file holds the subjects alone and a high may name an older
+// spec; the harness tests the roster. `addresses` is `[]` wherever the tally did not accept the items, and
+// on every undeclared spec audit.
 let blockers = null
 let highs = null
 let tallyFault = ''
+let addresses = []
 const regraded = []
 if (synth) {
   const confirmedIds = new Set(confirmed.map((f) => f.id))
   const severityById = new Map()
   const repeated = new Set()
+  const addressed = []
+  const unaddressed = []
   const perItem = { BLOCKER: 0, HIGH: 0, MEDIUM: 0, LOW: 0 }
   const perRaw = { BLOCKER: 0, HIGH: 0, MEDIUM: 0, LOW: 0 }
   // The severity is tested against the closed list. An unknown one skips its item, so its ids surface
@@ -1970,18 +2001,27 @@ if (synth) {
       else severityById.set(id, sev)
     }
     if (holdsConfirmed) perItem[sev]++
+    if (addressOwed && holdsConfirmed && (sev === 'BLOCKER' || sev === 'HIGH')) {
+      const held = it.ids.filter((id) => confirmedIds.has(id))
+      if (Array.isArray(it.specs) && it.specs.length && it.specs.every((s) => typeof s === 'string' && PIN_ID.test(s)))
+        addressed.push({ ids: held, severity: sev, specs: it.specs })
+      else unaddressed.push(...held)
+    }
   }
   const missing = [...confirmedIds].filter((id) => !severityById.has(id))
-  if (missing.length || repeated.size) {
+  if (missing.length || repeated.size || unaddressed.length) {
     tallyFault =
       (missing.length ? `confirmed id(s) ${missing.join(', ')} sit in no item` : '') +
       (missing.length && repeated.size ? '; ' : '') +
-      (repeated.size ? `confirmed id(s) ${[...repeated].join(', ')} sit in more than one item` : '')
+      (repeated.size ? `confirmed id(s) ${[...repeated].join(', ')} sit in more than one item` : '') +
+      ((missing.length || repeated.size) && unaddressed.length ? '; ' : '') +
+      (unaddressed.length ? `BLOCKER or HIGH id(s) ${unaddressed.join(', ')} carry no well-formed \`specs\`` : '')
     log(`WARNING: the synthesis item list does not place every confirmed finding exactly once — ${tallyFault}. blockers and highs are NULL.`)
   } else {
     for (const sev of severityById.values()) perRaw[sev]++
     blockers = perRaw.BLOCKER
     highs = perRaw.HIGH
+    addresses = addressed
     log(`adjudicated BLOCKER/HIGH/MEDIUM/LOW — by item ${perItem.BLOCKER}/${perItem.HIGH}/${perItem.MEDIUM}/${perItem.LOW}, ` +
       `by raw confirmed finding ${perRaw.BLOCKER}/${perRaw.HIGH}/${perRaw.MEDIUM}/${perRaw.LOW}`)
   }
@@ -2045,6 +2085,8 @@ return {
   // ids, and are null as well when that list does not place every confirmed id exactly once.
   blockers,
   highs,
+  // TOOL-dFoldedAudit-5 S3 - one `{ids, severity, specs}` per BLOCKER or HIGH item, on a spec subject only.
+  ...(isSpec ? { addresses } : {}),
   // TOOL-aSightedSkeptic-6 S7 - absent where no synthesis ran, as no adjudicated count exists there.
   ...(synth ? { regraded } : {}),
   // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was

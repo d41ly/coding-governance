@@ -213,6 +213,7 @@ memory/builds/dFurnishedOrders/README.md
 memory/builds/dTotalRecall/README.md
 memory/builds/dLinkedLibrary/README.md
 memory/builds/dMindYourWords/README.md
+memory/builds/dFoldedAudit/README.md
 memory/builds/dWellOiledMachine/README.md
 memory/builds/dWitnessedBar/README.md
 memory/builds/dRankedPlan/README.md

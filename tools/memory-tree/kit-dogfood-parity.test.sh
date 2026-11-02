@@ -528,6 +528,47 @@ done
 # S3: was `[ "$MODE" = --render ] && exit 0`, which DISCARDED st — so every --render exited 0 even
 # when it had just printed a failure. A mode that cannot report its own failure is not reporting.
 [ "$MODE" = --render ] && exit "$st"
+# TOOL-dFoldedAudit-1: THE METHOD'S NAMED SENTENCES AND ITS BYTE FIGURE. The pair loop compares two
+# copies with each other, so a literal deleted from both, or padding in both, leaves them equal, and
+# `build-method size` cannot red either while `budgets.enforce` is `warn`: a breach prints and exits 0.
+# WHAT THIS DOES NOT CHECK: this block grades one document's named sentences. It cannot tell that a
+# sentence is true, and a reworded sentence that keeps its literal passes.
+method_ship="$KITREL/BUILD-METHOD.template.md"; method_live="$M/guides/BUILD-METHOD.md"
+if [ -f "$method_ship" ] && [ -f "$method_live" ]; then
+  method_m4=$(tr -d '\r' <"$method_ship" | awk '/^## M4 /{f=1} /^## M5 /{f=0} f')
+  method_m8=$(tr -d '\r' <"$method_ship" | awk '/^## M8 /{f=1} /^## M9 /{f=0} f')
+  for lit in 'NEEDS A NEW MECHANISM' 'derived verdict' 'HOLD for the owner' 'DISPOSED BY SEVERITY, on CONVERGED too'; do
+    case "$method_m4" in
+      *"$lit"*) ;;
+      *) echo "kit-parity: $method_ship has no '$lit' in M4, so a spec audit's disposal or a closing review's is no longer stated"; st=1 ;;
+    esac
+  done
+  if grep -qi precision <<<"$method_m4"; then
+    echo "kit-parity: $method_ship still holds PRECISION in M4, and precision bounds no chain"; st=1
+  fi
+  case "$method_m8" in
+    *'where M4 promotes them'*) ;;
+    *) echo "kit-parity: $method_ship has no 'where M4 promotes them' in M8, so a closing review's text moved"; st=1 ;;
+  esac
+  # The ceiling is the source repo's to move and this leg runs in every install, over a render whose
+  # length the install's root, prefix and answers set, so only `gov_source = "."` grades the figure:
+  # an adopter past it would have no fix. That is the test the render makes at `ans["gov_source"]`,
+  # read here without the engine because those lines sit in a byte-gated inline copy. WHAT THIS DOES
+  # NOT CHECK: an adopter's render past the ceiling is reported by no gate, and the else arm says so.
+  if grep -Eq '^gov_source[[:space:]]*=[[:space:]]*"\."' .governance/deploy.toml 2>/dev/null; then
+    # A figure this cannot read fails, because a size compared with nothing would pass every render.
+    method_cap=$(tr -d '\r' <"$method_live" | sed -n 's/^\*\*Budget: [^0-9]*\([0-9][0-9]*\) bytes.*/\1/p' | head -n 1)
+    method_bytes=$(tr -d '\r' <"$method_live" | wc -c)
+    method_bytes=$((method_bytes))
+    if [ -z "$method_cap" ]; then
+      echo "kit-parity: $method_live states no **Budget: byte figure, so its size was compared with nothing"; st=1
+    elif [ "$method_bytes" -gt "$method_cap" ]; then
+      echo "kit-parity: $method_live measures $method_bytes bytes CR-stripped, past the $method_cap its own Budget line states"; st=1
+    fi
+  else
+    echo "kit-parity: the method's byte figure is not graded here: only the tree whose gov_source is \".\" can move it"
+  fi
+fi
 # The count is DERIVED from the population it reports on. It was a literal `2 pairs`, which is a
 # second hand-kept spelling of PAIRS — the drift class this file exists to catch, sitting in this
 # file's own success line. A third pair landed and the leg still said two.
