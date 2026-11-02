@@ -1,6 +1,6 @@
 # TOOL-dCountedConsumers-2 — the trace signal counts a commit that writes a help page as product
 
-**Status:** SPECCED · rev-1 · 2026-11-02 · node d · Tier-1 · base 8bec4cef · streams tooling · order 20
+**Status:** INPROGRESS · rev-1 · 2026-11-02 · node d · Tier-1 · base 8bec4cef · streams tooling · order 20
 
 <!-- gen:spec-records -->
 
