@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-14 — a rotated record keeps its own date floor for the fold cutoff
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 90 · ratified 2026-11-02
+**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 90 · ratified 2026-11-02
 
 <!-- gen:spec-records -->
 
