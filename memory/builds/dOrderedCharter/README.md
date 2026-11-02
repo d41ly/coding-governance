@@ -114,8 +114,8 @@ ids TOOL-dOrderedCharter-7
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [PLAY-dOrderedCharter-18 — the moved grammar: every name the core imports from the recall kit moved into memory-tree, and every by-path reader re-pointed in the same unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-18.md) | 1 | 2 | CLOSED | rev-3 | 2026-11-02 |
-| [PLAY-dOrderedCharter-16 — the layer register, the layer contract and the check that the core never depends on an expansion or an optional component](spec/2026-10-23-spec-PLAY-dOrderedCharter-16.md) | 2 | 2 | DEFERRED | rev-3 | 2026-10-24 |
-| [PLAY-dOrderedCharter-17 — every edge the layer check finds today made a declared optional slot with a named fallback, or moved into the core](spec/2026-10-23-spec-PLAY-dOrderedCharter-17.md) | 3 | 2 | DEFERRED | rev-2 | 2026-11-02 |
+| [PLAY-dOrderedCharter-16 — the layer register, the layer contract and the check that the core never depends on an expansion or an optional component](spec/2026-10-23-spec-PLAY-dOrderedCharter-16.md) | 2 | 2 | DEFERRED | rev-4 | 2026-11-02 |
+| [PLAY-dOrderedCharter-17 — every edge the layer check finds today made a declared optional slot with a named fallback, or moved into the core](spec/2026-10-23-spec-PLAY-dOrderedCharter-17.md) | 3 | 2 | DEFERRED | rev-3 | 2026-11-02 |
 | [PLAY-dOrderedCharter-19 — the tag grammar, its namespace registry, the derived SQLite tag index and its one resolver, and the join factory moved to the core](spec/2026-10-23-spec-PLAY-dOrderedCharter-19.md) | 4 | 2 | DEFERRED | rev-5 | 2026-10-25 |
 | [PLAY-dOrderedCharter-10 — the namespaced tag system: this build's eight namespaces registered, joined both ways, shape-checked in the core, and their words handed to the lexicon](spec/2026-10-23-spec-PLAY-dOrderedCharter-10.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [PLAY-dOrderedCharter-44 — the tag index keys freshness on each extractor as well as each blob, so a newly registered extractor reads old blobs](spec/2026-10-24-spec-PLAY-dOrderedCharter-44.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-24 |

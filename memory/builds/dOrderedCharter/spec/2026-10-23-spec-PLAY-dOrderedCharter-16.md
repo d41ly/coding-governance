@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-16 — the layer register, the layer contract and the check that the core never depends on an expansion or an optional component
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 2 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 2 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0046@bd068162 whole
 
@@ -43,9 +43,10 @@ name a core memory-tree module imported from the recall kit (P28, v2 `[layers]`;
   Rows at landing: the five core layers, the three expansions, and the optional rows
   `layer.memory.map`, `layer.memory.recall`, `layer.memory.lexicon` and `layer.flow.leg-packs`.
   Observed by AC8.
-- **S2** — The layer row in each kit descriptor (shared interface S20): `layer = "<tag>"` beside
-  `requires_if` in each of the 29 `kit.toml` files, and `optional = [{ part, point, fallback }]` on a
-  core kit for each edge it is allowed to keep. A kit's engine membership is derived from these keys,
+- **S2** — The layer row in each kit descriptor (shared interface S20): `layer = "<tag>"` in every
+  descriptor `git ls-files 'tools/*/kit.toml' 'tools/govkit/entries/*.kit.toml'` lists at the pass,
+  the population §4 "### The check" reads, counted there and never pinned, and
+  `optional = [{ part, point, fallback }]` on a core kit for each edge it is allowed to keep. A kit's engine membership is derived from these keys,
   never typed in the register. Observed by AC8.
 - **S3** — The layer contract and its conformance gate. Each row's tag is `layer.<seg>(.<seg>)*`
   (shared interface S4's shape); its kind is in the closed set; an `optional` row's `of` names a core
@@ -57,7 +58,7 @@ name a core memory-tree module imported from the recall kit (P28, v2 `[layers]`;
 - **S4** — The layer kind's factory: `check_layers.py --new <tag> --kind <kind> [--of <tag>]
   --definition <text>` appends a row that passes S3 to `layers.toml` and prints the descriptor key a
   kit adds to join it; it refuses a tag already registered or one S3 would red. Observed by AC9.
-- **S5** — The AST import walk, lifted from `tools/memory-tree/check-verdict-epoch.sh:222-263` into
+- **S5** — The AST import walk, lifted from `tools/memory-tree/check-verdict-epoch.sh:279-319` into
   `tools/memory-tree/import_walk.py` at its second instance. It yields each import a Python file
   makes, at any depth, by kind: `import`, `from`, and `dynamic` for a literal `__import__("<n>")`,
   `importlib.import_module("<n>")` or `importlib.util.spec_from_file_location(_, <literal path>)`.
@@ -164,8 +165,9 @@ The rows' definitions are v2 `[layers]`' table cells; the points are the eight
 are a stand-in: a later build registers a `point` namespace and the shape check joins it then.
 
 The kit-to-layer assignment is `layer-instruction.md`'s `[layers]` table ("Kits mapped to layers",
-lines 222-243), read as written: playbook, agent-instructions, roles, workflows, memory-tree,
-run-gates, push-main, session-kickoff, unattended, hooks and process-monitor core; codebase-map,
+lines 222-244), read as written: playbook, agent-instructions, roles, workflows, memory-tree,
+run-gates, push-main, session-kickoff, unattended, hooks and process-monitor core; the policy kit,
+`tools/policy/kit.toml`, which the table predates, `layer.instruction` core (§8 F4); codebase-map,
 memory-recall and lexicon `optional` of memory; gate-lint and pytest-parallel-guardrails `optional`
 of flow (`layer.flow.leg-packs`, "verdict leg packs"); runlog, drift-audit and branch-reconcile
 observability; govkit distribution. An entry the table does not name, the `check-*` scripts and
@@ -223,7 +225,7 @@ no gate runs between passes (BUILD-METHOD M6), and the close runs the bar once o
 - `tools/playbook/check_layers.py` (new)
 - `tools/memory-tree/import_walk.py` (new)
 - `tools/memory-tree/check-verdict-epoch.sh`
-- `tools/agent-instructions/kit.toml`, `tools/branch-reconcile/kit.toml`, `tools/codebase-map/kit.toml`, `tools/drift-audit/kit.toml`, `tools/gate-lint/kit.toml`, `tools/hooks/kit.toml`, `tools/lexicon/kit.toml`, `tools/memory-recall/kit.toml`, `tools/memory-tree/kit.toml`, `tools/playbook/kit.toml`, `tools/process-monitor/kit.toml`, `tools/pytest-parallel-guardrails/kit.toml`, `tools/roles/kit.toml`, `tools/run-gates/kit.toml`, `tools/runlog/kit.toml`, `tools/unattended/kit.toml`, `tools/workflows/kit.toml`
+- `tools/agent-instructions/kit.toml`, `tools/branch-reconcile/kit.toml`, `tools/codebase-map/kit.toml`, `tools/drift-audit/kit.toml`, `tools/gate-lint/kit.toml`, `tools/hooks/kit.toml`, `tools/lexicon/kit.toml`, `tools/memory-recall/kit.toml`, `tools/memory-tree/kit.toml`, `tools/playbook/kit.toml`, `tools/policy/kit.toml`, `tools/process-monitor/kit.toml`, `tools/pytest-parallel-guardrails/kit.toml`, `tools/roles/kit.toml`, `tools/run-gates/kit.toml`, `tools/runlog/kit.toml`, `tools/unattended/kit.toml`, `tools/workflows/kit.toml`
 - `tools/govkit/entries/check-agent-cap-restatement.kit.toml`, `tools/govkit/entries/check-install-prefix.kit.toml`, `tools/govkit/entries/check-kit-versions.kit.toml`, `tools/govkit/entries/check-line-length.kit.toml`, `tools/govkit/entries/check-microformats.kit.toml`, `tools/govkit/entries/check-placeholders.kit.toml`, `tools/govkit/entries/check-testsuite-counts.kit.toml`, `tools/govkit/entries/check-wiring.kit.toml`, `tools/govkit/entries/kickoff-manifest.kit.toml`, `tools/govkit/entries/playbook.kit.toml`, `tools/govkit/entries/push-main.kit.toml`, `tools/govkit/entries/settings-merge.kit.toml`
 - `tools/gate-legs.json`
 - `tools/govkit/registry.toml`
@@ -238,7 +240,7 @@ no gate runs between passes (BUILD-METHOD M6), and the close runs the bar once o
   descriptor declares its layer (P28, "a kit implements layers and declares which").
 - **A grep of `resolve_kit_dir` alone.** It misses imports through `sys.path`, `importlib` loads and
   `requires_if` rows, the kinds the clause lists, and the walk's own comment names those as what it
-  does not see (`check-verdict-epoch.sh:219-221`).
+  does not see (`check-verdict-epoch.sh:276-278`).
 - **The check in govkit.** govkit is distribution, an expansion, so the core's own contract would live
   in the layer it constrains.
 
@@ -284,11 +286,12 @@ no gate runs between passes (BUILD-METHOD M6), and the close runs the bar once o
   exits 1 naming the descriptor or row.
   Red when: a kit with no layer, a layer tag no row holds, or a used point nobody declares passes.
 - **AC8** — When `python check_layers.py --list` runs on the tree after
-  PLAY-dOrderedCharter-17's pass, it names twelve layer rows, 29 descriptors each with a layer, and
-  every edge allowed; on this unit's pass alone it prints at least the `gen_build_index.py` edge to
-  `drift-audit` as red.
-  Red when: the population is empty on today's tree, which would be a vacuous green.
-  figure: the edge counts are DERIVED at the run; twelve and 29 are PINNED, measured 2026-10-23.
+  PLAY-dOrderedCharter-17's pass, it names twelve layer rows, a descriptor count equal to the lines
+  S2's `git ls-files` prints at the run, each descriptor with a layer, and every edge allowed; on this
+  unit's pass alone it prints at least the `gen_build_index.py` edge to `drift-audit` as red.
+  Red when: the population is empty on today's tree, which would be a vacuous green, or a descriptor
+  S2's listing prints is missing from the check's count.
+  figure: the edge counts and the descriptor count are DERIVED at the run; twelve is PINNED, measured 2026-10-23.
 - **AC9** — When `python check_layers.py --new layer.fixture --kind expansion --definition "x"`
   runs in a scratch copy, `layers.toml` gains a row and the next plain run reds only on
   `layer.fixture` having no `uses` point declared by a core row if one is named; `--new layer.memory`
@@ -300,7 +303,7 @@ no gate runs between passes (BUILD-METHOD M6), and the close runs the bar once o
 
 ## 7. Gates
 
-`verdict epoch (kit version dates the engine)` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `agent-cap self-test` · `agent-instructions self-test` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `hook destinations self-test` · `lexicon selftest` · `measure-legs selftest` · `playbook render selftest` · `pre-push run-log line` · `pytest-guardrails self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `runlog selftest` · `scratch-guard self-test` · `shell-hygiene selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test`
+`verdict epoch (kit version dates the engine)` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `agent-cap self-test` · `agent-instructions self-test` · `branch-reconcile selftest` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `drift-audit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `hook destinations self-test` · `lexicon selftest` · `measure-legs selftest` · `playbook render selftest` · `policy fixtures` · `pre-push run-log line` · `pytest-guardrails self-test` · `recall floor` · `recall floor arms` · `review-join self-test` · `run-gates canary` · `run-gates gov canary` · `run-gates run-log line` · `runlog selftest` · `scratch-guard self-test` · `shell-hygiene selftest` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test`
 
 New arm: tools/playbook/check_layers.py · covers AC8 · the new leg itself, its failing case staged by deleting one `optional` row PLAY-dOrderedCharter-17 writes · none
 New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 AC4 AC5 AC6 AC7 · the playbook-render selftest runs `check_layers.py --fixture` under every plant of S9, asserting each exit and named line · none
@@ -325,27 +328,49 @@ New arm: tools/memory-tree/check-verdict-epoch.test.sh · covers AC1 · a case a
   today's edges, drained by that unit; land the leg live, both units in one landing. A list is
   scaffolding the next unit deletes. RESOLVED (agent, 2026-10-23, delegated): live, rung 3, since no
   bar runs between passes and the build lands whole. widens: none · relaxes: none
+- **F4 — The policy kit's layer.** `tools/policy/kit.toml` landed with TOOL-dGroundRules-1
+  (`c9bd97720`, 2026-10-23), after this spec's base, so the kit table (`layer-instruction.md:222-244`)
+  does not name it. Options: (a) `layer.instruction`, core; (b) an expansion or an `optional` row.
+  `[fit]` places "Policies, principles" in the Instruction layer as one policy file
+  (`layer-instruction.md:286`), and core kits read the kit through `resolve_kit_dir` with home
+  `policy`: `.githooks/pre-push:820`, `skills/session-kickoff/manifest-check.sh:862`,
+  `tools/memory-tree/gen_build_index.py:2306`, `tools/memory-tree/gotchas.py:505`,
+  `tools/memory-tree/check-memory-hygiene.sh:569,647`, `tools/memory-tree/check-verdict-epoch.sh:195`,
+  `tools/memory-tree/merge-rows.sh:136`, `tools/memory-tree/adopt-memory-tree.sh:251`,
+  `tools/playbook/adopt-playbook.sh:126`, `tools/process-monitor/adopt-process-monitor.sh:137`,
+  `tools/hooks/agent-cap.test.sh:153`, `tools/hooks/format-guard.test.sh:134` and
+  `tools/hooks/scratch-guard.test.sh:148`. Under (b) each is a red edge no unit cures, so AC8 fails,
+  M3 veto 1. RESOLVED (agent, 2026-11-02, delegated): (a), derived from `[fit]` and those edges, by
+  `2026-11-02-prompt-PLAY-dOrderedCharter-16-divergence-brief`. Core to core needs no `optional` row;
+  the kit's own reads of govkit become edges PLAY-dOrderedCharter-17 cures (its §4 "### The edges").
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-4 · 2026-11-02 · S2 · S5 · §4 · AC8 · §7 · §8 · §10 · `2026-11-02-prompt-PLAY-dOrderedCharter-16-divergence-brief`:
+  the builder's divergence, a descriptor count of 29 at `ce13efbe` against 30 at the pinned base
+  `8bec4cef`, the thirtieth `tools/policy/kit.toml`. The descriptor count is derived at the pass in S2 and AC8,
+  the policy kit is `layer.instruction` core (F4) and joins Files touched, `policy fixtures` joins §7
+  for its guard, and the walk's and govkit check 7's lines are re-read at HEAD after
+  PLAY-dOrderedCharter-18.
 
 ## 10. Reuse audit
 
-The seams extended: the inline import walk of `tools/memory-tree/check-verdict-epoch.sh:206-263`,
+The seams extended: the inline import walk of `tools/memory-tree/check-verdict-epoch.sh:263-319`,
 lifted at its second instance rather than copied; `requires_if` rows as govkit selfcheck check 7
-already parses them (`tools/govkit/govkit.py:2479-2502`), read here by the same field names;
+already parses them (`tools/govkit/govkit.py:2233-2258`), read here by the same field names;
 `resolve_kit_dir` (`tools/lib/resolve_kit_dir.py:15`), whose home argument is the probe kind's
-signal; and the kit-to-layer table of `layer-instruction.md:222-243`. `reuse_lookup.py "find every
+signal; and the kit-to-layer table of `layer-instruction.md:222-244`. `reuse_lookup.py "find every
 import or path reference from one kit to another kit's files"` ranked `kit_rel`, `resolve_kit_dir`
 (installs 72), `kit_dir` and `build_reference_index` (`tools/codebase-map/map_lib.py`, an optional
 component's, so the core cannot import it): no layer or dependency check exists. The recall probe
 returned the class record `memory/gotchas/core-depends-on-an-optional-part.md`, whose symptom, a
 dependency hidden behind a guard that seems to degrade it, is why an edge is red unless declared as an
-`optional` row rather than whenever it lacks a guard. Where the scout and source disagree: the scout cites the walk at `:222-266`; the python
-body ends at `:263` and `:264-270` is the shell's exit mapping. A base-tree probe over the core kits'
+`optional` row rather than whenever it lacks a guard. Where the scout and source disagree: the scout cites the walk at `:222-266`; at HEAD, after
+PLAY-dOrderedCharter-18, the python body ends at `:319` and `:320-324` is the shell's exit mapping. A base-tree probe over the core kits'
 shipped files found core-to-non-core edges beyond the nine the clause names: `.githooks/pre-push:947`
 (lexicon), `tools/push-main.sh:809`, `tools/check-install-prefix.sh:201` and
 `tools/run-gates/run-gates.sh:3008` (govkit), `tools/unattended/unattended.sh:12040` (codebase-map's

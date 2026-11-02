@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-17 — every edge the layer check finds today made a declared optional slot with a named fallback, or moved into the core
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 3 · closes PLAY-dOrderedCharter-56 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 3 · closes PLAY-dOrderedCharter-56 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0047@9b2f4330 whole
 
@@ -89,7 +89,9 @@ memory-recall, the case the clause names.
 ### The edges
 
 The base reading: a probe of `resolve_kit_dir` calls and path literals naming a non-core home, over
-the core kits' shipped files at `ce13efbe`, after subtracting what PLAY-dOrderedCharter-18 moves.
+the core kits' shipped files at `ce13efbe`, after subtracting what PLAY-dOrderedCharter-18 moves,
+and the same probe over the policy kit's at HEAD, a core kit (PLAY-dOrderedCharter-16 §8 F4) that
+`ce13efbe` did not hold.
 
 | Edge | Disposition | Point | Fallback |
 |---|---|---|---|
@@ -103,13 +105,23 @@ the core kits' shipped files at `ce13efbe`, after subtracting what PLAY-dOrdered
 | `tools/unattended/unattended.sh:12040` to codebase-map's journal | slot | `point.memory.consult` | the DoD item reads the recall journal alone |
 | `tools/check-install-prefix.sh:201` to govkit | slot | `point.flow.version` | the gate skips, said |
 | `tools/run-gates/run-gates.sh:3008` to govkit | slot | `point.flow.version` | the owner and epoch columns read unreachable |
+| `tools/policy/policy.py:1039`, the deployer's home under which `derive_registry_tree` (`:1043`) looks for its registry | slot | `point.runtime.install-target` | the tree reads `unadopted`, its answer today where no registry is |
+| `tools/policy/check_policy.py:1041`, `:1073` and `:3937` to govkit, each reached from a `--fixture` case of gov's `policy fixtures` leg | slot | `point.runtime.install-target` | the case's existing WRONG naming the deployer, its exit kept (S9) |
 | `check-verdict-epoch.sh`, `gotchas.py`, `corpus_ids.py`, `migrate_backlog.py`, `backlog.py` grammar sites | moved into the core by PLAY-dOrderedCharter-18 | — | — |
+
+Every edge into the policy kit, such as `.githooks/pre-push:820`, is core to core and takes no row.
+`tools/policy/caps.toml:315-375` names memory-recall, runlog and codebase-map files as data the check
+does not read, and its census already says `kit <kit> not installed` for such a row
+(`tools/policy/check_policy.py:696`).
 
 `point.flow.version` and `point.runtime.reading` are `[core-points]` rows of
 `layer-expansions.md` ("the version slot in the landing's prepare"; "reading and fix classes on
 command adapters"); `point.flow.leg-pack` is Test's leg-pack point the observability design names for
 the lexicon's signals; `point.memory.live-column` and `point.memory.consult` are declared here, the
 second being layer-library `[consult]`'s "where the core reads it" column.
+`point.runtime.install-target` is the `[core-points]` row "install targets on each harness adapter",
+read by the install, and the point PLAY-dOrderedCharter-16 §4's data model gives the distribution row
+as its `uses`: the policy kit's govkit reads are of the install's registry and its runs.
 
 **The rule for an edge §4 does not name.** Moved into the core when the target is a name the core
 already owns after PLAY-dOrderedCharter-18; otherwise a slot whose fallback is the site's existing
@@ -137,6 +149,9 @@ success prints the `filled` line on stderr, so stdout contracts are unchanged.
 - `tools/govkit/entries/push-main.kit.toml`
 - `tools/govkit/entries/check-install-prefix.kit.toml`
 - `tools/playbook/layers.toml`
+- `tools/policy/policy.py`
+- `tools/policy/check_policy.py`
+- `tools/policy/kit.toml`
 - `tools/push-main.test.sh`
 - `tools/memory-tree/gotchas.py`
 
@@ -194,7 +209,7 @@ success prints the `filled` line on stderr, so stdout contracts are unchanged.
 
 ## 7. Gates
 
-`memory hygiene` · `push-main self-test` · `pre-push self-test` · `install-prefix self-test` · `run-gates canary` · `run-gates turnstile` · `govkit selfcheck` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `playbook render selftest` · `build-index selftest` · `gotchas selftest` · `build README slot contract` · `unattended kit gate` · `measure-legs selftest` · `tier2-review self-test`
+`memory hygiene` · `push-main self-test` · `pre-push self-test` · `install-prefix self-test` · `run-gates canary` · `run-gates turnstile` · `govkit selfcheck` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `playbook render selftest` · `policy fixtures` · `build-index selftest` · `gotchas selftest` · `build README slot contract` · `unattended kit gate` · `measure-legs selftest` · `tier2-review self-test`
 
 New arm: tools/playbook/check_layers.py · covers AC1 · the layer leg over the tree, its failing case staged by deleting the `optional` row for `tools/push-main.sh` · none
 New arm: tools/push-main.test.sh · covers AC4 · the merge-loss and minter cases assert the slot line with the kit hidden · none
@@ -220,6 +235,10 @@ New arm: tools/memory-tree/gotchas.py · covers AC2 · the selftest's absent-kit
 - rev-2 · 2026-11-02 · §3 · closes PLAY-dOrderedCharter-56 by `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`:
   the slots' renderer is `TOOL-dFurnishedOrders-4`, not dBoundRoles, as clauses `cl-dClosedLoop-0195` and
   `cl-dClosedLoop-0203` place slot rendering in dFurnishedOrders.
+- rev-3 · 2026-11-02 · §4 · §7 · §10 · `2026-11-02-prompt-PLAY-dOrderedCharter-16-divergence-brief`: unit 16's
+  divergence makes the policy kit, the thirtieth descriptor, core of `layer.instruction`. Its own
+  reads of govkit join §4's table as slots at `point.runtime.install-target`, the edges into it take
+  no row, its three files join Files touched and `policy fixtures` joins §7 for their guard.
 
 ## 10. Reuse audit
 
@@ -233,6 +252,8 @@ searched with nothing found, or not installed with a named fallback"` ranked `se
 renders a slot state, so the line grammar of S9 is new. Where the scout and source disagree: the scout lists
 nine sites; a base probe of the core kits' shipped files found five more edges (`.githooks/pre-push:947`,
 `tools/push-main.sh:809`, `tools/check-install-prefix.sh:201`, `tools/run-gates/run-gates.sh:3008`,
-`tools/unattended/unattended.sh:12040`), each in §4's table.
+`tools/unattended/unattended.sh:12040`), each in §4's table; the policy kit's degraded branches,
+`derive_registry_tree`'s `unadopted` (`tools/policy/policy.py:1043-1054`) and `resolve_govkit`'s named
+refusal (`tools/policy/check_policy.py:1064-1076`), are its seams.
 
 Recall terms used: `python tools/memory-recall/query.py "how does a core site degrade when an optional kit is not installed" --terms "optional slot fallback not installed searched empty filled degraded branch resolve_kit_dir skip core expansion"`
