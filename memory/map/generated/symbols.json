@@ -3993,6 +3993,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_chain_fold",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_chain_refused",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -25723,6 +25728,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "write_chain_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_claim",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -25951,6 +25961,11 @@
       "id": "write_ir_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "write_join_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_join_spec",

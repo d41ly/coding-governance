@@ -120,3 +120,7 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T04:47:40Z dispatch · item e613916b TOOL-dFoldedAudit-10 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-10.md memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-10-ledger.md memory/builds/dFoldedAudit/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-11-02T04:47:40Z brief · item TOOL-dFoldedAudit-10 · reason 02a7e4c175e4 memory/builds/dFoldedAudit/prompts/2026-11-02-prompt-TOOL-dFoldedAudit-10-build-brief.md
+
+2026-11-02T05:11:58Z dispatch · item 80047416 TOOL-dFoldedAudit-11 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-11.md memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-11-ledger.md memory/builds/dFoldedAudit/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-11-02T05:11:59Z brief · item TOOL-dFoldedAudit-11 · reason 02bbb7e7f078 memory/builds/dFoldedAudit/prompts/2026-11-02-prompt-TOOL-dFoldedAudit-11-build-brief.md

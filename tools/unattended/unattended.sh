@@ -13479,6 +13479,46 @@ read_chain_record() { # slug -> 0 with _chain_rec the tracked record or empty, e
     check_chain_fault "the tracked record is gone from the worktree, and it would read as a chain with no rounds: $_chain_rec"
     return 1; }
 }
+# A FOLD JOINS TO THE TREE (TOOL-dFoldedAudit-11). A `local` or `--sibling` row is only its grammar until
+# this reads it: with every spec at rev-1, two claimed folds printed `STOP · reason own-work` and no spec
+# had changed. The unit's spec must stand at the row's rev or above, never exactly at it, because a second
+# fold moves the header past the first and the first row stays true, and its Revision log must hold an
+# entry at that rev. A rev below 2 refuses as well: a fold bumps a rev, and rev-1 is a spec's first draft.
+#
+# THE AWK COMPARES, because a `[0-9]+` token can overflow `[ -lt ]`. The grammar is the kit's, spelled here
+# because the driver spawns no Python at this read and this kit copy-installs without the memory-tree kit:
+# the status anchor is `spec_facts`'s and the entry is `REV_ENTRY` of `design_lib.py`. The heading admits no
+# ordinal as well, where `REV_LOG_HEAD` requires one, because a Tier-1 spec's numbering is free. A header
+# with no rev reads 0, so it takes the header refusal.
+#
+# WHAT THE JOIN DOES NOT CHECK. A rev the spec already held: a row claiming rev-2 on a spec whose rev-2 was
+# an older fold passes, so this proves that the rev exists and never that this finding made it. Bytes in
+# the index: it reads the worktree, as `print_chain_verdict` does, so an uncommitted fold passes, and the
+# caller's order commits it first. That the entry names the finding. A `new-mechanism` row's unit, because
+# a promoted unit has no spec yet, so `write_chain_round` hands this no such row.
+check_chain_fold() { # unit · the row's rev, with `load_spec_facts` already read -> 0 when the tree holds that rev, else check 118 and 1
+  local unit="$1" rev="$2" spec="${SPEC_PATH[$1]:-}" out
+  [ -n "$spec" ] || { check_chain_fault "a fold names $unit, and no tracked spec carries that id, so its rev joins to nothing"; return 1; }
+  out=$(awk -v claim="$rev" '
+    function revof(s) { match(s, /rev-[0-9]+/); return substr(s, RSTART + 4, RLENGTH - 4) }
+    { sub(/\r$/, "") }
+    head == "" && /^\*\*Status:\*\* [A-Z]+ · rev-[0-9]+ / { head = revof($0) }
+    /^## / { inlog = ($0 ~ /^## ([0-9]+[.] )?Revision log/); next }
+    inlog && /^([ \t]*[-*][ \t]*)?(\*\*)?rev-[0-9]+/ && revof($0) + 0 == claim + 0 { logged = 1 }
+    END {
+      if (claim + 0 < 2) print "draft"
+      else if (head + 0 < claim + 0) print "below " (head == "" ? 0 : head)
+      else if (!logged) print "unlogged"
+      else print "joined"
+    }' "$spec") || print_env_failure 118 "awk could not read the spec, so no fold can be joined: $spec"
+  case "$out" in
+    joined) return 0 ;;
+    draft) check_chain_fault "a fold claims rev-$rev on $unit, and rev-1 is a spec's first draft, so no fold produced it" ;;
+    below\ *) check_chain_fault "$unit's spec stands at rev-${out#below }, below the rev-$rev this row claims, so the fold never reached the tree" ;;
+    *) check_chain_fault "$unit's spec has no Revision log entry at rev-$rev, so the fold left no line to read" ;;
+  esac
+  return 1
+}
 # THE ROUND IS THE RECORD'S OWN ORDINAL, the last round plus one and never the harness's `round`: under
 # `REVIEW_ROUNDS` above 1 one generation spends several invocation rounds, which would burn the ceiling
 # faster than generations pass. `--subject` is the generation key, which is what refuses a replay.
@@ -13492,7 +13532,7 @@ read_chain_record() { # slug -> 0 with _chain_rec the tracked record or empty, e
 # none exists, and the caller commits the record beside the disposal's folds.
 write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS
   local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5"
-  local id='[A-Z]+-[A-Za-z0-9]+-[0-9]+' rel rec now tok rows="" last=0 seen=0 round folds=""
+  local id='[A-Z]+-[A-Za-z0-9]+-[0-9]+' rel rec now tok rows="" last=0 seen=0 round folds=()
   local f_id f_sev f_nat f_specs f_unit f_rev
   local re_ids="^$id( $id)*\$" re_sibling="^$id@rev-[0-9]+\$"
   local re_finding="^[0-9]+/(BLOCKER|HIGH|MEDIUM|LOW)/(local|new-mechanism)/$id(,$id)*/$id/[0-9]+\$"
@@ -13526,17 +13566,17 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
     IFS=/ read -r f_id f_sev f_nat f_specs f_unit f_rev <<<"$tok"
     rows+="round $round · finding $f_id · $f_sev · $f_nat · specs ${f_specs//,/ } · unit $f_unit · rev $f_rev"$'\n'
     case "$f_sev" in BLOCKER) b_ids[$f_id]=1 ;; HIGH) h_ids[$f_id]=1 ;; esac
-    [ "$f_nat" != local ] || folds=1
+    [ "$f_nat" != local ] || folds+=("$f_unit $f_rev")
   done
   for tok in ${RR_SIBLINGS[@]+"${RR_SIBLINGS[@]}"}; do
     [[ $tok =~ $re_sibling ]] || { check_chain_fault "a --sibling is outside <id>@rev-<N>: $tok"; return 1; }
     rows+="round $round · sibling · unit ${tok%@rev-*} · rev ${tok##*@rev-}"$'\n'
-    folds=1
+    folds+=("${tok%@rev-*} ${tok##*@rev-}")
   done
   # A FOLD ANSWERS TO THE RUN'S RULE, because the value a caller passes was its own copy of it
   # (TOOL-dFoldedAudit-13). A sibling edit is a fold too, and this read is lazy, so a round of
   # `new-mechanism` rows spawns nothing and passes under every answer.
-  if [ -n "$folds" ]; then
+  if [ "${#folds[@]}" -gt 0 ]; then
     runmd_of "$slug" >/dev/null
     read_spec_disposal "$_runmd" "$slug"
     [ "$_sd_value" = by-nature ] || { check_chain_fault "a local or --sibling row folds, and this run's spec disposal reads $_sd_value${_se_why:+, $_se_why}, which folds nothing"; return 1; }
@@ -13544,6 +13584,13 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
   if [ "${#b_ids[@]}" -lt "$blockers" ] || [ "${#h_ids[@]}" -lt "$highs" ]; then
     check_chain_fault "the rows dispose ${#b_ids[@]} BLOCKER and ${#h_ids[@]} HIGH id(s) where the review counted $blockers and $highs, and every confirmed one is disposed somewhere"
     return 1
+  fi
+  # THE JOIN RUNS LAST, behind every grammar and count test and ahead of the first byte, and a round with
+  # no fold reads no spec. Every severity joins, because a minor's fold bumps a rev too.
+  if [ "${#folds[@]}" -gt 0 ]; then
+    load_spec_facts $(git ls-files "$M/builds/$slug/spec/*.md" 2>/dev/null | drop_working_specs) \
+      || print_env_failure 118 "the build's specs could not be read, so no fold can be joined: $M/builds/$slug"
+    for tok in "${folds[@]}"; do check_chain_fold "${tok% *}" "${tok#* }" || return 1; done
   fi
   rec=$_chain_rec
   if [ -z "$rec" ]; then

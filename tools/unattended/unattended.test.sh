@@ -2665,8 +2665,10 @@ write_chain_fixture() { # 1 for the policy kit beside the driver · the policy f
   write_switch_fixture "$_fc_r" "${1:-0}" "${2:-}"
   mkdir -p "$_fc_r/memory/builds/dFix/spec"
   { printf '# dFix\n\n<!-- roster:units -->\n'; printf '%s\n' $_fc_all; printf '<!-- /roster:units -->\n'; } > "$_fc_r/memory/builds/dFix/README.md"
+  # AT REV-3 WITH EVERY REV LOGGED, because each `local` and `--sibling` row of the arms below claims rev 2
+  # or 3 and `check_chain_fold` reads the tree (TOOL-dFoldedAudit-11).
   for _fc_i in 1 2 3 4 5 6 7; do
-    printf '# FIX-dFix-%s — u\n\n**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 0123abcd\n' "$_fc_i" \
+    printf '# FIX-dFix-%s — u\n\n**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 0123abcd\n\n## 9. Revision log\n\n- rev-1 · 2026-11-01 · u.\n- rev-2 · 2026-11-01 · a fold.\n- rev-3 · 2026-11-01 · a fold.\n' "$_fc_i" \
       > "$_fc_r/memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-$_fc_i.md"
   done
   # DATED, because a `local` or `--sibling` row refuses under a blank cutoff (TOOL-dFoldedAudit-13), and
@@ -2849,6 +2851,65 @@ write_refold_fixture FIX-dFix-2
 sed -i 's/^\*\*Status:\*\* OPEN/**Status:** CLOSED/' "$_fc_r/memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-3.md"
 ( cd "$_fc_r" && git add -A >/dev/null && git commit -q -m closed --no-verify )
 hit "$(run_chain --chain-verdict dFix)" "round 3 · STOP · reason own-work"
+
+# ---- TOOL-dFoldedAudit-11: A FOLD JOINS TO THE TREE. `write_chain_fixture` holds every spec at rev-3 with
+# ---- rev-1 to rev-3 logged, and each arm here breaks it one spec at a time. WHAT THE ARMS DO NOT CHECK:
+# ---- that the CR cut is what passes AC6's CRLF spec, because no anchor of the reader's grammar reads the
+# ---- line's end. The failing cases, observed at the close and not by the pass that wrote this:
+# ---- `check_chain_fold` returning 0 at its head reds AC1 and AC2; the first-draft test cut reds AC3; the
+# ---- `folds` pair for `--sibling` unset reds AC5; the header test turned into equality reds AC6; the join
+# ---- moved below the write reds AC7.
+_cj_draft='s/ · rev-3 · / · rev-1 · /;/^- rev-[23] /d'; _cj_round='--subject s1 --audited FIX-dFix-2 --blockers 0 --highs 0'
+write_chain_spec() { # the sed script · the glob under spec/ -> those specs edited and committed, the caller's order
+  ( cd "$_fc_r/memory/builds/dFix/spec" && sed -i "$1" $2 && git add -A >/dev/null && git commit -q -m spec --no-verify )
+}
+write_join_fixture() { # the chain fixture holding one clean round, so `check_chain_refused` has bytes to compare
+  write_chain_fixture
+  write_fixture_round s0 FIX-dFix-1 0 0
+  _fc_f=$(read_chain_file); _fc_bytes=$(<"$_fc_r/$_fc_f")
+}
+# AC1: the report's reproduction with no record yet, and rev 100 is the row a string compare reads as low.
+write_chain_fixture
+write_chain_spec "$_cj_draft" '*.md'
+for _cj_rev in 99 100; do
+  out=$(run_chain --record-round dFix --subject s1 --audited FIX-dFix-2 --blockers 0 --highs 1 --finding "7/HIGH/local/FIX-dFix-2/FIX-dFix-2/$_cj_rev"); rc=$?
+  same "FA11 AC1 rev $_cj_rev exits 1" "$rc" "1"
+  hit "$out" "UNATTENDED check 118 FAILED"
+  hit "$out" "stands at rev-1, below the rev-$_cj_rev"
+  same "FA11 AC1 rev $_cj_rev left no record" "$(read_chain_file)" ""
+done
+hit "$(run_chain --chain-verdict dFix)" "round 0"
+# AC2: the header reads rev-3 with rev-2's line cut, so a header test alone passes a bump with no line.
+write_join_fixture
+write_chain_spec '/^- rev-2 /d' '*-2.md'
+check_chain_refused "FIX-dFix-2's spec has no Revision log entry at rev-2" $_cj_round --finding 7/HIGH/local/FIX-dFix-2/FIX-dFix-2/2
+# AC3: rev 1 on a rev-1 spec is at the header and logged, so only the first-draft test refuses it.
+write_join_fixture
+write_chain_spec "$_cj_draft" '*.md'
+check_chain_refused "a fold claims rev-1 on FIX-dFix-2, and rev-1 is a spec's first draft" $_cj_round --finding 7/HIGH/local/FIX-dFix-2/FIX-dFix-2/1
+check_chain_refused "a fold claims rev-1 on FIX-dFix-3, and rev-1 is a spec's first draft" $_cj_round --sibling FIX-dFix-3@rev-1
+# AC4: a minor's fold joins, and a promoted unit owes no spec.
+write_join_fixture
+check_chain_refused "a fold names FIX-dFix-9, and no tracked spec carries that id" $_cj_round --finding 7/MEDIUM/local/FIX-dFix-1/FIX-dFix-9/2
+write_fixture_round s1 FIX-dFix-2 0 0 --finding 7/MEDIUM/new-mechanism/FIX-dFix-1/FIX-dFix-9/1
+# AC5: a sibling row joins like a local one.
+write_join_fixture
+check_chain_refused "FIX-dFix-3's spec stands at rev-3, below the rev-99" $_cj_round --sibling FIX-dFix-3@rev-99
+write_fixture_round s1 FIX-dFix-2 0 0 --sibling FIX-dFix-3@rev-3
+# AC6: an older logged rev passes, so a second fold never reds the first, and each shape the corpus writes
+# reads as an entry. Each spec carries one shape, so a reader that misses it refuses that row.
+write_chain_fixture
+write_fixture_round s1 FIX-dFix-2 0 0 --finding 7/HIGH/local/FIX-dFix-2/FIX-dFix-2/2
+write_chain_spec 's/^- rev-3 /- **rev-3** /' '*-3.md'
+write_fixture_round s2 FIX-dFix-2 0 0 --finding 8/HIGH/local/FIX-dFix-3/FIX-dFix-3/3
+write_chain_spec 's/$/\r/' '*-4.md'
+write_fixture_round s3 FIX-dFix-2 0 0 --finding 9/HIGH/local/FIX-dFix-4/FIX-dFix-4/3
+write_chain_spec 's/^## 9[.] Revision log/## Revision log/' '*-5.md'
+write_fixture_round s4 FIX-dFix-2 0 0 --finding 10/HIGH/local/FIX-dFix-5/FIX-dFix-5/3
+# AC7: a good row beside a false one writes neither, and the grammar answers ahead of the join.
+write_join_fixture
+check_chain_refused "FIX-dFix-3's spec stands at rev-3, below the rev-99" $_cj_round --finding 7/HIGH/local/FIX-dFix-2/FIX-dFix-2/2 --finding 8/HIGH/local/FIX-dFix-3/FIX-dFix-3/99
+check_chain_refused "a --sibling is outside" $_cj_round --finding 7/HIGH/local/FIX-dFix-2/FIX-dFix-2/2 --finding 8/HIGH/local/FIX-dFix-3/FIX-dFix-3/99 --sibling FIX-dFix-1@rev-x
 
 # ---- TOOL-dFoldedAudit-13: ONE DRIVER ANSWER, PRINTED BY `--plan --paths` AND COPIED AS `disposal`, WITH A
 # ---- FOLD REFUSED UNDER ANY OTHER. Each fixture holds one tracked unit at rev-2, and a policy kit only
@@ -18555,7 +18616,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 3022 -> 3041 by TOOL-dFoldedAudit-10: the re-audit's arms in region one after the chain's, 13
 # `same` through `write_fixture_round`, one on an exit code and five `hit`, all unconditional, counted off
 # the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3041
+# RAISED 3041 -> 3082 by TOOL-dFoldedAudit-11: the fold join's arms in region one after the re-audit's, 41
+# unconditional, 14 `same` through `check_chain_refused` and `write_fixture_round`'s, 7 of that helper's
+# `hit`, 7 of its byte `same` and AC1's two-pass loop at 8 with one `hit`, then the 4 green rounds of AC6,
+# counted off the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3082
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18698,7 +18763,8 @@ PROLOGUE_ARMS=20
 # RAISED 461 -> 466 by TOOL-dFoldedAudit-14: the same 5 region-one staged rotation assertions, see FLOOR_ASSERTIONS.
 # RAISED 466 -> 505 by TOOL-dFoldedAudit-13: the same 39 region-one disposal line assertions, see FLOOR_ASSERTIONS.
 # RAISED 505 -> 524 by TOOL-dFoldedAudit-10: the same 19 region-one re-audit assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=524
+# RAISED 524 -> 565 by TOOL-dFoldedAudit-11: the same 41 region-one fold join assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=565
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
