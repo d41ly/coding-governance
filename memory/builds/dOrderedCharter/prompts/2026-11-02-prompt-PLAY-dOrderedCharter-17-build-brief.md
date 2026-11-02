@@ -66,3 +66,11 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
+
+## Owed by the unit before yours
+
+- PLAY-dOrderedCharter-16's pass made `tools/playbook/` read `tools/memory-tree/import_walk.py`, and the
+  `playbook render selftest` leg's guard in `tools/gate-legs.json` names only `{prefix}/playbook/` (class
+  held-suite-guard-misses-a-sibling-kit). Add `{prefix}/memory-tree/import_walk.py` to that guard in your pass,
+  re-stamp the kickoff manifest in the same commit (`gate-legs.json` is on its `watch:` list), declare both paths in
+  `--dispatch`, and record it as a `report` deviation naming unit 16's builder return.
