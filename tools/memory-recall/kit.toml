@@ -2,6 +2,7 @@
 
 id = "memory-recall"
 home = "memory-recall"
+layer = "layer.memory.recall"
 scope = "repo"
 version_from = { file = "recall_conf.py", pattern = "^KIT_MEMORY_RECALL_VERSION = " }
 requires = ["memory-tree"]

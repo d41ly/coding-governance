@@ -262,7 +262,8 @@ done
 
 # THE LIST IS GRADED AGAINST WHAT THE DELEGATES IMPORT (TOOL-dTrueNorth-25 S2). Four times a module a
 # delegate hands off to was missing from DELEGATES, so its change moved a verdict while this gate
-# printed `clean`. One python run reads every `.py` file the scan set holds, as UTF-8, parses it with
+# printed `clean`. One python run of `import_walk.py --closure`, the walk this kit shares with the
+# layer check (PLAY-dOrderedCharter-16 S5), reads every `.py` file the scan set holds, as UTF-8, parses it with
 # `ast` and walks every absolute `import` and `from ... import` node in it, nested ones included,
 # since a lazy import in a function is reached the moment that function runs. A first name `<n>` is a
 # sibling when `${_kit}<n>.py` is a file, and each sibling reached is walked the same way. A reached
@@ -277,46 +278,7 @@ done
 # invocation, is no edge; a relative import is no sibling; another kit's siblings are not walked;
 # and with no python the walk does not run, which its note line says.
 if [ -n "${_ve_py:-}" ]; then
-  "$_ve_py" -c '
-import ast, os, sys
-kit, scan = sys.argv[1], sys.argv[2:]
-def print_line(line):
-    sys.stdout.buffer.write((line + "\n").encode("utf-8"))
-    sys.stdout.buffer.flush()
-queue = [p for p in scan if p.endswith(".py")]
-read, importer, missing, broken = set(queue), {}, [], []
-for path in queue:
-    try:
-        with open(path, encoding="utf-8") as fh:
-            tree = ast.parse(fh.read(), filename=path)
-    except (OSError, UnicodeDecodeError, SyntaxError, ValueError) as e:
-        broken.append((path, " ".join(("%s: %s" % (type(e).__name__, e)).split())))
-        continue
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            names = [a.name for a in node.names]
-        elif isinstance(node, ast.ImportFrom) and not node.level and node.module:
-            names = [node.module]
-        else:
-            continue
-        for name in names:
-            sib = kit + name.split(".")[0] + ".py"
-            if sib in read or not os.path.isfile(sib):
-                continue
-            read.add(sib)
-            queue.append(sib)
-            importer[sib] = path
-            missing.append(sib)
-dash, tick = chr(0x2014), chr(0x27)
-for sib in missing:
-    print_line("verdict-epoch: FAILED %s %s is imported by %s and is not in DELEGATES, so a change to it moves a verdict this gate never dates; add it to DELEGATES" % (dash, sib, importer[sib]))
-for path, why in broken:
-    print_line("verdict-epoch: FAILED %s %s does not parse, so its imports were not read and the import closure is unknown (%s)" % (dash, path, why))
-if missing or broken:
-    sys.exit(2)
-sibs = sum(1 for p in read if p.startswith(kit) and "/" not in p[len(kit):])
-print_line("verdict-epoch: the delegates%s import closure is %d sibling module(s) and %d other scanned file(s), every sibling in DELEGATES" % (tick, sibs, len(read) - sibs))
-' "$_kit" $SCAN
+  "$_ve_py" "${_kit}import_walk.py" --closure "$_kit" $SCAN
   case $? in
     0) ;;
     2) exit 2 ;;

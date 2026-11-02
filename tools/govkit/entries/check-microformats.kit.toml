@@ -15,6 +15,7 @@ id = "check-microformats"
 scope = "repo"
 kind = "flat"
 home = "."
+layer = "layer.flow"
 requires = ["playbook"]
 # No constant: this gate versions with the CHARTER whose block it grades, not on its own clock. A
 # second version to keep in step would be a second thing to drift, and the grammar it enforces is

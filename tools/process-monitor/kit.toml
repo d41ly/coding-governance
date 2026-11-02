@@ -3,6 +3,7 @@
 
 id = "process-monitor"
 home = "process-monitor"
+layer = "layer.runtime"
 scope = "repo"
 
 # PINNED AT THE SHELL ADOPTER, not at an engine module, and the reason is a landing constraint

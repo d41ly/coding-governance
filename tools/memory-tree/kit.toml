@@ -2,6 +2,7 @@
 
 id = "memory-tree"
 home = "memory-tree"
+layer = "layer.memory"
 scope = "repo"
 version_from = { file = "check-memory-hygiene.sh", pattern = "^KIT_MEMORY_TREE_VERSION=" }
 requires = []

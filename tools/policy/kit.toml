@@ -3,6 +3,7 @@
 
 id = "policy"
 home = "policy"
+layer = "layer.instruction"
 scope = "repo"
 # The kit's version constant; README.md's first line carries the marker that equals it
 # (TOOL-dGroundRules-21 S3), which govkit selfcheck 5 and 5c and `check-kit-versions.sh` read.

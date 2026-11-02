@@ -1,0 +1,15 @@
+# PLAY-dOrderedCharter-16 deviation 163 — the layer check's helpers, its detectors' reading and the walk laid in the suite fixtures, as built
+
+**Serves:** deviation PLAY-dOrderedCharter-16
+
+- **Departs from:** `PLAY-dOrderedCharter-16@rev-4 [§2 S6, §4, §7]`
+- **Hand-off:** spec-to-code
+- **Before:** §4 "### Inventory" mints seven functions; S6's `probe` kind reads "a path literal naming" a non-core home; §4 "### The walk" has the gate run `"${_kit}import_walk.py"`; §4 "### Files touched" lists neither `tools/playbook/adopt-playbook.sh` nor `tools/playbook/README.md`.
+- **After:** `check_layers.py` also defines `derive_tracked`, `derive_string_constants`, `check_rows`, `check_point`, `check_shell_file` and `write_layer_row`, and the nested `derive_named_homes`, `derive_module_homes`, `add_edge` and `read_flag`, each passing `lexicon.py --suggest`; the `probe` kind also reads a bare non-core home name handed to a Python call or bound to a name, and an unquoted shell word equal to one, so `DEPLOYER_HOME = "govkit"` and `resolve_lander_kit lexicon lexicon.py` are edges; the line scan skips `echo` lines and the lines inside a `# >>>` to `# <<<` inlined copy of a shared primitive; a `copy` also reads a source file name a non-core home holds; one edge is kept per file, line and target kit, by the precedence requires-if, import, dynamic, copy, shell, probe; `check-verdict-epoch.test.sh`'s `engine` helper copies `import_walk.py` into each fixture's kit directory, since the gate runs the walk from the graded tree; the selftest arm lives in `adopt-playbook.sh`, as §7's `New arm:` line names, and the user docs in `tools/playbook/README.md`, as §5 names; `gen_map.py --write` also rewrote `memory/map/generated/CARDS.md`, `MAP.md` and `inventories.json`, which count the new leg.
+- **Cause:** builder discovery
+- **Reason:** the factory and the contract need a row check the gate and `--new` share; at HEAD the lander reaches lexicon and govkit through its own `resolve_lander_kit` wrapper and the policy kit names govkit through `DEPLOYER_HOME`, so a reading of `resolve_kit_dir` calls and slash-joined literals alone missed edges spec 17 §4 names; the canonical `resolve_kit_dir` copy every shell consumer inlines names `memory-recall` in its docstring, which read as an edge in every core shell file; without the walk in the fixtures every arm of the verdict-epoch suite exits 2.
+- **Evidence:** a probe of the check on the tree before the bare-name reading found no edge in `tools/push-main.sh` or `tools/policy/policy.py:1039`; with the inlined copies scanned it reported that docstring line, `kit dir: no probe finds a memory-recall kit`, in every core shell file carrying the copy, `run-gates.sh:211` and `check-verdict-epoch.sh:159` among them; `python tools/lexicon/lexicon.py --suggest <name> --as py.function` printed `OK` for every name above.
+- **Risk:** additive
+- **Approver:** author, the unit's builder, recorded in this pass commit under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
+- **Follow-through:** ask PLAY-dOrderedCharter-38
+- **Caused-by:** PLAY-dOrderedCharter-16

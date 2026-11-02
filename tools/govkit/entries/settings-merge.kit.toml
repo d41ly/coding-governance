@@ -4,6 +4,7 @@ id = "settings-merge"
 scope = "repo"
 kind = "flat"
 home = "."
+layer = "layer.runtime"
 version_from = { file = "settings-merge.py", pattern = "^KIT_SETTINGS_MERGE_VERSION = " }
 requires = []
 

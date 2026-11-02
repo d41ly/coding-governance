@@ -4,6 +4,7 @@ id = "kickoff-manifest"
 scope = "repo"
 kind = "flat"
 home = "skills/session-kickoff"
+layer = "layer.flow"
 # THE ONE HOME OUTSIDE THE TOOL ROOT, so it is spelled from the repo root and says so. Every other
 # `home` is kit-relative and joined to the derived tool root at load (TOOL-aRepatriatedFork-29 §8 F2);
 # the kickoff engine sits at machine-junction discovery's fixed path, which no install prefix moves.

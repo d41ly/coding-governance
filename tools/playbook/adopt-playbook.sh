@@ -178,4 +178,40 @@ case " $* " in
   *)                : ;;   # write the region
 esac
 
-exec "$PY_BIN" "$HERE/render_playbook.py" "$@"
+case " $* " in
+  *" --selftest "*) ;;
+  *) exec "$PY_BIN" "$HERE/render_playbook.py" "$@" ;;
+esac
+"$PY_BIN" "$HERE/render_playbook.py" "$@" || exit $?
+
+# THE LAYER CHECK'S ARMS (PLAY-dOrderedCharter-16 S9). Each row plants one case into the check's own
+# scratch tree, `<plant>|<exit>|<a line it must print>`; the exit and the named line are asserted
+# together, so a check turned into a printer reds here. `none` is the control, green with no edge.
+_lf=0
+while IFS='|' read -r _lp _lrc _lwant; do
+  [ -n "$_lp" ] || continue
+  # shellcheck disable=SC2086  # the plant field carries its own flags, word-split on purpose
+  _lout=$("$PY_BIN" "$HERE/check_layers.py" --fixture $( [ "$_lp" = none ] || echo "--plant $_lp" ) 2>&1); _lgot=$?
+  case "$_lgot:$_lout" in
+    "$_lrc:"*"$_lwant"*) printf 'arm ok    layers plant %s\n' "$_lp" ;;
+    *) _lf=$((_lf+1)); printf 'arm FAIL  layers plant %s — wanted rc=%s + %s, got rc=%s\n' "$_lp" "$_lrc" "$_lwant" "$_lgot"
+       printf '%s\n' "$_lout" | sed 's/^/      /' ;;
+  esac
+done <<'PLANTS'
+none|0|0 allowed, 0 red; 0 contract red(s)
+import|1|tools/corekit/core.py:9 · import · core kit corekit depends on non-core kit mapkit
+dynamic|1|tools/corekit/core.py:10 · dynamic · core kit corekit depends on non-core kit mapkit
+dynamic|1|tools/corekit/core.py:11 · dynamic · core kit corekit depends on non-core kit mapkit
+probe|1|tools/corekit/core.py:9 · probe · core kit corekit depends on non-core kit mapkit
+copy|1|tools/corekit/core.py:10 · copy · core kit corekit depends on non-core kit mapkit
+shell|1|tools/corekit/run.sh:4 · shell · core kit corekit depends on non-core kit expkit
+requires-if|1|tools/corekit/kit.toml:4 · requires-if · core kit corekit depends on non-core kit expkit
+unslotted|1|tools/corekit/core.py:7 · import · core kit corekit depends on non-core kit mapkit
+slotted --list|0|layers: edge tools/corekit/core.py:7 · import · corekit -> mapkit · allowed
+ex1-pair|1|row 'layer.exp' uses point.exp.hook, which 'layer.exp2' declares
+no-layer|1|descriptor tools/mapkit/kit.toml declares no layer
+unknown-layer|1|descriptor tools/mapkit/kit.toml names layer 'layer.nowhere', which no row holds
+undeclared-point|1|row 'layer.exp' uses point.core.missing, which 0 core row(s) declare
+PLANTS
+if [ "$_lf" != 0 ]; then echo "FAIL — $_lf layer-check arm(s) failed"; exit 1; fi
+echo "PASS — the layer check's plants"

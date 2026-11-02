@@ -1812,6 +1812,16 @@
     "ceiling": 120
   },
   {
+    "name": "layer dependencies (the core never depends on an expansion)",
+    "argv": [
+      "python",
+      "{prefix}/playbook/check_layers.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120
+  },
+  {
     "name": "policy fixtures",
     "argv": [
       "python",

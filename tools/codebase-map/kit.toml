@@ -2,6 +2,7 @@
 
 id = "codebase-map"
 home = "codebase-map"
+layer = "layer.memory.map"
 scope = "repo"
 version_from = { file = "map_lib.py", pattern = "^KIT_CODEBASE_MAP_VERSION = " }
 requires = ["memory-tree"]

@@ -4,6 +4,7 @@ id = "check-agent-cap-restatement"
 scope = "repo"
 kind = "flat"
 home = "."
+layer = "layer.flow"
 # NOT conditional since TOOL-aRoutedQuill-5: `agent-cap` joined the default set, and selfcheck 7e reds
 # a dependent of the default set that no declared selection reaches. `--all` reaches it now; the
 # default does not, because it polices PROSE about the fan-out bound and is worth installing only in

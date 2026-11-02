@@ -2,6 +2,7 @@
 
 id = "unattended"
 home = "unattended"
+layer = "layer.runtime"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # `settings-merge` since TOOL-aRepatriatedFork-11 (section 8 F2): this kit ships hook fragments and its

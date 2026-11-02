@@ -3,6 +3,7 @@
 
 id = "runlog"
 home = "runlog"
+layer = "layer.observability"
 scope = "repo"
 
 # Pinned at the reader module, which lands in the SAME unit as this descriptor, so the file the

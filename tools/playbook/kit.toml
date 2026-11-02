@@ -8,6 +8,7 @@ id = "playbook-render"
 scope = "repo"
 kind = "dir"
 home = "playbook"
+layer = "layer.instruction"
 version_from = { file = "render_playbook.py", pattern = "^KIT_PLAYBOOK_RENDER_VERSION = " }
 
 # The declarations this engine reads live on the `playbook` entry, beside the artifact they describe,

@@ -2,6 +2,7 @@
 
 id = "review-harness"
 home = "workflows"
+layer = "layer.roles"
 scope = "repo"
 # The TEMPLATE, since TOOL-aRepatriatedFork-7: `tier2-review.js` is a render now, and a version constant
 # the [[files]] rules do not land is one an adopter cannot pin against. Both carry the same line.

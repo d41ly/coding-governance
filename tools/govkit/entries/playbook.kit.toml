@@ -1,6 +1,7 @@
 # kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "playbook"
+layer = "layer.instruction"
 scope = "repo"
 kind = "flat"
 version_from = { file = "coding-governance-agents.template.md", pattern = "governance-template: v", kind = "marker" }

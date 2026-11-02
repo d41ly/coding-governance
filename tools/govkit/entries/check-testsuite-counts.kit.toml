@@ -7,6 +7,7 @@ id = "check-testsuite-counts"
 scope = "repo"
 kind = "flat"
 home = "."
+layer = "layer.flow"
 version_from = { none = "the leg carries no behaviour an adopter pins against: it reads the adopter's OWN gate manifest and the adopter's own waiver registry, so every value it grades belongs to them. A constant here would be one nothing asserts, which is what selfcheck reports as a mismatch." }
 requires = []
 

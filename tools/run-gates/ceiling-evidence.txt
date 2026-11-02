@@ -72,6 +72,7 @@ kit placeholders (a declared token its adopter substitutes)	1.2	1	a	2026-09-24	r
 kit version markers	22.0	1	a	2026-09-06	runner
 kit-placeholders self-test	9.8	2	a	2026-09-24	runner
 kit/dogfood doc parity	5.2	2	a	2026-09-24	runner
+layer dependencies (the core never depends on an expansion)	3.6	1	a	2026-11-02	check_layers.py on the worktree at 64454cba with the pass staged, timed by bash time, 3.6s wall, build pass of PLAY-dOrderedCharter-16
 leg ceilings clear their evidenced maximum	1.7	2	a	2026-09-24	runner
 lexicon naming predicates	7.3	2	a	2026-09-24	runner
 lexicon selftest	287.5	2	a	2026-09-24	runner

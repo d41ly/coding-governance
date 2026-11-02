@@ -1,0 +1,103 @@
+# layers.toml — the product's layer register (PLAY-dOrderedCharter-16). Read by check_layers.py beside it.
+#
+# One [[layer]] row per layer: `tag` (layer.<seg>(.<seg>)*), `kind` (core, optional or expansion), `of`
+# (the core row an optional row belongs to), `definition`, `declares` (the extension points it declares)
+# and `uses` (those it attaches at); `homes` names a tool directory that has no descriptor. A kit joins
+# a layer by its own descriptor's `layer = "<tag>"` key, so a layer's kits are derived, never typed here.
+# `shared` lists the tool directories that hold inline-copied primitives and no layer.
+#
+# The rows' definitions are the dClosedLoop architecture's `[layers]` table cells, and the points are the
+# eight `[core-points]` of its layer-expansions record, each spelled point.<layer>.<seg>. The `point`
+# words are a stand-in: a later build registers a `point` namespace and the shape check joins it then.
+# Add a row with: python check_layers.py --new <tag> --kind <kind> [--of <tag>] --definition <text>
+
+shared = ["lib"]
+
+[[layer]]
+tag = "layer.instruction"
+kind = "core"
+definition = "everything an agent is told, levelled 0 to 7 and tagged by scope"
+declares = []
+uses = []
+
+[[layer]]
+tag = "layer.flow"
+kind = "core"
+definition = "a build's lifecycle: Plan, Design, Build, Test and Deploy as programs of items, review as breakpoints and testing as probes at any boundary, with the verdict engine and the lander"
+declares = ["point.flow.verdict-backend", "point.flow.release", "point.flow.version"]
+uses = []
+
+[[layer]]
+tag = "layer.roles"
+kind = "core"
+definition = "the bound workers, and the driver"
+declares = []
+uses = []
+
+[[layer]]
+tag = "layer.memory"
+kind = "core"
+definition = "the trail, what happened in a build, and the library, what generalizes beyond one"
+declares = ["point.memory.record-home"]
+uses = []
+
+[[layer]]
+tag = "layer.runtime"
+kind = "core"
+definition = "what executes the cycle: the supervisor and its checklist engine, act sessions and the spawn harness, the next verb and the owner's controls, the hooks, isolation, process supervision"
+declares = ["point.runtime.cadence", "point.runtime.reading", "point.runtime.grant", "point.runtime.install-target"]
+uses = []
+
+[[layer]]
+tag = "layer.memory.map"
+kind = "optional"
+of = "layer.memory"
+definition = "the codebase map's owner views and dossiers, which agents consult to decide"
+declares = []
+uses = []
+
+[[layer]]
+tag = "layer.memory.recall"
+kind = "optional"
+of = "layer.memory"
+definition = "the record finder for why-questions"
+declares = []
+uses = []
+
+[[layer]]
+tag = "layer.memory.lexicon"
+kind = "optional"
+of = "layer.memory"
+definition = "the naming lexicon, the declared words agents consult before they name"
+declares = []
+uses = []
+
+[[layer]]
+tag = "layer.flow.leg-packs"
+kind = "optional"
+of = "layer.flow"
+definition = "verdict leg packs, legs that join the Test verdict where they are installed"
+declares = []
+uses = []
+
+[[layer]]
+tag = "layer.observability"
+kind = "expansion"
+definition = "signals about the loop and the runtime, read and filed but never deciding a position, and the cadence programs that act on them: Maintain and the Loop Review"
+declares = []
+uses = ["point.runtime.cadence", "point.runtime.reading", "point.memory.record-home"]
+
+[[layer]]
+tag = "layer.integrations"
+kind = "expansion"
+definition = "adapters to outside services, each registered at the core point it serves under one header: remote CI as a verdict backend, notifications, cloud hosts, and deploy engines that promote a landed tree through environments"
+declares = []
+uses = ["point.flow.verdict-backend", "point.flow.release", "point.runtime.grant", "point.memory.record-home"]
+
+[[layer]]
+tag = "layer.distribution"
+kind = "expansion"
+definition = "the product's delivery across a repository boundary"
+homes = ["govkit"]
+declares = []
+uses = ["point.runtime.install-target", "point.flow.version", "point.runtime.cadence", "point.memory.record-home"]

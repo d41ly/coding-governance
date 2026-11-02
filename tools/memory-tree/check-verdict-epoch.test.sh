@@ -60,6 +60,9 @@ engine() { # $1=dir $2=version $3=extra-body-line
     printf 'echo hygiene\n'
     [ -n "$3" ] && printf '%s\n' "$3"
   } > "$1/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
+  # PLAY-dOrderedCharter-16 S5: the gate runs its import walk from the graded tree's kit directory,
+  # so every fixture lays the walk beside its engine, as an install does.
+  cp "$HERE/import_walk.py" "$1/${PFX}${KIT_NAME}/import_walk.py"
 }
 
 commit_engine() { # $1=dir $2=version $3=extra-body-line $4=message
@@ -306,6 +309,22 @@ else
   GATE=$GATE_SAVED
 fi
 rm -f "$MUT"
+
+# ---- 5g. THE WALK IS LIFTED, ITS READING KEPT (PLAY-dOrderedCharter-16 S5). The closure moved into
+# `import_walk.py`, which the layer check shares and which also yields `dynamic` loads; this gate
+# keeps its static reading. A delegate reaching one sibling through a nested `from` import and
+# another module only through `importlib.import_module` prints the closure line the inline walk
+# printed, the dynamic load counted nowhere. Red against a walk that counts dynamic rows, which
+# exits 2 naming `newmod.py`.
+L=$(newrepo lifted)
+engine "$L" 1.5 ""
+printf 'import importlib\ndef render(root):\n    from deviation_join import read_record\n    return read_record(root), importlib.import_module("newmod")\n' > "$L/$KIT_REL/design_lib.py"
+printf 'def read_record(path):\n    return path\n' > "$L/$KIT_REL/deviation_join.py"
+printf 'X = 1\n' > "$L/$KIT_REL/newmod.py"
+printf 'X = 1\n' > "$L/${PFX}check-spec-tokens.py"
+( cd "$L" && git add -A && git commit -qm base --no-verify ) >/dev/null
+BASE_L=$(cd "$L" && git rev-parse HEAD)
+arm 'the lifted walk prints the inline walk'"'"'s closure line, a dynamic load no sibling' 0 "the delegates' import closure is 2 sibling module(s) and 1 other scanned file(s), every sibling in DELEGATES" "$L" "$BASE_L"
 
 # ---- 6. this repo, right now --------------------------------------------------------------------
 # The live tree must be clean, and it must be clean because the constant MOVED — not because nothing

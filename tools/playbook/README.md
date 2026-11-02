@@ -142,3 +142,40 @@ The memory-tree kit's region helper raises when no marker pair is present, so it
 absent-charter nor the charter-without-a-region state. This engine CONFORMS to the marker-region
 contract and is a fifth reader in its case table; it does not import that implementation, which
 would be the cross-kit edge the contract forbids.
+
+## The layer register and the layer check
+
+`layers.toml` beside the engine is the product's layer register (PLAY-dOrderedCharter-16): one
+`[[layer]]` row per layer, with its `tag` (`layer.<seg>(.<seg>)*`), its `kind` (`core`, `optional`
+or `expansion`), `of` (the core row an `optional` row belongs to), its `definition`, the extension
+points it `declares` and the ones it `uses`, and `homes` for a tool directory with no descriptor. A
+top-level `shared` list names the directories of inline-copied primitives, which hold no layer.
+
+Every kit descriptor joins a layer with two keys of its own, so a layer's kits are derived and never
+typed in the register:
+
+```toml
+layer = "layer.memory"
+optional = [{ part = "gen_build_index.py", point = "point.memory.record-home", fallback = "the column renders not-installed" }]
+```
+
+`optional` is a core kit's declared slot: an edge from the file it names as `part` to a non-core kit
+is allowed, its `point` declared by exactly one core row, its `fallback` what the core does when the
+component is absent.
+
+```
+python check_layers.py                 # the gate: the contract, the edges and EX-1 over the tree
+python check_layers.py --list          # every row, every descriptor and every edge, allowed or red
+python check_layers.py --new <tag> --kind <kind> [--of <tag>] --definition <text>
+python check_layers.py --fixture [--plant <case>] [--list]
+```
+
+The check reds a row the contract refuses, a descriptor with no layer or an unknown one, a tool
+directory nothing claims, a core layer with no kit, a point declared by a non-core row or used where
+no single core row declares it (EX-1), and every edge from a file a core kit ships to a non-core kit
+that no `optional` row allows. Edges are found by kind: `import`, `dynamic`, `probe`, `copy`,
+`shell` and `requires-if`. It does not read a path computed at run time, JavaScript, or a file no
+descriptor claims, and says so on every run. `--new` appends a row the contract admits and prints the
+descriptor key a kit adds to join it. The imports come from memory-tree's `import_walk.py`, the walk
+the verdict-epoch gate shares. The leg is gov's own; `adopt-playbook.sh --selftest` runs every
+fixture plant.

@@ -2,6 +2,7 @@
 
 id = "drift-audit"
 home = "drift-audit"
+layer = "layer.observability"
 scope = "repo"
 version_from = { file = "drift_report.py", pattern = "^KIT_DRIFT_AUDIT_VERSION = " }
 # DEPL-dGaugedVintage-4 S1. The two workflow harnesses carry `gov:kit drift-audit@` but live under

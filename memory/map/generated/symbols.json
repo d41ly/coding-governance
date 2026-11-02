@@ -388,6 +388,11 @@
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
+      "id": "Unreadable",
+      "kind": "class",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
       "id": "ViewShardRefused",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
@@ -2281,6 +2286,11 @@
       "id": "build_lang_mode_findings",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_layers_fixture",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
     },
     {
       "id": "build_layout",
@@ -4903,6 +4913,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_layers",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
       "id": "check_layout",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
@@ -5278,6 +5293,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_point",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
       "id": "check_pp_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -5638,6 +5658,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "check_rows",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
       "id": "check_rule_tags",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -5781,6 +5806,11 @@
       "id": "check_shape_run",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "check_shell_file",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
     },
     {
       "id": "check_shim_parity",
@@ -7663,6 +7693,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_edges",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
       "id": "derive_enforcer_imports",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -7911,6 +7946,11 @@
       "id": "derive_image_path",
       "kind": "function",
       "file": "tools/govkit/upgrade_steps.py"
+    },
+    {
+      "id": "derive_import_closure",
+      "kind": "function",
+      "file": "tools/memory-tree/import_walk.py"
     },
     {
       "id": "derive_index_repair",
@@ -8968,6 +9008,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "derive_string_constants",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
       "id": "derive_supersession_map",
       "kind": "function",
       "file": "tools/memory-tree/id_grammar.py"
@@ -9031,6 +9076,11 @@
       "id": "derive_tool_root",
       "kind": "function",
       "file": "tools/roles/render_agents.py"
+    },
+    {
+      "id": "derive_tracked",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
     },
     {
       "id": "derive_transition",
@@ -11350,6 +11400,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/import_walk.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
@@ -11371,6 +11426,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
     },
     {
       "id": "main",
@@ -14555,6 +14615,11 @@
     {
       "id": "read_descriptors",
       "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "read_descriptors",
+      "kind": "function",
       "file": "tools/run-gates/regen.py"
     },
     {
@@ -15316,6 +15381,11 @@
       "id": "read_last_valid_value",
       "kind": "function",
       "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_layers",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
     },
     {
       "id": "read_lease_hash",
@@ -19660,6 +19730,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/playbook/check_layers.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
     {
@@ -23306,6 +23381,11 @@
       "id": "scan_hold_region",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "scan_imports",
+      "kind": "function",
+      "file": "tools/memory-tree/import_walk.py"
     },
     {
       "id": "scan_js_definitions",
@@ -27586,6 +27666,11 @@
       "id": "write_lander_marker",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "write_layer_row",
+      "kind": "function",
+      "file": "tools/playbook/check_layers.py"
     },
     {
       "id": "write_lease",

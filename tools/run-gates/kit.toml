@@ -10,6 +10,7 @@
 
 id = "run-gates"
 home = "run-gates"
+layer = "layer.flow"
 scope = "repo"
 version_from = { file = "run-gates.sh", pattern = "^KIT_RUN_GATES_VERSION=" }
 requires = []

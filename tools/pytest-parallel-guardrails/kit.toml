@@ -2,6 +2,7 @@
 
 id = "pytest-parallel-guardrails"
 home = "pytest-parallel-guardrails"
+layer = "layer.flow.leg-packs"
 scope = "repo"
 version_from = { file = "crashprobe.py", pattern = "^KIT_PYTEST_GUARDRAILS_VERSION = " }
 requires = []

@@ -179,7 +179,7 @@ The governance playbook — the shipped template + companions, and the gates ove
 
 - status `shipped` · streams `playbook`, `tooling` · dossier `memory/map/features/playbook.md`
 - decisions 1: `TOOL-aSiftedPlaybook-1`
-- gate-legs 10: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`
+- gate-legs 11: `template size gate selftest`, `playbook parity`, `playbook parity selftest`, `playbook render wiring`, `playbook render selftest`, `charter size`, `micro-format definitions`, `micro-format gate selftest`, `line length`, `line-length gate selftest`, `layer dependencies (the core never depends on an expansion)`
 - kits 1: `playbook`
 - globs 8: `tools/check-template-size.sh`, `tools/check-template-size.test.sh`, `tools/template-size-highwater.txt`, `tools/check-playbook-parity.sh`, `tools/check-playbook-parity.test.sh`, `tools/playbook-kit-waivers.txt`, `tools/template-size-limits.txt`, `tools/playbook/*`
 
