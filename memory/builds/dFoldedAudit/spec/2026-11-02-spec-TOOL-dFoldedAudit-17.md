@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-17-1-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-1-spec-return.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

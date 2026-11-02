@@ -168,3 +168,5 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T09:57:24Z resume · item dFoldedAudit · reason held · keepalive d1caae3c · manual
 
 2026-11-02T10:12:51Z rescope · item add TOOL-dFoldedAudit-17 · reason the owner asked for origin/main merged by git; three of its eight conflicted paths sit under tools/, so a unit owns their reconcile
+
+2026-11-02T10:50:44Z dispatch · item b1bd4d05 TOOL-dFoldedAudit-17 · reason .memory-tree.conf tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/drift-audit/drift_signals.py memory/map/features/spec-tokens.md memory/guides/SESSION-KICKOFF.md .governance/policy.json memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md memory/builds/dFoldedAudit/README.md
