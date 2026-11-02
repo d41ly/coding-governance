@@ -17,6 +17,7 @@
 | [2026-11-02-build-TOOL-dFoldedAudit-1-11-stopped-dispatch.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-11-stopped-dispatch.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-12-literal-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-12-literal-fold-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-13-bar-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-13-bar-fold-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-1-14-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-14-builder-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-7 |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md) | journal | — |

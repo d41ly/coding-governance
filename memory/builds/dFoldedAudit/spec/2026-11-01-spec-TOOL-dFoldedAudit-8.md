@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-8 — dClosedLoop's unbuilt specs and its frozen design take the same rules
 
-**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 80
+**Status:** INPROGRESS · rev-2 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 80
 
 <!-- gen:spec-records -->
 
@@ -15,6 +15,8 @@
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-build-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md) | research | TOOL-dFoldedAudit-1 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-spec-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-8-2-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-8-2-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-8-pass-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-8-pass-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
