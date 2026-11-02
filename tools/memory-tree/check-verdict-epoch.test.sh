@@ -286,15 +286,15 @@ arm '...and a delegate that does not parse exits 2 naming it' 2 "$KIT_REL/design
 # naming it and the delegate that imports it. The copy sits beside the gate, where its own-directory
 # derivation reads the same kit prefix, and is removed by the EXIT trap. The gate before the move,
 # which scanned the grammar only through a resolved recall kit, exits 0 clean on the first fixture.
-G=$(newrepo grammar)
-engine "$G" 1.5 ""
-printf 'def grammar(root):\n    import id_grammar\n    return id_grammar.grammar_for(root)\n' > "$G/$KIT_REL/corpus_ids.py"
-printf 'ERAS = ("flat",)\n' > "$G/$KIT_REL/id_grammar.py"
-( cd "$G" && git add -A && git commit -qm base --no-verify ) >/dev/null
-BASE_G=$(cd "$G" && git rev-parse HEAD)
-printf 'ERAS = ("flat", "session")\n' > "$G/$KIT_REL/id_grammar.py"
-( cd "$G" && git add -A && git commit -qm "the grammar widens an era, no bump" --no-verify ) >/dev/null
-arm 'an id_grammar.py edit with no bump FAILS naming it' 1 "moved: $KIT_REL/id_grammar.py" "$G" "$BASE_G"
+GR=$(newrepo grammar)
+engine "$GR" 1.5 ""
+printf 'def grammar(root):\n    import id_grammar\n    return id_grammar.grammar_for(root)\n' > "$GR/$KIT_REL/corpus_ids.py"
+printf 'ERAS = ("flat",)\n' > "$GR/$KIT_REL/id_grammar.py"
+( cd "$GR" && git add -A && git commit -qm base --no-verify ) >/dev/null
+BASE_GR=$(cd "$GR" && git rev-parse HEAD)
+printf 'ERAS = ("flat", "session")\n' > "$GR/$KIT_REL/id_grammar.py"
+( cd "$GR" && git add -A && git commit -qm "the grammar widens an era, no bump" --no-verify ) >/dev/null
+arm 'an id_grammar.py edit with no bump FAILS naming it' 1 "moved: $KIT_REL/id_grammar.py" "$GR" "$BASE_GR"
 MUT="$HERE/check-verdict-epoch.mut$$.sh"
 trap 'rm -rf "$TMP" "$MUT"' EXIT
 sed 's/ \${_kit}id_grammar\.py / /' "$GATE" > "$MUT"
@@ -302,7 +302,7 @@ if grep -q '{_kit}id_grammar\.py' "$MUT"; then
   fails=$((fails+1)); printf 'arm FAIL  %s\n' 'the DELEGATES-drop plant did not remove id_grammar.py from the gate copy'
 else
   GATE_SAVED=$GATE; GATE=$MUT
-  arm '...and a gate whose DELEGATES drops id_grammar.py exits 2 naming it and its importer' 2 "$KIT_REL/id_grammar.py is imported by $KIT_REL/corpus_ids.py and is not in DELEGATES" "$G" "$BASE_G"
+  arm '...and a gate whose DELEGATES drops id_grammar.py exits 2 naming it and its importer' 2 "$KIT_REL/id_grammar.py is imported by $KIT_REL/corpus_ids.py and is not in DELEGATES" "$GR" "$BASE_GR"
   GATE=$GATE_SAVED
 fi
 rm -f "$MUT"
