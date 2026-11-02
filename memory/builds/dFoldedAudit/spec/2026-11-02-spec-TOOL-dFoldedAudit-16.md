@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-16 — the flagged bar's own reds cleared: the fork-site registry and the armed-cutoff pin
 
-**Status:** INPROGRESS · rev-1 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 160
+**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 160
 
 <!-- gen:spec-records -->
 
@@ -8,8 +8,11 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-16-1-first-bar.md](../build/2026-11-02-build-TOOL-dFoldedAudit-16-1-first-bar.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-16-2-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-16-2-spec-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-16-3-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-16-3-builder-return.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-16-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-16-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-16-2-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-16-2-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-16-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-16-build-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-16-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-16-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-16-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-16-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -282,10 +285,12 @@ scratch.
   figure: PINNED, 2 and 4 before the pass, measured at `0e3c26cf`.
   Red when: a `folds` caller keeps its substitution, or a BASE caller is converted beyond this scope.
 - **AC4** — When `grep -c '$(cat "$_sw_tmp/err")\|$(cat "$_fc_r/$_fc_f")' tools/unattended/unattended.test.sh`
-  runs it prints 0, and `grep -c '$(<"$_sw_tmp/err")\|$(<"$_fc_r/$_fc_f")'` over the same file prints 7.
+  runs it prints 0, and `grep -c '$(<"$_sw_tmp/err")\|$(<"$_fc_r/$_fc_f")'` over the same file prints 10:
+  the seven reads S2 converts, and the three `_fc_bytes=$(<"$_fc_r/$_fc_f")` reads at `:2877`, `:3276`
+  and `:3293` that an earlier unit wrote.
   Then `grep -c '_sd_tab=$(printf' tools/unattended/unattended.test.sh` and
   `grep -c "audited \"\$(printf 'FIX-dFix-1"` over the same file each print 0.
-  figure: PINNED, 7, 0, 1 and 1 before the pass, measured at `0e3c26cf`.
+  figure: PINNED, 7, 3, 1 and 1 before the pass, measured at `0e3c26cf`.
   Red when: a read keeps `cat`, or a value is still built in a substitution.
 - **AC5** — When `grep -c 'strict run_wf "$1" "$(printf' tools/workflows/unattended-build.test.sh` runs it
   prints 0, and `grep -c "grep -c '^THROW '"` over the same file prints 0.
@@ -328,6 +333,9 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, from the first bar's attribution, the promotion notes and the
   scanner's own reading of the five rows.
+- rev-2 · 2026-11-02 · AC4's `$(<…)` grep reads 10 after the pass and 3 before it, as the builder's
+  DIVERGENCE return measured: three `_fc_bytes` reads at `:2877`, `:3276` and `:3293` predate this unit.
+  No other criterion and no §4 text moves.
 
 ## 10. Reuse audit
 
