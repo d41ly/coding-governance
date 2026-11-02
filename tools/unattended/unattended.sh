@@ -1118,7 +1118,6 @@ scope_of() { # handle -> its declared scope; `all` when the entry carries no thi
 # one. The better refusal is worth having and is `TOOL-aScouredKit-34`, which carries what was
 # learned about the fixture so the next attempt does not re-derive it.
 is_auth_mode(){ case " $AUTH_MODES " in *" $1 "*) return 0;; esac; return 1; }
-is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 # The EFFECTIVE halt vocabulary: kit core plus whatever the project appended. Same shape as the phase
 # and Definition-of-Done sets, so a project can extend it and cannot delete from it.
 halt_codes() { printf '%s %s\n' "$HALT_CODES_CORE" "$HALT_CODES_EXTRA"; }
@@ -8201,33 +8200,8 @@ read_pinned_base() { # run-state file -> 0 with RPB_BASE · 1 when no committed 
   done
   return 1
 }
-# AN HONEST ROTATION: <commit> adds only archives named `RUN.<PHASE>.<8 hex>.md`, each hex the prefix
-# of the blob it adds, and its parent's committed record is one `--preflight` retires.
-check_honest_rotation() { # commit · run-state file -> 0 when it is one
-  local c=$1 rel=$2 dir p n=0 blob
-  dir=${rel%/RUN.md}
-  while IFS= read -r p; do
-    [ -n "$p" ] || continue
-    n=$((n + 1))
-    [[ "${p##*/}" =~ ^RUN\.[A-Z]+\.([0-9a-f]{8})\.md$ ]] || return 1
-    blob=$(GIT rev-parse -q --verify "$c:$p" 2>/dev/null) || return 1
-    [ "${blob:0:8}" = "${BASH_REMATCH[1]}" ] || return 1
-  done < <(GIT diff-tree --root --no-commit-id --no-renames -r --diff-filter=A --name-only "$c" -- "$dir/RUN.*.md" 2>/dev/null)
-  [ "$n" -gt 0 ] && check_retired_blob "$c^:$rel"
-}
-# A RECORD `--preflight` RETIRES, read from a committed blob: a terminal phase; a LANDING or a HELD
-# hand-off, each retired once it derives LANDED, its archive then reading LANDED; or `abandoned`
-# beside `work-landed-at`. A shape, not a derivation: the derivation needs the tip it was made at.
-check_retired_blob() { # rev:path -> 0 when that blob is one
-  local ph
-  ph=$(read_blob_fact "$1" phase)
-  [ -n "$ph" ] || return 1
-  if is_terminal "$ph" || [ "$ph" = LANDING ] || [ "$ph" = HELD ]; then return 0; fi
-  [ -n "$(read_blob_fact "$1" abandoned)" ] && [ -n "$(read_blob_fact "$1" work-landed-at)" ]
-}
-read_blob_fact() { # rev:path · key -> that key's value in the blob's Run facts section
-  GIT show "$1" 2>/dev/null | extract_run_facts | K="$2:" awk 'index($0, ENVIRON["K"]) == 1 { v = substr($0, length(ENVIRON["K"]) + 1); sub(/\r$/, "", v); sub(/^ +/, "", v); print v; exit }'
-}
+# `check_honest_rotation`, `check_retired_blob` and `read_blob_fact` are in `lib-unattended.sh`, beside
+# `check_landed_facts_due`, because check 2's archive clause reads them too.
 print_landing_line() { # -> the one line naming what resolve_landing_node decided
   case "$LN_STATE" in
     lander) echo "unattended: landing — lander · node $LN_TAG" ;;
@@ -12746,8 +12720,11 @@ review_exit_note() { # disposition -> the sentence
 #
 # THE DATE IS THE PREFLIGHT'S, never the README's `opened:`, because the chain builds opened in October
 # and not yet started must inherit the new rule. `check_landed_facts_due` is named for its first cutoff
-# and reads any record cutoff: 0 past it, 1 before it, 2 on a blank one. Check 2 calls it for the same
-# date, so the driver and the gate cannot disagree about one record.
+# and reads any record cutoff: 0 past it, 1 before it, 2 on a blank one. Check 2 calls it with the same
+# `tenancy` read, so a rotated record dates to its own run on both sides. The two agree on one record
+# but for one case: a never-committed record or a staged rotation reads past a cutoff dated ahead of
+# it, and reads grandfathered if its first commit lands before that cutoff. Every cutoff at or before
+# the first commit gives one answer.
 #
 # The switch is read only when the cutoff admits the record, so a run under `old` spawns no Python. A
 # refused read leaves `_se_rule` at `counted`.
@@ -12755,7 +12732,7 @@ read_spec_exit_rule() { # run-state file · slug · subject -> sets _se_rule and
   local out
   _se_rule=old; _se_why=""
   [ "$3" != "$2" ] || return 0
-  check_landed_facts_due "$1" "$SPEC_FOLD_CUTOFF" || return 0
+  check_landed_facts_due "$1" "$SPEC_FOLD_CUTOFF" tenancy || return 0
   _se_rule=counted
   if out=$(read_spec_audit_switch disposal); then
     [ "$out" != by-nature ] || _se_rule=folds

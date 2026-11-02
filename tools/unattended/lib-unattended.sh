@@ -32,7 +32,8 @@
 # one range rule the two history legs share. The same rule admits the resume tick as a third sourcer,
 # and the health log's appender, the `health_log_sh` block the driver and the tick both write through;
 # and the adopter's `--check` as a fourth for `read_tick_registration`, the one probe of whether the
-# resume tick is registered.
+# resume tick is registered; and `check_honest_rotation` with its callees, the one reading of a
+# rotation that the driver's pinned base and check 2's archive clause share.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -1710,7 +1711,9 @@ read_landing_commit() { # run-state file · [hand-off codes] -> the commit that 
 #
 # WHAT `--follow` DOES NOT DO, and the direction of its error. It takes the OLDEST add along the
 # followed history, so an archive in a folder that rotated more than once can date to an EARLIER
-# run's first commit. That errs toward grandfathering and never toward a frozen red.
+# run's first commit. Where the cutoff grandfathers by age that errs toward the laxer rule. Where the
+# record's own rows need the later rule, as a fold row past SPEC_FOLD_CUTOFF does, it is a permanent
+# red on an append-only archive, which is what `tenancy` below exists for.
 #
 # THE FLOOR, for the LIVE path. A live `RUN.md` in a folder that has rotated is recorded `M` at the
 # rotation and never re-added, so its oldest add is the PREVIOUS run's preflight and the record would
@@ -1722,21 +1725,38 @@ read_landing_commit() { # run-state file · [hand-off codes] -> the commit that 
 # into a graded set it was never graded by, and where that record is already terminal no verb may
 # add what the cutoff asks for; the caller that passes it says which record that would be.
 #
+# `tenancy` FLOORS A ROTATED PATH TOO, by the newest first touch of a sibling archive that HISTORY
+# places before the path's own first touch, so a record dates to the run that wrote it. It is an
+# opt-in for the one cutoff whose grandfathered rule is the stricter one: as a default it would move
+# every archive under LANDED_FACTS_CUTOFF into a graded set no verb can repair. "Before" is ancestry
+# and never `%cs`: two rotations can land on one day, and a day compare would floor the first archive
+# on the second and read its pre-cutoff run as past the cutoff. A first archive has no such sibling.
+# The floor reads an archive's first touch, so a file named like one moves the record beside it,
+# which is why check 2 reds an archive added on or after that cutoff that no rotation wrote.
+#
 # `--follow` ALSO FOLLOWS COPIES: at a record's first commit it may continue into another file that
 # shares more than half its lines, and date by that one's add. On a real history the source is the
 # older file, so the error is again toward grandfathering.
 #
 # NOTHING PRINTED is "this path has no committed history", which a caller reads as NEW - the one
 # thing a record with no first commit certainly is.
-read_first_commit_date() { # record path · [nofloor] -> YYYY-MM-DD, or nothing
-  local _fd_p="${1:-}" _fd_d _fd_s _fd_t _fd_floor=""
+read_first_commit_date() { # record path · [nofloor|tenancy] -> YYYY-MM-DD, or nothing
+  local _fd_p="${1:-}" _fd_d _fd_s _fd_h _fd_t _fd_own="" _fd_floor=""
   [ -n "$_fd_p" ] || return 0
   _fd_d=$(GIT log --follow --diff-filter=A --format=%cs -- "$_fd_p" 2>/dev/null | tail -1)
-  if [ "${_fd_p##*/}" = RUN.md ] && [ "${2:-}" != nofloor ]; then
+  if [ "${_fd_p##*/}" != RUN.md ] && [ "${2:-}" = tenancy ]; then
+    _fd_own=$(GIT log --full-history --format=%H -- "$_fd_p" 2>/dev/null | tail -1)
+  fi
+  if { [ "${_fd_p##*/}" = RUN.md ] && [ "${2:-}" != nofloor ]; } || [ -n "$_fd_own" ]; then
     while IFS= read -r _fd_s; do
-      [ -n "$_fd_s" ] || continue
-      _fd_t=$(GIT log --full-history --format=%cs -- "$_fd_s" 2>/dev/null | tail -1)
-      [ -n "$_fd_t" ] || continue
+      [ -n "$_fd_s" ] && [ "$_fd_s" != "$_fd_p" ] || continue
+      _fd_h=$(GIT log --full-history --format='%H %cs' -- "$_fd_s" 2>/dev/null | tail -1)
+      [ -n "$_fd_h" ] || continue
+      if [ -n "$_fd_own" ]; then
+        [ "${_fd_h%% *}" != "$_fd_own" ] || continue
+        GIT merge-base --is-ancestor "${_fd_h%% *}" "$_fd_own" 2>/dev/null || continue
+      fi
+      _fd_t=${_fd_h#* }
       if [ -z "$_fd_floor" ] || [[ "$_fd_t" > "$_fd_floor" ]]; then _fd_floor=$_fd_t; fi
     done < <(GIT ls-files -- "${_fd_p%/*}/RUN.*.md" 2>/dev/null)
   fi
@@ -1752,15 +1772,58 @@ read_first_commit_date() { # record path · [nofloor] -> YYYY-MM-DD, or nothing
 # per record: a path nothing wrote to at or after the cutoff cannot have begun after it, and on this
 # repo that answers almost every record. Its stated limit is a history whose commit DATES run
 # backwards along its parents, where the shortcut can grandfather a record the full read would grade.
-check_landed_facts_due() { # record path · cutoff -> 0 graded · 1 grandfathered · 2 off
+#
+# A STAGED ROTATION ANSWERS FIRST. `--preflight` stages it and the spec commit uses `git commit
+# --only`, so a `RUN.md` can reach a spec exit uncommitted, and the shortcut would read the PREVIOUS
+# tenant's last commit. A staged archive beside the record means a new tenant with no committed
+# history, which is the sentence above. A record with no opt-in reaches this too, and none can differ:
+# `--preflight`'s own call runs before the rotation is staged, and the leg's needs a LANDED or LANDING
+# population, which a new tenant's record is not. The test is `read_pinned_base`'s, and a
+# `--name-status` read of `RUN.md` never fires, because a staged rotation records that path `M`.
+#
+# The third argument is `read_first_commit_date`'s second, and an empty one is the default read.
+check_landed_facts_due() { # record path · cutoff · [tenancy] -> 0 graded · 1 grandfathered · 2 off
   local _ld_d _ld_l
   [ -n "${2:-}" ] || return 2
+  if [ "${1##*/}" = RUN.md ] \
+     && [ -n "$(GIT diff --cached --name-only --diff-filter=A -- "${1%/*}/RUN.*.md" 2>/dev/null)" ]; then
+    return 0
+  fi
   _ld_l=$(GIT log -1 --format=%cs -- "$1" 2>/dev/null)
   [ -n "$_ld_l" ] && [[ "$_ld_l" < "$2" ]] && return 1
-  _ld_d=$(read_first_commit_date "$1")
+  _ld_d=$(read_first_commit_date "$1" "${3:-}")
   [ -z "$_ld_d" ] && return 0
   [[ "$_ld_d" < "$2" ]] && return 1
   return 0
+}
+
+is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
+# AN HONEST ROTATION: <commit> adds only archives named `RUN.<PHASE>.<8 hex>.md`, each hex the prefix
+# of the blob it adds, and its parent's committed record is one `--preflight` retires.
+check_honest_rotation() { # commit · run-state file -> 0 when it is one
+  local c=$1 rel=$2 dir p n=0 blob
+  dir=${rel%/RUN.md}
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    n=$((n + 1))
+    [[ "${p##*/}" =~ ^RUN\.[A-Z]+\.([0-9a-f]{8})\.md$ ]] || return 1
+    blob=$(GIT rev-parse -q --verify "$c:$p" 2>/dev/null) || return 1
+    [ "${blob:0:8}" = "${BASH_REMATCH[1]}" ] || return 1
+  done < <(GIT diff-tree --root --no-commit-id --no-renames -r --diff-filter=A --name-only "$c" -- "$dir/RUN.*.md" 2>/dev/null)
+  [ "$n" -gt 0 ] && check_retired_blob "$c^:$rel"
+}
+# A RECORD `--preflight` RETIRES, read from a committed blob: a terminal phase; a LANDING or a HELD
+# hand-off, each retired once it derives LANDED, its archive then reading LANDED; or `abandoned`
+# beside `work-landed-at`. A shape, not a derivation: the derivation needs the tip it was made at.
+check_retired_blob() { # rev:path -> 0 when that blob is one
+  local ph
+  ph=$(read_blob_fact "$1" phase)
+  [ -n "$ph" ] || return 1
+  if is_terminal "$ph" || [ "$ph" = LANDING ] || [ "$ph" = HELD ]; then return 0; fi
+  [ -n "$(read_blob_fact "$1" abandoned)" ] && [ -n "$(read_blob_fact "$1" work-landed-at)" ]
+}
+read_blob_fact() { # rev:path · key -> that key's value in the blob's Run facts section
+  GIT show "$1" 2>/dev/null | extract_run_facts | K="$2:" awk 'index($0, ENVIRON["K"]) == 1 { v = substr($0, length(ENVIRON["K"]) + 1); sub(/\r$/, "", v); sub(/^ +/, "", v); print v; exit }'
 }
 
 # THE LANDED FACT SET, one predicate for two callers: the leg's fact-set arm, and `--preflight`,

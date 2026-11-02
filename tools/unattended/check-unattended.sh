@@ -836,11 +836,13 @@ else
     rv_foldgraded=0
     if [ "$rv_graded" = 1 ] && { [ -z "$rv_fc" ] || printf '%s\n%s\n' "$FOLD_CUTOFF" "$rv_fc" | sort -C; }; then rv_foldgraded=1; fi
     # THE SPEC EXIT ROW'S CUTOFF KEYS ON THE DAY THE RECORD BEGAN, by the function the driver's
-    # `read_spec_exit_rule` calls, so the two cannot disagree about one record. `rv_fc` will not do: it
-    # has no floor, so a re-preflighted slug would read as the previous run's date. The function is
-    # named for its first cutoff and reads any record cutoff; it grades a record with no history.
+    # `read_spec_exit_rule` calls with the same `tenancy` read, so a rotated archive dates to the run
+    # that wrote it and a legal fold row stays green once its record rotates. `rv_fc` will not do: it has
+    # no floor, so a re-preflighted slug would read as the previous run's date. The function is named
+    # for its first cutoff and reads any record cutoff; it grades a record with no history. The driver
+    # and this leg agree on one record but for one case, which the driver's function states.
     rv_foldpast=0
-    if [ -n "$rv_foldcut" ] && check_landed_facts_due "$rvf" "$rv_foldcut"; then rv_foldpast=1; fi
+    if [ -n "$rv_foldcut" ] && check_landed_facts_due "$rvf" "$rv_foldcut" tenancy; then rv_foldpast=1; fi
     rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v foldpast="$rv_foldpast" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
@@ -985,6 +987,34 @@ else
         }
       }' "$rvf")"
   done
+  # AN ARCHIVE ON OR AFTER SPEC_FOLD_CUTOFF THAT NO ROTATION WROTE (TOOL-dFoldedAudit-14), outside the
+  # loop because a stub carries no review row and the loop's first test skips it. The date floor reads
+  # an archive's first touch, so a file named like one moves the record beside it across the cutoff, and
+  # only a first touch on or after the cutoff can do that, so the clause exempts by date and never by a
+  # list. It reads the key itself: a blank one is announced above and a malformed one named above, so
+  # the `case` needs no second arm.
+  # THE NAME IS TESTED AGAINST THE BLOB THE ADDING COMMIT ADDED, through `check_honest_rotation`, because
+  # two tracked archives were edited after they rotated, and a current-bytes test would red an archive
+  # for good on a record no verb repairs. That predicate does not ask whether the commit rewrote
+  # `RUN.md`, and a stub beside a HELD record passes it, so that test sits here.
+  # WHAT THIS DOES NOT CHECK: an archive with no add commit, one still staged or a rotation landing
+  # inside a merge, and a complete hand rotation of a finished record with the true blob name and
+  # `RUN.md` rewritten, which the closing review reads in the diff. The key is the working copy's, so a
+  # run that blanks it turns this clause off, in its diff.
+  case "$SPEC_FOLD_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])
+      for rvf in $(GIT ls-files ":(glob)$M/builds/*/RUN.*.md" 2>/dev/null); do
+        rv_add=$(GIT log -1 --diff-filter=A --format='%H %cs' -- "$rvf" 2>/dev/null)
+        [ -n "$rv_add" ] || continue
+        [[ "${rv_add#* }" < "$SPEC_FOLD_CUTOFF" ]] && continue
+        rv_rel=${rvf%/*}/RUN.md
+        if ! check_honest_rotation "${rv_add%% *}" "$rv_rel" \
+           || [ -z "$(GIT diff-tree --root --no-commit-id --no-renames -r --name-only "${rv_add%% *}" -- "$rv_rel" 2>/dev/null)" ]; then
+          rv_bad="$rv_bad
+  $rvf (an archive added on or after SPEC_FOLD_CUTOFF that no rotation wrote: its name is not the blob it added, the record it retired was not finished, or its commit left the run-state file alone, and the date floor reads an archive's first touch, so it would move the record beside it across the cutoff)"
+        fi
+      done ;;
+  esac
   [ -z "${rv_bad//[[:space:]]/}" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
 fi
 

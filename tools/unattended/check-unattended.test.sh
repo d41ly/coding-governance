@@ -490,7 +490,7 @@ mkdisp() { # base-region-rows · head-region-rows · run rows
   git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m dispbase --no-verify
   DISPBASE=$(git rev-parse HEAD)
   printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$2" > memory/builds/tDisp/README.md
-  printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n%b' "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
+  printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: %s\nwitness: abc\nbase: %s\n\n%b' "${DISPPHASE:-RUNNING}" "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
   # COMMITTED, not merely staged. The cutoff grades the record's own FIRST-COMMIT date; a staged
   # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
   # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
@@ -501,6 +501,40 @@ mkdisp() { # base-region-rows · head-region-rows · run rows
   git add -A >/dev/null 2>&1
   GIT_COMMITTER_DATE="${DISPDATE:-2026-09-01T12:00:00 +0000}" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
 }
+# ---- TOOL-dFoldedAudit-14: A ROTATED FOLDER'S HISTORY, on top of `mkdisp`'s record. DISPPHASE sets that
+# ---- record's phase. Every commit is pinned at noon and every honest archive carries its true blob
+# ---- name. Each tenant keeps twenty filler lines of its own, or `--follow` has no rename worth
+# ---- detecting and the plain read would stay at the archive's own add.
+ROT_R=memory/builds/tDisp/RUN.md
+ROT_ROW='review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 2 · folded 3 · promoted 0 · disposition fold'
+ROT_FILLER=""
+for _rf_i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do ROT_FILLER="${ROT_FILLER}filler first line $_rf_i\n"; done
+write_rot_commit() { # YYYY-MM-DD · message
+  git add -A >/dev/null 2>&1
+  GIT_COMMITTER_DATE="$1T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m "$2" --no-verify >/dev/null 2>&1
+}
+write_rot_archive() { # archive phase · new phase · filler word · YYYY-MM-DD · message -> leaves the archive in ROT_A
+  local _ra_b
+  _ra_b=$(git hash-object "$ROT_R")
+  ROT_A=${ROT_R%/*}/RUN.$1.${_ra_b:0:8}.md
+  git mv "$ROT_R" "$ROT_A"
+  sed -e "s/^phase: .*/phase: $2/" -e "s/^filler [a-z]* /filler $3 /" -e '/ review · item /d' "$ROT_A" > "$ROT_R"
+  write_rot_commit "$4" "$5"
+}
+write_rot_history() { # the last two commits' date, or nothing for History H's own · 1 when the FIRST run holds the fold row
+  DISPPHASE=LANDED DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" "$ROT_FILLER"
+  if [ "${2:-}" = 1 ]; then printf '2026-10-21T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"; write_rot_commit 2026-10-21 row; fi
+  write_rot_archive LANDED LANDED second 2026-11-20 rotate1; ROT_1=$ROT_A
+  if [ "${2:-}" != 1 ]; then printf '2026-11-21T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"; write_rot_commit "${1:-2026-11-21}" row; fi
+  write_rot_archive LANDED RUNNING third "${1:-2026-11-25}" rotate2; ROT_2=$ROT_A
+}
+write_rot_stub() { # phase in the name -> writes a stub under its true blob name, uncommitted, and leaves it in ROT_A
+  local _rs_b
+  _rs_b=$(printf 'stub\n' | git hash-object --stdin)
+  ROT_A=${ROT_R%/*}/RUN.$1.${_rs_b:0:8}.md
+  printf 'stub\n' > "$ROT_A"
+}
+read_rot_lib() { ( . "$TMP/$KIT_REL/lib-unattended.sh"; "$@" ); } # a library call in its own shell, as a sourcer makes it
 drop_readme()  { rm -f memory/builds/tRun/README.md; }
 break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
 break_slug()   { sed -i 's|^slug: .*|slug: someoneElse|' memory/builds/tRun/README.md; }
@@ -1615,6 +1649,72 @@ reset_tree; mkconf; foldconf soon
 out=$(run)
 hit "$out" ".unattended.conf declares SPEC_FOLD_CUTOFF as no ISO date, so the exit-row clause cannot tell"
 hit "$out" "'soon'"
+reset_tree
+
+# ---- TOOL-dFoldedAudit-14: A ROTATED RECORD DATES TO THE RUN THAT WROTE IT, read through the library over
+# ---- a twice-rotated folder. The first archive keeps the `--follow` date, the second floors at the first
+# ---- one's first touch, and the plain read moves for nobody, which AC5 holds under the graded read too.
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+write_rot_history
+same "AC1 the second archive floors at the first one's first touch" "$(read_rot_lib read_first_commit_date "$ROT_2" tenancy)" "2026-11-20"
+same "AC1 the plain read keeps the oldest add" "$(read_rot_lib read_first_commit_date "$ROT_2")" "2026-10-20"
+same "AC1 the first archive has no earlier sibling" "$(read_rot_lib read_first_commit_date "$ROT_1" tenancy)" "2026-10-20"
+read_rot_lib check_landed_facts_due "$ROT_2" 2026-11-02; same "AC5 the default read grandfathers the archive" "$?" "1"
+read_rot_lib check_landed_facts_due "$ROT_2" 2026-11-02 tenancy; same "AC5 the opt-in grades it" "$?" "0"
+same "AC5 the driver holds one opted-in call" "$(grep -cE '^[^#]*check_landed_facts_due .*tenancy' "$HERE/unattended.sh")" "1"
+same "AC5 the leg holds one opted-in call" "$(grep -cE '^[^#]*check_landed_facts_due .*tenancy' "$HERE/check-unattended.sh")" "1"
+# AC2: both rotations on one day, which `%cs` cannot order, so the first archive floors on nothing.
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+write_rot_history 2026-11-20
+same "AC2 same-day rotations still order the second archive" "$(read_rot_lib read_first_commit_date "$ROT_2" tenancy)" "2026-11-20"
+same "AC2 the first archive does not floor itself on the second" "$(read_rot_lib read_first_commit_date "$ROT_1" tenancy)" "2026-10-20"
+# ---- H6's left-shift gate: a legal fold row stays green once its record rotates, and a row in a record
+# ---- begun before the cutoff keeps the old rule, so the floor cannot be read as a grant.
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+write_rot_history
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+write_rot_history "" 1
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+# ---- M3's left-shift gate: a stub moves the record beside it across the cutoff unless check 2 reds it.
+# ---- One stub per way a file can pass for a rotation, the row dated past the cutoff in a record begun
+# ---- before it. The green controls beside them are an archive edited after it rotated, a stub dated
+# ---- before the cutoff, and a blank cutoff; a stub's failure text is hit whole so no arm passes on a name.
+ROT_STUB="an archive added on or after SPEC_FOLD_CUTOFF that no rotation wrote"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf '2026-11-05T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"
+printf 'stub\n' > "${ROT_R%/*}/RUN.ABORTED.deadbeef.md"
+write_rot_commit 2026-11-05 stub
+hit "$(run)" "${ROT_R%/*}/RUN.ABORTED.deadbeef.md ($ROT_STUB"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf '2026-11-05T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"
+write_rot_stub ABORTED
+write_rot_commit 2026-11-05 stub
+hit "$(run)" "$ROT_A ($ROT_STUB"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+DISPPHASE=HELD DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf '2026-11-05T01:00:00Z %s\n' "$ROT_ROW" >> "$ROT_R"
+write_rot_commit 2026-11-05 row
+write_rot_stub ABORTED
+write_rot_commit 2026-11-05 stub
+hit "$(run)" "$ROT_A ($ROT_STUB"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+write_rot_history
+printf 'edited after it rotated\n' >> "$ROT_2"
+write_rot_commit 2026-11-26 edit
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-02
+DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf 'stub\n' > "${ROT_R%/*}/RUN.ABORTED.deadbeef.md"
+write_rot_commit 2026-10-30 stub
+miss "$(run)" "$ROT_STUB"
+reset_tree; dispconf 2000-01-01; foldconf ""
+DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
+printf 'stub\n' > "${ROT_R%/*}/RUN.ABORTED.deadbeef.md"
+write_rot_commit 2026-11-05 stub
+miss "$(run)" "$ROT_STUB"
 reset_tree
 
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
@@ -6944,13 +7044,17 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- and five `miss`, all beside the counted-spec-row block in region 2, so FLOOR_SHARD_2 carries the
 # ---- same +16 and the other seven are untouched. COUNTED off the block's own lines; this pass runs no
 # ---- suite, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=1057
+# ---- RAISED 1057 -> 1074 by exactly the arms, TOOL-dFoldedAudit-14: the rotated record's arms, nine
+# ---- `same`, four `hit` and four `miss`, all after the exit-row block in region 2, so FLOOR_SHARD_2
+# ---- carries the same +17 and the other seven are untouched. COUNTED off the block's own lines; this
+# ---- pass runs no suite, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=1074
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
 FLOOR_SHARD_1=159
-FLOOR_SHARD_2=83
+FLOOR_SHARD_2=100
 FLOOR_SHARD_3=127
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133

@@ -2620,6 +2620,33 @@ else
   same "AC7 a refused read wrote nothing" "$(grep -c 'review · item' "$_fa_run")" "0"
 fi
 
+# ---- TOOL-dFoldedAudit-14 AC6, M5's left-shift gate: ONE RECORD GIVES ONE ANSWER EITHER SIDE OF ITS FIRST
+# ---- COMMIT. `--preflight` stages a rotation and the spec commit uses `git commit --only`, so a record
+# ---- reaches a spec exit with the previous tenant's last commit on its path, and the shortcut would read
+# ---- that. The leg runs over the same tree, so the driver and the gate are read on one record, and the
+# ---- hand-written short row last is the control that the leg reached the new tenant's rows at all. The
+# ---- floors are declared because check 2 refuses a conf without them, ahead of any record.
+rm -rf "$_fa_r"; write_switch_fixture "$_fa_r" 0 ""
+printf 'DISPOSITION_CUTOFF="2000-01-01"\nREVIEW_ROUNDS="1"\nSPEC_FOLD_CUTOFF="2026-11-02"\nHALT_FLOOR="1"\nHOLD_FLOOR="1"\n' >> "$_fa_r/.unattended.conf"
+commit_fold_fixture "2026-10-19T12:00:00 +0000" conf
+_fa_base=$(git -C "$_fa_r" rev-parse HEAD)
+mkdir -p "${_fa_run%/*}"
+printf '# tFix\n\n## Run facts\nphase: LANDED\nwitness: abc\nbase: %s\n\n## Parked\n\n' "$_fa_base" > "$_fa_run"
+commit_fold_fixture "2026-10-20T12:00:00 +0000" record
+_fa_blob=$(git -C "$_fa_r" rev-parse HEAD:memory/builds/tFix/RUN.md)
+git -C "$_fa_r" mv memory/builds/tFix/RUN.md "memory/builds/tFix/RUN.LANDED.${_fa_blob:0:8}.md"
+printf '# tFix\n\n## Run facts\nphase: RUNNING\nwitness: abd\nbase: %s\n\n## Parked\n\n' "$_fa_base" > "$_fa_run"
+git -C "$_fa_r" add -A >/dev/null
+out=$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0 --disposition fold); rc=$?
+same "AC6 a staged rotation's record takes the fold rule" "$rc" "0"
+miss "$(cd "$_fa_r" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash "$HERE/check-unattended.sh" --skip 28 2>&1)" "check 2 FAILED"
+commit_fold_fixture "2026-11-05T12:00:00 +0000" rotation
+out=$(run_fold --subject S2 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0 --disposition fold); rc=$?
+same "AC6 the first commit leaves the answer where it stood" "$rc" "0"
+miss "$(cd "$_fa_r" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash "$HERE/check-unattended.sh" --skip 28 2>&1)" "check 2 FAILED"
+printf '2026-11-05T02:00:00Z review · item S3 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 2 · folded 1 · promoted 0 · disposition fold\n' >> "$_fa_run"
+hit "$(cd "$_fa_r" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash "$HERE/check-unattended.sh" --skip 28 2>&1)" "spec subject(s) S3 record an exit row past SPEC_FOLD_CUTOFF"
+
 # ---- TOOL-dFoldedAudit-5: THE SPEC-AUDIT CHAIN'S RECORD AND ITS VERDICT. Fixture R is a repository off
 # ---- `write_switch_fixture` holding a build of seven tracked OPEN specs, a roster and no RUN.md, so every
 # ---- arm here is an attended run. Each criterion writes its rounds through `--record-round`, so it
@@ -18387,7 +18414,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2882 -> 2978 by TOOL-dFoldedAudit-5: the chain's arms in region one after the spec exit's, the
 # two parity rows' 8 and 88 off the block, 78 unconditional and 10 over a policy kit, those COUNTED EITHER
 # WAY, counted off the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=2978
+# RAISED 2978 -> 2983 by TOOL-dFoldedAudit-14: the staged rotation's arm in region one after the spec
+# exit's, two `same`, two `miss` and one `hit`, counted off the block's own lines; no suite ran, and
+# their RED-first observation is the close's.
+FLOOR_ASSERTIONS=2983
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18527,7 +18557,8 @@ PROLOGUE_ARMS=20
 # RAISED 269 -> 319 by TOOL-dFoldedAudit-7: the same 50 region-one cutoff and switch assertions, see FLOOR_ASSERTIONS.
 # RAISED 319 -> 365 by TOOL-dFoldedAudit-2: the same 46 region-one spec exit assertions, see FLOOR_ASSERTIONS.
 # RAISED 365 -> 461 by TOOL-dFoldedAudit-5: the same 96 region-one chain assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=461
+# RAISED 461 -> 466 by TOOL-dFoldedAudit-14: the same 5 region-one staged rotation assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=466
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.

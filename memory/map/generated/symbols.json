@@ -4510,7 +4510,7 @@
     {
       "id": "check_honest_rotation",
       "kind": "function",
-      "file": "tools/unattended/unattended.sh"
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "check_hook_blobs",
@@ -5265,7 +5265,7 @@
     {
       "id": "check_retired_blob",
       "kind": "function",
-      "file": "tools/unattended/unattended.sh"
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "check_retired_flags",
@@ -9955,7 +9955,7 @@
     {
       "id": "is_terminal",
       "kind": "function",
-      "file": "tools/unattended/unattended.sh"
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "joinCall",
@@ -13450,7 +13450,7 @@
     {
       "id": "read_blob_fact",
       "kind": "function",
-      "file": "tools/unattended/unattended.sh"
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "read_blob_id",
@@ -15286,6 +15286,11 @@
       "id": "read_roster_family",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_rot_lib",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
     },
     {
       "id": "read_rounds_of",
@@ -26266,6 +26271,26 @@
       "id": "write_roles",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "write_rot_archive",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_rot_commit",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_rot_history",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_rot_stub",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
     },
     {
       "id": "write_rounds_line",

@@ -1,11 +1,12 @@
 # TOOL-dFoldedAudit-14 — a rotated record keeps its own date floor for the fold cutoff
 
-**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 90 · ratified 2026-11-02
+**Status:** CLOSED · rev-2 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 90 · ratified 2026-11-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-build-TOOL-dFoldedAudit-14-ledger.md](../build/2026-11-02-build-TOOL-dFoldedAudit-14-ledger.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-15 |
 | [2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-15 |
 | [2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-15 |
