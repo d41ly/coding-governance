@@ -80,11 +80,11 @@ ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudi
 | [TOOL-dFoldedAudit-4 — a repair unit edits its unbuilt sibling's spec with a rev bump](spec/2026-11-01-spec-TOOL-dFoldedAudit-4.md) | 40 | 2 | CLOSED | rev-3 | 2026-11-02 |
 | [TOOL-dFoldedAudit-5 — each HIGH records its specs and a verb derives the chain's stop verdict](spec/2026-11-01-spec-TOOL-dFoldedAudit-5.md) | 50 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dFoldedAudit-6 — an audit's own fold owes no hand `spec-revised` deviation record](spec/2026-11-01-spec-TOOL-dFoldedAudit-6.md) | 60 | 2 | CLOSED | rev-3 | 2026-11-02 |
-| [TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop](spec/2026-11-01-spec-TOOL-dFoldedAudit-1.md) | 70 | 2 | INPROGRESS | rev-6 | 2026-11-02 |
+| [TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop](spec/2026-11-01-spec-TOOL-dFoldedAudit-1.md) | 70 | 2 | INPROGRESS | rev-7 | 2026-11-02 |
 | [TOOL-dFoldedAudit-8 — dClosedLoop's unbuilt specs and its frozen design take the same rules](spec/2026-11-01-spec-TOOL-dFoldedAudit-8.md) | 80 | 2 | OPEN | rev-2 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 57 bound to this build, across 3 record folder(s).
+Records: 61 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop
 
-**Status:** INPROGRESS · rev-6 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 70
+**Status:** INPROGRESS · rev-7 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 70
 
 <!-- gen:spec-records -->
 
@@ -14,6 +14,8 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md) | journal | TOOL-dFoldedAudit-8 |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-10-row-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-10-row-fold-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-1-11-stopped-dispatch.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-11-stopped-dispatch.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-1-12-literal-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-12-literal-fold-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-7 |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md) | journal | — |
@@ -27,8 +29,10 @@
 | [2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md) | research | TOOL-dFoldedAudit-5 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md) | research | TOOL-dFoldedAudit-8 |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-2-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-2-fix-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-1-3-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-3-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-3-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-4-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-4-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-1-5-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-5-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -82,14 +86,18 @@ exactly as it did.
   because a disposal naming a unit with no `planState` is refused at rows 15 and 16 of
   TOOL-dFoldedAudit-4 §4. Observed by AC12.
 - **S13** — The suite arm the `New arm:` lines in §7 declare, a pin of M4 and the method's byte figure
-  in the memory-tree parity suite. Observed by AC1, AC2, AC4, AC5 through those lines, RED first at
-  the close.
+  in the memory-tree parity suite. The figure is graded only in the tree that owns the template, so a
+  longer render in an adopter reds nothing. Observed by AC1, AC2, AC4, AC5 through those lines, RED
+  first at the close, and by AC15.
 - **S14** — Line 27 of `tools/memory-tree/README.md`, the row of
   `tools/memory-tree/deviation_join.py`, states TOOL-dFoldedAudit-6's exemption as built, tag
   [fold-records]: a commit moving a spec's header, with every revision it moved holding a revision-log
   entry that cites a bound `spec-audit` record of the unit's build naming the unit, joins neither
   revision arm and owes no record, and a move with no such citation is still reported. Observed by
   AC14.
+- **S15** — The pass commit re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md` and carries
+  a delta line, because `memory/guides/BUILD-METHOD.md` is on that manifest's `watch:` list. Observed
+  by AC16.
 
 ## 3. Non-goals (OUT)
 
@@ -204,8 +212,12 @@ The fifth edit is the "Drive the build as ONE program" bullet (`:723-730`), whic
 sentences beside its `specAudit` sentence:
 
 ```
-A run preflighted on or after `SPEC_FOLD_CUTOFF` passes `disposal`, the value `python tools/policy/policy.py get review.spec-audit.disposal` reports, and a run before it omits the arg. Under `by-nature` every `units[]` entry also carries its `planState` from `--plan <slug> --paths`, because a disposal naming a unit with no `planState` is refused and its hand-out carries no roster.
+A run preflighted on or after `SPEC_FOLD_CUTOFF` passes `disposal`, the value `policy.py get review.spec-audit.disposal` reports, and a run before it omits the arg. Under `by-nature` every `units[]` entry also carries its `planState` from `--plan <slug> --paths`, because a disposal naming a unit with no `planState` is refused and its hand-out carries no roster.
 ```
+
+The read is spelled as `tools/workflows/REVIEW-PROTOCOL.template.md:133` spells one, because
+`GOVPFX` (`tools/check-install-prefix.sh:266`) bans a typed kit path under the tool root in this file
+and allows no waiver, and the unattended pair has no placeholder to drain it.
 
 `planState` is required in attended mode only today, and the verbs carrier spells it nowhere at BASE,
 so an unattended caller following the carrier would meet refusal rows 15 and 16 of
@@ -319,6 +331,22 @@ The row needs no render and owes no size row: `tools/template-size-limits.txt` n
 trips on `tools/memory-tree/BUILD-METHOD.template.md`, because `tools/gate-legs.json` names no
 guard for the file itself, so §7's leg line owes nothing new.
 
+### The kickoff manifest
+
+`memory/guides/BUILD-METHOD.md` is on the `watch:` list of `memory/guides/SESSION-KICKOFF.md`
+(`:6`, and `:49` says so), so `fail 5` (`skills/session-kickoff/manifest-check.sh:1537`) refuses the
+pass until `last-audit` moves. The pass commit carries the stamp, which is that line alone: the sha is
+`HEAD` (`skills/session-kickoff/manifest-check.sh:1405`), so the commit's parent, and the datetime is
+later than the one it replaces. The method is the only file on that list this unit touches. No
+orientation bullet states M4's rule, and line 118's "only where the build or its project declares it"
+stays true, so the commit message carries this delta line and the body does not move:
+
+```
+Manifest delta: none to section B — last-audit re-stamped for the watched memory/guides/BUILD-METHOD.md, whose M4 text no section B claim restates.
+```
+
+The file is no shared record (`.unattended.conf:417`), so the pass declares it.
+
 ### The parity arm
 
 `tools/memory-tree/kit-dogfood-parity.test.sh` gains one block in its check path, ahead of the success
@@ -327,12 +355,46 @@ line, reading the shipped template's M4 slice and the render. It fails with `st=
 - the slice lacks `NEEDS A NEW MECHANISM`, `derived verdict`, `HOLD for the owner`, or the literal
   `DISPOSED BY SEVERITY, on CONVERGED too`, or still holds `PRECISION`;
 - the M8 slice lacks `where M4 promotes them`;
-- the render's CR-stripped bytes exceed the figure its own `**Budget:` line states.
+- the render's CR-stripped bytes exceed the figure its own `**Budget:` line states, in the tree that
+  owns the template.
 
 The last one is needed because `build-method size` cannot red today: `budgets.enforce` is `warn`
 (`.governance/policy.toml:5`), so a breach prints and exits 0 (`tools/check-template-size.sh:19-25`).
 This block grades one document's named sentences. It cannot tell that a sentence is true, and a
 reworded sentence that keeps its literal passes.
+
+**Where the Budget clause runs.** `kit/dogfood doc parity` is a kit `[[gate_leg]]`
+(`tools/memory-tree/kit.toml:246-249`), so the block runs in every adopter, over a render whose length
+the adopter's install sets and against a ceiling only this repo can move. The render leaves 155 of
+30720 bytes. The memory root reaches 18 sites, so a root 9 characters longer than `memory` passes the
+ceiling. The install prefix reaches 13, the 6 of `{{KIT_DIR}}` and the 7 of `{{TOOL_ROOT}}`, so a
+prefix 12 characters longer than `tools` passes it too, and 9 answered sites move it again. PINNED at
+2026-11-02 over the template at `b0759e69a`, and 155 is the bytes paragraph's figure. Such an adopter
+has no fix.
+
+So the clause, its read of the Budget line included, runs only where `.governance/deploy.toml`
+declares `gov_source = "."`. That is the test this file already uses for the source repo
+(`tools/memory-tree/kit-dogfood-parity.test.sh:298-299`), read here without the engine because those
+lines sit inside a byte-gated inline copy. It closes the root, the prefix and the answers with one
+predicate. Everywhere else the clause prints one line and leaves `st` alone, so the skip is stated and
+the arm can tell it from a clause that ran and passed. The literal clauses above read the shipped
+template, which is the same bytes in every install, so they keep running everywhere.
+
+```sh
+if grep -Eq '^gov_source[[:space:]]*=[[:space:]]*"\."' .governance/deploy.toml 2>/dev/null; then
+  # read the figure and the bytes, and refuse no figure or a render past it
+else
+  echo "kit-parity: the method's byte figure is not graded here: only the tree whose gov_source is \".\" can move it"
+fi
+```
+
+This is where the limits file already puts the figure, a property of the document whose gate is a
+property of this repo (`tools/template-size-limits.txt:110-116`), and it is why `build-method size` is
+an `[[exempt_leg]]` (`tools/govkit/registry.toml:351-353`). The subject stays the render, because the
+figure prices M7's re-read of it (`tools/template-size-limits.txt:101-104`). An adopter's render past
+the ceiling is therefore reported by no gate. The leg's guard does not move: the script already
+consults this file (`tools/memory-tree/kit-dogfood-parity.test.sh:246`) with no guard for it, and this
+one key's value is fixed in this repo.
 
 ### Rendering
 
@@ -370,6 +432,7 @@ No switch of its own: this unit is the description, and the three switches are T
 - `tools/roles/SKILL.template.md`
 - `.claude/skills/build/SKILL.md`
 - `tools/template-size-limits.txt`
+- `memory/guides/SESSION-KICKOFF.md` (its `last-audit` line alone)
 - `memory/DECISIONS.md` (its own `Pass: none` records commit, already landed, and out of this pass's
   write set)
 
@@ -382,6 +445,9 @@ No switch of its own: this unit is the description, and the three switches are T
   in one place, and the policy catalogue owns it, so M4 names the key.
 - **A new gate over M4's prose.** A gate is its own unit by M2. One block in the leg that already reads
   this document costs no new mechanism.
+- **Grade a render at `memory`, or run the Budget clause only where the root is `memory`.** Either
+  stops the root's red and leaves the prefix's: an adopter at the default root with a long prefix
+  would still red with no fix. The `gov_source` test costs the same one line and closes both.
 
 ## 5. Production-readiness checklist
 
@@ -389,7 +455,8 @@ No switch of its own: this unit is the description, and the three switches are T
 - perf / scale — M7 re-reads the method at every pass, so its bytes are the cost, and M1's ceiling
   holds them; the new parity block costs two pipelines.
 - error / empty / loading states — N/A: prose, and the arm's only state is a missing literal.
-- observability — the parity arm prints the missing literal or the byte figure it read.
+- observability — the parity arm prints the missing literal, the byte figure it read, or that this
+  tree does not grade the figure.
 - risks — the carriers go stale if a sibling's as-built name differs from the spec it was written
   from, which is why this unit runs last among them. `budgets.py` reads the limits row at the landed
   revision (`tools/policy/budgets.py`), so until landing `unattended protocol size` and
@@ -466,14 +533,15 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
   figure: both counts are DERIVED at observation.
 - **AC12** — When `grep -c 'disposal'` runs over `.claude/skills/build/SKILL.md` it prints at least 1,
   `grep -c 'passes .disposal.'`, `grep -c 'review.spec-audit.disposal'` and `grep -c 'planState'` over
-  `memory/guides/UNATTENDED-VERBS.md` each print at least 1, and, owed to the close,
-  `bash tools/roles/adopt-roles.sh --check` exits 0.
+  `memory/guides/UNATTENDED-VERBS.md` each print at least 1, `grep -c 'tools/policy'` over
+  `tools/unattended/VERBS.template.md` and that render each print 0, and, owed to the close,
+  `bash tools/roles/adopt-roles.sh --check` and `bash tools/check-install-prefix.sh` each exit 0.
   Red when: the arg is documented in one carrier only, so an attended run stays on the old rule, or
   `planState` still prints 0, as it does at base, so an unattended caller meets refusal rows 15 and 16
-  on its first fold.
-  permission: the clause owed to the close is the `roles render wiring` leg, whose exact argv
-  `tools/hooks/scratch-guard.js:1373-1378` matches, so the builder does not attempt it and the main
-  loop observes it.
+  on its first fold, or the read keeps a typed kit path, which `GOVPFX` bans with no waiver.
+  permission: the clauses owed to the close are the `roles render wiring` and
+  `install-prefix (shipped surface)` legs, whose exact argv `tools/hooks/scratch-guard.js:1373-1378`
+  matches, so the builder does not attempt them and the main loop observes them.
 - **AC13** — When `grep -c 'addresses'` and `grep -c 'chainRecord'` run over
   `tools/workflows/README.md`, each prints at least 1.
   Red when: a caller reads the return from the README and never learns the fields exist.
@@ -484,12 +552,31 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
   four prints 0, or the new sentence cites by section number, which S11 refuses.
   figure: line 27 is PINNED, measured 2026-11-02 at `dada6c038`, and the file is unchanged since base
   `74274869`.
+- **AC15** — When the lines of `tools/memory-tree/kit-dogfood-parity.test.sh` from `method_ship=` up
+  to the `# The count is DERIVED` comment run alone, with `KITREL`, `M` and `st=0` bound, in a scratch
+  tree whose memory root is 30 characters long and whose method render measures past its `**Budget:`
+  line, they leave `st=0` and print `not graded here` with `.governance/deploy.toml` absent and again
+  with it declaring `gov_source = "local"`, and they leave `st=1` and print the byte figure with it
+  declaring `gov_source = "."`.
+  Red when: the clause still runs in an adopter, so a longer root reads `st=1`, or the predicate never
+  holds, so the third case reads `st=0` and this repo's own ceiling has gone ungraded.
+  fixture: the tree holds none, so the pass builds one under the run's scratch, the render being the
+  shipped template with `{{MEMORY_ROOT}}` replaced by that root.
+  figure: the root's 30 is PINNED, and the render's bytes are DERIVED at observation. A case whose
+  render does not measure past the Budget figure proves nothing and is not read as a pass.
+- **AC16** — When `git show --format= --unified=0 <pass> -- memory/guides/SESSION-KICKOFF.md` is
+  piped to `grep -c '^+last-audit: '` and to `grep -c '^+[^+]'`, each prints 1, and
+  `git show -s --format=%B <pass>` piped to `grep -c '^Manifest delta: '` prints 1.
+  Red when: the pass moves the method and leaves the stamp, which `fail 5` refuses, or the stamp
+  arrives with no delta line, which no check reads.
+  fixture: `<pass>` is the pass commit, which does not exist when the builder writes its ledger, so
+  this is owed to the close and the main loop observes it.
 
 ## 7. Gates
 
-`kit/dogfood doc parity` · `review-protocol parity (kit vs dogfood)` · `build-method size` · `unattended protocol size` · `unattended skill size` · `unattended skill wiring` · `unattended kit gate` · `kit version markers` · `memory hygiene` · `roles render wiring` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `policy fixtures`
+`kit/dogfood doc parity` · `review-protocol parity (kit vs dogfood)` · `build-method size` · `unattended protocol size` · `unattended skill size` · `unattended skill wiring` · `unattended kit gate` · `install-prefix (shipped surface)` · `kickoff-manifest ratchet` · `kit version markers` · `memory hygiene` · `roles render wiring` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `policy fixtures`
 
-New arm: tools/memory-tree/kit-dogfood-parity.test.sh · covers AC1 AC2 AC4 AC5 · the block of §4, staged by deleting one required literal from the template and the render together, which parity alone cannot see, and by padding the render past its Budget line · none
+New arm: tools/memory-tree/kit-dogfood-parity.test.sh · covers AC1 AC2 AC4 AC5 AC15 · the block of §4, staged by deleting one required literal from the template and the render together, which parity alone cannot see, and by padding the render past its Budget line, and one case for where the Budget clause runs: a scratch repository holding this kit and a `.memory-tree.conf` whose `MEMORY_ROOT` is 30 characters long, its documents written by the suite's `--render`, reds with `gov_source = "."` in `.governance/deploy.toml`, and stays green printing `not graded here` with that file absent, the render's bytes read past its Budget line each time · none
 
 New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · no new code, the existing pair over this unit's edit, staged by one appended line in `memory/guides/REVIEW-PROTOCOL.md` · none
 
@@ -534,6 +621,15 @@ none
   stands as written. The `--check` clauses of AC7 and AC12 are legs a pass may not run, so each is owed
   to the close under a `permission:` line, and §7 gains `unattended skill wiring`, the one of the two it
   did not name. M4's target text and the row's text do not move.
+- rev-7 · 2026-11-02 · §2 §4 §5 §7 §10 · S13 S15 · AC12 AC15 AC16 · the stopped builder's return, item
+  by item. The verbs fence typed a kit path `GOVPFX` bans with no waiver, so it now spells
+  `policy.py get`, and AC12 observes the literal gone and owes the leg to the close, which §7 names.
+  The pass's commit was refused until `last-audit` moved, so the manifest joins Files touched with a
+  design sub-head, S15 and AC16, and §7 names `kickoff-manifest ratchet`. The Budget clause ran in
+  every adopter against a ceiling none can move, so it now runs only where `gov_source` is `.`, and
+  AC15 and the parity arm's case prove a longer root does not red. The brief named two scopes by the
+  memory root. This one is neither, because a longer install prefix reds the same way with no fix, and
+  §4 states why. M4's target text and its byte figures do not move.
 
 ## 10. Reuse audit
 
@@ -549,5 +645,9 @@ its carriers"` ranked name-stem hits only, `build`, `audit` and `read_spec_revis
 prose seam, so the reuse_lookup probe is an answer and not a seam: the map indexes code, and these
 units are documents. One hit disagreed with source: the reuse scout priced the method's 1366 bytes of
 headroom and never the protocol's one, and a new row needs more than one byte, which §4 settles.
+
+The Budget clause's scope reuses the source-repo test at
+`tools/memory-tree/kit-dogfood-parity.test.sh:298-299`, found by searching the shipped kits for
+`gov_source`. No shell reader of that key exists to extend, so the clause reads the one line itself.
 
 Recall terms used: spec-audit disposition promote fold BOUNDED REVIEW_ROUNDS precision chain severity M4 rev-bump
