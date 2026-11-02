@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-11-02, the newest record date in this tree (dSafePassage).
+Dormant: no record dated within 21 days of 2026-11-02, the newest record date in this tree (dEasedEffort).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -60,3 +60,4 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 ## Open BLOCKER asks
 
 - [TOOL-aBriskPreflight-18](builds/aBriskPreflight/BACKLOG.md) · aBriskPreflight · inherited red: leg playbook render wiring red at 37200355, older than…
+- [TOOL-dEasedEffort-3](builds/dEasedEffort/BACKLOG.md) · dEasedEffort · inherited red: leg recall floor arms red at 529b98a4, older than the…

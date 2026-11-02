@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.10 -->
+<!-- gov:kit roles@1.11 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -181,7 +181,7 @@ R12 and every render refuses it with exit 2, so no level falls back silently.
 - `[effort.stages.<workflow>]` overrides a stage of one workflow, keyed by that workflow's `stages`
   keys. `handoff.py stage-efforts <workflow>` prints each stage's level, its entry here else its
   slot's, and a harness call passes that JSON as `efforts`, which wins over the agent type's level.
-  That is how `gov-skeptic` runs at `medium` in spec review and `high` in closing review.
+  That is how `gov-synthesizer` runs at `medium` in spec review and `high` in closing review.
 
 The levels are `low`, `medium`, `high`, `xhigh` and `max`, the names Claude Code 2.1.292 reads on both
 an agent type and a `Workflow` `agent()` call; the integer form only the agent loader takes is
