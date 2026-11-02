@@ -319,6 +319,17 @@ kit passes `'address'` until the replay records a hit. On both orders a batch is
 `verify:batch-<n>` and its result file is `verify-batch-<n>.json`, carrying its member ids as `ids`,
 since the label no longer tells them; a verify file without `ids` is never reused.
 
+`addressTwins` is `'hidden'` or `'shown'`, and absent it is `'hidden'`. Under `'shown'` the synthesis
+is handed two more blocks after the UNVERIFIED findings: `REFUTED findings`, one line per refuted
+finding with its claim and the skeptic's reason, and `SAME-ADDRESS PAIRS`, each confirmed and refuted
+finding that `deriveTwinPairs` reads as one address through `deriveAddressKey` and `checkSameAddress`.
+A merged duplicate is never among the refuted. The synthesis is told to flag a refuted finding that
+describes the same defect as a confirmed one and return each as `{refuted, confirmed}` in `twinFlags`,
+which its schema then requires, and RUN INTEGRITY states how many refuted findings and pairs it was
+shown. A flag notes a twin and never overturns a verdict: no verdict, grade, item or count moves. Any
+other value refuses before the first agent. It joins no review key, since the synthesis writes no keyed
+file. It ships dark: nothing in this kit passes `'shown'` until the replay records a hit.
+
 `preset` picks a spec audit's lens literal, `'unit-spec'` or `'design-audit'`, and absent it is
 `'unit-spec'`, the five lenses above. Only the caller picks it, and the kind stays `spec-audit`, so
 the binding line is unchanged. `'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
@@ -368,7 +379,12 @@ Every finding carries `lens`, the key of the lens the harness dispatched, never 
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
 it as `lens=<key>`. On a spec subject under a declared `disposal` a complete return also carries
 `addresses`, one `{ids, severity, specs}` per BLOCKER or HIGH item; with no `disposal` that list is
-empty and an item owes no `specs`. Every return carries five fields beside the counts:
+empty and an item owes no `specs`. Under `addressTwins: 'shown'` the final return also carries
+`twinPairs`, the number of same-address pairs the synthesis was handed, and `twinFlags`, each flag it
+returned whose `refuted` id stands refuted and whose `confirmed` id stands confirmed, as `{refuted,
+confirmed, sameAddress}`, with `sameAddress` true when the pair was one of those handed. A repeated flag
+is dropped, a flag naming any other id is discarded and named in a `WARNING:` line, and a dead
+synthesis returns `[]`. Under `'hidden'` neither key is present. Every return carries five fields beside the counts:
 
 - `shape` — one record line, also logged, in this fixed grammar:
   `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.

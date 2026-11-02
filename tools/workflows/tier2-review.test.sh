@@ -255,25 +255,49 @@ function evalAddress(extra, ret) {
     ck(sord.map((f) => f.id).join(',') === '3,2,1', 'address: a spec finding with no address sorts after every addressed finding of its file: ' + sord.map((f) => f.id).join(','))
   }
 }
-function armBatchBy(name, extra, want) {
+// A closed-set argument `field`: a proceeding arm reads the RESOLVED value back, a refusal must name `field`.
+function armClosedSet(field, name, extra, want) {
   let got = null
   let threw = null
   try {
-    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn batchBy')(Object.assign({}, base, extra), () => {}, null, null, null)
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn ' + field)(Object.assign({}, base, extra), () => {}, null, null, null)
   } catch (e) { threw = e.message }
   if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
     console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
     fail++
     return
   }
-  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review: `batchBy`') === 0 : !threw && got === want, name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review: `' + field + '`') === 0 : !threw && got === want, name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
 }
-armBatchBy('batchBy: absent resolves to id', {}, 'id')
-armBatchBy('batchBy: id proceeds', { batchBy: 'id' }, 'id')
-armBatchBy('batchBy: address proceeds', { batchBy: 'address' }, 'address')
-armBatchBy('batchBy: section is refused', { batchBy: 'section' }, 'refused')
-armBatchBy('batchBy: a number is refused', { batchBy: 1 }, 'refused')
-armBatchBy('batchBy: null is refused', { batchBy: null }, 'refused')
+armClosedSet('batchBy', 'batchBy: absent resolves to id', {}, 'id')
+armClosedSet('batchBy', 'batchBy: id proceeds', { batchBy: 'id' }, 'id')
+armClosedSet('batchBy', 'batchBy: address proceeds', { batchBy: 'address' }, 'address')
+armClosedSet('batchBy', 'batchBy: section is refused', { batchBy: 'section' }, 'refused')
+armClosedSet('batchBy', 'batchBy: a number is refused', { batchBy: 1 }, 'refused')
+armClosedSet('batchBy', 'batchBy: null is refused', { batchBy: null }, 'refused')
+
+// ---- TOOL-dFairHearing-7 AC1/AC2 — deriveTwinPairs over the address key, and `addressTwins` ----------
+// On the base harness neither name is defined, a harness fault counted as a failure, and `'on'` proceeds.
+{
+  const dtp = evalAddress({}, 'deriveTwinPairs')
+  const stp = evalAddress(GOOD_SPEC, 'deriveTwinPairs')
+  if (!dtp || !stp) fail++
+  else {
+    const df = (id, file, line) => ({ id: id, file: file, line: line, lens: 'l' })
+    const dgot = dtp([df(1, 'a.js', 10)], [df(2, 'a.js', 12), df(3, 'a.js', 14), df(4, 'b.js', 10)])
+    ck(JSON.stringify(dgot) === JSON.stringify([{ confirmed: 1, refuted: 2 }]),
+      'twins: a confirmed a.js:10 pairs with a refuted a.js:12 alone, not a.js:14 nor b.js:10: ' + JSON.stringify(dgot))
+    const sf = (id, where) => ({ id: id, file: 'x.md', where: where, lens: 'l' })
+    const sgot = stp([sf(1, 'section 2 S5'), sf(3, 'status header')], [sf(2, '§2'), sf(4, 'status header')])
+    ck(JSON.stringify(sgot) === JSON.stringify([{ confirmed: 1, refuted: 2 }]),
+      'twins: a spec finding at `section 2 S5` pairs with one at `§2`, and `status header` pairs with nothing: ' + JSON.stringify(sgot))
+  }
+}
+armClosedSet('addressTwins', 'addressTwins: absent resolves to hidden', {}, 'hidden')
+armClosedSet('addressTwins', 'addressTwins: hidden proceeds', { addressTwins: 'hidden' }, 'hidden')
+armClosedSet('addressTwins', 'addressTwins: shown proceeds', { addressTwins: 'shown' }, 'shown')
+armClosedSet('addressTwins', "addressTwins: 'on' is refused", { addressTwins: 'on' }, 'refused')
+armClosedSet('addressTwins', 'addressTwins: true is refused', { addressTwins: true }, 'refused')
 
 // ---- TOOL-aEvidencedLens-2 AC3 — `scratch`, required on a spec audit and refused by shape ---------
 // The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
@@ -1950,6 +1974,7 @@ async function runLedgerArms() {
   await runEffortsArms()
   await runAddressArms()
   await runGradesArms()
+  await runTwinArms()
   await runPresetArms()
   await runOptInArms()
 }
@@ -2225,6 +2250,67 @@ async function runGradesArms() {
       'grades: the synthesis prompt asks for one item per defect and its `grades`')
     ck(Array.isArray(req) && req.indexOf('grades') !== -1, 'grades: the synthesis schema requires `grades` on each item')
   }
+}
+
+// ==== TOOL-dFairHearing-7 — twins: refuted claims and same-address pairs handed to the synthesis ====
+// The `security` lens, first in the diff literal, raises ids 1 and 2 at a.js lines 10 and 12, so both meet
+// one skeptic in verify:batch-1; `seams` raises id 5 at c.js; every other finding cites its lens's own file
+// at lines 1 and 50, which pairs with nothing. Skeptics confirm every id `over` does not name. RED against
+// the base harness, which reads no `addressTwins`: the shown run hands neither block, its schema has no
+// `twinFlags`, and its return carries neither `twinPairs` nor `twinFlags`. Observed at the close.
+async function runTwinArms() {
+  const buildTwinLens = (label) => {
+    const lens = label.slice('find:'.length)
+    const mk = (file, line) => ({ file: file, line: line, severity: 'high', claim: lens + ' claim at ' + file + ':' + line, impact: 'i', fix: 'f' })
+    return { lens: lens, path: '/p', findings: lens === 'security' ? [mk('a.js', 10), mk('a.js', 12)]
+      : lens === 'seams' ? [mk('c.js', 1), mk('seams.js', 50)] : [mk(lens + '.js', 1), mk(lens + '.js', 50)] }
+  }
+  const buildTwinVerdicts = (over) => (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/v', verdicts: ids.map((id) => Object.assign({ id: id, verdict: 'confirmed', reason: 'r' }, over[id] || {})) }
+  }
+  const runTwins = (twins, over, flags) => runReview(Object.assign({}, DIFF, twins === undefined ? {} : { addressTwins: twins }),
+    buildStubs({ 'find:': buildTwinLens, 'verify:': buildTwinVerdicts(over),
+      synth: (label, prompt) => Object.assign(buildSynth(null)(label, prompt), flags ? { twinFlags: flags } : {}) }))
+  const scanSynthCall = (run) => run.trace.find((t) => t.label === 'synth') || { prompt: '', schema: { required: [], properties: {} } }
+  const FLAGS = [{ refuted: 2, confirmed: 1 }, { refuted: 2, confirmed: 1 }, { refuted: 1, confirmed: 2 }, { refuted: 9, confirmed: 1 }]
+  const BY_DESIGN = { 2: { verdict: 'refuted', reason: 'by design' } }
+  // ---- AC3: the shown prompt carries both blocks and the schema requires twinFlags; the default carries neither.
+  const rs = await runTwins('shown', BY_DESIGN, FLAGS)
+  const rh = await runTwins(undefined, BY_DESIGN, FLAGS)
+  if (checkNoThrow(rs, 'twins shown') && checkNoThrow(rh, 'twins hidden')) {
+    const ss = scanSynthCall(rs)
+    const sh = scanSynthCall(rh)
+    const refBlock = ss.prompt.slice(ss.prompt.indexOf('REFUTED findings'), ss.prompt.indexOf('SAME-ADDRESS PAIRS'))
+    ck(refBlock.indexOf('- id=2 [high] lens=security a.js:12 — security claim at a.js:12 | refuted because: by design') !== -1 &&
+      ss.prompt.indexOf('- confirmed id=1 and refuted id=2, both at a.js 10') !== -1 &&
+      ss.prompt.indexOf('refuted findings shown: 1; same-address pairs shown: 1.') !== -1 &&
+      ss.schema.required.indexOf('twinFlags') !== -1 && !!ss.schema.properties.twinFlags,
+      'twins: a shown run hands id 2\'s claim and reason, the pair 1/2, both counts in RUN INTEGRITY, and a schema requiring twinFlags')
+    ck(sh.prompt.length > 0 && sh.prompt.indexOf('REFUTED findings') === -1 && sh.prompt.indexOf('SAME-ADDRESS PAIRS') === -1 &&
+      sh.prompt.indexOf('twinFlags') === -1 && sh.schema.required.indexOf('twinFlags') === -1 && !('twinFlags' in sh.schema.properties) &&
+      !('twinFlags' in rh.result) && !('twinPairs' in rh.result),
+      'twins: the default run hands neither block, a schema without twinFlags, and returns neither field')
+    // ---- AC4: one flag kept, its repeat dropped, the two naming a wrong verdict discarded and named.
+    ck(JSON.stringify(rs.result.twinFlags) === JSON.stringify([{ refuted: 2, confirmed: 1, sameAddress: true }]) && rs.result.twinPairs === 1 &&
+      rs.logs.some((l) => l.indexOf('WARNING: 2 twin flag(s)') === 0 && l.indexOf('discarded: 1/2, 9/1') !== -1),
+      'twins: of four flags 2/1 is kept at sameAddress true, its repeat dropped, and 1/2 and 9/1 named as discarded: ' + JSON.stringify(rs.result.twinFlags))
+    // ---- AC5: no flag moves a verdict, a grade, an item or a count.
+    const FIELDS = ['confirmed', 'refuted', 'merged', 'precision', 'blockers', 'highs', 'confirmedFindings', 'ledger']
+    ck(rs.result.refuted === 1 && FIELDS.every((k) => JSON.stringify(rs.result[k]) === JSON.stringify(rh.result[k])),
+      'twins: the hidden and shown runs agree on ' + FIELDS.join(', '))
+  }
+  const r5 = await runTwins('shown', Object.assign({ 5: { verdict: 'refuted', reason: 'r' } }, BY_DESIGN), [{ refuted: 5, confirmed: 1 }])
+  if (checkNoThrow(r5, 'twins off-address'))
+    ck(JSON.stringify(r5.result.twinFlags) === JSON.stringify([{ refuted: 5, confirmed: 1, sameAddress: false }]) && r5.result.twinPairs === 1,
+      'twins: a refuted id 5 at c.js flagged against id 1 is kept at sameAddress false: ' + JSON.stringify(r5.result.twinFlags))
+  // ---- AC6: a merged duplicate is no twin of its own original.
+  const rd = await runTwins('shown', { 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }, [])
+  if (checkNoThrow(rd, 'twins merged'))
+    ck(rd.result.merged === 1 && rd.result.twinPairs === 0 &&
+      scanSynthCall(rd).prompt.indexOf('SAME-ADDRESS PAIRS (a confirmed and a refuted finding citing one address):\n  (none)') !== -1,
+      'twins: id 2 refuted as a duplicate of id 1 hands no pair, and the block reads (none)')
 }
 
 // ==== TOOL-aOrientedCast-10 — `efforts`, each stage spawned at the reasoning effort its caller names ====
@@ -2944,7 +3030,11 @@ printf '%s\n' "$out"
 # and the repeated id (2), the regraded id (1), the absent and the illegal grade (2), the misranked item
 # (1) and the old sentence, the prompt and the schema (3). The stubs gaining `grades` add none. Counted
 # by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=460
+# RAISED 460 -> 473 by TOOL-dFairHearing-7: 13 assertions, counted off the `twins:` and `addressTwins:`
+# arms — the diff and spec pairs (2), five addressTwins arms (5), the shown and default prompts (2), the
+# kept and discarded flags (1), the agreeing counts (1), the off-address flag (1) and the merged duplicate
+# (1). armBatchBy becoming armClosedSet adds none. Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=473
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

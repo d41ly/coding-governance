@@ -7368,6 +7368,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "deriveTwinPairs",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveTwinPairs",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "derive_abandoned_scratch",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"

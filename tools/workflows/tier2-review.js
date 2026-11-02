@@ -131,6 +131,9 @@ function readOutputTokens() {
 //   batchBy: "id" | "address",           // DEFAULTS to "id": the order the findings are sliced into skeptic
 //                                         // batches in, "address" sorting them by deriveAddressKey so two
 //                                         // lenses citing one place meet one skeptic; refused outside the set
+//   addressTwins: "hidden" | "shown",    // DEFAULTS to "hidden": "shown" hands the synthesis every refuted
+//                                         // finding's claim and reason and each confirmed/refuted pair at one
+//                                         // address, and has it return `twinFlags`; refused outside the set
 //   optIn: { "<opt-in lens key>": "<default lens key>" }, // DEFAULTS to {}: the CALLER's swap. Each key is a
 //                                         // shipped opt-in lens (OPTIN_LENSES) offered for the run's literal, run
 //                                         // in the slot of the default it names, so the literal keeps five. Refused
@@ -245,6 +248,12 @@ if (isSpec && intensity === 'light')
 const batchBy = a.batchBy === undefined ? 'id' : a.batchBy
 if (typeof batchBy !== 'string' || ['id', 'address'].indexOf(batchBy) === -1)
   throw new Error('tier2-review: `batchBy` must be one of id | address. Got ' + JSON.stringify(a.batchBy) + '.')
+// TOOL-dFairHearing-7 S2 - `addressTwins`, in the shape of `batchBy`: a closed set refused outside it before
+// any agent, dark at `hidden` until the replay records a hit. It joins no review key: the synthesis it
+// changes writes no keyed file.
+const addressTwins = a.addressTwins === undefined ? 'hidden' : a.addressTwins
+if (typeof addressTwins !== 'string' || ['hidden', 'shown'].indexOf(addressTwins) === -1)
+  throw new Error('tier2-review: `addressTwins` must be one of hidden | shown. Got ' + JSON.stringify(a.addressTwins) + '.')
 // TOOL-dFairHearing-2 S1 - `preset`, the CALLER's choice of a spec audit's lens literal, in the shape of
 // `intensity` above: a closed set refused by name outside it, and refused beside the diff kind, which
 // has one literal and so no preset. Each member but the default names the `gov:lens-slots` literal it
@@ -409,6 +418,16 @@ const ADDRESS_LINE_SLACK = 3
 function checkSameAddress(x, y) {
   if (x.file !== y.file || x.at === null || y.at === null) return false
   return typeof x.at === 'number' && typeof y.at === 'number' ? Math.abs(x.at - y.at) <= ADDRESS_LINE_SLACK : x.at === y.at
+}
+// TOOL-dFairHearing-7 S1 - THE TWIN PAIRS, pure: each confirmed and refuted finding checkSameAddress reads as
+// one address, in confirmed-id then refuted-id order. The caller hands `refuted` without a merged duplicate.
+// ponytail: O(confirmed x refuted), tens by tens on a review; sort by address key if a run ever holds thousands.
+function deriveTwinPairs(confirmed, refuted) {
+  const out = []
+  for (const c of confirmed)
+    for (const r of refuted)
+      if (checkSameAddress(deriveAddressKey(c), deriveAddressKey(r))) out.push({ confirmed: c.id, refuted: r.id })
+  return out
 }
 // S2 - a sorted COPY: file, then `at` (lines by value, tokens by code unit, null after every address of
 // its file), then lens, then id. The argument keeps id order for the ledger, the appendix and the yield.
@@ -1735,6 +1754,8 @@ function deriveBindingSeverity(f) {
 
 const confirmed = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'confirmed')
 const refuted = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted' && !mergedIds.has(f.id))
+// TOOL-dFairHearing-7 S1 - read only under `addressTwins: 'shown'`; `refuted` already holds no merged duplicate.
+const twinPairs = deriveTwinPairs(confirmed, refuted)
 // TOOL-aSightedSkeptic-6 S8 - UNVERIFIED is every finding with neither a confirmed nor a refuted
 // verdict: those a skeptic answered `uncertain`, and those with no usable verdict at all. The two are
 // counted apart, so a run whose skeptics all answered never reads as one where none returned.
@@ -1967,6 +1988,26 @@ const synth = await agent(
               : `status: NO USABLE VERDICT came back`))
           .join('\n')
       : '  (none)') +
+    // TOOL-dFairHearing-7 S3 - under `shown` only, the refuted claims and the same-address pairs, so a refuted
+    // twin of a confirmed finding can be flagged; a flag moves nothing. Every agent string through renderPromptLine.
+    (addressTwins === 'shown'
+      ? `\n\nREFUTED findings (refuted by an adversarial skeptic, and shown ONLY so a twin of a confirmed finding can be ` +
+        `seen: none may be reinstated, regraded or counted):\n` +
+        (refuted.length
+          ? refuted.map((f) => `- id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${renderPromptLine(f.claim)} | refuted because: ${renderPromptLine(verdictById.get(f.id).reason)}`).join('\n')
+          : '  (none)') +
+        `\n\nSAME-ADDRESS PAIRS (a confirmed and a refuted finding citing one address):\n` +
+        (twinPairs.length
+          ? twinPairs.map((p) => {
+              const k = deriveAddressKey(confirmed.find((f) => f.id === p.confirmed))
+              return `- confirmed id=${p.confirmed} and refuted id=${p.refuted}, both at ${k.file} ${k.at}`
+            }).join('\n')
+          : '  (none)') +
+        `\n\nFor each pair above, and for any refuted finding whose claim reads as the same defect as a confirmed one, ` +
+        `decide whether the two describe one defect. Where they do, note the refuted one as a twin beside the confirmed ` +
+        `finding in the report and return the pair in \`twinFlags\` as {refuted, confirmed}. Two different defects at one ` +
+        `address are not twins and get no flag. A flag changes no verdict, grade, item or count.`
+      : '') +
     `\n\n` + SEVERITY_RUBRIC + ` ` +
     // TOOL-dFairHearing-6 S2 - one item per defect whatever its findings' grades: the grade is carried per id
     // in `grades`, so a mixed-grade defect no longer splits into one item per grade.
@@ -2058,6 +2099,8 @@ const synth = await agent(
             (foldDegraded ? ` - a DEGRADED fold review: no priorFindings either, so nothing named the text the previous round's fixes introduced and every subject was reviewed whole` : '') + `.\n`
           : '')
       : '') +
+    // TOOL-dFairHearing-7 S3 - what the twin blocks held, so a run that flagged nothing is told from one handed nothing.
+    (addressTwins === 'shown' ? `refuted findings shown: ${refuted.length}; same-address pairs shown: ${twinPairs.length}.\n` : '') +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value
@@ -2154,7 +2197,7 @@ const synth = await agent(
         `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
         `<<<APPENDIX\n${appendix}\nAPPENDIX>>>\n\n`
       : '') +
-    `Return JSON {path, items, summary} with a FORWARD-SLASH path.`,
+    `Return JSON {path, items, summary${addressTwins === 'shown' ? ', twinFlags' : ''}} with a FORWARD-SLASH path.`,
   {
     ...synthOpts,
     label: renderAgentLabel(reviewScope, 'synth'),
@@ -2165,9 +2208,13 @@ const synth = await agent(
       // never required and never read. Requiring the field they come from is what makes a synthesis
       // that omits it fail loudly at validation instead of returning a partial object nobody notices.
       // TOOL-dMergedTally-1 - that field is `items` now; the two integers are derived below.
-      required: ['path', 'summary', 'items'],
+      // TOOL-dFairHearing-7 S3 - `twinFlags` joins the schema under `addressTwins: 'shown'` alone.
+      required: ['path', 'summary', 'items', ...(addressTwins === 'shown' ? ['twinFlags'] : [])],
       properties: {
         path: { type: 'string' },
+        ...(addressTwins === 'shown'
+          ? { twinFlags: { type: 'array', items: { type: 'object', required: ['refuted', 'confirmed'], properties: { refuted: { type: 'integer' }, confirmed: { type: 'integer' } } } } }
+          : {}),
         items: {
           type: 'array',
           items: {
@@ -2210,6 +2257,7 @@ let highs = null
 let tallyFault = ''
 let addresses = []
 const regraded = []
+const twinFlags = []
 if (synth) {
   const confirmedIds = new Set(confirmed.map((f) => f.id))
   const severityById = new Map()
@@ -2282,6 +2330,22 @@ if (synth) {
     if (severityById.has(f.id) && severityById.get(f.id) !== String(deriveBindingSeverity(f)).toUpperCase()) regraded.push(f.id)
   if (regraded.length)
     log(`WARNING: the synthesis placed ${regraded.length} confirmed finding(s) at a grade other than their binding one: ids ${regraded.join(', ')}`)
+  // TOOL-dFairHearing-7 S4/S5 - a flag is KEPT when its refuted id stands refuted and its confirmed id confirmed,
+  // a repeat dropped, and marked `sameAddress` when deriveTwinPairs handed that pair; every other flag is
+  // discarded and named. Read after the tally and by nothing it feeds, so no flag moves a verdict or a count.
+  if (addressTwins === 'shown') {
+    const refutedIds = new Set(refuted.map((f) => f.id))
+    const handed = new Set(twinPairs.map((p) => p.refuted + '/' + p.confirmed))
+    const discarded = []
+    for (const fl of Array.isArray(synth.twinFlags) ? synth.twinFlags : []) {
+      const pair = (fl ? fl.refuted : fl) + '/' + (fl ? fl.confirmed : fl)
+      if (!fl || !refutedIds.has(fl.refuted) || !confirmedIds.has(fl.confirmed)) discarded.push(pair)
+      else if (!twinFlags.some((k) => k.refuted === fl.refuted && k.confirmed === fl.confirmed))
+        twinFlags.push({ refuted: fl.refuted, confirmed: fl.confirmed, sameAddress: handed.has(pair) })
+    }
+    if (discarded.length)
+      log(`WARNING: ${discarded.length} twin flag(s) named an id that is not refuted or not confirmed — discarded: ${discarded.join(', ')}`)
+  }
 }
 
 // TOOL-aBoundedVerdict-14 S6 - the SYNTH-DEATH hole. Lens deaths and skeptic deaths are both counted
@@ -2341,6 +2405,8 @@ return {
   ...(isSpec ? { addresses } : {}),
   // TOOL-aSightedSkeptic-6 S7 - absent where no synthesis ran, as no adjudicated count exists there.
   ...(synth ? { regraded } : {}),
+  // TOOL-dFairHearing-7 S4 - under `shown` alone: the pairs handed and the flags kept, `[]` when none or no synthesis.
+  ...(addressTwins === 'shown' ? { twinPairs: twinPairs.length, twinFlags } : {}),
   // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was
   // reportable only when nothing else was degraded and the most serious note was the least reachable
   // one. Worst outcome first. Found by the closing review of the build that ported this ternary into
