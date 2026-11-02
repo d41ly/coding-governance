@@ -55,7 +55,7 @@ ids TOOL-dCountedConsumers-1
 | [TOOL-dCountedConsumers-1 — help/policy.md names every policy key family a reader consumes today](spec/2026-11-02-spec-TOOL-dCountedConsumers-1.md) | 10 | 1 | CLOSED | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
