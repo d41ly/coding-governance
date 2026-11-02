@@ -164,7 +164,7 @@ A diff review fans out over five finder lenses, in this order: `security`, `corr
 check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
 old `regressions` lens is retired. A spec audit runs five lenses of its own, in this order:
 `coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1),
-or, under `preset: 'design-audit'` (below), the five of `DESIGN_LENSES`. Every set has one source,
+or, under the `design-audit` preset (below), the five of `DESIGN_LENSES`. Every set has one source,
 `lenses.toml`, this kit's lens catalogue (below); `DIFF_LENSES`, `SPEC_LENSES` and `DESIGN_LENSES` in
 the harness are its render, and the method and the memory-tree README point at the literal. The
 fan-out leg holds each rendered literal to exactly five slots, and five is also the most the
@@ -293,14 +293,8 @@ value other than the two refuses on both kinds. `intensity` joins the review key
 trust boundary is not one to review light: the `security` lens is one of the two a light run skips.
 
 `preset` picks a spec audit's lens literal, `'unit-spec'` or `'design-audit'`, and absent it is
-`'unit-spec'`, the five lenses above. Only the caller picks it; the kind stays `spec-audit`, so the
-binding line is unchanged:
-
-```js
-args: { repo, kind: 'spec-audit', subjects, scratch, reviewDir, preset: 'design-audit' }
-```
-
-`'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
+`'unit-spec'`, the five lenses above. Only the caller picks it, and the kind stays `spec-audit`, so
+the binding line is unchanged. `'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
 architecture record, whose sections are not a unit spec's: `coherence`, `grounding`, `reuse` and
 `failure-envelope` in design briefs of their own, and `alternatives-and-cost` in place of
 `blast-radius`. Any value outside `PRESETS` refuses, and so does any `preset` on a diff review, before
