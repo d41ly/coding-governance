@@ -9,13 +9,23 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 529b98a4717bd8c884697bd247e5c689db976ebf · park · 0 touching
+asks-at-landing: TOOL-dEasedEffort-3=OPEN
+units-at-landing: TOOL-dEasedEffort-1 TOOL-dEasedEffort-2
+hold-run: 
+hold-streak: 1 · at a1e858ce
+resume-owed: none · owner
+held-at: 2026-11-02T03:09:11Z
+hold-reason: gates-green is unmet at 380196b7 and the parked decision is the owner's: land over seven reds that also read red at origin/main
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: 529b98a4717bd8c884697bd247e5c689db976ebf · handoff · 0 touching
 gates-run: unattended-1793576871074914266-1786 380196b7
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: de2e9af0ebac57c3a4f3dea4a006e4f021dadf7b
-phase: VERIFYING
+witness: a1e858ce4a99b58b85f1a3e2f2154b559898cec2
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/agent-effort-levels-062fb2
@@ -57,3 +67,7 @@ base: 94188878323ef3b20e96b769791de73453b09909
 2026-11-01T23:41:50Z dispatch · item 9f42f4e1 TOOL-dEasedEffort-2 · reason memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-1-acceptance-ledger.md memory/gotchas/criterion-asserts-what-its-own-command-cannot-show.md memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-2-1-acceptance-ledger.md memory/builds/dEasedEffort/spec/2026-11-02-spec-TOOL-dEasedEffort-2.md
 
 2026-11-02T03:08:07Z decision · item land 380196b73 though the close's flagged bar reads 7 of 144 legs red, six of them not labelled INHERITED · reason options: land as is; fix main's red suites inside this build; or keep it unlanded. Refused to decide: all seven are red at origin/main 529b98a4 by the bar's own run or by hand, with the same failing arms (memory/builds/dEasedEffort/build/2026-11-02-build-TOOL-dEasedEffort-1-hand-attribution.md), but gates-green reads OWN, CONTENDED and MIXED, so --override gates-green and --handoff --code owner-landing are refused and landing over a red bar is not this run's call
+
+2026-11-02T03:09:13Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dEasedEffort && bash tools/push-main.sh --land --slug dEasedEffort && bash tools/unattended/unattended.sh --settle dEasedEffort
+
+2026-11-02T03:09:13Z hold · item owner-decision · reason until owner · reaped cb8c4637 · resume none(owner)
