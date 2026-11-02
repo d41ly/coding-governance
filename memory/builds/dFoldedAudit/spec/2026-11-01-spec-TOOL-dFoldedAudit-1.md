@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop
 
-**Status:** INPROGRESS · rev-7 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 70
+**Status:** INPROGRESS · rev-8 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 70
 
 <!-- gen:spec-records -->
 
@@ -16,6 +16,7 @@
 | [2026-11-02-build-TOOL-dFoldedAudit-1-10-row-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-10-row-fold-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-11-stopped-dispatch.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-11-stopped-dispatch.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-12-literal-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-12-literal-fold-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-1-13-bar-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-13-bar-fold-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-7 |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md) | journal | — |
@@ -31,8 +32,10 @@
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-2-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-2-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-3-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-3-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-3-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-1-4-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-4-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-4-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-4-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-5-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-5-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-1-6-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-6-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -552,11 +555,11 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
   four prints 0, or the new sentence cites by section number, which S11 refuses.
   figure: line 27 is PINNED, measured 2026-11-02 at `dada6c038`, and the file is unchanged since base
   `74274869`.
-- **AC15** — When the lines of `tools/memory-tree/kit-dogfood-parity.test.sh` from `method_ship=` up
-  to the `# The count is DERIVED` comment run alone, with `KITREL`, `M` and `st=0` bound, in a scratch
+- **AC15** — When the block §4's parity arm adds, extracted from its opening `method_ship=` line up
+  to the `# The count is DERIVED` comment, runs alone, with `KITREL`, `M` and `st=0` bound, in a scratch
   tree whose memory root is 30 characters long and whose method render measures past its `**Budget:`
-  line, they leave `st=0` and print `not graded here` with `.governance/deploy.toml` absent and again
-  with it declaring `gov_source = "local"`, and they leave `st=1` and print the byte figure with it
+  line, it leaves `st=0` and prints `not graded here` with `.governance/deploy.toml` absent and again
+  with it declaring `gov_source = "local"`, and it leaves `st=1` and prints the byte figure with it
   declaring `gov_source = "."`.
   Red when: the clause still runs in an adopter, so a longer root reads `st=1`, or the predicate never
   holds, so the third case reads `st=0` and this repo's own ceiling has gone ungraded.
@@ -630,6 +633,10 @@ none
   AC15 and the parity arm's case prove a longer root does not red. The brief named two scopes by the
   memory root. This one is neither, because a longer install prefix reds the same way with no fix, and
   §4 states why. M4's target text and its byte figures do not move.
+- rev-8 · 2026-11-02 · §6 · AC15 · the fix brief's item 1. AC15 spelled the suite's path, which the bar
+  join reads as a suite named for an observation, so `--dispatch` refused the unit. It now names the
+  block by §4's parity arm and says the block opens on `method_ship=`, which no other section states.
+  The extraction, the fixture and the three cases do not move, and the `New arm:` line stands.
 
 ## 10. Reuse audit
 
