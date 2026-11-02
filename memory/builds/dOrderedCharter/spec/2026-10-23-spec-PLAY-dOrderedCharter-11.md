@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · closes PLAY-dOrderedCharter-57 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0041@29cae3c8 whole
 **Carries:** node:policy-key.instructions.checks
@@ -44,12 +44,17 @@ audit's C1-F1 and C1-F14).
 
 ## 2. Scope (IN)
 
-- **S1** — The load set. `derive_load_set(units, reader, item=None)` in a new module
+- **S1** — The load set. `derive_load_set(units, reader, item=None, features=())` in a new module
   `tools/playbook/load_sets.py` returns, from S10's rows read through `tools/playbook/instruction_units.py`,
   the units whose `scope` selects every reader (`reader.every`), the reader's role (its `role.<name>`
   selector, or a practice tag its `rules:` value cites), and its item. The item and step selectors are
   dDeclaredLoop's namespaces: until it registers them the item part is reported `unarmed`, never empty
-  and green. Observed by AC1.
+  and green. `features` holds the work order's `feature.*` tags, by which `TOOL-dFurnishedOrders-18`
+  selects its units: a unit whose `scope` carries a tag in `features` joins the set once
+  `tools/playbook/namespaces.toml` (PLAY-dOrderedCharter-19 S2), read through `read_namespaces`, holds a
+  `feature` row whose `role` is `selects` (TOOL-dLinkedLibrary-20 S1); while it holds none, the feature
+  part selects nothing and is reported `unarmed — feature.*: no feature namespace is registered`, never
+  empty and green. Observed by AC1 and AC7.
 - **S2** — The missing-unit refusal. `check_required(load_set, units, reader, item, mode)` names every
   unit whose `required-by` names the reader's role or its item and which the set lacks. `mode` is
   `instructions.checks`: `refuse` (default) leaves the render undone and exits 1 naming each unit;
@@ -112,7 +117,8 @@ audit's C1-F1 and C1-F14).
   `PLAY-dOrderedCharter-14`.
 - A composition over a harness's limit at update, and the project block's count:
   `PLAY-dOrderedCharter-34`.
-- The item, step and policy selectors' joins: dDeclaredLoop. The work order's packet budget:
+- The item, step and policy selectors' joins: dDeclaredLoop.
+- The `derive` verb's `--feature` flag and the work order's feature units: `TOOL-dFurnishedOrders-18`. The work order's packet budget:
   dBoundRoles.
 - Field loads measured from the roles' runs (R-C): no run measurement exists to read.
 
@@ -228,12 +234,17 @@ commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules
   `git grep -n -F '("instructions.checks"' -- tools/playbook/load_sets.py` finds one line.
   Red when: the row keeps no summary or usage, the name stays on the shrink-only list, or the key is
   read in a shape the reader-coverage arm does not count.
+- **AC7** — When `python -c` calls `load_sets.derive_load_set` with `features=("feature.roles",)` over a
+  fixture registry holding a unit scoped `feature.roles`, in a scratch tree whose
+  `tools/playbook/namespaces.toml` holds no `feature` row, the unit is not selected and the report
+  carries `unarmed — feature.*`; with a `feature` row whose `role` is `selects` planted, it is selected.
+  Red when: an unregistered feature selector reads as an empty set, so "no feature units" passes green.
 
 ## 7. Gates
 
 `playbook render selftest` · `playbook render wiring` · `roles render wiring` · `roles render selftest` · `govkit acceptance matrix` · `manifest-check self-test` · `scratch-guard self-test` · `lexicon naming predicates`
 
-New arm: tools/playbook/load_sets.py · covers AC1 AC2 AC3 AC4 · its selftest plants the fixture registry with a required unit scoped away from its role, and the oversized charter and role block · none
+New arm: tools/playbook/load_sets.py · covers AC1 AC2 AC3 AC4 AC7 · its selftest plants the fixture registry with a required unit scoped away from its role, a unit scoped `feature.roles` with no `feature` row registered, and the oversized charter and role block · none
 New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixture card write with a scratch cap below the agent list's bytes · none
 
 ## 8. Open questions
@@ -279,6 +290,10 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixtur
 - rev-4 · 2026-10-25 · S3 · §3 Edges · item 6 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md`,
   the parent audit's P1: `CODEX_MAX` is read with `budgets.py home codex-instructions`, the one reader of
   a cap's home, which unit 6 adds at order 19 (its §8 F5) since that unit's check calls it first.
+- rev-5 · 2026-11-02 · S1 · §3 · AC7 · §7 · closes PLAY-dOrderedCharter-57 by
+  `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`: `derive_load_set` carries the `features`
+  argument `TOOL-dFurnishedOrders-18` selects by, its feature part `unarmed` while no `feature` row is
+  registered as a selector, seen by AC7 on a fixture with none registered.
 
 ## 10. Reuse audit
 

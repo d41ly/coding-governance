@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-17 — every edge the layer check finds today made a declared optional slot with a named fallback, or moved into the core
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base ce13efbe · streams playbook · order 3 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 3 · closes PLAY-dOrderedCharter-56 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0047@9b2f4330 whole
 
@@ -72,7 +72,8 @@ memory-recall, the case the clause names.
 
 - The check, its kinds and the register: PLAY-dOrderedCharter-16's.
 - The move of the recall names: PLAY-dOrderedCharter-18's.
-- Rendering slots in a work order: dBoundRoles renders the slots (layer-library `[consult]`).
+- Rendering slots in a work order: `TOOL-dFurnishedOrders-4` renders the slots through `render_slot`
+  (`cl-dClosedLoop-0195`, `cl-dClosedLoop-0203`).
 - Moving drift-audit's `signal_spec_status` into the core as a flow leg (layer-expansions'
   observability design): a later build's; here it is a slot.
 - Changing what any optional kit computes.
@@ -215,6 +216,9 @@ New arm: tools/memory-tree/gotchas.py · covers AC2 · the selftest's absent-kit
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-11-02 · §3 · closes PLAY-dOrderedCharter-56 by `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`:
+  the slots' renderer is `TOOL-dFurnishedOrders-4`, not dBoundRoles, as clauses `cl-dClosedLoop-0195` and
+  `cl-dClosedLoop-0203` place slot rendering in dFurnishedOrders.
 
 ## 10. Reuse audit
 

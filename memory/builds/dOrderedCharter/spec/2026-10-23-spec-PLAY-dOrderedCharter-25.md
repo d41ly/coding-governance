@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · closes PLAY-dOrderedCharter-58 PLAY-dOrderedCharter-60 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0055@dc43d502 whole
 
@@ -88,7 +88,8 @@ edge's type is registered, and every target resolves, each seen red.
 
 - Spans in code (`gov:end`, a definition's extent as a region) and the region-parser factory:
   dTotalRecall's (relational-syntax research, units to add). The bundle renders the spans the index holds.
-- `feature` as a selector and its namespace: dTotalRecall registers it (NP-13).
+- `feature` as a selector and its namespace: dTotalRecall registers the namespace (TOOL-dTotalRecall-9
+  S1) and dLinkedLibrary arms it as a selector (TOOL-dLinkedLibrary-20, `cl-dClosedLoop-0209`, NP-13).
 - The edge grammar, the registry file and each address form's resolution: units 24 and 28.
 - A detector for bundle members whose code moved while their head line did not: dTendedCadence.
 - A `gov` launcher: unit 19 settles whether one ships (S5).
@@ -99,7 +100,7 @@ edge's type is registered, and every target resolves, each seen red.
 - **consumes-from** `PLAY-dOrderedCharter-24` — `tools/playbook/edges.toml`, its parser and the registry order S1 groups by
 - **consumes-from** `PLAY-dOrderedCharter-28` — the edges declared at every memory-plan site and each address form's resolution, which S6 calls
 - **consumes-from** external — dGroundRules, landed before this build run: the catalogue `tools/policy/catalogue.toml` holding both rows, the shrink-only `tools/policy/unsummarised-keys.txt` and the reader `policy.py get` (TOOL-dGroundRules-1 S3, S6, TOOL-dGroundRules-2 S7, `cl-dClosedLoop-0008`); without them S9 has no rows to fill and the keys no reader
-- **hands-off** external — dTotalRecall's span extractors fill the regions section; dBoundRoles fills the work order's code-notes slot from the bundle
+- **hands-off** external — dTotalRecall's span extractors fill the regions section; dFurnishedOrders fills the work order's code-notes slot from the bundle (TOOL-dFurnishedOrders-18, `cl-dClosedLoop-0209`)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 23, 32, 52 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
 - **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23)
 - **hands-off** `PLAY-dOrderedCharter-55` — `tools/playbook/edge_checks.py`, which that unit deletes with the rows of any leg running it, routing both `--only` arms through unit 24's `check_edges` (round-2 id 6)
@@ -248,6 +249,12 @@ New arm: tools/playbook/gov_tag.py · covers AC6 AC7 · the `tags (the resolver'
   arm counts, an exit 2 refusing; new S9 fills and drains the two landed rows, the mirror in a
   second commit. On the coordinator's follow-up the helper is `read_policy_value` in unit 19's
   `tools/playbook/policy_value.py`, the playbook kit's one policy helper.
+- rev-5 · 2026-11-02 · §3 · closes PLAY-dOrderedCharter-58 by `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`:
+  the build arming the `feature` selector is dLinkedLibrary, as clause `cl-dClosedLoop-0209` says; dTotalRecall
+  registers the namespace.
+- rev-5 · 2026-11-02 · §3 Edges · closes PLAY-dOrderedCharter-60 by `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`:
+  the filler of the work order's code-notes slot from the bundle is dFurnishedOrders, not dBoundRoles, as
+  clause `cl-dClosedLoop-0209` in dFurnishedOrders' row says.
 
 ## 10. Reuse audit
 

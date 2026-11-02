@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-42 — the bindings reader admits every kind the record factory mints, joined to its file name both ways
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-11-02 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · closes PLAY-dOrderedCharter-59 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -46,10 +46,14 @@ before unit 15 (order 16) and unit 2 (order 20) mint their kinds.
   Observed by AC2.
 - **S3** — The file-name join, every typed kind. The deviation rule `read_bindings` applies today
   (`tools/memory-tree/tree_lib.py:566-576`, TOOL-dTrueNorth-4 S2) is generalised to each member of
-  `TYPED_RECORD_KINDS`: a file named `-<kind>-<n>.md` in a `build/` folder whose Serves kind is not
-  `<kind>` is malformed, and a record whose Serves kind is a typed kind and whose file is not so named
-  is malformed, each naming the kind. The deviation wording is kept for the deviation kind.
-  Observed by AC3.
+  `TYPED_RECORD_KINDS`: a file named `<date>-build-<unit id>-<kind>-<n>.md` in a `build/` folder whose
+  Serves kind is not `<kind>` is malformed, and a record whose Serves kind is a typed kind and whose file
+  is not so named is malformed, each naming the kind. `-<kind>-<n>.md` is read only on that stem, never
+  on any name ending so, as `deviation_named` (`:491`) reads today: the six research records
+  `2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-2.md` to `-7.md` stay bound once `plan`
+  joins the tuple (TOOL-dRankedPlan-16 §8 F5). A file off the stem that the deviation join's glob reads
+  is still refused by that join's own file-name check (`tools/memory-tree/deviation_join.py:238-240`).
+  The deviation wording is kept for the deviation kind. Observed by AC3 and AC6.
 - **S4** — The round trip, armed. The factory gains `python tools/memory-tree/build_records.py
   --fixture --plant typed-kinds`, in the shape of `deviation_join.py --fixture`: it writes one record
   of every kind `TYPED_RECORD_KINDS` names into a build folder of a scratch git repository, through the
@@ -170,6 +174,11 @@ header.
   the closed `<kind>` list, it names every member of `TYPED_RECORD_KINDS` as a backticked kind.
   Red when: the doc's closed list still stops at `deviation`, or a word elsewhere in the file passes
   for the kind.
+- **AC6** — When a probe imports `tree_lib` from a scratch copy of `tools/memory-tree/` whose
+  `TYPED_RECORD_KINDS` adds `plan`, and calls `read_bindings` over a scratch git repository holding a
+  record `2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-2.md` in a `build/` folder whose
+  Serves line says `research`, its state is `bound` and its kind `research`.
+  Red when: the join reads `-plan-<n>.md` on a name off the `-build-<unit id>-<kind>-<n>.md` stem.
 
 ## 7. Gates
 
@@ -191,6 +200,10 @@ New arm: tools/memory-tree/build_records.py · covers AC4 · its `--fixture --pl
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 31 (HIGH, item H4).
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-3 · 2026-11-02 · S3 · AC6 · closes PLAY-dOrderedCharter-59 by
+  `2026-11-02-prompt-PLAY-dOrderedCharter-17-ask-fold-brief`: the typed-kind file-name join reads
+  `-<kind>-<n>.md` only on the stem `-build-<unit id>-<kind>-<n>.md`, seen by AC6 on a research record
+  named `…-return-plan-2.md` staying bound once `plan` joins `TYPED_RECORD_KINDS`.
 
 ## 10. Reuse audit
 
