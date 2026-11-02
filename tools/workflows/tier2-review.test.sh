@@ -1878,9 +1878,12 @@ async function runOptInArms() {
     ck(!r2.threw && want.length === 5 && f2.length === 5 && f2.every((t, i) => t.label === 'find:' + want[i].key && t.prompt.indexOf('LENS: ' + want[i].brief + '\n') !== -1) &&
       want.map((L) => L.key).join(' ') === 'coherence grounding reuse topology failure-envelope',
       'optIn: AC2 a unit-spec swap runs topology in the blast-radius slot, five finders in order: ' + (r2.threw || f2.map((t) => t.label).join(' ')))
+    const sp2 = r2.trace.find((t) => t.label === 'synth')
+    const ri2 = sp2 ? sp2.prompt.slice(sp2.prompt.indexOf('RUN INTEGRITY')) : ''
     ck(!!r2.result && JSON.stringify(r2.result.optIn) === '{"topology":"blast-radius"}' &&
-      r2.logs.some((l) => l.indexOf('optIn: topology runs in the slot of blast-radius') === 0),
-      'optIn: AC2 the return carries the swap, and the log names the dropped default')
+      r2.logs.some((l) => l.indexOf('optIn: topology runs in the slot of blast-radius') === 0) &&
+      /\noptIn: topology ran in the slot of blast-radius - /.test(ri2),
+      'optIn: AC2 the return carries the swap, and the log and RUN INTEGRITY name the dropped default')
     // ---- AC3: the four named refusals, each before the stub agent is called.
     const both = renderOptIns(['topology', 'adopter-migration'])
     for (const [render, v, word] of [[top, { coherence: 'reuse' }, 'already a lens'], [top, { portability: 'reuse' }, 'no opt-in of `unit-spec`'],
@@ -2288,6 +2291,8 @@ function runLensArms() {
     ['the unfilled literal', row({}), TPL, 'rule 9:', 'unit-spec'],
     ['the opt-in with nowhere to go', row({ optin: true }) + SPEC, TPL, 'rule 10: row `k`', 'optin = true'],
     ['the orphan token', row({}) + SPEC, TPL + '{{LENS_SLOTS}}\n', 'rule 11:', 'without a `gov:lens-slots` marker'],
+    // TOOL-dFairHearing-3 S6 - rule 11 covers the opt-in marker too.
+    ['the opt-in marker with no token', row({}) + SPEC, TPL + 'const O = [ // gov:lens-optins\n]\n', 'rule 11:', 'gov:lens-optins'],
   ]
   for (const [subject, text, template, rule, word] of cases) {
     const r = runRender(writeCatalogue(subject.replace(/\W+/g, '-'), text), template)
@@ -2681,7 +2686,9 @@ printf '%s\n' "$out"
 # prelude shape arms (6), the scratch render (1), the swap's finders and its return and log (2), the four
 # named refusals (4), the key (1), the light swap (1), five review_pin.py prints (5) and three refusals (3).
 # Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=410
+# RAISED 410 -> 411 by TOOL-dFairHearing-3's checklist follow-up: the opt-in marker's rule-11 refusal (1);
+# RUN INTEGRITY's swap line joined the AC2 log arm, adding none. Counted by hand, not by a run.
+FLOOR_ASSERTIONS=411
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
