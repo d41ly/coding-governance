@@ -221,6 +221,60 @@ armOptIn('optIn: a non-string value is refused', { topology: 7 }, 'refused')
 armOptIn('optIn: a key outside the lens-key grammar is refused', { 'Topology!': 'reuse' }, 'refused')
 armOptIn('optIn: null is refused', null, 'refused')
 
+// ---- TOOL-dFairHearing-4 AC1-AC4 — the address key, its equality and order, and `batchBy` ----------
+// Each arm reads a name the base harness does not define, so on the base it throws `... is not defined`,
+// a harness fault counted as a failure. The proceeding `batchBy` arms read the RESOLVED value back.
+function evalAddress(extra, ret) {
+  try {
+    return new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn ' + ret)(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { console.log('HARNESS-BROKEN address: ' + ret + ' -> ' + e.message); return null }
+}
+{
+  const dfn = evalAddress({}, '[deriveAddressKey, checkSameAddress, deriveAddressOrder]')
+  const sfn = evalAddress(GOOD_SPEC, '[deriveAddressKey, checkSameAddress, deriveAddressOrder]')
+  if (!dfn || !sfn) fail++
+  else {
+    const dk = (file, line) => dfn[0]({ file: file, line: line, lens: 'l', id: 1 })
+    const sk = (where) => sfn[0]({ file: 'x.md', where: where, lens: 'l', id: 1 })
+    ck(JSON.stringify(dfn[0]({ file: '.\\src\\a.js', line: 12, lens: 'security', id: 3 })) === JSON.stringify({ file: 'src/a.js', at: 12, lens: 'security', id: 3 }),
+      'address: a diff finding keys to its slash-folded file, its line, its lens and its id')
+    const wants = [['section 4 [walk-table] Design', '[walk-table]'], ['section 2 S5', '§2'], ['AC3 against section 6', 'AC3'], ['§ 7', '§7'], ['status header', null]]
+    const gots = wants.map((w) => sk(w[0]).at)
+    ck(gots.every((g, i) => g === wants[i][1]), 'address: a spec finding keys its first [tag], else its leftmost section token, else null: ' + JSON.stringify(gots))
+    ck(dfn[1](dk('a.js', 10), dk('a.js', 13)) && !dfn[1](dk('a.js', 10), dk('a.js', 14)) && !dfn[1](dk('a.js', 10), dk('b.js', 10)),
+      'address: diff lines within 3 on one file are one address, 4 apart or on two files are not')
+    const nk = dk('a.js', undefined)
+    ck(nk.at === null && !dfn[1](nk, nk) && !dfn[1](nk, dk('a.js', 10)), 'address: a key with no address matches nothing, itself included')
+    ck(sfn[1](sk('section 2'), sk('§2')) && !sfn[1](sk('§2'), sk('§3')), 'address: spec keys at one token are one address, at two are not')
+    const six = [{ id: 1, file: 'a.js', line: 100, lens: 'security' }, { id: 2, file: 'c.js', line: 5, lens: 'security' }, { id: 3, file: 'b.js', line: 7, lens: 'correctness' },
+      { id: 4, file: 'a.js', line: 42, lens: 'correctness' }, { id: 5, file: 'b.js', line: 7, lens: 'seams' }, { id: 6, file: 'a.js', line: 42, lens: 'intent' }]
+    const ord = dfn[2](six)
+    ck(ord !== six && ord.map((f) => f.id).join(',') === '4,6,1,3,5,2' && six.map((f) => f.id).join(',') === '1,2,3,4,5,6',
+      'address: the order is file, line by value, lens and id, in a new array, the argument left in id order: ' + ord.map((f) => f.id).join(','))
+    const sord = sfn[2]([{ id: 1, file: 'x.md', where: 'status header', lens: 'a' }, { id: 2, file: 'x.md', where: '§9', lens: 'b' }, { id: 3, file: 'w.md', where: '', lens: 'c' }])
+    ck(sord.map((f) => f.id).join(',') === '3,2,1', 'address: a spec finding with no address sorts after every addressed finding of its file: ' + sord.map((f) => f.id).join(','))
+  }
+}
+function armBatchBy(name, extra, want) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn batchBy')(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review: `batchBy`') === 0 : !threw && got === want, name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+armBatchBy('batchBy: absent resolves to id', {}, 'id')
+armBatchBy('batchBy: id proceeds', { batchBy: 'id' }, 'id')
+armBatchBy('batchBy: address proceeds', { batchBy: 'address' }, 'address')
+armBatchBy('batchBy: section is refused', { batchBy: 'section' }, 'refused')
+armBatchBy('batchBy: a number is refused', { batchBy: 1 }, 'refused')
+armBatchBy('batchBy: null is refused', { batchBy: null }, 'refused')
+
 // ---- TOOL-aEvidencedLens-2 AC3 — `scratch`, required on a spec audit and refused by shape ---------
 // The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
 // `scratch`: on the base render the read throws `scratch is not defined`, a harness fault. A refusal
@@ -415,7 +469,7 @@ const H = 'c'.repeat(40)
 const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none' }
 const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 'memory/builds/dX/spec/s.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }], scratch: '/tmp/s', workerType: 'none' }
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
-// One finding per lens, so five lenses make five ids and five batches of one: verify:ids-1-1 .. 5-5.
+// One finding per lens, so five lenses make five ids and five batches of one: verify:batch-1 .. verify:batch-5.
 const buildLensReturn = (label) => {
   const lens = label.slice('find:'.length)
   return { lens: lens, path: '/cd/review-lenses/k/find-' + lens + '.json', findings: [{ file: lens + '.js', line: 1, where: 'section 1', severity: 'high', claim: lens + ' claim', impact: 'i', fix: 'f' }] }
@@ -458,7 +512,7 @@ async function runWholeScriptArms() {
     const fb = rb.trace.map((t) => t.full)
     ck(!rb.threw && fb.length > 0 && fb.every((f) => f.indexOf('tB · diff-review round 1 · ') === 0),
       'OC27 AC8 in a build folder every label opens "tB · diff-review round 1 · ": ' + fb.length + ' label(s)')
-    const ends = [/ · resume:probe$/, / · find:[a-z-]+$/, / · verify:ids-\d+-\d+$/, / · synth$/].map((re) => fb.filter((f) => re.test(f)).length)
+    const ends = [/ · resume:probe$/, / · find:[a-z-]+$/, / · verify:batch-\d+$/, / · synth$/].map((re) => fb.filter((f) => re.test(f)).length)
     ck(ends.every((c) => c > 0), 'OC27 AC8 ...and the probe, a finder, a skeptic batch and the synthesis each carry one: ' + ends.join(' '))
     const fr = r.trace.map((t) => t.full)
     ck(fr.length > 0 && fr.every((f) => f.indexOf('diff-review round 1 · ') === 0),
@@ -487,9 +541,9 @@ async function runWholeScriptArms() {
   ck(finds.length === 5 && finds.every((t) => t.prompt.indexOf('/review-lenses/' + K + '/find-' + t.label.slice(5) + '.json') !== -1),
     'AC1 every find: prompt names review-lenses/<key>/find-<lens>.json')
   ck(verifies.length === 5 && verifies.every((t) => {
-    const m = /^verify:ids-(\d+)-(\d+)$/.exec(t.label)
-    return m && t.prompt.indexOf('/review-lenses/' + K + '/verify-' + m[1] + '-' + m[2] + '.json') !== -1
-  }), 'AC1 every verify: prompt names review-lenses/<key>/verify-<first id>-<last id>.json')
+    const m = /^verify:batch-(\d+)$/.exec(t.label)
+    return m && t.prompt.indexOf('/review-lenses/' + K + '/verify-batch-' + m[1] + '.json') !== -1
+  }), 'AC1 every verify: prompt names review-lenses/<key>/verify-batch-<n>.json')
   ck(finds.every((t) => t.prompt.indexOf('BEFORE you return') !== -1) && verifies.every((t) => t.prompt.indexOf('BEFORE you return') !== -1),
     'AC1 both prompt kinds order the write BEFORE the return')
   ck(finds.every((t) => t.schema && t.schema.required.indexOf('path') !== -1), 'AC1 the diff finding schema lists path in required')
@@ -653,16 +707,58 @@ async function runWholeScriptArms() {
   let print = ''
   if (checkNoThrow(r, 'AC5 print capture')) {
     ck(r.scanSpawned('find:').length === 0, 'AC5 with every lens file present no lens is dispatched')
-    const v1 = r.trace.find((t) => t.label === 'verify:ids-1-1')
+    const v1 = r.trace.find((t) => t.label === 'verify:batch-1')
     const m = v1 ? /"batch":"([0-9a-f]{8})"/.exec(v1.prompt) : null
     print = m ? m[1] : ''
     ck(print.length === 8, 'AC5 the verify prompt names the batch print the file must carry')
   }
-  const vfile = (batch) => ({ name: 'verify-1-1.json', key: K, batch: batch, path: '/cd/v.json', verdicts: [{ id: 1, verdict: 'confirmed', reason: 'r' }] })
+  const vfile = (batch) => ({ name: 'verify-batch-1.json', key: K, batch: batch, ids: [1], path: '/cd/v.json', verdicts: [{ id: 1, verdict: 'confirmed', reason: 'r' }] })
   r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(allLensFiles, [vfile(print)]) }))
-  if (checkNoThrow(r, 'AC5 matching print')) ck(r.scanSpawned('verify:ids-1-1').length === 0 && r.result.batchesReused === 1, 'AC5 a verify file with the key and the matching print is reused')
+  if (checkNoThrow(r, 'AC5 matching print')) ck(r.scanSpawned('verify:batch-1').length === 0 && r.result.batchesReused === 1, 'AC5 a verify file with the key and the matching print is reused')
   r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(allLensFiles, [vfile('0badf00d')]) }))
-  if (checkNoThrow(r, 'AC5 other print')) ck(r.scanSpawned('verify:ids-1-1').length === 1, 'AC5 the right ids over a print of other claims is dispatched')
+  if (checkNoThrow(r, 'AC5 other print')) ck(r.scanSpawned('verify:batch-1').length === 1, 'AC5 the right ids over a print of other claims is dispatched')
+
+  // ---- TOOL-dFairHearing-4 AC5/AC6 — address-ordered batches, numbered labels and files, `ids` carried.
+  // Five lenses of two findings each, every lens's first citing a.js line 10 and its second its own file.
+  {
+    const buildAddressLens = (label) => {
+      const lens = label.slice('find:'.length)
+      const mk = (file, claim) => ({ file: file, line: file === 'a.js' ? 10 : 1, severity: 'high', claim: lens + ' ' + claim, impact: 'i', fix: 'f' })
+      return { lens: lens, path: '/p', findings: [mk('a.js', 'shared'), mk(lens + '.js', 'own')] }
+    }
+    const A_IDS = [1, 3, 5, 7, 9]
+    const readBatches = (rr) => rr.trace.filter((t) => t.label.indexOf('verify:') === 0)
+      .map((t) => ({ label: t.label, prompt: t.prompt, ids: [...t.prompt.matchAll(/^id=(\d+) \[/gm)].map((x) => parseInt(x[1], 10)) }))
+    const ra = await runReview(Object.assign({}, DIFF, { batchBy: 'address' }), buildStubs({ 'find:': buildAddressLens }))
+    const rd = await runReview(DIFF, buildStubs({ 'find:': buildAddressLens }))
+    if (checkNoThrow(ra, 'batch: address run') && checkNoThrow(rd, 'batch: id run')) {
+      const ga = readBatches(ra)
+      const gd = readBatches(rd)
+      const shared = (g) => g.map((x) => x.ids.filter((id) => A_IDS.indexOf(id) !== -1).length).join(',')
+      ck(shared(ga) === '2,2,1,0,0', 'batch: by address the five a.js findings fill three consecutive batches: ' + shared(ga))
+      ck(gd.length === 5 && gd.every((x) => x.ids.filter((id) => A_IDS.indexOf(id) !== -1).length <= 1), 'batch: by id no two a.js findings share a batch: ' + shared(gd))
+      const NUMBERED = 'verify:batch-1 verify:batch-2 verify:batch-3 verify:batch-4 verify:batch-5'
+      ck(ga.map((x) => x.label).join(' ') === NUMBERED && gd.map((x) => x.label).join(' ') === NUMBERED,
+        'batch: both orders spawn exactly five skeptics, verify:batch-1 to verify:batch-5')
+      ck([ga, gd].every((g) => g.every((x, i) => x.ids.length === 2 && x.prompt.indexOf('/verify-batch-' + (i + 1) + '.json') !== -1 &&
+        x.prompt.indexOf('"ids":[' + x.ids.join(',') + ']') !== -1)), 'batch: each verify prompt names verify-batch-<n>.json and an "ids" list equal to its own findings')
+      ck(ra.logs.some((l) => / verifier\(s\) \(cap \d+\) by address$/.test(l)) && rd.logs.some((l) => / verifier\(s\) \(cap \d+\) by id$/.test(l)),
+        'batch: the verifier log line names the order it sliced by')
+    }
+    const lensFiles = ['security', 'correctness', 'seams', 'verification', 'intent'].map((l) => Object.assign({ name: 'find-' + l + '.json', key: K }, buildAddressLens('find:' + l)))
+    const r0 = await runReview(DIFF, buildStubs({ 'find:': buildAddressLens, 'resume:probe': buildProbe(lensFiles) }))
+    const v1 = r0.trace.find((t) => t.label === 'verify:batch-1')
+    const bp = v1 ? (/"batch":"([0-9a-f]{8})"/.exec(v1.prompt) || [])[1] || '' : ''
+    const bids = v1 ? [...v1.prompt.matchAll(/^id=(\d+) \[/gm)].map((x) => parseInt(x[1], 10)) : []
+    const vf = (name, ids) => Object.assign({ name: name, key: K, batch: bp, path: '/cd/v.json', verdicts: bids.map((id) => ({ id: id, verdict: 'confirmed', reason: 'r' })) }, ids ? { ids: ids } : {})
+    const reuseArm = async (file, reused, name) => {
+      const rr = await runReview(DIFF, buildStubs({ 'find:': buildAddressLens, 'resume:probe': buildProbe(lensFiles, [file]) }))
+      if (checkNoThrow(rr, name)) ck(bp.length === 8 && rr.scanSpawned('verify:batch-1').length === (reused ? 0 : 1) && rr.result.batchesReused === (reused ? 1 : 0), name)
+    }
+    await reuseArm(vf('verify-batch-1.json', bids), true, 'batch: verify-batch-1.json with the key, the batch print and ids is reused, batchesReused 1')
+    await reuseArm(vf('verify-1-2.json', bids), false, 'batch: the same file named verify-1-2.json is dispatched')
+    await reuseArm(vf('verify-batch-1.json', null), false, 'batch: the same file lacking ids is dispatched')
+  }
 
   // ---- AC6: the three lens-stage death paths all defer and none reads clean or partial.
   r = await runReview(DIFF, buildStubs({ 'find:': null }))
@@ -685,9 +781,9 @@ async function runWholeScriptArms() {
 
   // ---- AC7: a dead skeptic batch defers WITHOUT a synthesis; a dead synthesis defers; the tally
   // ---- fault stays complete beside a null count.
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': null }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-2': null }))
   if (checkNoThrow(r, 'AC7 dead batch')) {
-    ck(r.result.exit === 'deferred-platform' && r.result.blockers === null && r.result.pending.join(' ') === 'verify:ids-2-2',
+    ck(r.result.exit === 'deferred-platform' && r.result.blockers === null && r.result.pending.join(' ') === 'verify:batch-2',
       'AC7 one skeptic batch dead: deferred, blockers null, that batch pending')
     ck(r.scanSpawned('synth').length === 0, 'AC7 ...and no synthesis runs over the half-judged set')
   }
@@ -1215,7 +1311,7 @@ async function runWholeScriptArms() {
   })
   r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(otherFixFiles, [vfile(print)]) }))
   if (checkNoThrow(r, 'fix verdict other fix')) {
-    ck(print.length === 8 && r.scanSpawned('find:').length === 0 && r.scanSpawned('verify:ids-1-1').length === 1,
+    ck(print.length === 8 && r.scanSpawned('find:').length === 0 && r.scanSpawned('verify:batch-1').length === 1,
       'fix verdict: a verify file judged over another fix is dispatched')
   }
 
@@ -1280,7 +1376,7 @@ async function runWholeScriptArms() {
       'severity: a confirmed verdict with no grade falls back to the finder\'s, counted and announced')
   }
   // ---- AC5: one batch answers uncertain; it is unverified, outside precision, and listed with its reason.
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-3-3': buildGradedVerdicts('uncertain') }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-3': buildGradedVerdicts('uncertain') }))
   if (checkNoThrow(r, 'uncertain verdict')) {
     const sp = r.trace.find((t) => t.label === 'synth')
     const uv = sp ? sp.prompt.slice(sp.prompt.indexOf('UNVERIFIED findings')) : ''
@@ -1402,14 +1498,14 @@ async function runWholeScriptArms() {
       'observed-by: a dead synthesis logs every CONFIRMED finding\'s fix through renderFixLine')
   }
   // ---- S2: a dead skeptic batch logs the four confirmed findings at their binding grade.
-  r = await runReview(DIFF, buildStubs({ 'verify:': buildGradedVerdicts('confirmed', () => 'blocker'), 'verify:ids-2-2': null }))
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildGradedVerdicts('confirmed', () => 'blocker'), 'verify:batch-2': null }))
   if (checkNoThrow(r, 'observed-by dead batch')) {
     const cl = scanConfirmedLogs(r)
     ck(cl.length === 4 && cl.every((l) => l.indexOf('  CONFIRMED [blocker] ') === 0),
       'observed-by: a dead skeptic batch logs every CONFIRMED finding at its binding grade')
   }
   // ---- S3: one uncertain answer, counted apart from no verdict in the note, RUN INTEGRITY and the log.
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-3-3': buildGradedVerdicts('uncertain') }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-3': buildGradedVerdicts('uncertain') }))
   if (checkNoThrow(r, 'observed-by one uncertain')) {
     const sp = r.trace.find((t) => t.label === 'synth')
     const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
@@ -1483,7 +1579,7 @@ async function runLedgerArms() {
   ck(!!lc.result && lc.result.confirmed === 5 && [...lhead.matchAll(/id=(\d+) \[/g)].length === 5 && lcl.length === 5 &&
     lcl.every((l) => { const m = LINE_RE.exec(l); return !!m && m[2] === m[3] }),
     'ledger: the skeptic and synthesis lines name the lens: every CONFIRMED synth line, id pattern intact')
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': null }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-2': null }))
   if (checkNoThrow(r, 'ledger deferred log')) {
     const dl = r.logs.filter((l) => /^ {2}(CONFIRMED|UNVERIFIED) \[/.test(l))
     ck(dl.length === 5 && dl.every((l) => { const m = / lens=([a-z-]+) ([a-z-]+)\.js:1 - /.exec(l); return !!m && m[1] === m[2] }),
@@ -1493,11 +1589,11 @@ async function runLedgerArms() {
   // ---- AC3: one batch per state. id 1 refuted, 2 uncertain, 3 no verdict, 4 contradicted, 5 confirmed
   // ---- at low with an unsound fix.
   const VS = {
-    'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'r1' }] },
-    'verify:ids-2-2': { path: '/v', verdicts: [{ id: 2, verdict: 'uncertain', reason: 'r2' }] },
-    'verify:ids-3-3': { path: '/v', verdicts: [] },
-    'verify:ids-4-4': { path: '/v', verdicts: [{ id: 4, verdict: 'confirmed', reason: 'a' }, { id: 4, verdict: 'refuted', reason: 'b' }] },
-    'verify:ids-5-5': { path: '/v', verdicts: [{ id: 5, verdict: 'confirmed', reason: 'r5', severity: 'low', fixVerdict: 'unsound', fixNote: 'n5' }] },
+    'verify:batch-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'r1' }] },
+    'verify:batch-2': { path: '/v', verdicts: [{ id: 2, verdict: 'uncertain', reason: 'r2' }] },
+    'verify:batch-3': { path: '/v', verdicts: [] },
+    'verify:batch-4': { path: '/v', verdicts: [{ id: 4, verdict: 'confirmed', reason: 'a' }, { id: 4, verdict: 'refuted', reason: 'b' }] },
+    'verify:batch-5': { path: '/v', verdicts: [{ id: 5, verdict: 'confirmed', reason: 'r5', severity: 'low', fixVerdict: 'unsound', fixNote: 'n5' }] },
   }
   r = await runReview(DIFF, buildStubs(VS))
   if (checkNoThrow(r, 'ledger verdict states')) {
@@ -1522,7 +1618,7 @@ async function runLedgerArms() {
     for (const v of vr.verdicts) Object.assign(v, { severity: 'blocker', fixVerdict: 'unsound', fixNote: 'better fix' })
     return vr
   }
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': unsound2 }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-2': unsound2 }))
   if (checkNoThrow(r, 'ledger rejected fix')) {
     const c2 = Array.isArray(r.result.confirmedFindings) ? r.result.confirmedFindings : []
     ck(c2.length === 5 && c2[1].fix === 'better fix' && c2[1].fixVerdict === 'unsound' && c2[1].severity === 'blocker' &&
@@ -1532,7 +1628,7 @@ async function runLedgerArms() {
   // ---- Closing review round 1, L3 (finding 16): an EMPTY or blank note is no correction, so the
   // ---- finder's fix stays, marked by fixVerdict unsound; dropping the `&& note` guard hands on ''.
   for (const [what, note] of [['an empty note', ''], ['a blank note', '   ']]) {
-    r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': { path: '/v', verdicts: [{ id: 2, verdict: 'confirmed', reason: 'r', fixVerdict: 'unsound', fixNote: note }] } }))
+    r = await runReview(DIFF, buildStubs({ 'verify:batch-2': { path: '/v', verdicts: [{ id: 2, verdict: 'confirmed', reason: 'r', fixVerdict: 'unsound', fixNote: note }] } }))
     if (!checkNoThrow(r, 'ledger unsound ' + what)) continue
     const c3 = Array.isArray(r.result.confirmedFindings) ? r.result.confirmedFindings : []
     ck(c3.length === 5 && c3[1].fix === 'f' && c3[1].fixVerdict === 'unsound',
@@ -1552,7 +1648,7 @@ async function runLedgerArms() {
     if (lr.lens === 'security') lr.findings[0].claim = 'a | b\nc'
     return lr
   }
-  r = await runReview(DIFF, buildStubs({ 'find:': buildPipeLens, 'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'x | y\r\nz' }] } }))
+  r = await runReview(DIFF, buildStubs({ 'find:': buildPipeLens, 'verify:batch-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'x | y\r\nz' }] } }))
   if (checkNoThrow(r, 'ledger appendix')) {
     const ap = typeof r.result.appendix === 'string' ? r.result.appendix : ''
     const al = ap.split('\n')
@@ -1570,7 +1666,7 @@ async function runLedgerArms() {
   }
   // ---- Closing review round 1, L2: a reason carrying every other boundary Python's str.splitlines
   // ---- breaks on. The appendix must split into the same lines under that rule as under `\n`.
-  r = await runReview(DIFF, buildStubs({ 'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'p\u2028q\u2029r\x85s\x0bt\x0cu\x1cv\x1ew' }] } }))
+  r = await runReview(DIFF, buildStubs({ 'verify:batch-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'p\u2028q\u2029r\x85s\x0bt\x0cu\x1cv\x1ew' }] } }))
   if (checkNoThrow(r, 'ledger appendix splitlines')) {
     const ap = typeof r.result.appendix === 'string' ? r.result.appendix : ''
     const al = ap.split('\n')
@@ -1602,7 +1698,7 @@ async function runLedgerArms() {
     ['no finding raised', buildStubs({ 'find:': buildEmptyLens }), 'array', (x) => x.ledger.length === 0 && x.appendix === ''],
     ['every finding refuted', buildStubs({ 'verify:': buildVerdicts('refuted') }), 'array',
       (x) => x.ledger.length === 5 && x.ledger.every((e) => e.verdict === 'refuted') && x.confirmedFindings.length === 0 && x.appendix.split('\n').length === 9],
-    ['one skeptic batch dead', buildStubs({ 'verify:ids-2-2': null }), 'integer',
+    ['one skeptic batch dead', buildStubs({ 'verify:batch-2': null }), 'integer',
       (x) => x.exit === 'deferred-platform' && x.ledger.length === 5 && x.ledger[1].verdict === 'unverified' && x.confirmedFindings.length === 4],
     ['the synthesis dead', buildStubs({ synth: null }), 'integer', (x) => x.exit === 'deferred-platform' && x.ledger.length === 5 && x.confirmedFindings.length === 5],
     ['complete', ALL_OK, 'integer', (x) => x.exit === 'complete' && x.ledger.length === 5 && x.confirmedFindings.length === 5 && x.appendix.length > 0],
@@ -1643,7 +1739,7 @@ async function runLedgerArms() {
 
   // ==== TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and an
   // ==== ORPHANED duplicate is demoted. One finding per lens carries one-line, two-line or no evidence;
-  // ==== two per lens put ids 1 and 2 in one batch, verify:ids-1-2.
+  // ==== two per lens put ids 1 and 2 in one batch, verify:batch-1.
   const EVID = { coherence: 'cmd: grep -c x a.md -> 0', grounding: 'line one\nline two' }
   const buildEvidenceLens = (label) => {
     const out = buildLensReturn(label)
@@ -1693,7 +1789,7 @@ async function runLedgerArms() {
   r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
   if (checkNoThrow(r, 'spec skeptic kept duplicate')) {
     const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
-    ck(r.trace.some((t) => t.label === 'verify:ids-1-2') && row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
+    ck(r.trace.some((t) => t.label === 'verify:batch-1') && row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
       'spec skeptic: a duplicate of a confirmed survivor in its batch stays refuted, unannounced')
   }
   const runOrphanArm = async (over, what) => {
@@ -2726,7 +2822,11 @@ printf '%s\n' "$out"
 # RAISED 411 -> 418 by TOOL-dFairHearing-9: 7 assertions, counted off the `lens notes:` arms — AC4's loop
 # over two presets (2), AC6's loop over three refusals (3), the AC7 key (1) and the AC5 replaced-default
 # note (1). Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=418
+# RAISED 418 -> 439 by TOOL-dFairHearing-4: 21 assertions, counted off the `address:`, `batchBy:` and
+# `batch:` arms — seven address-key arms (7), six batchBy arms (6), five batch-order arms (5) and three
+# reuse arms (3). The 25 renamed `verify:batch-<n>` references add none. Counted by hand, not by a run:
+# the pass runs no suite.
+FLOOR_ASSERTIONS=439
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

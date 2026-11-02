@@ -309,6 +309,16 @@ lens counts as neither live nor dead. A spec audit has no light subset, so `'lig
 value other than the two refuses on both kinds. `intensity` joins the review key. A diff that crosses a
 trust boundary is not one to review light: the `security` lens is one of the two a light run skips.
 
+`batchBy` is `'id'` or `'address'`, and absent it is `'id'`: the order the findings are sliced into
+the fixed count of skeptic batches in. `'id'` slices them in id order, lens by lens. `'address'` sorts a
+copy by `deriveAddressKey`, the file, then the line on a diff review or the first `[tag]` or section
+token of `where` on a spec audit, then lens and id, so two lenses citing one place meet one skeptic; the
+batch count and sizes are the same on both. Any other value refuses before the first agent, and the
+`<n> finding(s) -> <k> verifier(s)` log line ends `by id` or `by address`. It ships dark: nothing in this
+kit passes `'address'` until the replay records a hit. On both orders a batch is labelled
+`verify:batch-<n>` and its result file is `verify-batch-<n>.json`, carrying its member ids as `ids`,
+since the label no longer tells them; a verify file without `ids` is never reused.
+
 `preset` picks a spec audit's lens literal, `'unit-spec'` or `'design-audit'`, and absent it is
 `'unit-spec'`, the five lenses above. Only the caller picks it, and the kind stays `spec-audit`, so
 the binding line is unchanged. `'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
@@ -564,7 +574,7 @@ the stage's scope.
 | `unattended-unit` | builder | `<slug> · <unitId> · build` |
 | `tier2-review` | resume probe | `<slug> · <kind> round <n> · resume:probe` |
 | | finder | `<slug> · <kind> round <n> · find:<lens>` |
-| | verify batch | `<slug> · <kind> round <n> · verify:ids-<a>-<b>` |
+| | verify batch | `<slug> · <kind> round <n> · verify:batch-<n>` |
 | | synthesis | `<slug> · <kind> round <n> · synth` |
 
 The group's unit ids are joined by single spaces in roster order, and `<n>` is the run's round. The

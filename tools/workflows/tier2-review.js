@@ -67,7 +67,8 @@ function buildKeyedSchema(schema, extra) {
   return {
     type: 'object',
     required: ['name', 'key'].concat(extra, schema.required),
-    properties: Object.assign({ name: { type: 'string' }, key: { type: 'string' }, batch: { type: 'string' } }, schema.properties),
+    properties: Object.assign({ name: { type: 'string' }, key: { type: 'string' }, batch: { type: 'string' },
+      ids: { type: 'array', items: { type: 'integer' } } }, schema.properties),
   }
 }
 
@@ -126,6 +127,9 @@ function readOutputTokens() {
 //   preset: "unit-spec" | "design-audit", // spec-audit ONLY, DEFAULTS to "unit-spec": the CALLER's choice of
 //                                         // lens literal, design-audit running DESIGN_LENSES, aimed at a design
 //                                         // or architecture record; refused outside the set and on a diff review
+//   batchBy: "id" | "address",           // DEFAULTS to "id": the order the findings are sliced into skeptic
+//                                         // batches in, "address" sorting them by deriveAddressKey so two
+//                                         // lenses citing one place meet one skeptic; refused outside the set
 //   optIn: { "<opt-in lens key>": "<default lens key>" }, // DEFAULTS to {}: the CALLER's swap. Each key is a
 //                                         // shipped opt-in lens (OPTIN_LENSES) offered for the run's literal, run
 //                                         // in the slot of the default it names, so the literal keeps five. Refused
@@ -233,6 +237,13 @@ if (typeof intensity !== 'string' || ['full', 'light'].indexOf(intensity) === -1
   throw new Error('tier2-review: `intensity` must be one of full | light. Got ' + JSON.stringify(a.intensity) + '.')
 if (isSpec && intensity === 'light')
   throw new Error('tier2-review: a spec-audit has no light lens subset; `intensity` must be full or absent. Got "light".')
+// TOOL-dFairHearing-4 S3 - `batchBy`, the order the verify stage slices its batches in, in the shape of
+// `intensity`: a closed set refused outside it before any agent. It ships dark at `id` until the replay
+// records a hit; `address` sorts by deriveAddressKey below. It joins no review key: a verify file is
+// reused only for the exact members its batch print covers.
+const batchBy = a.batchBy === undefined ? 'id' : a.batchBy
+if (typeof batchBy !== 'string' || ['id', 'address'].indexOf(batchBy) === -1)
+  throw new Error('tier2-review: `batchBy` must be one of id | address. Got ' + JSON.stringify(a.batchBy) + '.')
 // TOOL-dFairHearing-2 S1 - `preset`, the CALLER's choice of a spec audit's lens literal, in the shape of
 // `intensity` above: a closed set refused by name outside it, and refused beside the diff kind, which
 // has one literal and so no preset. Each member but the default names the `gov:lens-slots` literal it
@@ -370,6 +381,43 @@ function renderAuditBinding(subjects) {
 // composed it.
 function renderReviewedLine(subjects) {
   return 'Reviewed: ' + subjects.map(function (x) { return x.path + '@' + x.blob }).join(', ')
+}
+// TOOL-dFairHearing-4 S1 - THE ADDRESS KEY, one reading of where a finding points, pure. `file` is
+// slash-folded with one leading ./ dropped; `at` is the diff kind's integer line, or the spec kind's
+// first [tag] in `where`, else its LEFTMOST whole-word section token (section <n> and § <n> as §<n>,
+// S<n> and AC<n> upper-cased), else null. It never reads `ref`, so nothing is keyed on a ref string.
+const ADDRESS_TAG = /\[([a-z][a-z0-9-]*)\]/
+const ADDRESS_SECTION = /\bsection ?(\d+)\b|§ ?(\d+)\b|\b(S|AC)(\d+)\b/i
+function deriveAddressKey(f) {
+  const file = String(f.file).trim().replace(/\\/g, '/').replace(/^\.\//, '')
+  let at = null
+  if (!isSpec) at = Number.isInteger(f.line) ? f.line : null
+  else {
+    const where = String(f.where === undefined || f.where === null ? '' : f.where)
+    const tag = ADDRESS_TAG.exec(where)
+    const sec = tag ? null : ADDRESS_SECTION.exec(where)
+    if (tag) at = '[' + tag[1] + ']'
+    else if (sec) at = sec[3] ? sec[3].toUpperCase() + sec[4] : '§' + (sec[1] || sec[2])
+  }
+  return { file: file, at: at, lens: f.lens, id: f.id }
+}
+// S1 - two keys name one address when the files match, neither `at` is null, and the lines differ by at
+// most ADDRESS_LINE_SLACK or the tokens are equal. The slack lives here, never in the sort: equality
+// within a tolerance is not transitive, so it cannot be a sort key (spec section 8 F2).
+const ADDRESS_LINE_SLACK = 3
+function checkSameAddress(x, y) {
+  if (x.file !== y.file || x.at === null || y.at === null) return false
+  return typeof x.at === 'number' && typeof y.at === 'number' ? Math.abs(x.at - y.at) <= ADDRESS_LINE_SLACK : x.at === y.at
+}
+// S2 - a sorted COPY: file, then `at` (lines by value, tokens by code unit, null after every address of
+// its file), then lens, then id. The argument keeps id order for the ledger, the appendix and the yield.
+function deriveAddressOrder(findings) {
+  const cmp = (p, q) => (p === q ? 0 : p < q ? -1 : 1)
+  const cmpAt = (p, q) => (p === q ? 0 : p === null ? 1 : q === null ? -1 : typeof p === 'number' && typeof q === 'number' ? p - q : cmp(String(p), String(q)))
+  return findings
+    .map((f) => [deriveAddressKey(f), f])
+    .sort((u, v) => cmp(u[0].file, v[0].file) || cmpAt(u[0].at, v[0].at) || cmp(String(u[0].lens), String(v[0].lens)) || u[0].id - v[0].id)
+    .map((pair) => pair[1])
 }
 // The run's identity is its first log line and the first key of every return: the tool titles the
 // run with `meta.name` alone.
@@ -1166,7 +1214,7 @@ const probe = await agent(
       ? deriveReviewKey('', '')
       : `${kind}-r${round}-<the first 12 hex of the base sha>-<the first 12 hex of the head sha>-${inputPrint}`) +
     `/ . If it does not exist, return finds: [] and verifies: [] - that is the normal first run.\n` +
-    `4. Otherwise Read every file in it named find-<lens>.json or verify-<a>-<b>.json. Return each ` +
+    `4. Otherwise Read every file in it named find-<lens>.json or verify-batch-<n>.json. Return each ` +
     `find file's JSON in finds and each verify file's JSON in verifies, EXACTLY as it is on disk plus ` +
     `a name field holding its file name. Do not repair, complete or re-judge anything: a file that ` +
     `does not parse, or lacks a field the schema requires, is left out and its name listed in skipped.\n` +
@@ -1182,7 +1230,7 @@ const probe = await agent(
         base: { type: 'string' },
         head: { type: 'string' },
         finds: { type: 'array', items: buildKeyedSchema(isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA, []) },
-        verifies: { type: 'array', items: buildKeyedSchema(VERDICT_SCHEMA, ['batch']) },
+        verifies: { type: 'array', items: buildKeyedSchema(VERDICT_SCHEMA, ['batch', 'ids']) },
         skipped: { type: 'array', items: { type: 'string' } },
         // Optional (spec F2): a probe that omits it reads as every subject UNCHECKED, never as none moved.
         ...(isSpec ? { blobs: { type: 'array', items: { type: 'object', required: ['path', 'now'], properties: { path: { type: 'string' }, now: { type: 'string' } } } } } : {}),
@@ -1494,26 +1542,30 @@ log(`${allFindings.length} raw findings across ${lensesRunning} lenses — verif
 phase('Verify')
 // THE VERIFIER COUNT IS A CONSTANT. `chunk(allFindings, 5)` bounded the GROUP SIZE, so 70 findings
 // bought 14 skeptics — still linear, which the protocol says is not enough. Bounding the group COUNT
-// makes the batch grow and the agent count stand still. `chunk` slices contiguously, so a batch
-// labelled `verify:ids-1-14` really does contain ids 1..14, and Math.ceil never yields an empty
+// makes the batch grow and the agent count stand still. `chunk` slices `verifyOrder` contiguously, in
+// the order `batchBy` picks: id order, or address order so two lenses citing one place meet one
+// skeptic (TOOL-dFairHearing-4), and Math.ceil never yields an empty
 // group: at N < MAX_VERIFIERS it produces exactly N groups of one. The total is the agent-cap hook's
 // own MAX_VERIFIERS, the review protocol's verify total, and never the agent limit the concurrency
 // width above renders, which bounds how many run at once (TOOL-dGroundRules-10 F3).
 const MAX_VERIFIERS = 5
-const batches = chunk(allFindings, Math.ceil(allFindings.length / MAX_VERIFIERS)) // gov:fixed-verifiers
-log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MAX_VERIFIERS})`)
+const verifyOrder = batchBy === 'address' ? deriveAddressOrder(allFindings) : allFindings
+const batches = chunk(verifyOrder, Math.ceil(verifyOrder.length / MAX_VERIFIERS)) // gov:fixed-verifiers
+log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MAX_VERIFIERS}) by ${batchBy}`)
 // TOOL-dDerivedDocket-29 S4 - A BATCH IS REUSED ONLY FOR THE EXACT FINDINGS IT JUDGED. Its file must
-// carry the run's key AND a fingerprint over the batch's own ids and claims together. The id range
-// alone is not enough: when a dead lens is re-dispatched the ids after it shift, and an id-keyed
+// carry the run's key AND a fingerprint over the batch's own ids and claims together. The batch number
+// alone is not enough: when a dead lens is re-dispatched the ids after it shift, and a name-keyed
 // match would pair old verdicts with new findings. When every lens is reused the ids, the batches and
 // their prints come out identical, which is what lets a dead synthesis re-run alone.
 // TOOL-aSightedSkeptic-2 S5 - the FIX joins the print, since the skeptic now judges it: a verify file
 // judged against one fix is never reused for a finding carrying another under the same claim.
 const batchPrints = batches.map((g) => deriveFnv1a(renderCanonical(g.map((f) => [f.id, String(f.claim), String(f.fix)]))))
-const batchLabels = batches.map((g) => `verify:ids-${g[0].id}-${g[g.length - 1].id}`)
+// TOOL-dFairHearing-4 S5 - a label no longer tells its ids, so the file carries them as `ids`, and a
+// file without them, the old shape, is never reused.
+const batchLabels = batches.map((g, gi) => `verify:batch-${gi + 1}`)
 const reusedBatch = batches.map((g, gi) => {
-  const name = `verify-${g[0].id}-${g[g.length - 1].id}.json`
-  const file = presentVerifies.find((v) => v && v.name === name && Array.isArray(v.verdicts))
+  const name = `verify-batch-${gi + 1}.json`
+  const file = presentVerifies.find((v) => v && v.name === name && Array.isArray(v.verdicts) && Array.isArray(v.ids))
   if (file && file.key === reviewKey && file.batch === batchPrints[gi]) {
     log(`reused ${batchLabels[gi]} from ${keyDir}/${name} — not dispatched`)
     return file
@@ -1576,8 +1628,8 @@ const verdictResults = await boundedParallel(
         `The fix verdict NEVER changes the finding's verdict: judge the claim on its own, then the fix on its own.` +
         (!durable
           ? `\n\nWrite no file. Set path to an empty string.`
-          : `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
-            `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
+          : `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus three more fields ` +
+            `"key":"${reviewKey}", "batch":"${batchPrints[gi]}" and "ids":[${group.map((f) => f.id).join(',')}], to ${keyDir}/verify-batch-${gi + 1}.json, ` +
             `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.`) +
         `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +

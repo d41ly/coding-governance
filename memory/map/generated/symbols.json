@@ -3538,6 +3538,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkSameAddress",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkSameAddress",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "checkSeqMarker",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -6928,6 +6938,26 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "cmp",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "cmp",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "cmpAt",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "cmpAt",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "cnot",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
@@ -7191,6 +7221,26 @@
       "id": "demand_writable_target",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "deriveAddressKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveAddressKey",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveAddressOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveAddressOrder",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "deriveBindingSeverity",

@@ -170,7 +170,7 @@ On a spec subject each BLOCKER or HIGH item also lists the unit ids its fix woul
 read-only `Plan` type, which holds no Write tool, so it writes no result file and a resume reuses
 nothing: a re-run dispatches every judge again (TOOL-aMendedFleet-93). A run that passes
 `workerType: 'none'` spawns its judges with the charter loaded, and each Writes its result to
-`<git-common-dir>/review-lenses/<key>/find-<lens>.json` or `verify-<first id>-<last id>.json`
+`<git-common-dir>/review-lenses/<key>/find-<lens>.json` or `verify-batch-<n>.json`
 BEFORE it returns, and all three schemas require its `path`. The key is the kind, the round, the
 pinned subject and a print of the inputs, so a re-run with identical args reuses every file that
 carries it and dispatches only what is missing. A run where a lens, a batch or the synthesis
