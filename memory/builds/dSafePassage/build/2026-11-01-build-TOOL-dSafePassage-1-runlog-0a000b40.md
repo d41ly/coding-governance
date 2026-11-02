@@ -1,6 +1,6 @@
 # Run record
 
-**Serves:** journal TOOL-dSafePassage-1..13 TOOL-dSafePassage-15..54 TOOL-dSafePassage-56..59 TOOL-dSafePassage-62..78 TOOL-dSafePassage-80..84 TOOL-dSafePassage-86..103
+**Serves:** journal TOOL-dSafePassage-1..13 TOOL-dSafePassage-15..54 TOOL-dSafePassage-56..59 TOOL-dSafePassage-62..78 TOOL-dSafePassage-80..84 TOOL-dSafePassage-86..104
 
 Rendered from the run model by the runlog kit's `record` command. Every value below is drawn from a closed schema, so no line carries free text. Re-render it rather than edit it.
 
@@ -11,28 +11,28 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - start: 0a000b4060e34b6109758dc94d9abb5e5e3cdb7f
 - phase: VERIFYING
 - terminal: no
-- window: 2026-10-26T08:37:11Z to 2026-11-01T21:32:53Z
+- window: 2026-10-26T08:37:11Z to 2026-11-02T01:01:53Z
 - window opened by: git
 - window closed by: last-activity
-- duration: 564942s
+- duration: 577482s
 - own commits: 0
 - last own commit: -
 - merged: -
-- units served: 97
+- units served: 98
 - sources present: 7 of 7
 - owner turns: launch 1 · pre-run 0 · in-window 7 · post-close 0
-- usage main: requests 3039 · in 7902 · out 1803867 · cache-read 1667129255 · cache-write 4601338
-- usage agent: requests 4264 · in 8630 · out 4036154 · cache-read 642720510 · cache-write 22999083
-- usage workflow: requests 10262 · in 20580 · out 7375596 · cache-read 1162335804 · cache-write 43752925
-- attributed calls: 16459 of 18639
+- usage main: requests 3104 · in 8058 · out 1855707 · cache-read 1714134018 · cache-write 4698522
+- usage agent: requests 4362 · in 8830 · out 4128565 · cache-read 651905713 · cache-write 23394604
+- usage workflow: requests 10440 · in 20938 · out 7477474 · cache-read 1170326759 · cache-write 44350229
+- attributed calls: 16786 of 18997
 - values withheld: 0
-- commitment: sha256 f6898dbb8c3488533e234dc735b958f81a660903e3e1d6c665d2e6f63e4c1904 · lines 5448
+- commitment: sha256 f9b91b3fc0b04a2dfb9c8959257ef6cc39458043b89de4cb0dde80b8fb8482a7 · lines 5505
 
 ## Timeline
 
-- events: 265 · shown 60 · elided 205
-- elided: 205 events from 2026-10-26T17:15:51Z to 2026-11-01T10:24:14Z
-- withheld rows: verb 2383 · push 341 · push-refused 0 · gate 3 · compact 4 · limit 32 · idle 0 · workflow 144
+- events: 269 · shown 60 · elided 209
+- elided: 209 events from 2026-10-26T17:15:51Z to 2026-11-01T11:13:59Z
+- withheld rows: verb 2405 · push 347 · push-refused 0 · gate 4 · compact 4 · limit 32 · idle 0 · workflow 146
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
@@ -69,10 +69,6 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
-| 2026-11-01T10:29:32Z | run-state | dispatch | TOOL-dSafePassage-97 | - | - | - |
-| 2026-11-01T11:03:15Z | run-state | brief | TOOL-dSafePassage-98 | - | - | - |
-| 2026-11-01T11:08:13Z | run-state | dispatch | TOOL-dSafePassage-98 | - | - | - |
-| 2026-11-01T11:13:59Z | run-state | phase | 390033278090 | VERIFYING | - | - |
 | 2026-11-01T12:00:03Z | run-state | phase | 1d97c92327e6 | BUILDING | - | - |
 | 2026-11-01T12:37:13Z | run-state | brief | TOOL-dSafePassage-99 | - | - | - |
 | 2026-11-01T12:37:15Z | run-state | brief | TOOL-dSafePassage-100 | - | - | - |
@@ -99,15 +95,19 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 2026-11-01T21:10:32Z | run-state | dispatch | TOOL-dSafePassage-103 | - | - | - |
 | 2026-11-01T21:25:08Z | run-state | dispatch | TOOL-dSafePassage-103 | - | - | - |
 | 2026-11-01T21:32:53Z | run-state | phase | 02030bc97 | VERIFYING | - | - |
+| 2026-11-01T23:50:35Z | run-state | brief | TOOL-dSafePassage-104 | - | - | - |
+| 2026-11-01T23:50:35Z | run-state | phase | b9543af4bb17 | BUILDING | - | - |
+| 2026-11-02T00:47:31Z | run-state | dispatch | TOOL-dSafePassage-104 | - | - | - |
+| 2026-11-02T00:57:51Z | run-state | dispatch | TOOL-dSafePassage-104 | - | - | - |
 
 ## Units
 
-- units: 99 · shown 0 · aggregated yes
+- units: 100 · shown 0 · aggregated yes
 
 | # | status | units |
 |---|---|---|
 | 1 | DEFERRED | 1 |
-| 2 | CLOSED | 97 |
+| 2 | CLOSED | 98 |
 | 3 | WONTDO | 1 |
 
 ## Decisions
@@ -116,7 +116,7 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - trailer near-misses: 0
 - decision-log rows the owner's: 0
 - spec marks: owner-before 2 · owner-inside 3 · agent-before 87 · agent-inside 24
-- excluded rows: proposal 0 · rescope 41 · dispatch 148 · review 9 · brief 98 · hold 2 · resume 2
+- excluded rows: proposal 0 · rescope 42 · dispatch 150 · review 9 · brief 99 · hold 2 · resume 2
 - review rounds: 9 · shown 9 · aggregated no
 
 | # | source | entries |
@@ -161,16 +161,16 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ## Anomalies
 
-- anomalies: 321 · shown 0 · aggregated yes
+- anomalies: 326 · shown 0 · aggregated yes
 
 | # | kind | subclass | count |
 |---|---|---|---|
 | 1 | no-progress | - | 1 |
-| 2 | out-of-band-edit | - | 17 |
+| 2 | out-of-band-edit | - | 19 |
 | 3 | refusal-loop | - | 4 |
 | 4 | killed-verb | - | 169 |
 | 5 | red-behind-zero | - | 2 |
-| 6 | destructive-git | - | 127 |
+| 6 | destructive-git | - | 130 |
 | 7 | multi-run-session | - | 1 |
 
 ## Coverage
@@ -184,9 +184,9 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | # | source | state | lines | bad |
 |---|---|---|---|---|
 | 1 | run-state | present | - | - |
-| 2 | driver | present | 4763 | 1 |
-| 3 | gates | present | 3 | 0 |
-| 4 | pushes | present | 341 | 0 |
+| 2 | driver | present | 4807 | 1 |
+| 3 | gates | present | 4 | 0 |
+| 4 | pushes | present | 347 | 0 |
 | 5 | git | present | - | - |
 | 6 | transcripts | present | - | - |
 | 7 | build-folder | present | - | - |
@@ -195,8 +195,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ```json
 {"schema":1,"sections":{
-"Summary":{"facts":{"run-state":"memory/builds/dSafePassage/RUN.md","run":"2 of 2","start":"0a000b4060e34b6109758dc94d9abb5e5e3cdb7f","phase":"VERIFYING","terminal":"no","window":"2026-10-26T08:37:11Z to 2026-11-01T21:32:53Z","window opened by":"git","window closed by":"last-activity","duration":"564942s","own commits":"0","last own commit":"-","merged":"-","units served":"97","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 7 · post-close 0","usage main":"requests 3039 · in 7902 · out 1803867 · cache-read 1667129255 · cache-write 4601338","usage agent":"requests 4264 · in 8630 · out 4036154 · cache-read 642720510 · cache-write 22999083","usage workflow":"requests 10262 · in 20580 · out 7375596 · cache-read 1162335804 · cache-write 43752925","attributed calls":"16459 of 18639","values withheld":"0","commitment":"sha256 f6898dbb8c3488533e234dc735b958f81a660903e3e1d6c665d2e6f63e4c1904 · lines 5448"},"tables":[]},
-"Timeline":{"facts":{"events":"265 · shown 60 · elided 205","elided":"205 events from 2026-10-26T17:15:51Z to 2026-11-01T10:24:14Z","withheld rows":"verb 2383 · push 341 · push-refused 0 · gate 3 · compact 4 · limit 32 · idle 0 · workflow 144"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
+"Summary":{"facts":{"run-state":"memory/builds/dSafePassage/RUN.md","run":"2 of 2","start":"0a000b4060e34b6109758dc94d9abb5e5e3cdb7f","phase":"VERIFYING","terminal":"no","window":"2026-10-26T08:37:11Z to 2026-11-02T01:01:53Z","window opened by":"git","window closed by":"last-activity","duration":"577482s","own commits":"0","last own commit":"-","merged":"-","units served":"98","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 7 · post-close 0","usage main":"requests 3104 · in 8058 · out 1855707 · cache-read 1714134018 · cache-write 4698522","usage agent":"requests 4362 · in 8830 · out 4128565 · cache-read 651905713 · cache-write 23394604","usage workflow":"requests 10440 · in 20938 · out 7477474 · cache-read 1170326759 · cache-write 44350229","attributed calls":"16786 of 18997","values withheld":"0","commitment":"sha256 f9b91b3fc0b04a2dfb9c8959257ef6cc39458043b89de4cb0dde80b8fb8482a7 · lines 5505"},"tables":[]},
+"Timeline":{"facts":{"events":"269 · shown 60 · elided 209","elided":"209 events from 2026-10-26T17:15:51Z to 2026-11-01T11:13:59Z","withheld rows":"verb 2405 · push 347 · push-refused 0 · gate 4 · compact 4 · limit 32 · idle 0 · workflow 146"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
 ["2026-10-26T08:37:11Z","run-state","phase","60d90cb71db5","RUNNING","-","-"],
 ["2026-10-26T09:01:21Z","run-state","phase","7f9df190edf2","BUILDING","-","-"],
 ["2026-10-26T09:58:28Z","run-state","dispatch","TOOL-dSafePassage-1","-","-","-"],
@@ -228,10 +228,6 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-10-26T17:01:33Z","run-state","dispatch","TOOL-dSafePassage-22","-","-","-"],
 ["2026-10-26T17:01:41Z","run-state","brief","TOOL-dSafePassage-22","-","-","-"]]},
 {"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
-["2026-11-01T10:29:32Z","run-state","dispatch","TOOL-dSafePassage-97","-","-","-"],
-["2026-11-01T11:03:15Z","run-state","brief","TOOL-dSafePassage-98","-","-","-"],
-["2026-11-01T11:08:13Z","run-state","dispatch","TOOL-dSafePassage-98","-","-","-"],
-["2026-11-01T11:13:59Z","run-state","phase","390033278090","VERIFYING","-","-"],
 ["2026-11-01T12:00:03Z","run-state","phase","1d97c92327e6","BUILDING","-","-"],
 ["2026-11-01T12:37:13Z","run-state","brief","TOOL-dSafePassage-99","-","-","-"],
 ["2026-11-01T12:37:15Z","run-state","brief","TOOL-dSafePassage-100","-","-","-"],
@@ -257,12 +253,16 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-11-01T20:51:53Z","run-state","dispatch","TOOL-dSafePassage-103","-","-","-"],
 ["2026-11-01T21:10:32Z","run-state","dispatch","TOOL-dSafePassage-103","-","-","-"],
 ["2026-11-01T21:25:08Z","run-state","dispatch","TOOL-dSafePassage-103","-","-","-"],
-["2026-11-01T21:32:53Z","run-state","phase","02030bc97","VERIFYING","-","-"]]}]},
-"Units":{"facts":{"units":"99 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
+["2026-11-01T21:32:53Z","run-state","phase","02030bc97","VERIFYING","-","-"],
+["2026-11-01T23:50:35Z","run-state","brief","TOOL-dSafePassage-104","-","-","-"],
+["2026-11-01T23:50:35Z","run-state","phase","b9543af4bb17","BUILDING","-","-"],
+["2026-11-02T00:47:31Z","run-state","dispatch","TOOL-dSafePassage-104","-","-","-"],
+["2026-11-02T00:57:51Z","run-state","dispatch","TOOL-dSafePassage-104","-","-","-"]]}]},
+"Units":{"facts":{"units":"100 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
 ["1","DEFERRED","1"],
-["2","CLOSED","97"],
+["2","CLOSED","98"],
 ["3","WONTDO","1"]]}]},
-"Decisions":{"facts":{"entries":"121 · shown 0 · aggregated yes","trailer near-misses":"0","decision-log rows the owner's":"0","spec marks":"owner-before 2 · owner-inside 3 · agent-before 87 · agent-inside 24","excluded rows":"proposal 0 · rescope 41 · dispatch 148 · review 9 · brief 98 · hold 2 · resume 2","review rounds":"9 · shown 9 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
+"Decisions":{"facts":{"entries":"121 · shown 0 · aggregated yes","trailer near-misses":"0","decision-log rows the owner's":"0","spec marks":"owner-before 2 · owner-inside 3 · agent-before 87 · agent-inside 24","excluded rows":"proposal 0 · rescope 42 · dispatch 150 · review 9 · brief 99 · hold 2 · resume 2","review rounds":"9 · shown 9 · aggregated no"},"tables":[{"name":"by-source","header":["#","source","entries"],"rows":[
 ["1","decision","3"],
 ["2","abort","0"],
 ["3","override","0"],
@@ -292,19 +292,19 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["3","green-at-close","-","UNJUDGEABLE"],
 ["4","keepalive-reaped","-","MET"],
 ["5","review-exited","-","MET"]]}]},
-"Anomalies":{"facts":{"anomalies":"321 · shown 0 · aggregated yes"},"tables":[{"name":"by-kind","header":["#","kind","subclass","count"],"rows":[
+"Anomalies":{"facts":{"anomalies":"326 · shown 0 · aggregated yes"},"tables":[{"name":"by-kind","header":["#","kind","subclass","count"],"rows":[
 ["1","no-progress","-","1"],
-["2","out-of-band-edit","-","17"],
+["2","out-of-band-edit","-","19"],
 ["3","refusal-loop","-","4"],
 ["4","killed-verb","-","169"],
 ["5","red-behind-zero","-","2"],
-["6","destructive-git","-","127"],
+["6","destructive-git","-","130"],
 ["7","multi-run-session","-","1"]]}]},
 "Coverage":{"facts":{"journal starts":"0 joined of 0 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 2","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
 ["1","run-state","present","-","-"],
-["2","driver","present","4763","1"],
-["3","gates","present","3","0"],
-["4","pushes","present","341","0"],
+["2","driver","present","4807","1"],
+["3","gates","present","4","0"],
+["4","pushes","present","347","0"],
 ["5","git","present","-","-"],
 ["6","transcripts","present","-","-"],
 ["7","build-folder","present","-","-"]]}]}}}
