@@ -177,7 +177,8 @@ carries it and dispatches only what is missing. A run where a lens, a batch or t
 returned nothing exits `deferred-platform`, naming the `pending` labels and no blocker count:
 re-run it once, and hold on a second.
 
-- **Precision — confirmed / (confirmed + refuted) — is the #1 token lever.** Below 0.5, tighten the
+- **Precision — (confirmed + merged) / (confirmed + merged + refuted), a same-batch duplicate of a
+  confirmed finding counted as merged — is the #1 token lever.** Below 0.5, tighten the
   scope before adding agents. Measured on the review that produced this document: 18 / 20.
   It tunes a review and ends no chain: a spec audit's chain stops on the derived verdict the build
   method states.

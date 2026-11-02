@@ -76,9 +76,10 @@ function buildKeyedSchema(schema, extra) {
 // Pure, so a `node` slice evaluates it alone. A count the run has not produced at that stage arrives
 // null or absent and prints `-`, never `0`: a zero is a result and an absence is not. `key=value`
 // fields and no head from the chat micro-format set, because this is a RECORD line.
+// TOOL-dFairHearing-5 S4 - `merged` after `refuted`, so a stage before verify prints `merged=-`.
 function renderShapeLine(fields) {
   return `review-shape kind=${fields.kind} round=${fields.round} intensity=${fields.intensity} at=${fields.at} ` +
-    ['raw', 'confirmed', 'refuted', 'unverified', 'blocker', 'high', 'medium', 'low']
+    ['raw', 'confirmed', 'refuted', 'merged', 'unverified', 'blocker', 'high', 'medium', 'low']
       .map((k) => `${k}=${fields[k] === null || fields[k] === undefined ? '-' : fields[k]}`).join(' ') +
     ` agents=${fields.agents} out-tokens=${fields.outTokens === null || fields.outTokens === undefined ? 'unknown' : fields.outTokens}`
 }
@@ -418,6 +419,14 @@ function deriveAddressOrder(findings) {
     .map((f) => [deriveAddressKey(f), f])
     .sort((u, v) => cmp(u[0].file, v[0].file) || cmpAt(u[0].at, v[0].at) || cmp(String(u[0].lens), String(v[0].lens)) || u[0].id - v[0].id)
     .map((pair) => pair[1])
+}
+// TOOL-dFairHearing-5 S1 - THE DUPLICATE REASON FORM, read once: the id a refutation opening
+// `duplicate of id=<n>` names, else null. The orphan check, the merged count and the lens yield all
+// read it here; `duplicate of prior <ref>` names a previous round's finding and reads null.
+const DUPLICATE_REASON = /^duplicate of id=(\d+)/i
+function extractDuplicateTarget(reason) {
+  const m = DUPLICATE_REASON.exec(String(reason || '').trim())
+  return m ? Number(m[1]) : null
 }
 // The run's identity is its first log line and the first key of every return: the tool titles the
 // run with `meta.name` alone.
@@ -1156,7 +1165,9 @@ else log('WARNING: `checklist` was supplied with no item — no lens sweeps the 
 // TOOL-aEvidencedLens-1 S3 - r2, ONE bump for the whole aEvidencedLens build (its shared invariant 5).
 // r3 at the reconcile of aMendedFleet with origin/main: the merged reuse lens and the workerType-aware
 // re-run texts differ from both sides' prompts, so neither side's lens files may answer the merge.
-const REVIEW_SHAPE = 'lenses5-r3'
+// TOOL-dFairHearing-5 S5 - r4, ONE bump for the whole dFairHearing build: the diff skeptic's prompt
+// gains the `duplicate of id=<n>` form, so no verify file judged under the old prompt is reused.
+const REVIEW_SHAPE = 'lenses5-r4'
 // TOOL-aSightedSkeptic-3 S5 - `specs` is interpolated by renderIntent(), so it joins the print too.
 // TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
 // and a lens swept under one checklist is never reused under another.
@@ -1449,6 +1460,9 @@ const allFindings = finderResults
 // severity outside the closed four skips its item, and an id that is not confirmed is ignored.
 // `unique` counts ITEMS whose every confirmed id is this lens's, so two lenses confirming one defect
 // are one shared item and neither is credited. `precision` is null, never 0, where nothing was judged.
+// TOOL-dFairHearing-5 S4 - `merged` is a refuted row whose reason names a duplicate target; an orphan's
+// row reads unverified, so this selects exactly the verify stage's merged set. It leaves `refuted` and
+// joins precision's numerator and denominator.
 function deriveLensYield(rows, items) {
   const confirmedLens = new Map(rows.filter((e) => e.verdict === 'confirmed').map((e) => [e.id, e.lens]))
   const defects = {}
@@ -1461,12 +1475,13 @@ function deriveLensYield(rows, items) {
   }
   return runningLensKeys.map((k) => {
     const mine = rows.filter((e) => e.lens === k)
-    const n = { confirmed: 0, refuted: 0, uncertain: 0, unverified: 0 }
-    for (const e of mine) n[e.verdict]++
+    const n = { confirmed: 0, refuted: 0, merged: 0, uncertain: 0, unverified: 0 }
+    for (const e of mine) n[e.verdict === 'refuted' && extractDuplicateTarget(e.reason) !== null ? 'merged' : e.verdict]++
+    const judged = n.confirmed + n.merged + n.refuted
     return {
-      lens: k, returned: !!finderResults[LENS_KEYS.indexOf(k)], raw: mine.length, confirmed: n.confirmed, refuted: n.refuted,
-      uncertain: n.uncertain, unverified: mine.length - n.confirmed - n.refuted,
-      precision: n.confirmed + n.refuted ? n.confirmed / (n.confirmed + n.refuted) : null,
+      lens: k, returned: !!finderResults[LENS_KEYS.indexOf(k)], raw: mine.length, confirmed: n.confirmed, refuted: n.refuted, merged: n.merged,
+      uncertain: n.uncertain, unverified: mine.length - judged,
+      precision: judged ? (n.confirmed + n.merged) / judged : null,
       defects: items ? defects[k] || 0 : null, unique: items ? unique[k] || 0 : null,
     }
   })
@@ -1474,15 +1489,15 @@ function deriveLensYield(rows, items) {
 // The counts known BEFORE the synthesis, as the verbatim block its prompt carries; `defects` and
 // `unique` need its items, so they are returned and logged and never in the report.
 function renderLensYield(rows) {
-  const cols = ['lens', 'returned', 'raw', 'confirmed', 'refuted', 'uncertain', 'unverified', 'precision']
+  const cols = ['lens', 'returned', 'raw', 'confirmed', 'refuted', 'merged', 'uncertain', 'unverified', 'precision']
   return ['| ' + cols.join(' | ') + ' |', '|' + cols.map(() => '---').join('|') + '|']
-    .concat(rows.map((e) => '| ' + [e.lens, e.returned ? 'yes' : 'no', e.raw, e.confirmed, e.refuted, e.uncertain, e.unverified,
+    .concat(rows.map((e) => '| ' + [e.lens, e.returned ? 'yes' : 'no', e.raw, e.confirmed, e.refuted, e.merged, e.uncertain, e.unverified,
       e.precision === null ? '-' : e.precision.toFixed(2)].join(' | ') + ' |'))
     .join('\n')
 }
 function printLensYield(rows) {
   for (const e of rows)
-    log(`lens yield: ${e.lens} returned ${e.returned ? 'yes' : 'no'} · raw ${e.raw} · confirmed ${e.confirmed} · refuted ${e.refuted} · ` +
+    log(`lens yield: ${e.lens} returned ${e.returned ? 'yes' : 'no'} · raw ${e.raw} · confirmed ${e.confirmed} · refuted ${e.refuted} · merged ${e.merged} · ` +
       `uncertain ${e.uncertain} · unverified ${e.unverified} · precision ${e.precision === null ? '-' : e.precision.toFixed(2)} · ` +
       `defects ${e.defects === null ? '-' : e.defects} · unique ${e.unique === null ? '-' : e.unique}`)
 }
@@ -1598,7 +1613,9 @@ const verdictResults = await boundedParallel(
           `or \`duplicate of prior <ref>\` for a prior round's original; (6) a PREFERENCE that names no defect the rubric grades, not even a low.\n` +
           `Evidence that reads \`-\` was not recorded: probe the claim yourself and never confirm on the finder's word. ` +
           `A probe you could not run inside its bound is a finding you cannot establish; apply the default by the finder's grade, and never call it evidence that does not reproduce.\n\n`
-        : (roles.skeptic ? `For EACH finding below, ` : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — `) + `read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
+        : (roles.skeptic ? `For EACH finding below, ` : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — `) + `read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n` +
+          // TOOL-dFairHearing-5 S3 - the spec skeptic's case (5) form, so a diff duplicate is read as one.
+          `A DUPLICATE opens \`reason\` with \`duplicate of id=<n>\` for another finding in this batch that you CONFIRM in this same answer.\n\n`) +
         // TOOL-aSightedSkeptic-6 S4 - the default follows the FINDER's grade (spec section 8 F3). An
         // unsure skeptic refuting a real blocker loses the defect; one answering uncertain on every
         // low-precision nit floods disposal. So only a costly finding is left outstanding.
@@ -1669,24 +1686,29 @@ for (const r of liveVerdicts)
     else conflicts.add(v.id)
   }
 for (const id of conflicts) verdictById.delete(id)
-// TOOL-aEvidencedLens-3 S6 - an ORPHANED duplicate, spec kind only (spec section 8 F2). A refutation
+// TOOL-aEvidencedLens-3 S6 - an ORPHANED duplicate (spec section 8 F2). A refutation
 // opening `duplicate of id=<n>` drops the finding on the strength of another one, so it holds only when
 // <n> is a DIFFERENT id in the SAME batch that stands CONFIRMED after the conflict demotion above.
 // Otherwise the defect would leave the confirmed set with nothing kept in its place: it is demoted to
-// UNVERIFIED exactly as a contradicted verdict is. The diff kind's duplicate names no surviving id.
+// UNVERIFIED exactly as a contradicted verdict is. TOOL-dFairHearing-5 S2 - on both kinds, since the
+// diff skeptic is now given the same duplicate form.
 const orphanDuplicates = new Set()
-if (isSpec)
-  for (const group of batches) {
-    const batchIds = new Set(group.map((f) => f.id))
-    for (const f of group) {
-      const v = verdictById.get(f.id)
-      const m = v && v.verdict === 'refuted' ? /^duplicate of id=(\d+)/i.exec(String(v.reason || '').trim()) : null
-      if (!m) continue
-      const n = Number(m[1])
-      if (n === f.id || !batchIds.has(n) || verdictById.get(n)?.verdict !== 'confirmed') orphanDuplicates.add(f.id)
-    }
+for (const group of batches) {
+  const batchIds = new Set(group.map((f) => f.id))
+  for (const f of group) {
+    const v = verdictById.get(f.id)
+    const n = v && v.verdict === 'refuted' ? extractDuplicateTarget(v.reason) : null
+    if (n === null) continue
+    if (n === f.id || !batchIds.has(n) || verdictById.get(n)?.verdict !== 'confirmed') orphanDuplicates.add(f.id)
   }
+}
 for (const id of orphanDuplicates) verdictById.delete(id)
+// TOOL-dFairHearing-5 S4 - MERGED: a duplicate refutation that survived the orphan check above. Its
+// verdict stays `refuted` in the ledger and the appendix, which are the skeptic's record; it leaves the
+// `refuted` count and joins precision as a confirmation, and never the confirmed set or the items.
+const merged = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted' &&
+  extractDuplicateTarget(verdictById.get(f.id).reason) !== null)
+const mergedIds = new Set(merged.map((f) => f.id))
 
 // TOOL-aSightedSkeptic-2 S3/S6 - a confirmed finding's fix as the synthesis and the death log carry it.
 // Read at call time, so it is called only after the join above. Absent or outside FIX_VERDICTS is
@@ -1712,16 +1734,17 @@ function deriveBindingSeverity(f) {
 }
 
 const confirmed = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'confirmed')
-const refuted = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted')
+const refuted = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted' && !mergedIds.has(f.id))
 // TOOL-aSightedSkeptic-6 S8 - UNVERIFIED is every finding with neither a confirmed nor a refuted
 // verdict: those a skeptic answered `uncertain`, and those with no usable verdict at all. The two are
 // counted apart, so a run whose skeptics all answered never reads as one where none returned.
 const unverified = allFindings.filter((f) => ['confirmed', 'refuted'].indexOf(verdictById.get(f.id)?.verdict) === -1)
 const uncertainFindings = unverified.filter((f) => verdictById.get(f.id)?.verdict === 'uncertain')
 const noVerdict = unverified.filter((f) => verdictById.get(f.id)?.verdict !== 'uncertain')
-// precision is confirmed/(confirmed+refuted): an unjudged or uncertain finding is not evidence either way.
-const judged = confirmed.length + refuted.length
-const precision = judged ? confirmed.length / judged : 0
+// precision is (confirmed+merged)/(confirmed+merged+refuted): an unjudged or uncertain finding is not
+// evidence either way, and a merged duplicate is a confirmation of its original (TOOL-dFairHearing-5 S4).
+const judged = confirmed.length + merged.length + refuted.length
+const precision = judged ? (confirmed.length + merged.length) / judged : 0
 if (uncertainFindings.length)
   log(`WARNING: ${uncertainFindings.length} finding(s) answered UNCERTAIN by a skeptic — counted UNVERIFIED, neither confirmed nor refuted: ids ${uncertainFindings.map((f) => f.id).join(', ')}`)
 if (noVerdict.length)
@@ -1759,7 +1782,7 @@ if (skepticRegradedIds.length)
 if (skepticsDead)
   log(`WARNING: ${skepticsDead}/${verdictResults.length} skeptic batch(es) died — verification is PARTIAL.`)
 log(
-  `confirmed ${confirmed.length} / refuted ${refuted.length} / unverified ${unverified.length} (${uncertainFindings.length} uncertain) — precision ${precision.toFixed(2)}` +
+  `confirmed ${confirmed.length} / refuted ${refuted.length} / merged ${merged.length} / unverified ${unverified.length} (${uncertainFindings.length} uncertain) — precision ${precision.toFixed(2)}` +
     (judged === 0
       ? ' (NOTHING was judged — the number is a placeholder, not a result)'
       : precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
@@ -1838,7 +1861,7 @@ function renderAppendix(rows) {
 const appendix = renderAppendix(ledger)
 // TOOL-aMendedFleet-18 S1 - every count the verify stage produced, the four severities over RAW
 // confirmed findings by binding grade; a grade outside the closed four is counted in none.
-const verifiedCounts = { raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
+const verifiedCounts = { raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length, merged: merged.length,
   unverified: unverified.length, blocker: 0, high: 0, medium: 0, low: 0 }
 for (const f of confirmed) {
   const g = deriveBindingSeverity(f)
@@ -1868,7 +1891,7 @@ if (confirmed.length + unverified.length === 0) {
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
     // no synthesis pass ran to adjudicate a blocker count, so there is none to report.
     confirmed: [], report: null, precision, root: repo, blockers: null, highs: null,
-    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0, uncertain: 0,
+    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0, uncertain: 0, merged: merged.length,
     conflicts: conflicts.size, duplicates, spurious, lensesReused: reusedLens.size, batchesReused,
     note: deferred
       ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — ${renderRerunTail(pendingLabels.join(', '), false)}`
@@ -1899,7 +1922,7 @@ if (pendingLabels.length) {
     identity,
     shape: shapeLine,
     exit: 'deferred-platform', key: reviewKey, pending: pendingLabels, durable,
-    root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
+    root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length, merged: merged.length,
     unverified: unverified.length, uncertain: uncertainFindings.length, conflicts: conflicts.size, duplicates, spurious, precision,
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
@@ -1954,7 +1977,7 @@ const synth = await agent(
     `corrected fix into the report, never the rejected one; where the note gives no correction, say the fix is still to be ` +
     `designed. Where it is NOT JUDGED, present it as the finder's proposal only. ` +
     // TOOL-aSightedSkeptic-7 S6 - the intensity, in the review-shape sentence, on every run.
-    `State the review shape near the top — intensity ${intensity}, raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
+    `State the review shape near the top — intensity ${intensity}, raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, merged ${merged.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
     // TOOL-aEvidencedLens-6 S6 - copied, as the appendix is, and not verified; the return holds the rows.
     `\n\nLENS YIELD - the table between the two marker lines below goes into the report directly after the review-shape ` +
     `sentence, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
@@ -1976,8 +1999,9 @@ const synth = await agent(
     `lenses ${liveResults.length}/${lensesRunning} returned, ${lensesDead} DIED; ` +
     `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
     `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
-    // TOOL-aEvidencedLens-3 S6 - spec kind only, so the diff kind's prompt stays byte-identical.
-    (isSpec ? `${orphanDuplicates.size} orphaned duplicate refutation(s) demoted to unverified, ` : '') +
+    // TOOL-aEvidencedLens-3 S6 - TOOL-dFairHearing-5 S2/S4: on both kinds, the diff prompt's bytes moving here.
+    `${orphanDuplicates.size} orphaned duplicate refutation(s) demoted to unverified, ` +
+    `${merged.length} duplicate refutation(s) counted as merged confirmations, ` +
     `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s); ` +
     // TOOL-aSightedSkeptic-2 S4 - how many confirmed fixes a skeptic actually judged.
     `fixes on confirmed findings: ${fixCounts.sound} judged sound, ${fixCounts.unsound} judged UNSOUND, ` +
@@ -2266,6 +2290,7 @@ return {
   raw: allFindings.length,
   confirmed: confirmed.length,
   refuted: refuted.length,
+  merged: merged.length,
   unverified: unverified.length,
   uncertain: uncertainFindings.length,
   conflicts: conflicts.size,

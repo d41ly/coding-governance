@@ -9573,6 +9573,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "extractDuplicateTarget",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "extractDuplicateTarget",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "extractErrorClass",
       "kind": "function",
       "file": "tools/unattended/stall-recorder.js"

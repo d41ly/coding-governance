@@ -1709,7 +1709,7 @@ async function runLedgerArms() {
   const regradedWrong = []
   // TOOL-aMendedFleet-18 - each exit's `shape` matches the S1 grammar at the stage its path reaches,
   // is logged, and reads `out-tokens=unknown` because the stub runtime's `budget` has no `spent`.
-  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown$/
+  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) merged=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown$/
   const shapeStage = { 'every lens dead': 'find', 'no finding raised': 'find', 'every finding refuted': 'verify',
     'one skeptic batch dead': 'verify', 'the synthesis dead': 'synth', complete: 'synth' }
   let shapeSeen = 0
@@ -1728,7 +1728,7 @@ async function runLedgerArms() {
     if (what === 'complete') {
       const sp = r.trace.find((t) => t.label === 'synth')
       synthPromptShape = !!sp && sh.length > 0 && sp.prompt.indexOf('<<<SHAPE\n' + sh + '\nSHAPE>>>') !== -1 &&
-        sh.indexOf(' raw=5 confirmed=5 refuted=0 unverified=0 ') !== -1 && sh.indexOf(' agents=11 ') !== -1
+        sh.indexOf(' raw=5 confirmed=5 refuted=0 merged=0 unverified=0 ') !== -1 && sh.indexOf(' agents=11 ') !== -1
     }
   }
   ck(regradedSeen === 6 && regradedWrong.length === 0,
@@ -1792,16 +1792,17 @@ async function runLedgerArms() {
     ck(r.trace.some((t) => t.label === 'verify:batch-1') && row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
       'spec skeptic: a duplicate of a confirmed survivor in its batch stays refuted, unannounced')
   }
-  const runOrphanArm = async (over, what) => {
-    r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers(over) }))
-    if (!checkNoThrow(r, 'spec skeptic orphan ' + what)) return
+  // TOOL-dFairHearing-5 S2 - the kind is a parameter, so the diff kind's orphans run the same arm (AC4).
+  const runOrphanArm = async (over, what, args, kname) => {
+    r = await runReview(args || SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers(over) }))
+    if (!checkNoThrow(r, (kname || 'spec') + ' skeptic orphan ' + what)) return
     const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
     const sp = r.trace.find((t) => t.label === 'synth')
     const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
     ck(r.result.unverified >= 1 && row.verdict === 'unverified' && row.reason === 'duplicate of an unconfirmed id' &&
       r.logs.some((l) => l.indexOf('WARNING:') === 0 && /DUPLICATE of an id/.test(l) && / ids 2$/.test(l)) &&
       ri.indexOf('1 orphaned duplicate refutation(s) demoted to unverified') !== -1,
-      'spec skeptic: a duplicate of ' + what + ' is demoted to unverified, ledgered, warned and counted in RUN INTEGRITY')
+      (kname || 'spec') + ' skeptic: a duplicate of ' + what + ' is demoted to unverified, ledgered, warned and counted in RUN INTEGRITY')
   }
   await runOrphanArm({ 1: { verdict: 'refuted', reason: 'r' }, 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }, 'a refuted survivor')
   await runOrphanArm({ 2: { verdict: 'refuted', reason: 'duplicate of id=2' } }, 'its own id')
@@ -1810,9 +1811,57 @@ async function runLedgerArms() {
   if (checkNoThrow(r, 'spec skeptic diff kind')) {
     const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
     const dv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    // TOOL-dFairHearing-5 S2 - inverted: the base harness skipped the diff kind's orphan check.
     ck(dv.length > 0 && dv.every((t) => t.prompt.indexOf(' | evidence: ') === -1 && t.prompt.indexOf('PROBE POLICY') === -1) &&
-      row.verdict === 'refuted' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
-      'spec skeptic: a diff-kind verify prompt carries no evidence field and no probe policy, and its duplicate refutation is not scanned')
+      row.verdict === 'unverified' && r.logs.some((l) => /DUPLICATE of an id/.test(l)),
+      'spec skeptic: a diff-kind verify prompt carries no evidence field and no probe policy, and its orphaned duplicate refutation is scanned')
+  }
+
+  // ==== TOOL-dFairHearing-5 — a same-batch duplicate counts as a MERGED confirmation on both kinds, and
+  // ==== the orphan check runs on the diff kind. RED against the base harness, which defines no
+  // ==== extractDuplicateTarget, counts the duplicate as refuted, skips the diff kind's orphan check
+  // ==== and gives the diff skeptic no duplicate form. buildPairLens puts ids 1 and 2 in verify:batch-1.
+  // AC4 - the diff kind's orphans, through the spec arm's own runner.
+  await runOrphanArm({ 2: { verdict: 'refuted', reason: 'duplicate of id=3' } }, 'an id in another batch', DIFF, 'diff')
+  await runOrphanArm({ 1: { verdict: 'refuted', reason: 'r' }, 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }, 'a refuted survivor', DIFF, 'diff')
+  // AC1 - the reason form, read from the prelude.
+  {
+    let dt = null
+    try { dt = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn extractDuplicateTarget')(base, () => {}, null, null, null) } catch (e) { console.log('HARNESS-BROKEN merged: ' + e.message) }
+    const got = dt ? ['duplicate of id=4', '  Duplicate of id=12: same claim', 'duplicate of prior a.js:3', 'dup of id=4', '', undefined].map((x) => dt(x)) : []
+    ck(JSON.stringify(got) === '[4,12,null,null,null,null]', 'merged: extractDuplicateTarget reads id=4 and a cased, padded id=12, and a prior ref, another word, empty and undefined as null: ' + JSON.stringify(got))
+  }
+  for (const [kname, kargs] of [['diff', DIFF], ['spec', SPEC]]) {
+    // AC2, AC3, AC6 - id 2 refuted as a duplicate of id 1, its confirmed batch-mate.
+    r = await runReview(kargs, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
+    if (checkNoThrow(r, 'merged ' + kname)) {
+      const x = r.result
+      const row = (x.ledger || []).find((e) => e.id === 2) || {}
+      const yr = (x.lensYield || []).find((e) => e.lens === row.lens) || {}
+      ck(x.confirmed === 9 && x.merged === 1 && x.refuted === 0 && x.precision === 1 && String(x.shape).indexOf(' refuted=0 merged=1 ') !== -1 &&
+        yr.merged === 1 && yr.refuted === 0 && yr.precision === 1,
+        'merged: ' + kname + ' — a same-batch duplicate reads confirmed 9, merged 1, refuted 0, precision 1, in the shape and its lens\'s yield row')
+      const arow = String(x.appendix || '').split('\n').find((l) => l.indexOf('| 2 |') === 0) || ''
+      ck(row.verdict === 'refuted' && row.reason === 'duplicate of id=1' && arow.indexOf('| refuted | duplicate of id=1 |') !== -1,
+        'merged: ' + kname + ' — the ledger and appendix keep the skeptic\'s refuted verdict and duplicate reason')
+      const sp = r.trace.find((t) => t.label === 'synth')
+      const conf = sp ? sp.prompt.split('UNVERIFIED findings')[0] : 'id=2 ['
+      const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+      ck(!(x.confirmedFindings || []).some((f) => f.id === 2) && conf.indexOf('id=2 [') === -1 && x.blockers === 0 && x.highs === 9 &&
+        ri.indexOf('1 duplicate refutation(s) counted as merged confirmations') !== -1 && sp.prompt.indexOf(', refuted 0, merged 1, ') !== -1,
+        'merged: ' + kname + ' — the merged id stays out of the confirmed set and the CONFIRMED list, the tally holds, and the synthesis states merged')
+    }
+    // AC3 - a duplicate of a prior round's finding is no merge.
+    r = await runReview(kargs, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of prior a.js:3' } }) }))
+    if (checkNoThrow(r, 'merged prior ' + kname)) {
+      ck(r.result.merged === 0 && r.result.refuted === 1, 'merged: ' + kname + ' — a `duplicate of prior` refutation stays refuted, merged 0')
+    }
+  }
+  // AC5 - the diff skeptic is given the duplicate form, on every batch.
+  r = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(r, 'merged diff prompt')) {
+    const dv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    ck(dv.length === 5 && dv.every((t) => t.prompt.indexOf('duplicate of id=<n>') !== -1), 'merged: every diff verify prompt carries the `duplicate of id=<n>` form')
   }
 
   // ==== TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not
@@ -2233,7 +2282,7 @@ async function runLensYieldArms() {
     const block = end === -1 ? '' : sp.prompt.slice(at, end)
     const keys = scanYield(r, 5) ? r.result.lensYield.map((e) => e.lens) : []
     ck(keys.length === 5 && block !== '' && sp.prompt.indexOf('precision 1.00. \n\nLENS YIELD') !== -1 &&
-      keys.every((k) => block.indexOf('| ' + k + ' | yes | 1 | 1 | 0 | 0 | 0 | 1.00 |') !== -1),
+      keys.every((k) => block.indexOf('| ' + k + ' | yes | 1 | 1 | 0 | 0 | 0 | 0 | 1.00 |') !== -1),
       'lens yield: the spec synthesis prompt carries the marked block, a row per running lens with its precision')
     const yl = r.logs.filter((l) => l.indexOf('lens yield: ') === 0)
     ck(yl.length === 5 && keys.every((k) => yl.some((l) => l.indexOf('lens yield: ' + k + ' returned yes') === 0 && l.indexOf('defects 1') !== -1 && l.indexOf('unique 0') !== -1)),
@@ -2826,7 +2875,11 @@ printf '%s\n' "$out"
 # `batch:` arms — seven address-key arms (7), six batchBy arms (6), five batch-order arms (5) and three
 # reuse arms (3). The 25 renamed `verify:batch-<n>` references add none. Counted by hand, not by a run:
 # the pass runs no suite.
-FLOOR_ASSERTIONS=439
+# RAISED 439 -> 451 by TOOL-dFairHearing-5: 12 assertions, counted off the `merged:` block and its diff
+# orphans — two diff-kind orphan arms (2), the reason form (1), per kind the merged counts, the kept
+# verdict, the untouched confirmed set and the prior duplicate (8), and the diff prompt's form (1). The
+# inverted diff-kind arm adds none. Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=451
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

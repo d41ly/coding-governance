@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-5 — duplicates counted as merged confirmations, the orphan check on both kinds
 
-**Status:** INPROGRESS · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-2 · 2026-11-02 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0072@4afd6a04 whole
 

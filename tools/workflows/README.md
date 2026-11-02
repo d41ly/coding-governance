@@ -371,9 +371,13 @@ it as `lens=<key>`. On a spec subject under a declared `disposal` a complete ret
 empty and an item owes no `specs`. Every return carries five fields beside the counts:
 
 - `shape` — one record line, also logged, in this fixed grammar:
-  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
+  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
   `at` is the stage the exit reached; a count that stage has not produced is `-`, never `0`, and the
-  every-lens-dead exit prints `raw=-`. The four severities count RAW confirmed findings by binding
+  every-lens-dead exit prints `raw=-`. `merged` counts the findings a skeptic refuted as `duplicate of
+  id=<n>` of a confirmed finding in the same batch: they leave `refuted`, count as confirmations in
+  `precision`, `(confirmed + merged) / (confirmed + merged + refuted)`, and never join the confirmed
+  set; the ledger keeps their `refuted` verdict. A duplicate whose original is not such a survivor is
+  demoted to unverified on either kind, and every return carrying `refuted` carries `merged`. The four severities count RAW confirmed findings by binding
   grade, not the synthesis's adjudicated items, which stay in `blockers` and `highs`. `agents` is the
   final return's formula through the stage reached. `out-tokens` is a `budget.spent()` DELTA from just
   before the first agent: the counter is a pool shared by the main loop and every workflow in the
@@ -399,9 +403,10 @@ empty and an item owes no `specs`. Every return carries five fields beside the c
   cell is `-` when its value is absent or empty, a `|` is escaped, and line breaks fold to a space.
 - `lensYield` — per lens, `defects` and `unique` are `null` when no item list can be trusted (see below).
   One row per lens that RAN, in dispatch order, none for a lens a light run skipped:
-  `lens`, `returned` (false for a lens that died), `raw`, `confirmed`, `refuted`, `uncertain`,
-  `unverified` (every finding neither confirmed nor refuted, the uncertain ones included), `precision`
-  (`confirmed / (confirmed + refuted)`, `null` when both are 0), `defects` (synthesis items holding a
+  `lens`, `returned` (false for a lens that died), `raw`, `confirmed`, `refuted`, `merged` (a refuted
+  row whose reason opens `duplicate of id=<n>`, out of `refuted`), `uncertain`,
+  `unverified` (every finding neither confirmed, merged nor refuted, the uncertain ones included), `precision`
+  (`(confirmed + merged) / (confirmed + merged + refuted)`, `null` when all three are 0), `defects` (synthesis items holding a
   confirmed id from this lens) and `unique` (items whose every confirmed id is this lens's). The item
   list is untrusted, and both are `null` on every row, when no synthesis ran, it died,
   or the tally fault fired. Each row is logged as a `lens yield:` line, and the counts known before
