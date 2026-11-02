@@ -47,22 +47,23 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-11-02 · streams tooling
+**Build status:** SPECCED · 2 unit(s) · node d · opened 2026-11-02 · streams tooling
 ids TOOL-dCountedConsumers-1 TOOL-dCountedConsumers-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dCountedConsumers-1 — help/policy.md names every policy key family a reader consumes today](spec/2026-11-02-spec-TOOL-dCountedConsumers-1.md) | 10 | 1 | CLOSED | rev-1 | 2026-11-02 |
+| [TOOL-dCountedConsumers-2 — the trace signal counts a commit that writes a help page as product](spec/2026-11-02-spec-TOOL-dCountedConsumers-2.md) | 20 | 1 | SPECCED | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dCountedConsumers-1.
+Ids no `spec-audit` record has ever named: TOOL-dCountedConsumers-1 TOOL-dCountedConsumers-2.
 
-Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -70,6 +71,7 @@ Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 10 | `TOOL-dCountedConsumers-1` | no |
+| 20 | `TOOL-dCountedConsumers-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
