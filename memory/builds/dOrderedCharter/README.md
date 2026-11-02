@@ -169,7 +169,7 @@ ids TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 233 bound to this build, across 4 record folder(s).
+Records: 234 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
