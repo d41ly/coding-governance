@@ -5,7 +5,7 @@ opened: 2026-11-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17
+ids: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17 TOOL-dFoldedAudit-18
 ---
 
 # dFoldedAudit — a spec audit folds local fixes, promotes only new mechanisms, and its chain stops itself
@@ -75,12 +75,13 @@ None.
 | 15 | `TOOL-dFoldedAudit-15` | the closing review's mediums and lows closed as one batch |
 | 16 | `TOOL-dFoldedAudit-16` | the flagged bar's own reds cleared: the fork-site registry and the armed-cutoff pin |
 | 17 | `TOOL-dFoldedAudit-17` | origin/main reconciled into the run branch: the eight conflicted paths merged additively |
+| 18 | `TOOL-dFoldedAudit-18` | the help page for the spec-audit switches and the chain verbs, so the docs leg anchors them |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 17 unit(s) · node d · opened 2026-11-01 · streams tooling
 ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14
-ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17
+ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17 TOOL-dFoldedAudit-18
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -104,7 +105,7 @@ ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17
 | [TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively](spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md) | 170 | 1 | CLOSED | rev-5 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 138 bound to this build, across 4 record folder(s).
+Records: 140 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
