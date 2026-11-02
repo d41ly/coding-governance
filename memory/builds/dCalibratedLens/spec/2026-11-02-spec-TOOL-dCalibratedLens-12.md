@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-12 — the Loop Review pricing cost per item kind from trace rows
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0469@653feb80 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -30,7 +31,7 @@ TOOL-dCalibratedLens-9 (`ledgers.py acts` and `derive_act_tokens`), and the act 
 `Item`, `Tokens-In` and `Tokens-Out` fields (TOOL-dWellOiledMachine-32 S7, S8) read through
 `read_act_records` (TOOL-dWellOiledMachine-53 S4).
 
-- **S1** — The provider, `PROVIDERS`' `item` entry. `derive_item_rows(root, window)` in
+- **S1** — (amended, id 51) The provider, `PROVIDERS`' `item` entry. `derive_item_rows(root, window)` in
   `tools/loop/loop_review.py` runs `ledgers.py acts` once through the subprocess
   TOOL-dCalibratedLens-9 S1 states, and hands the parsed list to `derive_item_costs(acts, window)`.
   That pure function groups the act records by `item` and returns `(rows, events)` in
@@ -44,7 +45,7 @@ TOOL-dCalibratedLens-9 (`ledgers.py acts` and `derive_act_tokens`), and the act 
   · <item tag> · <n> act(s) unrecorded` line on stderr, and a row whose every in-window act is
   unrecorded renders `cost` as `-`. An act record with no `item`, or `item` `none`, is grouped under
   `unattributed`. Observed by AC2 and AC3.
-- **S4** — A refused act read yields no row and one `ledger — item · acts unread · <why>` line, the
+- **S4** — (amended, id 51) A refused act read yields no row and one `ledger — item · acts unread · <why>` line, the
   refusal TOOL-dCalibratedLens-9 S1 states. Observed by AC4.
 - **S5** — The docs. `tools/loop/README.md` and `help/loop-review.md` (TOOL-dCalibratedLens-2 S12)
   each state the `item` row and its source. NOT OBSERVED by a criterion: prose, read by the closing
@@ -72,6 +73,7 @@ TOOL-dCalibratedLens-9 (`ledgers.py acts` and `derive_act_tokens`), and the act 
 - **consumes-from** `TOOL-dCalibratedLens-2` — `PROVIDERS`, which gains the `item` entry, the provider shape and the `-` catches rule
 - **consumes-from** `TOOL-dCalibratedLens-3` — the window the walk hands `price`
 - **consumes-from** external — TOOL-dWellOiledMachine-32 (the act record and its token fields) and -53 (`read_act_records`), DEFERRED at base and of an ancestor build
+- **hands-off** `TOOL-dCalibratedLens-30` — the `[[usage]]` row of any flag it adds, which the minors batch's `docs_leg.py --list` observation reads (id 39)
 
 ## 4. Design
 
@@ -91,8 +93,8 @@ with no act record in the window writes no row, since the review prices what the
 sort by kind and then id, the grammar's order (TOOL-dCalibratedLens-2 §4 "The row").
 
 ```
-| item | item.build.unit | 2026-10-02 | 1840221tok/38 | - | - | - | 60d | idle |
-| item | item.review.synth | 2026-10-05 | 402118tok/12 | - | - | - | 60d | idle |
+| item | item.build.unit | 2026-08-02 | 1840221tok/38 | - | - | - | 60d | idle |
+| item | item.review.synth | 2026-08-05 | 402118tok/12 | - | - | - | 60d | idle |
 | item | unattributed | 2026-10-11 | - | - | - | - | 60d | new |
 ```
 
@@ -109,11 +111,29 @@ answered OK by `python tools/lexicon/lexicon.py --suggest <name> --as py.functio
 
 None: no act record exists at base, and a review over none writes no `item` row.
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 23 · §4 "The rows" (L8, `TOOL-dCalibratedLens-30`)** — Corrected in place: the two `idle`
+  sample rows carry `since` dates before the window's start, as unit 2's `derive_row_state` makes a
+  row inside it `new`.
+- **id 51 · S1, S4 (M26, `TOOL-dCalibratedLens-30`)** — The acts are read with
+  `ledgers.py acts --since <window start>` (TOOL-dCalibratedLens-9 S1 as amended).
+- **id 39 · Files touched (M19, `TOOL-dCalibratedLens-30`)** — Every `loop_review.py` verb or flag
+  this unit adds to `help/loop-review.md` gets its `[[usage]]` row in `tools/govkit/usage.toml`, and
+  the page's `<!-- usage: … -->` anchor is re-fingerprinted, so
+  `python tools/govkit/docs_leg.py --list` names it and the `docs` leg reads no `UNROWED` line.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py` (S1 to S4, and the `--fixture` cases of §7)
 - `tools/loop/README.md` (S5)
 - `help/loop-review.md` (S5, TOOL-dCalibratedLens-2's page)
+- `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
 ### Alternatives rejected
 
@@ -161,7 +181,7 @@ None: no act record exists at base, and a review over none writes no `item` row.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
 The leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11, argv `loop_review.py --fixture`) is not in
 the manifest at base, so it is named here in prose; it grades the arm below once that unit lands.
@@ -191,6 +211,9 @@ New arm: tools/loop/loop_review.py · covers AC1 AC2 AC3 AC4 · `--fixture` case
   and -9 as written this run, and TOOL-dWellOiledMachine-32, -51 and -53 at base `8bec4cef`. The status
   token is `OPEN`, the drafting token of TEMPLATE-SPEC; the brief's `DRAFT` is no member of
   `STATUS_TOKENS` (`tools/memory-tree/tree_lib.py:28`).
+- rev-2 · 2026-11-02 · §3 §4 §7 S1 S4 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 23, 51 and 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
 
 ## 10. Reuse audit
 

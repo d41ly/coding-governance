@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-14 — lens removal by a swap or an exclusion, a repository lens's replay result, and scenario promotion as `flow.promote` says
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 17 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 17 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0471@453f9872 whole
 **Carries:** node:policy-key.flow.promote
@@ -11,6 +11,7 @@
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 |
 
 <!-- /gen:spec-records -->
 
@@ -37,7 +38,7 @@ repository lens records a replay result when one ran and never owes one.
 - **S2** — `--trigger` (TOOL-dDeclaredLoop-20 S2) in `tools/unattended/unattended.sh` reads
   `instructions.exclude` with `policy.py get instructions.exclude` and passes each member tagged
   `lens.<key>` to `review_pin.py` as `--exclude <key>`. Observed by AC4.
-- **S3** — A repository lens's replay result. An overlay `[[lens]]` row of the lens kind
+- **S3** — (amended, id 44) A repository lens's replay result. An overlay `[[lens]]` row of the lens kind
   (TOOL-dCalibratedLens-13) takes an optional field `replay`, the repository path of the committed
   scorer output of a replay it ran (TOOL-dFairHearing-12's `replay_scorer.py`). `check_lens_replay` in
   `tools/workflows/render_lenses.py` refuses a `replay` naming no tracked file, naming the row's tag
@@ -49,7 +50,7 @@ repository lens records a replay result when one ran and never owes one.
   value, its build's slug and the scenario its build ran at the step it applied in, read from the
   `scenario=` field of the transition record into that step (TOOL-dDeclaredLoop-27 S8). A held or
   refused change is not carried. Observed by AC6.
-- **S5** — The proposals. `derive_scenario_proposals(changes, keeps, mode)` is a `propose` step: under
+- **S5** — (amended, id 7) The proposals. `derive_scenario_proposals(changes, keeps, mode)` is a `propose` step: under
   `loop-proposes` it raises one proposal per pair of an `After` value and a scenario carried by two or
   more distinct builds, unless a `keep` record keyed (`scenario`, that `After`) governs it; a row
   whose kind is not activatable (`kind.item` or `kind.splice`, TOOL-dDeclaredLoop-27 S3) is not
@@ -57,7 +58,7 @@ repository lens records a replay result when one ran and never owes one.
   `instructions_edit.py add --manifest overlay` command that would write it and the `Promoted-from`
   value naming every carrying change record. `file` (TOOL-dCalibratedLens-3) files each as an owner
   item. Observed by AC6, AC7 and AC8.
-- **S6** — The field. The `loop-review` record (TOOL-dCalibratedLens-3) gains `scenario-proposals`,
+- **S6** — (amended, id 47) The field. The `loop-review` record (TOOL-dCalibratedLens-3) gains `scenario-proposals`,
   `<n> · <After> under <scenario> from <slug>+<slug>` per proposal, or
   `none — flow.promote <value>` under `owner-only` and `off`. No second record kind. Observed by AC6
   and AC8.
@@ -220,6 +221,26 @@ reads `loop-proposes`, whose proposals the owner must still ratify.
 One landing, after the parents. The first proposal needs two builds carrying one change inside the
 window, so the Loop Review raises nothing on a tree with none.
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 7 · S5, AC6 (M3, `TOOL-dCalibratedLens-30`)** — A proposal is
+  `{"kind": "scenario", "id": <After>, "action": "promote", "accept": "the owner adds the row with instructions_edit.py add --manifest overlay, or declines it with a keep", "row": <the [[scenario]] row>}`,
+  and AC6 also runs `loop_review.py file --dry-run`, which prints one filed
+  `scenario <After> promote` text.
+- **id 44 · S3, Files touched, AC5 (M24, `TOOL-dCalibratedLens-30`)** —
+  `tools/workflows/lens-schema.toml` gains a `[[field]] key = "replay"` row with its class, and
+  TOOL-dFairHearing-13's `check_catalogue` rule 2 is amended in this pass where that unit lands it
+  (UNVERIFIED: `tools/workflows/render_lenses.py`, already listed): the six fields required, plus
+  `replay` admitted on an overlay row only and refused on a gov row. AC5 also plants a gov row
+  carrying `replay`, refused by name.
+- **id 47 · S6 (L11, `TOOL-dCalibratedLens-30`)** — `scenario-proposals` is a Metrics line per
+  proposal (TOOL-dCalibratedLens-3 S5 as amended), not a field, and the registry row is not edited.
+
 ### Files touched (estimate)
 
 - `tools/workflows/review_pin.py`
@@ -235,6 +256,7 @@ window, so the Loop Review raises nothing on a tree with none.
 - `tools/policy/unsummarised-keys.txt`
 - `help/policy.md`
 - `help/loop.md`
+- `tools/workflows/lens-schema.toml` — the `replay` field row (id 44)
 
 ### Alternatives rejected
 
@@ -283,11 +305,11 @@ window, so the Loop Review raises nothing on a tree with none.
   Red when: `--trigger` passes no `--exclude`.
   fixture: the `--trigger` fixture TOOL-dDeclaredLoop-20 lands in the unattended kit's suite, whose arm
   §7's `New arm:` line declares.
-- **AC5** — When `python render_lenses.py` checks a scratch overlay holding three
+- **AC5** — (amended, id 44) When `python render_lenses.py` checks a scratch overlay holding three
   repository lens rows, one with no `replay`, one whose `replay` names a tracked file and one whose
   `replay` names no tracked file, only the third is refused, its message naming its tag and `replay`.
   Red when: the first is refused, so a repository lens owes a replay, or the third passes.
-- **AC6** — When `python loop_review.py --fixture --plant promote-two-builds` runs, under
+- **AC6** — (amended, id 7) When `python loop_review.py --fixture --plant promote-two-builds` runs, under
   `loop-proposes` with two builds applying one change under `scenario.feature`, the record's
   `scenario-proposals` field names that `After` once with both slugs; with one of the two held, or
   with the second build under another scenario, it reads `0`.
@@ -395,6 +417,9 @@ New arm: tools/loop/scenario.py · covers AC11 AC12 · fixture plants of a compl
 
 - rev-1 · 2026-11-02 · initial draft. The header carries `OPEN`, not the brief's `DRAFT`, which check
   12's header grammar (`tools/memory-tree/check-memory-hygiene.sh:2145`) does not admit.
+- rev-2 · 2026-11-02 · §4 S3 S5 S6 AC5 AC6 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 7, 44 and 47 (`TOOL-dCalibratedLens-30`).
 
 ## 10. Reuse audit
 

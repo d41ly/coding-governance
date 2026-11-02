@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-10 — instruction evals: a replay suite of recorded items with known outcomes, scored through the scorer factory, owed again by a held leg when an instruction unit changes
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0467@0bd9d49f whole
 
@@ -11,6 +11,7 @@
 | [2026-11-02-build-TOOL-dCalibratedLens-10-deviation-101.md](../build/2026-11-02-build-TOOL-dCalibratedLens-10-deviation-101.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -46,7 +47,7 @@ PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
   --candidate <src> --matched <src>` writes the score into the case's `**Replayed:**` line with `HEAD`'s
   sha and the candidate's source, and raises `**Baseline:**` to the score when it is higher, through a
   temp file and `os.replace`; it writes nothing else. Observed by AC2.
-- **S3** — The check. `check_eval_suite(suite, guard, repo)` reads every case under `suite` and prints
+- **S3** — (amended, id 8) The check. `check_eval_suite(suite, guard, repo)` reads every case under `suite` and prints
   one line per case, `instruction-eval — <case> · <verdict> · <detail>`: `owed` when `**Replayed:**` is
   `none`, or when `git diff --name-only <replayed sha> HEAD -- <the case's Loads>` names a path, the
   detail naming those paths and the README section that runs a replay; `fell` when the replayed score is
@@ -54,7 +55,7 @@ PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
   (`unguarded`) and every tracked `instructions.toml` the guard lacks (`guard misses <path>`), and an
   empty suite prints `instruction-eval — unarmed · no case under <suite>`, never a pass. Exit 0 only when
   every case is held and nothing else red; 1 otherwise; 2 on a refusal. Observed by AC3 and AC4.
-- **S4** — The held leg. A row `instruction-eval` in `tools/gate-legs.json`: argv `["python3",
+- **S4** — (amended, id 41) The held leg. A row `instruction-eval` in `tools/gate-legs.json`: argv `["python3",
   "{prefix}/workflows/evals/check_evals.py"]`, `subject = "kit"`, `chunk = "selftests"`, and the guard of §4
   "The guard". `tools/workflows/evals/check_evals.py` runs `check_eval_suite` over its own directory with
   the guard it reads from that row by name, so the guard is one fact. `tools/workflows/kit.toml`'s
@@ -63,7 +64,7 @@ PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
   `[[exempt_leg]]` row of `tools/govkit/registry.toml` in the form `tier2-review self-test`'s takes, and
   `memory/map/features/review-harnesses.md` claims it. Because no kit ships its entry, `GATE_SELFTESTS=changed`
   selects it by its guard (`tools/run-gates/run-gates.sh:3075-3080`, §8 F1). Observed by AC5.
-- **S5** — The seed case, `tools/workflows/evals/design-audit-runtime-record.md`: the design-audit replay
+- **S5** — (amended, id 4) The seed case, `tools/workflows/evals/design-audit-runtime-record.md`: the design-audit replay
   of the runtime record at blob `767187aa` (TOOL-dFairHearing-1 S5), `**Known:**` that unit's known set,
   `**Expect:** found`, its `**Replayed:**` and `**Baseline:**` the reviewed score TOOL-dFairHearing-25's
   verdict record states for that replay, or `none` and `0/59` when no adjudicated score is recorded.
@@ -103,6 +104,7 @@ PLAY-dOrderedCharter-9 (the instruction manifests, `instructions.toml`).
 - **consumes-from** `TOOL-dCalibratedLens-5` — the appendix's `units` column, which marks a finding's cause an instruction, `read_finding_units`, and `PROPOSERS`, which gains `derive_eval_proposals`
 - **consumes-from** `TOOL-dCalibratedLens-3` — `METRICS` and `run_loop_file`, through which the proposal is filed
 - **consumes-from** external — TOOL-dFairHearing-12, -1 and -25 (the factory, the known-set grammar and adjudicated scoring, the seed's verdict) and PLAY-dOrderedCharter-9 (the instruction manifests), each DEFERRED at base and of a parent or ancestor build
+- **hands-off** `TOOL-dCalibratedLens-23` — `check_evals.py`, the seed case and `replay_scorer.py --record`, which that unit observes held and owed (id 4)
 
 ## 4. Design
 
@@ -195,6 +197,27 @@ held to `^[0-9]+$`, so no argument is a path.
 | `held`, `owed`, `fell`, `unguarded`, `unarmed` | verdicts | none |
 | `eval-case`, `add-case`, `eval-candidates` | proposal kind and action, `METRICS` name | none |
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 4 · S5, AC6 (H5, `TOOL-dCalibratedLens-23`)** — The seed's `**Replayed:**` and
+  `**Baseline:**` are the adjudicated score TOOL-dFairHearing-25's verdict record states for the
+  design-audit replay of the runtime record, a build-run precondition; the value none is not
+  admitted at landing, and AC6 reds on `owed`. The later units that edit a guard path,
+  TOOL-dCalibratedLens-8 and -1, owe one replay, recorded by the main loop after the last of them
+  builds and before the close bar.
+- **id 8 · §4 "The guard", S3 (M4, `TOOL-dCalibratedLens-30`)** — The guard gains
+  `tools/workflows/lenses.toml`, and S3's both-ways check reds every tracked file declaring
+  instruction units that the guard lacks, `lenses.toml` among them, not only `instructions.toml`.
+- **id 41 · S4, Files touched, §7 (M21, `TOOL-dCalibratedLens-30`)** — The held leg ships with its
+  measured row in `tools/run-gates/selftest-budgets.txt`, its subject pin in
+  `tools/govkit/subject-pins.tsv` regenerated by `govkit.py selfcheck --write`, and its evidence row
+  in `tools/run-gates/ceiling-evidence.txt`, as `tier2-review self-test` has.
+
 ### Files touched (estimate)
 
 - `tools/workflows/replay_scorer.py` (S1 to S3, S6, the fixture plants)
@@ -207,6 +230,7 @@ held to `^[0-9]+$`, so no argument is a path.
 - `memory/map/features/review-harnesses.md` (S4)
 - `tools/loop/loop_review.py` (S7)
 - `help/roles.md` (S8)
+- `tools/run-gates/selftest-budgets.txt`, `tools/govkit/subject-pins.tsv` and `tools/run-gates/ceiling-evidence.txt` — the held leg's budget, pin and ceiling evidence (id 41)
 
 ### Alternatives rejected
 
@@ -258,7 +282,7 @@ held to `^[0-9]+$`, so no argument is a path.
   `python tools/govkit/govkit.py shipped --epoch` prints no `tools/workflows/evals/` path; and `grep -n
   'name = "instruction-eval"' tools/govkit/registry.toml` prints the `[[exempt_leg]]` row.
   Red when: a kit ships the entry, so `changed` ignores the guard.
-- **AC6** — When `python check_evals.py` runs over the tree, it prints one line for
+- **AC6** — (amended, id 4) When `python check_evals.py` runs over the tree, it prints one line for
   `design-audit-runtime-record`, `held` or `owed` naming the paths that moved, and never `unarmed`.
   Red when: the seed case is missing or refused.
   figure: DERIVED, the verdict depends on the tree at observation time.
@@ -279,7 +303,7 @@ held to `^[0-9]+$`, so no argument is a path.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs` · `review-replay selftest` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `policy fixtures` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor` · `recall floor arms` · `codebase-map gate coverage`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs` · `review-replay selftest` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `policy fixtures` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor` · `recall floor arms` · `codebase-map gate coverage` · `every held leg is budgeted, every budget row resolves` · `govkit selfcheck` · `leg ceilings clear their evidenced maximum`
 
 The new leg `instruction-eval` is not in the manifest at base and is named here in prose; the loop kit's
 `loop-review selftest` grades S7's plant once TOOL-dCalibratedLens-2 lands.
@@ -329,6 +353,10 @@ New arm: tools/loop/loop_review.py · covers AC8 · the `eval-candidates` plant,
 - rev-1 · 2026-11-02 · initial draft, from the packet's Items 10 (`cl-dClosedLoop-0467@58bd6ee5`), the night
   pass's point 6 S2, the brief's row for unit 10 and its S10 interface, TOOL-dFairHearing-12, -1 and -25 at
   their current revisions, and the run-gates held-tier selection at base.
+- rev-2 · 2026-11-02 · §3 §4 §7 S3 S4 S5 AC6 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 4 (`TOOL-dCalibratedLens-23`), and 8 and 41 (`TOOL-dCalibratedLens-30`); §3 gains the
+  hands-off to unit 23.
 
 ## 10. Reuse audit
 

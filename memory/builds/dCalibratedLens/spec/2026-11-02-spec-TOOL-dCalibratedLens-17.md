@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-17 — the node beats and the pools' ledgers trended, and the reservation estimate per item kind re-derived from `trace.cost`
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 10 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 10 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0474@b1852db0 whole
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -55,7 +56,7 @@ TOOL-dWellOiledMachine-53 (`tools/runtime/ledgers.py`, `read_node_ledgers`, `rea
   `NODE_BEAT_KEYS` value as the record spells it, `node-plan` as a list of its lines. It reads the lease
   fields through the same read-only verb `members` reads, and adds no parser of the lease record.
   Observed by AC3.
-- **S4** — The three readings. `tools/loop/loop_review.py` gains `read_capacity_readings(root)`, which runs
+- **S4** — (amended, id 11) The three readings. `tools/loop/loop_review.py` gains `read_capacity_readings(root)`, which runs
   `beat.py members --json`, `ledgers.py pools` and `ledgers.py estimate` once per walk, each a bounded
   subprocess (60 s) of the runtime kit found through the inline `resolve_kit_dir` block, since a kit
   imports no sibling kit; and three `METRICS` entries (TOOL-dCalibratedLens-3 S5) in this order,
@@ -65,7 +66,7 @@ TOOL-dWellOiledMachine-53 (`tools/runtime/ledgers.py`, `read_node_ledgers`, `rea
   `read_loop_policy(root, "trace.cost")`. A reading whose subprocess is absent, refused, timed out or
   printed no parseable JSON answers `searched-none` with the command it ran and the reason. Observed by
   AC4, AC5 and AC6.
-- **S5** — The trend. A fourth `METRICS` entry, `capacity-trend`, after the three, with the reader
+- **S5** — (amended, id 30) The trend. A fourth `METRICS` entry, `capacity-trend`, after the three, with the reader
   `derive_capacity_trend(root, window)`: it lists the TRACKED `loop-review` records under the home
   (`git ls-files`) whose file-name date falls in the window, reads each at `HEAD` with `git show`, takes
   their three lines through `parse_capacity_line`, the parser of the lines S4 renders and the only one,
@@ -96,6 +97,7 @@ TOOL-dWellOiledMachine-53 (`tools/runtime/ledgers.py`, `read_node_ledgers`, `rea
 - **consumes-from** `TOOL-dCalibratedLens-2` — the module `tools/loop/loop_review.py`, `read_loop_policy` for `trace.cost`, and the help page this unit adds a section to
 - **consumes-from** `TOOL-dCalibratedLens-3` — `METRICS`, which gains four entries, the record whose Metrics lines carry them, its home the trend reads, and the `--fixture` plants this unit's cases join
 - **consumes-from** external — TOOL-dWellOiledMachine-52 (`beat.py`, `members` and the dPlacedRequest verb it reads), TOOL-dWellOiledMachine-53 (`ledgers.py`, `read_node_ledgers`, `read_act_records`, `derive_estimate_hours`) and TOOL-dWellOiledMachine-32 S8 (`Wall` under `trace.cost`), each DEFERRED at base and of an ancestor build
+- **hands-off** `TOOL-dCalibratedLens-30` — the three lines' dead-source answers, which the minors batch's `dead-sources` arm reads (id 11)
 
 ## 4. Design
 
@@ -170,6 +172,23 @@ empty series.
 | `node-beats`, `pool-ledgers`, `reservation-estimates`, `capacity-trend` | `METRICS` names | none |
 | `rising`, `falling`, `flat`, `new`, `gone` | trend directions | none |
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 11 · S4, §4 "The lines", AC5, AC6 (L1, `TOOL-dCalibratedLens-30`)** — A failed read is
+  `unread · <command>: <why>`, not `searched-none`, which stays for a source that holds nothing;
+  AC5's absent kit and AC6's schema refusal expect `unread`.
+- **id 30 · S5 (M14, `TOOL-dCalibratedLens-30`)** — `derive_capacity_trend` reads the window's
+  records through `read_loop_records` (TOOL-dCalibratedLens-3 S8 as amended).
+- **id 39 · Files touched (M19, `TOOL-dCalibratedLens-30`)** — Every `loop_review.py` verb or flag
+  this unit adds to `help/loop-review.md` gets its `[[usage]]` row in `tools/govkit/usage.toml`, and
+  the page's `<!-- usage: … -->` anchor is re-fingerprinted, so
+  `python tools/govkit/docs_leg.py --list` names it and the `docs` leg reads no `UNROWED` line.
+
 ### Files touched (estimate)
 
 - `tools/runtime/ledgers.py` (S1, S2)
@@ -178,6 +197,7 @@ empty series.
 - `tools/loop/loop_review.py` (S4, S5, the fixture plants)
 - `tools/loop/README.md` (S6)
 - `help/loop-review.md` and `help/runtime.md` (S6)
+- `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
 ### Alternatives rejected
 
@@ -236,11 +256,11 @@ empty series.
   `pool-ledgers` and `reservation-estimates` lines of §4 "The lines" byte for byte, in that order, after
   TOOL-dCalibratedLens-3's own entries.
   Red when: a planted member, pool or kind is missing from its line, or a segment's fields are reordered.
-- **AC5** — When the plant `capacity-absent` runs `gather --dry-run` with no runtime kit beside the loop
+- **AC5** — (amended, id 11) When the plant `capacity-absent` runs `gather --dry-run` with no runtime kit beside the loop
   kit, each of the three lines reads `searched-none` naming its command, and the walk continues to
   `price`.
   Red when: an absent kit prints `none` or `0`, which reads as a fleet with no capacity.
-- **AC6** — When the plant `capacity-refused` makes the stubbed `ledgers.py pools` exit 2 printing a
+- **AC6** — (amended, id 11) When the plant `capacity-refused` makes the stubbed `ledgers.py pools` exit 2 printing a
   schema refusal, `pool-ledgers` reads `searched-none · ledgers.py pools: <that line>` while
   `node-beats` and `reservation-estimates` carry their planted values.
   Red when: one refused read blanks the other two lines.
@@ -261,7 +281,7 @@ empty series.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) and the runtime kit's selftest leg
 are not in the manifest at base, so they are named here in prose; each grades this unit's arm once its
@@ -299,6 +319,9 @@ New arm: tools/runtime/selftest.py · covers AC1 AC3 · the `estimate`, `members
   brief's row for unit 17 and its S1, S3 and S4 interfaces as TOOL-dCalibratedLens-2 and -3 rev-1 spell
   them, cloud-and-scale items 6 and 7 and `[layers]`, and TOOL-dWellOiledMachine-52, -53 and -32 at their
   current revisions.
+- rev-2 · 2026-11-02 · §3 §4 §7 S4 S5 AC5 AC6 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 11, 30 and 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
 
 ## 10. Reuse audit
 

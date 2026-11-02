@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-4 — the measured-value factory, and the `budgets.*` caps re-derived from evidence and review cost
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 7 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 7 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0461@ea09b304 whole
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -43,7 +44,7 @@ every movement to the owner through the guarded policy command, writing no polic
   `<name>\t<class>\t<unit>\t<family>\t<home>`, the family flag spelled `true` or `false`; a census that
   refuses prints its refusal and exits 2, as `resolve` does. It is the loop kit's read of the cap
   population, since a kit imports no sibling. Observed by AC8.
-- **S4** — The evidence, `read_cap_evidence(repo, cap, window_days, now)` in `measure.py`, for a cap
+- **S4** — (amended, ids 6, 32) The evidence, `read_cap_evidence(repo, cap, window_days, now)` in `measure.py`, for a cap
   whose census `home` opens `limits:`. A measured-file cap (its name a tracked path) gives one row per
   first-parent commit of `HEAD` inside the window that changed the file, `{"bytes": <n>}`, `<n>` the
   blob's size counted without its CR bytes, as the template-size gate measures it. The class row
@@ -56,23 +57,23 @@ every movement to the owner through the guarded policy command, writing no polic
   `resolve_caps`' answer (`budgets.py:206`) and never re-read from a home. A `-` value reads as
   unset. A refusal of the resolve prints its line and gives that cap `refused: resolve refused`.
   Observed by AC2.
-- **S6** — The review cost: each cap's row of kind `cap` in the value ledger view
+- **S6** — (amended, id 5) The review cost: each cap's row of kind `cap` in the value ledger view
   `<MEMORY_ROOT>/views/value-ledger.md` (the brief's S1), its `cost` cell, read through the view's
   reader that TOOL-dCalibratedLens-2 ships, the rows TOOL-dCalibratedLens-15 provides. No view, or no
   row naming the cap, reads `cost searched-none`. The cost rides the proposal beside the derived value
   and never moves it (§8 F3). Observed by AC7.
-- **S7** — The step, `derive_cap_readings(repo, now)` in `measure.py`, run by `loop_review.py gather` as one of
+- **S7** — (amended, ids 2, 6) The step, `derive_cap_readings(repo, now)` in `measure.py`, run by `loop_review.py gather` as one of
   its steps (the brief's S3), over every census row of class `switch` with `family = false`: a
   `consumer`, `correctness` or `exempt` cap is outside the switch and a family cap's value is per
   subject, so neither is a `budgets.*` value (`budgets.py:259-265`, `:346-348`). It returns one line
   per cap, `<cap> · <unit> · current <value> (<source>) · rows <n> · p90 <value> · <direction> · cost
   <cost>`, with S2's proposal lines beneath a `raise` or `lower`. Observed by AC2, AC3, AC4 and AC5.
-- **S8** — The field: the `loop-review` record kind (the brief's S4, TOOL-dCalibratedLens-3) gains the
+- **S8** — (amended, ids 2, 3) The field: the `loop-review` record kind (the brief's S4, TOOL-dCalibratedLens-3) gains the
   field `caps`, the S7 lines of the period, written by `loop_review.py record`, so each review keeps
   the cap readings it proposed from. Each `raise` or `lower` line is a proposal keyed (`cap`, `<cap>`),
   which `loop_review.py file` files as it files every proposal (TOOL-dCalibratedLens-3). Observed by
   AC9.
-- **S9** — The leg: one `[[gate_leg]]` row `loop measure fixtures` in `tools/loop/kit.toml`, running
+- **S9** — (amended, id 42) The leg: one `[[gate_leg]]` row `loop measure fixtures` in `tools/loop/kit.toml`, running
   `python tools/loop/measure.py --fixture`, rendered into `tools/gate-legs.json` by
   `python tools/run-gates/leg_factory.py --write` (TOOL-dWitnessedBar-11 S1, S2), its `guard`
   `["{prefix}/loop/measure.py"]`; and `measure.py`'s `[[files]]` row in the same descriptor. Observed
@@ -101,11 +102,13 @@ every movement to the owner through the guarded policy command, writing no polic
 ### Edges
 
 - **consumes-from** `TOOL-dCalibratedLens-3` — `tools/loop/loop_review.py`, its `gather`, `record` and `file` verbs and the `loop-review` record kind, which carry S7's step, S8's field and its proposals
-- **consumes-from** `TOOL-dCalibratedLens-2` — the value ledger view and its reader, whose `kind=cap` rows give the `cost` S6 reads
+- **consumes-from** `TOOL-dCalibratedLens-2` — `PROVIDERS`, the table whose `cap` entry S6 calls in-process for the period's cost (id 5)
 - **consumes-from** `TOOL-dCalibratedLens-15` — the `kind=cap` rows of the value ledger, each breach priced by its bytes and its reads
 - **hands-off** `TOOL-dCalibratedLens-6` — `derive_measured_value` and `render_measured_proposal` in `tools/loop/measure.py`, which each role's item budget derives and proposes through
 - **hands-off** `TOOL-dCalibratedLens-16` — `derive_measured_value` and `render_measured_proposal` in `tools/loop/measure.py`, which the rework budget, the deadlines and the thresholds derive and propose through
 - **consumes-from** external — TOOL-dDeclaredLoop-2's `policy_edit.py propose`; TOOL-dWitnessedBar-11's `leg_factory.py`; the policy kit's `budgets.py` and `policy.py get`, landed
+- **hands-off** `TOOL-dCalibratedLens-21` — the caps step as a `METRICS` entry, whose lines that unit's `metrics-multi` plant writes (id 2)
+- **hands-off** `TOOL-dCalibratedLens-30` — `derive_cap_readings` under the walk's window, which the minors batch's `at-year-back` arm runs (id 6)
 
 ## 4. Design
 
@@ -124,7 +127,7 @@ every movement to the owner through the guarded policy command, writing no polic
   first-parent history in the 60 days to 2026-11-02 (`AGENTS.md` 26,
   `coding-governance-agents.template.md` 17, `skills/session-kickoff/SKILL.md` 8,
   `memory/guides/BUILD-METHOD.md` 58, `memory/guides/UNATTENDED-PROTOCOL.md` 78,
-  `.claude/skills/unattended/SKILL.md` 77), and spec files 342 times. PINNED, measured 2026-11-02 by
+  `.claude/skills/unattended/SKILL.md` 77), and spec files in 4,242 (path, commit) rows over 341 commits (id 20). PINNED, measured 2026-11-02 by
   `git log --first-parent --since="60 days ago"`. So at a 30-row floor three of the six refuse today.
 - `budgets.py` refuses a value held in both homes (`budgets.py:288-289`), so a proposal for a cap
   whose source is its legacy home is applied by moving the value, which the command's printed row diff
@@ -155,11 +158,11 @@ and 10 rows of 1 to 10 give 9. `min_rows` is the caller's: 30 for every caller i
 ### The caps step, by example
 
 ```
-caps — AGENTS.md · bytes · current 20480 (default) · rows 30 · p90 27000 · raise · cost 5400
+caps — AGENTS.md · bytes · current 20480 (default) · rows 30 · p90 27000 · raise · cost 4433344B/212
   policy_edit.py propose budgets."AGENTS.md" 27000
   <the row diff and the command policy_edit.py prints>
 caps — skills/session-kickoff/SKILL.md · bytes · current 18432 (default) · rows 8 · p90 - · refused: 8 of 30 rows · cost searched-none
-caps — guide-bytes · bytes · current 20480 (default) · rows 0 · p90 - · no evidence source · conf · cost searched-none
+caps — guide-bytes · bytes · current - (none) · rows 0 · p90 - · no evidence source · conf · cost searched-none
 ```
 
 The key is spelled as `policy.py`'s `parse_key` reads it (`tools/policy/policy.py:533`): a name
@@ -182,12 +185,59 @@ Each function name was asked of `python tools/lexicon/lexicon.py --suggest <name
 ### Waits on
 
 **Waits on:** TOOL-dDeclaredLoop-2 (`policy_edit.py propose`), TOOL-dWitnessedBar-11 (the leg factory),
-TOOL-dCalibratedLens-2 (the ledger view and its reader), TOOL-dCalibratedLens-3 (the module, `gather`,
+TOOL-dCalibratedLens-2 (`PROVIDERS`, id 5), TOOL-dCalibratedLens-3 (the module, `gather`,
 `record`, `file`, the record kind) and TOOL-dCalibratedLens-15 (the `kind=cap` rows).
 
 ### Migration
 
 None: the leg, the verb and the field are new, and no policy value moves.
+
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 2 · S7, S8, AC9 (H3, `TOOL-dCalibratedLens-21`)** — The caps step is a `METRICS` entry `caps`
+  answering one `(value, source)` pair per cap (TOOL-dCalibratedLens-3 S5 as amended), so the record
+  carries one `caps:` Metrics line per cap; there is no `caps` field and the registry row is not
+  edited. The proposal lines are not written into the record: they are the proposals of the next
+  bullet. AC9 reads the `caps:` Metrics lines.
+- **id 3 · S8, AC9 (H4, `TOOL-dCalibratedLens-22`)** — Each `raise` or `lower` is answered to the
+  walk as
+  `{"kind": "cap-value", "id": <cap>, "action": "raise"|"lower", "accept": "<the policy_edit.py set command S2 printed> applied by the owner, or <current> kept", "row": <the caps line>}`,
+  and the walk files it (TOOL-dCalibratedLens-3 S7 as amended); AC9's proposal is keyed `cap-value`
+  and `AGENTS.md`. `cap-value` keeps it apart from TOOL-dCalibratedLens-15's breach raise, keyed
+  `cap`.
+- **id 5 · S6, Edges, Waits on (M1, `TOOL-dCalibratedLens-30`)** — The cost is read in-process from
+  `PROVIDERS["cap"]`, TOOL-dCalibratedLens-15's `derive_cap_rows` over its cached
+  `read_cap_breaches`, in the same kit and the same walk, so it is the CURRENT period's cost; no
+  reader of the view exists or is needed. A cap whose subject has no row reads `cost -`, the class
+  row `memory/builds/*/spec/` among them; an unread provider reads `cost unread`. Waits on's "the
+  ledger view and its reader" reads `PROVIDERS`.
+- **id 32 · S4, S6 (M1, `TOOL-dCalibratedLens-30`)** — S4 takes the walk's window rather than
+  re-reading `review.loop.window-days`, as the next bullet states, and S6's cost is the same
+  period's.
+- **id 6 · S4, S7 (M2, `TOOL-dCalibratedLens-30`)** — `read_cap_evidence(repo, cap, window)` and
+  `derive_cap_readings(repo, window)` take the walk's `(start, end, days)` from `derive_loop_window`
+  and read no policy value; a plant `caps-at` runs `gather --dry-run --at` a year before now and
+  every evidence row falls inside that window.
+- **id 9 · AC7 (M5, `TOOL-dCalibratedLens-30`)** — AC7's planted `cost` is `4433344B/212`,
+  TOOL-dCalibratedLens-15's grammar, and the line ends `cost 4433344B/212` verbatim; with no `cap`
+  row it ends `cost -`.
+- **id 17 · AC2 (M7, `TOOL-dCalibratedLens-30`)** — AC2's fixture runs `git -c core.autocrlf=false`
+  for every commit of the CRLF bodies and asserts that `git cat-file -s` of one planted blob exceeds
+  its CR-stripped length before scoring, so the CR-counting break can fire on a node whose system
+  config sets `core.autocrlf=true`.
+- **id 42 · S9 (M22, `TOOL-dCalibratedLens-30`)** — The leg `loop measure fixtures` is claimed in
+  `memory/map/features/loop-review.md` (TOOL-dCalibratedLens-2's id 42), its `subject` and `chunk`
+  named on its row, `tools/govkit/subject-pins.tsv` regenerated, and a held leg's row added to
+  `tools/run-gates/selftest-budgets.txt`.
+- **id 20 · §4 Evidence, §5 (L5, `TOOL-dCalibratedLens-30`)** — Corrected in place: the class row's
+  population is 4,242 (path, commit) rows over 341 commits at `8bec4cef`.
+- **id 21 · §4 "The caps step, by example" (L6, `TOOL-dCalibratedLens-30`)** — Corrected in place:
+  `guide-bytes` prints `current - (none)`, as `budgets.py resolve guide-bytes` answers.
 
 ### Files touched (estimate)
 
@@ -195,11 +245,11 @@ None: the leg, the verb and the field are new, and no policy value moves.
 - `tools/loop/loop_review.py` — S7's step in `gather`, S8's field in `record`
 - `tools/loop/kit.toml` — S9's `[[gate_leg]]` and `[[files]]` rows
 - `tools/gate-legs.json` — S9, the render of the leg row
-- `tools/memory-tree/record-kinds.toml` — S8, the `caps` field of the `loop-review` row
 - `tools/policy/budgets.py` — S3
 - `tools/policy/check_policy.py` — S3's fixture case `budgets-census`
 - `tools/policy/README.md` — S3's line under "The size caps"
 - `help/size-caps.md` — S10
+- `memory/map/features/loop-review.md`, `tools/govkit/subject-pins.tsv` and `tools/run-gates/selftest-budgets.txt` — the leg's claim, pin and budget (id 42)
 
 ### Alternatives rejected
 
@@ -218,7 +268,7 @@ None: the leg, the verb and the field are new, and no policy value moves.
   view, and runs `policy_edit.py propose`, a verb that writes nothing, with an argument list and a
   timeout. The command's own guard (TOOL-dDeclaredLoop-2 S1) is untouched.
 - perf / scale — one `git log` per measured file and one per class row per run, and one `cat-file`
-  per changed blob; 342 spec changes in 60 days is the largest population today, read in one
+  per changed blob; 4,242 (path, commit) spec rows over 341 commits in 60 days are the largest population today (id 20), read in one
   `cat-file --batch`.
 - error / empty / loading states — no view: `cost searched-none`; fewer than 30 rows: `refused`; a
   home the step cannot measure: `no evidence source`; a resolve or command failure: one stderr line,
@@ -239,7 +289,7 @@ None: the leg, the verb and the field are new, and no policy value moves.
   one `true` and one `"12"`, the value still 27.
   Red when: a skipped row counts as zero, or the rank is taken as `int(0.9 * n)`.
   figure: every expected value is DERIVED by the nearest-rank rule over the planted rows.
-- **AC2** — When `python measure.py --fixture --plant caps-raise` commits `AGENTS.md` 30
+- **AC2** — (amended, id 17) When `python measure.py --fixture --plant caps-raise` commits `AGENTS.md` 30
   times at 1000 to 30000 bytes with CRLF endings, and a limits row `AGENTS.md` at 20480, the step
   prints `caps — AGENTS.md · bytes · current 20480 (default) · rows 30 · p90 27000 · raise` and,
   beneath it, the output of `policy_edit.py propose budgets."AGENTS.md" 27000`; `caps-lower`, the row
@@ -263,7 +313,7 @@ None: the leg, the verb and the field are new, and no policy value moves.
   repository's `.governance/policy.toml`, `tools/template-size-limits.txt` and `memory/DECISIONS.md`
   hash as they did before the step, and `git status --porcelain` there prints nothing.
   Red when: a re-derivation writes the policy directly, the shape the recheck finding C5-F6 names.
-- **AC7** — When `python measure.py --fixture --plant caps-cost` writes a value ledger view
+- **AC7** — (amended, id 9) When `python measure.py --fixture --plant caps-cost` writes a value ledger view
   holding a `kind=cap` row for `AGENTS.md` with `cost` 5400, the line ends `cost 5400` and its p90 is
   the same 27000 as `caps-raise`; with no view the line ends `cost searched-none`.
   Red when: the cost changes the derived value, or a missing view reads as `cost 0`.
@@ -273,7 +323,7 @@ None: the leg, the verb and the field are new, and no policy value moves.
   `limits:coding-governance-agents.template.md`.
   Red when: a row is dropped, reordered or its family flag misspelt.
   figure: the row count is DERIVED by the `grep`.
-- **AC9** — When `python measure.py --fixture --plant caps-record` runs `loop_review.py
+- **AC9** — (amended, ids 2, 3) When `python measure.py --fixture --plant caps-record` runs `loop_review.py
   gather` and `record` in the scratch repository, the written `loop-review` record carries a `caps`
   field holding the step's lines, and `loop_review.py file --dry-run` names one proposal keyed `cap`
   and `AGENTS.md`.
@@ -287,7 +337,7 @@ None: the leg, the verb and the field are new, and no policy value moves.
 
 ## 7. Gates
 
-`policy fixtures` · `policy check` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`policy fixtures` · `policy check` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `docs` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `codebase-map coverage + freshness` · `recall floor`
 
 New arm: tools/loop/measure.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC9 · the fixture plants, staged against a rank of `int(0.9 * n)`, a CR-counting measure, a step that writes `.governance/policy.toml`, and a cost that scales the value · none
 New arm: tools/policy/check_policy.py · covers AC8 · the case `budgets-census`, staged against a census verb that drops the family flag · none
@@ -323,6 +373,12 @@ New arm: tools/policy/check_policy.py · covers AC8 · the case `budgets-census`
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft.
+- rev-2 · 2026-11-02 · §3 §4 §5 §7 S4 S6 S7 S8 S9 AC2 AC7 AC9 · amended at the disposal of the
+  round-1 spec audit `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4
+  "Amendments (round-1 spec audit)": ids 2 (`TOOL-dCalibratedLens-21`), 3
+  (`TOOL-dCalibratedLens-22`), and 5, 32, 6, 9, 17, 42, 20 and 21 (`TOOL-dCalibratedLens-30`); the
+  Files touched row of the registry is withdrawn (id 2); §3 gains the hands-offs to units 21 and 30,
+  and the consumes-from unit 2 now names `PROVIDERS` (id 5).
 
 ## 10. Reuse audit
 

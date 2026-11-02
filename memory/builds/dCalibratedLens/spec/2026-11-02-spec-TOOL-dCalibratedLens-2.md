@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-2 — the shared value ledger: its snapshot, its view, its row grammar and the `price` verb
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0459@facc646b whole
 **Carries:** node:record-kind.value-ledger
@@ -14,6 +14,7 @@
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -57,7 +58,7 @@ The build run re-grounds on each and stops the unit when one is absent.
   from one `git log --reverse -p --unified=0 -- tools/gate-legs.json` pass; `cost` the leg's
   `<max seconds>` and `<readings>` columns of `tools/run-gates/ceiling-evidence.txt` (its header,
   `:28`), spelled `<seconds>s/<readings>`, or `-` for a leg with no row there. Observed by AC1 and AC3.
-- **S4** — The catch source, `read_catch_events(root, source, window)`, `source` the value of
+- **S4** — (amended, ids 27, 48) The catch source, `read_catch_events(root, source, window)`, `source` the value of
   `review.loop.catch-source` read through S1. Under `verdict-records`, `read_flake_events(root)` reads
   every tracked flake record (`<MEMORY_ROOT>/builds/*/build/*-flake-*.md`, TOOL-dWitnessedBar-8 S3), its
   date the `Ended` field as `read_record_fields(text)` returns it (the `- **<Key>:** <value>` grammar of
@@ -75,7 +76,7 @@ The build run re-grounds on each and stops the unit when one is absent.
   `derive_loop_window` (S1), builds the rows, and writes the snapshot through `write_ledger_snapshot`;
   `--dry-run` prints the table and writes nothing. It prints `price — <key> · <n> row(s) · source <value> · <path>`
   and exits 0. It commits nothing. Observed by AC1, AC5.
-- **S6** — The snapshot, the record kind `value-ledger`: `render_ledger_snapshot(key, at, base,
+- **S6** — (amended, ids 36, 38) The snapshot, the record kind `value-ledger`: `render_ledger_snapshot(key, at, base,
   source, window, rows)` and `write_ledger_snapshot(root, ...)`, one file per key at
   `<MEMORY_ROOT>/loop-review/<date>-value-ledger-<key>.md`, written through a temp file and `os.replace`
   as `write_record` does (`tools/runlog/record.py:1179-1201`), contained under the home. Its registry
@@ -88,11 +89,11 @@ The build run re-grounds on each and stops the unit when one is absent.
   `cmd_write`, and its `--check` reds a hand-edited view (TOOL-dLinkedLibrary-6 S3, §8 F2). Its fixture
   cases `value-ledger`, `value-ledger-empty` and `value-ledger-hand-edit` join `library_views.py
   --fixture`. Observed by AC4.
-- **S8** — The structure lint admits the home: check 3 of `tools/memory-tree/check-memory-hygiene.sh`
+- **S8** — (amended, id 1) The structure lint admits the home: check 3 of `tools/memory-tree/check-memory-hygiene.sh`
   adds `D:loop-review` to the memory root's sanctioned set (`:891`), and the check's prose in
   `tools/memory-tree/HYGIENE.template.md` names `loop-review/` and its two kinds, re-rendered into
   `memory/HYGIENE.md` by `adopt-memory-tree.sh --render`. Observed by AC7.
-- **S9** — The item row `item.loop.price` in `tools/loop/loop.toml` (the spec brief's shared interface
+- **S9** — (amended, id 26) The item row `item.loop.price` in `tools/loop/loop.toml` (the spec brief's shared interface
   S5, in the row form of TOOL-dDeclaredLoop-12 §4 "Data model"): `step = "cadence.loop"`,
   `actor = "command:loop.price"`, `needs = []`, `outcomes = ["priced"]`,
   `routes = { priced = "stand-in:tools/loop/loop_review.py" }`,
@@ -102,13 +103,13 @@ The build run re-grounds on each and stops the unit when one is absent.
 - **S10** — The catalogue row `review.loop.catch-source` (`tools/policy/catalogue.toml:1302-1306`)
   gains `summary` and `usage`, and `python tools/policy/policy.py lists --write` drains it from
   `tools/policy/unsummarised-keys.txt` (`:191`); values and default stay the row's. Observed by AC6.
-- **S11** — The leg `loop-review selftest`, argv `python {prefix}/loop/loop_review.py --fixture`, guard
+- **S11** — (amended, id 42) The leg `loop-review selftest`, argv `python {prefix}/loop/loop_review.py --fixture`, guard
   `{prefix}/loop/`, its `enforces` the practice tag of the charter's `[derive]` rule as
   PLAY-dOrderedCharter-7 S3's tag set spells it at the build run, a `[[gate_leg]]` row of
   `tools/loop/kit.toml` written by `leg_factory.py new` (TOOL-dWitnessedBar-11 S1 to S3), or a hand-written row of
   `tools/gate-legs.json` until that factory lands. NOT OBSERVED by a criterion: a manifest row; the main
   loop observes it RED and GREEN at the close (§7).
-- **S12** — The docs: a new page `help/loop-review.md` with the section "The value ledger" (the row,
+- **S12** — (amended, id 39) The docs: a new page `help/loop-review.md` with the section "The value ledger" (the row,
   each column's source, the two catch sources, the snapshot and the view, `price` and `--dry-run`),
   carrying the usage anchor `python tools/govkit/docs_leg.py --list` names for `loop_review.py`, and
   its line in `help/README.md`. Observed by AC9.
@@ -134,9 +135,13 @@ The build run re-grounds on each and stops the unit when one is absent.
 - **hands-off** `TOOL-dCalibratedLens-9` — `PROVIDERS`, which gains the `probe` entry
 - **hands-off** `TOOL-dCalibratedLens-12` — `PROVIDERS`, which gains the `item` entry
 - **hands-off** `TOOL-dCalibratedLens-15` — `PROVIDERS`, which gains the `cap` entry
-- **hands-off** `TOOL-dCalibratedLens-4` — the value ledger view `views/value-ledger.md`, whose `kind=cap` rows give the `cost` its review-cost read takes
+- **hands-off** `TOOL-dCalibratedLens-4` — `PROVIDERS`, whose `cap` entry (TOOL-dCalibratedLens-15's `derive_cap_rows`) its caps step calls in-process for each cap's current cost (id 5)
 - **hands-off** `TOOL-dCalibratedLens-17` — the module `tools/loop/loop_review.py`, `read_loop_policy` for `trace.cost`, and the help page `help/loop-review.md` it adds a section to
 - **consumes-from** external — TOOL-dDeclaredLoop-1 and -12 (the loop kit and its item rows), TOOL-dLinkedLibrary-6 (the library-view seam), TOOL-dTotalRecall-1 (the registry), TOOL-dWitnessedBar-8 S3 (the flake record), each DEFERRED at base; `runlog.py journal`, landed
+- **hands-off** `TOOL-dCalibratedLens-19` — `write_ledger_snapshot` and the `value-ledger` row, whose glob home that unit's `three-homes` plant grades (id 1)
+- **hands-off** `TOOL-dCalibratedLens-20` — `render_ledger_snapshot` and `write_ledger_snapshot`, whose Serves line that unit's `serves-kinds` plant grades (id 36)
+- **hands-off** `TOOL-dCalibratedLens-26` — `read_catch_events`, `derive_ledger_rows` and `price`, whose observed-leg rule that unit's catch plants prove (id 48)
+- **hands-off** `TOOL-dCalibratedLens-30` — `price` and the `cost` grammar, which the minors batch's `cost-grammar` arm validates (id 9)
 
 ## 4. Design
 
@@ -154,7 +159,7 @@ The build run re-grounds on each and stops the unit when one is absent.
 - `runlog.py journal --producer gates` prints one JSON object per good journal line, its keys the
   line's, `fail.<n>` among them (`tools/runlog/README.md:70-75`); `--by-leg` already counts reds per
   leg but over the whole journal with no window (`:80-88`), so S4 reads the per-line form.
-- `tools/gate-legs.json` names 148 legs and its history adds 506 `name` lines; one `git log -p` pass over
+- `tools/gate-legs.json` names 148 legs and its history adds 536 `name` lines (id 24); one `git log -p` pass over
   it took 0.28 s at `8bec4cef` (PINNED, 2026-11-02).
 
 ### The row
@@ -240,6 +245,70 @@ by node and by day, and the view must equal its render on every node (§8 F2).
 
 §6 runs a sibling's file by its basename: `loop_lib.py` is `tools/loop/loop_lib.py` (TOOL-dDeclaredLoop-12).
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 1 · §4 "The registry row", S8 (H1, `TOOL-dCalibratedLens-19`)** — The row's home is
+  `home = "memory/loop-review/*-value-ledger-*.md"`, the glob of its id-rule, spelled with this
+  repository's memory root as TOOL-dTotalRecall-42 S1 spells the shape-run home. S8's check-3 prose
+  names `loop-review/` and its three kinds, `value-ledger`, `loop-review` and `keep`.
+- **id 36 · §4 "The snapshot", S6 (H2, `TOOL-dCalibratedLens-20`)** — The snapshot's third line is
+  `**Serves:** value-ledger TOOL-dCalibratedLens-2`, and `value-ledger` joins `TYPED_RECORD_KINDS`
+  in `tools/memory-tree/tree_lib.py` and the closed `<kind>` list of
+  `tools/memory-tree/HYGIENE.template.md`, rendered into `memory/HYGIENE.md`, in this pass, so
+  TOOL-dTotalRecall-42 S5 grades the snapshot by its own row.
+- **id 48 · S4, §5 (H8, `TOOL-dCalibratedLens-26`)** — A leg's `catches`, `false-reds` and
+  `last-catch` are a count only when the source observed the leg run in the window, and `-`
+  otherwise; `read_catch_events` answers the observed set beside the events. Under `verdict-records`
+  a leg is observed when a tracked flake record whose `Ended` lies in the window carries its row
+  (TOOL-dWitnessedBar-8 S3 writes a row per executed leg); `verdict.flakes = retry-only` writes
+  none, so every leg reads `-`. Under `node-journal` a leg is observed when the journal read
+  succeeded, a GREEN or RED bar lies in the window, and the leg is `always_run` in `build_leg_yield`
+  or a windowed bar named it red; an absent or unreadable journal (exit 2), a timeout or no runlog
+  kit observes none. `price` prints
+  `NOTE: catch source <value> observed no run of <n> leg(s) · <why>` when any leg reads `-`.
+- **id 27 · S4 (M11, `TOOL-dCalibratedLens-30`)** — Under `node-journal` the reds come from
+  `runlog.py journal --producer gates --by-leg --legs tools/gate-legs.json`, never a second count of
+  `fail.<n>` names: this unit adds an optional `--since <utc>` and `--until <utc>` filter on
+  `started` to that verb, runs it windowed for `red` (the catches) and `unattributed`, and
+  unwindowed for `last_red`; `price`'s summary line names `unattributed <n>` when it is above 0.
+- **id 9 · §4 "The row" (M5, `TOOL-dCalibratedLens-30`)** — `cost` is `<number><unit>/<runs>` with
+  unit `s`, `tok` or `B`, the last TOOL-dCalibratedLens-15's bytes times reads (`4433344B/212`), or
+  `-`.
+- **id 12 · §4 "The registry row" (L2, `TOOL-dCalibratedLens-30`)** —
+  `writer = "loop_review.py price; loop_review.py record"`: `record` re-writes the snapshot in the
+  patch build that lands it (TOOL-dCalibratedLens-3 S8).
+- **id 37 · §4 "The registry row", AC7 (M17, `TOOL-dCalibratedLens-30`)** — The row carries
+  `unarmed = "no snapshot is tracked until loop_review.py record lands the first period"`
+  (TOOL-dTotalRecall-42 S2), and AC7 also runs `python tools/memory-tree/record_kinds.py --check`
+  after the pass: exit 0.
+- **id 38 · S6 (M18, `TOOL-dCalibratedLens-30`)** — After the row edit the pass runs
+  `python tools/memory-tree/record_kinds.py --write`, which renders the `<!-- gen:record-kinds -->`
+  region of `tools/memory-tree/HYGIENE.template.md`, then `adopt-memory-tree.sh --render` into
+  `memory/HYGIENE.md`; both copies land in one commit.
+- **id 39 · S12, AC9 (M19, `TOOL-dCalibratedLens-30`)** — `tools/govkit/usage.toml` gains the
+  `[[usage]]` row `script:{prefix}/loop/loop_review.py#price` with the flags `--key`, `--at` and
+  `--dry-run`, and the page's `<!-- usage: … -->` anchor carries its fingerprint; AC9 also runs
+  `python tools/govkit/docs_leg.py --list` and finds the row. Every later unit that adds a
+  `loop_review.py` verb or flag to the page adds or re-fingerprints its row.
+- **id 42 · S11 (M22, `TOOL-dCalibratedLens-30`)** — The leg `loop-review selftest` is claimed under
+  `[claims] gate-legs` by the feature dossier `memory/map/features/loop-review.md` (new when no
+  dossier claims `tools/loop/`); its row names `subject` and `chunk`;
+  `tools/govkit/subject-pins.tsv` is regenerated by `govkit.py selfcheck --write`; and a held leg
+  gains its measured row in `tools/run-gates/selftest-budgets.txt`.
+- **id 26 · S9 (M10, `TOOL-dCalibratedLens-30`)** — The `cadence.loop` step value is
+  TOOL-dCalibratedLens-3 §8 F5's fork, mirrored here: the rows stay in `tools/loop/loop.toml`, and
+  AC8's `loop_lib.py --check` passing them is a build-run precondition on the ask F5 states.
+- **id 24 · §4 Evidence (L9, `TOOL-dCalibratedLens-30`)** — Corrected in place: the manifest's
+  history adds 536 `name` lines across both forms at `8bec4cef`
+  (`git log -p -- tools/gate-legs.json` lines matching `^+.*"name"`, PINNED 2026-11-02), the
+  one-line `{ "name": ... }` rows of 2026-07-19 included, and `read_leg_rows` matches
+  `"name": "<name>"` anywhere on an added line.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py`: new (S1 to S6)
@@ -253,6 +322,10 @@ by node and by day, and the view must equal its render on every node (§8 F2).
 - `.memory-tree.conf`: `LIBRARY_VIEWS` gains `value-ledger` (S7)
 - `tools/policy/catalogue.toml` and `tools/policy/unsummarised-keys.txt` (S10)
 - `help/loop-review.md`: new, and `help/README.md` (S12)
+- `tools/memory-tree/tree_lib.py` — `TYPED_RECORD_KINDS` gains `value-ledger` (id 36)
+- `tools/runlog/runlog.py` and `tools/runlog/README.md` — `--since` and `--until` on `journal --by-leg` (id 27)
+- `tools/govkit/usage.toml` — the `price` row (id 39)
+- `memory/map/features/loop-review.md`, `tools/govkit/subject-pins.tsv` and `tools/run-gates/selftest-budgets.txt` — the leg's claim, pin and budget (id 42)
 
 ### Alternatives rejected
 
@@ -274,7 +347,7 @@ by node and by day, and the view must equal its render on every node (§8 F2).
   value read from a record reaches a shell; the snapshot carries leg names, counts and dates only.
 - perf / scale — one `git log -p` pass (0.28 s at base, PINNED), one read of each tracked flake record,
   one bounded journal subprocess, two policy reads; 148 rows today.
-- error / empty / loading states — no flake record: every leg's `catches` reads 0 and the line names
+- error / empty / loading states — no flake record: every leg's `catches` reads `-` (id 48) and the line names
   `0 record(s)`; an absent journal: `runlog: <path> absent`, zero events; a leg with no evidence row:
   cost `-`; no snapshot: the view's empty line; a refused policy read: the default and a `NOTE:` line.
 - observability — `price`'s summary line; the snapshot is the history, one per period.
@@ -319,7 +392,7 @@ by node and by day, and the view must equal its render on every node (§8 F2).
   shows `summary` and `usage`; `grep -cx 'review.loop.catch-source' tools/policy/unsummarised-keys.txt`
   prints `0`; `grep -n '"review.loop.catch-source"' loop_review.py` names S4's literal read.
   Red when: a field is missing, or the key is read through a variable.
-- **AC7** — When `grep -n 'name = "value-ledger"' record-kinds.toml` and `grep -n
+- **AC7** — (amended, id 37) When `grep -n 'name = "value-ledger"' record-kinds.toml` and `grep -n
   'D:loop-review' tools/memory-tree/check-memory-hygiene.sh` run, each prints one line, and the second
   sits inside check 3's sanctioned `case` arm.
   Red when: either line is absent, so a tracked snapshot reds check 3 as an unsanctioned directory.
@@ -327,13 +400,13 @@ by node and by day, and the view must equal its render on every node (§8 F2).
   `grep -n 'item.loop.price' loop.toml` prints the row's tag line.
   Red when: the row's route names an undeclared item.
   permission: `loop_lib.py` is TOOL-dDeclaredLoop-12's, built before this unit's build run.
-- **AC9** — When `grep -n 'review.loop.catch-source' loop-review.md` runs, it prints the section's
+- **AC9** — (amended, id 39) When `grep -n 'review.loop.catch-source' loop-review.md` runs, it prints the section's
   line naming both values; `grep -n 'loop-review.md' help/README.md` prints the index line.
   Red when: the page or its index line is absent.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `memory-hygiene self-test` · `build-index selftest` · `policy check` · `policy fixtures` · `docs` · `lexicon naming predicates` · `check-wiring self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `memory-hygiene self-test` · `build-index selftest` · `policy check` · `policy fixtures` · `docs` · `lexicon naming predicates` · `check-wiring self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `codebase-map coverage + freshness`
 
 The pass adds the leg `loop-review selftest` (S11), which the manifest does not hold at base, so it is
 named here and not on the line above.
@@ -374,6 +447,12 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC7 · a fixtu
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft.
+- rev-2 · 2026-11-02 · §3 §4 §5 §7 S4 S6 S8 S9 S11 S12 AC7 AC9 · amended at the disposal of the
+  round-1 spec audit `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4
+  "Amendments (round-1 spec audit)": ids 1 (`TOOL-dCalibratedLens-19`), 36
+  (`TOOL-dCalibratedLens-20`), 48 (`TOOL-dCalibratedLens-26`), and 27, 9, 12, 37, 38, 39, 42, 26 and
+  24 (`TOOL-dCalibratedLens-30`); §3 gains the hands-offs to units 19, 20, 26 and 30, and the
+  hands-off to unit 4 now names `PROVIDERS` (id 5).
 
 ## 10. Reuse audit
 

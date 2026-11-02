@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-9 — probe cost priced in the value ledger, and compactions counted per item kind
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 4 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0466@f36d2aed whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +35,7 @@ record and its token fields (TOOL-dWellOiledMachine-32 S7, S8); `read_act_record
 writer at a compaction (TOOL-dWellOiledMachine-12 S8); and the record door's `find` and `show`
 (TOOL-dTotalRecall-9 S3, S5).
 
-- **S1** — The act read across kits. `tools/runtime/ledgers.py` gains the verb `python ledgers.py acts
+- **S1** — (amended, id 51) The act read across kits. `tools/runtime/ledgers.py` gains the verb `python ledgers.py acts
   [--build <slug>]`, which calls `read_act_records(repo, build)` once and prints one JSON object per
   act record on stdout: `key`, `act`, `item`, `tokens-in`, `tokens-out` and `wall`, each as the record
   spells it, `withheld` kept as written and an absent field as `null`. The loop kit runs it as a
@@ -51,7 +52,7 @@ writer at a compaction (TOOL-dWellOiledMachine-12 S8); and the record door's `fi
   `<MEMORY_ROOT>/builds/*/build/*-probe-[0-9]*.md` and returns, per probe record path, the set of act
   ids whose commits touched it inside the window. A commit with no `Gov-Act:` trailer, the owner's or
   a command's, adds nothing. Observed by AC3.
-- **S4** — The provider, `PROVIDERS`' `probe` entry. `derive_probe_rows(root, window)` reads every
+- **S4** — (amended, id 50) The provider, `PROVIDERS`' `probe` entry. `derive_probe_rows(root, window)` reads every
   `probe` record through `gov_record.py find --kind probe` and `show`, each record's `Trigger` through
   `show` of its `probe-trigger` record, the acts through S1 and the commits through S3, and hands the
   parsed lists to `derive_probe_costs(probes, acts, commits, window)`. That pure function returns
@@ -63,13 +64,13 @@ writer at a compaction (TOOL-dWellOiledMachine-12 S8); and the record door's `fi
   whose id names no act record, is counted per row and printed as one `ledger — probe · <id> · <n>
   act(s) unrecorded` line on stderr; a row whose every act is unrecorded renders `cost` as `-`.
   Observed by AC5.
-- **S6** — The compaction count. `read_journal_compactions(root)` runs `python <runlog kit>/runlog.py
+- **S6** — (amended, id 31) The compaction count. `read_journal_compactions(root)` runs `python <runlog kit>/runlog.py
   journal --producer runtime` (the existing verb, `tools/runlog/runlog.py:151`, its producer choices
   read from `PRODUCER_FILES`, `:499`) as a bounded subprocess (60 s) found through `resolve_kit_dir`,
   and keeps the JSON objects whose `class` is `compaction`. `measure_compactions(lines, window)`, a
   pure function, counts the lines whose `t` lies in the window per `item` value, `item=none` and an
   absent `item` counted together as `unattributed`. Observed by AC6 and AC7.
-- **S7** — The metric. `METRICS` (TOOL-dCalibratedLens-3 S5) gains the entry `compactions`, whose
+- **S7** — (amended, id 11) The metric. `METRICS` (TOOL-dCalibratedLens-3 S5) gains the entry `compactions`, whose
   reader answers `(value, source)` per §4 "The metric": the counts in one value, the source the
   journal read and the node it was read on, `none` over an empty count, and `searched-none` with the
   journal path when the journal is absent or the read refused. The record writes it as its Metrics
@@ -103,6 +104,9 @@ writer at a compaction (TOOL-dWellOiledMachine-12 S8); and the record door's `fi
 - **consumes-from** `TOOL-dCalibratedLens-3` — `METRICS`, which gains the `compactions` entry, and the window the walk hands every reading
 - **hands-off** `TOOL-dCalibratedLens-12` — `derive_act_tokens` and `ledgers.py acts`, the act read and the one cost computation the `item` rows reuse
 - **consumes-from** external — TOOL-dPlacedRequest-7 (the `probe` and `probe-trigger` records), TOOL-dWellOiledMachine-12, -16, -32, -33 and -53 (the compaction line, the journal, the act record, the `Gov-Act:` trailer and `read_act_records`) and TOOL-dTotalRecall-9 (`find`, `show`), all DEFERRED at base and of ancestor builds
+- **hands-off** `TOOL-dCalibratedLens-28` — `derive_probe_rows` and `derive_probe_costs`, which that unit's `probes-41` plant prices (id 50)
+- **hands-off** `TOOL-dCalibratedLens-16` — `ledgers.py acts --build` and `read_runtime_journal`, the act read and the journal read its S4 and S3 share (ids 50, 31)
+- **hands-off** `TOOL-dCalibratedLens-30` — the `compactions` reading's dead-source line, which the minors batch's `dead-sources` arm reads (id 11)
 
 ## 4. Design
 
@@ -159,12 +163,42 @@ probe · …`.
 None: no probe, act record or compaction line exists at base, and a review over an empty population
 writes no `probe` row and `compactions: none`.
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 50 · S4 (H10, `TOOL-dCalibratedLens-28`)** — The probe records are listed with one
+  `git ls-files` over S3's pathspec `<MEMORY_ROOT>/builds/*/build/*-probe-[0-9]*.md`, each read
+  through `gov_record.py show`, and each `probe-trigger` record the same way; never
+  `gov_record.py find`, which stops at 40 rows.
+- **id 31 · S6 (M15, `TOOL-dCalibratedLens-30`)** — The runtime journal read is one helper,
+  `read_runtime_journal(root)`, the bounded `runlog.py journal --producer runtime` subprocess
+  returning the parsed lines; `read_journal_compactions` filters it, and TOOL-dCalibratedLens-16 S3
+  calls it and filters by the walk's window.
+- **id 51 · S1, AC1 (M26, `TOOL-dCalibratedLens-30`)** — `ledgers.py acts` gains `--since <date>`,
+  filtering by the act record's file-name date before any record is read, and reads the tracked act
+  records in one process (one `git ls-files`, one `git cat-file --batch`), never one
+  `gov_record.py show` per act; `estimate` (TOOL-dCalibratedLens-17) stays all-time. The 60 s bound
+  is sized for the population a window holds, and AC1 also times `acts --since` over 500 planted act
+  records under it.
+- **id 11 · S7, AC8 (L1, `TOOL-dCalibratedLens-30`)** — An absent runtime journal file reads
+  `searched-none` (nothing written yet); a refused or timed-out read, or no runlog kit, reads
+  `compactions: unread · <reason>`, and AC8's refused-read case expects `unread`.
+- **id 39 · Files touched (M19, `TOOL-dCalibratedLens-30`)** — Every `loop_review.py` verb or flag
+  this unit adds to `help/loop-review.md` gets its `[[usage]]` row in `tools/govkit/usage.toml`, and
+  the page's `<!-- usage: … -->` anchor is re-fingerprinted, so
+  `python tools/govkit/docs_leg.py --list` names it and the `docs` leg reads no `UNROWED` line.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py` (S2 to S7, and the `--fixture` cases of §7)
 - `tools/loop/README.md` (S8)
 - `tools/runtime/ledgers.py` (S1, and its `fixture` case of §7)
 - `help/loop-review.md` (S8, TOOL-dCalibratedLens-2's page)
+- `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
 ### Alternatives rejected
 
@@ -195,7 +229,7 @@ writes no `probe` row and `compactions: none`.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python ledgers.py acts` runs from the runtime kit directory in a scratch repository
+- **AC1** — (amended, id 51) When `python ledgers.py acts` runs from the runtime kit directory in a scratch repository
   holding two act records, one with `Tokens-In: withheld`, it prints two JSON objects whose `key`,
   `item`, `tokens-in` and `tokens-out` match the records, the withheld one as `"withheld"`.
   Red when: a withheld field is printed as `0` or the record is dropped.
@@ -228,7 +262,7 @@ writes no `probe` row and `compactions: none`.
   objects, three `class=compaction` lines with `item=item.build.unit`, one with `item=none`, one
   outside the window and one `class=stall` line, it returns `item.build.unit` 3 and `unattributed` 1.
   Red when: an out-of-window or non-compaction line is counted, or `item=none` is dropped.
-- **AC8** — When `python loop_review.py --fixture --plant compactions` runs from the loop kit directory,
+- **AC8** — (amended, id 11) When `python loop_review.py --fixture --plant compactions` runs from the loop kit directory,
   a scratch repository with no runtime journal answers the `compactions` metric `searched-none` with the
   journal path, and one holding the AC7 lines answers `item.build.unit 3, unattributed 1`.
   Red when: an absent journal reads as `none`, or the entry is missing from `METRICS`.
@@ -236,7 +270,7 @@ writes no `probe` row and `compactions: none`.
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
 The leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11, argv `loop_review.py --fixture`) and the
 runtime kit's fixture leg (TOOL-dWellOiledMachine-53) are not in the manifest at base, so they are
@@ -285,6 +319,10 @@ New arm: tools/runtime/ledgers.py · covers AC1 · a `fixture --case acts-withhe
   specs named in §2 at base `8bec4cef`. The status token is `OPEN`, the drafting token of
   TEMPLATE-SPEC; the brief's `DRAFT` is no member of `STATUS_TOKENS`
   (`tools/memory-tree/tree_lib.py:28`).
+- rev-2 · 2026-11-02 · §3 §4 §7 S1 S4 S6 S7 AC1 AC8 · amended at the disposal of the round-1 spec
+  audit `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1
+  spec audit)": ids 50 (`TOOL-dCalibratedLens-28`), and 31, 51, 11 and 39
+  (`TOOL-dCalibratedLens-30`); §3 gains the hands-offs to units 28, 16 and 30.
 
 ## 10. Reuse audit
 

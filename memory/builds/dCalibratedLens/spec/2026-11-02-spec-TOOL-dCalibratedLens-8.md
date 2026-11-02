@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-8 — the not-in-view cause on every confirmed finding, and the Loop Review's 38-finding reading of its share
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 14 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0465@f1db8527 whole
 
@@ -11,6 +11,7 @@
 | [2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md](../build/2026-11-02-build-TOOL-dCalibratedLens-8-deviation-81.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -36,7 +37,7 @@ work order's slot blocks, its `map` slot and its `code` slot), TOOL-dCalibratedL
 `METRICS` table, its `file` and `record` verbs and the `loop-review` record) and TOOL-dCalibratedLens-5
 (its `PROPOSERS` table and the appendix's `units` column). The build run re-grounds on each and stops the unit when one is absent.
 
-- **S1** — The `cause` column. `python tools/workflows/review_cause.py fill <record> [--write]` appends a
+- **S1** — (amended, id 33) The `cause` column. `python tools/workflows/review_cause.py fill <record> [--write]` appends a
   column, `cause`, after the last column of a review record's `## Appendix — every finding` table, which
   at this unit's pass is `units` (TOOL-dCalibratedLens-5 S2, after TOOL-dFairHearing-8 S8's
   `disposition`): one cell per row, the derived cause for a confirmed row and `-` for every other. The
@@ -166,6 +167,26 @@ answered OK by `python tools/lexicon/lexicon.py --suggest <name> --as py.functio
 
 None. A record written before this unit has no `cause` column; `fill` adds one only when run on it.
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 4 · §7 (H5, `TOOL-dCalibratedLens-23`)** — This unit edits
+  `tools/workflows/unattended-build.template.js`, in the guard of TOOL-dCalibratedLens-10's held leg
+  `instruction-eval`, so the seed case is owed from this pass; the one replay is recorded by the
+  main loop after unit 1, the build's last guard-path editor, and before the close bar
+  (TOOL-dCalibratedLens-23 S1).
+- **id 33 · S1, Files touched, Inventory (M16, `TOOL-dCalibratedLens-30`)** — `parse_appendix_rows`
+  is factored in `tools/workflows/review_replay.py`: a new `read_appendix_table(text)` returns every
+  row with its header and its line span, and `parse_appendix_rows` keeps its confirmed-only filter
+  and its count liveness check on top of it. `fill` rewrites the table through
+  `read_appendix_table`, so a refuted or unverified row gets its `-` cell and a record with no
+  stated count still gets the column. The Files touched line saying this unit writes none of
+  `review_replay.py` is withdrawn, and `read_appendix_table` joins the Inventory.
+
 ### Files touched (estimate)
 
 - `tools/workflows/review_cause.py` (new: S1, S2, S4, S6; it imports `review_replay.py` within the kit
@@ -176,6 +197,7 @@ None. A record written before this unit has no `cause` column; `fill` adds one o
 - `tools/roles/README.md` (S8)
 - `tools/loop/loop_review.py` (S7, the field and the proposal)
 - `help/spec-audit.md` (S8)
+- `tools/workflows/review_replay.py` — `read_appendix_table` (id 33)
 
 ## 5. Production-readiness checklist
 
@@ -288,6 +310,9 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC8 · the DISPOSAL 
   project map's `[test]` (`project-map.md:690-709`), research A's `review.dispose` row (`:189`), the
   brief's S3 and S8, and `review_replay.py`, `handoff.py`, `roles_lib.py` and the harness's appendix
   (`tools/workflows/tier2-review.template.js:1636-1644`) read at base `8bec4cef`.
+- rev-2 · 2026-11-02 · §4 §7 S1 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 4 (`TOOL-dCalibratedLens-23`) and 33 (`TOOL-dCalibratedLens-30`).
 
 ## 10. Reuse audit
 

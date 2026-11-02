@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-1 — each stage review's lenses and effort: four stage literals in the lens catalogue, chosen by the breakpoint's stage, run at `review.<stage>.effort`
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 16 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 16 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0458@5429e502 whole
 **Carries:** node:policy-key.review.<stage>.effort
@@ -15,6 +15,7 @@
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -41,7 +42,7 @@ and `maintain`, selects one by the stage of the breakpoint that fires, and runs 
   and three of TOOL-dFairHearing-2 S3's design-audit rows, `grounding`, `coherence` and
   `failure-envelope`, gaining the stages §4 names in their `presets` and `default_in`. Every stage
   literal fills exactly five slots. Observed by AC1 and AC2.
-- **S3** — The stage reaches the preset. `tools/workflows/review_pin.py` (TOOL-dFairHearing-3 S8)
+- **S3** — (amended, id 43) The stage reaches the preset. `tools/workflows/review_pin.py` (TOOL-dFairHearing-3 S8)
   takes `--stage <stage>`: a stage that a `gov:lens-slots` marker of the rendered harness beside it
   declares prints that literal as `preset`; `design` and `build`, which no marker names, leave the
   subject mapping as it is; any other value exits 2 naming the stage and the marked literals. The
@@ -105,6 +106,7 @@ this unit once each is CLOSED, and re-grounds every line this spec cites against
 - **consumes-from** external — TOOL-dIndexedDesign-3 S4's step 1a and TOOL-dBoundRoles-21's `read_policy_setting`, the effort order this unit widens from one stage to six
 - **consumes-from** external — TOOL-dDeclaredLoop-19 and -20: `derive_breakpoints`, the firing site and `--trigger`
 - **hands-off** external — dDeclaredLoop reads `review.maintain` in `derive_breakpoints` (§8 F4's ask)
+- **hands-off** `TOOL-dCalibratedLens-24` — the rendered `tools/workflows/tier2-review.js` and its stage receiver, which that unit feeds to the hook beside a looped copy (id 16)
 
 ## 4. Design
 
@@ -224,6 +226,36 @@ today, but a plan subject now runs the Plan literal where it ran `unit-spec`.
 One landing, after the parents. Every stage review stays opt-in under the default preset, so no run
 spawns a stage lens until the owner opts a stage in or a preset owes it.
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 16 · AC3, §4 Evidence (H6, `TOOL-dCalibratedLens-24`)** — AC3 feeds the hook a payload:
+  `node -e` builds
+  `{"tool_name": "Workflow", "tool_input": {"script": <the text of tools/workflows/tier2-review.js>}}`,
+  as `tools/workflows/check-verifier-fanout.sh:321-326` builds it, and pipes it to
+  `node tools/hooks/agent-cap.js --only=scripts`, which exits 0. A bare invocation reads no harness:
+  the hook exits 0 on an unparsable stdin (`tools/hooks/agent-cap.js:1853-1858`), so §4 Evidence's
+  citation of TOOL-dFairHearing-2's measurement through that command measured nothing, and the
+  seven-literal receiver stays UNVERIFIED until AC3 runs with the payload. The red twin over a
+  looped receiver is `TOOL-dCalibratedLens-24`'s.
+- **id 4 · §7 (H5, `TOOL-dCalibratedLens-23`)** — This unit edits
+  `tools/workflows/tier2-review.template.js` and `tools/workflows/lenses.toml`, both in the guard of
+  TOOL-dCalibratedLens-10's held leg `instruction-eval`, so the seed case is owed from this pass. It
+  is the build's last unit to edit a guard path: after it builds, the main loop records one replay
+  of every owed case through the procedure TOOL-dCalibratedLens-10 S8 writes into
+  `tools/workflows/README.md`, before the close bar.
+- **id 43 · S3, §7 New arm, AC11 (M23, `TOOL-dCalibratedLens-30`)** — Moving `PLAN_RECORD_PRESET`
+  from `unit-spec` to `plan` flips three arms of TOOL-dRankedPlan-6 in
+  `tools/workflows/tier2-review.test.sh`: its AC1 now expects `{"preset": "plan"}`, its AC3 five
+  spawns at the Plan lens keys, and its AC4 a `gov:lens-slots` marker naming the Plan literal; the
+  first `New arm:` line covers those flips. `help/loop.md`'s Plan Review paragraph, which says the
+  preset stays `unit-spec` until this build's Plan lenses land, is rewritten in this pass, and AC11
+  also runs `grep -c 'PLAN_LENSES' help/loop.md`, at least 1.
+
 ### Files touched (estimate)
 
 - `tools/workflows/lenses.toml`
@@ -243,6 +275,7 @@ spawns a stage lens until the owner opts a stage in or a preset owes it.
 - `tools/policy/catalogue.toml`
 - `tools/policy/unsummarised-keys.txt`
 - `help/policy.md`
+- `help/loop.md` — the Plan Review paragraph (id 43)
 
 ### Alternatives rejected
 
@@ -282,7 +315,7 @@ spawns a stage lens until the owner opts a stage in or a preset owes it.
 - **AC2** — When `bash tools/workflows/check-verifier-fanout.sh tools/workflows/tier2-review.js` runs,
   its `slots` line names each of the four stage literals holding 5 and it exits 0.
   Red when: a stage's drawn row lacks the stage in `default_in`, so its literal renders four slots.
-- **AC3** — When `node tools/hooks/agent-cap.js --only=scripts` runs over the re-rendered harness, it
+- **AC3** — (amended, id 16) When `node tools/hooks/agent-cap.js --only=scripts` runs over the re-rendered harness, it
   exits 0.
   Red when: the receiver's ternary over seven literals is denied, so no review can spawn.
 - **AC4** — When `python review_pin.py --subject <a design record> --stage deploy`
@@ -316,7 +349,7 @@ spawns a stage lens until the owner opts a stage in or a preset owes it.
 - **AC10** — When `python tools/policy/policy.py lists --check` runs, it exits 0, and
   `grep -c 'review.<stage>.effort' tools/policy/unsummarised-keys.txt` prints 0.
   Red when: the row has no `summary` or `usage`, or the name is still listed.
-- **AC11** — When `grep -c 'review.<stage>.effort' help/policy.md`,
+- **AC11** — (amended, id 43) When `grep -c 'review.<stage>.effort' help/policy.md`,
   `grep -c 'MAINTAIN_LENSES\|gov:lens-slots maintain' tools/workflows/README.md`,
   `grep -c '\-\-review-stage' tools/roles/README.md` and
   `grep -c '\-\-stage' memory/guides/UNATTENDED-VERBS.md` run, each counts at least one.
@@ -385,6 +418,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · a `--trigger` call
 
 - rev-1 · 2026-11-02 · initial draft. The header carries `OPEN`, not the brief's `DRAFT`, which check
   12's header grammar (`tools/memory-tree/check-memory-hygiene.sh:2145`) does not admit.
+- rev-2 · 2026-11-02 · §3 §4 §7 S3 AC3 AC11 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 16 (`TOOL-dCalibratedLens-24`), 4 (`TOOL-dCalibratedLens-23`) and 43
+  (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to `TOOL-dCalibratedLens-24`.
 
 ## 10. Reuse audit
 

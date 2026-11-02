@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-3 — the Loop Review: a cadence step run as `review.loop.cadence` says, its lease keyed by the selected period, its walk and its record
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0460@401ecbd8 whole
 **Carries:** node:record-kind.loop-review
@@ -18,6 +18,7 @@
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-15 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -26,9 +27,9 @@
 No retrospective reads the loop's own metrics (gap-review-02). This unit lands the Loop Review,
 registered as a cadence step of the observability expansion and run as `review.loop.cadence` says,
 `weekly`, `monthly` or `every-n-landings`, its lease keyed by the selected period, each value seen on its
-planted case. It is one program, `python tools/loop/loop_review.py run`, walking the six `item.loop.*`
+planted case. It is one program, `python tools/loop/loop_review.py run`, walking the five `item.loop.*`
 rows in `needs` order under the period lease, every reading taking the one window
-`review.loop.window-days` sets (default 60), and writing one `loop-review` record per period.
+`review.loop.window-days` sets (default 60), and writing one `loop-review` record per period. Unit 5 adds the sixth row, `item.loop.propose` (id 13).
 
 ## 2. Scope (IN)
 
@@ -42,12 +43,12 @@ block); TOOL-dWellOiledMachine-27 S1 (`intake.py file --origin cadence`); TOOL-d
 registry); DEPL-dShippedRelease-1 (the landing records `every-n-landings` counts). The build run
 re-grounds on each and stops the unit when one is absent.
 
-- **S1** — The rows. Four `[[item]]` rows in `tools/loop/loop.toml`, in TOOL-dDeclaredLoop-12's data
+- **S1** — (amended, id 26) The rows. Four `[[item]]` rows in `tools/loop/loop.toml`, in TOOL-dDeclaredLoop-12's data
   model, `step = "cadence.loop"`, `owner = "dCalibratedLens"`, as §4 "The items" tabulates:
   `item.loop.lease`, `item.loop.gather`, `item.loop.file` and `item.loop.record`. This unit re-points
   unit 2's `item.loop.price` row: `needs = ["item.loop.gather"]` and `routes = { priced =
   "item.loop.file" }`; unit 5 inserts `item.loop.propose` between them. Observed by AC7.
-- **S2** — The walk, `run_loop_walk(root, key, dry_run)`, run as `python loop_review.py run [--check]
+- **S2** — (amended, ids 25, 49) The walk, `run_loop_walk(root, key, dry_run)`, run as `python loop_review.py run [--check]
   [--dry-run] [--key <key>]`. `read_loop_items(kit_dir)` reads the `step = "cadence.loop"` rows with
   `tomllib` and orders them with `order_by_needs`; a need naming no row, a cycle, an outcome with no
   route and a route naming no row nor a `stand-in:<path>` each exit 2 with one line. `--check` stops
@@ -72,7 +73,7 @@ re-grounds on each and stops the unit when one is absent.
   observability expansion's one host key is `maintain.host` (§8 F1). The tick derives the period from
   the key's value through `derive_period`, whose `monthly` and `every-n-landings` forms are this unit's
   ask of §8 F2. Observed by AC1 and AC2.
-- **S5** — `loop.gather`, `measure_loop_metrics(root, window)`: each entry of `METRICS`, a list of
+- **S5** — (amended, ids 2, 49) `loop.gather`, `measure_loop_metrics(root, window)`: each entry of `METRICS`, a list of
   `(name, reader)` pairs, read over the one window `derive_loop_window` returns, each answering `(value,
   source)` and a reader whose source holds nothing answering `searched-none` with the path or glob it
   searched. This unit's two entries are `surface`, `<legs> legs · <gotchas> gotchas · <keys> keys`
@@ -85,7 +86,7 @@ re-grounds on each and stops the unit when one is absent.
 - **S6** — The window every reading uses. The walk calls `derive_loop_window(root, at)` once and hands
   the same `(start, end, days)` to `price` and to `gather`; the record's `**Window:**` field and the
   snapshot's are therefore one value. Observed by AC3.
-- **S7** — `loop.file`, `run_loop_file(root, key, proposals, dry_run)`. A proposal is `{"kind", "id",
+- **S7** — (amended, id 3) `loop.file`, `run_loop_file(root, key, proposals, dry_run)`. A proposal is `{"kind", "id",
   "action", "accept", "row"}`, handed by the walk from the item routed to it (unit 5's `propose`), or
   by `--proposals <path>` with `--dry-run`. Each is keyed by the first 16 hex of the SHA-256 of
   `<ledger kind>\t<id>`, the key hash, and filed with `python <runtime kit>/intake.py file --origin
@@ -96,7 +97,7 @@ re-grounds on each and stops the unit when one is absent.
   proposal with an empty `accept` is refused, `loop — refused: <kind> <id> carries no accept line`, and
   nothing is filed for it. `--dry-run` prints each text and route and files nothing. No proposal: `loop —
   <key> · item.loop.file · 0 proposal(s)`. Observed by AC5.
-- **S8** — `loop.record`, `render_loop_record(key, base, window, ledger, metrics, filed)` and
+- **S8** — (amended, id 30) `loop.record`, `render_loop_record(key, base, window, ledger, metrics, filed)` and
   `write_loop_record(root, ...)`, per §4 "The record", at `<MEMORY_ROOT>/loop-review/<date>-loop-review-<key>.md`,
   through a temp file and `os.replace`, contained under the home, the key held to §4 "The periods"
   before a path is built. The walk commits nothing: it files one records-only intake, `intake.py file
@@ -104,13 +105,13 @@ re-grounds on each and stops the unit when one is absent.
   JSON, so the patch build that takes it re-writes both with `python loop_review.py record --key <key>
   --base <sha>`, the JSON on stdin, and lands them, as TOOL-dTendedCadence-1 S6 lands a maintenance
   record. Observed by AC6.
-- **S9** — The registry row `loop-review` in `tools/memory-tree/record-kinds.toml`, §4 "The registry
+- **S9** — (amended, ids 1, 36, 37) The registry row `loop-review` in `tools/memory-tree/record-kinds.toml`, §4 "The registry
   row". Observed by AC8.
 - **S10** — The catalogue rows `review.loop.cadence` (`tools/policy/catalogue.toml:1283-1287`) and
   `review.loop.window-days` (`:1295-1300`) gain `summary` and `usage`, and `python
   tools/policy/policy.py lists --write` drains both from `tools/policy/unsummarised-keys.txt` (`:190`,
   `:193`); values and defaults stay the rows'. Observed by AC8.
-- **S11** — The docs: `help/loop-review.md` gains the section "The Loop Review": the six items, the
+- **S11** — (amended, id 39) The docs: `help/loop-review.md` gains the section "The Loop Review": the six items, the
   three periods and their keys, the `landings` field, the window, `run`, `--check` and `--dry-run`, and
   the record. Observed by AC9.
 - **S12** — The fixture cases of §6 join `python loop_review.py --fixture`, which unit 2's leg `loop-review
@@ -146,6 +147,12 @@ re-grounds on each and stops the unit when one is absent.
 - **hands-off** `TOOL-dCalibratedLens-17` — `METRICS`, which gains four entries, the record whose Metrics lines carry them, its home the trend reads, and the `--fixture` plants its cases join
 - **consumes-from** external — TOOL-dWellOiledMachine-59 and -13 with asks TOOL-dTendedCadence-27, -29 and -30 and §8 F2's ask; TOOL-dDeclaredLoop-12; TOOL-dWellOiledMachine-27 S1; TOOL-dTotalRecall-1; DEPL-dShippedRelease-1; each DEFERRED at base
 - **hands-off** external — dWellOiledMachine builds §8 F2's ask, `derive_period`'s `monthly` and `every-n-landings` forms
+- **hands-off** `TOOL-dCalibratedLens-19` — `write_loop_record`, the `loop-review` row and the `--fixture` frame that unit's `three-homes` plant joins (id 1)
+- **hands-off** `TOOL-dCalibratedLens-20` — `render_loop_record`, `write_loop_record` and the `--fixture` frame, which that unit's `serves-kinds` plant grades (id 36)
+- **hands-off** `TOOL-dCalibratedLens-21` — `measure_loop_metrics` and `render_loop_record`, the list-answer writer that unit's `metrics-multi` plant writes through (id 2)
+- **hands-off** `TOOL-dCalibratedLens-22` — `run_loop_walk` and `run_loop_file`, the one proposal route that unit's `every-proposer` plant proves (id 3)
+- **hands-off** `TOOL-dCalibratedLens-27` — `run_loop_walk` and `render_loop_record`, the isolated readers and the pre-render that unit's `reader-raises` and `record-refuses` plants prove (id 49)
+- **hands-off** `TOOL-dCalibratedLens-30` — `read_loop_records` and the walk's window, which the minors batch's `keep-after-review` and `at-year-back` arms run (ids 6, 30)
 
 ## 4. Design
 
@@ -244,6 +251,68 @@ The home is the record home `point.memory.record-home` names for this layer's pe
 
 §6 runs a sibling's file by its basename: `cadence.py` is `tools/runtime/cadence.py` (TOOL-dWellOiledMachine-59).
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 1 · §4 "The registry row" (H1, `TOOL-dCalibratedLens-19`)** —
+  `home = "memory/loop-review/*-loop-review-*.md"`, the glob of the row's id-rule, as
+  TOOL-dTotalRecall-42 S1 spells the shape-run home.
+- **id 36 · §4 "The record" (H2, `TOOL-dCalibratedLens-20`)** — The record's third line is
+  `**Serves:** loop-review TOOL-dCalibratedLens-3`, and `loop-review` joins `TYPED_RECORD_KINDS` in
+  `tools/memory-tree/tree_lib.py` and HYGIENE's closed `<kind>` list in this pass.
+- **id 2 · S5, §4 "The record" (H3, `TOOL-dCalibratedLens-21`)** — A `METRICS` reader may answer a
+  single pair or a reader answering a LIST of `(value, source)` pairs, each written as its own
+  Metrics line `<name>: <value> · <source>` in list order; a reading never adds a `fields`-form
+  field, so the row's fields stay `Key`, `Base`, `Window` and `Ledger`, and the writer's refusal of
+  a value carrying a line break stands.
+- **id 3 · S7 (H4, `TOOL-dCalibratedLens-22`)** — Every item's step answers `(outcome, proposals)`;
+  the walk appends each item's proposals in item order, and `item.loop.file` files the whole list. A
+  gather-time proposal and a `propose`-time one take this one route, and TOOL-dCalibratedLens-15
+  F5's extension is an instance of it.
+- **id 49 · S2, S5 (H9, `TOOL-dCalibratedLens-27`)** — Each `METRICS` reader and each proposer runs
+  under its own `try`; a raise or a refusal becomes that entry's Metrics line
+  `<name>: unread · <why>`, or for a proposer the line `loop — <key> · <proposer> · unread · <why>`
+  and no proposal, never the walk's exit. Before `item.loop.file` files anything the walk renders
+  the record once through `render_loop_record` with every proposal marked `pending`, so a writer
+  refusal exits 1 before any intake is filed. S2's exit 1 on a raise or refusal now applies to the
+  lease, price, file and record items only.
+- **id 11 · §4 "The record" (L1, `TOOL-dCalibratedLens-30`)** — Two states, one spelling each, for
+  every reading of the set: `searched-none · <path or glob>` is a source read that holds nothing (an
+  absent runlog journal file included, which the runlog kit reads as nothing written yet), and
+  `unread · <reason>` a source that could not be read (a refused or timed-out read, an absent kit,
+  an unparsable answer).
+- **id 30 · S8 (M14, `TOOL-dCalibratedLens-30`)** — The one reader of earlier records:
+  `read_loop_records(root, window=None)` in `loop_review.py` lists the committed
+  `memory/loop-review/*-loop-review-*.md` with `git ls-files`, orders them by file-name date and
+  then key, reads each at `HEAD` through `git show`, and keeps those in the window when one is
+  given; `read_metrics_lines(text)` splits a record's Metrics section on the first `: ` and the last
+  ` · `. Units 5 S7, 15 S6, 16 S6 and 17 S5 call these two and keep only their own line parsers.
+- **id 25 · S2, §4 Inventory (M9, `TOOL-dCalibratedLens-30`)** — The rows are read through
+  `loop_lib.read_items(kit_dir, step="cadence.loop")` (TOOL-dDeclaredLoop-12 S1), and every refusal
+  `check_program` grades comes from it; `read_loop_items` is not minted. The refusals it cannot
+  grade for a stepless cadence program stay in the walk under a `ponytail:` comment naming ask
+  TOOL-dTendedCadence-25 as the upgrade (§8 F5).
+- **id 26 · S1, §8 F5 (M10, `TOOL-dCalibratedLens-30`)** — §8 gains F5, which places the rows
+  against TOOL-dTendedCadence-1 F1 and ask TOOL-dTendedCadence-25, and states the ask on
+  dDeclaredLoop that admits `cadence.loop`.
+- **id 37 · §4 "The registry row", AC8 (M17, `TOOL-dCalibratedLens-30`)** — The row carries
+  `unarmed = "no record is tracked until the first period's record lands"`, and AC8 also runs
+  `python tools/memory-tree/record_kinds.py --check` after the pass: exit 0.
+- **id 38 · Files touched, §7 (M18, `TOOL-dCalibratedLens-30`)** — After the row edit the pass runs
+  `python tools/memory-tree/record_kinds.py --write`, then `adopt-memory-tree.sh --render`;
+  `tools/memory-tree/HYGIENE.template.md` and `memory/HYGIENE.md` land in the same commit.
+- **id 39 · S11 (M19, `TOOL-dCalibratedLens-30`)** — `tools/govkit/usage.toml` gains a `[[usage]]`
+  row for each of `run`, `lease`, `gather`, `file` and `record`, with their flags, and the page's
+  usage anchor is re-fingerprinted.
+- **id 13 · §1 (L3, `TOOL-dCalibratedLens-30`)** — Corrected in place: the walk covers five rows at
+  this unit's landing, and unit 5 adds the sixth.
+- **id 12 · AC6 (L2, `TOOL-dCalibratedLens-30`)** — Corrected in place: AC6's `**Ledger:**` is the
+  snapshot path `record` writes beside the record.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py`: the walk, the four verbs and the fixture cases (S2, S3, S5 to S8, S12)
@@ -252,6 +321,9 @@ The home is the record home `point.memory.record-home` names for this layer's pe
 - `tools/memory-tree/record-kinds.toml`: the row (S9)
 - `tools/policy/catalogue.toml` and `tools/policy/unsummarised-keys.txt` (S10)
 - `help/loop-review.md` (S11)
+- `tools/memory-tree/tree_lib.py` — `TYPED_RECORD_KINDS` gains `loop-review` (id 36)
+- `tools/memory-tree/HYGIENE.template.md` and its render `memory/HYGIENE.md` — the kind list and the re-rendered registry region (ids 36, 38)
+- `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
 ### Alternatives rejected
 
@@ -312,16 +384,16 @@ The home is the record home `point.memory.record-home` names for this layer's pe
   refusal line for the third.
   Red when: a period enters the text, so each period files a second ask, or a proposal without an
   accept line is filed.
-- **AC6** — When the plant `record` runs `record --key 2026-W45 --base <sha>` with the walk's JSON on
+- **AC6** — (amended, id 12) When the plant `record` runs `record --key 2026-W45 --base <sha>` with the walk's JSON on
   stdin, it writes `<MEMORY_ROOT>/loop-review/<date>-loop-review-2026-W45.md` with the four fields of §4
-  "The record", its `**Ledger:**` the snapshot path price wrote; `--key ../x` exits 2, writing nothing.
+  "The record", its `**Ledger:**` the snapshot path `record` writes beside it (id 12); `--key ../x` exits 2, writing nothing.
   Red when: a malformed key reaches a path, or the record names no snapshot.
 - **AC7** — When `python loop_review.py run --check` runs over the tree, it prints `loop — 5
   item(s) · ok`; `run --dry-run --key 2026-W45` in the fixture prints the items in the order lease,
   gather, price, file, record, each with its outcome; the plant `dangling-route`, a route naming no row,
   exits 2 naming it.
   Red when: the walk runs out of `needs` order, or a dangling route passes.
-- **AC8** — When `grep -n 'name = "loop-review"' record-kinds.toml` and `grep -n -A8
+- **AC8** — (amended, id 37) When `grep -n 'name = "loop-review"' record-kinds.toml` and `grep -n -A8
   'name = "review.loop.cadence"' tools/policy/catalogue.toml` run, the first prints the row and the second
   shows `summary` and `usage`; `grep -cxE 'review\.loop\.(cadence|window-days)'
   tools/policy/unsummarised-keys.txt` prints `0`.
@@ -332,7 +404,7 @@ The home is the record home `point.memory.record-home` names for this layer's pe
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `memory-hygiene self-test` · `build-index selftest` · `policy check` · `policy fixtures` · `docs` · `lexicon naming predicates` · `check-wiring self-test`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `memory-hygiene self-test` · `build-index selftest` · `policy check` · `policy fixtures` · `docs` · `lexicon naming predicates` · `check-wiring self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
 The fixture cases run in unit 2's leg `loop-review selftest`, which the manifest does not hold at base.
 
@@ -368,10 +440,31 @@ New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 · the `--f
 - **F4 — Which unit ships the module?** The brief's S3 gives it to this unit and its order puts unit 2
   first. RESOLVED (agent, 2026-11-02, delegated): unit 2 creates it with `price`, and this unit adds its
   verbs, as unit 2's §8 F1 settles. widens: none · relaxes: none
+- **F5 — Where do the `item.loop.*` rows live, given `step = "cadence.loop"`?** TOOL-dTendedCadence-1 F1 put
+  Maintain's rows in its engine kit's descriptor and rejected the core `loop.toml` "against EX-1", citing ask
+  TOOL-dTendedCadence-25 (`read_items` reads only `loop.toml`, and `check_program` needs a `[[step]]` exit row a
+  cadence program lacks); TOOL-dDeclaredLoop-50 S3 admits only `step = "none"`, on `item.review.*` rows. Options:
+  (a) the rows in a kit descriptor of the observability expansion, read under ask 25's reader; (b) the rows in
+  `tools/loop/loop.toml`, beside the module `tools/loop/loop_review.py` the brief's shared interface S3 places in the
+  loop kit, with an ask on dDeclaredLoop to admit `cadence.loop`; (c) a `[[step]]` row `cadence.loop`, a public surface
+  no clause names (veto 2). (a) has no kit to hold the rows: the Loop Review's module is the loop kit's and no
+  observability kit exists, a new install location (veto 2). Rung 3, spec audit id 26. RESOLVED (agent, 2026-11-02,
+  delegated): (b), a new ask the main loop files · dDeclaredLoop · THE LOOP KIT REFUSES A CADENCE STEP VALUE:
+  `check_program` admits `step = "cadence.loop"` on `item.loop.*` rows in the form TOOL-dDeclaredLoop-50 S3 admits
+  `step = "none"`, and grades a cadence program with no `[[step]]` exit row as ask TOOL-dTendedCadence-25 asks ·
+  accept `loop_lib.py --check` passes the `item.loop.*` rows and still refuses a planted `item.loop.*` row whose need
+  names no row. A build-run precondition of unit 2's AC8 and of S2. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft.
+- rev-2 · 2026-11-02 · §1 §3 §4 §7 §8 S1 S2 S5 S7 S8 S9 S11 AC6 AC8 · amended at the disposal of the
+  round-1 spec audit `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4
+  "Amendments (round-1 spec audit)": ids 1 (`TOOL-dCalibratedLens-19`), 36
+  (`TOOL-dCalibratedLens-20`), 2 (`TOOL-dCalibratedLens-21`), 3 (`TOOL-dCalibratedLens-22`), 49
+  (`TOOL-dCalibratedLens-27`), and 11, 30, 25, 26, 37, 38, 39, 13 and 12
+  (`TOOL-dCalibratedLens-30`); §8 gains F5 (id 26); §3 gains the hands-offs to units 19, 20, 21, 22,
+  27 and 30.
 
 ## 10. Reuse audit
 

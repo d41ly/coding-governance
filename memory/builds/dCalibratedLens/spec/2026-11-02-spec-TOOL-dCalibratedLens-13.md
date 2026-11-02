@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-13 — the `lens` kind and namespace: gov's lenses tagged, a repository's lenses from its overlay, the fixed set with the five slots, and lens tags joined to the step gate
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 15 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 15 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0470@dfafc75a whole
 **Carries:** node:tag-namespace.lens
@@ -11,6 +11,7 @@
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -35,7 +36,7 @@ kind's `schema` key) and -36 S1 to S7 (the fixed set and the exclusion refusals)
 §8 F5 (the playbook kit's `compose` verb on `overlay_rows.py`); TOOL-dWitnessedBar-11 (`leg_factory.py
 new`). The build run re-grounds on each and stops the unit when one is absent.
 
-- **S1** — The namespace. A `[[namespace]]` row in `tools/playbook/namespaces.toml` in
+- **S1** — (amended, id 8) The namespace. A `[[namespace]]` row in `tools/playbook/namespaces.toml` in
   PLAY-dOrderedCharter-19 S2's shape: `ns = "lens"`, `owner = "dCalibratedLens"`, `layer =
   "layer.flow"`, `source` the `key` of each `[[lens]]` row of `tools/workflows/lenses.toml` and of the
   overlay `.governance/instructions.toml`, `extractor = "tag_index:extract_lens"`, `role = "describes"`.
@@ -77,7 +78,7 @@ new`). The build run re-grounds on each and stops the unit when one is absent.
   `instructions.exclude` entry naming a tag `derive_opt_in_tags` returns, naming `review.opt-in`, the
   literal and the key: PLAY-dOrderedCharter-36 S4 compares a key's members with a tag verbatim and the
   map's members are no tags, so the rule lives here once (§8 F2). Observed by AC4 and AC5.
-- **S6** — Lens tags joined to dSafePassage's step gate. A `[[class]]` row `lens` in
+- **S6** — (amended, id 40) Lens tags joined to dSafePassage's step gate. A `[[class]]` row `lens` in
   `tools/govkit/surface-classes.toml` (TOOL-dSafePassage-10 S1): `reader =
   "{prefix}/workflows/render_lenses.py:read_lens_members"`, every gov row's `key` in `lenses.toml` at
   the tree it reads, empty where the file is absent (`tools/govkit/step_gate.py`'s reader contract,
@@ -88,7 +89,7 @@ new`). The build run re-grounds on each and stops the unit when one is absent.
   the change kind's reader of PLAY-dOrderedCharter-7 S7's factory, never a parser of this unit's. A lens
   tag that vanishes with no change record reds; one whose change record names its successor passes; one whose
   record says `Successor: none` reds. Observed by AC6.
-- **S7** — The gate. The leg `lens kind fixtures`, made by `leg_factory.py new` (TOOL-dWitnessedBar-11)
+- **S7** — (amended, id 42) The gate. The leg `lens kind fixtures`, made by `leg_factory.py new` (TOOL-dWitnessedBar-11)
   as a `[[gate_leg]]` row of `tools/workflows/kit.toml` rendered into `tools/gate-legs.json`, running
   `python {prefix}/workflows/render_lenses.py --fixture`, its `enforces` holding `principle.p8`
   (PLAY-dOrderedCharter-7 S5). The fixture, `render_lenses.py --fixture --plant <case>`, builds a scratch
@@ -191,7 +192,7 @@ may not begin `adopter-`, so no harness key of the repository collides with one 
 | `sixth-slot` | an overlay `amends` of `lens.coherence@<hash8>` with `default_in = { add = ["diff-review"] }` | the composition is refused naming `lens.coherence`, `default_in` and `LENS_SLOTS` |
 | `adopter-default` | an overlay row with `default_in = ["unit-spec"]` | the render exits 2 naming the row |
 | `exclude-opted` | `review.opt-in` mapping `adopter-security` to `coherence` under `unit-spec`, and `instructions.exclude = ["lens.adopter.security"]` | the composition is refused naming `review.opt-in`, `unit-spec` and `adopter-security` |
-| `opt-in-unknown` | `review.opt-in` mapping `adopter-missing` to `coherence` | `derive_opt_in_tags` refuses naming `review.opt-in` and `adopter-missing` |
+| `opt-in-unknown` | `review.opt-in` mapping `adopter-missing` to `coherence` | `derive_opt_in_tags` refuses naming `review.opt-in`, `adopter-missing` and `lens.adopter.missing` |
 
 ### Inventory
 
@@ -211,6 +212,28 @@ joining, never red, on that landing (`tools/govkit/step_gate.py:32-35`).
 
 §6 runs a sibling's file by its basename: `gov_tag.py` is `tools/playbook/gov_tag.py` (TOOL-dBoundRoles-14 S5).
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 8 · S1 (M4, `TOOL-dCalibratedLens-30`)** — A brief is an instruction unit measured by replay:
+  `tools/workflows/lenses.toml` joins TOOL-dCalibratedLens-10's guard, so a brief change owes an
+  eval. A lens tag is not added to an agent's `Units:` line, so S1's claim that a return or a
+  finding can cite a brief by its tag is withdrawn.
+- **id 40 · S6, §7 (M20, `TOOL-dCalibratedLens-30`)** — `tools/govkit/usage.toml` gains a
+  `[[class]]` row `class = "lens"`, `usage = "none"`, with a `why` naming the step gate as the
+  class's only reader, and §7 names `docs`.
+- **id 42 · S7 (M22, `TOOL-dCalibratedLens-30`)** — `lens kind fixtures` is claimed by
+  `memory/map/features/review-harnesses.md` under `[claims] gate-legs`; its row names `subject` and
+  `chunk`; `tools/govkit/subject-pins.tsv` is regenerated, and a held leg's row is added to
+  `tools/run-gates/selftest-budgets.txt`.
+- **id 14 · §4 "The cases", AC5 (L4, `TOOL-dCalibratedLens-30`)** — Corrected in place: the
+  `opt-in-unknown` refusal names the key `adopter-missing` and its tag `lens.adopter.missing`, in
+  both the table and AC5.
+
 ### Files touched (estimate)
 
 - `tools/playbook/namespaces.toml` (S1)
@@ -225,6 +248,8 @@ joining, never red, on that landing (`tools/govkit/step_gate.py:32-35`).
 - `tools/workflows/README.md` (S8)
 - `help/overlay-rows.md` and `help/step-gate.md` (S8)
 - `help/reference/kinds.md` (the kinds register's page, re-rendered by `python tools/playbook/render_playbook.py --reference`)
+- `tools/govkit/usage.toml` — the `lens` class row (id 40)
+- `memory/map/features/review-harnesses.md`, `tools/govkit/subject-pins.tsv` and `tools/run-gates/selftest-budgets.txt` — the leg's claim, pin and budget (id 42)
 
 ## 5. Production-readiness checklist
 
@@ -262,9 +287,9 @@ joining, never red, on that landing (`tools/govkit/step_gate.py:32-35`).
   Red when: `default_in` is declared open, so the patch composes a literal of six default slots.
 - **AC4** — When `--plant adopter-default` runs, the render exits 2 naming the overlay row.
   Red when: a repository row takes a default slot.
-- **AC5** — When `--plant exclude-opted` runs, the composition is refused naming `review.opt-in`,
+- **AC5** — (amended, id 14) When `--plant exclude-opted` runs, the composition is refused naming `review.opt-in`,
   `unit-spec` and `adopter-security`; when `--plant opt-in-unknown` runs, `derive_opt_in_tags` exits 2
-  naming `review.opt-in` and
+  naming `review.opt-in`, `adopter-missing` and
   `lens.adopter.missing`.
   Red when: an exclusion of a lens `review.opt-in` names composes, or an unknown member is dropped.
 - **AC6** — When `python tools/govkit/step_gate.py --fixture --plant lens` runs, it exits 1 with a
@@ -278,7 +303,7 @@ joining, never red, on that landing (`tools/govkit/step_gate.py:32-35`).
 
 ## 7. Gates
 
-`verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `policy fixtures` · `govkit acceptance matrix` · `playbook render selftest` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `step-gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `policy fixtures` · `govkit acceptance matrix` · `playbook render selftest` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `step-gate` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `docs` · `codebase-map coverage + freshness` · `govkit selfcheck` · `recall floor`
 
 The leg `lens kind fixtures` is new and not in the manifest at base; its arm is declared below.
 
@@ -326,6 +351,9 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC2 · the rendered fixt
   flow adoption's items 1 to 3 and 9 and FA-1 and FA-5, the brief's S7, TOOL-dDeclaredLoop-27 S1 and S2
   and TOOL-dBoundRoles-20 as the kind's templates, and the step gate, its class table and the policy
   catalogue read at base `8bec4cef`.
+- rev-2 · 2026-11-02 · §4 §7 S1 S6 S7 AC5 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 8, 40, 42 and 14 (`TOOL-dCalibratedLens-30`).
 
 ## 10. Reuse audit
 

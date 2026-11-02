@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-16 — the stall and loop classes trended per scenario, item and rule, and their bounds re-derived once 30 builds have run under them
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0473@17126ed2 whole
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -27,7 +28,7 @@ each bound through the build's measured-value factory, proposing every movement 
 - **S1** — The class tuple, read. `python tools/runtime/journal.py classes` prints `JOURNAL_CLASSES`
   (TOOL-dWellOiledMachine-16 S3) one per line, a verb beside its `write` and `prune` (its S4, S5), so
   the loop kit reads the tuple without importing a sibling. Observed by AC1.
-- **S2** — The trended set, derived. In `tools/loop/measure.py`, `NOT_TRENDED` holds the classes that
+- **S2** — (amended, id 49) The trended set, derived. In `tools/loop/measure.py`, `NOT_TRENDED` holds the classes that
   are no stall or loop event: `refusal` (the breaker's input, counted by `breaker-open`),
   `compaction` (TOOL-dCalibratedLens-9's sizing signal), `map-read-outside-slice`, `hook-failure` and
   `ledger-refused` (TOOL-dWellOiledMachine-53's). The trended set is every member of the tuple not in
@@ -36,12 +37,12 @@ each bound through the build's measured-value factory, proposing every movement 
   <why>` line each, a `NOT_TRENDED` member the tuple lacks, and any of the clause's six, `no-progress`,
   `repeat`, `budget-spent`, `deadline-passed`, `breaker-open` and `cycle`, outside the trended set.
   Observed by AC2.
-- **S3** — The lines. `read_journal_lines(repo, since)` runs `python <runlog kit>/runlog.py journal
+- **S3** — (amended, ids 6, 31) The lines. `read_journal_lines(repo, since)` runs `python <runlog kit>/runlog.py journal
   --producer runtime` (`tools/runlog/runlog.py:498`, `cmd_journal` at `:151`), which reads the producer
   file through `read_journal` and prints each line's fields as JSON, the reader contract of
   `point.journal-readers` (TOOL-dWellOiledMachine-16 S7). It keeps each line whose `t` is inside
   `review.loop.window-days` of the run. Observed by AC4.
-- **S4** — The trend, `derive_stall_trend(lines, acts, transitions)`: one count per (class, scenario,
+- **S4** — (amended, id 50) The trend, `derive_stall_trend(lines, acts, transitions)`: one count per (class, scenario,
   item, rule) over the trended set. The item is the `key=` field's item tag, the text before `@`
   (TOOL-dDeclaredLoop-7 S3), else the act record's `Item`, else `-`. The scenario is the `scenario`
   field of the newest transition record of the act's build at or before the line's `t`
@@ -51,22 +52,22 @@ each bound through the build's measured-value factory, proposing every movement 
   over each build with a transition in the window, the route TOOL-dWellOiledMachine-53's
   `read_act_records` runs in the runtime kit. A line whose act no record names, or keyed `session=`,
   keeps scenario `-`. Observed by AC3.
-- **S5** — The join both ways, `check_trend_complete(lines, trend)`: for each trended class the trend's
+- **S5** — (amended, id 49) The join both ways, `check_trend_complete(lines, trend)`: for each trended class the trend's
   counts sum to the lines of that class, and every trend row's class is in the trended set; a
   mismatch exits 1 naming the class and both counts. Lines of a `NOT_TRENDED` class print
   `stall trend — not trended · <class> · <n> line(s)`, so none goes uncounted. Observed by AC2 and AC5.
-- **S6** — The field: the `loop-review` record kind (the brief's S4, TOOL-dCalibratedLens-3) gains
+- **S6** — (amended, ids 2, 30) The field: the `loop-review` record kind (the brief's S4, TOOL-dCalibratedLens-3) gains
   `stall-trend`, one line per tuple, `<class> · <scenario> · <item> · <rule> · <count> · was <m>`, `<m>`
   the same tuple's count in the previous `loop-review` record, `0` where it had none. The step runs at
   `loop_review.py gather` and `record` writes the field. Observed by AC6.
-- **S7** — The bounds' evidence, kept. `read_bound_evidence(repo, slug)` gives one row per closed build
+- **S7** — (amended, ids 2, 54) The bounds' evidence, kept. `read_bound_evidence(repo, slug)` gives one row per closed build
   for each key of `BOUND_EVIDENCE` (§4), and the field `bound-evidence` of the `loop-review` record
   keeps the rows of every build that closed in its period, so evidence read from a node-local file
   survives that file's retention (`runtime.journal`, TOOL-dWellOiledMachine-16 S5). A closed build is
   one whose README's generated `**Build status:**` line reads `CLOSED` (`derive_status`,
   `tools/memory-tree/gen_build_index.py:801`). A node-local source this node does not hold gives that
   build no row for that key and prints `searched-none`. Observed by AC7 and AC9.
-- **S8** — The re-derivation, `derive_bound_values(repo)`: for each key, the rows of every
+- **S8** — (amended, id 3) The re-derivation, `derive_bound_values(repo)`: for each key, the rows of every
   `bound-evidence` field and this period's, keeping a build only when `policy.py get <key> --rev
   <the commit of its newest transition record>` equals the key's value at `HEAD`, the builds that ran
   under it; then `derive_measured_value(rows, field, 30)` (TOOL-dCalibratedLens-4 S1) and
@@ -99,6 +100,8 @@ each bound through the build's measured-value factory, proposing every movement 
 - **consumes-from** `TOOL-dCalibratedLens-4` — `derive_measured_value` and `render_measured_proposal` in `tools/loop/measure.py`, the factory and the proposal every bound goes through
 - **consumes-from** `TOOL-dCalibratedLens-3` — `tools/loop/loop_review.py`, its `gather`, `record` and `file` verbs and the `loop-review` record kind, which carry S6's and S7's fields and S8's proposals
 - **consumes-from** external — TOOL-dWellOiledMachine-16's `JOURNAL_CLASSES` and `journal.py`, -32's act record, -46's progress ledger; TOOL-dDeclaredLoop-3's `read_transitions`, -27's scenario field, -30's draw rows and `budget_state`; TOOL-dTotalRecall-9's `record find` and `record show`; the runlog kit's `journal` verb and the policy kit's `policy.py get --rev`, landed
+- **consumes-from** `TOOL-dCalibratedLens-9` — `ledgers.py acts --build` and `read_runtime_journal`, the act read S4 maps acts through and the journal read S3 filters (ids 50, 31)
+- **hands-off** `TOOL-dCalibratedLens-30` — `read_journal_lines` under the walk's window and the `BOUND_EVIDENCE` rows, which the minors batch's `at-year-back` and `bounds-default` arms run (ids 6, 18)
 
 ## 4. Design
 
@@ -124,7 +127,7 @@ each bound through the build's measured-value factory, proposing every movement 
 |---|---|---|---|
 | `flow.rework-budget` | `max(0, spent - per_unit * units)`; the proposal is `<p90>+<per_unit>`, `per_unit` the value's own share, 0 for a bare count | the freeze and draw rows `budget_state` reads (TOOL-dDeclaredLoop-30) | committed |
 | `flow.route-backs` | the most `route-back` draws one item took | the same draw rows | committed |
-| `runtime.act-ceiling` | the build's longest act `Wall`, in hours, rounded up | the act records (TOOL-dWellOiledMachine-32 S7, S8) | committed |
+| `runtime.act-ceiling` | the build's longest act `Wall`, in hours to two decimals (id 18) | the act records (TOOL-dWellOiledMachine-32 S7, S8) | committed |
 | `runtime.no-progress` | one more than the longest run of `new: no` rows on one instance that a `new: yes` row ended | the progress ledger (TOOL-dWellOiledMachine-46 S1) | node-local |
 | `runtime.refusal-repeats` | one more than the longest run of one rule's `refusal` lines in one act with no `breaker-open` line for that rule | the journal (S3) | node-local |
 | `flow.wait-ceiling`, `runtime.hold-ceiling`, `run.owner-deadline` | none: no record carries a wait's duration | — | — |
@@ -167,13 +170,50 @@ TOOL-dTotalRecall-9; TOOL-dCalibratedLens-3 and -4; and the ask of §8 F1.
 None: the first review trends the window's lines and keeps the rows of builds closed in its period; a
 bound refuses until 30 builds have run under its value.
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 2 · S6, S7, AC6, AC9 (H3, `TOOL-dCalibratedLens-21`)** — `stall-trend` and `bound-evidence`
+  are `METRICS` entries answering one pair per tuple and per kept row:
+  `stall-trend: <class> · <scenario> · <item> · <rule> · <count> · was <m> · <source>` and
+  `bound-evidence: <key> · <build> · <value> · <source>`; there is no field and the registry row is
+  not edited. AC6 and AC9 read these Metrics lines.
+- **id 3 · S8 (H4, `TOOL-dCalibratedLens-22`)** — Each proposal is answered to the walk as
+  `{"kind": "bound", "id": <key>, "action": "raise"|"lower", "accept": "<the policy_edit.py set command S8 printed> applied by the owner, or the bound kept", "row": <the bounds line>}`,
+  and the walk files it (TOOL-dCalibratedLens-3 S7 as amended).
+- **id 49 · S2, S5 (H9, `TOOL-dCalibratedLens-27`)** — A refusal of `check_trend_classes` or
+  `check_trend_complete` answers the `stall-trend` reading `unread · <why>`, never exit 1 of the
+  walk.
+- **id 50 · S4, AC3 (H10, `TOOL-dCalibratedLens-28`)** — Acts are mapped to builds and items from
+  `ledgers.py acts --build <slug>` (TOOL-dCalibratedLens-9 S1), whose `read_act_records` pages past
+  `gov_record.py find`'s 40-row cap; `find` is not called. AC3 also plants 41 acts of one build, the
+  41st carrying the deciding item.
+- **id 31 · S3 (M15, `TOOL-dCalibratedLens-30`)** — `read_journal_lines` calls
+  TOOL-dCalibratedLens-9's `read_runtime_journal` and filters it; it runs no second journal
+  subprocess.
+- **id 6 · S3, AC4 (M2, `TOOL-dCalibratedLens-30`)** — `read_journal_lines` filters by the walk's
+  `(start, end, days)`, never by `review.loop.window-days` read anew; AC4 also runs under `--at` a
+  year back and counts the line dated inside that window.
+- **id 18 · §4 `BOUND_EVIDENCE`, AC8 (M8, `TOOL-dCalibratedLens-30`)** — `runtime.act-ceiling`'s row
+  is the longest act `Wall` in hours to two decimals; AC8's plant also closes 30 builds whose
+  longest `Wall` is 1.5 h under the default 1.5, and that line reads `hold`.
+- **id 30 · S6 (M14, `TOOL-dCalibratedLens-30`)** — `was <m>` reads the previous record through
+  `read_loop_records` (TOOL-dCalibratedLens-3 S8 as amended).
+- **id 54 · S7 (M28, `TOOL-dCalibratedLens-30`)** — The kept population is every CLOSED build that
+  no earlier `loop-review` record's `bound-evidence` lines name, read back through
+  `read_loop_records`; a plant closes a build after period P's walk, and period P+1's record carries
+  its rows.
+
 ### Files touched (estimate)
 
 - `tools/runtime/journal.py` — S1's verb
 - `tools/runtime/README.md` — S1's verb in the grammar's section
 - `tools/loop/measure.py` — S2 to S5, S7, S8 and the fixture plants
 - `tools/loop/loop_review.py` — the step in `gather`, S6's and S7's fields in `record`
-- `tools/memory-tree/record-kinds.toml` — S6 and S7, the two fields of the `loop-review` row
 - `help/loop.md` — S9
 
 ### Alternatives rejected
@@ -216,21 +256,21 @@ bound refuses until 30 builds have run under its value.
   refused · cycle`; the plant `stall-new-class` adds a class `livelock` to the planted
   tuple, journals one such line, and the trend counts it, exit 0.
   Red when: a clause class can be left out with no refusal, or a new class is not trended.
-- **AC3** — When the plant `stall-tuple` journals a `no-progress` line keyed
+- **AC3** — (amended, id 50) When the plant `stall-tuple` journals a `no-progress` line keyed
   `item.build.unit@1#0a1b2c3d` on act `act-0000000000a1`, a `breaker-open` line with
   `rule=fx-guard/locked-file` on act `act-0000000000a2`, and a `repeat` line keyed `session=`, over
   fixture act records and transitions naming build `tA` at `scenario.feature`, the step prints
   `no-progress · scenario.feature · item.build.unit · - · 1`, `breaker-open · scenario.feature ·
   <the act's Item> · fx-guard/locked-file · 1` and `repeat · - · <item> · - · 1`.
   Red when: a line keyed `session=` is dropped, or a scenario is taken from a transition after the line.
-- **AC4** — When the plant `stall-window` journals a `no-progress` line 61 days before `--now` under
+- **AC4** — (amended, id 6) When the plant `stall-window` journals a `no-progress` line 61 days before `--now` under
   the default `review.loop.window-days`, the trend does not count it.
   Red when: a line outside the window is counted.
 - **AC5** — When the plant `stall-incomplete` hands `check_trend_complete` the plant `stall-tuple`'s
   lines and a trend with its `breaker-open` row removed, it exits 1 naming `breaker-open`, 1 line and
   0 counted; the `compaction` line the plant adds prints `not trended · compaction · 1 line(s)`.
   Red when: the incomplete trend passes, or a not-trended line prints nothing.
-- **AC6** — When the plant `stall-record` runs `loop_review.py gather` and `record` twice, the second
+- **AC6** — (amended, id 2) When the plant `stall-record` runs `loop_review.py gather` and `record` twice, the second
   record's `stall-trend` field ends each line with `was <m>`, `<m>` the first record's count.
   Red when: the field is absent or `was` reads the current period.
 - **AC7** — When the plant `bounds-budget` commits 30 closed builds of one unit each under
@@ -240,11 +280,11 @@ bound refuses until 30 builds have run under its value.
   refused: 25 of 30 rows`.
   Red when: a build that ran under another value counts, or a build still open counts.
   figure: 27 is DERIVED, the nearest-rank p90 of the residuals 1 to 30.
-- **AC8** — When the plant `bounds-act` commits 30 closed builds whose longest act `Wall` runs 1h to
+- **AC8** — (amended, id 18) When the plant `bounds-act` commits 30 closed builds whose longest act `Wall` runs 1h to
   30h, the line reads `runtime.act-ceiling · builds 30 · p90 27`; `bounds-thin` with 29 reads
   `refused: 29 of 30 rows`, and `flow.wait-ceiling` reads `no evidence source`.
   Red when: a key with no reader prints a value, or 29 builds give one.
-- **AC9** — When the plant `bounds-kept` writes a `loop-review` record whose `bound-evidence` field
+- **AC9** — (amended, id 2) When the plant `bounds-kept` writes a `loop-review` record whose `bound-evidence` field
   holds the rows of 20 closed builds for `runtime.no-progress`, removes their progress ledgers, and
   closes 10 more with ledgers present, the line reads `builds 30`.
   Red when: rows kept in a record are not read, so pruned evidence is lost.
@@ -301,6 +341,12 @@ New arm: tools/runtime/selftest.py · covers AC1 · a case comparing the `classe
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft.
+- rev-2 · 2026-11-02 · §3 §4 S2 S3 S4 S5 S6 S7 S8 AC3 AC4 AC6 AC8 AC9 · amended at the disposal of
+  the round-1 spec audit `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4
+  "Amendments (round-1 spec audit)": ids 2 (`TOOL-dCalibratedLens-21`), 3
+  (`TOOL-dCalibratedLens-22`), 49 (`TOOL-dCalibratedLens-27`), 50 (`TOOL-dCalibratedLens-28`), and
+  31, 6, 18, 30 and 54 (`TOOL-dCalibratedLens-30`); the Files touched row of the registry is
+  withdrawn (id 2); §3 gains the consumes-from unit 9 and the hands-off to unit 30.
 
 ## 10. Reuse audit
 

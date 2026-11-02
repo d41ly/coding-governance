@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-11 — the Loop Review's delivery metrics and the owner queue's depth, read with no bound
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 13 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0468@b4b68e80 whole
 
@@ -11,6 +11,7 @@
 | [2026-11-02-build-TOOL-dCalibratedLens-11-deviation-111.md](../build/2026-11-02-build-TOOL-dCalibratedLens-11-deviation-111.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -43,7 +44,7 @@ absent.
   held for the walk, and each takes its value from `derive_delivery_metrics(inputs, window)`, a pure
   function returning the eight values of §4 "The values". The `record` verb writes each as the record's
   Metrics line `<name>: <value> · <source>` (TOOL-dCalibratedLens-3 §4). Observed by AC1 to AC8.
-- **S2** — The landings. `read_delivery_inputs` lists the landing records with one bounded `git ls-remote
+- **S2** — (amended, id 53) The landings. `read_delivery_inputs` lists the landing records with one bounded `git ls-remote
   origin 'refs/gov/landing/*'` and reads each through `read_landing(sha, root)` (DEPL-dShippedRelease-1
   S4, the same kit), keeping the landings whose landing commit's committer time falls inside the
   window. From them it derives `lead-time`, `landing-frequency`, `change-failure-rate` and
@@ -92,6 +93,7 @@ absent.
 
 - **consumes-from** `TOOL-dCalibratedLens-3` — `METRICS`, which these eight entries join, `derive_loop_window`, the `record` verb and the `loop-review` record; without them the fields have no reader, no window and no record
 - **consumes-from** external — DEPL-dShippedRelease-1 S4 (`read_landing`), -13 (`core`), -15 (the release exit record), TOOL-dWellOiledMachine-48 S4 (`decide_owner_items`), TOOL-dRankedPlan-13 S3 and -16 S4 (`plan_fields.py`, the plan record), each specced and unbuilt at base `8bec4cef` and of an ancestor build
+- **hands-off** `TOOL-dCalibratedLens-30` — the delivery readings' dead-source lines, which the minors batch's `dead-sources` arm reads (id 11)
 
 ## 4. Design
 
@@ -170,6 +172,25 @@ Minted: the constant `DELIVERY_FIELDS` and the functions `read_delivery_inputs` 
 None. A `loop-review` record written before this unit carries none of the eight fields, and nothing
 reads one back.
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 53 · S2, §5 (M27, `TOOL-dCalibratedLens-30`)** — `read_delivery_inputs` filters before it
+  reads: one `git log --no-walk --format='%H %ct' <shas>` over every listed landing sha gives each
+  committer time, and `read_landing` runs only for the shas inside the window, so the gather makes
+  at most one fetch per windowed landing (about 180 in 60 days, the count TOOL-dCalibratedLens-3 §4
+  Evidence pins) and a failed fetch of a landing outside the window unreads nothing. A plant
+  `landings-outside` holds a landing outside the window whose fetch fails, and the four delivery
+  fields still read.
+- **id 39 · Files touched (M19, `TOOL-dCalibratedLens-30`)** — Every `loop_review.py` verb or flag
+  this unit adds to `help/loop-review.md` gets its `[[usage]]` row in `tools/govkit/usage.toml`, and
+  the page's `<!-- usage: … -->` anchor is re-fingerprinted, so
+  `python tools/govkit/docs_leg.py --list` names it and the `docs` leg reads no `UNROWED` line.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py` (S1, S2, S3, S7)
@@ -181,6 +202,7 @@ reads one back.
 - `tools/runtime/owner_items.py` (S6)
 - `tools/loop/README.md` (S8)
 - `help/loop-review.md` (S8)
+- `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
 ## 5. Production-readiness checklist
 
@@ -259,7 +281,7 @@ line opening with the quoted text.
 
 ## 7. Gates
 
-`runlog selftest` · `runlog record schema` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`runlog selftest` · `runlog record schema` · `pre-push run-log line` · `run-gates run-log line` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
 The loop kit's leg, `loop-review selftest` (TOOL-dCalibratedLens-2's), and the runtime kit's legs are not
 in the manifest at base; their arms are declared below and graded once those kits land.
@@ -309,6 +331,9 @@ New arm: tools/runlog/selftest.py · covers AC10 · a scratch copy of a committe
   night pass's `[p6-sdlc]` S4 and NP-18 (`night-pass.md:340-411`, `:538`, `:668`), the brief's S3 and S4,
   and runlog, the landing record (DEPL-dShippedRelease-1, -13, -15), the owner items
   (TOOL-dWellOiledMachine-48) and the plan record (TOOL-dRankedPlan-13, -16) read at base `8bec4cef`.
+- rev-2 · 2026-11-02 · §3 §4 §5 §7 S2 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 53 and 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
 
 ## 10. Reuse audit
 

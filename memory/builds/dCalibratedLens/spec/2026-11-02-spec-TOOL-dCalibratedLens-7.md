@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-7 — the value ledger's shape rows, priced from the shape-run records `review.cost` and the journal reconcile write
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0464@b1127f93 whole
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,7 @@ each and stops the unit when one is absent.
 
 - **consumes-from** `TOOL-dCalibratedLens-2` — `PROVIDERS`, `derive_ledger_rows`, `read_record_fields`, the `-` catches rule an `act` row takes, and `price`, which prints this provider's rows and its summary line
 - **consumes-from** external — TOOL-dTotalRecall-11 (the shape-run record), TOOL-dDeclaredLoop-20 S3 (`review.cost`'s fields) and TOOL-dWellOiledMachine-19 S6 (the act form), each DEFERRED at base
+- **hands-off** `TOOL-dCalibratedLens-30` — the `[[usage]]` row of any verb it adds, which the minors batch's `docs_leg.py --list` observation reads (id 39)
 
 ## 4. Design
 
@@ -112,10 +114,23 @@ red and its flake are: a refutation is a reported defect the verify stage found 
 | `read_shape_rows`, `read_shape_records` | functions in `loop_review.py` | `py.function`, each answered OK by `lexicon.py --suggest` at base |
 | `shape` | `PROVIDERS` key and ledger kind | none |
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 39 · Files touched (M19, `TOOL-dCalibratedLens-30`)** — Every `loop_review.py` verb or flag
+  this unit adds to `help/loop-review.md` gets its `[[usage]]` row in `tools/govkit/usage.toml`, and
+  the page's `<!-- usage: … -->` anchor is re-fingerprinted, so
+  `python tools/govkit/docs_leg.py --list` names it and the `docs` leg reads no `UNROWED` line.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py`: the provider, its summary line and five fixture cases (S1 to S5)
 - `help/loop-review.md`: the `shape` row (S6)
+- `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
 ### Alternatives rejected
 
@@ -172,7 +187,7 @@ red and its flake are: a refutation is a reported defect the verify stage found 
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `docs` · `lexicon naming predicates` · `check-wiring self-test`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `docs` · `lexicon naming predicates` · `check-wiring self-test` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
 The fixture cases run in unit 2's leg `loop-review selftest`, which the manifest does not hold at base.
 
@@ -196,6 +211,9 @@ New arm: tools/loop/loop_review.py · covers AC1 AC2 AC3 AC4 · the five shape p
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft.
+- rev-2 · 2026-11-02 · §3 §4 §7 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
 
 ## 10. Reuse audit
 

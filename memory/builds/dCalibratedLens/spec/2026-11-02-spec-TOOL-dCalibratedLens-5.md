@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-5 — instruction effectiveness from returns and findings that cite unit tags, and the Loop Review's proposals under `review.loop.retire`, with the keep record
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0462@cad135ef whole
 **Carries:** node:item.loop.propose
@@ -13,6 +13,7 @@
 | [2026-11-02-build-TOOL-dCalibratedLens-5-deviation-51.md](../build/2026-11-02-build-TOOL-dCalibratedLens-5-deviation-51.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-token-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -40,7 +41,7 @@ and `read_units`), -11 (`tools/playbook/load_sets.py` and its `derive` verb, and
 change record and its `new change` stand-in door); TOOL-dFairHearing-8 S8 (the appendix's tenth column,
 `disposition`); TOOL-dTotalRecall-1 (the registry `tools/memory-tree/record-kinds.toml`).
 
-- **S1** — A return cites unit tags. `UNIT_SCHEMA` (`tools/workflows/unattended-unit.js:206`) and
+- **S1** — (amended, id 35) A return cites unit tags. `UNIT_SCHEMA` (`tools/workflows/unattended-unit.js:206`) and
   `SPEC_SCHEMA` (`tools/workflows/unattended-build.template.js:739`, rendered into
   `tools/workflows/unattended-build.js`) gain an optional `units`, an array of strings. The `returned`
   micro-format (`coding-governance-agents.template.md:70`, rendered into `AGENTS.md:66`) gains the
@@ -60,7 +61,7 @@ change record and its `new change` stand-in door); TOOL-dFairHearing-8 S8 (the a
   `unit.cite-units` (§4 "The citation unit"), written with its change record through
   `build_records.py new change` while `instructions_edit.py` refuses writes (PLAY-dOrderedCharter-15 S4,
   S7). The agent files `.claude/agents/*.md` are re-rendered. Observed by AC3.
-- **S4** — The effectiveness reading. `read_returned_units(root, window)` reads the `returned` lines
+- **S4** — (amended, id 28) The effectiveness reading. `read_returned_units(root, window)` reads the `returned` lines
   ADDED inside the window to the tracked agent ledgers `<MEMORY_ROOT>/builds/*/build/*-agent-ledger.md`,
   from one `git log --since --until -p --unified=0` pass, each line's role (its first field) and its
   `units`; `read_finding_units(root, window)` reads the appendix rows whose `verdict` is `confirmed` from
@@ -77,7 +78,7 @@ change record and its `new change` stand-in door); TOOL-dFairHearing-8 S8 (the a
   falls in the window, each record's `Rule` and `Session` through `read_record_fields`; a record lacking
   either is counted `unread`, never left out silently. A `METRICS` entry `overrides` answers §4 "The
   lines". Observed by AC6.
-- **S6** — `loop.propose`. `derive_proposals(root, window, rows, readings, retire, earlier)` runs each
+- **S6** — (amended, id 3) `loop.propose`. `derive_proposals(root, window, rows, readings, retire, earlier)` runs each
   entry of `PROPOSERS`, a list of `(name, proposer)` pairs, in list order, and returns the proposals in
   TOOL-dCalibratedLens-3 S7's shape `{"kind", "id", "action", "accept", "row"}`. This unit's three:
   `derive_retire_proposals` (every ledger row whose state is `idle` and whose `catches` is a number:
@@ -90,7 +91,7 @@ change record and its `new change` stand-in door); TOOL-dFairHearing-8 S8 (the a
   the walk's item between `item.loop.price` and `item.loop.file`. **Readers:** by name: none, since
   this item withdraws no name and its action words are values it mints · by value: NO VALUE READERS,
   nothing this item names is taken out of the tree. Observed by AC5, AC6 and AC8.
-- **S7** — `review.loop.retire`, read through `read_loop_policy(root, "review.loop.retire")`, the key a
+- **S7** — (amended, id 30) `review.loop.retire`, read through `read_loop_policy(root, "review.loop.retire")`, the key a
   string literal at the call. `resolve_retire_route(value, proposals, earlier)` governs the `retire`,
   `prune` and `tighten` proposals and never an `amend` or another unit's: under `propose-ratify` each is
   handed to `item.loop.file`; under `demote-then-propose` a `retire` or `prune` becomes `demote` unless a
@@ -100,7 +101,7 @@ change record and its `new change` stand-in door); TOOL-dFairHearing-8 S8 (the a
   `proposals` line the record carries (§4 "The lines"). Each value is seen on its planted case.
   **Readers:** by name: none, since the item reads a key and withdraws no name · by value:
   NO VALUE READERS, the key's values are unchanged. Observed by AC7.
-- **S8** — The keep record, kind `keep`. `write_keep_record(root, kind, id, words, caused_by, at)`, run as
+- **S8** — (amended, ids 1, 36, 37) The keep record, kind `keep`. `write_keep_record(root, kind, id, words, caused_by, at)`, run as
   `python loop_review.py keep --kind <kind> --id <id> --words <text> --caused-by <id>`, writes
   `<MEMORY_ROOT>/loop-review/<date>-keep-<key hash>.md`, and `-<n>` before `.md` when that day already
   holds one for the key, so a second keep is a record of its own; the key hash is `derive_key_hash(kind,
@@ -148,6 +149,8 @@ change record and its `new change` stand-in door); TOOL-dFairHearing-8 S8 (the a
 - **hands-off** `TOOL-dCalibratedLens-8` — `PROPOSERS`, which gains the map-retirement entry
 - **hands-off** `TOOL-dCalibratedLens-14` — `PROPOSERS`, which gains the scenario entry, and the keep record and `read_keep_records`, which its decline writes and reads under its own rule, never this unit's lapse
 - **consumes-from** external — PLAY-dOrderedCharter-9, -11, -2 S4 and -15, TOOL-dFairHearing-8 S8 and TOOL-dTotalRecall-1, each DEFERRED at base and of an ancestor or parent build
+- **hands-off** `TOOL-dCalibratedLens-25` — the `returned` fence and `print_agent_lines`' `units` field, whose position that unit's format-guard fixtures hold (id 35)
+- **hands-off** `TOOL-dCalibratedLens-30` — the `[[usage]]` rows of `propose` and `keep`, which the minors batch's `docs_leg.py --list` observation reads (id 39)
 
 ## 4. Design
 
@@ -266,6 +269,53 @@ check = "record-kinds"
 
 §6 runs a sibling's file by its basename: `record_kinds.py` is `tools/memory-tree/record_kinds.py` (TOOL-dTotalRecall-1).
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 1 · §4 "The registry row" (H1, `TOOL-dCalibratedLens-19`)** —
+  `home = "memory/loop-review/*-keep-*.md"`, the glob of the row's id-rule.
+- **id 36 · §4 "The keep record", S8, AC9 (H2, `TOOL-dCalibratedLens-20`)** — The keep's third line
+  is `**Serves:** keep TOOL-dCalibratedLens-5`, and `keep` joins `TYPED_RECORD_KINDS` in
+  `tools/memory-tree/tree_lib.py` and HYGIENE's closed `<kind>` list in this pass, so AC9's field
+  check reaches it.
+- **id 35 · S1 (H7, `TOOL-dCalibratedLens-25`)** — The field sits before the run field as an
+  optional bracket:
+  `returned — <role> · <outcome> · <wall> · <tokens> out[ · units <units>] · run <run-id|direct>/<agent-id>`,
+  so the agent id stays last for the format guard's `checkCarries`
+  (`tools/hooks/format-guard.js:431-435`) and a line without the field still matches;
+  `print_agent_lines` always writes it, `-` when the result carries none. The guard's fixtures and
+  the leg's guard are `TOOL-dCalibratedLens-25`'s.
+- **id 3 · §3, §8 F5, S6 (H4, `TOOL-dCalibratedLens-22`)** — `PROPOSERS` holds propose-time
+  proposers only: this unit's three and those of units 8, 10 and 14. The gather-time proposals of
+  units 4, 6, 15 and 16 reach `item.loop.file` through the walk's one route (TOOL-dCalibratedLens-3
+  S7 as amended), and none is re-homed here; F5's "joining it in this unit's pass" is withdrawn.
+- **id 48 · AC5 (H8, `TOOL-dCalibratedLens-26`)** — AC5 also runs `propose --dry-run` over
+  TOOL-dCalibratedLens-26's plant `catch-none`, where every leg reads `catches` `-`, and it prints
+  no `retire` proposal.
+- **id 28 · S4 (M12, `TOOL-dCalibratedLens-30`)** — `read_finding_units` reads confirmed rows
+  through a new verb `python tools/workflows/review_replay.py --confirmed-rows <record> --json`,
+  printing `parse_appendix_rows`' rows or its refusal, run as a bounded subprocess through
+  `resolve_kit_dir`; a refused record counts as `unread`, never as zero breaks.
+- **id 29 · §4 "The citation unit", §7 (M13, `TOOL-dCalibratedLens-30`)** — The cited-tag check is
+  PLAY-dOrderedCharter-19's `TAG_RE` and `TAG_MAX_BYTES`; the Python copies in `handoff.py` and
+  `loop_review.py` are held by a new `PARITY_ROWS` row of `tools/lib/resolve-python.test.sh`, and
+  the arm in `tier2-review.test.sh` compares only the JS template's copy with the canonical.
+  `UNIT_TAG_RE` is not minted.
+- **id 30 · S7 (M14, `TOOL-dCalibratedLens-30`)** — The earlier record S7 compares against is read
+  through `read_loop_records` (TOOL-dCalibratedLens-3 S8 as amended).
+- **id 37 · §4 "The registry row", AC9 (M17, `TOOL-dCalibratedLens-30`)** — The row carries
+  `unarmed = "no keep is tracked until the owner's first keep"`, and AC9 also runs
+  `record_kinds.py --check` over the tree after the pass: exit 0.
+- **id 38 · Files touched, §7 (M18, `TOOL-dCalibratedLens-30`)** — After the row edit,
+  `python tools/memory-tree/record_kinds.py --write` then `adopt-memory-tree.sh --render`; both
+  HYGIENE copies land in this commit.
+- **id 39 · S11 (M19, `TOOL-dCalibratedLens-30`)** — `tools/govkit/usage.toml` gains `[[usage]]`
+  rows for `propose` and `keep`, with their flags.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py` (S4 to S8, the fixture plants)
@@ -283,6 +333,11 @@ check = "record-kinds"
 - `tools/workflows/unattended-unit.js` (S1)
 - `tools/roles/adopt-roles.test.sh` and `tools/workflows/tier2-review.test.sh` (the arms in §7)
 - `help/loop-review.md` and `help/roles.md` (S11)
+- `tools/memory-tree/tree_lib.py` — `TYPED_RECORD_KINDS` gains `keep` (id 36)
+- `tools/memory-tree/HYGIENE.template.md` and its render `memory/HYGIENE.md` (ids 36, 38)
+- `tools/workflows/review_replay.py` — the `--confirmed-rows` verb (id 28)
+- `tools/lib/resolve-python.test.sh` — the `PARITY_ROWS` row of the tag grammar (id 29)
+- `tools/govkit/usage.toml` — the `propose` and `keep` rows (id 39)
 
 ### Alternatives rejected
 
@@ -343,7 +398,7 @@ check = "record-kinds"
   `unit.b`, over planted load sets, `gather --dry-run` prints the `instruction-units` line with the
   planted counts, and a ledger line added before the window is not counted.
   Red when: a line outside the window counts, or a return with no `units` field counts as a load.
-- **AC5** — When the plant `retire` commits a snapshot holding one `idle` row with `catches` 0, one `new`
+- **AC5** — (amended, id 48) When the plant `retire` commits a snapshot holding one `idle` row with `catches` 0, one `new`
   row and one row whose `catches` is `-`, `propose --dry-run` prints one proposal, `leg <id> retire`, with
   an `accept`; and `run --check` prints `loop — 6 item(s) · ok`, the dry-run walk running `propose`
   between `price` and `file`.
@@ -368,7 +423,7 @@ check = "record-kinds"
   second `keep` the same day writes a second file ending `-2.md`; `keep` with an empty `--words` exits 2
   and writes nothing.
   Red when: a pricer ignores the keep, a keep never lapses, or a second keep overwrites the first.
-- **AC9** — When `python record_kinds.py --check` runs in a scratch worktree holding one
+- **AC9** — (amended, ids 36, 37) When `python record_kinds.py --check` runs in a scratch worktree holding one
   keep record that lacks `Words`, it exits 1 naming the record; with the field restored it exits 0.
   Red when: the `keep` row's fields do not reach the field check.
   fixture: `record_kinds.py` is TOOL-dTotalRecall-1's, absent at `8bec4cef`.
@@ -382,7 +437,7 @@ check = "record-kinds"
 
 ## 7. Gates
 
-`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs` · `micro-format definitions` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `policy check` · `policy fixtures` · `check-wiring self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `review-protocol parity (kit vs dogfood)`
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs` · `micro-format definitions` · `roles catalogue` · `roles render wiring` · `roles render selftest` · `roles adopter self-test` · `policy check` · `policy fixtures` · `check-wiring self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `review-protocol parity (kit vs dogfood)` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) is not in the manifest at base and
 is named here in prose; it grades the loop arm once that unit lands.
@@ -449,6 +504,11 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC2 · an appendix fixtu
   Obligations v2:1343, the brief's row for unit 5 and its S2, S3, S5 and S11 interfaces as
   TOOL-dCalibratedLens-2 and -3 rev-1 spell them, layer-expansions:212 and :259-266, the walkthrough's
   R2, foundations step 1, and PLAY-dOrderedCharter-2, -9, -11 and -15 at their current revisions.
+- rev-2 · 2026-11-02 · §3 §4 §7 §8 S1 S4 S6 S7 S8 AC5 AC9 · amended at the disposal of the round-1
+  spec audit `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments
+  (round-1 spec audit)": ids 1 (`TOOL-dCalibratedLens-19`), 36 (`TOOL-dCalibratedLens-20`), 35
+  (`TOOL-dCalibratedLens-25`), 3 (`TOOL-dCalibratedLens-22`), 48 (`TOOL-dCalibratedLens-26`), and
+  28, 29, 30, 37, 38 and 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-offs to units 25 and 30.
 
 ## 10. Reuse audit
 

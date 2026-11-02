@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-15 — each size breach priced by its bytes and its reads, and a persisting or grown breach raised to the owner
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 6 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 6 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0472@bf8d8ee5 whole
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-edge-fix-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-1-spec-brief.md) | research | TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 |
+| [2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-14 |
 
 <!-- /gen:spec-records -->
 
@@ -33,7 +34,7 @@ its proposal shape, the record and its home, and the window), the `warned` and `
 directory, its `ended`, `verdict`, `skipped` and `reused` keys, and runlog's transcript walker are built
 at base and cited where used.
 
-- **S1** — The breaches read. `read_verdict_warnings(root, window)` in `tools/loop/loop_review.py`
+- **S1** — (amended, id 22) The breaches read. `read_verdict_warnings(root, window)` in `tools/loop/loop_review.py`
   reads the `verdict` file of every run directory under each git dir of the clone, the common dir's
   `gate-run/` and each `worktrees/<name>/gate-run/` (the runner's `RUNROOT="$gd/gate-run"`,
   `tools/run-gates/run-gates.sh:2721`, `gd` the worktree's `--git-dir`, `:114-116`), and takes the
@@ -64,7 +65,7 @@ at base and cited where used.
   returns `(rows, events)` in TOOL-dCalibratedLens-2's provider shape, as §4 "The rows" states: one row
   per breached subject, its `cost` `<bytes times reads>B/<reads>` or `-`, its `catches` `-`, and no
   event. Observed by AC6.
-- **S6** — The trend. `read_previous_breaches(root, key)` reads the newest committed `loop-review`
+- **S6** — (amended, ids 10, 30, 46) The trend. `read_previous_breaches(root, key)` reads the newest committed `loop-review`
   record other than this period's, the record the newest first-parent commit of `HEAD` touching
   `<MEMORY_ROOT>/loop-review/` added, through `git show` and never the working tree, and parses its
   `cap-breaches:` Metrics line; a record whose line reads `searched-none` is skipped back to the newest
@@ -115,6 +116,7 @@ at base and cited where used.
 - **consumes-from** `TOOL-dCalibratedLens-3` — `METRICS`, which gains `cap-breaches` and `cap-counted`; `run_loop_walk` and the proposal shape `run_loop_file` reads; the record's Metrics lines and its home
 - **hands-off** `TOOL-dCalibratedLens-4` — the `kind=cap` rows of the value ledger, each breach priced by its bytes and its reads in the `cost` column
 - **consumes-from** external — TOOL-dWitnessedBar-29 (the `warn.<k>` verdict keys) and TOOL-dWitnessedBar-4 (the `tree` key), DEFERRED at base and of an ancestor build
+- **hands-off** `TOOL-dCalibratedLens-30` — `read_previous_breaches` over `read_loop_records`, which the minors batch's `keep-after-review` arm runs (ids 10, 46)
 
 ## 4. Design
 
@@ -199,6 +201,40 @@ entries `cap-breaches` and `cap-counted`; the cost unit `B`; the proposal action
 None: at base no verdict record carries a `warn.<k>` key and no `loop-review` record exists, so the
 first decided review reads every breach `new` and raises none.
 
+### Amendments (round-1 spec audit)
+
+The round-1 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Each bullet supersedes the text it
+names; the unit it names owns the finding and its proof.
+
+- **id 49 · §4 "The metrics" (H9, `TOOL-dCalibratedLens-27`)** — A subject carrying a space or a
+  comma is skipped from `cap-breaches` with one
+  `ledger — cap · <subject> · skipped · unsplittable subject` line, never refused at the write
+  boundary, so one such path cannot stop the period.
+- **id 10 · S6, AC7 (M6, `TOOL-dCalibratedLens-30`)** — The previous record is the newest committed
+  `*-loop-review-*.md` other than this period's, read through `read_loop_records`
+  (TOOL-dCalibratedLens-3 S8 as amended), never the record the newest commit touching the folder
+  added, which may have added only a keep or a snapshot. AC7 also plants a keep committed after the
+  previous review, and the trend still reads that review.
+- **id 46 · S6 (M6, `TOOL-dCalibratedLens-30`)** — The same defect, raised by a second lens: it
+  closes with id 10's rule.
+- **id 30 · S6 (M14, `TOOL-dCalibratedLens-30`)** — `read_previous_breaches` keeps only its
+  `cap-breaches:` line parser over `read_loop_records` and `read_metrics_lines`.
+- **id 22 · S1, §4 "No full run" (L7, `TOOL-dCalibratedLens-30`)** — A full run is one where every
+  leg of subject `repo` executed: legs are held only when of subject `kit` or chunk `selftests`
+  (`run-gates.sh:3249-3251`), and `read_verdict_warnings` answers `unread` when a leg emitting class
+  `size` warnings has subject `kit` or chunk `selftests`, so a held size leg can never read as
+  cleared.
+- **id 34 · §10 (L10, `TOOL-dCalibratedLens-30`)** — §10's precedent for S1's walk is
+  `read_git_dirs` (`tools/drift-audit/drift_report.py:3114`, its glob at `:3133-3134`), carried
+  inline with the same order, the common dir then the sorted `worktrees/` dirs, and the same empty
+  case.
+- **id 39 · Files touched (M19, `TOOL-dCalibratedLens-30`)** — Every `loop_review.py` verb or flag
+  this unit adds to `help/loop-review.md` gets its `[[usage]]` row in `tools/govkit/usage.toml`, and
+  the page's `<!-- usage: … -->` anchor is re-fingerprinted, so
+  `python tools/govkit/docs_leg.py --list` names it and the `docs` leg reads no `UNROWED` line.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py` (S1, S2, S4 to S8, and the `--fixture` cases of §7)
@@ -208,6 +244,7 @@ first decided review reads every breach `new` and raises none.
 - `tools/runlog/selftest.py` (the arm in §7)
 - `tools/runlog/README.md` (S9)
 - `help/loop-review.md` (S9, TOOL-dCalibratedLens-2's page)
+- `tools/govkit/usage.toml` — the `[[usage]]` row of each verb or flag added (id 39)
 
 ### Alternatives rejected
 
@@ -273,7 +310,7 @@ first decided review reads every breach `new` and raises none.
   `4433344B/212` and `-`, each with `catches` `-` and no event, and the planted reads stub records one
   call.
   Red when: a `-` read prices as 0, a catch column carries a number, or the node is read twice.
-- **AC7** — When a probe calls `derive_cap_trends` with this review's breaches `A` at 120 bytes, `B` at
+- **AC7** — (amended, ids 10, 46) When a probe calls `derive_cap_trends` with this review's breaches `A` at 120 bytes, `B` at
   90 and `C` at 50 against a previous line naming `A` at 100, `B` at 90 and `D`, it returns `A`
   `grown`, `B` `held`, `C` `new` and `D` `cleared`; and when `read_previous_breaches` reads a scratch
   repository whose newest committed record's line is `searched-none` and whose record before it names
@@ -295,7 +332,7 @@ first decided review reads every breach `new` and raises none.
 
 ## 7. Gates
 
-`runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `format-guard self-test` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs`
+`runlog selftest` · `pre-push run-log line` · `run-gates run-log line` · `format-guard self-test` · `policy fixtures` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `lexicon naming predicates` · `docs` · `recall floor arms` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`
 
 The leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11, argv `loop_review.py --fixture`) is not in
 the manifest at base, so it is named here in prose; it grades the loop arm below once that unit lands.
@@ -357,6 +394,10 @@ New arm: tools/runlog/selftest.py · covers AC4 AC5 · a planted projects dir of
   TOOL-dWitnessedBar-4 and -29, and the runner, the policy kit and runlog at base `8bec4cef`. The status
   token is `OPEN`, the drafting token of TEMPLATE-SPEC; the brief's `DRAFT` is no member of
   `STATUS_TOKENS` (`tools/memory-tree/tree_lib.py:28`).
+- rev-2 · 2026-11-02 · §3 §4 §7 §10 S1 S6 AC7 · amended at the disposal of the round-1 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
+  audit)": ids 49 (`TOOL-dCalibratedLens-27`), and 10, 46, 30, 22, 34 and 39
+  (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to unit 30.
 
 ## 10. Reuse audit
 

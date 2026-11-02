@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18
+ids: TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30
 spec-audit: 2026-10-21
 parents: dTendedCadence dFairHearing
 may: PLAY-dClosedLoop-3
@@ -77,45 +77,58 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 17 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 29 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-2 TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12
-ids TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18
+ids TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-18 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24
+ids TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dCalibratedLens-2 — the shared value ledger: its snapshot, its view, its row grammar and the `price` verb](spec/2026-11-02-spec-TOOL-dCalibratedLens-2.md) | 1 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-3 — the Loop Review: a cadence step run as `review.loop.cadence` says, its lease keyed by the selected period, its walk and its record](spec/2026-11-02-spec-TOOL-dCalibratedLens-3.md) | 2 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-7 — the value ledger's shape rows, priced from the shape-run records `review.cost` and the journal reconcile write](spec/2026-11-02-spec-TOOL-dCalibratedLens-7.md) | 3 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-9 — probe cost priced in the value ledger, and compactions counted per item kind](spec/2026-11-02-spec-TOOL-dCalibratedLens-9.md) | 4 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-12 — the Loop Review pricing cost per item kind from trace rows](spec/2026-11-02-spec-TOOL-dCalibratedLens-12.md) | 5 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-15 — each size breach priced by its bytes and its reads, and a persisting or grown breach raised to the owner](spec/2026-11-02-spec-TOOL-dCalibratedLens-15.md) | 6 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-4 — the measured-value factory, and the `budgets.*` caps re-derived from evidence and review cost](spec/2026-11-02-spec-TOOL-dCalibratedLens-4.md) | 7 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-6 — each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured`](spec/2026-11-02-spec-TOOL-dCalibratedLens-6.md) | 8 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-16 — the stall and loop classes trended per scenario, item and rule, and their bounds re-derived once 30 builds have run under them](spec/2026-11-02-spec-TOOL-dCalibratedLens-16.md) | 9 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-17 — the node beats and the pools' ledgers trended, and the reservation estimate per item kind re-derived from `trace.cost`](spec/2026-11-02-spec-TOOL-dCalibratedLens-17.md) | 10 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-5 — instruction effectiveness from returns and findings that cite unit tags, and the Loop Review's proposals under `review.loop.retire`, with the keep record](spec/2026-11-02-spec-TOOL-dCalibratedLens-5.md) | 11 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-10 — instruction evals: a replay suite of recorded items with known outcomes, scored through the scorer factory, owed again by a held leg when an instruction unit changes](spec/2026-11-02-spec-TOOL-dCalibratedLens-10.md) | 12 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-11 — the Loop Review's delivery metrics and the owner queue's depth, read with no bound](spec/2026-11-02-spec-TOOL-dCalibratedLens-11.md) | 13 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-8 — the not-in-view cause on every confirmed finding, and the Loop Review's 38-finding reading of its share](spec/2026-11-02-spec-TOOL-dCalibratedLens-8.md) | 14 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-13 — the `lens` kind and namespace: gov's lenses tagged, a repository's lenses from its overlay, the fixed set with the five slots, and lens tags joined to the step gate](spec/2026-11-02-spec-TOOL-dCalibratedLens-13.md) | 15 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-1 — each stage review's lenses and effort: four stage literals in the lens catalogue, chosen by the breakpoint's stage, run at `review.<stage>.effort`](spec/2026-11-02-spec-TOOL-dCalibratedLens-1.md) | 16 | 2 | OPEN | rev-1 | 2026-11-02 |
-| [TOOL-dCalibratedLens-14 — lens removal by a swap or an exclusion, a repository lens's replay result, and scenario promotion as `flow.promote` says](spec/2026-11-02-spec-TOOL-dCalibratedLens-14.md) | 17 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-2 — the shared value ledger: its snapshot, its view, its row grammar and the `price` verb](spec/2026-11-02-spec-TOOL-dCalibratedLens-2.md) | 1 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-26 — a catch source that observed no run of a leg reads `-`, never 0, so no unobserved leg is proposed for retirement](spec/2026-11-02-spec-TOOL-dCalibratedLens-26.md) | 2 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-3 — the Loop Review: a cadence step run as `review.loop.cadence` says, its lease keyed by the selected period, its walk and its record](spec/2026-11-02-spec-TOOL-dCalibratedLens-3.md) | 2 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-19 — the three Loop Review record kinds homed at their id-rules' globs, so no record sits under another kind's home](spec/2026-11-02-spec-TOOL-dCalibratedLens-19.md) | 3 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-20 — every Loop Review record carries a `**Serves:**` line naming its kind, so the registry's field check reaches it](spec/2026-11-02-spec-TOOL-dCalibratedLens-20.md) | 3 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-22 — one route from every item to `file`: the walk collects each item's proposals, and every producer spells the five fields](spec/2026-11-02-spec-TOOL-dCalibratedLens-22.md) | 3 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-27 — a failing reading or proposer becomes an `unread` line, and the record is checked before anything is filed, so no period re-runs forever](spec/2026-11-02-spec-TOOL-dCalibratedLens-27.md) | 3 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-7 — the value ledger's shape rows, priced from the shape-run records `review.cost` and the journal reconcile write](spec/2026-11-02-spec-TOOL-dCalibratedLens-7.md) | 3 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-9 — probe cost priced in the value ledger, and compactions counted per item kind](spec/2026-11-02-spec-TOOL-dCalibratedLens-9.md) | 4 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-12 — the Loop Review pricing cost per item kind from trace rows](spec/2026-11-02-spec-TOOL-dCalibratedLens-12.md) | 5 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-28 — no population is read through `gov_record.py find`: probe records and Loop Review records are listed from the index, acts read through the paging act reader](spec/2026-11-02-spec-TOOL-dCalibratedLens-28.md) | 5 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-15 — each size breach priced by its bytes and its reads, and a persisting or grown breach raised to the owner](spec/2026-11-02-spec-TOOL-dCalibratedLens-15.md) | 6 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-4 — the measured-value factory, and the `budgets.*` caps re-derived from evidence and review cost](spec/2026-11-02-spec-TOOL-dCalibratedLens-4.md) | 7 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-21 — one carrier for a multi-line reading: the record's Metrics lines, one per entry, never a `fields`-form field](spec/2026-11-02-spec-TOOL-dCalibratedLens-21.md) | 8 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-6 — each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured`](spec/2026-11-02-spec-TOOL-dCalibratedLens-6.md) | 8 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-16 — the stall and loop classes trended per scenario, item and rule, and their bounds re-derived once 30 builds have run under them](spec/2026-11-02-spec-TOOL-dCalibratedLens-16.md) | 9 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-29 — the work-order population read without argv: paths on stdin, one history pass, one policy read per policy revision, timed over the real tree](spec/2026-11-02-spec-TOOL-dCalibratedLens-29.md) | 9 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-17 — the node beats and the pools' ledgers trended, and the reservation estimate per item kind re-derived from `trace.cost`](spec/2026-11-02-spec-TOOL-dCalibratedLens-17.md) | 10 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-5 — instruction effectiveness from returns and findings that cite unit tags, and the Loop Review's proposals under `review.loop.retire`, with the keep record](spec/2026-11-02-spec-TOOL-dCalibratedLens-5.md) | 11 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-10 — instruction evals: a replay suite of recorded items with known outcomes, scored through the scorer factory, owed again by a held leg when an instruction unit changes](spec/2026-11-02-spec-TOOL-dCalibratedLens-10.md) | 12 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-25 — the `returned` line's units field sits before the agent id, and the format guard's fixtures and guard follow the fence](spec/2026-11-02-spec-TOOL-dCalibratedLens-25.md) | 12 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-11 — the Loop Review's delivery metrics and the owner queue's depth, read with no bound](spec/2026-11-02-spec-TOOL-dCalibratedLens-11.md) | 13 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-23 — the instruction-eval seed lands held, and a guarded edit's owed replay is recorded before the close bar](spec/2026-11-02-spec-TOOL-dCalibratedLens-23.md) | 13 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-8 — the not-in-view cause on every confirmed finding, and the Loop Review's 38-finding reading of its share](spec/2026-11-02-spec-TOOL-dCalibratedLens-8.md) | 14 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-13 — the `lens` kind and namespace: gov's lenses tagged, a repository's lenses from its overlay, the fixed set with the five slots, and lens tags joined to the step gate](spec/2026-11-02-spec-TOOL-dCalibratedLens-13.md) | 15 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-1 — each stage review's lenses and effort: four stage literals in the lens catalogue, chosen by the breakpoint's stage, run at `review.<stage>.effort`](spec/2026-11-02-spec-TOOL-dCalibratedLens-1.md) | 16 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-14 — lens removal by a swap or an exclusion, a repository lens's replay result, and scenario promotion as `flow.promote` says](spec/2026-11-02-spec-TOOL-dCalibratedLens-14.md) | 17 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dCalibratedLens-24 — the stage receiver judged by the hook over a real payload, green on the shipped harness and red on a looped copy](spec/2026-11-02-spec-TOOL-dCalibratedLens-24.md) | 17 | 2 | OPEN | rev-1 | 2026-11-02 |
+| [TOOL-dCalibratedLens-30 — the round-1 spec audit's 41 minors batched: each correction carried by the sibling it lands on, and six arms that hold the classes no sibling owns](spec/2026-11-02-spec-TOOL-dCalibratedLens-30.md) | 18 | 2 | OPEN | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 3 record folder(s).
+Records: 26 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dCalibratedLens-1 TOOL-dCalibratedLens-10 TOOL-dCalibratedLens-11 TOOL-dCalibratedLens-12 TOOL-dCalibratedLens-13 TOOL-dCalibratedLens-14 TOOL-dCalibratedLens-15 TOOL-dCalibratedLens-16 TOOL-dCalibratedLens-17 TOOL-dCalibratedLens-2
-TOOL-dCalibratedLens-3 TOOL-dCalibratedLens-4 TOOL-dCalibratedLens-5 TOOL-dCalibratedLens-6 TOOL-dCalibratedLens-7 TOOL-dCalibratedLens-8 TOOL-dCalibratedLens-9.
+Ids no `spec-audit` record has ever named: TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28
+TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30.
 
-Ids whose spec moved past its audited revision: none — 0 of 17 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 17 of 29 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dCalibratedLens's 17 clause(s) and 15 owned node(s), over 17 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dCalibratedLens's 17 clause(s) and 15 owned node(s), over 29 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 17
 - carried in parts: 0 (none)
@@ -124,7 +137,10 @@ Coverage of dCalibratedLens's 17 clause(s) and 15 owned node(s), over 17 spec(s)
 - stale: 0 (none)
 - ambiguous: 0 (none)
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: `spec/2026-11-02-spec-TOOL-dCalibratedLens-19.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-TOOL-dCalibratedLens-20.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-TOOL-dCalibratedLens-21.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-02-spec-TOOL-dCalibratedLens-22.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-TOOL-dCalibratedLens-23.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-TOOL-dCalibratedLens-24.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-TOOL-dCalibratedLens-25.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-02-spec-TOOL-dCalibratedLens-26.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-TOOL-dCalibratedLens-27.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-TOOL-dCalibratedLens-28.md` (PLAY-dClosedLoop-2), `spec/2026-11-02-spec-TOOL-dCalibratedLens-29.md` (PLAY-dClosedLoop-2),
+  `spec/2026-11-02-spec-TOOL-dCalibratedLens-30.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0459, cl-dClosedLoop-0462, cl-dClosedLoop-0466, cl-dClosedLoop-0467, cl-dClosedLoop-0468, cl-dClosedLoop-0469, cl-dClosedLoop-0472, cl-dClosedLoop-0473
 <!-- /gen:build-coverage -->
 
@@ -133,22 +149,23 @@ Coverage of dCalibratedLens's 17 clause(s) and 15 owned node(s), over 17 spec(s)
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dCalibratedLens-2` | no |
-| 2 | `TOOL-dCalibratedLens-3` | no |
-| 3 | `TOOL-dCalibratedLens-7` | no |
+| 2 | `TOOL-dCalibratedLens-26`, `TOOL-dCalibratedLens-3` | no |
+| 3 | `TOOL-dCalibratedLens-19`, `TOOL-dCalibratedLens-20`, `TOOL-dCalibratedLens-22`, `TOOL-dCalibratedLens-27`, `TOOL-dCalibratedLens-7` | no |
 | 4 | `TOOL-dCalibratedLens-9` | no |
-| 5 | `TOOL-dCalibratedLens-12` | no |
+| 5 | `TOOL-dCalibratedLens-12`, `TOOL-dCalibratedLens-28` | no |
 | 6 | `TOOL-dCalibratedLens-15` | no |
 | 7 | `TOOL-dCalibratedLens-4` | no |
-| 8 | `TOOL-dCalibratedLens-6` | no |
-| 9 | `TOOL-dCalibratedLens-16` | no |
+| 8 | `TOOL-dCalibratedLens-21`, `TOOL-dCalibratedLens-6` | no |
+| 9 | `TOOL-dCalibratedLens-16`, `TOOL-dCalibratedLens-29` | no |
 | 10 | `TOOL-dCalibratedLens-17` | no |
 | 11 | `TOOL-dCalibratedLens-5` | no |
-| 12 | `TOOL-dCalibratedLens-10` | no |
-| 13 | `TOOL-dCalibratedLens-11` | no |
+| 12 | `TOOL-dCalibratedLens-10`, `TOOL-dCalibratedLens-25` | no |
+| 13 | `TOOL-dCalibratedLens-11`, `TOOL-dCalibratedLens-23` | yes |
 | 14 | `TOOL-dCalibratedLens-8` | no |
 | 15 | `TOOL-dCalibratedLens-13` | no |
 | 16 | `TOOL-dCalibratedLens-1` | no |
-| 17 | `TOOL-dCalibratedLens-14` | no |
+| 17 | `TOOL-dCalibratedLens-14`, `TOOL-dCalibratedLens-24` | no |
+| 18 | `TOOL-dCalibratedLens-30` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
