@@ -102,7 +102,7 @@ ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16
 | [TOOL-dFoldedAudit-16 — the flagged bar's own reds cleared: the fork-site registry and the armed-cutoff pin](spec/2026-11-02-spec-TOOL-dFoldedAudit-16.md) | 160 | 2 | CLOSED | rev-2 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 114 bound to this build, across 4 record folder(s).
+Records: 115 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
