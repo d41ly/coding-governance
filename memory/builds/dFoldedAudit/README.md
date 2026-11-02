@@ -100,7 +100,7 @@ ids TOOL-dFoldedAudit-15
 | [TOOL-dFoldedAudit-15 — the closing review's mediums and lows closed as one batch](spec/2026-11-02-spec-TOOL-dFoldedAudit-15.md) | 150 | 2 | CLOSED | rev-2 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 104 bound to this build, across 4 record folder(s).
+Records: 105 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -19,6 +19,10 @@ Every unit's own return is recorded under `build/`. This record lists only what 
 - `runlog-writer.test.sh`'s fixture has no `base:`, so its `--dispatch` and `--review` now refuse; unit 9 read its arms as staying green, unrun. The leg suite's tRev no-base arm likewise.
 - Check 2's `$(awk ...)` status is untested: a typo that broke that awk read as a clean corpus, and only a positive arm caught it.
 
+- The merge of `main` is blocked. `sync_with_base_branch` refused on 2026-11-02: the merge changes sandbox-protected `.claude/skills/*` files, and the app takes those only from an origin the owner has confirmed under Help → Troubleshooting → Review Pinned Git Origins. A raw `git merge` or `--prepare` makes the same write, so neither is taken. Seven paths conflict on that merge: `.governance/policy.json`, `.memory-tree.conf`, `memory/guides/SESSION-KICKOFF.md`, `memory/map/features/spec-tokens.md`, `memory/map/generated/symbols.json`, `tools/check-spec-tokens.py`, `tools/check-spec-tokens.test.sh`.
+- `SPEC_FOLD_CUTOFF` is written at the close, after that merge: strictly past the newest run record on any ref. `dEasedEffort` began 2026-11-02, so 2026-11-03 is the floor today.
+- Unit 15's S5 says no red is permanent, but a commit cutting a MIDDLE chain row stays red after its bytes are restored; the code is as specified and the wrap-up names the limit.
+
 ## Findings for the closing review
 
 - Lexicon pin: `lexicon.py --check` reports 1214 verb offenders over a pin of 1212. The two names this build's diff adds are `foldconf` (`tools/unattended/check-unattended.test.sh:486`) and `commit_fold_fixture` (`tools/unattended/unattended.test.sh:2503`), from TOOL-dFoldedAudit-2.
