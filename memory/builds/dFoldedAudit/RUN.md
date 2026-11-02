@@ -179,3 +179,7 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T11:48:55Z dispatch · item 8f7666b1 TOOL-dFoldedAudit-17 · reason .memory-tree.conf tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/drift-audit/drift_signals.py memory/map/features/spec-tokens.md memory/guides/SESSION-KICKOFF.md .governance/policy.json memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md memory/builds/dFoldedAudit/README.md
 
 2026-11-02T12:45:13Z rescope · item add TOOL-dFoldedAudit-18 · reason the close's docs leg, which main brought in, reds five members this build added with no help page: three review.spec-audit policy keys and the --record-round and --chain-verdict verbs
+
+2026-11-02T13:31:47Z dispatch · item 7c21d200 TOOL-dFoldedAudit-18 · reason help/spec-audit.md help/README.md memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-18.md memory/builds/dFoldedAudit/README.md
+
+2026-11-02T13:31:48Z brief · item TOOL-dFoldedAudit-18 · reason 2f4f88f8e482 memory/builds/dFoldedAudit/prompts/2026-11-02-prompt-TOOL-dFoldedAudit-18-build-brief.md
