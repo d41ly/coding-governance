@@ -657,3 +657,7 @@ base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 2026-11-01T23:50:32Z rescope · item add TOOL-dSafePassage-104 · reason the close's bar on the landing merge 9f8812d80 reds memory hygiene check 12 on 103's edge onto 8 and both lexicon legs on 103's second ask
 
 2026-11-01T23:50:35Z brief · item TOOL-dSafePassage-104 · reason 714005088178 memory/builds/dSafePassage/prompts/2026-11-02-prompt-TOOL-dSafePassage-104-build-brief.md
+
+2026-11-02T00:47:31Z dispatch · item e0dd80b2 TOOL-dSafePassage-104 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-11-02-spec-TOOL-dSafePassage-104.md memory/builds/dSafePassage/build/2026-11-02-build-TOOL-dSafePassage-104-ledger.md memory/backlog/TOOL.md memory/builds/dSafePassage/README.md
+
+2026-11-02T00:57:51Z dispatch · item e0dd80b2 TOOL-dSafePassage-104 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-11-02-spec-TOOL-dSafePassage-104.md memory/builds/dSafePassage/build/2026-11-02-build-TOOL-dSafePassage-104-ledger.md memory/backlog/TOOL.md memory/builds/dSafePassage/README.md

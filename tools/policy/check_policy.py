@@ -4193,6 +4193,15 @@ def derive_window_edge_paths():
     return written, posixpath.join(posixpath.dirname(RELOCATED_PREFIX.rstrip("/")), REGISTRY_REL)
 
 
+def ask(call, *args):
+    """`call(*args)`, or `refused <path>` where it raises a `policy.Refusal`: the one Refusal-to-value
+    wrapper the census cases compare through (TOOL-dSafePassage-104 S2)."""
+    try:
+        return call(*args)
+    except policy.Refusal as exc:
+        return f"refused {exc.path}"
+
+
 def run_census_window_edge(name):
     """`census-window-edge` (TOOL-dGroundRules-39 S1): the edges of the window `derive_census_tree`
     searches with no receipt. Over `derive_window_edge_paths`' written registries, each a copy of the
@@ -4202,22 +4211,16 @@ def run_census_window_edge(name):
     would grade every census enforcer and find each absent."""
     written, planted = derive_window_edge_paths()
     checks, t = [], Path(tempfile.mkdtemp(prefix="pol-"))
-
-    def ask():
-        try:
-            return policy.derive_census_tree(t)
-        except policy.Refusal as exc:
-            return f"refused {exc.path}"
     try:
         registry = (derive_source_top() / written[0]).read_bytes()  # each plant a copy of the source's registry
         run_fixture_git(t, "init", "-q")
         for rel in written:
             write_case_file(t, rel, registry)
-        want, got = ("source", budgets.derive_tool_root()), ask()
+        want, got = ("source", budgets.derive_tool_root()), ask(policy.derive_census_tree, t)
         checks.append((", ".join(written), f"{want}, the depth-3 and top-level registries uncounted",
                        got == want, f"{got}"))
         write_case_file(t, planted, registry)
-        want, got = f"refused {', '.join(sorted((written[0], planted)))}", ask()
+        want, got = f"refused {', '.join(sorted((written[0], planted)))}", ask(policy.derive_census_tree, t)
         checks.append((f"{planted} planted", want, got == want, "RED as planted" if got == want else f"{got}"))
     except (subprocess.CalledProcessError, OSError) as exc:
         checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
@@ -4235,12 +4238,9 @@ def run_census_source_receipt(name):
     written, planted = derive_window_edge_paths()
     checks, t = [], Path(tempfile.mkdtemp(prefix="pol-"))
 
-    def ask():
-        try:
-            tree = policy.derive_census_tree(t)
-            return tree[0] if tree[0] == "adopter" else tree, policy.check_legacy_graded(t, KIT)
-        except policy.Refusal as exc:
-            return f"refused {exc.path}"
+    def derive_answer():
+        tree = policy.derive_census_tree(t)
+        return tree[0] if tree[0] == "adopter" else tree, policy.check_legacy_graded(t, KIT)
     try:
         registry = (derive_source_top() / written[0]).read_bytes()
         receipt = {"schema": 4, "mode": "source", "gov_source": ".", "prefix": budgets.derive_tool_root(),
@@ -4248,18 +4248,18 @@ def run_census_source_receipt(name):
         run_fixture_git(t, "init", "-q")
         write_case_file(t, written[0], registry)
         write_case_file(t, RECEIPT_REL, json.dumps(receipt))
-        want, got = (("source", budgets.derive_tool_root()), True), ask()
+        want, got = (("source", budgets.derive_tool_root()), True), ask(derive_answer)
         checks.append(("source-mode receipt", f"{want}", got == want, f"{got}"))
         write_case_file(t, RECEIPT_REL, json.dumps({k: v for k, v in receipt.items() if k != "mode"}))
-        want, got = ("adopter", False), ask()
+        want, got = ("adopter", False), ask(derive_answer)
         checks.append(("adopter receipt", f"{want}", got == want, f"{got}"))
         write_case_file(t, RECEIPT_REL, json.dumps(receipt))
         Path(t, written[0]).unlink()
-        want, got = f"refused {RECEIPT_REL}", ask()
+        want, got = f"refused {RECEIPT_REL}", ask(derive_answer)
         checks.append(("no registry", want, got == want, f"{got}"))
         write_case_file(t, written[0], registry)
         write_case_file(t, planted, registry)
-        want, got = f"refused {', '.join(sorted((written[0], planted)))}", ask()
+        want, got = f"refused {', '.join(sorted((written[0], planted)))}", ask(derive_answer)
         checks.append(("source-mode receipt, two registries", want, got == want, f"{got}"))
     except (subprocess.CalledProcessError, OSError) as exc:
         checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))

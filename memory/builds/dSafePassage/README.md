@@ -245,7 +245,7 @@ ids TOOL-dSafePassage-99 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafeP
 | [TOOL-dSafePassage-101 — the three bar legs this build's diff turns red at `70273a468`, each cleared by the remedy its own message names](spec/2026-11-01-spec-TOOL-dSafePassage-101.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
 | [TOOL-dSafePassage-102 — ask 85's two red legs, by the owner's ruling: five fork ceilings raised to their measured counts, three evidence how texts respelled through the prefix token](spec/2026-11-01-spec-TOOL-dSafePassage-102.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-01 |
 | [TOOL-dSafePassage-103 — the census tree reads gov's source-mode receipt as gov's own tree, by the registry search it makes with no receipt](spec/2026-11-01-spec-TOOL-dSafePassage-103.md) | 16 | 2 | CLOSED | rev-3 | 2026-11-02 |
-| [TOOL-dSafePassage-104 — the two reds TOOL-dSafePassage-103 leaves on the landing merge `9f8812d80`, each cleared by its leg's own remedy: 103's edge onto CLOSED 8 written as prose, and one Refusal wrapper both census cases call](spec/2026-11-02-spec-TOOL-dSafePassage-104.md) | 16 | 2 | DEFERRED | rev-2 | 2026-11-02 |
+| [TOOL-dSafePassage-104 — the two reds TOOL-dSafePassage-103 leaves on the landing merge `9f8812d80`, each cleared by its leg's own remedy: 103's edge onto CLOSED 8 written as prose, and one Refusal wrapper both census cases call](spec/2026-11-02-spec-TOOL-dSafePassage-104.md) | 16 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dSafePassage-61 — the size-limits step and gov's own migration, held until the guard admits a value-preserving write](spec/2026-10-26-spec-TOOL-dSafePassage-61.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dSafePassage-72 — a before-image path is contained by one predicate govkit's destinations share, and refused where any segment on it is a link](spec/2026-10-28-spec-TOOL-dSafePassage-72.md) | 16 | 2 | CLOSED | rev-4 | 2026-10-28 |
 | [TOOL-dSafePassage-73 — the forward and reverse walks read "no up on record" through one predicate, so a step re-applied by its witness after a rollback keeps its `via` mark](spec/2026-10-28-spec-TOOL-dSafePassage-73.md) | 16 | 2 | CLOSED | rev-4 | 2026-10-28 |
@@ -275,7 +275,7 @@ ids TOOL-dSafePassage-99 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafeP
 | [TOOL-dSafePassage-99 — govkit selftest holds one engine: `govkit_module()` answers the engine at `GOVKIT` after a staged copy loads in process](spec/2026-11-01-spec-TOOL-dSafePassage-99.md) | 16 | 2 | CLOSED | rev-3 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 526 bound to this build, across 4 record folder(s).
+Records: 527 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

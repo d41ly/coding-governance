@@ -1038,6 +1038,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "ask",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "ask_disposition_of",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

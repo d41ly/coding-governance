@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-104 — the two reds TOOL-dSafePassage-103 leaves on the landing merge `9f8812d80`, each cleared by its leg's own remedy: 103's edge onto CLOSED 8 written as prose, and one Refusal wrapper both census cases call
 
-**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 4467aa796 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-2 · 2026-11-02 · node a · Tier-2 · base 4467aa796 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-103
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-build-TOOL-dSafePassage-104-ledger.md](../build/2026-11-02-build-TOOL-dSafePassage-104-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dSafePassage-104-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dSafePassage-104-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dSafePassage-104-2-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dSafePassage-104-2-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dSafePassage-104-audit-fold-brief.md](../prompts/2026-11-02-prompt-TOOL-dSafePassage-104-audit-fold-brief.md) | research | — |
