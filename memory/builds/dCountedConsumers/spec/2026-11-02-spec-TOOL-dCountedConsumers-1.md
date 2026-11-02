@@ -1,6 +1,6 @@
 # TOOL-dCountedConsumers-1 — help/policy.md names every policy key family a reader consumes today
 
-**Status:** SPECCED · rev-1 · 2026-11-02 · node d · Tier-1 · base 8bec4cef · streams tooling · order 10
+**Status:** INPROGRESS · rev-1 · 2026-11-02 · node d · Tier-1 · base 8bec4cef · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
