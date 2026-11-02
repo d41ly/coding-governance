@@ -15593,6 +15593,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_spec_audit_ids",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "read_spec_audit_switch",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -26238,6 +26243,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "write_refold_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_refs",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -26309,6 +26319,11 @@
     },
     {
       "id": "write_rot_stub",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_round_fixture",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
     },

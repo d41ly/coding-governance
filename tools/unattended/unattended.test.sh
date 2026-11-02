@@ -2817,6 +2817,39 @@ hit "$out" "the roster yields no id"
 same "FA5 AC17 the chain's refusal has one site" "$(grep -c 'fail 118' "$SCRIPT")" "1"
 same "FA5 AC17 the waiver refusal has one site" "$(grep -c 'fail 41 "a waiver reason may not spell' "$SCRIPT")" "1"
 
+# ---- TOOL-dFoldedAudit-10: A ROUND'S PROMOTIONS AND FOLDS ANSWER TO THE NEXT ROUND'S OWN `audited` ROW.
+# ---- `aud` stays cumulative, so what this adds is a second test in the U loop, and the rows claim rev 2 or
+# ---- 3, where TOOL-dFoldedAudit-11 leaves this fixture's specs. The failing case, observed at the close
+# ---- and not by the pass that wrote this: the second test cut from the U loop turns AC8 back to
+# ---- `STOP · reason clean`.
+# AC8: round 2 scoped itself past round 1's fold, so the chain cannot stop clean, and re-reading it can.
+write_chain_fixture
+write_fixture_round s1 "$_fc_all" 0 1 --finding 1/HIGH/local/FIX-dFix-2/FIX-dFix-2/2
+write_fixture_round s2 FIX-dFix-3 0 0
+out=$(run_chain --chain-verdict dFix); rc=$?
+same "FA10 AC8 an unreviewed verdict exits 0" "$rc" "0"
+hit "$out" "round 2 · CONTINUE · reason unreviewed · audit FIX-dFix-2"
+write_chain_fixture
+write_fixture_round s1 "$_fc_all" 0 1 --finding 1/HIGH/local/FIX-dFix-2/FIX-dFix-2/2
+write_fixture_round s2 FIX-dFix-2 0 0
+hit "$(run_chain --chain-verdict dFix)" "round 2 · STOP · reason clean"
+# AC9: `own-work` waits for the same re-read, and a CLOSED spec holds nothing open, because the test walks
+# the live roster. Rounds 1 and 2 fold into FIX-dFix-2 and then FIX-dFix-3, and round 3 folds there again.
+write_refold_fixture() { # round 3's audited id -> the three rounds
+  write_chain_fixture
+  write_fixture_round s1 "$_fc_all" 0 1 --finding 1/HIGH/local/FIX-dFix-2/FIX-dFix-2/2
+  write_fixture_round s2 FIX-dFix-2 0 1 --finding 2/HIGH/local/FIX-dFix-3/FIX-dFix-3/2
+  write_fixture_round s3 "$1" 0 1 --finding 3/HIGH/local/FIX-dFix-3/FIX-dFix-3/3
+}
+write_refold_fixture FIX-dFix-2
+hit "$(run_chain --chain-verdict dFix)" "round 3 · CONTINUE · reason unreviewed · audit FIX-dFix-3"
+write_refold_fixture FIX-dFix-3
+hit "$(run_chain --chain-verdict dFix)" "round 3 · STOP · reason own-work"
+write_refold_fixture FIX-dFix-2
+sed -i 's/^\*\*Status:\*\* OPEN/**Status:** CLOSED/' "$_fc_r/memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-3.md"
+( cd "$_fc_r" && git add -A >/dev/null && git commit -q -m closed --no-verify )
+hit "$(run_chain --chain-verdict dFix)" "round 3 · STOP · reason own-work"
+
 # ---- TOOL-dFoldedAudit-13: ONE DRIVER ANSWER, PRINTED BY `--plan --paths` AND COPIED AS `disposal`, WITH A
 # ---- FOLD REFUSED UNDER ANY OTHER. Each fixture holds one tracked unit at rev-2, and a policy kit only
 # ---- where the arm is about the switch. No arm turns on the day it runs: a past cutoff stays past, and
@@ -18519,7 +18552,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2983 -> 3022 by TOOL-dFoldedAudit-13: the disposal line's arms in region one after the chain's,
 # 25 unconditional and 14 over a policy kit, those COUNTED EITHER WAY, counted off the block's own lines
 # with its one two-pass loop at 4; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3022
+# RAISED 3022 -> 3041 by TOOL-dFoldedAudit-10: the re-audit's arms in region one after the chain's, 13
+# `same` through `write_fixture_round`, one on an exit code and five `hit`, all unconditional, counted off
+# the block's own lines; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3041
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18661,7 +18697,8 @@ PROLOGUE_ARMS=20
 # RAISED 365 -> 461 by TOOL-dFoldedAudit-5: the same 96 region-one chain assertions, see FLOOR_ASSERTIONS.
 # RAISED 461 -> 466 by TOOL-dFoldedAudit-14: the same 5 region-one staged rotation assertions, see FLOOR_ASSERTIONS.
 # RAISED 466 -> 505 by TOOL-dFoldedAudit-13: the same 39 region-one disposal line assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=505
+# RAISED 505 -> 524 by TOOL-dFoldedAudit-10: the same 19 region-one re-audit assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=524
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.

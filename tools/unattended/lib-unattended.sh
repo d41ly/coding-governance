@@ -2311,6 +2311,26 @@ expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, o
     }
   }'
 }
+# WHICH IDS A BUILD'S SPEC-AUDIT RECORDS NAME, for the `specs-audited` term and check 2, which is the
+# kind's second instance (TOOL-dFoldedAudit-10). THE INDEX, not the worktree, and the first twelve
+# UNFENCED lines, not the whole file. The index is this kit's stated per-run population and the reason
+# --preflight stages the run-state file; the twelve-line window is the binding grammar's own, and
+# without it a review record QUOTING another record's binding line satisfies the join for a unit nobody
+# audited. Through GIT() so the object-substitution lever stays inert.
+# THE `git grep` NARROWS THE WALK AND DECIDES NOTHING: the window and the fence test stay the awk's. It
+# exists because check 2 runs on every bar, where the loop it replaced spawned two processes per `.md`
+# file of the build.
+read_spec_audit_ids() { # build folder -> stdout: ids its tracked spec-audit binding lines name, one per line
+  local f
+  for f in $(GIT grep --cached -l -E '^\*\*Serves:\*\*[[:space:]]*spec-audit([[:space:]]|$)' -- "$1/*.md" 2>/dev/null); do
+    GIT show ":$f" 2>/dev/null | awk '
+      /^```/ { fence = !fence; next }
+      fence  { next }
+      { n++ }
+      n > 12 { exit }
+      /^\*\*Serves:\*\*[ \t]*spec-audit([ \t]|$)/ { print }'
+  done | expand_id_runs
+}
 # ------------------------------------------------------- the IDLIST reader, ALL OR NOTHING
 # THE `asks:` VALUE IS AN IDLIST, NOT A BINDING LINE, and the expander above is the wrong reader for
 # it (closing diff review of dDerivedDocket, round 1, F2). A binding line carries words, so that

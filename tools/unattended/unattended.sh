@@ -11965,7 +11965,7 @@ $_bcopen"
       # OVERRIDABLE, deliberately, unlike `authorization-reachable`: a genuinely thin Tier-1 unit
       # becomes a recorded decision rather than an invisible skip.
       DOD_OUT=""
-      local _sa_rows _sa_ids _sa_id _sa_f _sa_named _sa_fact _sa_miss=""
+      local _sa_rows _sa_ids _sa_id _sa_named _sa_fact _sa_miss=""
       # TERM ZERO, the `pieces-complete` shape: MET, and it ANNOUNCES the skip, because a silent pass
       # is indistinguishable from coverage. Keyed on the BASE-DERIVED value (closing review of units
       # 2-5, F3): `authorization-reachable` is graded earlier in this same shell, is not overridable,
@@ -12007,21 +12007,8 @@ $_bcopen"
         DOD_OUT="specs-audited — no unit of this build is CLOSED, so no spec audit is owed yet"
         return 0
       fi
-      # THE INDEX, not the worktree, and the first twelve UNFENCED lines, not the whole file. The
-      # index is this kit's stated per-run population and the reason --preflight stages the run-state
-      # file; the twelve-line window is the binding grammar's own, and without it a review record
-      # QUOTING another record's binding line satisfies the join for a unit nobody audited. Through
-      # GIT() so the object-substitution lever stays inert.
-      _sa_named=$(
-        for _sa_f in $(GIT ls-files -- "$M/builds/$slug/" 2>/dev/null); do
-          case "$_sa_f" in *.md) ;; *) continue ;; esac
-          GIT show ":$_sa_f" 2>/dev/null | awk '
-            /^```/ { fence = !fence; next }
-            fence  { next }
-            { n++ }
-            n > 12 { exit }
-            /^\*\*Serves:\*\*[ \t]*spec-audit([ \t]|$)/ { print }'
-        done | expand_id_runs)
+      # The library's reader says why the index and why the twelve-line window (TOOL-dFoldedAudit-10).
+      _sa_named=$(read_spec_audit_ids "$M/builds/$slug")
       for _sa_id in $_sa_ids; do
         printf '%s\n' "$_sa_named" | grep -qxF -- "$_sa_id" || _sa_miss="$_sa_miss $_sa_id"
       done
@@ -13577,7 +13564,10 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
 # `new-mechanism` row whatever its severity, and F the unit of every `local` row at BLOCKER or HIGH and of
 # every `sibling` row, because M4 already counts a review's own fold of a minor as reviewed. U is the
 # live roster less every audited id and less P(N): a unit round N just promoted is named by no audit yet,
-# so a U holding it would answer CONTINUE before the stop or the ceiling is read.
+# so a U holding it would answer CONTINUE before the stop or the ceiling is read. U also holds every live
+# id of P(N-1) and F(N-1) that round N's OWN `audited` row lacks (TOOL-dFoldedAudit-10), because `aud` is
+# cumulative, which keeps a spec round 1 audited reviewed, and alone it let a round stop clean over a fold
+# the next round never read. Live is what ends that test: a CLOSED or WONTDO id is in no walk here.
 #   1. U non-empty: CONTINUE, unreviewed, auditing U, P(N) and F(N).
 #   2. H(N) and P(N) empty: STOP, clean.
 #   3. own-work, N >= 2, H(N) NON-EMPTY, every high's specs inside P(N-1) and F(N-1): STOP, own-work.
@@ -13621,6 +13611,7 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
       r = w[2] + 0
       if (k == 3 && f[2] ~ /^subject [A-Za-z0-9-]+$/ && f[3] ~ /^audited / && isids(substr(f[3], 9))) {
         toset(substr(f[3], 9), aud)
+        audn[r] = substr(f[3], 9)
       } else if (k == 4 && f[2] == "sibling" && f[3] ~ /^unit / && isid(substr(f[3], 6)) && f[4] ~ /^rev [0-9]+$/) {
         fold[r] = fold[r] " " substr(f[3], 6)
       } else if (k == 7 && f[2] ~ /^finding [0-9]+$/ && f[3] ~ /^(BLOCKER|HIGH|MEDIUM|LOW)$/ &&
@@ -13636,9 +13627,9 @@ derive_chain_verdict() { # record or empty · live ids · stop mode · ceiling -
     END {
       if (bad != "") { print "BAD|" bad; exit }
       N = last + 0
-      toset(prom[N], P); toset(fold[N], F); toset(prom[N - 1] " " fold[N - 1], prior)
+      toset(prom[N], P); toset(fold[N], F); toset(prom[N - 1] " " fold[N - 1], prior); toset(audn[N], own)
       c = split(live, L, " ")
-      for (i = 1; i <= c; i++) if (!(L[i] in aud) && !(L[i] in P)) { U[L[i]] = 1; unreviewed = 1 }
+      for (i = 1; i <= c; i++) if ((!(L[i] in aud) && !(L[i] in P)) || ((L[i] in prior) && !(L[i] in own))) { U[L[i]] = 1; unreviewed = 1 }
       pn = joined(P)
       word = "CONTINUE"; reason = "open"; override = ""
       if (unreviewed) reason = "unreviewed"

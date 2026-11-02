@@ -535,6 +535,20 @@ write_rot_stub() { # phase in the name -> writes a stub under its true blob name
   printf 'stub\n' > "$ROT_A"
 }
 read_rot_lib() { ( . "$TMP/$KIT_REL/lib-unattended.sh"; "$@" ); } # a library call in its own shell, as a sourcer makes it
+# ---- TOOL-dFoldedAudit-10: ONE CHAIN ROUND WRITTEN BY THE REAL VERB, committed beside `mkdisp`'s record and
+# ---- a tracked spec-audit record, so a drift in the round's grammar reds the join's arms. The ids need
+# ---- no roster, because neither the verb nor the join reads one. A refused round is a FAIL by name, or
+# ---- a green arm would stand on a record that was never written.
+CR_REC=memory/builds/tDisp/reviews/2026-11-02-review-FIX-tFix-1-spec-audit.md
+write_round_fixture() { # run rows · the binding line, or nothing · the flags after --subject S1
+  local _cr_rows=$1 _cr_bind=$2; shift 2
+  reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+  DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$_cr_rows"
+  if [ -n "$_cr_bind" ]; then mkdir -p "${CR_REC%/*}"; printf '%s\n' "$_cr_bind" > "$CR_REC"; fi
+  env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash "$TMP/$KIT_REL/unattended.sh" --record-round tDisp --subject S1 "$@" >/dev/null 2>&1 \
+    || { echo "FAIL the fixture round refused: $*"; st=1; }
+  write_rot_commit 2026-11-02 round
+}
 drop_readme()  { rm -f memory/builds/tRun/README.md; }
 break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
 break_slug()   { sed -i 's|^slug: .*|slug: someoneElse|' memory/builds/tRun/README.md; }
@@ -1715,6 +1729,82 @@ DISPDATE="2026-10-20T12:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" ''
 printf 'stub\n' > "${ROT_R%/*}/RUN.ABORTED.deadbeef.md"
 write_rot_commit 2026-11-05 stub
 miss "$(run)" "$ROT_STUB"
+reset_tree
+
+# ---- TOOL-dFoldedAudit-10: A CHAIN ROUND JOINS TO THE TERMINAL REVIEW ROW AND THE SPEC-AUDIT RECORDS IT
+# ---- CLAIMS. Each red sits beside a green control over the same round, so no arm passes by finding
+# ---- nothing. Every `--finding` is `new-mechanism`, because the round's counts do not read nature and a
+# ---- `local` row owes a spec once TOOL-dFoldedAudit-11 lands. The failing cases, observed at the close and
+# ---- not by the pass that wrote this: the exceeds test forced false greens AC1 and AC2; the attended
+# ---- count forced to 0 reds AC4; the whole-key test turned into `index` reds AC5; the join's file list
+# ---- narrowed to the live RUN.md reds AC6.
+CR_ROW1='2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · folded 1 · promoted 0 · disposition fold\n'
+CR_ROW0='2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 0 · folded 0 · promoted 0\n'
+CR_BIND='**Serves:** spec-audit FIX-tFix-1@rev-1 FIX-tFix-2@rev-1'
+CR_ONE="FIX-tFix-1 FIX-tFix-2"
+CR_H4=4/HIGH/new-mechanism/FIX-tFix-1/FIX-tFix-4/1
+CR_COUNTS="counts 0 blocker(s) and 1 high(s), and the round disposes 0 and 0"
+CR_ATT="took each as attended"
+CR_LOST="audited FIX-tFix-3 named by no tracked spec-audit record"
+# AC1: a forged clean round beside a row carrying a HIGH, and the sentence names the record's own path.
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 0
+out=$(run)
+hit "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$(git ls-files '*-chain-rounds.md') (round 1, subject S1: its first terminal review row $CR_COUNTS, so a confirmed finding reached no row the chain verdict reads)"
+# AC2: the blockers half, and one HIGH id on two rows counts once, as the verb counts it.
+write_round_fixture '2026-11-02T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · highs 0 · minors 0 · folded 2 · promoted 0 · disposition fold\n' "$CR_BIND" \
+  --audited "$CR_ONE" --blockers 1 --highs 0 --finding 5/BLOCKER/new-mechanism/FIX-tFix-1/FIX-tFix-4/1
+hit "$(run)" "counts 2 blocker(s) and 0 high(s), and the round disposes 1 and 0"
+write_round_fixture '2026-11-02T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 0 · folded 2 · promoted 0 · disposition fold\n' "$CR_BIND" \
+  --audited "$CR_ONE" --blockers 0 --highs 1 --finding 5/HIGH/new-mechanism/FIX-tFix-1/FIX-tFix-4/1 --finding 5/HIGH/new-mechanism/FIX-tFix-2/FIX-tFix-4/1
+hit "$(run)" "counts 0 blocker(s) and 2 high(s), and the round disposes 0 and 1"
+# AC3: the green control, and a second HIGH id above the row's count stays legal: "exceeds", never "differs".
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 1 --finding "$CR_H4"
+miss "$(run)" "UNATTENDED check 2 FAILED"
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 1 --finding "$CR_H4" --finding 6/HIGH/new-mechanism/FIX-tFix-2/FIX-tFix-5/1
+miss "$(run)" "UNATTENDED check 2 FAILED"
+# AC4: no row at all, then a mid-loop row, both attended, and neither silent.
+write_round_fixture "" "" --audited "$CR_ONE" --blockers 0 --highs 0
+out=$(run)
+miss "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$CR_ATT"
+write_round_fixture '2026-11-02T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 1 · CONVERGING\n' "" --audited "$CR_ONE" --blockers 0 --highs 0
+out=$(run)
+miss "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$CR_ATT"
+# AC5: an id no record names, a substring of one a record names, a line past the window, a range that
+# does name it, and a round with no terminal row, which joins nothing.
+write_round_fixture "$CR_ROW0" "$CR_BIND" --audited "FIX-tFix-1 FIX-tFix-3" --blockers 0 --highs 0
+hit "$(run)" "$CR_LOST"
+printf '%s FIX-tFix-31@rev-1\n' "$CR_BIND" > "$CR_REC"; write_rot_commit 2026-11-02 substring
+hit "$(run)" "$CR_LOST"
+{ printf '%s\n' "$CR_BIND"; printf 'filler\n%.0s' 1 2 3 4 5 6 7 8 9 10 11; printf '**Serves:** spec-audit FIX-tFix-3@rev-1\n'; } > "$CR_REC"
+write_rot_commit 2026-11-02 line13
+hit "$(run)" "$CR_LOST"
+printf '**Serves:** spec-audit FIX-tFix-1..3\n' > "$CR_REC"; write_rot_commit 2026-11-02 range
+miss "$(run)" "UNATTENDED check 2 FAILED"
+write_round_fixture "" "" --audited "FIX-tFix-1 FIX-tFix-3" --blockers 0 --highs 0
+miss "$(run)" "UNATTENDED check 2 FAILED"
+# AC6: AC1's row in an archive beside a record holding none, so a rotation hides no forged round. The
+# name is no rotation's, so check 2 names that too, and this arm reads the join's own sentence.
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 0
+git mv "$ROT_R" "${ROT_R%/*}/RUN.LANDED.0bd0bd00.md"
+sed '/ review · item /d' "${ROT_R%/*}/RUN.LANDED.0bd0bd00.md" > "$ROT_R"
+write_rot_commit 2026-11-03 rotate
+hit "$(run)" "$CR_COUNTS"
+# AC7: an honest rotation, because a stub would red check 2 by name, and a later row for one subject. The
+# earlier stamp answers either way round, wherever it sits, so a run after the rotation cannot red a chain.
+CR_ROW3='review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 3 · minors 0 · folded 3 · promoted 0 · disposition fold'
+write_round_fixture "$CR_ROW1" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 1 --finding "$CR_H4"
+sed -i 's/^phase: .*/phase: LANDED/' "$ROT_R"; write_rot_commit 2026-11-03 landed
+write_rot_archive LANDED RUNNING second 2026-11-20 rotate
+printf '2026-11-20T01:00:00Z %s\n' "$CR_ROW3" >> "$ROT_R"; write_rot_commit 2026-11-20 row
+miss "$(run)" "UNATTENDED check 2 FAILED"
+write_round_fixture "${CR_ROW1/2026-11-02T/2026-11-20T}" "$CR_BIND" --audited "$CR_ONE" --blockers 0 --highs 1 --finding "$CR_H4"
+sed -i 's/^phase: .*/phase: LANDED/' "$ROT_R"; write_rot_commit 2026-11-03 landed
+write_rot_archive LANDED RUNNING second 2026-11-20 rotate
+printf '2026-11-02T01:00:00Z %s\n' "$CR_ROW3" >> "$ROT_R"; write_rot_commit 2026-11-20 row
+hit "$(run)" "counts 0 blocker(s) and 3 high(s), and the round disposes 0 and 1"
 reset_tree
 
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
@@ -7048,13 +7138,17 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- `same`, four `hit` and four `miss`, all after the exit-row block in region 2, so FLOOR_SHARD_2
 # ---- carries the same +17 and the other seven are untouched. COUNTED off the block's own lines; this
 # ---- pass runs no suite, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=1074
+# ---- RAISED 1074 -> 1092 by exactly the arms, TOOL-dFoldedAudit-10: the chain round's joins, eleven `hit`
+# ---- and seven `miss`, all after the rotated record's block in region 2, so FLOOR_SHARD_2 carries the
+# ---- same +18 and the other seven are untouched. COUNTED off the block's own lines; this pass runs no
+# ---- suite, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=1092
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
 FLOOR_SHARD_1=159
-FLOOR_SHARD_2=100
+FLOOR_SHARD_2=118
 FLOOR_SHARD_3=127
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133

@@ -1015,6 +1015,83 @@ else
         fi
       done ;;
   esac
+  # A CHAIN ROUND ANSWERS TO THE TERMINAL REVIEW ROW OF ITS OWN EXIT AND TO THE TRACKED RECORDS IT CLAIMS
+  # (TOOL-dFoldedAudit-10). `--record-round` compares its counts only with its own rows and joins
+  # `--audited` to nothing, so a forged zero-count round read `STOP · reason clean`. A gate over tracked
+  # records is the independent reader, and it reads no verdict word and computes no set the verdict
+  # computes, because the verdict stays in the driver alone. Both joins feed `rv_bad`: a new `fail` site
+  # would pass this file's refusal ceiling.
+  # THE COUNTS ARE DISTINCT IDS, the test the verb makes, because a multi-spec fold writes two rows for one
+  # id and a count of rows would pass a HIGH that stood twice over. The test is "exceeds", never "differs",
+  # because a finding the disposal adjudicated from UNVERIFIED adds a row above the count. A row with no
+  # `highs` field is an older shape, so its zero leaves only the blockers to compare.
+  # THE FIRST ROW BY TIMESTAMP ANSWERS, across every RUN*.md, an archive included. `--review` refuses a
+  # second terminal row per subject by reading the live record alone, so a later run can write another
+  # after a rotation, and `--record-round` refuses that subject as a replay, so the later row has no round
+  # to answer for, and reading it would put a permanent red on two append-only records. The stamps are ISO
+  # UTC, so they compare as strings.
+  # THE AUDITED JOIN tests each id as a whole key, so `FIX-tFix-31` does not satisfy `FIX-tFix-3`, and only
+  # a round with a terminal row is joined. Both routes that write a round leave such a record.
+  # WHAT THESE DO NOT CHECK: a round with no terminal row, whether attended or a run that skipped
+  # `--review`, which is announced, because an attended round makes no driver call and treating it as
+  # forged would red every attended chain. That the terminal row itself is true: the row and the round are
+  # two acts of one run, so a run forging both passes, and the closing review reads that diff. That the
+  # audit read the spec at its current rev: like `specs-audited`, the join is a `has ever named` lower
+  # bound, so a re-audit round's ids pass on round 1's record. MEDIUM and LOW counts.
+  for rv_cr in $(GIT ls-files ":(glob)$M/builds/*/build/*-chain-rounds.md" 2>/dev/null); do
+    [ -f "$rv_cr" ] || continue
+    rv_dir=${rv_cr%/build/*}
+    rv_runs=()
+    for rvf in $(GIT ls-files ":(glob)$rv_dir/RUN*.md" 2>/dev/null); do
+      [ ! -f "$rvf" ] || rv_runs+=("$rvf")
+    done
+    rv_named=$(read_spec_audit_ids "$rv_dir")
+    # ONE AWK OVER THE RECORD AND THEN THE RUN-STATE FILES, told apart by FILENAME, so the sets are built
+    # once. Its first line is the count of rounds left alone, and each fault follows it.
+    rv_out=$(awk -v rec="$rv_cr" -v named="${rv_named//$'\n'/ }" '
+      BEGIN { c = split(named, w, " "); for (i = 1; i <= c; i++) has[w[i]] = 1 }
+      { sub(/\r$/, "") }
+      FILENAME == rec {
+        if ($0 !~ /^round [0-9]+ · /) next
+        split($0, f, " · "); split(f[1], w, " "); r = w[2] + 0
+        if (f[2] ~ /^subject /) { nr++; ord[nr] = r; subj[r] = substr(f[2], 9); aud[r] = substr(f[3], 9) }
+        else if (f[2] ~ /^finding / && (f[3] == "BLOCKER" || f[3] == "HIGH") && !((r, f[3], f[2]) in seen)) {
+          seen[r, f[3], f[2]] = 1
+          if (f[3] == "BLOCKER") rb[r]++; else rh[r]++
+        }
+        next
+      }
+      /^[0-9][0-9-]*T[0-9:]*Z review · item / {
+        rest = substr($0, index($0, " · item ") + length(" · item "))
+        j = index(rest, " · reason "); if (j == 0) next
+        rs = substr(rest, j + length(" · reason "))
+        if (rs !~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) next
+        it = substr(rest, 1, j - 1)
+        if ((it in first) && first[it] <= $1) next
+        first[it] = $1; bl[it] = 0; hi[it] = 0
+        if (match(rs, /blockers [0-9]+/)) bl[it] = substr(rs, RSTART + 9, RLENGTH - 9) + 0
+        if (match(rs, / · highs [0-9]+/)) { h = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", h); hi[it] = h + 0 }
+      }
+      END {
+        out = ""
+        for (o = 1; o <= nr; o++) {
+          r = ord[o]; s = subj[r]
+          if (!(s in first)) { att++; continue }
+          if (bl[s] > rb[r] + 0 || hi[s] > rh[r] + 0)
+            out = out sprintf("\n  %s (round %d, subject %s: its first terminal review row counts %d blocker(s) and %d high(s), and the round disposes %d and %d, so a confirmed finding reached no row the chain verdict reads)", rec, r, s, bl[s], hi[s], rb[r], rh[r])
+          c = split(aud[r], a, " "); lost = ""
+          for (i = 1; i <= c; i++) if (!(a[i] in has)) lost = lost (lost == "" ? "" : " ") a[i]
+          if (lost != "")
+            out = out sprintf("\n  %s (round %d, subject %s: audited %s named by no tracked spec-audit record, so the round claims an audit that left no evidence)", rec, r, s, lost)
+        }
+        printf "%d%s\n", att, out
+      }' "$rv_cr" ${rv_runs[@]+"${rv_runs[@]}"})
+    rv_att=${rv_out%%$'\n'*}
+    rv_bad="$rv_bad${rv_out#"$rv_att"}"
+    # ANNOUNCED, outside report() as the blank-cutoff lines are: a round left alone reads exactly like one
+    # that passed.
+    [ "${rv_att:-0}" = 0 ] || echo "unattended: check 2 read $rv_att chain round(s) in $rv_cr with no terminal review row and took each as attended, so nothing grades their counts or their audited ids"
+  done
   [ -z "${rv_bad//[[:space:]]/}" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
 fi
 
