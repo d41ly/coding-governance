@@ -84,7 +84,7 @@ ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudi
 | [TOOL-dFoldedAudit-8 — dClosedLoop's unbuilt specs and its frozen design take the same rules](spec/2026-11-01-spec-TOOL-dFoldedAudit-8.md) | 80 | 2 | OPEN | rev-2 | 2026-11-01 |
 <!-- /gen:build-units -->
 
-Records: 53 bound to this build, across 3 record folder(s).
+Records: 55 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
