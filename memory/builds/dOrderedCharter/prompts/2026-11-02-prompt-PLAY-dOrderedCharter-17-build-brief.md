@@ -7,7 +7,7 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 ## Where the build stands
 
 - This is dOrderedCharter's build run; the spec run landed every spec and deferred every unit to it (README rule 1).
-- The build order is 18, 16, 17, 19, 10, 44, 22, 51, 24, 28, 26, 47, 48, 50, 25, 7, 53, 13, 42, 12, 9, 20, 15, 1, 45, 3, 41, 52, 6, 2, 11, 27, 21, 5, 4, 8, 14, 43, 30, 29, 23, 32, 33, 46, 35, 36, 34, 31, 37, 39, 40, 49, 54, 55 (each `order` group sorted by its specs' `consumes-from` edges). Every unit before yours in
+- The build order is 18, 16, 61, 17, 19, 10, 44, 22, 51, 24, 28, 26, 47, 48, 50, 25, 7, 53, 13, 42, 12, 9, 20, 15, 1, 45, 3, 41, 52, 6, 2, 11, 27, 21, 5, 4, 8, 14, 43, 30, 29, 23, 32, 33, 46, 35, 36, 34, 31, 37, 39, 40, 49, 54, 55 (each `order` group sorted by its specs' `consumes-from` edges). Every unit before yours in
   that order is built and committed on this branch; read their code where your spec names it, never re-implement it.
   Your spec's §3 Edges name what you consume.
 - The spec audit is closed: the owner capped spec review at two rounds
@@ -66,11 +66,3 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - Your spec header's `advances PLAY-dOrderedCharter-38` stays `advances` when you flip it to `CLOSED`; you are not the last unit.
 - The unattended kit's own self-test suites are WAIVED for this build's landing (README, "Build-level rules"); a
   criterion they would observe is named as owed with PLAY-dClosedLoop-12, never run.
-
-## Owed by the unit before yours
-
-- PLAY-dOrderedCharter-16's pass made `tools/playbook/` read `tools/memory-tree/import_walk.py`, and the
-  `playbook render selftest` leg's guard in `tools/gate-legs.json` names only `{prefix}/playbook/` (class
-  held-suite-guard-misses-a-sibling-kit). Add `{prefix}/memory-tree/import_walk.py` to that guard in your pass,
-  re-stamp the kickoff manifest in the same commit (`gate-legs.json` is on its `watch:` list), declare both paths in
-  `--dispatch`, and record it as a `report` deviation naming unit 16's builder return.
