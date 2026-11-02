@@ -1897,9 +1897,13 @@ const synth = await agent(
           .join('\n')
       : '  (none)') +
     `\n\n` + SEVERITY_RUBRIC + ` ` +
-    `Each CONFIRMED finding's bracketed grade is its BINDING grade under this rubric: put each confirmed id in an item ` +
-    `whose severity is that grade, merge findings of one binding grade only, and where you judge a different grade right, ` +
-    `write the reason in the report beside that finding.` +
+    // TOOL-dFairHearing-6 S2 - one item per defect whatever its findings' grades: the grade is carried per id
+    // in `grades`, so a mixed-grade defect no longer splits into one item per grade.
+    `Each CONFIRMED finding's bracketed grade is its BINDING grade under this rubric. Make one item per defect: the ` +
+    `findings on one defect form one item whatever their grades. Give each item \`grades\`, mapping each confirmed id it ` +
+    `holds to the grade that id takes, its binding grade unless you judge another grade right, and then write the reason ` +
+    `in the report beside that finding. Set the item's severity to the highest of its grades, and rank the report's items ` +
+    `by that severity, blockers first.` +
     `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'file:line'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
     // TOOL-aSightedSkeptic-2 S3 - a REJECTED fix never reaches the report as the fix.
     `Each CONFIRMED finding's fix line says whether a skeptic judged its fix. Where it is REJECTED, write the skeptic's ` +
@@ -2049,10 +2053,11 @@ const synth = await agent(
     // already failed. The item list below carries the raw ids, and the counts are derived from it.
     `Return \`items\`, one entry per item AS YOU ADJUDICATED IT in the report: \`severity\` is ` +
     `BLOCKER, HIGH, MEDIUM or LOW, and \`ids\` lists the integer id of every CONFIRMED finding that ` +
-    `item covers. When you merge several findings into one item, that item lists all of their ids. ` +
-    `Every CONFIRMED id above appears in EXACTLY ONE item, the one whose severity it takes; an ` +
-    `UNVERIFIED id you list is not counted. The harness counts \`blockers\` and \`highs\` from these ` +
-    `ids, so both count RAW confirmed findings and never items, and a list that leaves a confirmed ` +
+    `item covers, and \`grades\` maps each of those ids, as a string key, to the BLOCKER, HIGH, MEDIUM or ` +
+    `LOW grade it takes. When you merge several findings into one item, that item lists all of their ids. ` +
+    `Every CONFIRMED id above appears in EXACTLY ONE item; an UNVERIFIED id you list is not counted. ` +
+    `The harness counts \`blockers\` and \`highs\` from the per-id grades in \`grades\`, so both count ` +
+    `RAW confirmed findings and never items, and a list that leaves a confirmed ` +
     `id out or names one twice returns neither count. In the review shape, state the adjudicated ` +
     `tally BOTH ways, by item and by raw confirmed finding, so the table you wrote and the ids you ` +
     `return agree. ` +
@@ -2096,10 +2101,13 @@ const synth = await agent(
           type: 'array',
           items: {
             type: 'object',
-            required: ['severity', 'ids'],
+            // TOOL-dFairHearing-6 S1 - `grades` maps each confirmed id to its grade. Typed only as an object,
+            // as no schema in this kit uses an `additionalProperties` map; the tally checks each entry.
+            required: ['severity', 'ids', 'grades'],
             properties: {
               severity: { type: 'string', enum: ['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'] },
               ids: { type: 'array', items: { type: 'integer' } },
+              grades: { type: 'object' },
               // TOOL-dFoldedAudit-5 S1 - optional, because this object is shared with the diff kind, whose
               // schema stays as it was. The tally below is what requires it, on a BLOCKER or HIGH item.
               ...(addressOwed ? { specs: { type: 'array', items: { type: 'string' } } } : {}),
@@ -2139,6 +2147,12 @@ if (synth) {
   const unaddressed = []
   const perItem = { BLOCKER: 0, HIGH: 0, MEDIUM: 0, LOW: 0 }
   const perRaw = { BLOCKER: 0, HIGH: 0, MEDIUM: 0, LOW: 0 }
+  // TOOL-dFairHearing-6 S3 and S4 - each confirmed id is placed at its OWN grade from the item's `grades`;
+  // one with no legal grade there takes the item's severity and is named. An item whose severity is not
+  // the highest grade it placed is named too, and the counts stay per id. SEVERITIES ranks the four,
+  // highest first.
+  const gradesDefaulted = []
+  const itemsMisranked = []
   // The severity is tested against the closed list. An unknown one skips its item, so its ids surface
   // as unplaced rather than counting as placed while moving neither count. Case is folded because the
   // finders' own schema spells the same four words in lowercase.
@@ -2146,13 +2160,23 @@ if (synth) {
     const sev = it ? String(it.severity).toUpperCase() : ''
     if (['BLOCKER', 'HIGH', 'MEDIUM', 'LOW'].indexOf(sev) === -1) continue
     let holdsConfirmed = false
+    let first = null
+    let top = 'LOW'
     for (const id of Array.isArray(it.ids) ? it.ids : []) {
       if (!confirmedIds.has(id)) continue
+      if (!holdsConfirmed) first = id
       holdsConfirmed = true
+      let grade = String(it.grades[String(id)]).toUpperCase()
+      if (SEVERITIES.indexOf(grade.toLowerCase()) === -1) {
+        grade = sev
+        gradesDefaulted.push(id)
+      }
+      if (SEVERITIES.indexOf(grade.toLowerCase()) < SEVERITIES.indexOf(top.toLowerCase())) top = grade
       if (severityById.has(id)) repeated.add(id)
-      else severityById.set(id, sev)
+      else severityById.set(id, grade)
     }
     if (holdsConfirmed) perItem[sev]++
+    if (holdsConfirmed && top !== sev) itemsMisranked.push(first)
     if (addressOwed && holdsConfirmed && (sev === 'BLOCKER' || sev === 'HIGH')) {
       const held = it.ids.filter((id) => confirmedIds.has(id))
       if (Array.isArray(it.specs) && it.specs.length && it.specs.every((s) => typeof s === 'string' && PIN_ID.test(s)))
@@ -2160,6 +2184,10 @@ if (synth) {
       else unaddressed.push(...held)
     }
   }
+  if (gradesDefaulted.length)
+    log(`WARNING: the synthesis gave ${gradesDefaulted.length} confirmed finding(s) no legal grade in their item's grades — placed at the item's severity: ids ${gradesDefaulted.join(', ')}`)
+  if (itemsMisranked.length)
+    log(`WARNING: ${itemsMisranked.length} synthesis item(s) carry a severity other than the highest grade they place — counts read the per-id grades: items holding ids ${itemsMisranked.join(', ')}`)
   const missing = [...confirmedIds].filter((id) => !severityById.has(id))
   if (missing.length || repeated.size || unaddressed.length) {
     tallyFault =

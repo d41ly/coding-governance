@@ -480,11 +480,14 @@ const buildVerdicts = (verdict) => (label, prompt) => {
   const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
   return { path: '/cd/v.json', verdicts: ids.map((id) => ({ id: id, verdict: verdict, reason: 'r' })) }
 }
+// TOOL-dFairHearing-6 - an item's `grades`, every id it holds at one grade: the stubs below place each id
+// at the item's severity, the count the tally read before per-id grades.
+const buildGrades = (ids, sev) => Object.fromEntries(ids.map((id) => [String(id), sev]))
 // The synthesis places every CONFIRMED id in one item unless told to drop one.
 const buildSynth = (drop) => (label, prompt) => {
   const head = prompt.split('UNVERIFIED findings')[0]
   const ids = [...head.matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)).filter((id) => id !== drop)
-  return { path: 'memory/reviews/r.md', summary: 's', items: [{ severity: 'HIGH', ids: ids, specs: ['TOOL-x-1'] }] }
+  return { path: 'memory/reviews/r.md', summary: 's', items: [{ severity: 'HIGH', ids: ids, grades: buildGrades(ids, 'HIGH'), specs: ['TOOL-x-1'] }] }
 }
 const ALL_OK ={ 'resume:probe': buildProbe(), 'find:': buildLensReturn, 'verify:': buildVerdicts('confirmed'), synth: buildSynth(null) }
 const buildStubs = (over) => Object.assign({}, ALL_OK, over)
@@ -1946,6 +1949,7 @@ async function runLedgerArms() {
   await runRolesArms()
   await runEffortsArms()
   await runAddressArms()
+  await runGradesArms()
   await runPresetArms()
   await runOptInArms()
 }
@@ -2126,8 +2130,10 @@ async function runOptInArms() {
 // `addressOwed` reading `isSpec` nulls that arm's counts.
 async function runAddressArms() {
   const SPEC_DECLARED = Object.assign({}, SPEC, { disposal: 'by-nature' })
-  const buildSynthItem = (over) => (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
-    items: [Object.assign({ severity: 'HIGH', ids: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)) }, over)] })
+  const buildSynthItem = (over) => (label, prompt) => {
+    const it = Object.assign({ severity: 'HIGH', ids: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)) }, over)
+    return { path: 'memory/reviews/r.md', summary: 's', items: [Object.assign(it, { grades: buildGrades(it.ids, it.severity) })] }
+  }
   const scanSynth = (run) => run.trace.filter((t) => t.label.indexOf('synth') === 0)[0].prompt
   // ---- AC1: the item's address comes back beside the counts, and the prompt asks for the line.
   let r = await runReview(SPEC_DECLARED, buildStubs({ synth: buildSynthItem({ specs: ['TOOL-x-1'] }) }))
@@ -2163,6 +2169,61 @@ async function runAddressArms() {
     ck(r.result.blockers === 0 && r.result.highs === 5, 'address: an undeclared spec audit\'s HIGH with no specs counts')
     ck(scanSynth(r).indexOf('**Specs:**') === -1, 'address: the undeclared prompt carries no **Specs:** line')
     ck(Array.isArray(r.result.addresses) && r.result.addresses.length === 0, 'address: an undeclared return\'s `addresses` stays empty')
+  }
+}
+
+// ==== TOOL-dFairHearing-6 — `grades`, one item per defect, each confirmed id counted at its own grade ====
+// Skeptics confirm id 1 at blocker and id 2 at medium and refute ids 3 to 5; the synthesis stub hands back
+// the items it is given. RED against the base harness, whose tally places each id at its item's severity
+// and whose prompt still merges findings of one binding grade only: observed at the close, not by this pass.
+async function runGradesArms() {
+  const buildMixedVerdicts = (label, prompt) => {
+    const m = /ids ([0-9, ]+)\)/.exec(prompt)
+    const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
+    return { path: '/v', verdicts: ids.map((id) => (id === 1 ? { id: id, verdict: 'confirmed', reason: 'r', severity: 'blocker' }
+      : id === 2 ? { id: id, verdict: 'confirmed', reason: 'r', severity: 'medium' } : { id: id, verdict: 'refuted', reason: 'r' })) }
+  }
+  const runItems = (items) => runReview(DIFF, buildStubs({ 'verify:': buildMixedVerdicts, synth: { path: 'memory/reviews/r.md', summary: 's', items: items } }))
+  const MIXED = { severity: 'BLOCKER', ids: [1, 2], grades: { 1: 'BLOCKER', 2: 'MEDIUM' } }
+  const scanWarn = (run, text) => run.logs.filter((l) => l.indexOf('WARNING:') === 0 && l.indexOf(text) !== -1)
+  // ---- AC1: one mixed item counts each id at its own grade; a repeated id still nulls both counts.
+  let r = await runItems([MIXED])
+  if (checkNoThrow(r, 'grades mixed item')) {
+    ck(r.result.blockers === 1 && r.result.highs === 0 && Array.isArray(r.result.regraded) && r.result.regraded.length === 0 &&
+      !r.logs.some((l) => l.indexOf('other than their binding one') !== -1),
+      'grades: one item holding a blocker and a medium counts blockers 1, highs 0 and regrades none')
+  }
+  r = await runItems([MIXED, { severity: 'BLOCKER', ids: [1], grades: { 1: 'BLOCKER' } }])
+  if (checkNoThrow(r, 'grades repeated id'))
+    ck(r.result.blockers === null && r.result.highs === null, 'grades: an id in two items still nulls both counts')
+  // ---- AC2: a per-id grade off the binding one is regraded by id.
+  r = await runItems([{ severity: 'BLOCKER', ids: [1, 2], grades: { 1: 'BLOCKER', 2: 'HIGH' } }])
+  if (checkNoThrow(r, 'grades regraded'))
+    ck(r.result.highs === 1 && Array.isArray(r.result.regraded) && r.result.regraded.join(' ') === '2',
+      'grades: id 2 graded HIGH reads highs 1 and regraded [2]')
+  // ---- AC3: an absent and an illegal grade each fall back to the item's severity, named.
+  for (const [name, grades] of [['an absent grade', { 1: 'BLOCKER' }], ['an illegal grade', { 1: 'BLOCKER', 2: 'severe' }]]) {
+    r = await runItems([{ severity: 'BLOCKER', ids: [1, 2], grades: grades }])
+    if (checkNoThrow(r, 'grades ' + name))
+      ck(r.result.blockers === 2 && scanWarn(r, 'no legal grade').some((l) => /ids 2$/.test(l)),
+        'grades: ' + name + ' places id 2 at the item\'s BLOCKER and names it')
+  }
+  // ---- AC4: an item whose severity is not its highest grade is named, and the counts stay per id.
+  r = await runItems([Object.assign({}, MIXED, { severity: 'MEDIUM' })])
+  if (checkNoThrow(r, 'grades misranked'))
+    ck(r.result.blockers === 1 && scanWarn(r, 'other than the highest grade').some((l) => /items holding ids 1$/.test(l)),
+      'grades: a MEDIUM item holding a BLOCKER grade counts blockers 1 and is named')
+  // ---- AC5: the old merge rule is gone from both files; the prompt and the schema carry the new one.
+  const tpl = fs.readFileSync(require('path').join(require('path').dirname(FILE), 'tier2-review.template.js'), 'utf8')
+  ck(src.indexOf('merge findings of one binding grade only') === -1 && tpl.indexOf('merge findings of one binding grade only') === -1,
+    'grades: neither the template nor the render says merge findings of one binding grade only')
+  r = await runItems([MIXED])
+  if (checkNoThrow(r, 'grades prompt')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const req = sp && sp.schema && sp.schema.properties.items.items.required
+    ck(!!sp && sp.prompt.indexOf('one item per defect') !== -1 && sp.prompt.indexOf('`grades`') !== -1,
+      'grades: the synthesis prompt asks for one item per defect and its `grades`')
+    ck(Array.isArray(req) && req.indexOf('grades') !== -1, 'grades: the synthesis schema requires `grades` on each item')
   }
 }
 
@@ -2214,7 +2275,7 @@ async function runLensYieldArms() {
   const LORDER = ['security', 'correctness', 'seams', 'verification', 'intent']
   const scanYield = (run, n) => !!run.result && Array.isArray(run.result.lensYield) && run.result.lensYield.length === n
   const buildSynthOwn = (label, prompt) => ({ path: 'memory/reviews/r.md', summary: 's',
-    items: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => ({ severity: 'HIGH', ids: [parseInt(x[1], 10)], specs: ['TOOL-x-1'] })) })
+    items: [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => ({ severity: 'HIGH', ids: [parseInt(x[1], 10)], grades: { [x[1]]: 'HIGH' }, specs: ['TOOL-x-1'] })) })
   const buildVerdictById = (pick) => (label, prompt) => {
     const m = /ids ([0-9, ]+)\)/.exec(prompt)
     const ids = m ? m[1].split(',').map((x) => parseInt(x, 10)) : []
@@ -2879,7 +2940,11 @@ printf '%s\n' "$out"
 # orphans — two diff-kind orphan arms (2), the reason form (1), per kind the merged counts, the kept
 # verdict, the untouched confirmed set and the prior duplicate (8), and the diff prompt's form (1). The
 # inverted diff-kind arm adds none. Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=451
+# RAISED 451 -> 460 by TOOL-dFairHearing-6: 9 assertions, counted off the `grades:` arms — the mixed item
+# and the repeated id (2), the regraded id (1), the absent and the illegal grade (2), the misranked item
+# (1) and the old sentence, the prompt and the schema (3). The stubs gaining `grades` add none. Counted
+# by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=460
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
