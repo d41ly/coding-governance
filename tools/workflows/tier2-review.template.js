@@ -117,7 +117,10 @@ function readOutputTokens() {
 //   priorFindings: [ ... ],               // a previous round's confirmed set
 //   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
 //                                         // sibling context; absent -> [], and with no context a WARNING
-//   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING
+//   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING;
+//                                         // or per preset, { "<literal name>": { "<lens key>": "<note>" } },
+//                                         // keyed by diff-review or a PRESETS member, the run reading its own
+//                                         // literal's entry only; a note for a default a swap displaced is unread
 //   intensity: "full" | "light",          // DEFAULTS to "full"; only the CALLER picks light, which runs
 //                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
 //   preset: "unit-spec" | "design-audit", // spec-audit ONLY, DEFAULTS to "unit-spec": the CALLER's choice of
@@ -882,21 +885,37 @@ if (lightBadIdx !== -1)
 // The offence is carried by a FLAG, never by a sentinel value: `null` is itself one of the values
 // refused here, so `got === null` could not tell "nothing wrong" from "handed null" (the D6 class).
 const LENS_KEYS = LENSES.map((L) => L.key)
+// TOOL-dFairHearing-9 S2 - the PER-PRESET form: an object whose every key is a literal name maps each
+// to a flat note map, and the run reads only its own literal's entry, `runNotes`, absent meaning {}.
+// Only that entry is checked; another preset's is checked when that preset runs. No lens key equals a
+// literal name (TOOL-dFairHearing-13's catalogue rule), so a key tells the forms apart, and an object
+// mixing them is refused naming both. Any other value is the flat form, checked as before.
+const LITERAL_NAMES = ['diff-review'].concat(PRESETS)
 const lensNotes = a.lensNotes === undefined ? {} : a.lensNotes
+const lensNotesKeys = lensNotes && typeof lensNotes === 'object' && !Array.isArray(lensNotes) ? Object.keys(lensNotes) : []
+const literalNoteKeys = lensNotesKeys.filter((k) => LITERAL_NAMES.indexOf(k) !== -1)
+if (literalNoteKeys.length && literalNoteKeys.length !== lensNotesKeys.length)
+  throw new Error('tier2-review: `lensNotes` mixes the per-preset form, keyed by literal name (' + LITERAL_NAMES.join(' | ') +
+    '), with the flat form, keyed by lens; pass one form. Got ' + JSON.stringify(lensNotes) + '.')
+const perPreset = literalNoteKeys.length > 0
+const runNotes = !perPreset ? lensNotes : lensNotes[SLOT_LITERAL] === undefined ? {} : lensNotes[SLOT_LITERAL]
+// TOOL-dFairHearing-9 S3 - the legal keys are the run literal's DEFAULT keys plus the opt-ins swapped
+// in, so a note keyed to a default a swap displaced is accepted here and reported unread below.
+const LEGAL_NOTE_KEYS = SLOT_DEFAULTS.concat(LENS_KEYS.filter((k) => SLOT_DEFAULTS.indexOf(k) === -1))
 let lensNotesBad = false
-let lensNotesGot = a.lensNotes
-if (!lensNotes || typeof lensNotes !== 'object' || Array.isArray(lensNotes)) lensNotesBad = true
+let lensNotesGot = perPreset ? runNotes : a.lensNotes
+if (!runNotes || typeof runNotes !== 'object' || Array.isArray(runNotes)) lensNotesBad = true
 else
-  for (const k of Object.keys(lensNotes)) {
-    if (LENS_KEYS.indexOf(k) !== -1 && typeof lensNotes[k] === 'string' && lensNotes[k]) continue
+  for (const k of Object.keys(runNotes)) {
+    if (LEGAL_NOTE_KEYS.indexOf(k) !== -1 && typeof runNotes[k] === 'string' && runNotes[k]) continue
     lensNotesBad = true
-    lensNotesGot = LENS_KEYS.indexOf(k) === -1 ? k : { [k]: lensNotes[k] }
+    lensNotesGot = LEGAL_NOTE_KEYS.indexOf(k) === -1 ? k : { [k]: runNotes[k] }
     break
   }
 if (lensNotesBad) {
   throw new Error(
-    'tier2-review: `lensNotes` must be an object mapping a ' + kind + ' lens key to a non-empty string; ' +
-      'legal keys: ' + LENS_KEYS.join(' | ') + '. Got ' + JSON.stringify(lensNotesGot) + '.',
+    'tier2-review: `lensNotes`' + (perPreset ? ' entry `' + SLOT_LITERAL + '`' : '') + ' must be an object mapping a ' + kind + ' lens key to a non-empty string; ' +
+      'legal keys: ' + LEGAL_NOTE_KEYS.join(' | ') + '. Got ' + JSON.stringify(lensNotesGot) + '.',
   )
 }
 // TOOL-dFairHearing-3 S3 - `optIn`'s MEMBERSHIP, checked once, here, against what evaluating the literals
@@ -923,7 +942,7 @@ for (const L of swappedLenses)
 // TOOL-dFairHearing-2 S5 - a spec audit off the default preset says so before the first agent.
 if (preset !== 'unit-spec')
   log(`preset ${preset} — this spec audit runs the ${preset} lenses, not the unit-spec ones: ${LENS_KEYS.join(', ')}`)
-const notedLenses = Object.keys(lensNotes)
+const notedLenses = Object.keys(runNotes)
 if (!notedLenses.length)
   log('WARNING: no `lensNotes` supplied — every lens runs on the kit\'s generic brief, with no project addendum')
 // TOOL-aSightedSkeptic-3 S4 - a run told nothing about what its subject is FOR is announced, on both
@@ -945,8 +964,9 @@ if (skippedLenses.length)
 // Closing review round 1, L6 - a note for a lens this run skips reaches no prompt, so the log and RUN
 // INTEGRITY report it apart, as UNREAD. Wording only: the check above still accepts the key (spec 7's
 // non-goal), and the review key still carries it.
-const unreadNotes = notedLenses.filter((k) => skippedLenses.indexOf(k) !== -1)
-const readNotes = notedLenses.filter((k) => skippedLenses.indexOf(k) === -1)
+// TOOL-dFairHearing-9 S3 - and so is a note for a default a swap displaced: that lens does not run either.
+const unreadNotes = notedLenses.filter((k) => skippedLenses.indexOf(k) !== -1 || swappedLenses.some((L) => L.replaces === k))
+const readNotes = notedLenses.filter((k) => unreadNotes.indexOf(k) === -1)
 if (unreadNotes.length)
   log(`WARNING: lens notes were supplied for skipped lens(es), unread: ${unreadNotes.join(', ')}`)
 // TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT. Item n goes to keys[(n - 1) % K], so every item is in
@@ -1036,7 +1056,9 @@ const REVIEW_SHAPE = 'lenses5-r3'
 // reuses a unit-spec run's lens files on the same subjects and every key a run without it derives holds.
 // TOOL-dFairHearing-3 S5 - and `optIn`, ONLY when not empty, so a swapped run never resumes an unswapped
 // one's lens files and every key a run without it derives holds.
-const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
+// TOOL-dFairHearing-9 S4 - the notes print as the run's own, `runNotes`, so a flat-form caller and a
+// per-preset caller passing the same notes derive one key, and every flat-form key holds.
+const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: runNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
   ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
   roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {},
   optInKeys.length ? { optIn: optIn } : {})))
@@ -1253,7 +1275,7 @@ const finderResults = await boundedParallel(
         // TOOL-aEvidencedLens-2 S2 - the probe policy directly under the brief; '' on the diff kind.
         probeBlock +
         // TOOL-aSightedSkeptic-5 S5 - this lens's note and no other's, directly under its brief.
-        (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${lensNotes[L.key]}\n` : '') +
+        (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${runNotes[L.key]}\n` : '') +
         // TOOL-aSightedSkeptic-4 S3 - this lens's checklist share, and no other's.
         checklistBlock[L.key] +
         `\n` +

@@ -178,7 +178,24 @@ args: { repo, base, head, reviewDir,
 ```
 
 Its keys are the lens keys of the run's own kind. A key naming no such lens, a non-object, or an
-empty note refuses before any agent spawns, with the legal keys in the message. Absent, it is
+empty note refuses before any agent spawns, with the legal keys in the message.
+
+A caller that runs more than one literal passes the notes per preset instead: an object whose every
+key is a literal name, `diff-review`, `unit-spec` or `design-audit`, each mapping to the map above.
+
+```js
+args: { kind: 'spec-audit', subjects, scratch,
+        lensNotes: { 'unit-spec': { reuse: 'the kits under tools/ are the seams' },
+                     'design-audit': { 'alternatives-and-cost': 'price a new kit against tools/lib/' } } }
+```
+
+The run reads only its own literal's entry, absent meaning `{}` and announced as no notes; only that
+entry is checked, and another preset's is checked when that preset runs. An object mixing literal
+names with lens keys refuses, naming both forms. The flat form keeps its meaning, and the two forms of
+the same notes derive one review key. After an `optIn` swap (below) the legal keys are the literal's
+defaults plus the opt-ins swapped in: a note keyed to a default the swap displaced is accepted and
+reported unread, in the log and in RUN INTEGRITY, as a skipped light lens's note is, and a note keyed
+to the swapped-in opt-in reaches that slot's prompt. Absent, it is
 announced: a `WARNING:` log line, and a clause in the report's RUN INTEGRITY block. The notes and a
 review-shape literal both join the review key, so a lens file written by older prompts or under
 other notes is never reused. An adopter test that counted four diff lenses sees five from 1.17.
@@ -315,7 +332,7 @@ no shipped row offers for that literal; a default the literal lacks; and one def
 keys. A light diff run selects its slots by each slot's default key, so a swap into a light slot runs
 there. A non-empty `optIn` joins the review key, each swap is logged before the first agent and named in
 RUN INTEGRITY, and every return carries `optIn` beside `intensity`. A lens note keyed to a replaced
-default is refused, since the swapped lens is the one that runs. Only an `optin = true` row of
+default is accepted and reported unread, since the swapped lens is the one that runs. Only an `optin = true` row of
 `lenses.toml` can be swapped in, and today none is: each opt-in row ships `optin = false` until its
 losing test is recorded.
 
@@ -335,7 +352,7 @@ prints `unit-spec`; a set of design records alone prints `--design-record-preset
 `optIn` maps, and the entry for the printed preset rides as `optIn`. It checks `--opt-in`'s shape only;
 membership is the harness's. It exits 2 naming `SPEC_SUBJECT_PATH`, `--opt-in` or `--subject` on a
 harness with no predicate line, a malformed value or no subject. `unattended-build.js` forwards a
-caller's `optIn` and `preset` to its audit stage's review call unchanged, and unchecked.
+caller's `optIn`, `preset` and `lensNotes` to its audit stage's review call unchanged, and unchecked.
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names

@@ -776,6 +776,30 @@ async function runWholeScriptArms() {
   r = await runReview(Object.assign({}, SPEC, { lensNotes: { reuse: 'n' } }), ALL_OK)
   ck(!r.threw && r.result && r.result.exit === 'complete' && r.scanSpawned('find:').length === 5,
     'a malformed lensNotes refuses before any agent spawns: control, a spec-kind key on a spec audit, proceeds')
+  // ---- TOOL-dFairHearing-9 AC4: a per-preset map, each run reading its own literal's entry and no other.
+  // ---- Five finders are asserted beside each absence, so it cannot pass over a run that spawned none.
+  // ---- RED against the base harness, which refuses `unit-spec` as a lens key.
+  const PER_PRESET = { 'unit-spec': { reuse: 'FH9-N1' }, 'design-audit': { 'alternatives-and-cost': 'FH9-N2' } }
+  const noteCarriers = (run, mark) => run.trace.filter((t) => t.prompt.indexOf(mark) !== -1).map((t) => t.label).join(' ')
+  for (const [preset, own, other, lens] of [['unit-spec', 'FH9-N1', 'FH9-N2', 'reuse'], ['design-audit', 'FH9-N2', 'FH9-N1', 'alternatives-and-cost']]) {
+    r = await runReview(Object.assign({}, SPEC, preset === 'unit-spec' ? {} : { preset: preset }, { lensNotes: PER_PRESET }), ALL_OK)
+    ck(!r.threw && r.scanSpawned('find:').length === 5 && noteCarriers(r, own) === 'find:' + lens && noteCarriers(r, other) === '',
+      'lens notes: AC4 a ' + preset + ' run reads its own per-preset entry, in find:' + lens + ' alone, and never another preset\'s: ' + (r.threw || noteCarriers(r, own)))
+  }
+  // ---- TOOL-dFairHearing-9 AC6: a typo'd key, flat or in the run's entry, names the legal keys; an object
+  // ---- mixing literal names with lens keys names both forms. Each before the first agent.
+  for (const [what, notes, word] of [['a typo\'d flat key', { nope: 'x' }, 'legal keys: ' + SPEC_KEYS],
+    ['a typo\'d key in the run\'s entry', { 'unit-spec': { nope: 'x' } }, 'legal keys: ' + SPEC_KEYS],
+    ['a mixed object', { 'unit-spec': { reuse: 'x' }, reuse: 'y' }, 'per-preset form']]) {
+    r = await runReview(Object.assign({}, SPEC, { lensNotes: notes }), ALL_OK)
+    ck(typeof r.threw === 'string' && r.threw.indexOf('tier2-review: `lensNotes`') === 0 && r.threw.indexOf(word) !== -1 && r.trace.length === 0,
+      'lens notes: AC6 ' + what + ' refuses before any agent, naming "' + word + '": ' + r.threw)
+  }
+  // ---- TOOL-dFairHearing-9 AC7: the flat and the per-preset form of one note derive one review key.
+  const kFlat = await runReview(Object.assign({}, SPEC, { lensNotes: { reuse: 'N' } }), ALL_OK)
+  const kPer = await runReview(Object.assign({}, SPEC, { lensNotes: { 'unit-spec': { reuse: 'N' } } }), ALL_OK)
+  ck(!!kFlat.result && !!kPer.result && !!kFlat.result.key && kFlat.result.key === kPer.result.key,
+    'lens notes: AC7 the flat and the per-preset form of one note derive one review key: ' + (kFlat.threw || kFlat.result.key) + ' / ' + (kPer.threw || (kPer.result && kPer.result.key)))
 
   // ---- AC5: the absence is ANNOUNCED in the log and in RUN INTEGRITY; a supplied note silences the
   // ---- warning and is named instead.
@@ -1897,6 +1921,17 @@ async function runOptInArms() {
     const k1 = await runReview(SPEC, ALL_OK, top.src)
     ck(!!k0.result && !!k1.result && !!r2.result && k1.result.key === k0.result.key && r2.result.key !== k1.result.key,
       'optIn: AC5 a swap moves the review key, and a run without one keeps the key: ' + (k1.result && k1.result.key) + ' / ' + (r2.result && r2.result.key))
+    // ---- TOOL-dFairHearing-9 AC5: a note keyed to the default the swap displaced proceeds and is reported
+    // ---- unread; the swapped-in lens's note reaches its prompt. RED against the harness TOOL-dFairHearing-3
+    // ---- left, whose check throws on the replaced key.
+    const r9 = await runReview(Object.assign({}, SWAP, { lensNotes: { 'blast-radius': 'FH9-B', topology: 'FH9-T' } }), ALL_OK, top.src)
+    const sp9 = r9.trace.find((t) => t.label === 'synth')
+    const ri9 = sp9 ? sp9.prompt.slice(sp9.prompt.indexOf('RUN INTEGRITY')) : ''
+    const carry9 = (mark) => r9.trace.filter((t) => t.prompt.indexOf(mark) !== -1).map((t) => t.label).join(' ')
+    ck(!r9.threw && scanFinds(r9).length === 5 && carry9('FH9-T') === 'find:topology' && carry9('FH9-B') === '' &&
+      ri9.indexOf('lens notes supplied for: topology; lens notes for skipped lenses, unread: blast-radius.') !== -1 &&
+      r9.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('unread: blast-radius') !== -1),
+      'lens notes: AC5 a note for the replaced default is unread in the log and RUN INTEGRITY, the opt-in\'s reaches find:topology: ' + (r9.threw || carry9('FH9-T')))
   }
   // ---- AC4: a light diff run takes a swap into a light slot, and skips by the default keys.
   const port = renderOptIns(['portability'])
@@ -2688,7 +2723,10 @@ printf '%s\n' "$out"
 # Counted by hand, not by a run: the pass runs no suite.
 # RAISED 410 -> 411 by TOOL-dFairHearing-3's checklist follow-up: the opt-in marker's rule-11 refusal (1);
 # RUN INTEGRITY's swap line joined the AC2 log arm, adding none. Counted by hand, not by a run.
-FLOOR_ASSERTIONS=411
+# RAISED 411 -> 418 by TOOL-dFairHearing-9: 7 assertions, counted off the `lens notes:` arms — AC4's loop
+# over two presets (2), AC6's loop over three refusals (3), the AC7 key (1) and the AC5 replaced-default
+# note (1). Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=418
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

@@ -235,8 +235,9 @@ Workflow review harnesses — one pipeline, three implementations, one hardened
 - decisions 0
 - gate-legs 6: `workflow script syntax`, `review-join ban (no ref-keyed join)`, `review-join self-test`, `review-replay selftest`, `tier2-review self-test`, `unattended-build self-test`
 - workflow-scripts 9: `check-workflow-syntax.js`, `drift-audit-code.js`, `drift-audit-code.template.js`, `drift-audit-state.js`, `drift-audit-state.template.js`, `orient-counterfactual.js`, `tier2-review.js`, `tier2-review.template.js`, `unattended-build.template.js`
-- gotcha-classes 4: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`, `observed-by-claim-no-arm-discharges.md`, `test-oracle-read-from-a-historical-sha.md`
-- globs 1: `tools/workflows/*`
+- gotcha-classes 7: `degradation-known-but-unreported.md`, `node-check-is-not-a-syntax-gate.md`, `observed-by-claim-no-arm-discharges.md`, `test-oracle-read-from-a-historical-sha.md`, `portability-sweep.md`, `topology-sweep.md`, `adopter-migration-sweep.md`
+- globs 1
+- cut 1 item(s) to fit 1024 bytes; the dossier's toml fence lists them all
 
 ## roles
 

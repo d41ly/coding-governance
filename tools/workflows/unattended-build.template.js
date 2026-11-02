@@ -231,8 +231,12 @@ function chunk(a, n) {
 //                                                   //   to the audit's review call, never checked here:
 //                                                   //   the review harness's boundary is the one check.
 //                                                   //   `review_pin.py` prints it. Absent, no key is sent
-//   preset: "unit-spec" | "design-audit"            // optional: forwarded the same way, unchecked; the
+//   preset: "unit-spec" | "design-audit",           // optional: forwarded the same way, unchecked; the
 //                                                   //   review harness picks its lens literal by it
+//   lensNotes: { "<literal name>": { "<lens key>": "<note>" } } // optional (TOOL-dFairHearing-9): the
+//                                                   //   per-preset or flat lens notes, forwarded the same
+//                                                   //   way, unchecked; the review harness reads its run
+//                                                   //   literal's entry. Absent, no key is sent
 // }
 // TOOL-aEvidencedLens-5 - the two fold args are REFUSED at a callee round of 1 (a fresh generation has
 // no previous round) and refused by name when malformed, before any agent spawns.
@@ -1750,6 +1754,9 @@ const auRaw = !specAudit ? null : await workflow(
     // when the caller passed none, so every existing call keeps its arguments.
     ...(a.optIn !== undefined ? { optIn: a.optIn } : {}),
     ...(a.preset !== undefined ? { preset: a.preset } : {}),
+    // TOOL-dFairHearing-9 S5 - the caller's lens notes, forwarded the same way: the callee holds the
+    // literal's keys and derives the run's notes, so this harness neither checks nor rewrites them.
+    ...(a.lensNotes !== undefined ? { lensNotes: a.lensNotes } : {}),
   },
 )
 

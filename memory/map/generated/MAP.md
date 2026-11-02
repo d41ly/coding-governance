@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 151 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 154 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -265,6 +265,7 @@ Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · 
 | `ab-arm-never-did-the-work.md` | run-gates |
 | `absence-assertion-over-whole-file-text.md` | baseline |
 | `absence-read-from-one-of-several-homes.md` | build-method |
+| `adopter-migration-sweep.md` | review-harnesses |
 | `allocation-knob-without-a-ceiling.md` | run-gates-turnstile |
 | `allowlist-narrower-than-the-root-it-guards.md` | agent-cap |
 | `amendment-leaves-its-other-half-standing.md` | build-method |
@@ -350,6 +351,7 @@ Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · 
 | `pipe-in-a-code-span-splits-a-table-cell.md` | memory-tree-hygiene |
 | `policy-value-with-no-route.md` | build-method |
 | `porcelain-diff-names-a-rename-by-its-destination.md` | unattended |
+| `portability-sweep.md` | review-harnesses |
 | `predicate-bounded-by-its-own-count.md` | run-gates-turnstile |
 | `predicate-designed-without-a-run-over-the-tree.md` | build-method |
 | `process-creation-is-the-suite-cost.md` | unattended |
@@ -387,6 +389,7 @@ Inventories: gate-legs: 148 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · 
 | `task-handed-as-the-spec-is-reviewed-not-done.md` | build-method |
 | `test-oracle-read-from-a-historical-sha.md` | review-harnesses |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
+| `topology-sweep.md` | review-harnesses |
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |
 | `trapped-signal-waits-for-the-foreground-child.md` | runlog |
