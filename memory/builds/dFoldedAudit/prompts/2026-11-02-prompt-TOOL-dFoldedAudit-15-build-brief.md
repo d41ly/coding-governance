@@ -10,3 +10,4 @@ Build this unit from `memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFold
 - Commit the CLOSED flip last, after every write under `tools/`. The write gate refuses a closed unit's next edit.
 - This is one batch by M2's exception. Close each item or state in the return why its finding no longer stands.
 - Also fix the comment on `read_spec_audit_switch` near `tools/unattended/unattended.sh:1297`: it says a spec exit and the chain verdict are the only readers, and `--plan --paths` and a folding `--record-round` read it too. Unit 13 could not after its CLOSED flip.
+- Also fix `tools/unattended/check-unattended.sh:1093`, where `${rv_att:-0}` reads a dead awk as zero rounds. Test `[ "$rv_att" = 0 ]` so an empty output prints instead of passing. Unit 10 could not after its CLOSED flip.

@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-11 — a chain fold joins to the tree: the spec's header rev and its Revision log
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 120
+**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 120
 
 <!-- gen:spec-records -->
 
