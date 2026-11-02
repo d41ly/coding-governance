@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively
 
-**Status:** INPROGRESS · rev-1 · 2026-11-02 · node d · Tier-1 · base 8a5328a9 · streams tooling · order 170
+**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-1 · base 8a5328a9 · streams tooling · order 170
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-17-1-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-1-spec-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-2-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-2-builder-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-17-3-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-3-spec-return.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md) | journal | — |
@@ -26,7 +27,8 @@ keeps both sides' content. The close's `--prepare` then meets no conflict. The o
 ## 2. Scope (IN)
 
 - **S1** — The merge, in a scratch clone of the run branch under `%TEMP%`, whose `origin` is the run
-  repository's GitHub remote and whose hooks are the tracked `.githooks/`. The clone fetches `origin` and
+  repository's GitHub remote, whose hooks are the tracked `.githooks/` and whose merge drivers are the run
+  repository's `rows` and `ours`. The clone fetches `origin` and
   runs `git merge --no-ff --no-commit origin/main`. A conflict on any path outside §4's table stops the
   unit before any resolution. Observed by AC1.
 - **S2** — `.memory-tree.conf` keeps both blocks unchanged: main's `SPEC_AC_ORDER_CUTOFF`
@@ -63,8 +65,8 @@ keeps both sides' content. The close's `--prepare` then meets no conflict. The o
 - Re-deriving `SPEC_SUPERSEDE_CUTOFF` or arming `SPEC_FOLD_CUTOFF`. The first is the landing's, and the
   second is the close's.
 - A kit version mint. The merge brings main's version markers and the lander mints at landing.
-- This unit's status flip, its acceptance ledger and its pass commit. They are the main loop's, after
-  the fast-forward.
+- This unit's status flip to CLOSED, its acceptance ledger and its pass commit. They are the main
+  loop's, after the fast-forward, and neither M nor F carries the flip.
 - Running any suite or the bar inside the pass.
 - The parked question of the two unattended suites, recorded in this build's `RUN.md`.
 
@@ -91,6 +93,16 @@ Skills, the method guides and the review workflow, gains only main's kit-version
 halves. So an
 auto-merged pair stays a pair, and no render needs a hand step.
 
+Re-read 2026-11-02 at `origin/main` `84acebdc`, the tip the builder's first dispatch fetched
+(`memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-17-2-builder-return.md`).
+`8a5328a9` is its ancestor, and `git diff --name-only 8a5328a9 84acebdc` over the table's eight paths
+prints nothing, so none of them moved. The figures hold: floor 215, pin 39, `last-body-change`
+`201eb127`. `git merge-tree --write-tree --name-only`
+over `d9d556dd` and `84acebdc`, in the run repository, names the same eight. The auto-merged set is
+twenty-four. The two it gained are `tools/roles/SKILL.template.md` and `.claude/skills/build/SKILL.md`,
+and main moves each from `roles@1.10` to `roles@1.11` on its kit marker line alone, so they stay a pair.
+A later tip still re-derives by the last subsection's rule.
+
 ### S1 — the clone
 
 A clone of the local repository names that repository as `origin`. There `origin/main` is local `main`,
@@ -98,14 +110,31 @@ A clone of the local repository names that repository as `origin`. There `origin
 URL before it fetches. A fresh clone also carries no `core.hooksPath`, and its commits would skip every
 hook, so the clone sets it.
 
+Nor does a clone carry the merge drivers. `.gitattributes` routes `memory/LIVE.md`, `memory/ledger/*.md`
+and the dClosedLoop as-built record to `merge=ours` (`.gitattributes:90-91` and `:100`), and the authored
+indexes to `merge=rows` (`:77-84`). Both drivers are defined only in the run repository's `.git/config`,
+which `git -C "$REPO" config --get-regexp '^merge\.'` prints as `merge.rows.driver bash
+tools/memory-tree/merge-rows.sh %O %A %B %P` and `merge.ours.driver true`, measured 2026-11-02. The
+trial merge ran in the run repository, where both are set. Without them the clone conflicts on those
+three `merge=ours` paths besides the eight. With both set, `git merge-tree --write-tree --name-only` in
+the clone printed exactly the eight. That is the builder's first dispatch, recorded in the return the
+conflict-set section names. So the clone copies both after the hooks path, and prints them back.
+
+`GOV_PYTHON` names Python 3.15.2. Both sides' resolvers try a caller's override, then `GOV_PYTHON`, then
+`python3` (`tools/lib/resolve-python.sh:30`, and line 36 of main's copy at `84acebdc`), so the exported
+path is the one the resolver reaches first. `python3` on PATH answers 3.15.2 too, measured 2026-11-02, so the resolver's fallback also clears
+the 3.15 floor.
+
 ```bash
-export GOV_PYTHON=C:/Users/d41ly/AppData/Roaming/uv/python/cpython-3.15.0b1-windows-x86_64-none/python.exe
+export GOV_PYTHON=C:/Users/d41ly/AppData/Local/Programs/Python/Python315/python.exe
 REPO=C:/projects/coding-governance
 RUNWT=$REPO/.claude/worktrees/gov-build-m4-spec-audit-694e7b
 CL="$TEMP/dFoldedAudit-17-merge"
 git clone --branch branch/gov-build-m4-spec-audit-694e7b "$REPO" "$CL" && cd "$CL"
 git remote set-url origin "$(git -C "$REPO" remote get-url origin)"
 git config core.hooksPath .githooks
+git -C "$REPO" config --get-regexp '^merge\.' | while read -r key val; do git config "$key" "$val"; done
+git config --get-regexp '^merge\.'
 git fetch origin
 git merge --no-ff --no-commit origin/main
 git diff --name-only --diff-filter=U
@@ -320,8 +349,10 @@ SIX=".memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec
 
 - **AC1** — When `git diff --name-only --diff-filter=U` runs right after the merge, it prints exactly the
   eight paths of `$EIGHT`.
-  figure: PINNED, measured by `git merge-tree --write-tree` over `951f44e4` and `8a5328a9` on 2026-11-02.
-  Red when: the fetched tip conflicts on a ninth path, which stops the unit before any resolution.
+  figure: PINNED, measured by `git merge-tree --write-tree` over `951f44e4` and `8a5328a9` on 2026-11-02,
+  and over `d9d556dd` and `84acebdc` the same day, both in the run repository with its two merge drivers.
+  Red when: the fetched tip conflicts on a ninth path, or the clone lacks a merge driver, which adds the
+  three `merge=ours` paths. Either stops the unit before any resolution.
 - **AC2** — When `git grep -n -E '^(<<<<<<<|>>>>>>>)( |$)' HEAD -- $EIGHT` runs it prints nothing, and
   `git diff --check HEAD^1 HEAD -- $SIX` and `git diff --check HEAD^2 HEAD -- $SIX` print nothing.
   figure: PINNED, on the unresolved merge tree the grep prints 46 lines and the diff check 21 marker
@@ -394,6 +425,15 @@ none
 ## 8. Revision log
 
 - rev-1 · 2026-11-02 · initial draft.
+- rev-2 · 2026-11-02 · S1 · §4 · AC1 · the clone copies the run repository's `merge.rows.driver` and
+  `merge.ours.driver` after `core.hooksPath`, since without them it conflicted on three `merge=ours`
+  paths besides the eight; AC1's expected set stays the eight, and its red case names a missing driver.
+- rev-2 · 2026-11-02 · S9 · §4 · `GOV_PYTHON` names the 3.15.2 interpreter that exists, replacing the
+  absent uv path, cited as the first candidate the resolver reaches, with `python3` its passing fallback.
+- rev-2 · 2026-11-02 · §3 · the CLOSED flip stated once, as the main loop's after the fast-forward,
+  carried by neither M nor F; the build brief's contrary sentence is withdrawn by the re-dispatch note.
+- rev-2 · 2026-11-02 · §4 · the conflict set re-read at `origin/main` `84acebdc`: none of the eight paths
+  moved since `8a5328a9`, the floor, the pin and `last-body-change` hold, and the later-tip rule stays.
 
 ## 9. Reuse audit
 
