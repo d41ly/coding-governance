@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop
 
-**Status:** INPROGRESS · rev-5 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 70
+**Status:** INPROGRESS · rev-6 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 70
 
 <!-- gen:spec-records -->
 
@@ -13,6 +13,7 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md) | journal | TOOL-dFoldedAudit-8 |
+| [2026-11-02-build-TOOL-dFoldedAudit-1-10-row-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-10-row-fold-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-7 |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md) | journal | — |
@@ -27,6 +28,7 @@
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md) | research | TOOL-dFoldedAudit-8 |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-2-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-2-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-1-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-3-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-1-4-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-4-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -69,7 +71,8 @@ exactly as it did.
 - **S9** — `tools/roles/agents/gov-spec-writer.agent.md` and its render state the repair rule for the
   disposal's writer. Observed by AC9.
 - **S10** — One row in `memory/DECISIONS.md` records the ruling, the superseded rows and the clause it
-  amends. Observed by AC10.
+  amends. The main loop wrote it ahead of the pass, as §4 states, and the builder writes nothing to
+  that file. Observed by AC10.
 - **S11** — New text in every carrier cites by name or tag, never by a positional reference, tag
   [limits]. Observed by AC11.
 - **S12** — The verbs carrier's "Drive the build as ONE program" bullet and the `/build` Skill tell a
@@ -239,8 +242,12 @@ keys with no conf home (TOOL-dFoldedAudit-7 §3), so they owe no row.
 limits file's own paragraph (`:16-28`) lets a run raise a measured-file row on four terms, and they
 hold here: this unit's change takes the render past the row; the row's comment block reserves nothing
 to the owner and states no headroom, so the new value is the measured render exactly; the movement is
-argued above the row as `RAISED <old> -> <new>`, with the date, this unit, the figure and why; and S10's
-row lands with it. M3 states that a raise on those terms changes no governance carrier.
+argued above the row as `RAISED <old> -> <new>`, with the date, this unit, the figure and why; and
+term 4's "before or with the raise" (`:23`) is met by "before". S10's row landed in its own `Pass: none`
+records commit ahead of the pass commit, written by the main loop, because `memory/DECISIONS.md` is a
+shared record (`.unattended.conf:417`) that `--dispatch` refuses
+(`tools/unattended/unattended.sh:14269-14272`), so no pass commit can carry it. M3 states that a raise
+on those terms changes no governance carrier.
 
 ### The kit Skill
 
@@ -273,6 +280,10 @@ unit and the review record by its file stem, and a CLOSED sibling stays frozen."
 `tools/roles/README.md` already states of a render.
 
 ### The decision row
+
+The main loop wrote this row in `10b5814cf`, its own `Pass: none` records commit ahead of the pass
+commit, and the builder writes nothing to that file. `memory/DECISIONS.md:243` is byte-identical to
+this fence, measured 2026-11-02.
 
 ```
 - **TOOL-dFoldedAudit-1** - **a spec audit folds local fixes, promotes only new mechanisms, and its chain stops on a derived verdict**: owner, 2026-11-01. Amends cl-dClosedLoop-0117; supersedes TOOL-aEvidencedLens-17 for spec audits and TOOL-dGatedProse-4's bound. Detail `builds/dFoldedAudit/`.
@@ -359,7 +370,8 @@ No switch of its own: this unit is the description, and the three switches are T
 - `tools/roles/SKILL.template.md`
 - `.claude/skills/build/SKILL.md`
 - `tools/template-size-limits.txt`
-- `memory/DECISIONS.md`
+- `memory/DECISIONS.md` (its own `Pass: none` records commit, already landed, and out of this pass's
+  write set)
 
 ### Alternatives rejected
 
@@ -373,7 +385,7 @@ No switch of its own: this unit is the description, and the three switches are T
 
 ## 5. Production-readiness checklist
 
-- security — no new write path; `memory/DECISIONS.md` takes one authored row.
+- security — no new write path; the pass writes no shared record, and S10's row is the main loop's.
 - perf / scale — M7 re-reads the method at every pass, so its bytes are the cost, and M1's ceiling
   holds them; the new parity block costs two pipelines.
 - error / empty / loading states — N/A: prose, and the arm's only state is a missing literal.
@@ -382,7 +394,8 @@ No switch of its own: this unit is the description, and the three switches are T
   from, which is why this unit runs last among them. `budgets.py` reads the limits row at the landed
   revision (`tools/policy/budgets.py`), so until landing `unattended protocol size` and
   `unattended skill size` print a warning and exit 0, which is expected and is not the raise failing.
-- testing — the pass runs the greps and diffs of §6; the main loop observes the arms in §7.
+- testing — the pass runs the greps and diffs of §6; the main loop observes the arms in §7 and the
+  clause each of AC7 and AC12 owes the close.
 - migration — none.
 - user docs — none: no `help/` page covers these verbs, as §3 states.
 
@@ -424,9 +437,12 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
   `diff` between the CR-stripped `tools/unattended/VERBS.template.md` and the render prints nothing;
   `grep -c 'unattended.sh --record-round '` and `grep -c 'unattended.sh --chain-verdict '` over
   `tools/unattended/SKILL.template.md` and `.claude/skills/unattended/SKILL.md` each print at least 1;
-  and `bash tools/unattended/adopt-unattended.sh --check` exits 0.
+  and, owed to the close, `bash tools/unattended/adopt-unattended.sh --check` exits 0.
   Red when: the verbs carrier keeps either unscoped sentence, each of which prints 1 at base, so it
   describes the old driver, or a verb reaches the carrier and not the Skill, which check 26 refuses.
+  permission: the clause owed to the close is the `unattended skill wiring` leg, whose exact argv
+  `tools/hooks/scratch-guard.js:1373-1378` matches, so the builder does not attempt it and the main
+  loop observes it.
 - **AC8** — When `grep -c '^| .SPEC_FOLD_CUTOFF. |' memory/guides/UNATTENDED-PROTOCOL.md` runs it
   prints 1; `tr -d '\r' < memory/guides/UNATTENDED-PROTOCOL.md | wc -c` prints exactly the figure
   on that file's row of `tools/template-size-limits.txt`, the comment block above it carrying
@@ -450,11 +466,14 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
   figure: both counts are DERIVED at observation.
 - **AC12** — When `grep -c 'disposal'` runs over `.claude/skills/build/SKILL.md` it prints at least 1,
   `grep -c 'passes .disposal.'`, `grep -c 'review.spec-audit.disposal'` and `grep -c 'planState'` over
-  `memory/guides/UNATTENDED-VERBS.md` each print at least 1, and
+  `memory/guides/UNATTENDED-VERBS.md` each print at least 1, and, owed to the close,
   `bash tools/roles/adopt-roles.sh --check` exits 0.
   Red when: the arg is documented in one carrier only, so an attended run stays on the old rule, or
   `planState` still prints 0, as it does at base, so an unattended caller meets refusal rows 15 and 16
   on its first fold.
+  permission: the clause owed to the close is the `roles render wiring` leg, whose exact argv
+  `tools/hooks/scratch-guard.js:1373-1378` matches, so the builder does not attempt it and the main
+  loop observes it.
 - **AC13** — When `grep -c 'addresses'` and `grep -c 'chainRecord'` run over
   `tools/workflows/README.md`, each prints at least 1.
   Red when: a caller reads the return from the README and never learns the fields exist.
@@ -468,7 +487,7 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
 
 ## 7. Gates
 
-`kit/dogfood doc parity` · `review-protocol parity (kit vs dogfood)` · `build-method size` · `unattended protocol size` · `unattended skill size` · `unattended kit gate` · `kit version markers` · `memory hygiene` · `roles render wiring` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `policy fixtures`
+`kit/dogfood doc parity` · `review-protocol parity (kit vs dogfood)` · `build-method size` · `unattended protocol size` · `unattended skill size` · `unattended skill wiring` · `unattended kit gate` · `kit version markers` · `memory hygiene` · `roles render wiring` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `policy fixtures`
 
 New arm: tools/memory-tree/kit-dogfood-parity.test.sh · covers AC1 AC2 AC4 AC5 · the block of §4, staged by deleting one required literal from the template and the render together, which parity alone cannot see, and by padding the render past its Budget line · none
 
@@ -507,6 +526,14 @@ none
   and not unit 6's spec, which says a section number where the predicate reads a heading at any
   ordinal, so the row says "revision-log entry". M4's target text and its byte figures do not move,
   and §3's sentence on `memory/HYGIENE.md` stands as written.
+- rev-6 · 2026-11-02 · §4 §5 §7 · S10 · AC7 AC12 · the stopped builder's return. `--dispatch` refused
+  `memory/DECISIONS.md`, a shared record, so no pass commit can carry S10's row. The main loop landed
+  it in its own `Pass: none` records commit ahead of the pass, which meets term 4 of
+  `tools/template-size-limits.txt` by "before", so the file leaves this pass's write set and stays in
+  Files touched marked, as TOOL-dTrueNorth-27 rev-2 did. The builder writes nothing to it, and AC10
+  stands as written. The `--check` clauses of AC7 and AC12 are legs a pass may not run, so each is owed
+  to the close under a `permission:` line, and §7 gains `unattended skill wiring`, the one of the two it
+  did not name. M4's target text and the row's text do not move.
 
 ## 10. Reuse audit
 

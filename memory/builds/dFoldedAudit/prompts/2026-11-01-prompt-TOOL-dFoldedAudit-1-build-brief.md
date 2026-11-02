@@ -12,3 +12,4 @@ Build this unit from `memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFold
 - One more carrier reads short after TOOL-dFoldedAudit-6 and joins this unit's write set, by this spec's latest rev: `tools/memory-tree/README.md:27`, which lists what is no member and omits a cited fold. `memory/HYGIENE.md` stays untouched, as §3 says; that question is parked for the owner.
 - `writeRound`'s terminal-subject throw belongs to no prose carrier and stays out of this unit.
 - This unit's name for the verbs is what `tools/unattended/unattended.sh` ships: `--record-round` and `--chain-verdict`.
+- Leave `memory/DECISIONS.md` out of `--writes`: the row is already landed, and that file's token in the spec reads as declared only because the parser cannot read the marking.
