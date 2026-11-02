@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop
 
-**Status:** INPROGRESS · rev-4 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
+**Status:** INPROGRESS · rev-5 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 70
 
 <!-- gen:spec-records -->
 
@@ -14,14 +14,17 @@
 | [2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-7-1-token-fold-return.md) | journal | TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md) | journal | TOOL-dFoldedAudit-8 |
 | [2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md) | journal | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-7 |
+| [2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-7-stopped-dispatch.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-8-carrier-fold-return.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-1-reuse-scout.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-1-reuse-scout.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-2-orienter.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-2-orienter.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-build-brief.md) | research | — |
-| [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
+| [2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-fix-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-spec-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-5-fix-brief.md) | research | TOOL-dFoldedAudit-5 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-fix-brief.md) | research | TOOL-dFoldedAudit-8 |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-1-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-1-3-spec-writer.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -76,6 +79,12 @@ exactly as it did.
 - **S13** — The suite arm the `New arm:` lines in §7 declare, a pin of M4 and the method's byte figure
   in the memory-tree parity suite. Observed by AC1, AC2, AC4, AC5 through those lines, RED first at
   the close.
+- **S14** — Line 27 of `tools/memory-tree/README.md`, the row of
+  `tools/memory-tree/deviation_join.py`, states TOOL-dFoldedAudit-6's exemption as built, tag
+  [fold-records]: a commit moving a spec's header, with every revision it moved holding a revision-log
+  entry that cites a bound `spec-audit` record of the unit's build naming the unit, joins neither
+  revision arm and owes no record, and a move with no such citation is still reported. Observed by
+  AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -115,6 +124,7 @@ exactly as it did.
 - **consumes-from** `TOOL-dFoldedAudit-5` — `--record-round` and `--chain-verdict`, which M4 names and
   check 26 joins, and the `addresses` and `chainRecord` fields the review kit README lists
 - **consumes-from** `TOOL-dFoldedAudit-6` — the fold exemption, which M4's unreviewed sentence reads
+  and the memory-tree README's row of the join states
 - **hands-off** `TOOL-dFoldedAudit-8` — M4's rewritten sentences, which DL-20's S9 and FH-17's chain
   rule point at, and the decision row naming `cl-dClosedLoop-0117` that its deviation record cites
 
@@ -271,6 +281,31 @@ It measures 295 characters against `ENTRY_CAP_CHARS=300`
 `tools/memory-tree/deviation_join.py:705-733` accepts an owner approver only through a row naming the
 departed clause, which is what TOOL-dFoldedAudit-8's record cites.
 
+### The memory-tree README
+
+`tools/memory-tree/README.md:27` is the kit's file-table row for the join, and it lists what is no
+member: a revision changing only its status line and generated regions. It omits the fold the join
+has exempted since unit 6. One edit, in place: the row's clause naming the unattended kit's
+`GEN_REGION_AWK` and its full stop become this text, and the row's next sentence, "A unit's first
+pass", stays:
+
+```
+by the unattended kit's `GEN_REGION_AWK`, and neither is an audit's own fold, by `design_lib.check_audit_fold`: a commit moving the spec's header, every revision it moved holding a revision-log entry that cites by file stem a bound `spec-audit` record of the unit's build whose text names the unit, pinned or not, joins neither revision arm and owes no record. A move with no such citation is still reported, and so is a material edit moving no header.
+```
+
+The text follows the code, and unit 6's "§9 entry" becomes the second row's wording.
+
+| The code | Why the row says so |
+|---|---|
+| `check_audit_fold` asks of every revision the commit moved (`tools/memory-tree/design_lib.py:594-611`, called at `tools/memory-tree/deviation_join.py:611`) | a two-revision commit with one citation is still a member |
+| `REV_LOG_HEAD` finds the log by its heading text at any ordinal (`tools/memory-tree/design_lib.py:533`) | "revision-log entry" is true of either tier, a section number is not, and S11 refuses one |
+| the citable set is every bound `spec-audit` record of the build under `reviews/`, pinned or not (`tools/memory-tree/deviation_join.py:570-573`) | a scoped round pins no sibling its repair moves |
+
+The row needs no render and owes no size row: `tools/template-size-limits.txt` names no such file, and
+`tools/memory-tree/kit.toml` declares no render of it. Every leg guard that trips on this path also
+trips on `tools/memory-tree/BUILD-METHOD.template.md`, because `tools/gate-legs.json` names no
+guard for the file itself, so §7's leg line owes nothing new.
+
 ### The parity arm
 
 `tools/memory-tree/kit-dogfood-parity.test.sh` gains one block in its check path, ahead of the success
@@ -307,6 +342,7 @@ No switch of its own: this unit is the description, and the three switches are T
 - `tools/memory-tree/BUILD-METHOD.template.md`
 - `memory/guides/BUILD-METHOD.md`
 - `tools/memory-tree/kit-dogfood-parity.test.sh`
+- `tools/memory-tree/README.md`
 - `tools/workflows/REVIEW-PROTOCOL.template.md`
 - `memory/guides/REVIEW-PROTOCOL.md`
 - `tools/workflows/README.md`
@@ -420,6 +456,13 @@ Each slice is `awk '/^## M4 /{f=1} /^## M5 /{f=0} f'` over the named file.
 - **AC13** — When `grep -c 'addresses'` and `grep -c 'chainRecord'` run over
   `tools/workflows/README.md`, each prints at least 1.
   Red when: a caller reads the return from the README and never learns the fields exist.
+- **AC14** — When `sed -n 27p tools/memory-tree/README.md` is piped to `grep -c` for each of
+  `check_audit_fold`, `spec-audit`, `joins neither revision arm` and `still reported`, each prints 1,
+  and for `§` it prints 0.
+  Red when: the row still lists only the status-line exemption, as it does at base, where each of the
+  four prints 0, or the new sentence cites by section number, which S11 refuses.
+  figure: line 27 is PINNED, measured 2026-11-02 at `dada6c038`, and the file is unchanged since base
+  `74274869`.
 
 ## 7. Gates
 
@@ -456,12 +499,19 @@ none
 - rev-4 · 2026-11-01 · §4 · the unit 8 fix brief's item 2. The bytes paragraph's last sentence no longer
   opens on another build's id. The sentence never met the anchor grammar, so check 13's hit on that id
   was unit 8's heading alone. The byte figures do not move.
+- rev-5 · 2026-11-02 · §3 §4 §10 · S14 · AC14 · the stopped builder's return. Unit 6 left one carrier
+  short: the join's row in the memory-tree README lists what is no member and omits a cited fold, so
+  the row joins Files touched with a Scope line, a design sub-head and a criterion. S14 reads the code
+  and not unit 6's spec, which says a section number where the predicate reads a heading at any
+  ordinal, so the row says "revision-log entry". M4's target text and its byte figures do not move,
+  and §3's sentence on `memory/HYGIENE.md` stands as written.
 
 ## 10. Reuse audit
 
 The seams are the documents themselves, each extended in place: M4's paragraphs, the `--review` entry
 and state list in `tools/unattended/VERBS.template.md:246-264` and `:784-818`, the key table at
-`tools/unattended/PROTOCOL.template.md:529`, and the render pairs in
+`tools/unattended/PROTOCOL.template.md:529`, the join's file-table row at
+`tools/memory-tree/README.md:27`, and the render pairs in
 `tools/memory-tree/kit-dogfood-parity.test.sh:61` and `tools/workflows/check-protocol-parity.test.sh`.
 The arm extends that first suite rather than adding a leg.
 

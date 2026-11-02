@@ -9,6 +9,6 @@ Build this unit from `memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFold
 - Temp files go in the run's scratch root, never under the repo.
 - A divergence from the spec stops the unit: return `DIVERGENCE:`, never improvise.
 - Describe what units 2 to 7 shipped: read their code, not their specs, wherever a name could have moved. The method stays under its 30720-byte ceiling.
-- Two more carriers read short after TOOL-dFoldedAudit-6 and join this unit's write set: `tools/memory-tree/README.md:27`, which lists what is no member and omits a cited fold, and the Deviation records paragraph of `memory/HYGIENE.md`, which says a departure from a spec once its code has started is a record. Edit the source of each, its template where it has one, and declare them with `--dispatch` first.
+- One more carrier reads short after TOOL-dFoldedAudit-6 and joins this unit's write set, by this spec's latest rev: `tools/memory-tree/README.md:27`, which lists what is no member and omits a cited fold. `memory/HYGIENE.md` stays untouched, as §3 says; that question is parked for the owner.
 - `writeRound`'s terminal-subject throw belongs to no prose carrier and stays out of this unit.
 - This unit's name for the verbs is what `tools/unattended/unattended.sh` ships: `--record-round` and `--chain-verdict`.

@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 529b98a4717bd8c884697bd247e5c689db976ebf · park · 23 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: d322d6ac4c07648bef3c547cae6fbf8b4d5e7659
 phase: BUILDING
@@ -73,3 +74,5 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T00:09:19Z dispatch · item f76ff571 TOOL-dFoldedAudit-6 · reason tools/memory-tree/design_lib.py tools/memory-tree/deviation_join.py tools/memory-tree/gen_build_index.py memory/builds/dRankedPlan/README.md memory/builds/dFurnishedOrders/README.md memory/builds/dDeclaredLoop/README.md memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFoldedAudit-6.md memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-6-ledger.md memory/builds/dFoldedAudit/README.md memory/map/generated/symbols.json
 
 2026-11-02T00:09:23Z brief · item TOOL-dFoldedAudit-6 · reason e89f3ad9bd31 memory/builds/dFoldedAudit/prompts/2026-11-01-prompt-TOOL-dFoldedAudit-6-build-brief.md
+
+2026-11-02T00:33:44Z decision · item Should memory/HYGIENE.md's Deviation records paragraph name the audit-fold exemption TOOL-dFoldedAudit-6 built? · reason Options: (a) leave it, since the paragraph binds a departure once code has started and an audit fold precedes code; (b) add one sentence naming the exemption. Refused here because HYGIENE is a method carrier under M11, the accepted brief bars a governance-carrier write beyond M4's stated change, and M3's veto 2 collapses onto a park. Nothing is wrong meanwhile: no rule read today is contradicted.
