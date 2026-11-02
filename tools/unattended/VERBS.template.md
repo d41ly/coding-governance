@@ -245,23 +245,71 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
   always did. At a TERMINAL exit — `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED` — on EVERY
   subject, spec subjects included, the round REQUIRES `--highs <n>` and `--minors <n>`, the confirmed
-  HIGH and MEDIUM-plus-LOW findings standing at the exit, and writes them before the disposition:
+  HIGH and MEDIUM-plus-LOW findings standing at the exit, and writes them before the disposition.
+  The build slug, and a spec subject before `SPEC_FOLD_CUTOFF` or under a blank one, write
   `blockers <b> · <EXIT> · highs <h> · minors <m>[ · disposition promote]`. Owner rulings of
   2026-10-04 for the closing diff review, the build-slug subject, and of 2026-10-05 for a spec
-  subject: every finding a terminal exit confirms is promoted, one unit per BLOCKER and HIGH and the
-  MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. So `promote` is the
-  ONLY value a terminal exit can record. It is REQUIRED whenever anything stood, "because every
-  confirmed finding there is promoted", and refused when nothing did, since it "promotes nothing, and
-  the gate would read the row as owing a unit". `fold` is refused at every terminal exit of every
-  subject, which "folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched
-  into one unit or two". `fold` survives only as the reading of a row written before spec subjects
+  subject before that cutoff: every finding such an exit confirms is promoted, one unit per BLOCKER
+  and HIGH and the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. So
+  `promote` is the ONLY value such an exit can record. It is REQUIRED whenever anything stood,
+  "because every confirmed finding there is promoted", and refused when nothing did, since it
+  "promotes nothing, and the gate would read the row as owing a unit". `fold` is refused there, which
+  "folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or
+  two". On this shape `fold` survives only as the reading of a row written before spec subjects
   counted their exits, which carries no counts. A record naming no value where one is owed leaves the
-  gate inferring one from ids. It refuses a verdict or a disposition outside its closed set, a
-  missing subject or count, a terminal exit missing either count or a disposition it owes, `fold` at
-  a terminal exit, a disposition or either count on a round that is not a terminal exit, and a round
-  on a subject whose loop has already ended. Check 2 reads a row carrying both counts as owing
-  `blockers + highs`, plus one for the minors when any stood, new non-WONTDO unit ids; every other
-  row keeps the floor of one.
+  gate inferring one from ids. A spec subject in a run preflighted on or after `SPEC_FOLD_CUTOFF`
+  writes `blockers <b> · <EXIT> · highs <h> · minors <m> · folded <f> · promoted <p>[ · disposition fold|promote]`
+  and also REQUIRES `--folded <f> --promoted <p>`. `f + p` counts findings, never units, and reaches
+  `b + h + m`, more where the disposal adjudicated an UNVERIFIED finding. The disposition is DERIVED
+  from the counts and stays the row's last field: `promote` when p > 0, `fold` when p = 0 and f > 0,
+  absent when nothing stood, and a `--disposition` naming anything else is refused.
+  `review.spec-audit.disposal` picks the rule past the cutoff: `by-nature`, the default, folds a LOCAL
+  finding and promotes one that needs a new mechanism, and `promote-all`, the old rule, writes the
+  same row with `--folded 0` and refuses `fold`. A row before the cutoff keeps its shape and its
+  grading, which is why it holds neither count. The verb refuses a verdict or a disposition outside
+  its closed set, a missing subject or count, a terminal exit missing either count or a disposition it
+  owes, `fold` at a terminal exit its rule does not admit, `--folded` or `--promoted` anywhere but a
+  spec exit past the cutoff, a sum short of the findings counted, a disposition or either count on a
+  round that is not a terminal exit, and a round on a subject whose loop has already ended. Check 2
+  reads a row of the first shape carrying both counts as owing `blockers + highs`, plus one for the
+  minors when any stood, new non-WONTDO unit ids, and a row of the second as owing nothing on `fold`
+  or no disposition and `promoted - minors`, at least one, on `promote`, and reds a short sum or a
+  disposition its counts do not derive; every other row keeps the floor of one.
+- `--record-round` — `--record-round <slug> --subject <s> --audited "<ids>" --blockers <b> --highs <h>`
+  with a repeatable `--finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>` and a repeatable
+  `--sibling <unit>@rev-<n>`: appends ONE spec-audit round to the build's one tracked chain record,
+  `<date>-build-<first audited id>-chain-rounds.md` in its `build/` folder, and stages it. It needs no
+  run-state file, so an attended run takes the same route, and the record is append-only. The build
+  harness renders this command as `chainRecord` on every hand-out past the disposal and never runs it:
+  the caller commits the disposal's folds and specs, runs it, and commits the record. The round's
+  number is the record's own, the last plus one and never the harness's `round`, and `--subject` is
+  the generation, so a replay is refused. A row is a `local` or `new-mechanism` finding or a sibling
+  edit, and a sibling edit counts as a fold. Before writing a byte it refuses a token outside its
+  grammar, a slug with no build folder, a terminal run, two `-chain-rounds.md` files, a tracked record
+  gone from the worktree, and rows disposing fewer BLOCKER or HIGH ids than `--blockers` or `--highs`
+  count, so a round whose HIGHs reached neither a promotion nor a fold is a refusal.
+- `--chain-verdict` — `--chain-verdict <slug>`: derives whether a spec audit's chain goes on from that
+  record and the roster alone, and writes nothing. It prints one line, and every word exits 0:
+  `unattended: chain <slug> · round <N> · <word> · reason <reason>[ · audit <ids>][ · override specs-audited <ids>]`.
+  The word is `CONTINUE`, `STOP` or `HOLD`, in the five ordered steps the build method's
+  spec-audit section states, and the reason names the step: `unreviewed`, `clean`, `own-work`,
+  `ceiling` or `open`. On CONTINUE, re-invoke the build harness at the next `round` with `auditIds`
+  the ids after `audit`, no `subjectRound` and no `subjects`, and dispatch nothing, because a folded
+  spec is audited again. On STOP, dispatch the roster; a unit after `override specs-audited` is built
+  from its spec as written and closes under a recorded `--override specs-audited`. On HOLD a second
+  line prints the recipe: `--park <slug> --item spec-audit-chain-ceiling`, reap the keepalive, then
+  `--handoff <slug> --code owner-decision --reaped <id>`, because `--hold` refuses that code; an
+  attended run asks the owner. A HOLD stays the answer until the owner moves the ceiling or rules.
+  THE VERDICT IS COMPUTED ONCE, here: the harness renders the two commands and reads no set. Three
+  policy keys answer, each reported by `policy.py get`, and with no policy kit each takes its kit
+  default with a note. `review.spec-audit.disposal` is the rule above, its old value `promote-all`.
+  `review.spec-audit.chain-stop` is `own-work` by default, with `clean-only`, the old value, reading
+  only the clean stop. `review.spec-audit.chain-ceiling` is the round that holds for the owner, a new
+  bound with no old value, and it is no `CEILING` state: that backstop counts one subject's rounds
+  and this counts a chain's. Most chains end at round 2. A HIGH naming one older spec keeps the chain
+  alive, because that spec sits outside the previous round's work. An empty set of HIGHs never reads
+  as the own-work stop. A HIGH with no address is refused at synthesis: `tier2-review.js` holds it a
+  tally fault, both counts go null, and the harness refuses the stated absence.
 - `--check-commit` — `--check-commit <message file>`, run by the `commit-msg` hook on EVERY commit.
   It binds the run whose branch this worktree has checked out and is silent when there is none. A
   `Pass: <unit-id>` trailer must name an open dispatched pass, and the staged paths, less the
@@ -726,6 +774,11 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   off. Pass `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>`
   or `opted in by project default SPEC_AUDIT_DEFAULT: <date>`, and omit it on `not owed (opt-in)`;
   the fan-out hook compares the value with the run's pinned `spec-audit` fact and refuses any other.
+  A run preflighted on or after `SPEC_FOLD_CUTOFF` passes `disposal`, the value
+  `policy.py get review.spec-audit.disposal` reports, and a run before it omits the arg. Under
+  `by-nature` every `units[]` entry also carries its `planState` from `--plan <slug> --paths`,
+  because a disposal naming a unit with no `planState` is refused and its hand-out carries no
+  roster.
   The unit harness then builds ONE unit per call from its brief and its spec. Every call is made by
   `scriptPath`, never by `name`: the fan-out guard's read-window narrowing is conditional on
   `scriptPath`. **Every harness call also carries `roles`**: the JSON the roles kit's
@@ -784,31 +837,39 @@ state it answers (the rule is M4 and M8; the verb entry above states the recordi
 - **CONVERGING** — strictly smaller than the round before. Fold and go again: on a SPEC subject the
   fold fixes what that round confirmed and only the exit promotes; on the closing diff review it
   fixes BLOCKERS only, and the rest carries to the exit (M8).
-- **CONVERGED** — zero blockers; its confirmed highs, mediums and lows are still disposed by
-  severity. The round records `--highs` and `--minors` on every subject, and `--disposition
-  promote` whenever anything stood.
+- **CONVERGED** — zero blockers; its confirmed highs, mediums and lows are still disposed, by
+  severity on the closing diff review and a spec subject before `SPEC_FOLD_CUTOFF`, and by nature
+  past it, as **BOUNDED** states. The round records `--highs` and `--minors` on every subject, and
+  `--disposition promote` whenever anything stood, a spec subject past the cutoff recording the
+  disposition its `--folded` and `--promoted` derive instead.
 - **NON-CONVERGENT** — the count did not shrink. The loop STOPS and every CONFIRMED finding is
   DISPOSED BY SEVERITY: a BLOCKER or HIGH becomes a UNIT whose mechanism closes it, specced, audited
-  as a SPEC, built and closed; a MEDIUM or LOW is PROMOTED too, on every subject, batched as the
+  as a SPEC, built and closed; a MEDIUM or LOW is PROMOTED too, batched as the
   paragraph below states. Never folded, parked, waived, RETIRED or re-reviewed — a promoted unit
   flipped to `WONTDO` would satisfy both the promotion count and `build-complete` — and never
   DEFERRED to be carried forward, except once by a spec run: `build-complete` carries a unit the
   run added only from a spec run whose `--rescope --act add` row stands, and the build run after it
-  must build it. Record `--highs`, `--minors` and `--disposition promote`; `fold` is refused at every
-  exit of every subject.
+  must build it. Record `--highs`, `--minors` and `--disposition promote`; `fold` is refused at this
+  exit. A spec subject past `SPEC_FOLD_CUTOFF` takes **BOUNDED**'s disposal instead.
 - **BOUNDED** — `REVIEW_ROUNDS` (kit default 1) reached on a subject that is not the build slug.
-  Disposed exactly as `NON-CONVERGENT`, recorded with both counts and `promote`. A promotion here is
-  not audited by the round that produced it: after `--rescope --act add` and the new spec, re-invoke
-  the harness at round N+1 — a post-disposal re-invoke passes `auditIds` and no `subjectRound`, a
-  fold re-invoke copies the `subjectRound` the CONVERGING return handed back, and `auditIds` and
-  `subjects` are never passed together. Skip it and `specs-audited` refuses at `--close` where an audit is declared.
+  Before `SPEC_FOLD_CUTOFF`, disposed exactly as `NON-CONVERGENT`, recorded with both counts and
+  `promote`. Past it the build harness's DISPOSAL stage disposes by nature: a LOCAL finding, a BLOCKER
+  too, folds into each spec it touches, a NEW MECHANISM finding is PROMOTED, and a repair's sibling
+  edit rewrites an UNBUILT sibling's spec, while a CLOSED one stays frozen. Each folded or edited spec
+  takes a rev bump and a revision-log line, and the round records `--folded` and `--promoted`. A
+  promotion here is not audited by the round that produced it: after `--rescope --act add` and the
+  new spec, re-invoke the harness at round N+1 — a post-disposal re-invoke passes `auditIds`, under a
+  declared `disposal` the ids `--chain-verdict` names, and no `subjectRound`, a fold re-invoke copies
+  the `subjectRound` the CONVERGING return handed back, and `auditIds` and `subjects` are never
+  passed together. Skip it and `specs-audited` refuses at `--close` where an audit is declared.
 - **CEILING** — the runaway backstop fired: a defect in the predicate. Promote, land anyway, and
-  record it in the build README.
+  record it in the build README. A chain's `review.spec-audit.chain-ceiling` is another bound, which
+  HOLDs a chain of subjects for the owner and is a `--chain-verdict` word, never this state.
 
-**Every terminal exit promotes EVERY confirmed finding, and COUNTS them** (owner rulings of
-2026-10-04 for the closing diff review and 2026-10-05 for a spec subject): a unit per BLOCKER and
+**The closing diff review's exit promotes EVERY confirmed finding, and COUNTS them** (owner ruling of
+2026-10-04, and of 2026-10-05 for a spec subject before `SPEC_FOLD_CUTOFF`): a unit per BLOCKER and
 HIGH, the MEDIUMs and LOWs batched into ONE unit, TWO only across disjoint write sets by M6. The
-terminal round on every subject carries `--highs <H> --minors <M> --disposition promote`, refused on
+terminal round carries `--highs <H> --minors <M> --disposition promote`, refused on
 a round that is not one. On a spec subject the build harness records them itself. Otherwise derive
 both from the harness returns, never the report: on the closing diff review, per round, `<H>` adds
 that round's `highs` and `<M>` adds `confirmed - blockers - highs`, summed over every round; on a
@@ -816,6 +877,14 @@ spec subject recorded by hand they are that exit round's `highs`, and its `confi
 highs` plus every UNVERIFIED finding the disposal promoted, with no summing, because a spec round's
 fold fixes everything that round confirmed. Strictly smaller, never merely different: 2, 1, 2
 changes forever. A subject whose loop ended takes no further round.
+
+**A spec subject past `SPEC_FOLD_CUTOFF` COUNTS its disposal.** Its terminal round also carries
+`--folded <F> --promoted <P>`, and the build harness, given `disposal`, records the exit after the
+disposal at every exit, so the row counts what the disposal did. Recorded by hand, `<H>` and `<M>`
+derive as above, `<M>` adding every UNVERIFIED finding the disposal folded or promoted, and `<F>` and
+`<P>` count findings, never units, and sum to at least `blockers + <H> + <M>`. `--disposition` is what
+the two derive: `promote` when `<P>` is above 0, `fold` when `<P>` is 0 and `<F>` above 0, and no flag
+when both are 0. The chain's next subject is the route for anything confirmed afterwards.
 
 ### Resume
 

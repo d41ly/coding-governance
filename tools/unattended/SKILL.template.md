@@ -118,6 +118,8 @@ unattended.sh --claims  # RUN_CLAIMS on
 unattended.sh --overlaps  # local
 unattended.sh --beat <slug>
 unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
+unattended.sh --record-round <slug> --subject <s> --audited "<ids>" --blockers <N> --highs <N>
+unattended.sh --chain-verdict <slug>
 python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
 ```
 
