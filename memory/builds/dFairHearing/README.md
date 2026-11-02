@@ -78,7 +78,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** INPROGRESS · 38 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14
 ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-19 TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 TOOL-dFairHearing-24 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28
 ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40
@@ -92,7 +92,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-9 — portability, topology and adopter migration as anchored checklist classes, and lens notes derived per preset after a swap](spec/2026-10-23-spec-TOOL-dFairHearing-9.md) | 4 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dFairHearing-4 — skeptic batches sorted by cited address](spec/2026-10-23-spec-TOOL-dFairHearing-4.md) | 5 | 2 | CLOSED | rev-4 | 2026-11-02 |
 | [TOOL-dFairHearing-5 — duplicates counted as merged confirmations, the orphan check on both kinds](spec/2026-10-23-spec-TOOL-dFairHearing-5.md) | 6 | 2 | CLOSED | rev-2 | 2026-11-02 |
-| [TOOL-dFairHearing-6 — items carrying a grade per id, ranked by the highest](spec/2026-10-23-spec-TOOL-dFairHearing-6.md) | 7 | 2 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dFairHearing-6 — items carrying a grade per id, ranked by the highest](spec/2026-10-23-spec-TOOL-dFairHearing-6.md) | 7 | 2 | INPROGRESS | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-7 — refuted claims and same-address twins handed to the synthesizer to flag](spec/2026-10-23-spec-TOOL-dFairHearing-7.md) | 8 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 | [TOOL-dFairHearing-11 — every agent the review harness spawns is typed from a declared stage, and an opted-in review step runs twin finder runs the synthesis merges](spec/2026-10-23-spec-TOOL-dFairHearing-11.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-8 — fix verdicts judged by class behind a switch, and every confirmed finding given one disposition from the report's grammar](spec/2026-10-23-spec-TOOL-dFairHearing-8.md) | 10 | 2 | DEFERRED | rev-2 | 2026-10-23 |
@@ -126,7 +126,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 26 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 139 bound to this build, across 4 record folder(s).
+Records: 140 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
