@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-25 — the `returned` line's units field sits before the agent id, and the format guard's fixtures and guard follow the fence
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 12 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-25-deviation-251.md](../build/2026-11-02-build-TOOL-dCalibratedLens-25-deviation-251.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -23,8 +24,10 @@ end `/<agentId>`, so every returned line carrying the field fails, the live hook
 `tools/hooks/format-guard.test.sh` copies the live fence (`:310-315`) while its fixtures R1, R2 and R3
 (`:485-489`) carry no units field, so the suite reds. The `format-guard self-test` leg's guard names
 neither `AGENTS.md` nor the charter template, so the unit lands green and the red appears on an
-unrelated change. This unit places the field before the run field as an optional bracket, gives the
-fixtures their units cases, and makes a fence change select the leg. It repairs
+unrelated change. This unit places the field before the run field as an optional bracket and gives
+the fixtures their units cases. The renderer that prints the bracket's content
+(`TOOL-dCalibratedLens-31`) and the guard that makes a fence change select the leg
+(`TOOL-dCalibratedLens-37`) are the round-2 audit's repairs of this unit. It repairs
 `TOOL-dCalibratedLens-5`.
 
 ## 2. Scope (IN)
@@ -35,15 +38,18 @@ fixtures their units cases, and makes a fence change select the leg. It repairs
   `coding-governance-agents.template.md` and its render `AGENTS.md`. The agent id stays last, so
   `checkCarries` is unchanged; the bracket is optional to `buildShapeRegex`
   (`tools/hooks/format-guard.js:164-179`), so a returned line without the field still matches; and
-  `print_agent_lines` writes the field always, `-` when the result carries none. Observed by AC1.
+  `print_agent_lines` writes the field always, `-` when the result carries none. The bracket never
+  reaches an emission: `render_shape_line` renders a `[ · …]` group as its content when the fields
+  hold its placeholders and leaves it out otherwise, `TOOL-dCalibratedLens-31`'s S1 (round-2 id 30).
+  Observed by AC1.
 - **S2** — The fixtures, in `tools/hooks/format-guard.test.sh`: R1, R2 and R3 stay as they are (the
   optional form), and three twins R1u, R2u and R3u carry ` · units unit.reuse-first` before their run
   field; each allow arm that asserts allow for R1 to R3 asserts it for the twin too, and one deny arm
   asserts a line whose units field follows the run field is refused. The suite's assertion floor rises
   by the arms added. Observed by AC2.
-- **S3** — The guard, in `tools/gate-legs.json`: the `format-guard self-test` row's `guard` gains
-  `AGENTS.md` and `coding-governance-agents.template.md`, so a fence change selects the leg that copies
-  the fence. Observed by AC3.
+- **S3** — The leg's guard is `TOOL-dCalibratedLens-37`'s (round-2 id 24): it adds `AGENTS.md` alone,
+  a pathspec govkit's check 7c classes `exempt`, because the bare template path falls into no class.
+  This unit edits no guard. NOT OBSERVED here — `TOOL-dCalibratedLens-37` AC1 observes the selection.
 - **S4** — The build probe: the suite is read at the main loop's close RED against a fence whose units
   field trails the run field, and GREEN on S1's fence. Observed by AC2.
 
@@ -53,10 +59,17 @@ fixtures their units cases, and makes a fence change select the leg. It repairs
   as they are, which is the smaller change the skeptic's fix offers first.
 - The `units` content and its tag grammar: unit 5 S1 and id 29 (`TOOL-dCalibratedLens-30`).
 - The `agent` line: it carries no units field.
+- The renderer's bracket rule and its arm: `TOOL-dCalibratedLens-31` (round-2 id 30). The guard:
+  `TOOL-dCalibratedLens-37` (round-2 id 24), which also carries the corrected guard command (round-2
+  ids 5, 16, 23 and 39, `TOOL-dCalibratedLens-41`).
+- AC1 reads the fence a sibling's pass writes and is green once unit 5 lands; it is a precondition of
+  this unit's arms, not an observation of them (the round-2 audit's ids 4, 18 and 29).
 
 ### Edges
 
 - **consumes-from** `TOOL-dCalibratedLens-5` — the `returned` fence of `coding-governance-agents.template.md` and `AGENTS.md`, and `print_agent_lines`' `units` field; without them there is no field whose position the fixtures hold
+- **hands-off** `TOOL-dCalibratedLens-31` — the fence's `[ · units <units>]` group, which that unit's renderer prints as its content and its arm feeds to the guard (round-2 id 30)
+- **hands-off** `TOOL-dCalibratedLens-37` — the fence change and the suite arms, which that unit's guard on `AGENTS.md` selects (round-2 id 24)
 
 ## 4. Design
 
@@ -81,7 +94,6 @@ fixtures their units cases, and makes a fence change select the leg. It repairs
 ### Files touched (estimate)
 
 - `tools/hooks/format-guard.test.sh` — S2
-- `tools/gate-legs.json` — S3
 
 ### Alternatives rejected
 
@@ -97,7 +109,7 @@ fixtures their units cases, and makes a fence change select the leg. It repairs
 - perf / scale — three fixture lines and four arms.
 - error / empty / loading states — a result with no units renders `· units -`, never an empty field.
 - observability — the hook's existing refusal lines.
-- risks — the guard now runs the suite on every charter edit, a cost of seconds.
+- risks — a fence edit selects this suite only once `TOOL-dCalibratedLens-37` lands its guard.
 - testing — S2's arms, read RED and GREEN at the close.
 - migration — N/A: the field is new.
 - user docs — N/A: the fence is the definition; `help/roles.md` is unit 5's.
@@ -111,9 +123,6 @@ fixtures their units cases, and makes a fence change select the leg. It repairs
   six, and the suite's arms are read at the close RED against a trailing-field fence and GREEN on S1's.
   Red when: the fixtures carry no units twin, or a trailing field passes.
   permission: a pass runs no suite; the RED and GREEN reads are the main loop's.
-- **AC3** — When `python -c "import json;print([l['guard'] for l in json.load(open('gate-legs.json'))['legs'] if l['name']=='format-guard self-test'][0])"`
-  runs from the `tools` directory, its list holds `AGENTS.md` and `coding-governance-agents.template.md`.
-  Red when: a fence edit still selects no format-guard leg.
 
 ## 7. Gates
 
@@ -129,6 +138,12 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 35 (HIGH, item H7) of the round-1 spec audit;
   unit 5 amended at the disposal (its rev-2).
+- rev-2 · 2026-11-02 · §1 §3 §4 §5 S1 S3 AC3 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`: S1 names the renderer's group rule (id 30,
+  `TOOL-dCalibratedLens-31`); the guard of S3 and its criterion go to `TOOL-dCalibratedLens-37` with
+  `AGENTS.md` alone (id 24), carrying the corrected command of ids 5, 16, 23 and 39; AC1 stated a
+  precondition (ids 4, 18, 29), both `TOOL-dCalibratedLens-41`; §3 gains the hands-offs to units 31
+  and 37.
 
 ## 10. Reuse audit
 

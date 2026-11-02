@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-28 — no population is read through `gov_record.py find`: probe records and Loop Review records are listed from the index, acts read through the paging act reader
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 5 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-28-deviation-281.md](../build/2026-11-02-build-TOOL-dCalibratedLens-28-deviation-281.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -32,9 +33,10 @@ plant whose 41st record decides. It repairs `TOOL-dCalibratedLens-9`, the first 
   ls-files` over S3's own pathspec `<MEMORY_ROOT>/builds/*/build/*-probe-[0-9]*.md` and reads each
   through `gov_record.py show`, never `find`; unit 16 S4 maps acts to builds and items from `ledgers.py
   acts --build <slug>` (unit 9 S1), whose `read_act_records` pages past the cap
-  (TOOL-dWellOiledMachine-53 S4); unit 6 S6 lists `<MEMORY_ROOT>/loop-review/*-loop-review-*.md` with
-  `git ls-files`, takes the newest by file-name date and then key, and reads it at `HEAD` with `git
-  show`. A `rows match` line that still prints anywhere is read as `unread`, never as a complete set.
+  (TOOL-dWellOiledMachine-53 S4); unit 6 S6 finds and reads the newest `loop-review` record through
+  unit 3's `read_loop_records` and `read_metrics_lines`, reached through `resolve_kit_dir`, so the
+  ordering rule has one copy (round-2 id 10), and `read_loop_records` lists from the revision it
+  reads, `git ls-tree -r --name-only HEAD`, never the index (round-2 id 38). A `rows match` line that still prints anywhere is read as `unread`, never as a complete set.
   Observed by AC1.
 - **S2** — The proof on unit 9, a `--fixture` plant `probes-41` in `tools/loop/loop_review.py`: 41
   probe records of one origin, the 41st by name carrying the only decided verdict; `price --dry-run`
@@ -48,6 +50,8 @@ plant whose 41st record decides. It repairs `TOOL-dCalibratedLens-9`, the first 
 - Units 6 and 16's own 41-record plants: each lands with its amended criteria (unit 6 AC7, unit 16
   AC3), since both build after this unit.
 - The act read's own cost under a fixed timeout: id 51 (`TOOL-dCalibratedLens-30`).
+- AC1 observes only the disposal's text in sibling specs and is green at writing; it is a
+  precondition, not an observation of this unit's build (the round-2 audit's ids 4, 18 and 29).
 
 ### Edges
 
@@ -95,8 +99,10 @@ plant whose 41st record decides. It repairs `TOOL-dCalibratedLens-9`, the first 
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -n '^- \*\*id 50 · '` runs over the specs of units 6, 9 and 16, each prints
-  its §4 "Amendments (round-1 spec audit)" bullet, and each amended S-item opens `(amended, id 50)`.
+  its §4 "Amendments (round-1 spec audit)" bullet, and each amended S-item matches
+  `\(amended, ids? [0-9, ]*\b50\b` (round-2 id 9), so unit 6's `(amended, ids 2, 50)` counts.
   Red when: a sibling still reads a population through `find` with no amendment superseding it.
+  A precondition read at writing: it greps the disposal's text.
 - **AC2** — When `python loop_review.py --fixture --plant probes-41` runs `price --dry-run`, the origin's
   row counts 41 records and `catches` 1.
   Red when: the 41st record is dropped.
@@ -121,6 +127,10 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 50 (HIGH, item H10) of the round-1 spec audit;
   units 9, 6 and 16 amended at the disposal (their rev-2).
+- rev-2 · 2026-11-02 · §3 S1 AC1 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, each `TOOL-dCalibratedLens-41`'s: unit 6's
+  route reads through unit 3's readers (id 10) and lists from `HEAD` (id 38); AC1's match admits an
+  id list (id 9) and is stated a precondition (ids 4, 18, 29).
 
 ## 10. Reuse audit
 

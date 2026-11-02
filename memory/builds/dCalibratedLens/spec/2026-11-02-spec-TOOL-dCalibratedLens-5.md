@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-5 — instruction effectiveness from returns and findings that cite unit tags, and the Loop Review's proposals under `review.loop.retire`, with the keep record
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 11 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0462@cad135ef whole
 **Carries:** node:item.loop.propose
@@ -151,6 +151,7 @@ change record and its `new change` stand-in door); TOOL-dFairHearing-8 S8 (the a
 - **consumes-from** external — PLAY-dOrderedCharter-9, -11, -2 S4 and -15, TOOL-dFairHearing-8 S8 and TOOL-dTotalRecall-1, each DEFERRED at base and of an ancestor or parent build
 - **hands-off** `TOOL-dCalibratedLens-25` — the `returned` fence and `print_agent_lines`' `units` field, whose position that unit's format-guard fixtures hold (id 35)
 - **hands-off** `TOOL-dCalibratedLens-30` — the `[[usage]]` rows of `propose` and `keep`, which the minors batch's `docs_leg.py --list` observation reads (id 39)
+- **consumes-from** `TOOL-dCalibratedLens-35` — the `three-homes` plant's `graded-by-a-row` case, which grades the keep this unit adds to the plant with its `keep` row (round-2 id 1)
 
 ## 4. Design
 
@@ -316,6 +317,19 @@ names; the unit it names owns the finding and its proof.
 - **id 39 · S11 (M19, `TOOL-dCalibratedLens-30`)** — `tools/govkit/usage.toml` gains `[[usage]]`
   rows for `propose` and `keep`, with their flags.
 
+### Amendments (round-2 spec audit)
+
+The round-2 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Its ids restart at 1, so each bullet
+spells `r2 id`; each supersedes the text it names, and the unit it names owns the finding and its
+proof.
+
+- **r2 id 1 · S8, AC9 (H2, `TOOL-dCalibratedLens-35`)** — In the pass that lands the `keep` row,
+  this unit adds one keep record of §4 "The keep record" to `TOOL-dCalibratedLens-19`'s `three-homes`
+  plant in `tools/loop/loop_review.py`, so that plant's `graded-by-a-row` case grades three records
+  from this order on; AC9 also runs that plant and reads `graded-by-a-row — ok` for the keep.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py` (S4 to S8, the fixture plants)
@@ -423,8 +437,9 @@ names; the unit it names owns the finding and its proof.
   second `keep` the same day writes a second file ending `-2.md`; `keep` with an empty `--words` exits 2
   and writes nothing.
   Red when: a pricer ignores the keep, a keep never lapses, or a second keep overwrites the first.
-- **AC9** — (amended, ids 36, 37) When `python record_kinds.py --check` runs in a scratch worktree holding one
-  keep record that lacks `Words`, it exits 1 naming the record; with the field restored it exits 0.
+- **AC9** — (amended, ids 36, 37; r2 id 1) When `python record_kinds.py --check` runs in a scratch worktree holding one
+  keep record that lacks `Words`, it exits 1 naming the record; with the field restored it exits 0;
+  and `python loop_review.py --fixture --plant three-homes` prints `graded-by-a-row — ok` for the keep.
   Red when: the `keep` row's fields do not reach the field check.
   fixture: `record_kinds.py` is TOOL-dTotalRecall-1's, absent at `8bec4cef`.
 - **AC10** — When `grep -n -A8 'name = "review.loop.retire"' tools/policy/catalogue.toml` runs it shows
@@ -509,6 +524,10 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC2 · an appendix fixtu
   (round-1 spec audit)": ids 1 (`TOOL-dCalibratedLens-19`), 36 (`TOOL-dCalibratedLens-20`), 35
   (`TOOL-dCalibratedLens-25`), 3 (`TOOL-dCalibratedLens-22`), 48 (`TOOL-dCalibratedLens-26`), and
   28, 29, 30, 37, 38 and 39 (`TOOL-dCalibratedLens-30`); §3 gains the hands-offs to units 25 and 30.
+- rev-3 · 2026-11-02 · §3 §4 S8 AC9 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 id
+  1 (`TOOL-dCalibratedLens-35`), the keep added to the `three-homes` plant; §3 gains the
+  consumes-from of unit 35.
 
 ## 10. Reuse audit
 

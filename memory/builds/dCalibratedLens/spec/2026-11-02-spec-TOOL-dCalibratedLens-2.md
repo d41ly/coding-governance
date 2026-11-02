@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-2 — the shared value ledger: its snapshot, its view, its row grammar and the `price` verb
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 1 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0459@facc646b whole
 **Carries:** node:record-kind.value-ledger
@@ -143,6 +143,7 @@ The build run re-grounds on each and stops the unit when one is absent.
 - **hands-off** `TOOL-dCalibratedLens-20` — `render_ledger_snapshot` and `write_ledger_snapshot`, whose Serves line that unit's `serves-kinds` plant grades (id 36)
 - **hands-off** `TOOL-dCalibratedLens-26` — `read_catch_events`, `derive_ledger_rows` and `price`, whose observed-leg rule that unit's catch plants prove (id 48)
 - **hands-off** `TOOL-dCalibratedLens-30` — `price` and the `cost` grammar, which the minors batch's `cost-grammar` arm validates (id 9)
+- **hands-off** `TOOL-dCalibratedLens-41` — the `loop-review selftest` row of S11, whose guard that unit widens to the files the loop plants run (round-2 id 13)
 
 ## 4. Design
 
@@ -310,6 +311,20 @@ names; the unit it names owns the finding and its proof.
   one-line `{ "name": ... }` rows of 2026-07-19 included, and `read_leg_rows` matches
   `"name": "<name>"` anywhere on an added line.
 
+### Amendments (round-2 spec audit)
+
+The round-2 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Its ids restart at 1, so each bullet
+spells `r2 id`; each supersedes the text it names, and the unit it names owns the finding and its
+proof.
+
+- **r2 id 17 · id 48's bullet (M9, `TOOL-dCalibratedLens-41`)** — Under `node-journal` an
+  `always_run` leg counts as observed in a windowed GREEN or RED bar only when it declares no
+  `doc_reads`; a leg declaring `doc_reads` is skipped by a docs-mode bar before its guard is read
+  (`tools/run-gates/run-gates.sh:3257-3262`), so it is observed only when a windowed bar named it red,
+  and otherwise its catch columns read `-`.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py`: new (S1 to S6)
@@ -454,6 +469,10 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC7 · a fixtu
   (`TOOL-dCalibratedLens-20`), 48 (`TOOL-dCalibratedLens-26`), and 27, 9, 12, 37, 38, 39, 42, 26 and
   24 (`TOOL-dCalibratedLens-30`); §3 gains the hands-offs to units 19, 20, 26 and 30, and the
   hands-off to unit 4 now names `PROVIDERS` (id 5).
+- rev-3 · 2026-11-02 · §3 §4 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 id
+  17 (`TOOL-dCalibratedLens-41`), the docs-mode rule of id 48's observation; §3 gains the hands-off to
+  unit 41.
 
 ## 10. Reuse audit
 

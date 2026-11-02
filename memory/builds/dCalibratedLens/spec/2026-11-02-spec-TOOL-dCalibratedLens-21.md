@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-21 — one carrier for a multi-line reading: the record's Metrics lines, one per entry, never a `fields`-form field
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-21-deviation-211.md](../build/2026-11-02-build-TOOL-dCalibratedLens-21-deviation-211.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -36,18 +37,25 @@ first multi-line reading to land. It repairs `TOOL-dCalibratedLens-4`.
   one line per role, and `read_measured_item_budget` reads the role's `item-budgets:` Metrics line;
   unit 16 S6 and S7 make `stall-trend` and `bound-evidence` two, one line per tuple and per kept row.
   None of units 4, 6 and 16 edits `tools/memory-tree/record-kinds.toml`, and each one's criterion that
-  read "the field holds the lines" reads the Metrics lines. Observed by AC1.
+  read "the field holds the lines" reads the Metrics lines. Read back, those lines are unit 3's
+  `read_metrics_lines` answer: a list of `(name, value, source)` triples in line order, a repeated
+  name kept once per line, never a mapping (round-2 id 27, `TOOL-dCalibratedLens-39`). A list reading
+  that answers no pair writes one line `<name>: searched-none · <source>`, the spelling unit 3's
+  id-11 amendment gives a source holding nothing (round-2 id 40). Observed by AC2.
 - **S2** — The proof, a `--fixture` plant `metrics-multi` in `tools/loop/loop_review.py`: it runs the
   walk's `gather` and `record` over unit 4's planted caps (the `caps-raise` population of spec-4 AC2)
   and one planted `METRICS` entry answering three pairs, one of them a value holding a `·`; the written
   record carries one `caps:` line per cap and three lines of the planted entry, in list order; the
-  writer refuses nothing; and splitting the `## Metrics` section on its first `: ` and its last ` · `
-  returns every `(name, value, source)` triple as written. Observed by AC2.
+  writer refuses nothing; and `read_metrics_lines` over the written record returns every
+  `(name, value, source)` triple as planted, in order (round-2 id 21). A second planted entry answers
+  an empty list and the record carries its one `searched-none` line (round-2 id 40). Observed by AC2.
 - **S3** — The registry stays four fields: `tomllib` over `tools/memory-tree/record-kinds.toml` gives the
   `loop-review` row the schema `{ form = "fields", fields = ["Key", "Base", "Window", "Ledger"] }`
   after this unit's pass. Observed by AC3.
-- **S4** — The staged break: a reader answering one value carrying a line break still exits the
-  writer's refusal, so the list form is the only way a reading writes several lines. Observed by AC4.
+- **S4** — A reader answering one value carrying a line break is never handed to the writer: the
+  walk's isolation boundary writes `<name>: unread · refused value` for it (round-2 id 31,
+  `TOOL-dCalibratedLens-40`), so the list form is the only way a reading writes several lines and a
+  multi-line answer cannot exit the walk. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -56,11 +64,15 @@ first multi-line reading to land. It repairs `TOOL-dCalibratedLens-4`.
 - Units 6 and 16's own readings: each lands its lines under its amended spec; this unit observes unit
   4's, the only one built before it.
 - Unit 14's `scenario-proposals`, which takes the same carrier under id 47 (`TOOL-dCalibratedLens-30`).
+- The splitter's answer shape and its own plant: `TOOL-dCalibratedLens-39` (round-2 id 27).
+- AC1 observes only the disposal's text in sibling specs and is green at writing; it is a
+  precondition, not an observation of this unit's build (the round-2 audit's ids 4, 18 and 29).
 
 ### Edges
 
 - **consumes-from** `TOOL-dCalibratedLens-4` — the caps step `derive_cap_readings` as a `METRICS` entry, whose lines the plant writes; without it there is no multi-line reading built at this order
-- **consumes-from** `TOOL-dCalibratedLens-3` — `measure_loop_metrics`, `render_loop_record` and its line-break refusal, the writer the plant writes through
+- **consumes-from** `TOOL-dCalibratedLens-3` — `measure_loop_metrics`, `render_loop_record`, `read_metrics_lines` and the isolation boundary, the writer the plant writes through and the splitter it reads back with
+- **hands-off** `TOOL-dCalibratedLens-39` — the list-form `METRICS` answer, whose repeated names that unit's `metrics-repeat` plant reads through the splitter (round-2 id 27)
 
 ## 4. Design
 
@@ -107,8 +119,8 @@ A value may carry ` · `; the split takes the name before the first `: ` and the
 - security — the writer's refusal of a line break stays; the list form adds lines only through the
   writer, each held to the same refusal.
 - perf / scale — one Metrics line per cap, role, tuple or kept row, at most a few hundred per period.
-- error / empty / loading states — an empty list writes no line for that entry; a refusing reader is
-  `TOOL-dCalibratedLens-27`'s `unread` line.
+- error / empty / loading states — an empty list writes one `<name>: searched-none · <source>` line
+  (round-2 id 40); a refusing or multi-line reader is the `unread` line of the isolation boundary.
 - observability — every reading is a named line in the period's record.
 - risks — a source string carrying ` · ` would split wrongly; S2's plant holds the rule.
 - testing — the plant of S2 and the staged break of S4.
@@ -122,16 +134,18 @@ A value may carry ` · `; the split takes the name before the first `: ` and the
   each prints 0, and `grep -n 'answering a LIST' memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-3.md`
   prints the amendment.
   Red when: a sibling still adds a `fields`-form field for a reading.
+  A precondition read at writing: it greps the disposal's text.
 - **AC2** — When `python loop_review.py --fixture --plant metrics-multi` runs, the record holds one
-  `caps:` line per planted cap and three planted lines in order, and the split returns each triple as
-  written.
-  Red when: the writer refuses the multi-line reading, or a line is lost or reordered.
+  `caps:` line per planted cap, three planted lines in order and one `searched-none` line for the
+  empty entry, and `read_metrics_lines` returns each triple as planted.
+  Red when: the writer refuses the multi-line reading, a line is lost or reordered, an empty list
+  writes nothing, or a splitter cutting at the first ` · ` passes.
 - **AC3** — When `python -c "import tomllib;r=[k for k in tomllib.load(open('record-kinds.toml','rb'))['record-kind'] if k['name']=='loop-review'][0];print(r['schema']['fields'])"`
   runs from the memory-tree kit directory after this unit's pass, it prints `['Key', 'Base', 'Window', 'Ledger']`.
   Red when: a reading added a field to the row.
-- **AC4** — When the plant `metrics-multi` runs a reader answering one value carrying a line break, the writer
-  refuses it and names the entry.
-  Red when: a raw multi-line value reaches the record.
+- **AC4** — When the plant `metrics-multi` runs a reader answering one value carrying a line break,
+  the walk exits 0 and the record carries `<entry>: unread · refused value` for it.
+  Red when: a raw multi-line value reaches the record, or the writer's refusal exits the walk.
 
 ## 7. Gates
 
@@ -140,7 +154,7 @@ A value may carry ` · `; the split takes the name before the first `: ` and the
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) is not in the manifest at base
 and is named here in prose; it runs the plant once that unit lands.
 
-New arm: tools/loop/loop_review.py · covers AC2 AC4 · the `metrics-multi` plant, staged red by a writer that joins a list answer into one line · none
+New arm: tools/loop/loop_review.py · covers AC2 AC4 · the `metrics-multi` plant, staged red by a writer that joins a list answer into one line and by a `read_metrics_lines` that cuts at the first ` · ` · none
 
 ## 8. Open questions
 
@@ -150,12 +164,19 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 2 (HIGH, item H3) of the round-1 spec audit;
   units 3, 4, 6 and 16 amended at the disposal (their rev-2).
+- rev-2 · 2026-11-02 · §3 §5 §7 §10 S1 S2 S4 AC1 AC2 AC4 · amended at the disposal of the round-2 spec
+  audit `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`: the splitter's answer shape (id 27,
+  `TOOL-dCalibratedLens-39`); a multi-line answer read as `unread · refused value` (id 31,
+  `TOOL-dCalibratedLens-40`); the plant parsing through `read_metrics_lines` (id 21), the empty list's
+  `searched-none` line (id 40) and AC1 stated a precondition (ids 4, 18, 29), all
+  `TOOL-dCalibratedLens-41`; §3 gains the hands-off to unit 39.
 
 ## 10. Reuse audit
 
 The seam extended is unit 3's `METRICS` table and its Metrics-line writer, the carrier units 9, 11,
 15 and 17 already use; this unit widens a reader's answer from one pair to a list and adds no
-carrier. `python tools/codebase-map/reuse_lookup.py "isolate each reader so one failure becomes an
+carrier. The plant writes through `render_loop_record` and reads back through `read_metrics_lines`,
+both unit 3's, and copies neither (round-2 id 21). `python tools/codebase-map/reuse_lookup.py "isolate each reader so one failure becomes an
 unread line, never the walk's exit"`, run once for the set, ranked name stems only; the loop kit is
 absent at base, so no existing code seam fits beyond the sibling specs. The recall probe returned
 TOOL-cMendedVintage-19, the placement ruling this unit's order follows.

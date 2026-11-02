@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-1 — each stage review's lenses and effort: four stage literals in the lens catalogue, chosen by the breakpoint's stage, run at `review.<stage>.effort`
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 16 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 16 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0458@5429e502 whole
 **Carries:** node:policy-key.review.<stage>.effort
@@ -256,6 +256,17 @@ names; the unit it names owns the finding and its proof.
   preset stays `unit-spec` until this build's Plan lenses land, is rewritten in this pass, and AC11
   also runs `grep -c 'PLAN_LENSES' help/loop.md`, at least 1.
 
+### Amendments (round-2 spec audit)
+
+The round-2 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Its ids restart at 1, so each bullet
+spells `r2 id`; each supersedes the text it names, and the unit it names owns the finding and its
+proof.
+
+- **r2 id 15 · AC3 (M8, `TOOL-dCalibratedLens-41`)** — AC3's own text carries the `node -e` payload
+  pipe, so a builder following the criterion runs the observation id 16 asks for.
+
 ### Files touched (estimate)
 
 - `tools/workflows/lenses.toml`
@@ -315,8 +326,10 @@ names; the unit it names owns the finding and its proof.
 - **AC2** — When `bash tools/workflows/check-verifier-fanout.sh tools/workflows/tier2-review.js` runs,
   its `slots` line names each of the four stage literals holding 5 and it exits 0.
   Red when: a stage's drawn row lacks the stage in `default_in`, so its literal renders four slots.
-- **AC3** — (amended, id 16) When `node tools/hooks/agent-cap.js --only=scripts` runs over the re-rendered harness, it
-  exits 0.
+- **AC3** — (amended, id 16; r2 id 15) When `node -e` builds `{"tool_name": "Workflow", "tool_input": {"script": <text>}}`
+  from the re-rendered `tools/workflows/tier2-review.js` and pipes it to
+  `node tools/hooks/agent-cap.js --only=scripts`, the hook exits 0; a bare invocation with no stdin reads no harness and is not this
+  observation.
   Red when: the receiver's ternary over seven literals is denied, so no review can spawn.
 - **AC4** — When `python review_pin.py --subject <a design record> --stage deploy`
   runs, it prints `{"preset": "deploy"}`; with `--stage build` it prints the subject mapping's line,
@@ -422,6 +435,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC9 · a `--trigger` call
   `2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit`, §4 "Amendments (round-1 spec
   audit)": ids 16 (`TOOL-dCalibratedLens-24`), 4 (`TOOL-dCalibratedLens-23`) and 43
   (`TOOL-dCalibratedLens-30`); §3 gains the hands-off to `TOOL-dCalibratedLens-24`.
+- rev-3 · 2026-11-02 · §4 AC3 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 id
+  15 (`TOOL-dCalibratedLens-41`), AC3's text carrying the payload.
 
 ## 10. Reuse audit
 

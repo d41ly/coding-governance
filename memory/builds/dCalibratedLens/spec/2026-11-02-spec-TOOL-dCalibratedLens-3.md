@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-3 — the Loop Review: a cadence step run as `review.loop.cadence` says, its lease keyed by the selected period, its walk and its record
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0460@401ecbd8 whole
 **Carries:** node:record-kind.loop-review
@@ -95,7 +95,8 @@ re-grounds on each and stops the unit when one is absent.
   key's, so a recurrence appends its receipt to the open intake, route `seen`, and a new key is route
   `filed` (TOOL-dWellOiledMachine-4's content-key rule, the route TOOL-dTendedCadence-15 S2 takes). A
   proposal with an empty `accept` is refused, `loop — refused: <kind> <id> carries no accept line`, and
-  nothing is filed for it. `--dry-run` prints each text and route and files nothing. No proposal: `loop —
+  nothing is filed for it; (r2 id 7) that line is the proposal's own refusal and not the file item's,
+  so the walk goes on, the other proposals are filed once, and the period records. `--dry-run` prints each text and route and files nothing. No proposal: `loop —
   <key> · item.loop.file · 0 proposal(s)`. Observed by AC5.
 - **S8** — (amended, id 30) `loop.record`, `render_loop_record(key, base, window, ledger, metrics, filed)` and
   `write_loop_record(root, ...)`, per §4 "The record", at `<MEMORY_ROOT>/loop-review/<date>-loop-review-<key>.md`,
@@ -153,6 +154,8 @@ re-grounds on each and stops the unit when one is absent.
 - **hands-off** `TOOL-dCalibratedLens-22` — `run_loop_walk` and `run_loop_file`, the one proposal route that unit's `every-proposer` plant proves (id 3)
 - **hands-off** `TOOL-dCalibratedLens-27` — `run_loop_walk` and `render_loop_record`, the isolated readers and the pre-render that unit's `reader-raises` and `record-refuses` plants prove (id 49)
 - **hands-off** `TOOL-dCalibratedLens-30` — `read_loop_records` and the walk's window, which the minors batch's `keep-after-review` and `at-year-back` arms run (ids 6, 30)
+- **hands-off** `TOOL-dCalibratedLens-39` — `read_metrics_lines` and `render_loop_record`, whose list-of-triples answer that unit's `metrics-repeat` plant holds (round-2 id 27)
+- **hands-off** `TOOL-dCalibratedLens-40` — the walk's isolation boundary and `read_metrics_lines`, whose folded `<why>` that unit's `reader-raises-multiline` case reads (round-2 id 31)
 
 ## 4. Design
 
@@ -313,6 +316,35 @@ names; the unit it names owns the finding and its proof.
 - **id 12 · AC6 (L2, `TOOL-dCalibratedLens-30`)** — Corrected in place: AC6's `**Ledger:**` is the
   snapshot path `record` writes beside the record.
 
+### Amendments (round-2 spec audit)
+
+The round-2 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Its ids restart at 1, so each bullet
+spells `r2 id`; each supersedes the text it names, and the unit it names owns the finding and its
+proof.
+
+- **r2 id 27 · S8, id 30's bullet (H6, `TOOL-dCalibratedLens-39`)** — `read_metrics_lines(text)`
+  returns a list of `(name, value, source)` triples, one per line of the `## Metrics` section in the
+  order the lines appear, a repeated name kept as one triple per line, each line split on its first
+  `: ` and its last ` · `; a line with no `: ` or no ` · ` is a `ValueError` naming it. No caller reads
+  the answer as a mapping.
+- **r2 id 31 · S2, S5, id 49's bullet (H7, `TOOL-dCalibratedLens-40`)** — At the isolation boundary
+  `<why>` is `<exception class>: <message>` with every line break made a space and every ` · ` made
+  `, `; and a reading whose answered value or source carries a line break is written
+  `<name>: unread · refused value`, never handed to the writer. No isolation path exits the walk.
+- **r2 id 7 · S2, S7, id 49's bullet (M4, `TOOL-dCalibratedLens-41`)** — An empty-`accept` refusal is
+  a per-proposal line and not the file item's refusal, so S2's exit 1 does not follow from it.
+- **r2 id 22 · S2, S5, id 49's bullet (M11, `TOOL-dCalibratedLens-41`)** — The gather item's outcome
+  line counts its unread readings: `loop — <key> · item.loop.gather · measured · <n> unread:
+  <names>`, the plain `measured` when n is 0.
+- **r2 id 20 · id 30's bullet (M5, `TOOL-dCalibratedLens-41`)** — The callers of
+  `read_loop_records` and `read_metrics_lines` are units 5 S7, 6 S6, 15 S6, 16 S6 and 17 S5.
+- **r2 id 38 · id 30's bullet (M5, `TOOL-dCalibratedLens-41`)** — `read_loop_records` lists
+  `git ls-tree -r --name-only HEAD -- 'memory/loop-review/*-loop-review-*.md'`, the revision it reads
+  each record at, never `git ls-files`, so a record staged and not committed is neither listed nor
+  read.
+
 ### Files touched (estimate)
 
 - `tools/loop/loop_review.py`: the walk, the four verbs and the fixture cases (S2, S3, S5 to S8, S12)
@@ -465,6 +497,10 @@ New arm: tools/loop/loop_review.py · covers AC1 AC3 AC4 AC5 AC6 AC7 · the `--f
   (`TOOL-dCalibratedLens-27`), and 11, 30, 25, 26, 37, 38, 39, 13 and 12
   (`TOOL-dCalibratedLens-30`); §8 gains F5 (id 26); §3 gains the hands-offs to units 19, 20, 21, 22,
   27 and 30.
+- rev-3 · 2026-11-02 · §3 §4 S2 S5 S7 S8 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 ids
+  27 (`TOOL-dCalibratedLens-39`) and 31 (`TOOL-dCalibratedLens-40`), and r2 ids 7, 22, 20 and 38
+  (`TOOL-dCalibratedLens-41`); §3 gains the hands-offs to units 39 and 40.
 
 ## 10. Reuse audit
 

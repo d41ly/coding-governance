@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-19 — the three Loop Review record kinds homed at their id-rules' globs, so no record sits under another kind's home
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-11-02-build-TOOL-dCalibratedLens-19-deviation-191.md](../build/2026-11-02-build-TOOL-dCalibratedLens-19-deviation-191.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -21,12 +22,14 @@ Close finding id 1, HIGH, item H1 of the round-1 spec audit
 row (unit 2), the `loop-review` row (unit 3) and the `keep` row (unit 5) of
 `tools/memory-tree/record-kinds.toml` each set `home = "<MEMORY_ROOT>/loop-review/"` with
 `form = "fields"` and a different field list (spec-2 §4 "The registry row", spec-3 §4 "The registry
-row", spec-5 §4 "The registry row"). TOOL-dTotalRecall-1 S4 grades every tracked record under a
-row's home against that row's fields, so once one record of each kind is tracked each is graded
-against the other two lists, and spec-5 AC9 cannot pass. TOOL-dTotalRecall-42 S4 also refuses a home
-ending in `/`. This unit makes each home the glob of its own `id-rule`, so the three homes match
-disjoint file sets, and proves it on a tree holding one record of each kind. It repairs
-`TOOL-dCalibratedLens-3`, the unit at which the second row of the shared home lands.
+row", spec-5 §4 "The registry row"). The ancestor these rows meet is TOOL-dTotalRecall-42 at rev-2,
+read at its newest revision: its S4 refuses a home that ends in `/` or names a directory, naming the
+row, so all three rows red the check as written; its S5 grades a record only against the row its
+Serves kind names, so a record under two homes is graded once and overlapping homes give no red.
+TOOL-dTotalRecall-1 S4's reading, every record under a home graded by that home's row, is the one -42
+S5 replaced. This unit makes each home the glob of its own `id-rule`, which S4 admits and which keeps
+each home naming its own kind's files, and proves it on a tree holding a snapshot and a record. It
+repairs `TOOL-dCalibratedLens-3`, the unit at which the second row of the shared home lands.
 
 ## 2. Scope (IN)
 
@@ -37,18 +40,23 @@ disjoint file sets, and proves it on a tree holding one record of each kind. It 
   with this repository's memory root as TOOL-dTotalRecall-42 S1 spells the shape-run home; and unit 2
   S8's check-3 prose names `loop-review/` and its THREE kinds. The folder, the file names and every
   reader of a record path are unchanged, because the glob narrows what a row admits and moves no
-  file. Observed by AC1 and AC2.
+  file. That the three globs match disjoint files is observed by `TOOL-dCalibratedLens-33`'s
+  `disjoint-homes` case, never inferred from the record-kind check, which grades by Serves kind.
+  Observed by AC2.
 - **S2** — The proof, a `--fixture` plant `three-homes` in `tools/loop/loop_review.py`: in a scratch
-  worktree it writes one snapshot through `write_ledger_snapshot`, one record through
-  `write_loop_record` and one keep file of §4 "The keep", commits them, and runs
-  `python <memory-tree kit>/record_kinds.py --check` there as a bounded subprocess (60 s). Each record
-  is graded against its own row only: the check exits 0, and the same tree with the keep's `Words`
-  line absent exits 1 naming the keep's path and `Words` and naming neither other record. A
-  `record_kinds.py` absent from the scratch tree's kit prints `three-homes — unread · record_kinds.py
-  absent` and fails the plant, never passes it. Observed by AC2 and AC3.
-- **S3** — The staged break for the plant: the same three records under rows whose homes are all
-  `memory/loop-review/*.md` make the check name the snapshot or the record against a field it does not
-  carry, so the plant reds when the homes overlap. Observed by AC3.
+  worktree it writes one snapshot through `write_ledger_snapshot` and one record through
+  `write_loop_record`, commits them, and runs `python <memory-tree kit>/record_kinds.py --check` there
+  as a bounded subprocess (60 s). The check exits 0, and the same tree with the snapshot's
+  `**Window:**` line absent exits 1 naming the snapshot's path and `Window` and not naming the record,
+  the per-record grading TOOL-dTotalRecall-42 S5 gives. The plant writes no keep at this order: the
+  `keep` row is unit 5's, at order 11, and unit 5 adds its keep to this plant in that pass (round-2 id
+  1, `TOOL-dCalibratedLens-35`). A `record_kinds.py` absent from the scratch tree's kit prints
+  `three-homes — unread · record_kinds.py absent` and fails the plant, never passes it. Observed by
+  AC2 and AC3.
+- **S3** — The plant's red twin is `TOOL-dCalibratedLens-32`'s `bare-home` case: the real
+  `loop-review` row's home rewritten in place to the bare folder, which TOOL-dTotalRecall-42 S4
+  refuses naming the row. Its red rests on that clause; no case here expects a cross-graded record,
+  since -42 S5 gives none. Observed by AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -61,11 +69,19 @@ disjoint file sets, and proves it on a tree holding one record of each kind. It 
 - The `**Serves:**` line each template needs for TOOL-dTotalRecall-42 S5's kind derivation:
   `TOOL-dCalibratedLens-20`, id 36.
 - The `unarmed` key and the check run after each landing: `TOOL-dCalibratedLens-30`, id 37.
+- The red twin, the disjointness case and the graded-by-a-row case: `TOOL-dCalibratedLens-32`, `-33`
+  and `-35` (the round-2 audit's ids 26, 2 and 1). The leg's guard reaching `record_kinds.py`:
+  `TOOL-dCalibratedLens-41`, id 13.
+- AC1 observes only the disposal's text in sibling specs and the row this pass writes, and is a
+  precondition, not an observation of the plant (the round-2 audit's ids 4, 18 and 29).
 
 ### Edges
 
 - **consumes-from** `TOOL-dCalibratedLens-2` — `write_ledger_snapshot` and the `value-ledger` row, whose home S1 narrows; without them the plant has no snapshot to grade
 - **consumes-from** `TOOL-dCalibratedLens-3` — `write_loop_record`, the `loop-review` row and the `--fixture` frame the plant joins; without them there is no record and no plant runner
+- **hands-off** `TOOL-dCalibratedLens-32` — the `three-homes` plant and its scratch worktree, which that unit's `bare-home` case mutates (round-2 id 26)
+- **hands-off** `TOOL-dCalibratedLens-33` — the plant's committed records, which that unit's `disjoint-homes` case lists (round-2 id 2)
+- **hands-off** `TOOL-dCalibratedLens-35` — the records the plant writes, which that unit's `graded-by-a-row` case grades (round-2 id 1)
 
 ## 4. Design
 
@@ -82,19 +98,8 @@ disjoint file sets, and proves it on a tree holding one record of each kind. It 
 
 ### The keep
 
-The plant's keep file is the shape spec-5 §4 "The keep record" gives, written by the plant itself
-because `loop_review.py keep` is unit 5's and lands later (order 11):
-
-```markdown
-# Keep — leg alpha
-
-**Serves:** keep TOOL-dCalibratedLens-5
-
-- **Kind:** leg
-- **Id:** alpha
-- **Words:** "keep alpha"
-- **Caused-by:** INTAKE-1
-```
+The plant writes no keep at this order (round-2 id 1). The keep record's shape is spec-5 §4 "The keep
+record", and unit 5 adds one to this plant when it lands the `keep` row.
 
 ### Inventory
 
@@ -108,6 +113,8 @@ because `loop_review.py keep` is unit 5's and lands later (order 11):
 
 ### Alternatives rejected
 
+- **A staged break of overlapping homes.** Rejected at the round-2 audit (id 26): TOOL-dTotalRecall-42
+  S5 grades by Serves kind, so the overlap exits 0 and the twin can never red.
 - **A sibling directory per kind** (`loop-review/reviews/`, `/ledger/`, `/keeps/`). The test: count the
   readers that name the folder in the audited specs, units 2 S7, 15 S6, 16 S6 and 17 S5; each would
   move, and the view's reader too, for a disjointness the id-rule globs already give with none moving.
@@ -122,9 +129,9 @@ because `loop_review.py keep` is unit 5's and lands later (order 11):
 - error / empty / loading states — an absent `record_kinds.py` fails the plant with an `unread` line,
   never a pass.
 - observability — the check's own lines name the record and the field.
-- risks — a fourth kind added under `loop-review/` later must take its own id-rule glob; the plant
-  reds if it takes the bare folder.
-- testing — the plant of S2 and its staged break of S3.
+- risks — a fourth kind added under `loop-review/` later must take its own id-rule glob; the
+  `bare-home` case reds if a row takes the bare folder.
+- testing — the plant of S2; its red twin is `TOOL-dCalibratedLens-32`'s case.
 - migration — N/A: no record exists under `loop-review/` at base.
 - user docs — N/A: no help page names a registry home.
 
@@ -135,13 +142,15 @@ because `loop_review.py keep` is unit 5's and lands later (order 11):
   `grep -c 'home = "memory/loop-review/\*-keep-\*.md"' memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-5.md`,
   run from the repository root, prints 1.
   Red when: a row's home is the bare folder, or unit 5's keep row was not amended.
+  A precondition read at writing: it greps the disposal's text and the row this pass writes.
 - **AC2** — When `python loop_review.py --fixture --plant three-homes` runs from the loop kit
-  directory, the plant prints `three-homes — ok` and `record_kinds.py --check` inside it exited 0.
-  Red when: any record is graded against another kind's fields.
+  directory, the plant prints `three-homes — ok` and `record_kinds.py --check` inside it exited 0
+  over the snapshot and the record.
+  Red when: a narrowed home is refused, or a planted record is graded against another kind's fields.
   fixture: `record_kinds.py` is TOOL-dTotalRecall-1's, absent at `8bec4cef`; a build-run precondition.
-- **AC3** — When the same plant runs with the keep's `Words` line removed, the check exits 1 naming the
-  keep's path and `Words` only; and under the staged break of S3 it names the snapshot or the record.
-  Red when: the missing field passes, or the overlapping homes pass.
+- **AC3** — When the same plant runs with the snapshot's `**Window:**` line cut, `record_kinds.py
+  --check` exits 1 naming the snapshot's path and `Window` and not the record.
+  Red when: the missing field passes, or the record is named for the snapshot's field.
 
 ## 7. Gates
 
@@ -150,7 +159,7 @@ because `loop_review.py keep` is unit 5's and lands later (order 11):
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) is not in the manifest at base
 and is named here in prose; it runs the plant once that unit lands.
 
-New arm: tools/loop/loop_review.py · covers AC2 AC3 · the `three-homes` plant, staged red by three rows whose homes are all `memory/loop-review/*.md` · none
+New arm: tools/loop/loop_review.py · covers AC2 AC3 · the `three-homes` plant, staged red by the snapshot's `**Window:**` line cut; its home red twin is `TOOL-dCalibratedLens-32`'s · none
 
 ## 8. Open questions
 
@@ -160,6 +169,13 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 1 (HIGH, item H1) of the round-1 spec audit;
   the rows of units 2, 3 and 5 amended at the disposal (their rev-2).
+- rev-2 · 2026-11-02 · §1 §3 §4 §5 §7 S1 S2 S3 AC1 AC2 AC3 · amended at the disposal of the round-2
+  spec audit `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`: §1 re-grounded on
+  TOOL-dTotalRecall-42 S4 and S5 (id 11, `TOOL-dCalibratedLens-34`); S3's overlap twin replaced by
+  the bare-folder case (id 26, `TOOL-dCalibratedLens-32`); S1's disjointness pointed at the listing
+  case (id 2, `TOOL-dCalibratedLens-33`); the plant writes no keep and AC3 reads the snapshot (id 1,
+  `TOOL-dCalibratedLens-35`); AC1 stated a precondition (ids 4, 18, 29) and the guard pointer added
+  (id 13), both `TOOL-dCalibratedLens-41`; §3 gains the hands-offs to units 32, 33 and 35.
 
 ## 10. Reuse audit
 

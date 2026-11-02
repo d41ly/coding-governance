@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-30 — the round-1 spec audit's 41 minors batched: each correction carried by the sibling it lands on, and six arms that hold the classes no sibling owns
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 18 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 18 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-30-deviation-301.md](../build/2026-11-02-build-TOOL-dCalibratedLens-30-deviation-301.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 |
 
 <!-- /gen:spec-records -->
 
@@ -43,92 +44,134 @@ once every sibling has landed.
   unit 15's `derive_cap_rows`, the current period's, and names no reader of the view. Observed by
   AC1.
 - **S2** — id 32, M1, landing on unit 4. S4 and S6 take the walk's window, so the cost and the evidence
-  are one period's. Observed by AC1.
+  are one period's. NOT OBSERVED here — the sibling it lands on observes it through its amended
+  criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S3** — id 6, M2, landing on units 4 and 16. `read_cap_evidence`, `derive_cap_readings` and
-  `read_journal_lines` take the walk's `(start, end, days)` and read no policy value. Observed by AC1
-  and AC2.
+  `read_journal_lines` take the walk's `(start, end, days)` and read no policy value. Observed by AC2;
+  AC1 is a spec-text precondition (round-2 id 3).
 - **S4** — id 7, M3, landing on unit 14. A scenario proposal carries `kind`, `id`, `action`, `accept`
-  and `row`, and AC6 observes it filed. Observed by AC1.
+  and `row`, and AC6 observes it filed. NOT OBSERVED here — the sibling it lands on observes it
+  through its amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S5** — id 8, M4, landing on units 13 and 10. Unit 13 withdraws the claim that a brief is cited by
-  its tag; unit 10's guard and both-ways check reach `tools/workflows/lenses.toml`. Observed by AC1.
+  its tag; unit 10's guard and both-ways check reach `tools/workflows/lenses.toml`. NOT OBSERVED
+  here — the sibling it lands on observes it through its amended criterion; AC1 is a spec-text
+  precondition (round-2 id 3).
 - **S6** — id 9, M5, landing on units 2 and 4. The `cost` grammar admits the unit `B`, and unit 4's AC7
-  plants `4433344B/212`. Observed by AC1 and AC3.
+  plants `4433344B/212`. Observed by AC3; AC1 is a spec-text precondition (round-2 id 3).
 - **S7** — id 10, M6, landing on unit 15. The previous review is the newest committed
   `*-loop-review-*.md` other than this period's, read through `read_loop_records`, never the newest
-  commit touching the folder. Observed by AC1 and AC4.
+  commit touching the folder. Observed by AC4; AC1 is a spec-text precondition (round-2 id 3).
 - **S8** — id 46, M6, the same defect raised by a second lens, landing on unit 15, closed by S7's rule.
-  Observed by AC1 and AC4.
+  Observed by AC4; AC1 is a spec-text precondition (round-2 id 3).
 - **S9** — id 17, M7, landing on unit 4. AC2's fixture pins `core.autocrlf=false` and asserts a planted
-  blob holds a CR. Observed by AC1.
+  blob holds a CR. NOT OBSERVED here — the sibling it lands on observes it through its amended
+  criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S10** — id 18, M8, landing on unit 16. The act-ceiling row is hours to two decimals, so a `hold` is
-  reachable at the default 1.5. Observed by AC1 and AC5.
+  reachable at the default 1.5. Observed by AC5; AC1 is a spec-text precondition (round-2 id 3).
 - **S11** — id 25, M9, landing on unit 3. The walk reads its rows through `loop_lib.read_items` and
-  takes `check_program`'s refusals; `read_loop_items` is not minted. Observed by AC1.
+  takes `check_program`'s refusals; `read_loop_items` is not minted. NOT OBSERVED here — the sibling
+  it lands on observes it through its amended criterion; AC1 is a spec-text precondition (round-2 id
+  3).
 - **S12** — id 26, M10, landing on units 3 and 2. Unit 3's §8 F5 places the rows against
   TOOL-dTendedCadence-1 F1 and ask TOOL-dTendedCadence-25 and states the ask admitting
-  `cadence.loop`; unit 2 S9 mirrors it. Observed by AC1.
+  `cadence.loop`; unit 2 S9 mirrors it. NOT OBSERVED here — the sibling it lands on observes it
+  through its amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S13** — id 27, M11, landing on unit 2. The node-journal reds come from `build_leg_yield` through a
-  windowed `runlog.py journal --by-leg`, never a second counter. Observed by AC1.
+  windowed `runlog.py journal --by-leg`, never a second counter. NOT OBSERVED here — the sibling it
+  lands on observes it through its amended criterion; AC1 is a spec-text precondition (round-2 id
+  3).
 - **S14** — id 28, M12, landing on unit 5. `read_finding_units` reads through `review_replay.py
-  --confirmed-rows`, so `parse_appendix_rows`' liveness check holds. Observed by AC1.
+  --confirmed-rows`, so `parse_appendix_rows`' liveness check holds. NOT OBSERVED here — the sibling
+  it lands on observes it through its amended criterion; AC1 is a spec-text precondition (round-2 id
+  3).
 - **S15** — id 29, M13, landing on unit 5. The cited-tag check is PLAY-dOrderedCharter-19's `TAG_RE` and
-  `TAG_MAX_BYTES`, its Python copies held by a `PARITY_ROWS` row. Observed by AC1.
+  `TAG_MAX_BYTES`, its Python copies held by a `PARITY_ROWS` row. NOT OBSERVED here — the sibling it
+  lands on observes it through its amended criterion; AC1 is a spec-text precondition (round-2 id
+  3).
 - **S16** — id 30, M14, landing on units 3, 5, 15, 16 and 17. One reader of earlier records,
-  `read_loop_records`, and one Metrics splitter, `read_metrics_lines`, in unit 3; units 5, 15, 16 and
-  17 call them. Observed by AC1 and AC4.
+  `read_loop_records`, and one Metrics splitter, `read_metrics_lines`, in unit 3; units 5, 6, 15, 16
+  and 17 call them (unit 6 added at round 2, id 20). Observed by AC4; AC1 is a spec-text
+  precondition (round-2 id 3).
 - **S17** — id 31, M15, landing on units 9 and 16. Unit 16 reads acts through `ledgers.py acts` and the
-  runtime journal through unit 9's `read_runtime_journal`. Observed by AC1.
+  runtime journal through unit 9's `read_runtime_journal`. NOT OBSERVED here — the sibling it lands
+  on observes it through its amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S18** — id 33, M16, landing on unit 8. `fill` rewrites the appendix through a new
-  `read_appendix_table` in `review_replay.py`, which returns every row. Observed by AC1.
+  `read_appendix_table` in `review_replay.py`, which returns every row. NOT OBSERVED here — the
+  sibling it lands on observes it through its amended criterion; AC1 is a spec-text precondition
+  (round-2 id 3).
 - **S19** — id 37, M17, landing on units 2, 3 and 5. Each registry row carries `unarmed` until its
   first record is tracked, and each unit runs `record_kinds.py --check` after its pass. Observed by
   AC1.
 - **S20** — id 38, M18, landing on units 2, 3 and 5. Each row edit is followed by `record_kinds.py
-  --write` and `adopt-memory-tree.sh --render`, both HYGIENE copies in one commit. Observed by AC1.
+  --write` and `adopt-memory-tree.sh --render`, both HYGIENE copies in one commit. NOT OBSERVED here
+  — the sibling it lands on observes it through its amended criterion; AC1 is a spec-text
+  precondition (round-2 id 3).
 - **S21** — id 39, M19, landing on units 2, 3, 5, 7, 9, 11, 12, 15 and 17. Every `loop_review.py` verb or
-  flag on `help/loop-review.md` has its `[[usage]]` row in `tools/govkit/usage.toml`. Observed by AC1
-  and AC6.
+  flag on `help/loop-review.md` has its `[[usage]]` row in `tools/govkit/usage.toml`. Observed by AC6;
+  AC1 is a spec-text precondition (round-2 id 3).
 - **S22** — id 40, M20, landing on unit 13. The `lens` surface class has its `[[class]]` row in
-  `usage.toml`, and unit 13's §7 names `docs`. Observed by AC1.
+  `usage.toml`, and unit 13's §7 names `docs`. NOT OBSERVED here — the sibling it lands on observes
+  it through its amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S23** — id 41, M21, landing on unit 10. The held leg `instruction-eval` ships with its budget, pin
-  and ceiling-evidence rows. Observed by AC1.
+  and ceiling-evidence rows. NOT OBSERVED here — the sibling it lands on observes it through its
+  amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S24** — id 42, M22, landing on units 2, 4 and 13. Each new leg is claimed by a feature dossier,
-  names its subject and chunk, and is pinned and, when held, budgeted. Observed by AC1.
+  names its subject and chunk, and is pinned and, when held, budgeted. NOT OBSERVED here — the
+  sibling it lands on observes it through its amended criterion; AC1 is a spec-text precondition
+  (round-2 id 3).
 - **S25** — id 43, M23, landing on unit 1. The three TOOL-dRankedPlan-6 arms the preset move flips are
-  named, and `help/loop.md`'s Plan Review paragraph is rewritten. Observed by AC1.
+  named, and `help/loop.md`'s Plan Review paragraph is rewritten. NOT OBSERVED here — the sibling it
+  lands on observes it through its amended criterion; AC1 is a spec-text precondition (round-2 id
+  3).
 - **S26** — id 44, M24, landing on unit 14. `lens-schema.toml` declares `replay`, admitted on an
-  overlay row only. Observed by AC1.
+  overlay row only. NOT OBSERVED here — the sibling it lands on observes it through its amended
+  criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S27** — id 45, M25, the blast-radius lens's copy of H3 (id 2), landing on units 3, 4, 6 and 16. It
   closes with `TOOL-dCalibratedLens-21`'s carrier, whose `id 2` amendments those four specs carry, and
-  this item observes them. Observed by AC1.
+  this item observes them. NOT OBSERVED here — the sibling it lands on observes it through its
+  amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S28** — id 51, M26, landing on units 9 and 12. `ledgers.py acts --since` filters by file-name date
-  and reads the act records in one process; `estimate` stays all-time. Observed by AC1.
+  and reads the act records in one process; `estimate` stays all-time. NOT OBSERVED here — the
+  sibling it lands on observes it through its amended criterion; AC1 is a spec-text precondition
+  (round-2 id 3).
 - **S29** — id 53, M27, landing on unit 11. The landings are windowed by committer time before any
-  `read_landing` fetch. Observed by AC1.
+  `read_landing` fetch. NOT OBSERVED here — the sibling it lands on observes it through its amended
+  criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S30** — id 54, M28, landing on unit 16. The kept population is every CLOSED build no earlier
-  record's `bound-evidence` lines name. Observed by AC1.
+  record's `bound-evidence` lines name. NOT OBSERVED here — the sibling it lands on observes it
+  through its amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S31** — id 11, L1, landing on units 3, 9 and 17. `searched-none` is an empty source and
-  `unread · <reason>` a dead one, everywhere. Observed by AC1 and AC7.
+  `unread · <reason>` a dead one, everywhere. Observed by AC7; AC1 is a spec-text precondition
+  (round-2 id 3).
 - **S32** — id 12, L2, landing on units 2 and 3. The snapshot's `writer` names both doors, and unit 3's
-  AC6 names the path `record` writes. Observed by AC1.
+  AC6 names the path `record` writes. NOT OBSERVED here — the sibling it lands on observes it
+  through its amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S33** — id 13, L3, landing on unit 3. The goal counts five rows, unit 5 adding the sixth. Observed
   by AC1.
 - **S34** — id 14, L4, landing on unit 13. The `opt-in-unknown` table row and AC5 name the same
-  refusal text. Observed by AC1.
+  refusal text. NOT OBSERVED here — the sibling it lands on observes it through its amended
+  criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S35** — id 20, L5, landing on unit 4. The evidence figure is 4,242 (path, commit) rows over 341
-  commits. Observed by AC1.
+  commits. NOT OBSERVED here — the sibling it lands on observes it through its amended criterion;
+  AC1 is a spec-text precondition (round-2 id 3).
 - **S36** — id 21, L6, landing on unit 4. The `guide-bytes` example prints `current - (none)`.
-  Observed by AC1.
+  NOT OBSERVED here — the sibling it lands on observes it through its amended criterion; AC1 is a
+  spec-text precondition (round-2 id 3).
 - **S37** — id 22, L7, landing on unit 15. A full run is every `repo`-subject leg executed, and a held
-  size leg reads `unread`. Observed by AC1.
+  size leg reads `unread`. NOT OBSERVED here — the sibling it lands on observes it through its
+  amended criterion; AC1 is a spec-text precondition (round-2 id 3).
 - **S38** — id 23, L8, landing on unit 12. The `idle` sample rows carry `since` dates before the window.
-  Observed by AC1.
+  NOT OBSERVED here — the sibling it lands on observes it through its amended criterion; AC1 is a
+  spec-text precondition (round-2 id 3).
 - **S39** — id 24, L9, landing on unit 2. The manifest history figure is 536 across both forms.
-  Observed by AC1.
+  NOT OBSERVED here — the sibling it lands on observes it through its amended criterion; AC1 is a
+  spec-text precondition (round-2 id 3).
 - **S40** — id 34, L10, landing on unit 15. Its §10 cites `read_git_dirs` as the walk's precedent.
-  Observed by AC1.
+  NOT OBSERVED here — the sibling it lands on observes it through its amended criterion; AC1 is a
+  spec-text precondition (round-2 id 3).
 - **S41** — id 47, L11, landing on unit 14. `scenario-proposals` is a Metrics line, not a field.
-  Observed by AC1.
+  NOT OBSERVED here — the sibling it lands on observes it through its amended criterion; AC1 is a
+  spec-text precondition (round-2 id 3).
 - **S42** — The `at-year-back` arm (ids 6, 32, the M2 left-shift): a `--fixture` plant of
   `tools/loop/loop_review.py` that runs `run --dry-run --at` one year before now and reds when any
   reading's printed window, `derive_cap_readings`' and `read_journal_lines`' included, differs from the
@@ -264,8 +307,10 @@ Unit 2's leg rows (`41.2s/3`), unit 12's item rows (`1840221tok/38`) and unit 15
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -c '^- \*\*id <n> · '` runs over each spec the table of §4 names for id `<n>`,
-  every count is at least 1.
+  every count is at least 1, except id 45 in specs 3, 4, 6 and 16, which their `id 2` bullet carries
+  and for which `grep -c '^- \*\*id 2 · '` is read (round-2 id 3).
   Red when: a minor is named here and carried by no sibling's amendment.
+  A precondition read at writing: it greps the disposal's text, and nothing this unit builds moves it.
   figure: DERIVED, the table's 41 ids.
 - **AC2** — When `python loop_review.py --fixture --plant at-year-back` runs from the loop kit
   directory, every reading's window equals the snapshot's.
@@ -315,6 +360,11 @@ New arm: tools/loop/measure.py · covers AC5 · the `bounds-default` plant, stag
 
 - rev-1 · 2026-11-02 · initial draft, promoted from the round-1 spec audit's 30 MEDIUM and 11 LOW,
   batched; the seventeen siblings amended at the disposal (their rev-2).
+- rev-2 · 2026-11-02 · §2 S1 to S41 S16 AC1 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, each `TOOL-dCalibratedLens-41`'s: AC1 reads
+  id 45 through the `id 2` bullet and is stated a precondition, and every S-item it alone observed is
+  marked NOT OBSERVED here with the sibling's criterion as its observer (id 3); S16's callers gain
+  unit 6 (id 20).
 
 ## 10. Reuse audit
 

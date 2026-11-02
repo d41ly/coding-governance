@@ -56,3 +56,27 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-02T19:50:34Z rescope · item add TOOL-dCalibratedLens-30 · reason spec-audit round 1 (reviews/2026-11-02-review-TOOL-dCalibratedLens-1-spec-audit.md) minors batched into one unit, 30 MEDIUM and 11 LOW by raw id: 5 32 6 7 8 9 10 46 17 18 25 26 27 28 29 30 31 33 37 38 39 40 41 42 43 44 45 51 53 54 11 12 13 14 20 21 22 23 24 34 47; repairs no unit in particular
 
 2026-11-02T20:23:30Z review · item dCalibratedLens-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 11 · minors 41 · disposition promote
+
+2026-11-02T21:40:07Z review · item dCalibratedLens-spec-set-r2 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 9 · minors 28 · disposition promote
+
+2026-11-02T21:50:27Z rescope · item add TOOL-dCalibratedLens-31 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 30 BLOCKER, item B1: the shipped renderer prints the returned line's optional units group with literal brackets; repairs TOOL-dCalibratedLens-25
+
+2026-11-02T21:50:29Z rescope · item add TOOL-dCalibratedLens-32 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 26 HIGH, item H1 (shared with ids 2 and 11): unit 19's staged overlap break cannot go red under TOOL-dTotalRecall-42 S5; repairs TOOL-dCalibratedLens-19
+
+2026-11-02T21:50:32Z rescope · item add TOOL-dCalibratedLens-33 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 2 HIGH, item H1 (shared with ids 11 and 26): the arm reads as coverage for disjoint homes it never tests; repairs TOOL-dCalibratedLens-19
+
+2026-11-02T21:50:35Z rescope · item add TOOL-dCalibratedLens-34 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 11 HIGH, item H1 (shared with ids 2 and 26): unit 19 rests on the ancestor clause TOOL-dTotalRecall-42 S5 replaced; repairs TOOL-dCalibratedLens-19
+
+2026-11-02T21:50:39Z rescope · item add TOOL-dCalibratedLens-35 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 1 HIGH, item H2: unit 19's keep is graded by no row at its build order; repairs TOOL-dCalibratedLens-19
+
+2026-11-02T21:50:56Z rescope · item add TOOL-dCalibratedLens-36 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 6 HIGH, item H3: the seed's held verdict at unit 23 ignores guard-path edits by units 5 and 25; repairs TOOL-dCalibratedLens-23
+
+2026-11-02T21:50:58Z rescope · item add TOOL-dCalibratedLens-37 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 24 HIGH, item H4: unit 25 adds a guard pathspec govkit selfcheck classes into no class; repairs TOOL-dCalibratedLens-25
+
+2026-11-02T21:51:00Z rescope · item add TOOL-dCalibratedLens-38 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 19 HIGH, item H5: unit 29 writes a second adding-commit reader beside tree_lib.read_adding_commits; repairs TOOL-dCalibratedLens-29
+
+2026-11-02T21:51:02Z rescope · item add TOOL-dCalibratedLens-39 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 27 HIGH, item H6: unit 21 makes repeated Metrics names normal but never constrains read_metrics_lines' return shape; repairs TOOL-dCalibratedLens-21
+
+2026-11-02T21:51:04Z rescope · item add TOOL-dCalibratedLens-40 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) id 31 HIGH, item H7: an unsanitised why in an unread line blocks every period's record; repairs TOOL-dCalibratedLens-27
+
+2026-11-02T21:51:06Z rescope · item add TOOL-dCalibratedLens-41 · reason spec-audit round 2 (reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) minors batched into one unit, 22 MEDIUM and 6 LOW by raw id: 3 4 5 16 23 39 7 33 10 20 38 12 13 15 17 21 22 32 34 35 36 40 8 9 18 29 28 41; repairs no unit in particular

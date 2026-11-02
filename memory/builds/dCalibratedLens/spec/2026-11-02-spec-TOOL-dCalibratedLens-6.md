@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-6 — each role's `memory.item-budget` derived from its p90 over 30 sliced work orders under `measured`
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-3 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 8 · advances TOOL-dCalibratedLens-18
 
 **Carries:** cl-dClosedLoop-0463@33710e39 whole
 
@@ -85,6 +85,7 @@ role win.
 - **consumes-from** `TOOL-dCalibratedLens-3` — `tools/loop/loop_review.py`, its `gather`, `record` and `file` verbs and the `loop-review` record kind, which carry S4's field and S5's proposals
 - **consumes-from** external — TOOL-dTotalRecall-9's `render_handoff` `reads:` list, `check_read_set`, `record find` and `record show`; TOOL-dDeclaredLoop-2's `policy_edit.py propose`; the policy kit's `policy.py get --rev`, landed
 - **hands-off** `TOOL-dCalibratedLens-29` — `handoff.py reads -` and `derive_role_item_budgets`, which that unit times over the real tree (id 52)
+- **hands-off** `TOOL-dCalibratedLens-38` — `derive_role_item_budgets`' history read, which that unit's `item-budget-history` plant holds to the oldest add (round-2 id 19)
 
 ## 4. Design
 
@@ -171,6 +172,34 @@ names; the unit it names owns the finding and its proof.
   history pass, one blob map and one policy read per policy blob. AC1 runs `handoff.py reads -` with
   the two paths on stdin.
 
+### Amendments (round-2 spec audit)
+
+The round-2 spec audit
+(`reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md`) confirmed the
+findings below on this spec, and its disposal amended this text. Its ids restart at 1, so each bullet
+spells `r2 id`; each supersedes the text it names, and the unit it names owns the finding and its
+proof.
+
+- **r2 id 19 · S2, id 52's bullet (H5, `TOOL-dCalibratedLens-38`)** — S2's adding commits come from
+  `tree_lib.read_adding_commits(root, "memory/builds/*/prompts/*.md", wanted)`, the one
+  adding-commit reader (`tools/memory-tree/tree_lib.py:302-325`), and each adding commit's
+  `.governance/policy.toml` text from one `tree_lib.read_blobs_at` call, the commits grouped by that
+  text for one `policy.py get --rev` per group; `tree_lib` is reached through `resolve_kit_dir`. The
+  id-52 bullet's own `git log` and `git cat-file --batch-check` spellings are superseded.
+- **r2 id 34 · S2 (M13, `TOOL-dCalibratedLens-41`)** — A tracked work order with no adding commit is
+  counted into one stderr line `item-budgets — <n> work order(s) with no adding commit` and left out
+  of the population, never raised.
+- **r2 id 35 · S2 (M14, `TOOL-dCalibratedLens-41`)** — Every adding commit with no policy file joins
+  one absent group, read once as the catalogue default.
+- **r2 id 10 · S6 (M5, `TOOL-dCalibratedLens-41`)** — `read_measured_item_budget` finds and reads the
+  newest record through unit 3's `read_loop_records` and `read_metrics_lines`, reached through
+  `resolve_kit_dir("loop", "loop_review.py", …)`, so the ordering rule has one copy; an absent loop
+  kit reads 96,000 bytes with the stderr line's `<why>` `loop kit absent`. The id-50 bullet's own
+  listing is superseded.
+- **r2 id 38 · S6, AC7 (M5, `TOOL-dCalibratedLens-41`)** — The records are listed from the revision
+  they are read at (unit 3's `read_loop_records` as amended), so a newer record staged and not
+  committed is not listed, and the newest committed record's line is read.
+
 ### Files touched (estimate)
 
 - `tools/roles/handoff.py` — S1
@@ -195,8 +224,9 @@ names; the unit it names owns the finding and its proof.
 
 - security — the step writes no policy value; `handoff.py reads` reads tracked files and prints no
   content but a path, a role and a count; the budget check reads one committed record.
-- perf / scale — (amended, id 52) one `handoff.py reads -` call with the paths on stdin, one `git log` pass and
-  one `policy.py get --rev` per distinct commit, once per review period; the budget check adds one
+- perf / scale — (amended, id 52; r2 id 19) one `handoff.py reads -` call with the paths on stdin, one
+  `read_adding_commits` pass, one `read_blobs_at` call and one `policy.py get --rev` per distinct
+  policy text, once per review period; the budget check adds one
   `record find` and one `record show` per work order it renders.
 - error / empty / loading states — no sliced work order: no line for the role; below 30: `96000 until
   30`; no record or an unreadable line: 96,000 bytes with its stderr line, never a zero cap.
@@ -238,7 +268,10 @@ names; the unit it names owns the finding and its proof.
   --role gov-builder <key>` over a 30,000-byte slice under `memory.over-budget = "report"`, it prints
   `memory over budget: gov-builder 30000 B > 28000 B`; with no record it prints no over-budget line and
   the stderr line `memory budget — measured · gov-builder · 96000 B · no loop-review record`.
-  Red when: the check reads 96,000 bytes while a measured line exists, or a missing record reads as 0.
+  With a newer record staged and not committed, it reads the newest committed record's line (r2 id
+  38).
+  Red when: the check reads 96,000 bytes while a measured line exists, a missing record reads as 0,
+  or a staged record hides the committed one.
   permission: `record_find.py` and `gov_record.py` are TOOL-dTotalRecall-9's, built before this pass.
 - **AC8** — (amended, ids 2, 3) When `item-budget-measured` runs `loop_review.py gather` and `record`, the written record's
   `item-budgets` field holds the S4 line, and `loop_review.py file --dry-run` names one proposal keyed
@@ -299,6 +332,10 @@ New arm: tools/loop/measure.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · the 
   (round-1 spec audit)": ids 2 (`TOOL-dCalibratedLens-21`), 3 (`TOOL-dCalibratedLens-22`), 50
   (`TOOL-dCalibratedLens-28`) and 52 (`TOOL-dCalibratedLens-29`); the Files touched row of the
   registry is withdrawn (id 2); §3 gains the hands-off to unit 29.
+- rev-3 · 2026-11-02 · §3 §4 §5 S2 S6 AC7 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, §4 "Amendments (round-2 spec audit)": r2 id
+  19 (`TOOL-dCalibratedLens-38`), and r2 ids 34, 35, 10 and 38 (`TOOL-dCalibratedLens-41`); §3 gains
+  the hands-off to unit 38.
 
 ## 10. Reuse audit
 

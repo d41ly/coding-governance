@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-22 — one route from every item to `file`: the walk collects each item's proposals, and every producer spells the five fields
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-22-deviation-221.md](../build/2026-11-02-build-TOOL-dCalibratedLens-22-deviation-221.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -39,6 +40,9 @@ proposers. It repairs `TOOL-dCalibratedLens-3`, whose walk is the route.
   `gather` steps, each answering one proposal with all five fields, and a third answering one whose
   `accept` is empty; `run --dry-run --key 2026-W45` prints both filed texts at `item.loop.file`, each
   `filed`, and the refusal line `loop — refused: <kind> <id> carries no accept line` for the third.
+  The same plant then runs `run` twice without `--dry-run`, the key in `GOV_CADENCE_KEY=2026-W45` and a
+  counting stub standing in for the intake filer: each run exits 0, the first files the two valid
+  proposals as `filed`, and the second files no new intake, each a `seen` receipt (round-2 id 33).
   Observed by AC2.
 - **S3** — The staged break: a walk that hands `file` only the outcomes routed to it files zero of the
   planted proposals, so the plant reds. Observed by AC3.
@@ -49,6 +53,8 @@ proposers. It repairs `TOOL-dCalibratedLens-3`, whose walk is the route.
   route on planted ones, since units 4, 6 and 16 build after it.
 - Routing by `review.loop.retire`: unit 5 S7 governs `retire`, `prune` and `tighten` only, unchanged.
 - Unit 14's scenario proposal shape: id 7 (`TOOL-dCalibratedLens-30`).
+- AC1 observes only the disposal's text in sibling specs and is green at writing; it is a
+  precondition, not an observation of this unit's build (the round-2 audit's ids 4, 18 and 29).
 
 ### Edges
 
@@ -112,9 +118,13 @@ items, and the key hash of `<kind>\t<id>` keeps them apart.
   and `grep -n '^- \*\*id 3 · '` runs over the specs of units 3 and 5, each prints its amendment, unit
   5's naming `propose-time` proposers only.
   Red when: a producer's spec still names no `accept`, or unit 5 still re-homes earlier proposers.
+  A precondition read at writing: it greps the disposal's text.
 - **AC2** — When `python loop_review.py --fixture --plant every-proposer` runs `run --dry-run --key
-  2026-W45`, it prints two filed texts and one refusal line at `item.loop.file`.
-  Red when: a gather-time proposal is not filed, or an empty `accept` is filed.
+  2026-W45`, it prints two filed texts and one refusal line at `item.loop.file`; run twice as `run`
+  under `GOV_CADENCE_KEY=2026-W45` with the counting stub, each run exits 0 and the second files no
+  `filed` intake.
+  Red when: a gather-time proposal is not filed, an empty `accept` is filed, the refusal exits the
+  walk, or a second run files a new intake.
 - **AC3** — When the plant `every-proposer` runs under the staged break of S3, it reds naming the two unfiled
   proposals.
   Red when: a walk that drops gather-time proposals passes.
@@ -136,6 +146,9 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 3 (HIGH, item H4) of the round-1 spec audit;
   units 3, 4, 5, 6 and 16 amended at the disposal (their rev-2).
+- rev-2 · 2026-11-02 · §3 S2 AC1 AC2 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, each `TOOL-dCalibratedLens-41`'s: AC2 states
+  exit 0 and a second run filing no new intake (id 33); AC1 stated a precondition (ids 4, 18, 29).
 
 ## 10. Reuse audit
 

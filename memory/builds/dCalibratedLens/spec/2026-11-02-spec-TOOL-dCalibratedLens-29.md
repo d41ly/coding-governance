@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-29 — the work-order population read without argv: paths on stdin, one history pass, one policy read per policy revision, timed over the real tree
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 9 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-29-deviation-291.md](../build/2026-11-02-build-TOOL-dCalibratedLens-29-deviation-291.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -28,18 +29,29 @@ history in one pass, and proves the step over the real tree within a stated boun
 ## 2. Scope (IN)
 
 - **S1** — The design change, made at the audit's disposal in unit 6's text (rev-2, its §4
-  "Amendments (round-1 spec audit)", id 52): `python tools/roles/handoff.py reads -` reads the paths
-  from stdin, one per line, and refuses a path argument beyond `-`; S2 takes every work order's adding
-  commit from ONE `git log --diff-filter=A --name-only --format=%H -- 'memory/builds/*/prompts/*.md'`
-  pass; it reads `memory.item-budget` once per distinct blob of `.governance/policy.toml`, each commit
-  mapped to its blob by one `git cat-file --batch-check` over `<sha>:.governance/policy.toml` lines, and
-  `policy.py get memory.item-budget --rev <one commit of that blob> --json` per blob; the step runs under
-  a 120 s bound and a timeout reads `item-budgets: unread · timed out`. §5's perf line states the three
-  passes. Observed by AC1.
+  "Amendments (round-1 spec audit)", id 52, and rev-3, round-2 ids 19, 34 and 35):
+  `python tools/roles/handoff.py reads -` reads the paths from stdin, one per line, and refuses a path
+  argument beyond `-`. S2 takes every sliced work order's adding commit from
+  `tree_lib.read_adding_commits(root, "memory/builds/*/prompts/*.md", wanted)`
+  (`tools/memory-tree/tree_lib.py:302-325`), the one adding-commit reader, whose single
+  `git log --no-renames --diff-filter=A --reverse` keeps the oldest add (round-2 id 19,
+  `TOOL-dCalibratedLens-38`). A tracked work order the reader leaves unanswered, a merge-added one
+  say, is counted into one stderr line `item-budgets — <n> work order(s) with no adding commit` and
+  left out of the population, never raised (round-2 id 34). Each adding commit's
+  `.governance/policy.toml` text comes from ONE `tree_lib.read_blobs_at` call; commits are grouped by
+  that text, every commit whose answer is `None` (no policy file) joining one absent group (round-2
+  id 35), and `policy.py get memory.item-budget --rev <one commit of the group> --json` runs once per
+  group, the absent group's answer being the catalogue default. `tree_lib` is reached through
+  `resolve_kit_dir`, as `load_tree_lib` in `tools/policy/check_policy.py` reaches it. The step runs
+  under a 120 s bound and a timeout reads `item-budgets: unread · timed out`. §5's perf line states the
+  passes. Observed by AC2.
 - **S2** — The proof over the real tree, at this unit's order: `python measure.py --fixture --plant
   item-budget-tree` runs the step over this repository's own tracked work orders, prints one
   `item-budgets` line per role it finds or the `96000 until 30` reading, and prints its wall time,
-  which is under the 120 s bound. Observed by AC2.
+  which is under the 120 s bound. It also asserts that the step's unmapped count equals the number of
+  tracked work orders a per-path `git log --diff-filter=A -1` answers with nothing (round-2 id 34),
+  and the measure fixture's planted history carries one pre-policy commit whose work order is read
+  under the absent group (round-2 id 35). Observed by AC2.
 - **S3** — The argv probe: `git ls-files 'memory/builds/*/prompts/*.md' | python tools/roles/handoff.py
   reads -` exits 0 over the whole population, and `handoff.py reads <path> <path>` exits 2 naming the
   stdin form. Observed by AC3.
@@ -50,10 +62,15 @@ history in one pass, and proves the step over the real tree within a stated boun
   third option. The one-pass history makes the full population cheap, and a cap would need a second
   rule for a role that has fewer than 30 recent work orders.
 - The newest `loop-review` record's read in S6: id 50 (`TOOL-dCalibratedLens-28`).
+- The re-added and renamed work-order plant: `TOOL-dCalibratedLens-38` (round-2 id 19). The leg's
+  guard reaching `handoff.py`, `tree_lib.py` and `policy.py`: `TOOL-dCalibratedLens-41` (round-2 id 13).
+- AC1 observes only the disposal's text in unit 6's spec and is green at writing; it is a
+  precondition, not an observation of this unit's build (the round-2 audit's ids 4, 18 and 29).
 
 ### Edges
 
 - **consumes-from** `TOOL-dCalibratedLens-6` — `handoff.py reads`, `derive_role_item_budgets` and the `measure.py --fixture` plants it adds; without them there is no step to time
+- **hands-off** `TOOL-dCalibratedLens-38` — the one-pass step and the `measure.py --fixture` frame, which that unit's `item-budget-history` plant runs over a re-added and a renamed work order (round-2 id 19)
 
 ## 4. Design
 
@@ -64,6 +81,12 @@ history in one pass, and proves the step over the real tree within a stated boun
   every work order, one `git log` per work order".
 - 2,170 paths and 197,728 bytes, the skeptic's `git ls-files` measure at `8bec4cef`; about 0.16 s per
   `git` process on this node, so one `git log` per work order costs minutes.
+- `tools/memory-tree/tree_lib.py:302-340` at base: `read_adding_commits`, "THE one adding-commit
+  reader", and `read_blobs_at`, one `git cat-file --batch` answering `None` for a missing object.
+- The round-2 review's probes (PINNED, 2026-11-02): with `--no-renames`, 2 of 2,172 tracked work
+  orders have no adding commit (`dGroundRules-86-3-spec-writer.md` and `-86-merge-brief.md`,
+  merge-added at `f53cd3fcb`); of the 849 adding commits, 629 hold no `.governance/policy.toml` and
+  220 hold one blob, `43fa1bb1`.
 - The refuted id 19 found the SLICED population near zero at base; the argv call is still over every
   work order, sliced or not, because S1 decides slicing by reading each file.
 
@@ -86,8 +109,9 @@ history in one pass, and proves the step over the real tree within a stated boun
 ## 5. Production-readiness checklist
 
 - security — stdin paths are read as data; `handoff.py` opens only tracked files, as before.
-- perf / scale — three subprocess passes plus one policy read per policy blob, bounded at 120 s,
-  timed over the real tree by S2.
+- perf / scale — one `handoff.py reads -` call, one `git log` pass, one `git cat-file --batch` and one
+  policy read per distinct policy text, the absent group included, bounded at 120 s and timed over the
+  real tree by S2.
 - error / empty / loading states — a timeout is an `unread` reading; an empty population prints no
   role line.
 - observability — the plant prints the wall time.
@@ -101,9 +125,12 @@ history in one pass, and proves the step over the real tree within a stated boun
 - **AC1** — When `grep -n 'reads -' memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-6.md`
   runs, it prints the amended S1 and §5 lines.
   Red when: the design still passes the population as argv.
+  A precondition read at writing: it greps the disposal's text.
 - **AC2** — When `python measure.py --fixture --plant item-budget-tree` runs from the loop kit
-  directory, it exits 0 and prints a wall time under 120 s.
-  Red when: process creation fails or the bound is exceeded.
+  directory, it exits 0, prints a wall time under 120 s, prints the unmapped count equal to the
+  per-path answer, and reads the planted pre-policy work order under the absent group.
+  Red when: process creation fails, the bound is exceeded, an unmapped path raises or vanishes
+  uncounted, or a commit with no policy file is left unread.
   figure: DERIVED, the tree's population at observation time.
 - **AC3** — When `git ls-files 'memory/builds/*/prompts/*.md' | python tools/roles/handoff.py reads -`
   runs, it exits 0; `python tools/roles/handoff.py reads a.md b.md` exits 2 naming `reads -`.
@@ -116,7 +143,7 @@ history in one pass, and proves the step over the real tree within a stated boun
 The loop kit's leg `loop measure fixtures` (TOOL-dCalibratedLens-4 S9) is not in the manifest at base
 and is named here in prose; it runs the plant once that unit lands.
 
-New arm: tools/loop/measure.py · covers AC2 · the `item-budget-tree` plant, staged red by a step that passes the population as argv · none
+New arm: tools/loop/measure.py · covers AC2 · the `item-budget-tree` plant, staged red by a step that refuses when the argv it would pass exceeds 32,767 bytes, so the red holds on every host (round-2 id 41) · none
 
 ## 8. Open questions
 
@@ -126,14 +153,22 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 52 (HIGH, item H11) of the round-1 spec audit;
   unit 6 amended at the disposal (its rev-2).
+- rev-2 · 2026-11-02 · §3 §4 §5 §7 §10 S1 S2 AC1 AC2 · amended at the disposal of the round-2 spec
+  audit `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`: S1's history read through
+  `tree_lib.read_adding_commits` and `read_blobs_at` (id 19, `TOOL-dCalibratedLens-38`); the
+  unmapped-path line (id 34), the absent policy group (id 35), the host-independent staged break (id
+  41), the guard pointer (id 13) and AC1 stated a precondition (ids 4, 18, 29), all
+  `TOOL-dCalibratedLens-41`; §3 gains the hands-off to unit 38.
 
 ## 10. Reuse audit
 
-The seam extended is unit 6's own `handoff.py reads` and `derive_role_item_budgets`; the policy read
-stays `policy.py get --rev` (`tools/policy/policy.py:1346-1374`, read by unit 6 at base). `python
+The seams extended are unit 6's own `handoff.py reads` and `derive_role_item_budgets`, and the two
+shared history readers `tree_lib.read_adding_commits` and `tree_lib.read_blobs_at`
+(`tools/memory-tree/tree_lib.py:302-340`); the policy read stays `policy.py get --rev`
+(`tools/policy/policy.py:1346-1374`, read by unit 6 at base). `python
 tools/codebase-map/reuse_lookup.py "isolate each reader so one failure becomes an unread line, never
-the walk's exit"`, run once for the set, ranked name stems only; no seam batches per-path history, so
-the one-pass log is new over those. The recall probe returned TOOL-cMendedVintage-19, the placement
+the walk's exit"`, run once for the set, ranked name stems only. Rev-1 said no seam batches per-path
+history; the round-2 audit (id 19) found `read_adding_commits`, and the source decides. The recall probe returned TOOL-cMendedVintage-19, the placement
 ruling this unit's order follows.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a spec audit finding promoted to a

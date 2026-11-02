@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-20 — every Loop Review record carries a `**Serves:**` line naming its kind, so the registry's field check reaches it
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 3 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-20-deviation-201.md](../build/2026-11-02-build-TOOL-dCalibratedLens-20-deviation-201.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -41,9 +42,11 @@ so the check reaches every record, and proves it with a planted record missing a
   `python <memory-tree kit>/record_kinds.py --check` there as a bounded subprocess (60 s): exit 0. With
   the snapshot's `**Window:**` line cut it exits 1 naming the snapshot and `Window`; with the
   record's `**Ledger:**` line cut it exits 1 naming the record and `Ledger`. Observed by AC2.
-- **S3** — The staged break: the same plant with the writers' Serves line dropped. The check must then
-  name each record as kind None (`home-kind mismatch` in TOOL-dTotalRecall-42's counts) or fail the
-  plant, so a template that loses its line cannot pass silently. Observed by AC3.
+- **S3** — The staged break: the same plant with the writers' Serves line cut. A record with no Serves
+  kind is graded by no row (TOOL-dTotalRecall-42 S5), so the check names nothing and its cut-field
+  runs exit 0; the plant itself fails then, one `serves-kinds — FAIL · <path> · cut <field> passed`
+  line per cut record whose run exited 0, so a template that loses its line cannot pass silently
+  (round-2 id 12). Observed by AC3.
 - **S4** — Each writer's own output carries the line: `price --dry-run` and `record --key 2026-W45`
   print a body whose third line opens `**Serves:** `. Observed by AC4.
 
@@ -57,6 +60,10 @@ so the check reaches every record, and proves it with a planted record missing a
   kind's owning unit and nothing more.
 - Dropping `check = "record-kinds"` from the rows, the other option the review names: it leaves
   spec-5 AC9 unpassable and the three schemas declared and never graded.
+- The leg's guard reaching `record_kinds.py`: `TOOL-dCalibratedLens-41` (round-2 id 13).
+- AC1's grep of unit 5's spec observes only the disposal's text and is green at writing; that half is
+  a precondition, and AC1's probes of the built join are the observation (the round-2 audit's ids 4,
+  18 and 29).
 
 ### Edges
 
@@ -123,14 +130,17 @@ token is the row's `name`, so `canonical_kind` returns it unchanged.
 - **AC1** — When `grep -c '\*\*Serves:\*\* value-ledger TOOL-dCalibratedLens-2\|\*\*Serves:\*\* loop-review TOOL-dCalibratedLens-3' loop_review.py`,
   run from the loop kit directory, and `grep -c 'keep TOOL-dCalibratedLens-5' memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-5.md`,
   run from the repository root, both run after this unit's pass, the first counts at least 2 and the
-  second at least 1.
-  Red when: a template carries no Serves line, or unit 5's keep template was not amended.
+  second at least 1; and a `python -c` probe from the memory-tree kit directory prints `value-ledger`
+  and `loop-review` among `tree_lib.TYPED_RECORD_KINDS`, and `grep -c` of each kind over
+  `HYGIENE.template.md` and `memory/HYGIENE.md` prints at least 1 (round-2 id 8).
+  Red when: a template carries no Serves line, a kind misses the join, or unit 5's keep template was
+  not amended.
 - **AC2** — When `python loop_review.py --fixture --plant serves-kinds` runs, the check exits 0 over the
   whole records, and 1 naming `Window` for the cut snapshot and `Ledger` for the cut record.
   Red when: a record missing a required field passes.
   fixture: `record_kinds.py` is TOOL-dTotalRecall-1's and -42's, absent at `8bec4cef`.
-- **AC3** — When the plant `serves-kinds` runs under the staged break of S3, it fails, naming the records the check
-  read as kind None.
+- **AC3** — When the plant `serves-kinds` runs under the staged break of S3, it prints one
+  `serves-kinds — FAIL` line naming each cut record whose cut-field run exited 0.
   Red when: records without the line pass as graded.
 - **AC4** — When `python loop_review.py price --dry-run --key 2026-W45` runs in the fixture, its third
   output line of the snapshot body is `**Serves:** value-ledger TOOL-dCalibratedLens-2`.
@@ -153,6 +163,10 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 36 (HIGH, item H2) of the round-1 spec audit;
   the templates of units 2, 3 and 5 amended at the disposal (their rev-2).
+- rev-2 · 2026-11-02 · §3 S3 AC1 AC3 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, each `TOOL-dCalibratedLens-41`'s: the plant
+  fails itself on a cut-field run that exits 0 (id 12); AC1 probes the `TYPED_RECORD_KINDS` and HYGIENE
+  join (id 8); the grep half of AC1 stated a precondition (ids 4, 18, 29); the guard pointer (id 13).
 
 ## 10. Reuse audit
 

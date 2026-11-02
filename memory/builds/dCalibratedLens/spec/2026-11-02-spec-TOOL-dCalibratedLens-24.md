@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-24 — the stage receiver judged by the hook over a real payload, green on the shipped harness and red on a looped copy
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 17 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 17 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-24-deviation-241.md](../build/2026-11-02-build-TOOL-dCalibratedLens-24-deviation-241.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -31,7 +32,8 @@ adds the red twin that shows the observation can fail. It repairs `TOOL-dCalibra
   "tool_input": {"script": <the rendered tools/workflows/tier2-review.js>}}` with `node -e`, as
   `tools/workflows/check-verifier-fanout.sh:321-326` builds it, pipes it to `node
   tools/hooks/agent-cap.js --only=scripts` and expects exit 0; and the §4 evidence bullet states that a
-  bare invocation reads no harness and measures nothing. Observed by AC1.
+  bare invocation reads no harness and measures nothing. AC3's own text carries the pipe, not only
+  the amendment bullet (round-2 id 15). Observed by AC2.
 - **S2** — The observation over the built harness, at this unit's order: the AC3 payload over the
   shipped render exits 0. Observed by AC2.
 - **S3** — The red twin, an arm of `tools/workflows/tier2-review.test.sh`: a scratch copy of the
@@ -44,6 +46,10 @@ adds the red twin that shows the observation can fail. It repairs `TOOL-dCalibra
 
 - Changing the receiver. Unit 1 S1 is built as written; this unit observes whether the hook admits it,
   and a red here is unit 1's defect, fixed in unit 1's code by the main loop.
+- The `tier2-review self-test` guard reaching `tools/hooks/agent-cap.js`: `TOOL-dCalibratedLens-41`
+  (round-2 id 28).
+- AC1 observes only the disposal's text in unit 1's spec and is green at writing; it is a
+  precondition, not an observation of this unit's build (the round-2 audit's ids 4, 18 and 29).
 - The `scriptPath` payload form the review also names. The inline-script form is the one the bar's
   own fan-out leg already uses, so the observation and the leg judge the same bytes.
 
@@ -98,9 +104,10 @@ None minted: the arm is a case of an existing suite.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `grep -n 'tool_input' memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-1.md`
-  runs, it prints amended AC3's payload.
-  Red when: AC3 still runs the hook with no stdin.
+- **AC1** — When `grep -n 'AC3.*tool_input' memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-1.md`
+  runs, it prints the criterion's own line carrying the payload, not the §4 amendment bullet.
+  Red when: AC3's text still runs the hook with no stdin.
+  A precondition read at writing: it greps the disposal's text.
 - **AC2** — When the command of §4 "The observation" runs after unit 1's pass, feeding
   `tools/workflows/tier2-review.js` to `node tools/hooks/agent-cap.js --only=scripts`, it exits 0.
   Red when: the hook denies the shipped receiver.
@@ -122,6 +129,10 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 16 (HIGH, item H6) of the round-1 spec audit;
   unit 1 amended at the disposal (its rev-2).
+- rev-2 · 2026-11-02 · §3 S1 AC1 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, each `TOOL-dCalibratedLens-41`'s: AC1 greps
+  unit 1's criterion, whose text now carries the payload (id 15); the guard pointer (id 28); AC1
+  stated a precondition (ids 4, 18, 29).
 
 ## 10. Reuse audit
 

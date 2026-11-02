@@ -1,6 +1,6 @@
 # TOOL-dCalibratedLens-26 — a catch source that observed no run of a leg reads `-`, never 0, so no unobserved leg is proposed for retirement
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
+**Status:** OPEN · rev-2 · 2026-11-02 · node a · Tier-2 · base 8bec4cef · streams tooling · order 2 · advances TOOL-dCalibratedLens-18
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-11-02-build-TOOL-dCalibratedLens-26-deviation-261.md](../build/2026-11-02-build-TOOL-dCalibratedLens-26-deviation-261.md) | deviation | — |
 | [2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dCalibratedLens-19-promoted-fix-brief.md) | research | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-30 |
+| [2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md](../reviews/2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit.md) | spec-audit | TOOL-dCalibratedLens-19 TOOL-dCalibratedLens-20 TOOL-dCalibratedLens-22 TOOL-dCalibratedLens-27 TOOL-dCalibratedLens-28 TOOL-dCalibratedLens-21 TOOL-dCalibratedLens-29 TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-23 TOOL-dCalibratedLens-24 TOOL-dCalibratedLens-30 |
 
 <!-- /gen:spec-records -->
 
@@ -36,7 +37,10 @@ repairs `TOOL-dCalibratedLens-2`.
   one row per leg the run executed, green ones included). Under `node-journal` a leg is observed when the
   journal read succeeded, at least one GREEN or RED bar lies in the window, and the leg is one
   `build_leg_yield` marks `always_run` (`tools/runlog/runlog.py:90-140`: no guard, subject not `kit`,
-  chunk not `selftests`) or one a windowed bar named red; an absent journal, an unreadable one (exit 2),
+  chunk not `selftests`) and that declares no `doc_reads`, or one a windowed bar named red; a leg
+  declaring `doc_reads` is skipped by a docs-mode bar before its guard is read
+  (`tools/run-gates/run-gates.sh:3257-3262`), so it counts as observed only when a windowed bar named
+  it red (round-2 id 17); an absent journal, an unreadable one (exit 2),
   a timeout or a missing runlog kit observes none. `price` prints one line, `NOTE: catch source <value>
   observed no run of <n> leg(s) · <why>`, when any leg reads `-`. Unit 2 §5's "every leg's `catches`
   reads 0" now reads `-`. Observed by AC1.
@@ -45,8 +49,10 @@ repairs `TOOL-dCalibratedLens-2`.
   `NOTE:` line names `0 flake record(s) in the window`; `catch-green` (one flake record in the window
   whose rows give `alpha` rc 0 and `beta` rc 1 then 1): `alpha` reads `catches` 0 and state `idle`,
   `beta` 1, and a leg with no row reads `-`; `catch-journal-dead` (`node-journal`, a `gates.log` the
-  runlog reader refuses): every leg reads `-` and the `NOTE:` line names the refusal. Observed by AC2
-  and AC3.
+  runlog reader refuses): every leg reads `-` and the `NOTE:` line names the refusal; and
+  `catch-docs-only` (`node-journal`, a journal holding one GREEN bar in the window, over a manifest
+  with one `always_run` leg declaring `doc_reads` and one declaring none): the first reads `-`, the
+  second `catches` 0 (round-2 id 17). Observed by AC2 and AC3.
 - **S3** — The consequence downstream, stated for unit 5 at the disposal (spec-5 rev-2, id 48): AC5
   also runs over `catch-none`, where `propose --dry-run` prints no `retire` proposal. Observed by AC4.
 
@@ -56,6 +62,9 @@ repairs `TOOL-dCalibratedLens-2`.
   once an unobserved leg reads `-`.
 - A per-leg run count column. The ledger's row grammar keeps its nine columns; observation decides
   only between a count and `-`.
+- The leg's guard reaching `runlog.py` and `runlog_lib.py`: `TOOL-dCalibratedLens-41` (round-2 id 13).
+- AC1 and AC4 observe only the disposal's text in sibling specs and are green at writing; they are
+  preconditions, not observations of this unit's build (the round-2 audit's ids 4, 18 and 29).
 - Windowing the journal's per-leg counter: id 27 (`TOOL-dCalibratedLens-30`) moves S4's red count onto
   `build_leg_yield`, which this unit's `always_run` set already reads.
 
@@ -113,16 +122,20 @@ repairs `TOOL-dCalibratedLens-2`.
   runs, it prints the amendment, and `grep -c "every leg's .catches. reads 0"` over the same file
   prints 0.
   Red when: an unobserved leg still reads 0 in the design.
+  A precondition read at writing: it greps the disposal's text.
 - **AC2** — When `python loop_review.py --fixture --plant catch-none` runs `price --dry-run`, every leg
   row's `catches` is `-` and one `NOTE:` line prints; `catch-green` prints `alpha` with `catches` 0 and
   `idle`, `beta` with 1, and an unnamed leg with `-`.
-  Red when: an unobserved leg prints 0, or an observed green leg prints `-`.
+  `catch-docs-only` prints `-` for its `doc_reads` leg and `catches` 0 for the other.
+  Red when: an unobserved leg prints 0, an observed green leg prints `-`, or a leg a docs-mode bar
+  skipped reads as observed.
 - **AC3** — When the plant `catch-journal-dead` runs, every leg reads `-` and the `NOTE:` line names
   the runlog refusal.
   Red when: a dead journal prices as zero catches.
 - **AC4** — When `grep -n 'catch-none' memory/builds/dCalibratedLens/spec/2026-11-02-spec-TOOL-dCalibratedLens-5.md`
   runs, it prints unit 5's amended AC5 line.
   Red when: unit 5's retire criterion never meets an unobserved leg.
+  A precondition read at writing: it greps the disposal's text.
 
 ## 7. Gates
 
@@ -131,7 +144,7 @@ repairs `TOOL-dCalibratedLens-2`.
 The loop kit's leg `loop-review selftest` (TOOL-dCalibratedLens-2 S11) is not in the manifest at base
 and is named here in prose; it runs the plants once that unit lands.
 
-New arm: tools/loop/loop_review.py · covers AC2 AC3 · the plants `catch-none`, `catch-green` and `catch-journal-dead`, staged red by a pricer that reads an unobserved leg as 0 · none
+New arm: tools/loop/loop_review.py · covers AC2 AC3 · the plants `catch-none`, `catch-green`, `catch-journal-dead` and `catch-docs-only`, staged red by a pricer that reads an unobserved leg as 0 · none
 
 ## 8. Open questions
 
@@ -141,6 +154,11 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, promoted from id 48 (HIGH, item H8) of the round-1 spec audit;
   units 2 and 5 amended at the disposal (their rev-2).
+- rev-2 · 2026-11-02 · §3 §7 S1 S2 AC1 AC2 AC4 · amended at the disposal of the round-2 spec audit
+  `2026-11-02-review-TOOL-dCalibratedLens-19-spec-audit`, each `TOOL-dCalibratedLens-41`'s: a
+  `doc_reads` leg is observed only when named red, with the `catch-docs-only` plant (id 17, unit 2's
+  id-48 text amended with it); AC1 and AC4 stated preconditions (ids 4, 18, 29); the guard pointer
+  (id 13).
 
 ## 10. Reuse audit
 
