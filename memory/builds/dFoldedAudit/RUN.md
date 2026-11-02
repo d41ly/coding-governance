@@ -166,3 +166,5 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T09:16:43Z hold · item host-owner-action · reason until owner · reaped 4cecbb34 · resume none(owner)
 
 2026-11-02T09:57:24Z resume · item dFoldedAudit · reason held · keepalive d1caae3c · manual
+
+2026-11-02T10:12:51Z rescope · item add TOOL-dFoldedAudit-17 · reason the owner asked for origin/main merged by git; three of its eight conflicted paths sit under tools/, so a unit owns their reconcile
