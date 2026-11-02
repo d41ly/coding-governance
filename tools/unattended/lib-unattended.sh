@@ -1797,6 +1797,62 @@ check_landed_facts_due() { # record path · cutoff · [tenancy] -> 0 graded · 1
   return 0
 }
 
+# TOOL-aQuotedBrief-4 S1 - PROMPT_BRIEF_CUTOFF AS THE CONF AT A COMMIT DECLARES IT, read the
+# SPEC_AUDIT_DEFAULT way in check_authorization and for its reasons: the working copy is a file the run
+# commits itself, so a run that blanked the key, or moved it past its README's `opened:`, turned off
+# the grading of its own brief (closing review round 1, H1 and M1). The key is BLANKED first, so a
+# conf predating it cannot inherit the working copy's value through the environment; the sentinel is
+# printed FROM INSIDE the eval'd text, on a descriptor the blob's own redirect does not cover, so it
+# appears iff evaluation reached the end whatever the last statement's status. The TWO newlines of
+# glue are that read's: without the first a blob ending in a comment swallows the printf, without the
+# second a last line ending in a backslash continuation joins the sentinel as a temp-env prefix.
+# Prints the value and returns 0, prints nothing for an ABSENT blob (off), and returns 2 for a blob
+# that ends before the read - a return, an exit, an unbound reference, a syntax error - or for no
+# commit at all, since an unknown side is not an absent key.
+# TOOL-aRoutedQuill-7 S1 - the optional second argument names a sibling date key read the same way,
+# PROMPT_BRIEF_SKELETON_CUTOFF; it is only ever a literal from this file, never a conf value.
+read_brief_cutoff() { # commit · key -> the value on stdout · 2 when it cannot be known
+  local _cf _v _k=${2:-PROMPT_BRIEF_CUTOFF}
+  [ -n "${1:-}" ] || return 2
+  _cf=$(GIT show "$1:.unattended.conf" 2>/dev/null) || return 0
+  _v=$( eval "$_k=''"; exec 3>&1
+        eval "$_cf"$'\n\n''printf "OK %s" "${'"$_k"':-}" >&3' >/dev/null 2>&1 )
+  case "$_v" in "OK "*) printf '%s' "${_v#OK }" ;; *) return 2 ;; esac
+}
+
+# THE SPEC_FOLD_CUTOFF ONE RECORD ANSWERS TO (TOOL-dFoldedAudit-9), read from the conf blob at the
+# default-branch side of its BASE, for PROMPT_BRIEF_CUTOFF's reason: a run that wrote the key moved
+# itself onto the fold rule, and a run that blanked it stepped off it. The driver and check 2 both call
+# this, so one record gets one date.
+#
+# THE MERGE-BASE IS UNCONDITIONAL. `check_authorization` selects on an ANCHOR_KIND it derived in its own
+# shell, and a later verb holds only the recorded `anchor-kind`, a value the run wrote. Nothing has to
+# select: on the first anchor BASE is an ancestor of the anchor, so the merge-base is BASE.
+#
+# NO RUN-STATE FILE READS THE SOURCED CONF, because an attended caller has no BASE and has an owner.
+# UNKNOWN IS NEVER OFF: a record with no `base:`, a merge-base git cannot answer, a blob that ends before
+# the read and a value that is no date each return 2, and every caller refuses. Blank is a real answer.
+#
+# WHAT IT DOES NOT CHECK. An absent `anchor-sha:` reads at `base:`, a branch for fixtures, because every
+# tracked record with a spec row carries the fact. A run that deletes it and wrote its own BASE reads a
+# date it chose, and one whose `base:` then resolves to nothing reads as an absent blob, so blank. The
+# edit shows in the diff, and check 9 still grades the BASE.
+read_fold_cutoff() { # run-state file -> the value on stdout · 2 when it cannot be known
+  local _fc_f _fc_b _fc_a _fc_c _fc_v
+  [ -f "$1" ] || { printf '%s' "${SPEC_FOLD_CUTOFF:-}"; return 0; }
+  _fc_f=$(extract_run_facts < "$1" | awk '
+    { sub(/\r$/, "") }
+    /^base:/ && !sb { sb = 1; b = substr($0, 6); sub(/^ +/, "", b) }
+    /^anchor-sha:/ && !sa { sa = 1; a = substr($0, 12); sub(/^ +/, "", a) }
+    END { print b "|" a }')
+  _fc_b=${_fc_f%%|*}; _fc_a=${_fc_f#*|}
+  [ -n "$_fc_b" ] || return 2
+  _fc_c=$_fc_b
+  [ -z "$_fc_a" ] || _fc_c=$(GIT merge-base "$_fc_a" "$_fc_b" 2>/dev/null) || _fc_c=""
+  _fc_v=$(read_brief_cutoff "$_fc_c" SPEC_FOLD_CUTOFF) || return 2
+  case "$_fc_v" in ""|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) printf '%s' "$_fc_v" ;; *) return 2 ;; esac
+}
+
 is_terminal() { case " $PHASES_TERMINAL " in *" $1 "*) return 0;; esac; return 1; }
 # AN HONEST ROTATION: <commit> adds only archives named `RUN.<PHASE>.<8 hex>.md`, each hex the prefix
 # of the blob it adds, and its parent's committed record is one `--preflight` retires.

@@ -549,6 +549,13 @@ write_round_fixture() { # run rows · the binding line, or nothing · the flags 
     || { echo "FAIL the fixture round refused: $*"; st=1; }
   write_rot_commit 2026-11-02 round
 }
+# ---- TOOL-dFoldedAudit-9: ONE FOLD ROW IN A RECORD WHOSE KEY A RUN COMMIT MOVED ABOVE BASE. `FR_DATED`,
+# ---- `D_ONE` and `FR_FOLD` are the calling block's.
+write_moved_disp() { # SPEC_FOLD_CUTOFF at BASE · a later run commit's value
+  reset_tree; dispconf 2000-01-01; foldconf "$1"
+  DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+  foldconf "$2"; write_rot_commit 2026-11-02 "run key"
+}
 drop_readme()  { rm -f memory/builds/tRun/README.md; }
 break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
 break_slug()   { sed -i 's|^slug: .*|slug: someoneElse|' memory/builds/tRun/README.md; }
@@ -1656,7 +1663,7 @@ hit "$out" "DISPOSITION_CUTOFF is blank or undeclared"
 # AC8 and AC11: the key's two other shapes. A blank one is announced, because a clause turned off reads
 # like one finding nothing. A malformed one is named inside check 2 and grades no row as past it.
 reset_tree; mkconf; sed -i '/^SPEC_FOLD_CUTOFF=/d' .unattended.conf
-hit "$(run)" "SPEC_FOLD_CUTOFF is blank or undeclared, so every spec audit exit keeps the old rule and no fold is graded"
+hit "$(run)" "SPEC_FOLD_CUTOFF is blank or undeclared, so a run preflighted from this tree keeps the old rule, and a record is graded by the conf at its own BASE"
 reset_tree; mkconf; foldconf 2026-11-01
 miss "$(run)" "SPEC_FOLD_CUTOFF is blank or undeclared"
 reset_tree; mkconf; foldconf soon
@@ -1805,6 +1812,53 @@ sed -i 's/^phase: .*/phase: LANDED/' "$ROT_R"; write_rot_commit 2026-11-03 lande
 write_rot_archive LANDED RUNNING second 2026-11-20 rotate
 printf '2026-11-02T01:00:00Z %s\n' "$CR_ROW3" >> "$ROT_R"; write_rot_commit 2026-11-20 row
 hit "$(run)" "counts 0 blocker(s) and 3 high(s), and the round disposes 0 and 1"
+reset_tree
+
+# ---- TOOL-dFoldedAudit-9: A RECORD ANSWERS TO THE CONF AT ITS OWN BASE. `mkdisp` commits the conf it finds as
+# ---- BASE, and a commit above it is the run moving the key, so each arm reads a working copy that disagrees
+# ---- with BASE. The driver's own suite holds the same populations at `--review` and `--dispatch`. The
+# ---- failing case, observed at the close and not by the pass that wrote this: `rv_foldpast` reading the
+# ---- sourced key reds AC10, AC11 and AC12.
+FB_UNKNOWN="$ROT_R (the conf at the default-branch side of this record's BASE ends before SPEC_FOLD_CUTOFF can be read"
+# AC10: one fold row under a moved date, each side, so the working copy decides neither.
+write_moved_disp "" 2026-11-01
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+write_moved_disp 2026-11-01 ""
+miss "$(run)" "check 2 FAILED"
+# AC11: a run commit above the anchor is not BASE's side, whatever `anchor-kind` the record claims, and an
+# anchor above a dated BASE answers BASE.
+write_moved_disp "" 2026-11-01
+sed -i "s/^base: .*/anchor-kind: local\nanchor-sha: $DISPBASE\nbase: $(git rev-parse HEAD)/" "$ROT_R"; write_rot_commit 2026-11-02 facts
+hit "$(run)" "spec subject(s) S1 $SC_MSG"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+sed -i "s/^base: .*/anchor-sha: $(git rev-parse HEAD)\n&/" "$ROT_R"; write_rot_commit 2026-11-02 facts
+miss "$(run)" "check 2 FAILED"
+# AC12: each unknown shape names the record, over a working copy a later commit restored, and the last arm
+# is the population that reads no conf at all: one row, on the record's own slug, over the same bad BASE.
+write_moved_disp soon 2026-11-01
+out=$(run)
+hit "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$FB_UNKNOWN"
+hit "$out" "unknown, and unknown is not off"
+reset_tree; dispconf 2000-01-01; sed -i '1i return 0' .unattended.conf
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+sed -i 1d .unattended.conf; write_rot_commit 2026-11-02 restored
+out=$(run)
+hit "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$FB_UNKNOWN"
+hit "$out" "unknown, and unknown is not off"
+reset_tree; dispconf 2000-01-01; foldconf 2026-11-01
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" "$FR_FOLD"
+sed -i '/^base: /d' "$ROT_R"; write_rot_commit 2026-11-02 bare
+out=$(run)
+hit "$out" "UNATTENDED check 2 FAILED"
+hit "$out" "$FB_UNKNOWN"
+hit "$out" "unknown, and unknown is not off"
+reset_tree; dispconf 2000-01-01; sed -i '1i return 0' .unattended.conf
+DISPDATE="$FR_DATED" mkdisp "$D_ONE" "$D_ONE" '2026-11-02T01:00:00Z review · item tDisp · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0\n'
+sed -i 1d .unattended.conf; write_rot_commit 2026-11-02 restored
+miss "$(run)" "$FB_UNKNOWN"
 reset_tree
 
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
@@ -7142,13 +7196,17 @@ fi   # ---- end of the region-8 span, re-cut across the eight regions by TOOL-aG
 # ---- and seven `miss`, all after the rotated record's block in region 2, so FLOOR_SHARD_2 carries the
 # ---- same +18 and the other seven are untouched. COUNTED off the block's own lines; this pass runs no
 # ---- suite, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=1092
+# ---- RAISED 1092 -> 1106 by exactly the arms, TOOL-dFoldedAudit-9: a record's date from the conf at its own
+# ---- BASE, eleven `hit` and three `miss`, all after the chain round's block in region 2, so FLOOR_SHARD_2
+# ---- carries the same +14 and the other seven are untouched. COUNTED off the block's own lines; this pass
+# ---- runs no suite, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=1106
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
 FLOOR_SHARD_1=159
-FLOOR_SHARD_2=118
+FLOOR_SHARD_2=132
 FLOOR_SHARD_3=127
 FLOOR_SHARD_4=101
 FLOOR_SHARD_5=133

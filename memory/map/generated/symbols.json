@@ -3988,6 +3988,11 @@
       "file": "tools/run-gates/run-gates.evidence.test.sh"
     },
     {
+      "id": "check_chain_dispatch",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "check_chain_fault",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -4346,6 +4351,21 @@
       "id": "check_fragment_wiring",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_gate_admits",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "check_gate_refused",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "check_gate_unknown",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "check_gate_wall",
@@ -13515,7 +13535,7 @@
     {
       "id": "read_brief_cutoff",
       "kind": "function",
-      "file": "tools/unattended/unattended.sh"
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "read_brief_items",
@@ -13619,6 +13639,11 @@
     },
     {
       "id": "read_chain_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_chain_verdict",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
     },
@@ -14101,6 +14126,11 @@
       "id": "read_fm_key_of",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "read_fold_cutoff",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "read_foreign_field",
@@ -15976,6 +16006,11 @@
       "id": "read_unnamed_holds",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_unrecorded_exits",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_user_name",
@@ -20436,6 +20471,11 @@
       "id": "run_gate_in",
       "kind": "function",
       "file": "tools/check-template-size.test.sh"
+    },
+    {
+      "id": "run_gate_review",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "run_gh33",
@@ -25898,6 +25938,26 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "write_gate_exit",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_gate_fact",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_gate_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_gate_key",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "write_gate_legs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -25906,6 +25966,11 @@
       "id": "write_gate_manifest",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "write_gate_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_gates_staged",
@@ -25941,6 +26006,11 @@
       "id": "write_held_stamp",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
+    },
+    {
+      "id": "write_hold_rounds",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_hooks",
@@ -26091,6 +26161,16 @@
       "id": "write_model_copy",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "write_moved_disp",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_moved_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_mp_meminfo",

@@ -314,9 +314,11 @@ while IFS= read -r -d '' _ck; do
     # itself, and this is an unguarded merge-bar leg. The two sibling importers - check-pass-order
     # and check-brief-recorded - already close it. `check-brief-recorded.sh`'s own comment names a
     # sibling that sets DRIVER above its import and evals a classifier out of it: that is
-    # `check-pass-order.sh`, not this leg, which evals nothing but its own import assignment. An
-    # earlier revision of this paragraph claimed that comment named THIS hole; it does not, and the
-    # attribution is corrected rather than left to mislead the next reader.
+    # `check-pass-order.sh`, not this leg, which evals nothing but its own import assignment and, inside
+    # the library's `read_brief_cutoff`, a committed conf blob in a subshell for check 2 (TOOL-dFoldedAudit-9),
+    # whose one output is a shape-checked date. An earlier revision of this paragraph claimed that
+    # comment named THIS hole; it does not, and the attribution is corrected rather than left to
+    # mislead the next reader.
     #
     # THE SET IS THE INTERSECTION of the keys initialised above with the keys the shipped
     # `.unattended.conf.example` declares, which is what "the keys this leg reads FROM THE CONF"
@@ -720,10 +722,11 @@ else
   # ---- silently disabled clause reads exactly like a clause finding nothing wrong.
   echo "unattended: DISPOSITION_CUTOFF is blank or undeclared, so check 2 clause 3 grades EVERY record on the id-delta proxy and reads no recorded disposition — a run that folded correctly is still graded as though it had promoted"
 fi
-# ---- ANNOUNCED FOR THE SAME REASON: a blank SPEC_FOLD_CUTOFF turns the exit-row clause below off, and a
-# ---- clause turned off reads exactly like one finding nothing wrong (TOOL-dFoldedAudit-2 S7).
+# ---- ANNOUNCED FOR THE SAME REASON: a blank SPEC_FOLD_CUTOFF keeps a run off the exit-row clause below,
+# ---- and a clause turned off reads exactly like one finding nothing wrong (TOOL-dFoldedAudit-2 S7). It
+# ---- speaks for this tree alone, because each record answers to the conf at its own BASE (TOOL-dFoldedAudit-9).
 if [ -z "$SPEC_FOLD_CUTOFF" ]; then
-  echo "unattended: SPEC_FOLD_CUTOFF is blank or undeclared, so every spec audit exit keeps the old rule and no fold is graded"
+  echo "unattended: SPEC_FOLD_CUTOFF is blank or undeclared, so a run preflighted from this tree keeps the old rule, and a record is graded by the conf at its own BASE"
 fi
 if [ "$_disp_ok" != 1 ]; then
   # ---- AND THE LOOP BELOW IS SKIPPED ENTIRELY. An unreadable cutoff means this leg cannot decide
@@ -750,12 +753,11 @@ else
   (the driver declares no readable ISO-date SPEC_COUNTS_CUTOFF, so the counted-spec-row clause cannot tell a record written when a spec subject's terminal row carried no counts and could fold from one written after, and would red every record or none: '$SPEC_COUNTS_CUTOFF')" ;;
   esac
   # A CONF KEY, not a driver constant, so a blank one is a real value, announced above, and only a
-  # malformed one is named here. It feeds the same failure and `rv_foldcut` stays empty, as
-  # SPEC_COUNTS_CUTOFF's does, because a new `fail` site would pass this file's refusal ceiling.
-  rv_foldcut=$SPEC_FOLD_CUTOFF
+  # malformed one is named here. It feeds the same failure, because a new `fail` site would pass this
+  # file's refusal ceiling. This grades the tree's own shape: no record takes a date from this value.
   case "$SPEC_FOLD_CUTOFF" in
     ""|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
-    *) rv_foldcut=""; rv_bad="$rv_bad
+    *) rv_bad="$rv_bad
   (.unattended.conf declares SPEC_FOLD_CUTOFF as no ISO date, so the exit-row clause cannot tell a spec audit exit that keeps the old rule from one that counts its folds and promotions, and would grade every record or none: '$SPEC_FOLD_CUTOFF')" ;;
   esac
   for rvf in $(GIT ls-files ":(glob)$M/builds/*/RUN*.md" 2>/dev/null); do
@@ -841,8 +843,22 @@ else
     # no floor, so a re-preflighted slug would read as the previous run's date. The function is named
     # for its first cutoff and reads any record cutoff; it grades a record with no history. The driver
     # and this leg agree on one record but for one case, which the driver's function states.
+    # THE VALUE THE CONF IMPORT BOUND DECIDES NOTHING HERE: `read_fold_cutoff` re-reads the key at the
+    # default-branch side of this record's own BASE (TOOL-dFoldedAudit-9), as `--review` does, so a run
+    # blanking its date cannot disagree with its own exit. Only a record holding a row off its slug pays
+    # for that read, and the test spawns nothing. An unknown reading feeds the same failure, for the
+    # ceiling's reason above, and is never read as off.
     rv_foldpast=0
-    if [ -n "$rv_foldcut" ] && check_landed_facts_due "$rvf" "$rv_foldcut" tenancy; then rv_foldpast=1; fi
+    IFS= read -r -d '' rv_text < "$rvf" || :
+    rv_text=${rv_text//"Z review · item $rv_slug · reason "/}
+    if [ "${rv_text#*Z review · item }" != "$rv_text" ]; then
+      if ! rv_cut=$(read_fold_cutoff "$rvf"); then
+        rv_bad="$rv_bad
+  $rvf (the conf at the default-branch side of this record's BASE ends before SPEC_FOLD_CUTOFF can be read or declares it as no ISO date, or the record names no base:, so which rule its spec exits take is unknown, and unknown is not off)"
+      elif check_landed_facts_due "$rvf" "$rv_cut" tenancy; then
+        rv_foldpast=1
+      fi
+    fi
     rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v foldpast="$rv_foldpast" -v fc="$rv_fc" -v speccut="$rv_speccut" -v slug="$rv_slug" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)

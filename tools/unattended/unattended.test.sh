@@ -2502,16 +2502,19 @@ _fa_r="$_sw_tmp/r"; _fa_run="$_fa_r/memory/builds/tFix/RUN.md"
 _fa_dated="2026-11-02T12:00:00 +0000"; _fa_early="2026-10-30T12:00:00 +0000"; _fa_cf="CLEAN WITH FIXES"
 _fa_refused="--review cannot record this spec audit exit: "
 _fa_old="--folded and --promoted are counted only at a spec audit's terminal exit past SPEC_FOLD_CUTOFF"
-commit_fold_fixture() { # committer date · message
-  ( cd "$_fa_r" && git add -A >/dev/null && GIT_COMMITTER_DATE="$1" git commit -q -m "$2" --no-verify )
+commit_fold_fixture() { # committer date · message · the repository, the fold fixture's by default
+  ( cd "${3:-$_fa_r}" && git add -A >/dev/null && GIT_COMMITTER_DATE="$1" git commit -q -m "$2" --no-verify )
 }
+# THE CONF IS COMMITTED FIRST AND THAT COMMIT IS `base:`, because the cutoff is read there and a record
+# with none refuses (TOOL-dFoldedAudit-9).
 write_fold_fixture() { # the record's first commit, or nothing for no record · SPEC_FOLD_CUTOFF's value · 1 for the policy kit beside the driver · the policy file's text
   rm -rf "$_fa_r"
   write_switch_fixture "$_fa_r" "${3:-0}" "${4:-}"
   printf 'DISPOSITION_CUTOFF="2000-01-01"\nREVIEW_ROUNDS="1"\nSPEC_FOLD_CUTOFF="%s"\n' "$2" >> "$_fa_r/.unattended.conf"
   mkdir -p "${_fa_run%/*}"
   [ -n "$1" ] || return 0
-  printf '# tFix\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n## Parked\n\n' > "$_fa_run"
+  commit_fold_fixture "$1" conf
+  printf '# tFix\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n## Parked\n\n' "$(git -C "$_fa_r" rev-parse HEAD)" > "$_fa_run"
   commit_fold_fixture "$1" record
 }
 run_fold() { # the --review flags after the slug -> the fixture driver's output and status
@@ -2666,9 +2669,10 @@ write_chain_fixture() { # 1 for the policy kit beside the driver · the policy f
   mkdir -p "$_fc_r/memory/builds/dFix/spec"
   { printf '# dFix\n\n<!-- roster:units -->\n'; printf '%s\n' $_fc_all; printf '<!-- /roster:units -->\n'; } > "$_fc_r/memory/builds/dFix/README.md"
   # AT REV-3 WITH EVERY REV LOGGED, because each `local` and `--sibling` row of the arms below claims rev 2
-  # or 3 and `check_chain_fold` reads the tree (TOOL-dFoldedAudit-11).
+  # or 3 and `check_chain_fold` reads the tree (TOOL-dFoldedAudit-11). READY, because `--dispatch` refuses
+  # a THIN unit and the chain gate's arms read past that (TOOL-dFoldedAudit-9).
   for _fc_i in 1 2 3 4 5 6 7; do
-    printf '# FIX-dFix-%s — u\n\n**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 0123abcd\n\n## 9. Revision log\n\n- rev-1 · 2026-11-01 · u.\n- rev-2 · 2026-11-01 · a fold.\n- rev-3 · 2026-11-01 · a fold.\n' "$_fc_i" \
+    printf '# FIX-dFix-%s — u\n\n**Status:** OPEN · rev-3 · 2026-11-01 · node d · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n\n## 9. Revision log\n\n- rev-1 · 2026-11-01 · u.\n- rev-2 · 2026-11-01 · a fold.\n- rev-3 · 2026-11-01 · a fold.\n' "$_fc_i" \
       > "$_fc_r/memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-$_fc_i.md"
   done
   # DATED, because a `local` or `--sibling` row refuses under a blank cutoff (TOOL-dFoldedAudit-13), and
@@ -3003,6 +3007,204 @@ else
   hit "$out" "spec-disposal: refused - "
   hit "$out" "TOOL-tFix-1"
 fi
+
+# ---- TOOL-dFoldedAudit-9: A BUILD CANNOT PASS A CHAIN VERDICT THAT IS NOT STOP. Fixture G is the chain's
+# ---- own fixture with a run-state file committed above a BASE carrying the conf, its first commit pinned
+# ---- either side of the cutoff, so no arm turns on the day it runs, and no policy kit sits beside the
+# ---- driver unless the arm is about a switch. Every refusal shares one signature, so each arm reads its
+# ---- own text, and a red sits beside a green population, so no arm passes by finding nothing. The failing
+# ---- cases, observed at the close and not by the pass that wrote this: the `check_chain_dispatch` call
+# ---- deleted from `verb_dispatch` reds AC1 and AC5; the HOLD arm returning 0 where a park row exists reds
+# ---- AC2; the rule test deleted from the gate reds AC7; `read_spec_exit_rule` reading the sourced key reds
+# ---- AC9 and AC12; a second `fail 118` reds AC15.
+_cg_run="$_fc_r/memory/builds/dFix/RUN.md"; _cg_conf="$_fc_r/.unattended.conf"
+_cg_pass="--dispatch dFix --pass FIX-dFix-1 --writes a.sh"; _cg_unknown="is unknown, and unknown is not off"
+_cg_cont="--dispatch builds nothing while the chain reads CONTINUE"; _cg_hold="--dispatch builds nothing while the chain reads HOLD"
+_cg_lost="--dispatch reads a terminal spec exit no chain round records"
+_cg_census='(^|[^a-zA-Z_])fail [0-9]+ "'
+write_gate_fixture() { # the record's first commit · SPEC_FOLD_CUTOFF at BASE · 1 for the policy kit · the policy file's text · a line opening the conf at BASE, restored above it
+  write_chain_fixture "${3:-0}" "${4:-}"
+  sed -i '/^SPEC_FOLD_CUTOFF=/d' "$_cg_conf"
+  printf 'DISPOSITION_CUTOFF="2000-01-01"\nREVIEW_ROUNDS="1"\nSPEC_FOLD_CUTOFF="%s"\n' "$2" >> "$_cg_conf"
+  [ -z "${5:-}" ] || sed -i "1i $5" "$_cg_conf"
+  commit_fold_fixture "$1" conf "$_fc_r"
+  _cg_base=$(git -C "$_fc_r" rev-parse HEAD)
+  [ -z "${5:-}" ] || sed -i 1d "$_cg_conf"
+  printf '# dFix\n\n## Run facts\nphase: BUILDING\nwitness: abc\nbase: %s\n\n## Parked\n\n' "$_cg_base" > "$_cg_run"
+  commit_fold_fixture "$1" record "$_fc_r"
+}
+write_gate_key() { # value -> SPEC_FOLD_CUTOFF rewritten by a dated run commit
+  sed -i '/^SPEC_FOLD_CUTOFF=/d' "$_cg_conf"
+  printf 'SPEC_FOLD_CUTOFF="%s"\n' "$1" >> "$_cg_conf"
+  commit_fold_fixture "$_fa_dated" "run key" "$_fc_r"
+}
+write_moved_fixture() { # SPEC_FOLD_CUTOFF at BASE · a later run commit's value
+  write_gate_fixture "$_fa_dated" "$1"
+  write_gate_key "$2"
+}
+write_gate_fact() { # the sed script over the run-state file -> edited and committed, dated
+  sed -i "$1" "$_cg_run"
+  commit_fold_fixture "$_fa_dated" fact "$_fc_r"
+}
+write_gate_record() { # -> AC1's record by hand, because `--record-round` refuses its `local` row off the fold rule
+  mkdir -p "${_cg_run%/*}/build"
+  printf '# dFix — the spec-audit chain'\''s rounds\n\n**Serves:** journal FIX-dFix-1\n\nAppended by `--record-round` and read by `--chain-verdict`. Never edited by hand.\n\nround 1 · subject s1 · audited %s\nround 1 · finding 1 · HIGH · local · specs FIX-dFix-2 · unit FIX-dFix-2 · rev 2\n' "$_fc_all" \
+    > "${_cg_run%/*}/build/2026-11-02-build-FIX-dFix-1-chain-rounds.md"
+  commit_fold_fixture "$_fa_dated" chain "$_fc_r"
+}
+write_gate_exit() { # subject -> AC5's terminal spec exit, through the verb
+  out=$(run_chain --review dFix --subject "$1" --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 1 --promoted 0 --disposition fold); rc=$?
+  same "FA9 the fixture exit on $1 records" "$rc" "0"
+}
+write_hold_rounds() { # -> FA5's AC8 record: four promoting rounds, which the shipped ceiling holds
+  write_fixture_round s1 "FIX-dFix-1 FIX-dFix-2 FIX-dFix-3" 0 1 --finding 1/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-4/1
+  write_fixture_round s2 FIX-dFix-4 0 1 --finding 2/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-5/1
+  write_fixture_round s3 FIX-dFix-5 0 1 --finding 3/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-6/1
+  write_fixture_round s4 FIX-dFix-6 0 1 --finding 4/HIGH/new-mechanism/FIX-dFix-1/FIX-dFix-7/1
+}
+run_gate_review() { # subject -> AC9's call
+  run_chain --review dFix --subject "$1" --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0 --disposition fold
+}
+check_gate_refused() { # label · each text the refusal prints -> `$PASS` exits 1 on check 118 and writes no row
+  local _cg_l=$1 _cg_t; shift
+  out=$(run_chain $_cg_pass); rc=$?
+  same "FA9 $_cg_l exits 1" "$rc" "1"
+  hit "$out" "UNATTENDED check 118 FAILED"
+  for _cg_t in "$@"; do hit "$out" "$_cg_t"; done
+  same "FA9 $_cg_l gains no dispatch row" "$(grep -c ' dispatch · item ' "$_cg_run")" "0"
+}
+check_gate_admits() { # label -> `$PASS` exits 0 and the record gains its row, the output left in `out`
+  out=$(run_chain $_cg_pass); rc=$?
+  same "FA9 $1 exits 0" "$rc" "0"
+  same "FA9 $1 gains its row" "$(grep -c ' dispatch · item ' "$_cg_run")" "1"
+}
+check_gate_unknown() { # label -> beside a committed spec row, the exit and `$PASS` each refuse, and neither reads off
+  printf '2026-11-02T01:00:00Z review · item S0 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0 · folded 0 · promoted 0\n' >> "$_cg_run"
+  commit_fold_fixture "$_fa_dated" row "$_fc_r"
+  out=$(run_gate_review S1); rc=$?
+  same "FA9 AC12 [$1] the exit exits 1" "$rc" "1"
+  hit "$out" "$_fa_refused"
+  hit "$out" "$_cg_unknown"
+  check_gate_refused "AC12 [$1]" "$_cg_unknown"
+}
+# AC1: a fold on CONTINUE refuses, naming the reason and the ids, and writes no row.
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_fixture_round s1 "$_fc_all" 0 1 --finding 1/HIGH/local/FIX-dFix-2/FIX-dFix-2/2
+hit "$(run_chain --chain-verdict dFix)" "round 1 · CONTINUE · reason open · audit FIX-dFix-2"
+check_gate_refused "AC1 a fold on CONTINUE" "$_cg_cont: round 1, reason open; re-invoke the build harness with auditIds: FIX-dFix-2"
+# AC4: a STOP is admitted with its line, clean and own-work alike, the green beside AC1's red.
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_fixture_round s1 "$_fc_all" 0 0
+check_gate_admits "AC4 a clean STOP"
+hit "$out" "unattended: dispatch — chain dFix · round 1 · STOP · reason clean"
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_fixture_round s1 "$_fc_five" 0 2 --finding 1/HIGH/local/FIX-dFix-2/FIX-dFix-2/2 --finding 2/HIGH/new-mechanism/FIX-dFix-6/FIX-dFix-6/1
+write_fixture_round s2 "FIX-dFix-2 FIX-dFix-6" 0 2 --finding 3/HIGH/local/FIX-dFix-2,FIX-dFix-6/FIX-dFix-2/3 --finding 3/HIGH/local/FIX-dFix-2,FIX-dFix-6/FIX-dFix-6/2 --finding 4/HIGH/new-mechanism/FIX-dFix-6/FIX-dFix-7/1
+check_gate_admits "AC4 an own-work STOP"
+hit "$out" "STOP · reason own-work"
+# AC5: an exit no round records stands over an older STOP, and over no record at all; recording it hands
+# the answer back to the verdict.
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_fixture_round s1 "$_fc_all" 0 0
+write_gate_exit s2
+check_gate_refused "AC5 an exit beside a STOP" "$_cg_lost, so the verdict would be read without it: s2; run that round's --record-round"
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_gate_exit s2
+check_gate_refused "AC5 an exit with no record" "$_cg_lost, so the verdict would be read without it: s2;"
+write_fixture_round s2 "$_fc_all" 0 1 --finding 1/HIGH/local/FIX-dFix-2/FIX-dFix-2/2
+check_gate_refused "AC5 the recorded exit" "$_cg_cont: round 1, reason open"
+miss "$out" "$_cg_lost"
+
+# AC2: a HOLD refuses, and neither row a run can write moves it.
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_hold_rounds
+check_gate_refused "AC2 a HOLD" "$_cg_hold: round 4 stands at the ceiling of 4 round(s), and only the owner moves review.spec-audit.chain-ceiling"
+run_chain --park dFix --item spec-audit-chain-ceiling --reason r >/dev/null
+same "FA9 AC2 the park row stands" "$(grep -c ' · item spec-audit-chain-ceiling · reason r$' "$_cg_run")" "1"
+printf '2026-11-02T13:00:00Z handoff · item owner-decision · reason r\n' >> "$_cg_run"
+check_gate_refused "AC2 a HOLD under the run's own rows" "$_cg_hold"
+# AC14: the split moved neither line of the verb, and one derivation stands. AC15: both censuses hold at
+# their counts before this unit, so a refusal took an existing site. A lower count is a retirement.
+out=$(run_chain --chain-verdict dFix); rc=$?
+same "FA9 AC14 a hold exits 0" "$rc" "0"
+hit "$out" "round 4 · HOLD · reason ceiling"
+same "FA9 AC14 the recipe is a second line" "$(grep '^unattended: chain' <<<"$out" | sed -n 2p | grep -c -- '--handoff dFix --code owner-decision')" "1"
+same "FA9 AC14 one derivation" "$(grep -c 'derive_chain_verdict "' "$SCRIPT")" "1"
+same "FA9 AC15 the driver's census holds" "$(( $(grep -cE "$_cg_census" "$SCRIPT") <= 318 ))" "1"
+same "FA9 AC15 the leg's census holds" "$(( $(grep -cE "$_cg_census" "$HERE/check-unattended.sh") <= 264 ))" "1"
+# AC3, and AC7's third population, over a policy kit, so COUNTED EITHER WAY. The owner's move reads as
+# CONTINUE, never as a pass, and the round the raised ceiling asks for lets the dispatch through.
+if [ -z "$_sw_rel" ]; then
+  n=$((n+18))
+  echo "  SKIP the chain gate's arms over a policy kit: no policy kit resolves beside this one, so nothing answers them; their 18 assertions are counted, not run"
+else
+  write_gate_fixture "$_fa_dated" 2026-11-01 1
+  write_hold_rounds
+  check_gate_refused "AC3 the shipped ceiling" "$_cg_hold"
+  mkdir -p "$_fc_r/.governance"
+  printf '[review.spec-audit]\nchain-ceiling = 6\n' > "$_fc_r/.governance/policy.toml"
+  commit_fold_fixture "$_fa_dated" policy "$_fc_r"
+  check_gate_refused "AC3 the owner's move" "$_cg_cont: round 4, reason open; re-invoke the build harness with auditIds: FIX-dFix-7"
+  write_fixture_round s5 FIX-dFix-7 0 0
+  check_gate_admits "AC3 the raised ceiling's round"
+  write_gate_fixture "$_fa_dated" 2026-11-01 1 $'[review.spec-audit]\ndisposal = "promote-all"\n'
+  write_gate_record
+  check_gate_admits "AC7 under promote-all"
+  miss "$out" "unattended: dispatch — chain"
+fi
+
+# AC6: the declaration arms the gate alone, because a run skipping both verbs leaves nothing else.
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_gate_fact 's/^witness: abc$/&\nspec-audit: 2026-11-01/'
+check_gate_refused "AC6 a declared audit with no round" "$_cg_cont: round 0, reason unreviewed"
+# AC7: the same record off the rule, each way a run keeps it, so the word is never read ahead of the rule.
+write_gate_fixture "$_fa_dated" ""
+write_gate_record
+check_gate_admits "AC7 a blank cutoff at BASE"
+miss "$out" "unattended: dispatch — chain"
+write_gate_fixture "$_fa_early" 2026-11-01
+write_gate_record
+check_gate_admits "AC7 a record begun before the cutoff"
+miss "$out" "unattended: dispatch — chain"
+# AC8: a closing review's row arms nothing, and the skip says so.
+write_gate_fixture "$_fa_dated" 2026-11-01
+run_chain --review dFix --subject dFix --verdict CLEAN --blockers 0 --highs 0 --minors 0 >/dev/null
+check_gate_admits "AC8 no audit declared or recorded"
+hit "$out" "unattended: dispatch — no spec audit is declared or recorded, so no chain verdict gates this dispatch: an announced skip, not a pass"
+
+# AC9: the conf at BASE answers, whichever way a run commit moved the working copy.
+write_moved_fixture "" 2026-11-01
+out=$(run_gate_review S1); rc=$?
+same "FA9 AC9 a run dating its own key refuses" "$rc" "1"
+hit "$out" "$_fa_refused$_fa_old"
+write_moved_fixture 2026-11-01 ""
+run_gate_review S1 >/dev/null
+same "FA9 AC9 a run blanking its own key keeps the fold rule" "$?" "0"
+# AC11: a run commit above the anchor is not BASE's side, whatever `anchor-kind` the record claims, and an
+# anchor at or above a dated BASE answers BASE.
+write_moved_fixture "" 2026-11-01
+_cg_above=$(git -C "$_fc_r" rev-parse HEAD)
+write_gate_fact "s/^base: .*/anchor-kind: local\nanchor-sha: $_cg_base\nbase: $_cg_above/"
+hit "$(run_gate_review S1)" "$_fa_refused$_fa_old"
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_gate_fact "s/^base: .*/anchor-sha: $(git -C "$_fc_r" rev-parse HEAD)\n&/"
+run_gate_review S1 >/dev/null
+same "FA9 AC11 an anchor above a dated BASE admits the fold" "$?" "0"
+sed -i "s/^anchor-sha: .*/anchor-sha: $_cg_base/" "$_cg_run"
+run_gate_review S2 >/dev/null
+same "FA9 AC11 an anchor at a dated BASE admits the fold" "$?" "0"
+# AC12: each unknown shape refuses, over a working copy a later commit restored. AC13: a closing review reads
+# nothing new, so the same bare record still takes its row.
+write_gate_fixture "$_fa_dated" 2026-11-01 0 "" "return 0"
+check_gate_unknown "a conf that returns"
+write_moved_fixture soon 2026-11-01
+check_gate_unknown "a key that is no date"
+write_gate_fixture "$_fa_dated" 2026-11-01
+write_gate_fact '/^base: /d'
+check_gate_unknown "no base"
+out=$(run_chain --review dFix --subject dFix --verdict CLEAN --blockers 0 --highs 0 --minors 0); rc=$?
+same "FA9 AC13 a closing review needs no base" "$rc" "0"
+same "FA9 AC13 its row is written" "$(grep -c 'review · item dFix · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0$' "$_cg_run")" "1"
 rm -rf "$_sw_tmp"
 
 # ---- TOOL-aSparedSpawn-6 S8, AC8: THE TOP-LEVEL EXIT ARM. An `exit` the driver runs at top level,
@@ -6913,9 +7115,6 @@ same "duplicate title: the FIRST occurrence binds, so an empty first section is 
 fkspec 'none'
 same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$TMP/fk.md")" "READY"
 
-
-
-
 echo "MARK brief-and-dispatch-arms" >&2
 # ---------------------------------------------------------------------------------------------
 # ---- TOOL-dBriefedPass-2 and -3 - THE REFUSAL ARMS, asserting each branch's OWN longest literal
@@ -6942,6 +7141,9 @@ o=$(run --brief tRun --unit "A · B" --path memory/builds/tRun/prompts/armbrief.
 n=$((n+1)); case "$o" in *"a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"*) echo "ok   brief: the field separator in the unit is refused" ;; *) echo "FAIL brief: the field separator in the unit is refused -- $o"; st=1 ;; esac
 o=$(run --brief tRun --unit "A--no-verify" --path memory/builds/tRun/prompts/armbrief.md)
 n=$((n+1)); case "$o" in *"a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite"*) echo "ok   brief: the declared bypass flag in the unit is refused" ;; *) echo "FAIL brief: the declared bypass flag in the unit is refused -- $o"; st=1 ;; esac
+# THIS RECORD WAS NEVER PREFLIGHTED, so it names a `base:` here, or the chain gate above each refusal below
+# answers first: an unknown conf is refused and never read as off (TOOL-dFoldedAudit-9).
+add_facts memory/builds/tRun/RUN.md "base: $(git rev-parse HEAD)"
 o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last"*) echo "ok   dispatch: a unit no spec defines is M2 MISSING" ;; *) echo "FAIL dispatch: a unit no spec defines is M2 MISSING -- $o"; st=1 ;; esac
 printf '# ARCH-tRun-1 — u
@@ -18620,7 +18822,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # unconditional, 14 `same` through `check_chain_refused` and `write_fixture_round`'s, 7 of that helper's
 # `hit`, 7 of its byte `same` and AC1's two-pass loop at 8 with one `hit`, then the 4 green rounds of AC6,
 # counted off the block's own lines; no suite ran, and their RED-first observation is the close's.
-FLOOR_ASSERTIONS=3082
+# RAISED 3082 -> 3193 by TOOL-dFoldedAudit-9: the chain gate's arms in region one after the disposal
+# line's, 93 unconditional and 18 over a policy kit, those COUNTED EITHER WAY, both paths counted by a
+# scratch probe of the same rows; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3193
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18764,7 +18969,8 @@ PROLOGUE_ARMS=20
 # RAISED 466 -> 505 by TOOL-dFoldedAudit-13: the same 39 region-one disposal line assertions, see FLOOR_ASSERTIONS.
 # RAISED 505 -> 524 by TOOL-dFoldedAudit-10: the same 19 region-one re-audit assertions, see FLOOR_ASSERTIONS.
 # RAISED 524 -> 565 by TOOL-dFoldedAudit-11: the same 41 region-one fold join assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=565
+# RAISED 565 -> 676 by TOOL-dFoldedAudit-9: the same 111 region-one chain gate assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=676
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
