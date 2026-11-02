@@ -651,7 +651,8 @@ async function runWholeScriptArms() {
 
   // ---- TOOL-aMendedFleet-67 S5 - `workerType` routes the JUDGES and only them, and they write nothing.
   // ---- The default half reads the first run's judges, so an arm that always sets the option reds here.
-  ck(finds.concat(verifies).every((t) => t.agentType === undefined), 'workerType: none, no judge spawn carries an agentType')
+  // TOOL-dFairHearing-11 S2 - `none` types every judge as PLATFORM_TYPE, so no judge spawns untyped.
+  ck(finds.concat(verifies).every((t) => t.agentType === 'general-purpose'), 'workerType: none, every judge spawn carries agentType general-purpose')
   const ABSENT = Object.assign({}, DIFF)
   delete ABSENT.workerType
   const rd = await runReview(ABSENT, ALL_OK)
@@ -668,7 +669,8 @@ async function runWholeScriptArms() {
     const judges = r.trace.filter((t) => /^(find|verify):/.test(t.label))
     const orch = r.trace.filter((t) => !/^(find|verify):/.test(t.label))
     ck(judges.length === 10 && judges.every((t) => t.agentType === 'Plan'), 'workerType: all five finders and five skeptic batches spawn as Plan')
-    ck(orch.length === 2 && orch.every((t) => t.agentType === undefined), 'workerType: the probe and the synthesis carry none: ' + orch.map((t) => t.label).join(' '))
+    ck(orch.length === 2 && orch[0].label === 'resume:probe' && orch[0].agentType === 'Plan' && orch[1].agentType === 'general-purpose',
+      'workerType: the probe takes Plan and the synthesis general-purpose, never the worker type: ' + orch.map((t) => t.label + '=' + t.agentType).join(' '))
     ck(judges.every((t) => t.prompt.indexOf('DURABILITY') === -1), 'workerType: no judge is told to write a lens or verify file')
     ck(judges.every((t) => t.prompt.indexOf('Set path to an empty string') !== -1), 'workerType: every judge is told to return path empty')
     ck(r.logs.some((l) => l.indexOf('worker type Plan') === 0 && l.indexOf('NOT durable') !== -1), 'workerType: the log says the results are not durable')
@@ -1977,6 +1979,8 @@ async function runLedgerArms() {
   await runTwinArms()
   await runPresetArms()
   await runOptInArms()
+  await runTypedStageArms()
+  await runTwinRunArms()
 }
 
 // ==== TOOL-dFairHearing-2 — the design-audit preset: its lenses, its review key and its announcements ====
@@ -2313,6 +2317,221 @@ async function runTwinArms() {
       'twins: id 2 refuted as a duplicate of id 1 hands no pair, and the block reads (none)')
 }
 
+// ==== TOOL-dFairHearing-11 — every spawn typed from a declared stage (AC1-AC4) ======================
+// RED against the parent render: its probe passes no stage options, its synthesis and a `none` run's
+// judges carry no agentType, `roles.probe` is an unknown key, and the code-reading arm names the probe's
+// agent( call. WHAT IT DOES NOT CHECK: that the platform spawns a type the options name; and the code
+// arm reads the template's agent( calls only, an `agent` reached under another name being invisible to it.
+const STAGE_OPTS = ['probeOpts', 'findOpts', 'verifyOpts', 'synthOpts']
+// The code with every string, template text, comment and regex literal blanked, lengths and newlines
+// kept, so a paren, a comma or an `agent(` inside one is never read; a `${...}` body stays code.
+function blankStrings(s) {
+  const out = s.split('')
+  const blank = (a, b) => { for (let k = a; k < b && k < s.length; k++) if (out[k] !== '\n') out[k] = ' ' }
+  const tpl = [] // the brace depth each open template literal's `${` returns to
+  let depth = 0
+  let lastCh = ''
+  let lastWord = ''
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i]
+    if (tpl.length && depth === tpl[tpl.length - 1]) { // template text, up to its close or a `${`
+      const st = i
+      while (i < s.length && s[i] !== '`' && !(s[i] === '$' && s[i + 1] === '{')) i += s[i] === '\\' ? 2 : 1
+      blank(st, i)
+      if (s[i] === '`') { out[i] = ' '; tpl.pop(); lastCh = ')'; lastWord = '' } else { i++; depth++; lastCh = '{'; lastWord = '' }
+      continue
+    }
+    if (c === '/' && s[i + 1] === '/') { const e = s.indexOf('\n', i); const end = e === -1 ? s.length : e; blank(i, end); i = end - 1; continue }
+    if (c === '/' && s[i + 1] === '*') { const e = s.indexOf('*/', i + 2); const end = e === -1 ? s.length : e + 2; blank(i, end); i = end - 1; continue }
+    if (c === '\'' || c === '"' || (c === '/' && (lastCh === '' || '(,=:[!&|?{};+-*%<>~^'.indexOf(lastCh) !== -1 || lastWord === 'return'))) {
+      let j = i + 1
+      let cls = false
+      while (j < s.length && s[j] !== '\n' && (cls || s[j] !== c)) {
+        if (s[j] === '\\') j++
+        else if (c === '/' && s[j] === '[') cls = true
+        else if (c === '/' && s[j] === ']') cls = false
+        j++
+      }
+      blank(i, j + 1); i = j; lastCh = ')'; lastWord = ''; continue
+    }
+    if (c === '`') { out[i] = ' '; tpl.push(depth); continue }
+    if (c === '{') depth++
+    else if (c === '}') depth--
+    if (/\s/.test(c)) continue
+    lastWord = /[\w$]/.test(c) ? (/[\w$]/.test(s[i - 1] || '') ? lastWord + c : c) : ''
+    lastCh = c
+  }
+  return out.join('')
+}
+// Every agent( call outside a string or comment: its line, and its second top-level argument as code and as written.
+function scanAgentCalls(text) {
+  const code = blankStrings(text)
+  const calls = []
+  const re = /(^|[^.\w$])agent\s*\(/g
+  let m
+  while ((m = re.exec(code))) {
+    const open = m.index + m[0].length - 1
+    let d = 0
+    let k = open
+    const commas = []
+    for (; k < code.length; k++) {
+      const ch = code[k]
+      if (ch === '(' || ch === '[' || ch === '{') d++
+      else if (ch === ')' || ch === ']' || ch === '}') { if (--d === 0) break }
+      else if (ch === ',' && d === 1) commas.push(k)
+    }
+    const end = commas.length > 1 ? commas[1] : k
+    calls.push({ line: code.slice(0, open).split('\n').length, opts: commas.length ? code.slice(commas[0] + 1, end) : '',
+      raw: commas.length ? text.slice(commas[0] + 1, end) : '' })
+  }
+  return calls
+}
+// The arm's predicate: an agent( call whose options name none of the four stage option constants is untyped.
+function checkStageOpts(text) {
+  const calls = scanAgentCalls(text)
+  const bad = calls.filter((c) => !STAGE_OPTS.some((n) => new RegExp('(?<![\\w$])' + n + '(?![\\w$])').test(c.opts)))
+  return { calls: calls, bad: bad }
+}
+async function runTypedStageArms() {
+  const path = require('path')
+  const tpl = fs.readFileSync(path.join(path.dirname(FILE), 'tier2-review.template.js'), 'utf8')
+  // ---- S3/AC4: every agent( call of the template takes a stage constant; a copy without the probe's names it.
+  const live = checkStageOpts(tpl)
+  ck(live.calls.length >= 5 && live.bad.length === 0, 'stage: all ' + live.calls.length + ' agent( calls of the template take one of ' + STAGE_OPTS.join(', ') +
+    ' as their options' + (live.bad.length ? ' — untyped at L' + live.bad.map((c) => c.line).join(', L') : ''))
+  const PROBE_OPTS = '  }, probeOpts), // TOOL-dFairHearing-11 S1'
+  const planted = checkStageOpts(tpl.replace(PROBE_OPTS, '  }), // TOOL-dFairHearing-11 S1'))
+  ck(tpl.indexOf(PROBE_OPTS) !== -1 && planted.bad.length === 1 && planted.bad[0].raw.indexOf('\'resume:probe\'') !== -1,
+    'stage: a copy with the probe\'s probeOpts removed names exactly the probe\'s agent( call: ' + planted.bad.map((c) => 'L' + c.line).join(' '))
+  const SYNTH_TYPE = 'const synthType = roles.synthesis || PLATFORM_TYPE'
+  const re = whole.indexOf(SYNTH_TYPE) === -1 ? { threw: 'the stage table line moved', trace: [] }
+    : await runReview(DIFF, ALL_OK, whole.replace(SYNTH_TYPE, 'const synthType = roles.synthesis || \'\''))
+  ck(!!re.threw && re.threw.indexOf('the stage synthesis resolves to no agent type') !== -1 && re.trace.length === 0,
+    'stage: a stage table resolving synthesis to an empty string refuses by name before the probe: ' + re.threw)
+  // ---- AC1: roles.probe types the probe, Plan without it, and `none` is refused like any roles value.
+  const probeOf = (x) => x.trace.find((t) => t.label === 'resume:probe') || {}
+  let r = await runReview(Object.assign({}, DIFF, { roles: { probe: 'gov-orienter' } }), ALL_OK)
+  ck(!r.threw && probeOf(r).agentType === 'gov-orienter' && r.logs.indexOf('role probe: gov-orienter — roles.probe') !== -1,
+    'stage: roles.probe types the resume probe, and its log line names the source')
+  r = await runReview(Object.assign({}, DIFF, { roles: { probe: 'none' } }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `roles` key probe') === 0 && r.trace.length === 0, 'stage: roles.probe none is refused before any spawn')
+  r = await runReview(Object.assign({}, DIFF, { efforts: { probe: 'low' } }), ALL_OK)
+  ck(!r.threw && probeOf(r).effort === 'low' && r.logs.indexOf('effort probe: low — efforts.probe') !== -1, 'stage: efforts.probe sets the probe\'s effort')
+  // ---- AC2: under `none` every judge and the synthesis take general-purpose; absent, the judges Plan.
+  const rn = await runReview(DIFF, ALL_OK)
+  const ABSW = Object.assign({}, DIFF); delete ABSW.workerType
+  const ra = await runReview(ABSW, ALL_OK)
+  const typesOf = (x, re2) => x.trace.filter((t) => re2.test(t.label)).map((t) => t.agentType)
+  ck(!rn.threw && probeOf(rn).agentType === 'Plan' && typesOf(rn, /^(find|verify):|^synth$/).length === 11 &&
+    typesOf(rn, /^(find|verify):|^synth$/).every((t) => t === 'general-purpose'), 'stage: none, the five finders, five batches and the synthesis are general-purpose and the probe Plan')
+  ck(!ra.threw && probeOf(ra).agentType === 'Plan' && typesOf(ra, /^(find|verify):/).length === 10 && typesOf(ra, /^(find|verify):/).every((t) => t === 'Plan') &&
+    typesOf(ra, /^synth$/).join() === 'general-purpose' && ra.trace.every((t) => typeof t.agentType === 'string' && t.agentType !== ''),
+    'stage: workerType absent, the judges are Plan, the synthesis general-purpose, and every spawn typed: ' + ra.trace.length)
+  // ---- AC3: `durable` follows the judge stages' resolution to PLATFORM_TYPE, not the explicit type.
+  ck(rn.result.durable === true && rn.trace.filter((t) => t.label.indexOf('find:') === 0).every((t) => t.prompt.indexOf('DURABILITY') !== -1) &&
+    ra.result.durable === false, 'stage: none is durable with every finder told DURABILITY, and Plan is not durable')
+}
+
+// ==== TOOL-dFairHearing-11 — `twin`, run b and the twin merge (AC5-AC10) =============================
+// RED against the parent render: it reads no `twin`, refuses no value, dispatches five finders on every
+// run, hands no TWIN RUN block or review-twin line, and returns no `twin`. WHAT IT DOES NOT CHECK: that a
+// live synthesis merges the two runs as told or copies the line; the return's `twin` is the source a caller
+// compares against.
+async function runTwinRunArms() {
+  const finds = (x) => x.trace.filter((t) => t.label.indexOf('find:') === 0)
+  // ---- AC5: a closed set, refused outside it before any spawn; each member starts.
+  let r = await runReview(Object.assign({}, DIFF, { twin: 'sometimes' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `twin` must be one of never | design-records | design-and-landing | always') === 0 && r.trace.length === 0,
+    'twin: sometimes is refused before any spawn, naming the four values')
+  const started = []
+  for (const v of ['never', 'design-records', 'design-and-landing', 'always']) {
+    r = await runReview(Object.assign({}, DIFF, { twin: v }), ALL_OK)
+    if (!r.threw && r.result && r.result.exit === 'complete') started.push(v)
+  }
+  ck(started.length === 4, 'twin: each of the four values starts and completes: ' + started.join(' '))
+  // ---- AC6: ten finders exactly where S5 says; ten is twice the five-slot literal.
+  const CASES = { diff: DIFF, 'unit-spec audit': SPEC, 'design-audit preset': Object.assign({}, SPEC, { preset: 'design-audit' }),
+    'design-subject audit': Object.assign({}, SPEC, { subjects: [{ path: 'memory/builds/dX/build/a.md', blob: 'abc1234', id: 'PLAY-dX-1' }] }) }
+  const WANT = { never: [], 'design-records': ['design-audit preset', 'design-subject audit'], 'design-and-landing': ['diff', 'design-audit preset', 'design-subject audit'],
+    always: ['diff', 'unit-spec audit', 'design-audit preset', 'design-subject audit'] }
+  for (const t of Object.keys(WANT)) {
+    const got = []
+    for (const c of Object.keys(CASES)) {
+      const x = await runReview(Object.assign({}, CASES[c], { twin: t }), ALL_OK)
+      got.push(x.threw ? c + ' threw' : finds(x).length === 10 ? c : finds(x).length === 5 ? null : c + ' at ' + finds(x).length)
+    }
+    ck(got.filter(Boolean).join(', ') === WANT[t].join(', '), 'twin: ' + t + ' dispatches ten finders on ' + (got.filter(Boolean).join(', ') || 'no run'))
+  }
+  // ---- AC7: run a two findings a lens, run b one; ids run 1-10 then 11-15, and the batch count is an
+  // untwinned fifteen-finding run's.
+  const buildRunLens = (label) => {
+    const lens = label.slice('find:'.length).replace(/:b$/, '')
+    const b = /:b$/.test(label)
+    const mk = (n) => ({ file: lens + '.js', line: n, severity: 'high', claim: lens + ' ' + n + (b ? ' b' : ' a'), impact: 'i', fix: 'f' })
+    return { lens: lens, path: '/p', findings: b ? [mk(1)] : [mk(1), mk(40)] }
+  }
+  const buildFifteen = (label) => ({ lens: label.slice('find:'.length), path: '/p', findings: [1, 2, 3].map((n) => ({ file: 'f.js', line: n * 10, severity: 'high', claim: 'c' + n, impact: 'i', fix: 'f' })) })
+  const buildTwinSynth = (drop) => (label, prompt) => {
+    const ids = [...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10)).filter((id) => id !== drop && id !== 12)
+    return { path: 'memory/reviews/r.md', summary: 's', items: ids.map((id) => {
+      const hold = id === 3 ? [3, 12] : [id]
+      return { severity: 'HIGH', ids: hold, grades: buildGrades(hold, 'HIGH') }
+    }) }
+  }
+  const TW = Object.assign({}, DIFF, { twin: 'always' })
+  const rt = await runReview(TW, buildStubs({ 'find:': buildRunLens, synth: buildTwinSynth(null) }))
+  const ru = await runReview(DIFF, buildStubs({ 'find:': buildFifteen }))
+  if (checkNoThrow(rt, 'twin run') && checkNoThrow(ru, 'untwinned fifteen')) {
+    const fb = finds(rt).slice(5)
+    ck(rt.result.ledger.map((e) => e.id).join(',') === '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15' &&
+      rt.result.ledger.every((e) => / (a|b)$/.exec(e.claim)[1] === (e.id <= 10 ? 'a' : 'b')) &&
+      fb.length === 5 && fb.every((t) => /:b$/.test(t.label) && t.prompt.indexOf('/find-' + t.label.slice(5, -2) + '-b.json') !== -1),
+      'twin: run a takes ids 1-10 and run b 11-15, run b\'s labels ending :b and its files -b: ' + fb.map((t) => t.label).join(' '))
+    const vb = (x) => x.trace.filter((t) => t.label.indexOf('verify:') === 0).length
+    ck(vb(rt) === vb(ru) && ru.result.raw === 15 && rt.result.raw === 15 && rt.result.agents === 10 + vb(rt) + 1 && rt.result.lensesRun === 10 &&
+      / raw=15 .* agents=16 /.test(rt.result.shape), 'twin: the verify stage dispatches ' + vb(rt) + ' batches as an untwinned fifteen does, and agents, raw and the shape line count both runs: ' + rt.result.shape)
+    // ---- AC8: the figures come from the items; the prompt carries the block and the line; an untwinned run neither.
+    const tw = rt.result.twin || {}
+    ck(tw.agreed === 1 && tw.onlyA === 9 && tw.onlyB === 4 && (tw.a || []).join(',') === '1,2,3,4,5,6,7,8,9,10' && (tw.b || []).join(',') === '11,12,13,14,15',
+      'twin: ids 3 and 12 in one item read agreed 1, and a and b list each run\'s confirmed ids: ' + JSON.stringify(rt.result.twin))
+    const sp = (rt.trace.find((t) => t.label === 'synth') || { prompt: '' }).prompt
+    ck(sp.indexOf('\n\nTWIN RUN - ') !== -1 && sp.indexOf('<<<TWIN\nreview-twin runs=2 a=1-10 b=11-15\nTWIN>>>') !== -1 && sp.indexOf(' lens=correctness run=a correctness.js:1 — ') !== -1 &&
+      sp.indexOf('- run a id=3 and run b id=12, both at correctness.js 1') !== -1, 'twin: the synthesis prompt carries the TWIN RUN block, each finding\'s run, the pair 3/12 and the review-twin line between markers')
+    const su = (ru.trace.find((t) => t.label === 'synth') || { prompt: '' }).prompt
+    ck(su.length > 0 && su.indexOf('TWIN RUN') === -1 && su.indexOf('review-twin') === -1 && su.indexOf(' run=') === -1 && ru.result.twin === null,
+      'twin: an untwinned run\'s synthesis prompt carries neither the block nor the line, and its return reads twin null')
+  }
+  // ---- AC9: a run-b confirmed id in no item nulls blockers and twin, and the note names it.
+  r = await runReview(TW, buildStubs({ 'find:': buildRunLens, synth: buildTwinSynth(14) }))
+  ck(!r.threw && r.result.blockers === null && r.result.twin === null && r.result.note.indexOf('confirmed id(s) 14 sit in no item') !== -1,
+    'twin: an unplaced run-b id 14 nulls blockers and twin, and the note names it')
+  // ---- AC10: a twinned run keys apart; `never` keys as an absent value.
+  const deriveTwinKey = async (v) => {
+    const x = await runReview(v === undefined ? DIFF : Object.assign({}, DIFF, { twin: v }), ALL_OK)
+    return x.result ? x.result.key : 'threw: ' + x.threw
+  }
+  const kAbsent = await deriveTwinKey(undefined)
+  const kNever = await deriveTwinKey('never')
+  const kAlways = await deriveTwinKey('always')
+  ck(kAbsent.indexOf('threw') !== 0 && kAbsent === kNever && kAlways !== kAbsent, 'twin: always moves the key and never keeps it: ' + [kAbsent, kNever, kAlways].join(' '))
+  // ---- a dead run-b lens defers by its :b label.
+  r = await runReview(TW, buildStubs({ 'find:seams:b': null }))
+  ck(!r.threw && r.result.exit === 'deferred-platform' && JSON.stringify(r.result.pending) === '["find:seams:b"]', 'twin: a dead run-b lens defers, pending find:seams:b: ' + JSON.stringify(r.result && r.result.pending))
+  // ---- AC5's stand-in half: review_pin.py prints the pin argument, and refuses a value off the set by name.
+  const py = process.argv[5] || ''
+  const { spawnSync } = require('child_process')
+  const pin = require('path').join(require('path').dirname(FILE), 'review_pin.py')
+  const runPin = (argv) => {
+    if (!py) return { status: -1, stdout: '', stderr: 'no python was resolved' }
+    const x = spawnSync(py, ['-B', pin].concat(argv), { encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    return { status: x.status, stdout: x.stdout || '', stderr: (x.stderr || '') + (x.error ? String(x.error) : '') }
+  }
+  const p1 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--twin', 'always'])
+  ck(p1.status === 0 && p1.stdout === '{"preset": "unit-spec", "twin": "always"}\n', 'twin: review_pin.py --twin always prints twin always (got ' + p1.status + ': ' + (p1.stdout || p1.stderr).trim() + ')')
+  const p2 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--twin', 'sometimes'])
+  ck(p2.status === 2 && p2.stdout === '' && p2.stderr.indexOf('--twin') !== -1, 'twin: review_pin.py --twin sometimes exits 2 naming --twin (got ' + p2.status + ')')
+}
+
 // ==== TOOL-aOrientedCast-10 — `efforts`, each stage spawned at the reasoning effort its caller names ====
 // Every arm is RED against the parent render, which reads no `efforts`: no refusal fires, no spawn's
 // options carry an `effort` key and no `effort ` line is logged. A green arm says the routing follows
@@ -2347,7 +2566,7 @@ async function runEffortsArms() {
   // ---- independent of `roles`: an untyped skeptic still takes its level.
   r = await runReview(Object.assign({}, DIFF, { efforts: { skeptic: 'max' } }), ALL_OK)
   if (checkNoThrow(r, 'efforts untyped skeptic'))
-    ck(checkEvery(scanStage(r, 'verify:'), (t) => t.effort === 'max' && t.agentType === undefined), 'efforts: an untyped skeptic spawns at its level')
+    ck(checkEvery(scanStage(r, 'verify:'), (t) => t.effort === 'max' && t.agentType === 'general-purpose'), 'efforts: a skeptic no role names spawns at its level')
   // ---- absent, no spawn's options carry the key: the call is today's byte for byte.
   r = await runReview(DIFF, ALL_OK)
   if (checkNoThrow(r, 'efforts absent'))
@@ -2464,12 +2683,12 @@ async function runRolesArms() {
   }
   let r = await runReview(Object.assign({}, ABSW, { roles: {} }), ALL_OK)
   ck(!r.threw && r.result && r.result.exit === 'complete', 'roles: an empty object proceeds' + (r.threw ? ' (threw: ' + r.threw + ')' : ''))
-  // ---- S3: each stage spawns as the type its key names, and the probe never takes one.
+  // ---- S3: each stage spawns as the type its key names, and the probe as Plan when no key names it.
   r = await runReview(Object.assign({}, ABSW, { roles: FULL }), ALL_OK)
   if (checkNoThrow(r, 'roles full diff')) {
     ck(checkAll(scanTypes(r, 'find:'), 'gov-diff-reviewer') && checkAll(scanTypes(r, 'verify:'), 'gov-skeptic') &&
-      checkAll(scanTypes(r, 'synth'), 'gov-synthesizer') && checkAll(scanTypes(r, 'resume:probe'), undefined),
-      'roles: a full diff set spawns finders, skeptics and the synthesis as their roles, and the probe untyped')
+      checkAll(scanTypes(r, 'synth'), 'gov-synthesizer') && checkAll(scanTypes(r, 'resume:probe'), 'Plan'),
+      'roles: a full diff set spawns finders, skeptics and the synthesis as their roles, and the probe as Plan')
   }
   const rsf = await runReview(Object.assign({}, SPEC, { roles: FULL }), ALL_OK)
   if (checkNoThrow(rsf, 'roles full spec'))
@@ -2477,11 +2696,11 @@ async function runRolesArms() {
       'roles: a spec audit spawns its finders as specFinder, never diffFinder')
   const rsk = await runReview(Object.assign({}, ABSW, { roles: { skeptic: 'gov-skeptic' } }), ALL_OK)
   if (checkNoThrow(rsk, 'roles skeptic only'))
-    ck(checkAll(scanTypes(rsk, 'find:'), 'Plan') && checkAll(scanTypes(rsk, 'verify:'), 'gov-skeptic') && checkAll(scanTypes(rsk, 'synth'), undefined),
-      'roles: a skeptic key alone moves the skeptics; the finders keep workerType\'s Plan and the synthesis stays untyped')
+    ck(checkAll(scanTypes(rsk, 'find:'), 'Plan') && checkAll(scanTypes(rsk, 'verify:'), 'gov-skeptic') && checkAll(scanTypes(rsk, 'synth'), 'general-purpose'),
+      'roles: a skeptic key alone moves the skeptics; the finders keep workerType\'s Plan and the synthesis stays general-purpose')
   const rsy = await runReview(Object.assign({}, DIFF, { roles: { synthesis: 'gov-synthesizer' } }), ALL_OK)
   if (checkNoThrow(rsy, 'roles synthesis only'))
-    ck(checkAll(scanTypes(rsy, 'find:'), undefined) && checkAll(scanTypes(rsy, 'verify:'), undefined) && checkAll(scanTypes(rsy, 'synth'), 'gov-synthesizer'),
+    ck(checkAll(scanTypes(rsy, 'find:'), 'general-purpose') && checkAll(scanTypes(rsy, 'verify:'), 'general-purpose') && checkAll(scanTypes(rsy, 'synth'), 'gov-synthesizer'),
       'roles: a synthesis key under workerType none moves the synthesis alone')
   // ---- S4: a roled judge makes the whole run not durable; a synthesis role does not.
   const rdf = await runReview(Object.assign({}, DIFF, { roles: { diffFinder: 'gov-diff-reviewer' } }), ALL_OK)
@@ -2546,8 +2765,9 @@ async function runRolesArms() {
   }
   r = await runReview(DIFF, ALL_OK)
   if (checkNoThrow(r, 'roles classic logs'))
-    ck(r.logs.filter((l) => /^role (find|verify|synthesis): /.test(l)).length === 3 && r.logs.indexOf('role synthesis: the platform default — no roles.synthesis, as before roles') !== -1,
-      'roles: a classic run logs the three stage lines too')
+    ck(r.logs.filter((l) => /^role (probe|find|verify|synthesis): /.test(l)).length === 4 && r.logs.indexOf('role synthesis: general-purpose — no roles.synthesis, so PLATFORM_TYPE') !== -1 &&
+      r.logs.indexOf('role probe: Plan — no roles.probe, so Plan') !== -1,
+      'roles: a classic run logs the four stage lines too, the probe\'s and the synthesis\'s naming their default type')
   // ---- S8: the synthesis record says the run ran under roles; a classic run's prompt carries no clause.
   const extractSynthPrompt = (run) => (scanStage(run, 'synth')[0] || { prompt: '' }).prompt
   if (rsy.result) {
@@ -3034,7 +3254,13 @@ printf '%s\n' "$out"
 # arms — the diff and spec pairs (2), five addressTwins arms (5), the shown and default prompts (2), the
 # kept and discarded flags (1), the agreeing counts (1), the off-address flag (1) and the merged duplicate
 # (1). armBatchBy becoming armClosedSet adds none. Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=473
+# RAISED 473 -> 498 by TOOL-dFairHearing-11: 25 assertions, counted off the `stage:` and `twin:` arms — the
+# code-reading arm and its planted copy (2), the emptied synthesis type (1), the probe's role, refusal and
+# effort (3), the two type tables and durability (3), the twin refusal and its four starts (2), AC6's loop
+# over four values (4), the two run ranges and counts (2), the figures and both prompts (3), the unplaced id
+# (1), the key (1), the dead run-b lens (1) and two review_pin.py --twin arms (2). The six re-pinned type
+# arms add none. Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=498
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

@@ -330,6 +330,26 @@ shown. A flag notes a twin and never overturns a verdict: no verdict, grade, ite
 other value refuses before the first agent. It joins no review key, since the synthesis writes no keyed
 file. It ships dark: nothing in this kit passes `'shown'` until the replay records a hit.
 
+`twin` is the policy key `review.twin`, passed directly as a pin argument until a policy-file trigger
+lands: `'never'`, `'design-records'`, `'design-and-landing'` or `'always'`, and absent it is `'never'`;
+any other value refuses before the first agent. It twins a run under `'always'`; under
+`'design-records'` on a design-record audit, a spec audit whose subjects are all design subjects by
+`SPEC_SUBJECT_PATH` or whose `preset` is not `'unit-spec'`; and under `'design-and-landing'` on that case
+or on any diff review, every diff review here being the closing review. A twinned run dispatches a
+second finder run, run b, over the same lens literal after run a, as a second bounded fan: run b's
+labels end `:b` (`find:<lens>:b`, so a dead one sits in `pending` that way) and its lens files are
+`find-<lens>-b.json`. Ids number run a's findings first and then run b's, so each run is one contiguous
+range; the verify stage keeps its fixed batch count over the union, and `agents`, `lensesRun`, every
+count and the review-shape line cover both runs. Each confirmed finding reaches the synthesis carrying
+`run=a` or `run=b`, under a `TWIN RUN` block listing the cross-run candidate pairs at one address by
+`deriveAddressKey` and asking for one item per defect, its ids from either run or both. The harness
+renders `review-twin runs=2 a=<first>-<last> b=<first>-<last>` (`-` for a run with no finding), which the
+synthesis copies verbatim directly below the review-shape line. The final return carries `twin`: `{a,
+b, agreed, onlyA, onlyB}`, run a's and run b's confirmed ids and three ITEM counts derived from the
+item list, `agreed` holding a confirmed id of each run; it is `null` when the tally refuses the items,
+when no synthesis ran, and on every untwinned run. A twinned run's key print gains `twin: true`, so it
+never reuses an untwinned run's files; an untwinned run's key and synthesis prompt are unchanged.
+
 `preset` picks a spec audit's lens literal, `'unit-spec'` or `'design-audit'`, and absent it is
 `'unit-spec'`, the five lenses above. Only the caller picks it, and the kind stays `spec-audit`, so
 the binding line is unchanged. `'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
@@ -357,12 +377,13 @@ default is accepted and reported unread, since the swapped lens is the one that 
 `lenses.toml` can be swapped in, and today none is: each opt-in row ships `optin = false` until its
 losing test is recorded.
 
-`review_pin.py`, beside the harness, is the stand-in for `review.pin`: it prints the `preset` and
-`optIn` of one spec-audit call as one JSON line, and runs nothing.
+`review_pin.py`, beside the harness, is the stand-in for `review.pin`: it prints the `preset`,
+`optIn` and `twin` of one spec-audit call as one JSON line, and runs nothing.
 
 ```
 python <kit>/review_pin.py --subject <path> [--subject <path> ...]
                            [--opt-in none|'<json>'] [--design-record-preset unit-spec|design-audit]
+                           [--twin never|design-records|design-and-landing|always]
 ```
 
 A subject is a spec subject when the harness's own `SPEC_SUBJECT_PATH`, read from the `tier2-review.js`
@@ -372,7 +393,9 @@ prints `unit-spec`; a set of design records alone prints `--design-record-preset
 `review.opt-in` value: `none`, the default, or a JSON object keyed by literal name whose values are
 `optIn` maps, and the entry for the printed preset rides as `optIn`. It checks `--opt-in`'s shape only;
 membership is the harness's. It exits 2 naming `SPEC_SUBJECT_PATH`, `--opt-in` or `--subject` on a
-harness with no predicate line, a malformed value or no subject. `unattended-build.js` forwards a
+harness with no predicate line, a malformed value or no subject. `--twin` is the `review.twin` value,
+printed as `twin` when given and checked against the four values only; absent, no `twin` is printed.
+`unattended-build.js` forwards a
 caller's `optIn`, `preset` and `lensNotes` to its audit stage's review call unchanged, and unchecked.
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
@@ -481,7 +504,8 @@ brief the harness wrote and lands nothing, so `workerType` lets a caller spawn t
 agent type instead. In `tier2-review.js` an absent `workerType` reads as `Plan`, the default one
 measured A/B pair set (TOOL-aMendedFleet-93's reading): its read-only judges matched the charter-loaded
 arm's precision at about half the first-turn context. The reserved literal `none` spawns every judge as
-before that default, durability instructions and review key included. In the two drift harnesses an
+`general-purpose`, the harness's `PLATFORM_TYPE` and the Agent tool's own default, durability
+instructions and review key included (TOOL-dFairHearing-11). In the two drift harnesses an
 absent `workerType` still spawns every agent as the platform default, because no pair measured them.
 
 ```js
@@ -493,9 +517,11 @@ args: { repo, base, outDir, workerType: 'Plan' }
 
 The value must match `^[A-Za-z][A-Za-z0-9_-]{0,63}$`, or the harness refuses before any agent spawns
 with a message naming `workerType`. A well-formed name the platform does not know comes back as its
-named `not found` refusal, which each harness already counts as a dead agent. The orchestrating
-agents never take the type: the tier2 resume probe reads the lens files and the synthesis writes the
-report.
+named `not found` refusal, which each harness already counts as a dead agent. `workerType` does not
+reach the tier2 orchestrating agents, each typed by its own stage instead: the resume probe, which reads
+the lens files, spawns as `Plan` unless `roles.probe` names a type, and the synthesis, which writes the
+report, as `general-purpose` unless `roles.synthesis` does. So no tier2 agent spawns untyped, and a stage
+resolving to no type is refused by name before the probe.
 
 Under a type, a tier2 judge is told to write no `find-*.json` or `verify-*.json` and to return `path`
 empty, because the read-only types hold no Write tool. One log line names the type and says the run's
@@ -553,22 +579,27 @@ harness's reserved untyped literal; an untyped stage is spelled by leaving its k
   which then governs only a judge stage no role names. A judge run under a role writes no lens or verify
   file, so a deferred-platform return whose review says `durable: false` tells the caller the re-run
   dispatches every judge again, instead of promising a reuse.
-- **The review harness's roles.** `tier2-review.js` takes four keys: `diffFinder` and `specFinder` name
-  the finders of a diff review and of a spec audit, only the running kind's key being read; `skeptic`
-  names every skeptic batch; `synthesis` names the synthesis. A key wins over `workerType` for its own
-  stage, `workerType` keeps every judge stage no key names, and the synthesis takes its key or no type;
-  the resume probe never takes one. A roled finder or skeptic is told none of the posture its role
-  carries, and keeps every stage protocol sentence: the acquire step, the rubric, the probe policy, the
-  schemas. Any judge under a type, a role or `workerType`, makes the whole run not durable, so every
-  judge writes no file and a re-run dispatches every finder and skeptic again; a synthesis role alone
-  keeps a `none` run durable and its key. A judge role joins the review key; the synthesis role does not.
+- **The review harness's roles.** `tier2-review.js` takes five keys: `probe` names the resume probe;
+  `diffFinder` and `specFinder` name the finders of a diff review and of a spec audit, only the running
+  kind's key being read; `skeptic` names every skeptic batch; `synthesis` names the synthesis. A key wins
+  over `workerType` for its own stage, `workerType` keeps every judge stage no key names, and under
+  `none` such a judge takes `general-purpose` (`PLATFORM_TYPE`); the synthesis takes its key or
+  `general-purpose`, and the resume probe its key or `Plan`, which holds no Write tool, logged as a
+  `role probe:` line beside the other three (TOOL-dFairHearing-11). Every spawn carries an explicit
+  `agentType`, from one of the four stage option constants `probeOpts`, `findOpts`, `verifyOpts` and
+  `synthOpts`, and the suite reds an `agent(` call taking none. A roled finder or skeptic is told none of
+  the posture its role carries, and keeps every stage protocol sentence: the acquire step, the rubric,
+  the probe policy, the schemas. Any judge off `general-purpose`, under a type, a role or `workerType`,
+  makes the whole run not durable, so every judge writes no file and a re-run dispatches every finder and
+  skeptic again; a synthesis or probe role alone keeps a `none` run durable and its key. A judge role
+  joins the review key; the synthesis and probe roles do not.
   Compose the object with `<prefix>/roles/handoff.py harness-args tier2-review` rather than by hand.
 - **The harnesses' efforts** (TOOL-aOrientedCast-10). Each harness takes `efforts` beside `roles`, keyed
   by the same stage keys: a level of lower-case letters, set as that stage's `agent()` `effort` option.
   It is independent of `roles`, so an untyped stage still takes its level; a stage it does not name
   passes no `effort` and runs at its agent type's level, else the session's, and each harness logs one
-  `effort <key>:` line per stage saying which. The review harness never sets it on the resume probe;
-  the build harness spawns its spec writer, spec commit and disposal at theirs, forwards the audit's three
+  `effort <key>:` line per stage saying which. The review harness sets it on the resume probe only
+  under `efforts.probe`; the build harness spawns its spec writer, spec commit and disposal at theirs, forwards the audit's three
   review keys as the review call's `efforts` and `builder` in `dispatch.args`. A malformed object, an
   unknown key or a value off the shape refuses before any spawn. The vocabulary is the roles kit's, so
   a harness grades the shape only. Compose it with `<prefix>/roles/handoff.py stage-efforts
@@ -595,6 +626,7 @@ the stage's scope.
 | `unattended-unit` | builder | `<slug> · <unitId> · build` |
 | `tier2-review` | resume probe | `<slug> · <kind> round <n> · resume:probe` |
 | | finder | `<slug> · <kind> round <n> · find:<lens>` |
+| | twin run b finder | `<slug> · <kind> round <n> · find:<lens>:b` |
 | | verify batch | `<slug> · <kind> round <n> · verify:batch-<n>` |
 | | synthesis | `<slug> · <kind> round <n> · synth` |
 

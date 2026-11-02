@@ -134,6 +134,10 @@ function readOutputTokens() {
 //   addressTwins: "hidden" | "shown",    // DEFAULTS to "hidden": "shown" hands the synthesis every refuted
 //                                         // finding's claim and reason and each confirmed/refuted pair at one
 //                                         // address, and has it return `twinFlags`; refused outside the set
+//   twin: "never" | "design-records" | "design-and-landing" | "always", // DEFAULTS to "never": the
+//                                         // `review.twin` key, passed as a pin argument. A run it twins dispatches
+//                                         // a second finder run, run b, and the synthesis merges the two; refused
+//                                         // outside the set (TOOL-dFairHearing-11)
 //   optIn: { "<opt-in lens key>": "<default lens key>" }, // DEFAULTS to {}: the CALLER's swap. Each key is a
 //                                         // shipped opt-in lens (OPTIN_LENSES) offered for the run's literal, run
 //                                         // in the slot of the default it names, so the literal keeps five. Refused
@@ -147,18 +151,19 @@ function readOutputTokens() {
 //                                         // touches`, then `- ` lines): it is cut out before the items are
 //                                         // parsed and joins `byDesign`. The array form carries no block.
 //   workerType: "<agent type>" | "none",  // the type every finder and skeptic spawns as; absent -> Plan,
-//                                         // "none" -> the platform default. Under a type no judge writes a lens file,
+//                                         // "none" -> PLATFORM_TYPE. Under any other type no judge writes a lens file,
 //                                         // so a deferred return's `durable` is false and a re-run re-dispatches every judge
-//   roles: { diffFinder, specFinder, skeptic, synthesis }, // TOOL-aOrientedCast-5: each an agent type
+//   roles: { probe, diffFinder, specFinder, skeptic, synthesis }, // TOOL-aOrientedCast-5: each an agent type
 //                                         // name, never "none"; absent -> {}. A key names the type ITS stage spawns
 //                                         // as and wins over `workerType`, which keeps every judge stage no key
-//                                         // names; the synthesis takes its key or no type. Only this kind's finder
-//                                         // key is read. Any judge under a type makes the run not durable.
-//   efforts: { diffFinder, specFinder, skeptic, synthesis } } // TOOL-aOrientedCast-10: each a reasoning
+//                                         // names; the synthesis takes its key or PLATFORM_TYPE, and the resume probe
+//                                         // its key or Plan (TOOL-dFairHearing-11). Only this kind's finder key is
+//                                         // read. Any judge off PLATFORM_TYPE makes the run not durable.
+//   efforts: { probe, diffFinder, specFinder, skeptic, synthesis } } // TOOL-aOrientedCast-10: each a reasoning
 //                                         // effort level, lower-case letters; absent -> {}. A key sets ITS stage's
 //                                         // `effort` option, independent of `roles`; an unnamed stage runs at its
 //                                         // agent type's level, else the session's. The caller passes what
-//                                         // `handoff.py stage-efforts <workflow>` prints. Never the resume probe.
+//                                         // `handoff.py stage-efforts <workflow>` prints.
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -254,6 +259,13 @@ if (typeof batchBy !== 'string' || ['id', 'address'].indexOf(batchBy) === -1)
 const addressTwins = a.addressTwins === undefined ? 'hidden' : a.addressTwins
 if (typeof addressTwins !== 'string' || ['hidden', 'shown'].indexOf(addressTwins) === -1)
   throw new Error('tier2-review: `addressTwins` must be one of hidden | shown. Got ' + JSON.stringify(a.addressTwins) + '.')
+// TOOL-dFairHearing-11 S4 - `twin`, the policy key `review.twin` passed as a pin argument until dDeclaredLoop's
+// `review.trigger` lands, in the shape of `intensity`: a closed set refused outside it before any agent.
+// Which runs it twins is `twinned`, derived below once the subjects and the preset are read.
+const TWINS = ['never', 'design-records', 'design-and-landing', 'always']
+const twin = a.twin === undefined ? 'never' : a.twin
+if (typeof twin !== 'string' || TWINS.indexOf(twin) === -1)
+  throw new Error('tier2-review: `twin` must be one of ' + TWINS.join(' | ') + '. Got ' + JSON.stringify(a.twin) + '.')
 // TOOL-dFairHearing-2 S1 - `preset`, the CALLER's choice of a spec audit's lens literal, in the shape of
 // `intensity` above: a closed set refused by name outside it, and refused beside the diff kind, which
 // has one literal and so no preset. Each member but the default names the `gov:lens-slots` literal it
@@ -290,9 +302,9 @@ if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !AGENT_TY
 // agent when it is not a plain object, carries a key outside ROLE_KEYS, or a value that is not a type
 // name; `none` is refused too, since an untyped stage is spelled by leaving its key out. A key names
 // its own stage and wins over `workerType`, which keeps every judge stage no key names (spec section 8
-// F1); the synthesis, which `workerType` never governed, takes its key or no type; the resume probe
-// never takes one. Only this kind's finder key is read.
-const ROLE_KEYS = ['diffFinder', 'specFinder', 'skeptic', 'synthesis']
+// F1); the synthesis, which `workerType` never governed, takes its key or PLATFORM_TYPE, and the resume
+// probe its key or Plan (TOOL-dFairHearing-11 S1/S2). Only this kind's finder key is read.
+const ROLE_KEYS = ['probe', 'diffFinder', 'specFinder', 'skeptic', 'synthesis']
 const roles = a.roles === undefined ? {} : a.roles
 if (!roles || typeof roles !== 'object' || Array.isArray(roles) || Object.prototype.toString.call(roles) !== '[object Object]')
   throw new Error('tier2-review: `roles` must be an object mapping a stage key to an agent type name; legal keys: ' + ROLE_KEYS.join(' | ') +
@@ -306,9 +318,19 @@ for (const k of Object.keys(roles)) {
 }
 const finderKey = isSpec ? 'specFinder' : 'diffFinder'
 const otherFinderKey = isSpec ? 'diffFinder' : 'specFinder'
-const findType = roles[finderKey] || workerType
-const verifyType = roles.skeptic || workerType
-const synthType = roles.synthesis || ''
+// TOOL-dFairHearing-11 S2 - THE STAGE TABLE: every stage resolves an explicit type. PLATFORM_TYPE, the Agent
+// tool's own default, is the type a stage takes where it took none before: the synthesis with no role, and a
+// judge stage under `workerType: 'none'` that no role names. The probe judges and writes nothing, so it takes
+// Plan, which holds no Write tool (spec section 8 F3).
+const PLATFORM_TYPE = 'general-purpose'
+const probeType = roles.probe || 'Plan'
+const findType = roles[finderKey] || workerType || PLATFORM_TYPE
+const verifyType = roles.skeptic || workerType || PLATFORM_TYPE
+const synthType = roles.synthesis || PLATFORM_TYPE
+// S3 - no agent spawns untyped: a stage that resolves to no type is refused by name before the probe.
+const STAGE_TYPES = { probe: probeType, [finderKey]: findType, skeptic: verifyType, synthesis: synthType }
+for (const k of Object.keys(STAGE_TYPES))
+  if (!STAGE_TYPES[k]) throw new Error('tier2-review: the stage ' + k + ' resolves to no agent type, and no agent spawns untyped; name one as roles.' + k + '.')
 const roledJudges = !!(roles[finderKey] || roles.skeptic)
 // TOOL-aOrientedCast-10 S7 - `efforts`, the reasoning effort each STAGE spawns at, keyed as `roles`
 // is. Refused before any agent when it is not a plain object, carries a key outside ROLE_KEYS, or a
@@ -332,12 +354,14 @@ function renderStageOpts(type, key) {
 const findOpts = renderStageOpts(findType, finderKey)
 const verifyOpts = renderStageOpts(verifyType, 'skeptic')
 const synthOpts = renderStageOpts(synthType, 'synthesis')
+const probeOpts = renderStageOpts(probeType, 'probe')
 // TOOL-aMendedFleet-111 S6 - whether the judges' results outlive this run. Under a named type no judge
 // writes its file, so every deferred note says a re-run dispatches every finder and skeptic again, and
 // every return carrying `pending` carries `durable` too, so a caller reads the fact, not the prose.
 // TOOL-aOrientedCast-5 S4 - it reads the judge stages' RESOLVED types, so a roled judge counts as a
 // named type, and a mixed run's untyped judge stage is told to write no file as well (spec section 8 F3).
-const durable = !findType && !verifyType
+// TOOL-dFairHearing-11 S2 - both judge stages at PLATFORM_TYPE, the case an empty type covered before.
+const durable = findType === PLATFORM_TYPE && verifyType === PLATFORM_TYPE
 function renderRerunTail(only, synthToo) {
   return durable
     ? `re-run with identical args to dispatch only ${only}`
@@ -451,18 +475,20 @@ function extractDuplicateTarget(reason) {
 // run with `meta.name` alone.
 const identity = renderAgentLabel(reviewScope, 'review')
 log(identity)
-if (workerType && !roledJudges)
+if (!durable && workerType && !roledJudges)
   log(`worker type ${workerType} — every finder and skeptic spawns as it and writes no find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
 if (!durable && roledJudges)
   log(`judges under a named type — no finder or skeptic writes a find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
 // TOOL-aOrientedCast-5 S7 - one line per stage on every run, naming its type and where it came from.
-log(`role find: ${findType || 'the platform default'} — ${roles[finderKey] ? `roles.${finderKey}` : workerType ? 'workerType' : `no roles.${finderKey}, and workerType is none`}`)
-log(`role verify: ${verifyType || 'the platform default'} — ${roles.skeptic ? 'roles.skeptic' : workerType ? 'workerType' : 'no roles.skeptic, and workerType is none'}`)
-log(`role synthesis: ${synthType || 'the platform default'} — ${roles.synthesis ? 'roles.synthesis' : 'no roles.synthesis, as before roles'}`)
+// TOOL-dFairHearing-11 S1 - the probe's included.
+log(`role probe: ${probeType} — ${roles.probe ? 'roles.probe' : 'no roles.probe, so Plan'}`)
+log(`role find: ${findType} — ${roles[finderKey] ? `roles.${finderKey}` : workerType ? 'workerType' : `no roles.${finderKey}, and workerType is none`}`)
+log(`role verify: ${verifyType} — ${roles.skeptic ? 'roles.skeptic' : workerType ? 'workerType' : 'no roles.skeptic, and workerType is none'}`)
+log(`role synthesis: ${synthType} — ${roles.synthesis ? 'roles.synthesis' : 'no roles.synthesis, so PLATFORM_TYPE'}`)
 if (roles[otherFinderKey] !== undefined)
   log(`role find: roles.${otherFinderKey} is not read on a ${kind}`)
 // TOOL-aOrientedCast-10 S7 - one line per stage on every run, naming its effort and where it came from.
-for (const k of [finderKey, 'skeptic', 'synthesis'])
+for (const k of ['probe', finderKey, 'skeptic', 'synthesis'])
   log(efforts[k] ? `effort ${k}: ${efforts[k]} — efforts.${k}` : `effort ${k}: the agent type's own, else the session's — no efforts.${k}`)
 if (efforts[otherFinderKey] !== undefined)
   log(`effort ${otherFinderKey}: efforts.${otherFinderKey} is not read on a ${kind}`)
@@ -1018,6 +1044,13 @@ for (const L of swappedLenses)
 // TOOL-dFairHearing-2 S5 - a spec audit off the default preset says so before the first agent.
 if (preset !== 'unit-spec')
   log(`preset ${preset} — this spec audit runs the ${preset} lenses, not the unit-spec ones: ${LENS_KEYS.join(', ')}`)
+// TOOL-dFairHearing-11 S5 - WHICH RUNS TWIN. A design-record audit is a spec audit whose subjects are all design
+// subjects by SPEC_SUBJECT_PATH, or whose preset is off `unit-spec`; every diff review is a landing review, the
+// closing review over the cumulative diff (spec section 8 F5).
+const designRecordAudit = isSpec && (preset !== 'unit-spec' || subjects.every((x) => !SPEC_SUBJECT_PATH.test(String(x && x.path))))
+const twinned = twin === 'always' || (twin === 'design-records' && designRecordAudit) || (twin === 'design-and-landing' && (designRecordAudit || !isSpec))
+if (twinned)
+  log(`twin ${twin} — this ${kind} runs its finder lenses twice, as run a and run b, and the synthesis merges the two runs`)
 const notedLenses = Object.keys(runNotes)
 if (!notedLenses.length)
   log('WARNING: no `lensNotes` supplied — every lens runs on the kit\'s generic brief, with no project addendum')
@@ -1035,6 +1068,8 @@ if (intentAbsent)
 const skippedLenses = !isSpec && intensity === 'light' ? LENSES.filter((L) => LIGHT_LENSES.indexOf(L.replaces || L.key) === -1).map((L) => L.key) : []
 const runningLensKeys = LENS_KEYS.filter((k) => skippedLenses.indexOf(k) === -1)
 const lensesRunning = runningLensKeys.length
+// TOOL-dFairHearing-11 S6 - every finder agent the run dispatches, both runs on a twinned one.
+const findersRunning = lensesRunning * (twinned ? 2 : 1)
 if (skippedLenses.length)
   log(`WARNING: intensity light — the ${skippedLenses.join(', ')} lens(es) were NOT run; their classes are swept only through the checklist shares`)
 // Closing review round 1, L6 - a note for a lens this run skips reaches no prompt, so the log and RUN
@@ -1136,10 +1171,12 @@ const REVIEW_SHAPE = 'lenses5-r4'
 // one's lens files and every key a run without it derives holds.
 // TOOL-dFairHearing-9 S4 - the notes print as the run's own, `runNotes`, so a flat-form caller and a
 // per-preset caller passing the same notes derive one key, and every flat-form key holds.
+// TOOL-dFairHearing-11 S8 - and `twin: true` ONLY on a twinned run, so it never reuses an untwinned run's lens
+// or verify files, and every untwinned key holds. The probe's type stays out: it writes no keyed file.
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: runNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
   ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
   roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {},
-  optInKeys.length ? { optIn: optIn } : {})))
+  optInKeys.length ? { optIn: optIn } : {}, twinned ? { twin: true } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -1178,7 +1215,7 @@ const probe = await agent(
     `a name field holding its file name. Do not repair, complete or re-judge anything: a file that ` +
     `does not parse, or lacks a field the schema requires, is left out and its name listed in skipped.\n` +
     `Return JSON {commonDir, ${isSpec ? 'blobs:[...], ' : 'base, head, '}finds:[...], verifies:[...], skipped:[...]}.`,
-  {
+  Object.assign({
     label: renderAgentLabel(reviewScope, 'resume:probe'),
     phase: 'Resume',
     schema: {
@@ -1195,7 +1232,7 @@ const probe = await agent(
         ...(isSpec ? { blobs: { type: 'array', items: { type: 'object', required: ['path', 'now'], properties: { path: { type: 'string' }, now: { type: 'string' } } } } } : {}),
       },
     },
-  },
+  }, probeOpts), // TOOL-dFairHearing-11 S1 - the probe's stage, typed like the other three
 )
 // A DEAD PROBE REUSES NOTHING, and says so. Reading a null as "every file present" would dispatch no
 // lens and return an empty review; reading it as "nothing present" costs a full re-run, which is
@@ -1244,17 +1281,28 @@ if (probeLive && Array.isArray(probe.skipped) && probe.skipped.length)
 // REUSE COMPARES THE FILE'S OWN `key` FIELD with the string computed above, never the directory name
 // alone: the probe composed the directory, and a probe that composed it wrong must not turn a stale
 // file into a current answer.
-const reusedLens = new Map()
-for (const L of LENSES) {
-  if (skippedLenses.indexOf(L.key) !== -1) continue // S4 - no `reused` line names a lens that will not run
-  const file = presentFinds.find((f) => f && f.name === `find-${L.key}.json` && f.lens === L.key && Array.isArray(f.findings))
-  if (file && file.key === reviewKey) {
-    reusedLens.set(L.key, file)
-    log(`reused find:${L.key} from ${keyDir}/find-${L.key}.json — not dispatched`)
-  } else if (file) {
-    log(`find:${L.key}: a file is present under another key (${file.key}) — dispatched`)
-  }
+// TOOL-dFairHearing-11 S6 - a finder run's stage key and file name: run a's as before, run b's suffixed `:b`
+// and `-b`, so run b reuses only its own file. `reusedLens` is keyed by the file name.
+function renderLensStage(L, run) {
+  return `find:${L.key}${run === 'b' ? ':b' : ''}`
 }
+function renderLensFileName(L, run) {
+  return `find-${L.key}${run === 'b' ? '-b' : ''}.json`
+}
+const FINDER_RUNS = twinned ? ['a', 'b'] : ['a']
+const reusedLens = new Map()
+for (const run of FINDER_RUNS)
+  for (const L of LENSES) {
+    if (skippedLenses.indexOf(L.key) !== -1) continue // S4 - no `reused` line names a lens that will not run
+    const name = renderLensFileName(L, run)
+    const file = presentFinds.find((f) => f && f.name === name && f.lens === L.key && Array.isArray(f.findings))
+    if (file && file.key === reviewKey) {
+      reusedLens.set(name, file)
+      log(`reused ${renderLensStage(L, run)} from ${keyDir}/${name} — not dispatched`)
+    } else if (file) {
+      log(`${renderLensStage(L, run)}: a file is present under another key (${file.key}) — dispatched`)
+    }
+  }
 
 // TOOL-aSightedSkeptic-1 - THE BRIEF, one copy, opening every finder AND every skeptic prompt. The
 // skeptic used to be handed none of it, so it read whatever checkout its working directory was and
@@ -1324,16 +1372,18 @@ function renderBrief(role) {
   return lines.join('\n') + '\n\n'
 }
 
-phase('Find')
-const finderResults = await boundedParallel(
-  LENSES.map((L) => () =>
-    // TOOL-aSightedSkeptic-7 S4 - a skipped lens resolves to a SENTINEL and dispatches nothing. Never
-    // null: null is how a dead agent reaches the script, and every light run would defer forever.
-    skippedLenses.indexOf(L.key) !== -1
-      ? Promise.resolve({ lens: L.key, path: '', findings: [], skipped: true })
-      : reusedLens.has(L.key)
-      ? Promise.resolve(reusedLens.get(L.key))
-      : agent(
+// TOOL-dFairHearing-11 S6 - ONE LENS'S CALL, for either finder run: its prompt, every option but its stage's,
+// and `ready`, what a skipped or reused lens resolves to without a spawn, else null. Both fans below call it
+// at call time, since the brief needs the shas the probe resolved, and keep their agent( call inline.
+function buildLensCall(L, run) {
+  const name = renderLensFileName(L, run)
+  // TOOL-aSightedSkeptic-7 S4 - a skipped lens resolves to a SENTINEL and dispatches nothing. Never
+  // null: null is how a dead agent reaches the script, and every light run would defer forever.
+  const ready = skippedLenses.indexOf(L.key) !== -1 ? { lens: L.key, path: '', findings: [], skipped: true } : reusedLens.get(name) || null
+  return {
+    ready: ready,
+    opts: { label: renderAgentLabel(reviewScope, renderLensStage(L, run)), phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA },
+    prompt:
       renderBrief('finder') +
       (isSpec
         // S6 - the spec kind's acquire sentence. The lens holds a filesystem and the orchestrator does
@@ -1370,14 +1420,30 @@ const finderResults = await boundedParallel(
         // TOOL-aOrientedCast-5 S4 - nor under a role, and a mixed run's untyped judges follow `durable`.
         (!durable
           ? `\nWrite no file. Set path to an empty string.\n`
-          : `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n`) +
+          : `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/${name}, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n`) +
         (isSpec
           ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix,evidence}]}.`
           : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
-        Object.assign({ label: renderAgentLabel(reviewScope, `find:${L.key}`), phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA }, findOpts),
-      ),
-  ),
+  }
+}
+phase('Find')
+const finderResults = await boundedParallel(
+  LENSES.map((L) => () => {
+    const c = buildLensCall(L, 'a')
+    return c.ready ? Promise.resolve(c.ready) : agent(c.prompt, Object.assign(c.opts, findOpts))
+  }),
 )
+// TOOL-dFairHearing-11 S6 - RUN B, a second awaited fan over the same literal after run a's, never a loop, so
+// each fan stays one call over the bounded literal. An untwinned run dispatches nothing here.
+const finderResultsB = !twinned ? [] : await boundedParallel(
+  LENSES.map((L) => () => {
+    const c = buildLensCall(L, 'b')
+    return c.ready ? Promise.resolve(c.ready) : agent(c.prompt, Object.assign(c.opts, findOpts))
+  }),
+)
+// Every finder slot, run a's then run b's, beside the return each one gave: what every count below reads.
+const FINDER_SLOTS = FINDER_RUNS.flatMap((run) => LENSES.map((L) => ({ L: L, run: run })))
+const finderReturns = finderResults.concat(finderResultsB)
 
 // S1 (TOOL-aGuardedTally-1): a dead lens returns null and filter(Boolean) drops it silently, so an
 // all-dead run used to be indistinguishable from an all-clean one. Observed live: a review returned
@@ -1385,20 +1451,22 @@ const finderResults = await boundedParallel(
 // lines and zero `result` lines. Count what actually came back and never call absence cleanliness.
 // TOOL-aSightedSkeptic-7 S5 - a skipped lens is neither live nor dead. Membership in skippedLenses
 // decides it, never the sentinel's own field, which a reused file could also carry.
-const liveResults = finderResults.filter((x, i) => x && skippedLenses.indexOf(LENSES[i].key) === -1)
-const lensesDead = finderResults.filter((x) => !x).length
+const liveResults = finderReturns.filter((x, i) => x && skippedLenses.indexOf(FINDER_SLOTS[i].L.key) === -1)
+const lensesDead = finderReturns.filter((x) => !x).length
 // TOOL-dDerivedDocket-29 S5 - the LABEL of every agent that did not return, so a caller can say what a
 // re-run will dispatch. The harness cannot tell a user's mid-run skip from a death, because both
-// return null, and both defer: an unjudged finding was never a result.
-const deadLensLabels = LENSES.filter((L, i) => !finderResults[i]).map((L) => `find:${L.key}`)
+// return null, and both defer: an unjudged finding was never a result. Run b's carry `:b`.
+const deadLensLabels = FINDER_SLOTS.filter((s, i) => !finderReturns[i]).map((s) => renderLensStage(s.L, s.run))
 // `ref` is DISPLAY ONLY from here on — it rides the prompts and the report lines and is never a map
 // key. `id` is assigned once, after every lens has returned, and is the only join key.
 // TOOL-aSightedSkeptic-8 S1 - derived from finderResults BY INDEX, so each finding carries `lens`, the
 // key the harness DISPATCHED (spec F1), never the agent's echo. Same members, same order as
 // liveResults, so ids and batch membership do not move.
-const allFindings = finderResults
-  .flatMap((r, i) => (!r || skippedLenses.indexOf(LENSES[i].key) !== -1 ? [] : (r.findings || []).map((f) =>
-    ({ ...f, lens: LENSES[i].key, ref: `${f.file}:${isSpec ? f.where : f.line}` }))))
+// TOOL-dFairHearing-11 S6 - and `run`, the finder run it came from: run a's findings number first, then run
+// b's, so each run is one contiguous id range.
+const allFindings = finderReturns
+  .flatMap((r, i) => (!r || skippedLenses.indexOf(FINDER_SLOTS[i].L.key) !== -1 ? [] : (r.findings || []).map((f) =>
+    ({ ...f, lens: FINDER_SLOTS[i].L.key, run: FINDER_SLOTS[i].run, ref: `${f.file}:${isSpec ? f.where : f.line}` }))))
   .map((f, i) => ({ ...f, id: i + 1 }))
 
 // TOOL-aEvidencedLens-6 - THE PER-LENS YIELD, one row per lens that RAN, in dispatch order. `rows` is
@@ -1427,7 +1495,8 @@ function deriveLensYield(rows, items) {
     for (const e of mine) n[e.verdict === 'refuted' && extractDuplicateTarget(e.reason) !== null ? 'merged' : e.verdict]++
     const judged = n.confirmed + n.merged + n.refuted
     return {
-      lens: k, returned: !!finderResults[LENS_KEYS.indexOf(k)], raw: mine.length, confirmed: n.confirmed, refuted: n.refuted, merged: n.merged,
+      // TOOL-dFairHearing-11 S6 - a twinned lens returned when both its runs did.
+      lens: k, returned: FINDER_SLOTS.every((s, i) => s.L.key !== k || !!finderReturns[i]), raw: mine.length, confirmed: n.confirmed, refuted: n.refuted, merged: n.merged,
       uncertain: n.uncertain, unverified: mine.length - judged,
       precision: judged ? (n.confirmed + n.merged) / judged : null,
       defects: items ? defects[k] || 0 : null, unique: items ? unique[k] || 0 : null,
@@ -1457,10 +1526,10 @@ function printLensYield(rows) {
 // ---- `durable` is true, the `workerType: 'none'` case; when it is false a re-run dispatches all. The
 // ---- one null `blockers` that is NOT a death, the tally fault below, stays `complete`: a re-run
 // ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
-if (lensesDead === lensesRunning) {
-  log(`UNVERIFIED — all ${lensesRunning} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
+if (lensesDead === findersRunning) {
+  log(`UNVERIFIED — all ${findersRunning} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
   // TOOL-aMendedFleet-18 S3 - no lens returned, so even `raw` was never produced (spec rev-3).
-  const shapeLine = renderStageShape('find', {}, lensesRunning)
+  const shapeLine = renderStageShape('find', {}, findersRunning)
   log(shapeLine)
   const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5 - every row returned: false, zeros
   printLensYield(lensYield)
@@ -1471,8 +1540,8 @@ if (lensesDead === lensesRunning) {
     exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     lensesReused: reusedLens.size,
-    note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; ${renderRerunTail(deadLensLabels.join(', '), false)}`,
-    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses,
+    note: `DEFERRED: no lens completed (${lensesDead}/${findersRunning} died) — nothing was reviewed; ${renderRerunTail(deadLensLabels.join(', '), false)}`,
+    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
     ledger: [], confirmedFindings: [], appendix: '', lensYield,
   }
@@ -1482,10 +1551,10 @@ if (allFindings.length === 0) {
   // nothing`, which the build harness's clean-round test cannot tell from a result; it defers now.
   const deferred = lensesDead > 0
   const note = deferred
-    ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — ${renderRerunTail(deadLensLabels.join(', '), false)}`
+    ? `DEFERRED: ${lensesDead}/${findersRunning} lenses died and the survivors found nothing — ${renderRerunTail(deadLensLabels.join(', '), false)}`
     : 'clean: 0 findings'
   log(note)
-  const shapeLine = renderStageShape('find', { raw: 0 }, lensesRunning)
+  const shapeLine = renderStageShape('find', { raw: 0 }, findersRunning)
   log(shapeLine)
   const lensYield = deriveLensYield([], null) // TOOL-aEvidencedLens-6 S5
   printLensYield(lensYield)
@@ -1495,11 +1564,11 @@ if (allFindings.length === 0) {
     shape: shapeLine,
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
-    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses,
+    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     ledger: [], confirmedFindings: [], appendix: '', lensYield, // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
-log(`${allFindings.length} raw findings across ${lensesRunning} lenses — verifying in batches.`)
+log(`${allFindings.length} raw findings across ${findersRunning} lenses — verifying in batches.`)
 
 // --- Phase 2: VERIFY — batched skeptics (NOT one agent per finding) -----
 phase('Verify')
@@ -1685,6 +1754,16 @@ const confirmed = allFindings.filter((f) => verdictById.get(f.id)?.verdict === '
 const refuted = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted' && !mergedIds.has(f.id))
 // TOOL-dFairHearing-7 S1 - read only under `addressTwins: 'shown'`; `refuted` already holds no merged duplicate.
 const twinPairs = deriveTwinPairs(confirmed, refuted)
+// TOOL-dFairHearing-11 S7 - THE TWIN RUN's hand-off: the cross-run candidate pairs, each confirmed finding of
+// run a and one of run b that deriveTwinPairs, read with its two arguments as the two runs, places at one
+// address; and the record line, rendered here and copied by the synthesis. Both read only on a twinned run.
+const crossRunPairs = deriveTwinPairs(confirmed.filter((f) => f.run === 'a'), confirmed.filter((f) => f.run === 'b'))
+  .map((p) => ({ a: p.confirmed, b: p.refuted }))
+function renderTwinRange(findings) {
+  return findings.length ? findings[0].id + '-' + findings[findings.length - 1].id : '-'
+}
+const twinLine = `review-twin runs=2 a=${renderTwinRange(allFindings.filter((f) => f.run === 'a'))} b=${renderTwinRange(allFindings.filter((f) => f.run === 'b'))}`
+if (twinned) log(twinLine)
 // TOOL-aSightedSkeptic-6 S8 - UNVERIFIED is every finding with neither a confirmed nor a refuted
 // verdict: those a skeptic answered `uncertain`, and those with no usable verdict at all. The two are
 // counted apart, so a run whose skeptics all answered never reads as one where none returned.
@@ -1830,7 +1909,7 @@ if (confirmed.length + unverified.length === 0) {
   // A REFUTATION OVER A PARTIAL FAN DEFERS. It used to return `… treat as partial` beside a null
   // count, which a caller had to parse prose to tell from the clean result on the line below it.
   const deferred = pendingLabels.length > 0
-  const shapeLine = renderStageShape('verify', verifiedCounts, lensesRunning + batches.length)
+  const shapeLine = renderStageShape('verify', verifiedCounts, findersRunning + batches.length)
   log(shapeLine)
   const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4 - no synthesis, no items
   printLensYield(lensYield)
@@ -1844,9 +1923,9 @@ if (confirmed.length + unverified.length === 0) {
     lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0, uncertain: 0, merged: merged.length,
     conflicts: conflicts.size, duplicates, spurious, lensesReused: reusedLens.size, batchesReused,
     note: deferred
-      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — ${renderRerunTail(pendingLabels.join(', '), false)}`
+      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${findersRunning} lenses died — ${renderRerunTail(pendingLabels.join(', '), false)}`
       : 'all findings adjudicated and refuted',
-    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses,
+    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
     // only place this ledger and appendix exist; a caller may write them.
     ledger, confirmedFindings, appendix, lensYield,
@@ -1864,7 +1943,7 @@ if (pendingLabels.length) {
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
   for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
-  const shapeLine = renderStageShape('verify', verifiedCounts, lensesRunning + batches.length)
+  const shapeLine = renderStageShape('verify', verifiedCounts, findersRunning + batches.length)
   log(shapeLine)
   const lensYield = deriveLensYield(ledger, null) // TOOL-aEvidencedLens-6 S4/S5 - a dead lens's row reads returned: false
   printLensYield(lensYield)
@@ -1877,7 +1956,7 @@ if (pendingLabels.length) {
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — ${renderRerunTail(pendingLabels.join(', '), false)}`,
-    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses,
+    round, priorFindings: priorFindings.length, intensity, optIn, ...(isSpec ? { preset } : {}), skippedLenses, twin: null,
     ledger, confirmedFindings, appendix, lensYield, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
@@ -1886,7 +1965,7 @@ if (pendingLabels.length) {
 // TOOL-aMendedFleet-18 S3/S4 - rendered BEFORE the synthesis, because that agent writes the record and
 // this script cannot: the line the record copies and the line the final return carries are one string.
 // Its `out-tokens` therefore excludes the synthesis agent's own spend (spec section 3).
-const synthShape = renderStageShape('synth', verifiedCounts, lensesRunning + batches.length + 1)
+const synthShape = renderStageShape('synth', verifiedCounts, findersRunning + batches.length + 1)
 log(synthShape)
 // TOOL-aEvidencedLens-6 S6 - the per-lens counts that exist before the synthesis, for its verbatim block.
 const preSynthYield = deriveLensYield(ledger, null)
@@ -1903,7 +1982,8 @@ const synth = await agent(
             const grades = g !== f.severity
               ? ` (finder graded ${f.severity}, skeptic graded ${g})`
               : ungradedIds.indexOf(f.id) !== -1 ? ` (no skeptic grade - the finder's binds)` : ''
-            return `- id=${f.id} [${g}]${grades} lens=${f.lens} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  ${renderFixLine(f)}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`
+            // TOOL-dFairHearing-11 S7 - a twinned run names each confirmed finding's run.
+            return `- id=${f.id} [${g}]${grades} lens=${f.lens}${twinned ? ' run=' + f.run : ''} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  ${renderFixLine(f)}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`
           })
           .join('\n')
       : '  (none)') +
@@ -1936,6 +2016,21 @@ const synth = await agent(
         `decide whether the two describe one defect. Where they do, note the refuted one as a twin beside the confirmed ` +
         `finding in the report and return the pair in \`twinFlags\` as {refuted, confirmed}. Two different defects at one ` +
         `address are not twins and get no flag. A flag changes no verdict, grade, item or count.`
+      : '') +
+    // TOOL-dFairHearing-11 S7 - THE TWIN MERGE, on a twinned run only, so an untwinned prompt is byte-identical.
+    // A different block from the same-address twins above: those are one run's refuted twins, these two runs.
+    (twinned
+      ? `\n\nTWIN RUN - this review ran its finder lenses twice over one subject, as run a and run b, and each ` +
+        `CONFIRMED finding above names its run. Merge the two runs into one report: make one item per defect, its ids ` +
+        `from either run or both, so a defect both runs found is ONE item holding an id of each run.\n` +
+        `CROSS-RUN CANDIDATE PAIRS (a confirmed finding of each run citing one address):\n` +
+        (crossRunPairs.length
+          ? crossRunPairs.map((p) => {
+              const k = deriveAddressKey(confirmed.find((f) => f.id === p.a))
+              return `- run a id=${p.a} and run b id=${p.b}, both at ${k.file} ${k.at}`
+            }).join('\n')
+          : '  (none)') +
+        `\nA pair is a candidate only: where its two findings describe different defects, they are two items.`
       : '') +
     `\n\n` + SEVERITY_RUBRIC + ` ` +
     // TOOL-dFairHearing-6 S2 - one item per defect whatever its findings' grades: the grade is carried per id
@@ -1970,7 +2065,7 @@ const synth = await agent(
     // whose skeptics disagreed and were demoted to UNVERIFIED) and does not compute the second.
     // Interpolating a counter nothing derives would put an invented number in a durable record.
     `\n\nRUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:\n` +
-    `lenses ${liveResults.length}/${lensesRunning} returned, ${lensesDead} DIED; ` +
+    `lenses ${liveResults.length}/${findersRunning} returned, ${lensesDead} DIED; ` +
     `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
     `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
     // TOOL-aEvidencedLens-3 S6 - TOOL-dFairHearing-5 S2/S4: on both kinds, the diff prompt's bytes moving here.
@@ -1990,7 +2085,7 @@ const synth = await agent(
       : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
     // TOOL-aOrientedCast-5 S8 - a run where `roles` named a stage it reads says so; a classic run carries no clause.
     (roles[finderKey] || roles.skeptic || roles.synthesis
-      ? `Roles: finders ${findType || 'the platform default'}, skeptic batches ${verifyType || 'the platform default'}, synthesis ${synthType || 'the platform default'}.\n`
+      ? `Roles: finders ${findType}, skeptic batches ${verifyType}, synthesis ${synthType}.\n`
       : '') +
     // TOOL-dFairHearing-2 S5 - spec kind only, so the report says which lens literal ran.
     (isSpec ? `preset: ${preset} - the ${preset} lenses ran: ${LENS_KEYS.join(', ')}.\n` : '') +
@@ -2121,6 +2216,11 @@ const synth = await agent(
     // TOOL-aMendedFleet-18 S4 - the shape line rides the same copy instruction; the return's `shape` holds it.
     `\n\nREVIEW-SHAPE LINE - copy the review-shape line between the two marker lines below VERBATIM, alone on its own line, immediately above the appendix heading, and neither marker line copied.\n` +
     `<<<SHAPE\n${synthShape}\nSHAPE>>>` +
+    // TOOL-dFairHearing-11 S7 - the twin record line rides beside the shape line, copied the same way.
+    (twinned
+      ? `\n\nREVIEW-TWIN LINE - copy the review-twin line between the two marker lines below VERBATIM, alone on its own line, ` +
+        `directly below the review-shape line, and neither marker line copied.\n<<<TWIN\n${twinLine}\nTWIN>>>`
+      : '') +
     (appendix
       ? `\n\nAPPENDIX - the report's LAST section, after everything else, is the text between the two marker lines ` +
         `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
@@ -2291,8 +2391,26 @@ if (!synth) {
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
 }
 
+// TOOL-dFairHearing-11 S7 - THE TWIN FIGURES, derived from the items and only over a list the tally accepted,
+// so an unplaced id nulls `twin` rather than skewing `agreed`. Each counts ITEMS: `agreed` holds a confirmed id
+// of each run, `onlyA` and `onlyB` of one run alone. `a` and `b` list each run's confirmed ids.
+function deriveTwinFigures(items) {
+  const runOf = new Map(confirmed.map((f) => [f.id, f.run]))
+  const n = { agreed: 0, onlyA: 0, onlyB: 0 }
+  for (const it of items) {
+    const runs = new Set((it && Array.isArray(it.ids) ? it.ids : []).filter((id) => runOf.has(id)).map((id) => runOf.get(id)))
+    if (runs.size === 2) n.agreed++
+    else if (runs.has('a')) n.onlyA++
+    else if (runs.has('b')) n.onlyB++
+  }
+  return { a: confirmed.filter((f) => f.run === 'a').map((f) => f.id), b: confirmed.filter((f) => f.run === 'b').map((f) => f.id),
+    agreed: n.agreed, onlyA: n.onlyA, onlyB: n.onlyB }
+}
+const twinFigures = twinned && synth && !tallyFault ? deriveTwinFigures(Array.isArray(synth.items) ? synth.items : []) : null
+if (twinFigures)
+  log(`twin: run a ${twinFigures.a.length} confirmed, run b ${twinFigures.b.length} confirmed — items agreed ${twinFigures.agreed}, only a ${twinFigures.onlyA}, only b ${twinFigures.onlyB}`)
 // TOOL-aEvidencedLens-6 S4 - defects and unique only over an item list the tally accepted.
-const lensYield = deriveLensYield(ledger, synth && !tallyFault ? synth.items || [] : null)
+const lensYield =deriveLensYield(ledger, synth && !tallyFault ? synth.items || [] : null)
 printLensYield(lensYield)
 // H1: the SUCCESS return carries the same trust counts as the early ones. A caller that only ever
 // sees {confirmed, precision} cannot tell a full review from one where half the lenses died.
@@ -2321,7 +2439,7 @@ return {
   lensesRun: liveResults.length,
   lensesDead,
   skepticsDead,
-  agents: lensesRunning + batches.length + 1, // finders + batched skeptics + synth
+  agents: findersRunning + batches.length + 1, // finders + batched skeptics + synth
   report: synth?.path || null,
   summary: synth?.summary || '',
   // TOOL-dTieredTribunal-1 S2/S3b - the counts the synthesis pass adjudicated, returned rather than
@@ -2336,6 +2454,8 @@ return {
   ...(synth ? { regraded } : {}),
   // TOOL-dFairHearing-7 S4 - under `shown` alone: the pairs handed and the flags kept, `[]` when none or no synthesis.
   ...(addressTwins === 'shown' ? { twinPairs: twinPairs.length, twinFlags } : {}),
+  // TOOL-dFairHearing-11 S7 - null on an untwinned run, and where the tally refused the items or no synthesis ran.
+  twin: twinFigures,
   // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was
   // reportable only when nothing else was degraded and the most serious note was the least reachable
   // one. Worst outcome first. Found by the closing review of the build that ported this ternary into

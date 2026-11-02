@@ -1518,6 +1518,16 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "buildLensCall",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "buildLensCall",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "buildNativePath",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -7364,6 +7374,16 @@
     },
     {
       "id": "deriveSubjectPair",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "deriveTwinFigures",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveTwinFigures",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
     },
@@ -17828,6 +17848,26 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
+      "id": "renderLensFileName",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderLensFileName",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderLensStage",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderLensStage",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderLensYield",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -18026,6 +18066,16 @@
       "id": "renderStrippedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderTwinRange",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderTwinRange",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "renderUtc",
