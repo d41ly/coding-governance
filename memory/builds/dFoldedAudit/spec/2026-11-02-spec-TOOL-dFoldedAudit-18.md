@@ -1,12 +1,14 @@
 # TOOL-dFoldedAudit-18 — the help page for the spec-audit switches and the chain verbs, so the docs leg anchors them
 
-**Status:** INPROGRESS · rev-1 · 2026-11-02 · node d · Tier-1 · base 84acebdc · streams tooling · order 180
+**Status:** CLOSED · rev-1 · 2026-11-02 · node d · Tier-1 · base 84acebdc · streams tooling · order 180
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-18-1-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-18-1-spec-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-18-2-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-18-2-builder-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-18-ledger.md](../build/2026-11-02-build-TOOL-dFoldedAudit-18-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-18-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-18-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-18-2-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-18-2-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-18-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-18-build-brief.md) | research | — |
