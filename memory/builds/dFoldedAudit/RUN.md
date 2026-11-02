@@ -174,3 +174,5 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T10:51:44Z brief · item TOOL-dFoldedAudit-17 · reason 2e9f0abfd31c memory/builds/dFoldedAudit/prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md
 
 2026-11-02T11:10:47Z dispatch · item d672227c TOOL-dFoldedAudit-17 · reason .memory-tree.conf tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/drift-audit/drift_signals.py memory/map/features/spec-tokens.md memory/guides/SESSION-KICKOFF.md .governance/policy.json memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md memory/builds/dFoldedAudit/README.md
+
+2026-11-02T11:48:55Z dispatch · item 8f7666b1 TOOL-dFoldedAudit-17 · reason .memory-tree.conf tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/drift-audit/drift_signals.py memory/map/features/spec-tokens.md memory/guides/SESSION-KICKOFF.md .governance/policy.json memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md memory/builds/dFoldedAudit/README.md

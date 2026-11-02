@@ -19,6 +19,7 @@
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-5-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-5-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-6-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-6-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-7-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-7-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-17-8-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-8-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-fix-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-fix2-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-fix2-brief.md) | research | — |
