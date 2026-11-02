@@ -84,8 +84,8 @@ machines/sessions on the same repo.
   whose machine claims are CI-verified against live code inventories (a both-directions ratchet —
   new moving parts fail until claimed; claims naming dead keys fail too), a shrink-only baseline,
   freshness-gated generated artifacts, and a `map_diff` git-range digest. Project specifics live in
-  `.codebase-map.conf` + `tools/codebase-map/map_extractors.py`; the engine (`map_lib.py`, stdlib-only
-  py≥3.11) is identical across repos. Adopt with `adopt-codebase-map.sh --scaffold`; see
+  `.codebase-map.conf` + `tools/codebase-map/map_extractors.py`; the engine (`map_lib.py`, stdlib-only,
+  at the interpreter floor `tools/lib/python-floor.txt` declares) is identical across repos. Adopt with `adopt-codebase-map.sh --scaffold`; see
   `tools/codebase-map/README.md` + `tools/codebase-map/INVENTORY-DERIVATION.md`. Operationalizes the charter's
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED

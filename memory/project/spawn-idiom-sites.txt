@@ -166,7 +166,7 @@ tools/memory-tree/merge-rows.sh	path-subst	1	predates the lint; `${p##*/}` and `
 tools/memory-tree/merge-rows.test.sh	path-subst	8	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/memory-tree/merge-rows.test.sh	printf-subst	6	predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/merge-rows.test.sh	pure-fn-subst	1	callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: minus×1
-tools/memory-tree/merge-rows.test.sh	var-pipe	43	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+tools/memory-tree/merge-rows.test.sh	var-pipe	42	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/memory-tree/transition-audit.test.sh	path-subst	2	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
 tools/memory-tree/transition-audit.test.sh	var-pipe	2	predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
 tools/playbook/adopt-playbook.sh	path-subst	1	predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit

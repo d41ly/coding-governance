@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.30
+gov:kit drift-audit@1.31
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -135,6 +135,7 @@ SHRINK_ONLY: dict[str, str] = {
     # value standing next to it (TOOL-aScouredKit-8).
     "memory/project/unarmed-branches.txt": "fail branches with no arm; drains as each is armed",
     "memory/project/trace-waiver.txt": "CLOSED specs no TRACE_GLOBS subject can name — signal 6's exemption",
+    "memory/project/docs-undocumented.txt": "user-facing members no help page anchors yet; drains as each is documented",
 }
 
 # --------------------------------------------------------------------------------------------
@@ -348,7 +349,9 @@ PINS: dict[str, int] = {
     # TOOL-aRoutedQuill-7 PROMPT_BRIEF_SKELETON_CUTOFF in .unattended.conf; no key stopped being armed.
     # 34 -> 36 at dTrueNorth's close, 2026-10-22, under decision TOOL-dTrueNorth-28: TOOL-dTrueNorth-1 arms
     # SPEC_CARRIES_CUTOFF and TOOL-dTrueNorth-5 SPEC_AUDIT_PIN_CUTOFF in .memory-tree.conf; no key stopped being armed.
-    "cutoff_keys_armed": 36,
+    # 36 -> 37 at TOOL-dSafePassage-34's pass, under ER:388 (TOOL-dSafePassage-42 section 8 F1 (a)): it arms
+    # SPEC_AC_ORDER_CUTOFF in .memory-tree.conf; no key stopped being armed.
+    "cutoff_keys_armed": 37,
     # 26 - MEASURED at TOOL-aMendedFleet-37, which added the signal, at its own commit: 26 of 27
     # feature dossiers older than their paths, every one but the codebase-map dossier that unit
     # refreshed. Report-only; the pin is a declared DRAIN, one dossier re-read at a time, and the

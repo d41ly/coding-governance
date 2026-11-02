@@ -1419,6 +1419,7 @@
       "{prefix}/govkit/govkit.py",
       "selfcheck"
     ],
+    "reads": {"history": "its arm 11 finds the commit that landed each closed shim row with `git log --first-parent -S` and counts the releases descending from it (TOOL-dSafePassage-6)."},
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 310
@@ -1436,6 +1437,53 @@
     "ceiling": 300
   },
   {
+    "name": "step-rows-frozen",
+    "argv": [
+      "python",
+      "{prefix}/govkit/upgrade_steps.py",
+      "frozen"
+    ],
+    "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through the step module's resolve_landing_base, the base kit epoch reads (TOOL-dSafePassage-1, -26).", "history": "it reads every landed row and program at that base out of the object store and compares them with HEAD's (TOOL-dSafePassage-1)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120
+  },
+  {
+    "name": "step-gate",
+    "argv": [
+      "python",
+      "{prefix}/govkit/step_gate.py"
+    ],
+    "reads": {"base": "it grades from GATE_PUSH_BASE, else the merge-base with the default branch, through govkit's resolve_landing_base, the base kit epoch reads (TOOL-dSafePassage-10).", "history": "it checks the base out in a detached sparse worktree and reads the adopter-visible population there with the tip's readers (TOOL-dSafePassage-10)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 130
+  },
+  {
+    "name": "docs",
+    "argv": [
+      "python",
+      "{prefix}/govkit/docs_leg.py"
+    ],
+    "reads": {"history": "it reads help.enforce at the landed revision through govkit's read_policy_value, and walks the first-parent history of memory/project/docs-undocumented.txt through drift-audit's derive_low_waters for the list's low-water (TOOL-dSafePassage-13)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 130,
+    "doc_reads": ["help/", "memory/project/docs-undocumented.txt"]
+  },
+  {
+    "name": "upgrade-walk",
+    "argv": [
+      "python",
+      "{prefix}/govkit/upgrade_walk.py"
+    ],
+    "reads": {"history": "it clones gov with no tags, checks out the pinned commit in <prefix>/govkit/fixtures/release-0/pin.txt to apply release-0, and reads each step's introducing commit along the landed ref gov's own resolve_landed_ref names (TOOL-dSafePassage-5)."},
+    "chunk": "e2e",
+    "subject": "kit",
+    "ceiling": 14360,
+    "doc_reads": []
+  },
+  {
     "name": "govkit selftest",
     "argv": [
       "python",
@@ -1445,7 +1493,8 @@
       "{prefix}/govkit/",
       "{prefix}/hooks/kit.toml",
       "{prefix}/settings-merge.py",
-      "{prefix}/codebase-map/kit.toml"
+      "{prefix}/codebase-map/kit.toml",
+      "{prefix}/process-monitor/census.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

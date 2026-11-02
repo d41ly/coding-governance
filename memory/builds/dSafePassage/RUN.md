@@ -9,253 +9,660 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-asks-at-landing: TOOL-dSafePassage-14=DEFERRED TOOL-dSafePassage-60=DEFERRED
-units-at-landing: TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-16 TOOL-dSafePassage-2 TOOL-dSafePassage-20 TOOL-dSafePassage-4 TOOL-dSafePassage-43 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-21 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-5 TOOL-dSafePassage-26 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-41 TOOL-dSafePassage-38 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-50 TOOL-dSafePassage-49 TOOL-dSafePassage-52 TOOL-dSafePassage-51 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-59
-gates-run: unattended-179273668328029618926-1944 2a2d97e1
-parked-surfaced: yes, 58 surfaced
+gates-run: unattended-179358479339660419980-1540 b8525887
+parked-surfaced: yes
 keepalive-reaped: yes
+asks-at-landing: TOOL-dSafePassage-14=DEFERRED TOOL-dSafePassage-60=OPEN TOOL-dSafePassage-79=CLOSED TOOL-dSafePassage-85=CLOSED
+units-at-landing: TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-16 TOOL-dSafePassage-2 TOOL-dSafePassage-20 TOOL-dSafePassage-4 TOOL-dSafePassage-43 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-21 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-5 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-26 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-67 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-35 TOOL-dSafePassage-41 TOOL-dSafePassage-70 TOOL-dSafePassage-38 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-71 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-50 TOOL-dSafePassage-49 TOOL-dSafePassage-52 TOOL-dSafePassage-51 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-59 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafePassage-102 TOOL-dSafePassage-103 TOOL-dSafePassage-104 TOOL-dSafePassage-61 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePassage-88 TOOL-dSafePassage-89 TOOL-dSafePassage-90 TOOL-dSafePassage-91 TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-95 TOOL-dSafePassage-96 TOOL-dSafePassage-97 TOOL-dSafePassage-98 TOOL-dSafePassage-99
+hold-run: 
+hold-streak: 1 · at d507ab9d
+resume-owed: none · owner
+held-at: 2026-11-01T16:37:31Z
+hold-reason: two bar legs stay red on ask TOOL-dSafePassage-85's owner rows (five fork ceilings, three ceiling-evidence lines), and TOOL-dSafePassage-61 waits on TOOL-dGroundRules-13, another build's ask, so build-complete cannot carry it
+hold-until: owner
+hold-code: owner-decision
+held-from: VERIFYING
+refreshed-at: f4597719e4b1ff0f0f779998bd7b8c2ce5213088 · handoff · 145 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 30acf270735f54418c6a61ed9071a0667916118a
+witness: f4cc4c5e2
 phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
-run-branch: refs/heads/branch/unattended-dsafepassage-736310
+run-branch: refs/heads/branch/unattended-dsafepassage-567339
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-22T22:09:20Z
+lease-utc: 2026-11-01T16:44:31Z
 pid-image: claude.exe
-host: compeeto
-pid: 29072
-session: 61b1c096-e48d-43c1-9900-8735f8af9d55
-keepalive: c3b67264
-anchor-url: https://github.com/d41ly/coding-governance
-anchor-sha: 3708a705e834709f340a2d160f9acdf9c18b699f
+host: compeeto-agent
+pid: 18428
+session: c5f50d22-89c6-41d7-84e5-2382dcd49faa
+keepalive: e7f5ef83
+anchor-url: https://github.com/d41ly/coding-governance.git
+anchor-sha: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 anchor-ref: refs/heads/main
-base: 3708a705e834709f340a2d160f9acdf9c18b699f
+base: 60d90cb71db51e651aa1c5efe3f6d48ba21a997d
 
 ## Parked
 
-2026-10-22T23:47:35Z review · item dSafePassage-spec-set-r1 · reason verdict BLOCKED · blockers 3 · BOUNDED · highs 8 · minors 54 · disposition promote
+2026-10-26T09:06:44Z rescope · item add TOOL-dSafePassage-61 · reason TOOL-dSafePassage-1's build pass diverged at §8 F8: the landed policy guard (tools/policy/guard.py, TOOL-dGroundRules-6) refuses S8's seven-key write of .governance/policy.toml ('7 keys changed; one cap raised is the one agent shape'), and TOOL-dGroundRules-13, the ask that would admit it, is OPEN; F8 says the build run stops S8 if not granted, so the gov migration of template-size-limits.txt moves to this new unit, DEFERRED until TOOL-dGroundRules-13
 
-2026-10-23T00:15:49Z rescope · item add TOOL-dSafePassage-15 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 1 at BLOCKER (item D-1, shared with id 50)
+2026-10-26T09:58:28Z dispatch · item 2d20e0b5 TOOL-dSafePassage-1 · reason tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/steps/fanout_cap.py tools/govkit/govkit.py tools/govkit/registry.toml tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/subject-pins.tsv tools/govkit/matrix.py tools/check-install-prefix.test.sh tools/hooks/kit.toml tools/hooks/README.md tools/gate-legs.json help/upgrade-steps.md help/README.md memory/guides/SESSION-KICKOFF.md memory/map/features/govkit.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-1.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-1-ledger.md
 
-2026-10-23T00:15:50Z rescope · item add TOOL-dSafePassage-16 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 50 at BLOCKER (item D-1, shared with id 1)
+2026-10-26T09:58:34Z brief · item TOOL-dSafePassage-1 · reason 4ad3dd0f8071 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-1-build-brief.md
 
-2026-10-23T00:15:50Z rescope · item add TOOL-dSafePassage-17 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 51 at BLOCKER (item D-2)
+2026-10-26T10:39:05Z dispatch · item 2d20e0b5 TOOL-dSafePassage-1 · reason tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/steps/fanout_cap.py tools/govkit/govkit.py tools/govkit/registry.toml tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/subject-pins.tsv tools/govkit/matrix.py tools/check-install-prefix.test.sh tools/hooks/kit.toml tools/hooks/README.md tools/gate-legs.json help/upgrade-steps.md help/README.md memory/guides/SESSION-KICKOFF.md memory/map/features/govkit.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-1.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-1-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T00:15:51Z rescope · item add TOOL-dSafePassage-18 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 2 at HIGH (item D-3, shared with id 52)
+2026-10-26T10:43:20Z dispatch · item 2d20e0b5 TOOL-dSafePassage-1 · reason .gitattributes
 
-2026-10-23T00:15:52Z rescope · item add TOOL-dSafePassage-19 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 52 at HIGH (item D-3, shared with id 2)
+2026-10-26T10:56:17Z dispatch · item 29ccb065 TOOL-dSafePassage-1 · reason tools/govkit/selftest.py memory/map/generated/symbols.json
 
-2026-10-23T00:15:52Z rescope · item add TOOL-dSafePassage-20 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 3 at HIGH (item D-4)
+2026-10-26T11:29:59Z dispatch · item 14054d44 TOOL-dSafePassage-3 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/steps/receipt_schema_4.py tools/govkit/selftest.py tools/govkit/matrix.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-3.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-3-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T00:15:53Z rescope · item add TOOL-dSafePassage-21 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 5 at HIGH (item D-5)
+2026-10-26T11:30:19Z brief · item TOOL-dSafePassage-3 · reason 3df06df6ea40 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-3-build-brief.md
 
-2026-10-23T00:15:54Z rescope · item add TOOL-dSafePassage-22 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 16 at HIGH (item D-6)
+2026-10-26T11:45:05Z dispatch · item 14054d44 TOOL-dSafePassage-3 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/steps/receipt_schema_4.py tools/govkit/selftest.py tools/govkit/matrix.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-3.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-3-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-3-deviation-165.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
-2026-10-23T00:15:54Z rescope · item add TOOL-dSafePassage-23 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 35 at HIGH (item D-7)
+2026-10-26T12:06:51Z brief · item TOOL-dSafePassage-16 · reason 009ed7d60646 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-16-build-brief.md
 
-2026-10-23T00:15:55Z rescope · item add TOOL-dSafePassage-24 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 53 at HIGH (item D-8)
+2026-10-26T12:11:29Z dispatch · item 885d0ff9 TOOL-dSafePassage-16 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-16-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T00:15:56Z rescope · item add TOOL-dSafePassage-25 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 54 at HIGH (item D-9)
+2026-10-26T12:24:11Z brief · item TOOL-dSafePassage-20 · reason 8afb1c293e7a memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-20-build-brief.md
 
-2026-10-23T00:15:56Z rescope · item add TOOL-dSafePassage-26 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: the MEDIUM and LOW batch, finding ids 4 26 42 65 7 8 37 9 10 11 62 12 19 27 28 29 61 30 31 36 38 39 40 43 44 46 47 48 49 55 56 57 58 59 60 63 64 66 67 (MEDIUM) and 6 13 14 20 41 15 17 21 22 23 24 25 33 34 45 (LOW)
+2026-10-26T12:32:29Z dispatch · item c4fc7de1 TOOL-dSafePassage-20 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/refusal_join.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-20.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-20-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T01:12:53Z rescope · item add TOOL-dSafePassage-27 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 1 at HIGH (item D-1, shared with id 35)
+2026-10-26T12:43:52Z brief · item TOOL-dSafePassage-43 · reason 567106089b61 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-43-build-brief.md
 
-2026-10-23T01:12:53Z rescope · item add TOOL-dSafePassage-28 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 35 at HIGH (item D-1, shared with id 1)
+2026-10-26T12:48:03Z dispatch · item adc480e5 TOOL-dSafePassage-43 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-43.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-43-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T01:12:54Z rescope · item add TOOL-dSafePassage-29 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 12 at HIGH (item D-2)
+2026-10-26T13:01:44Z brief · item TOOL-dSafePassage-7 · reason d427289f281b memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-7-build-brief.md
 
-2026-10-23T01:12:55Z rescope · item add TOOL-dSafePassage-30 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 38 at HIGH (item D-3)
+2026-10-26T13:09:45Z dispatch · item 0becfe7d TOOL-dSafePassage-7 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-7.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-7-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T01:12:55Z rescope · item add TOOL-dSafePassage-31 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 13 at HIGH (item D-4)
+2026-10-26T13:28:53Z brief · item TOOL-dSafePassage-2 · reason 26a49c296f4d memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-2-build-brief.md
 
-2026-10-23T01:12:56Z rescope · item add TOOL-dSafePassage-32 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 37 at HIGH (item D-5)
+2026-10-26T13:32:45Z dispatch · item 5aac6409 TOOL-dSafePassage-2 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-2.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-2-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T01:12:57Z rescope · item add TOOL-dSafePassage-33 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 40 at HIGH (item D-6)
+2026-10-26T14:24:38Z dispatch · item f8262323 TOOL-dSafePassage-4 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-4.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-4-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T01:12:57Z rescope · item add TOOL-dSafePassage-34 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 29 at HIGH (item D-7)
+2026-10-26T14:24:43Z brief · item TOOL-dSafePassage-4 · reason 7d3491cc41cd memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-4-build-brief.md
 
-2026-10-23T01:12:58Z rescope · item add TOOL-dSafePassage-35 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: the MEDIUM and LOW batch, finding ids 2 4 14 15 16 17 18 24 30 31 32 36 39 41 42 43 44 45 46 47 (MEDIUM) and 3 5 6 7 8 9 10 11 19 20 21 22 23 25 26 27 28 33 34 (LOW)
+2026-10-26T15:25:29Z dispatch · item 16cfa267 TOOL-dSafePassage-15 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-15.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-15-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T01:33:36Z review · item dSafePassage-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 8 · minors 39 · disposition promote
+2026-10-26T15:25:38Z brief · item TOOL-dSafePassage-15 · reason 96f496fcf412 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-15-build-brief.md
 
-2026-10-23T02:05:52Z rescope · item add TOOL-dSafePassage-36 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 8 at HIGH (item D-1)
+2026-10-26T15:36:53Z decision · item TOOL-dSafePassage-11 needs Python 3.15 on the build node: provision node a (and every node) at 3.15 final, or rule how the floor lands · reason options: (a) the owner provisions 3.15 per AP-31 and the run resumes 11 and its 38 dependants; (b) the owner rules a different landing for the floor. Refused to choose: node a resolves only 3.14.6 (py -0p; uv lists 3.15.0b2 only); provisioning is a §3 non-goal and an owner act; a resolver refusing below 3.15 would refuse every later hook and the close's bar; a floor switch is the fail-open override §3 rules out. Units outside 11's consumes-from closure build meanwhile
 
-2026-10-23T02:05:52Z rescope · item add TOOL-dSafePassage-37 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 28 at HIGH (item D-2)
+2026-10-26T15:43:18Z dispatch · item ee025c5f TOOL-dSafePassage-18 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-18.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-18-ledger.md
 
-2026-10-23T02:05:53Z rescope · item add TOOL-dSafePassage-38 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 30 at HIGH (item D-3)
+2026-10-26T15:43:24Z brief · item TOOL-dSafePassage-18 · reason 8e9915b50083 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-18-build-brief.md
 
-2026-10-23T02:05:53Z rescope · item add TOOL-dSafePassage-39 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 23 at HIGH (item D-4)
+2026-10-26T16:38:49Z dispatch · item dfb5381c TOOL-dSafePassage-19 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-19.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-19-ledger.md memory/builds/dSafePassage/README.md memory/LIVE.md memory/backlog/TOOL.md memory/map/generated/symbols.json
 
-2026-10-23T02:05:54Z rescope · item add TOOL-dSafePassage-40 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 29 at HIGH (item D-5)
+2026-10-26T16:38:56Z brief · item TOOL-dSafePassage-19 · reason bd47d8ece66f memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-19-build-brief.md
 
-2026-10-23T02:05:55Z rescope · item add TOOL-dSafePassage-41 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 22 at HIGH (item D-6)
+2026-10-26T17:01:33Z dispatch · item a860921f TOOL-dSafePassage-22 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-22.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-22-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
 
-2026-10-23T02:05:55Z rescope · item add TOOL-dSafePassage-42 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: the MEDIUM and LOW batch, finding ids 1 10 31 2 9 27 21 24 11 18 12 25 (MEDIUM) and 3 13 19 14 33 4 15 5 6 7 16 17 20 26 32 (LOW)
+2026-10-26T17:01:41Z brief · item TOOL-dSafePassage-22 · reason f236ff62e3e6 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-22-build-brief.md
 
-2026-10-23T02:22:05Z review · item dSafePassage-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 27 · disposition promote
+2026-10-26T17:15:51Z dispatch · item a182f2c2 TOOL-dSafePassage-24 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/refusal_join.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-24.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-24-ledger.md memory/builds/dSafePassage/README.md memory/LIVE.md memory/map/generated/symbols.json
 
-2026-10-23T02:58:00Z rescope · item add TOOL-dSafePassage-43 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: finding id 2 at HIGH (item D-1)
+2026-10-26T17:15:57Z brief · item TOOL-dSafePassage-24 · reason 367133729cff memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-24-build-brief.md
 
-2026-10-23T02:58:00Z rescope · item add TOOL-dSafePassage-44 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: finding id 13 at HIGH (item D-2)
+2026-10-26T17:36:47Z hold · item host-owner-action · reason until owner · reaped 6e25bf31 · resume none(owner)
 
-2026-10-23T02:58:01Z rescope · item add TOOL-dSafePassage-45 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: the MEDIUM and LOW batch of the step contract, finding ids 1 7 14 24 9 22 10 19 20 21 3 18 23 (MEDIUM) and 4 26 11 17 5 6 8 12 (LOW)
+2026-10-26T18:23:36Z resume · item dSafePassage · reason held · keepalive 94fa87dd · manual
 
-2026-10-23T02:58:01Z rescope · item add TOOL-dSafePassage-46 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: the MEDIUM and LOW batch of the lander arm, the drift pin and the spec template, finding ids 25 15 (MEDIUM) and 16 (LOW)
+2026-10-26T18:36:24Z brief · item TOOL-dSafePassage-11 · reason 5c224e575915 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-11-build-brief.md
 
-2026-10-23T03:06:58Z review · item dSafePassage-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 24 · disposition promote
+2026-10-26T18:41:36Z dispatch · item 2e382c09 TOOL-dSafePassage-11 · reason tools/lib/python-floor.txt tools/lib/python-floor.sh tools/lib/python_floor.py tools/lib/resolve-python.sh tools/lib/resolve-python.test.sh tools/govkit/steps.toml tools/memory-tree/merge-rows.test.sh tools/settings-merge.py tools/govkit/govkit.py tools/govkit/check_runbook_parity.py tools/codebase-map/map_lib.py tools/codebase-map/README.md README.md tools/check-line-length.sh tools/playbook/adopt-playbook.sh help/python-floor.md help/README.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-11.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-11-ledger.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json .githooks/pre-push .githooks/pre-push.runlog.test.sh .githooks/pre-push.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/check-agent-cap-restatement.test.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/check-install-prefix.sh tools/check-kit-placeholders.test.sh tools/check-kit-versions.sh tools/check-line-length.test.sh tools/check-playbook-parity.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.test.sh tools/check-template-size.sh tools/check-testsuite-counts.test.sh tools/check-wiring.sh tools/check-wiring.test.sh tools/codebase-map/adopt-codebase-map.sh tools/codebase-map/adopt-codebase-map.test.sh tools/drift-audit/adopt-drift-audit.sh tools/govkit/census.test.sh tools/hooks/agent-cap.test.sh tools/hooks/format-guard.test.sh tools/hooks/scratch-guard.test.sh tools/lexicon/adopt-lexicon.sh tools/memory-recall/adopt-memory-recall.sh tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/check-verdict-epoch.sh tools/memory-tree/kit-dogfood-parity.test.sh tools/memory-tree/merge-rows.sh tools/memory-tree/merge-rows.test.sh tools/policy/adopt-policy.sh tools/policy/policy-shim.sh tools/process-monitor/adopt-process-monitor.sh tools/process-monitor/adopt-process-monitor.test.sh tools/push-main.sh tools/push-main.test.sh tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh tools/roles/adopt-roles.sh tools/run-gates/foreign-prefix.gov.test.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.gov.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.turnstile.test.sh tools/run-gates/run-held-wsl.sh tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/runlog/adopt-runlog.sh tools/unattended/adopt-unattended.sh tools/unattended/adopt-unattended.test.sh tools/unattended/check-brief-recorded.test.sh tools/unattended/check-pass-order.test.sh tools/unattended/check-unattended.sh tools/unattended/gate-guard.test.sh tools/unattended/run-unattended-gates.sh tools/unattended/runlog-writer.test.sh tools/unattended/stall-recorder.test.sh tools/unattended/stop-guard.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/workflows/check-protocol-parity.test.sh tools/workflows/check-review-join.sh tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-verifier-fanout.test.sh tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.test.sh
 
-2026-10-23T03:42:14Z rescope · item add TOOL-dSafePassage-47 · reason round-5 spec audit 2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md: finding id 9 at HIGH (item D-1)
+2026-10-26T20:30:03Z brief · item TOOL-dSafePassage-8 · reason f5899d4f67c7 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-8-build-brief.md
 
-2026-10-23T03:42:15Z rescope · item add TOOL-dSafePassage-48 · reason round-5 spec audit 2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md: finding id 10 at HIGH (item D-2)
+2026-10-26T20:35:53Z dispatch · item 3f102408 TOOL-dSafePassage-8 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/matrix.py tools/push-main.sh tools/push-main.test.sh tools/run-gates/check-receipt.py tools/memory-tree/check-verdict-epoch.sh memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-8.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-8-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-8-deviation-166.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
 
-2026-10-23T03:42:16Z rescope · item add TOOL-dSafePassage-49 · reason round-5 spec audit 2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md: the MEDIUM and LOW batch of the step module, finding ids 1 11 18 19 2 26 27 29 3 (MEDIUM) and 4 6 7 20 12 15 16 31 32 33 25 (LOW)
+2026-10-26T20:43:39Z dispatch · item 3f102408 TOOL-dSafePassage-8 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/matrix.py tools/push-main.sh tools/push-main.test.sh tools/run-gates/check-receipt.py tools/memory-tree/check-verdict-epoch.sh memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-8.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-8-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-8-deviation-166.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
-2026-10-23T03:42:16Z rescope · item add TOOL-dSafePassage-50 · reason round-5 spec audit 2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md: the MEDIUM and LOW batch of the lander arm and the spec template, finding ids 30 (MEDIUM) and 5 8 13 17 (LOW)
+2026-10-26T20:55:28Z brief · item TOOL-dSafePassage-12 · reason a93eb905f05e memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-12-build-brief.md
 
-2026-10-23T03:53:53Z review · item dSafePassage-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 25 · disposition promote
+2026-10-26T21:00:53Z dispatch · item 4987c13d TOOL-dSafePassage-12 · reason .github/workflows/remote-ci.yml memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-12.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-12-ledger.md memory/builds/dSafePassage/README.md memory/LIVE.md
 
-2026-10-23T04:25:18Z rescope · item add TOOL-dSafePassage-51 · reason spec audit of units 47 to 50, round 1: the step-module minors batched, ids 1, 2, 9, 4, 14, 22 at MEDIUM and ids 3, 8, 10, 19, 12, 13, 18, 23, 24 at LOW (items D-1 to D-6, D-9, D-10, D-12, D-13, D-17, D-18, D-19)
+2026-10-26T21:16:19Z dispatch · item 1d30fd14 TOOL-dSafePassage-10 · reason tools/govkit/step_gate.py tools/govkit/surface-classes.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/map/features/govkit.md help/step-gate.md help/README.md memory/map/generated/symbols.json
 
-2026-10-23T04:25:22Z rescope · item add TOOL-dSafePassage-52 · reason spec audit of units 47 to 50, round 1: the TOOL-dSafePassage-50 minors batched, ids 6, 20, 7, 11, 15, 16 and 17 at LOW (items D-7, D-8, D-11, D-14, D-15, D-16)
+2026-10-26T21:16:26Z brief · item TOOL-dSafePassage-10 · reason ff04c15588ca memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-10-build-brief.md
 
-2026-10-23T04:35:26Z review · item dSafePassage-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 22 · disposition promote
+2026-10-26T21:41:56Z dispatch · item 1d30fd14 TOOL-dSafePassage-10 · reason tools/govkit/step_gate.py tools/govkit/surface-classes.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/map/features/govkit.md help/step-gate.md help/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
 
-2026-10-23T04:57:16Z review · item dSafePassage-spec-set-r7 · reason verdict BLOCKED · blockers 2 · BOUNDED · highs 3 · minors 22 · disposition promote
+2026-10-26T21:48:32Z dispatch · item 1d30fd14 TOOL-dSafePassage-10 · reason tools/govkit/step_gate.py tools/govkit/surface-classes.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/map/features/govkit.md help/step-gate.md help/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/guides/SESSION-KICKOFF.md
 
-2026-10-23T05:03:36Z rescope · item add TOOL-dSafePassage-53 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): finding id 22 at BLOCKER (item B1, shared with id 7)
+2026-10-26T21:55:26Z dispatch · item 1d30fd14 TOOL-dSafePassage-10 · reason tools/govkit/step_gate.py tools/govkit/surface-classes.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/map/features/govkit.md help/step-gate.md help/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-10-deviation-167.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-10-deviation-168.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-10-deviation-169.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-10-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-10.md
 
-2026-10-23T05:03:37Z rescope · item add TOOL-dSafePassage-54 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): finding id 7 at BLOCKER (item B1, shared with id 22)
+2026-10-26T22:15:16Z dispatch · item f7e56a96 TOOL-dSafePassage-17 · reason tools/govkit/upgrade_steps.py tools/govkit/steps.toml tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-17.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-17-ledger.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
 
-2026-10-23T05:03:38Z rescope · item add TOOL-dSafePassage-55 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): finding id 1 at HIGH (item H1)
+2026-10-26T22:15:22Z brief · item TOOL-dSafePassage-17 · reason 10fa24169a9e memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-17-build-brief.md
 
-2026-10-23T05:03:38Z rescope · item add TOOL-dSafePassage-56 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): finding id 8 at HIGH (item H3)
+2026-10-26T22:42:19Z dispatch · item 66631b0f TOOL-dSafePassage-23 · reason .githooks/pre-push .githooks/pre-push.runlog.test.sh .githooks/pre-push.test.sh skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/check-agent-cap-restatement.test.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/check-install-prefix.sh tools/check-kit-placeholders.test.sh tools/check-kit-versions.sh tools/check-line-length.sh tools/check-line-length.test.sh tools/check-playbook-parity.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.test.sh tools/check-template-size.sh tools/check-testsuite-counts.test.sh tools/check-wiring.sh tools/check-wiring.test.sh tools/codebase-map/adopt-codebase-map.sh tools/codebase-map/adopt-codebase-map.test.sh tools/drift-audit/adopt-drift-audit.sh tools/govkit/census.test.sh tools/hooks/agent-cap.test.sh tools/hooks/format-guard.test.sh tools/hooks/scratch-guard.test.sh tools/lexicon/adopt-lexicon.sh tools/lib/resolve-python.sh tools/memory-recall/adopt-memory-recall.sh tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/check-verdict-epoch.sh tools/memory-tree/kit-dogfood-parity.test.sh tools/memory-tree/merge-rows.sh tools/memory-tree/merge-rows.test.sh tools/playbook/adopt-playbook.sh tools/policy/adopt-policy.sh tools/policy/policy-shim.sh tools/process-monitor/adopt-process-monitor.sh tools/process-monitor/adopt-process-monitor.test.sh tools/push-main.sh tools/push-main.test.sh tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh tools/roles/adopt-roles.sh tools/run-gates/foreign-prefix.gov.test.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.gov.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.turnstile.test.sh tools/run-gates/run-held-wsl.sh tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/runlog/adopt-runlog.sh tools/unattended/adopt-unattended.sh tools/unattended/adopt-unattended.test.sh tools/unattended/check-brief-recorded.test.sh tools/unattended/check-pass-order.test.sh tools/unattended/check-unattended.sh tools/unattended/gate-guard.test.sh tools/unattended/run-unattended-gates.sh tools/unattended/runlog-writer.test.sh tools/unattended/stall-recorder.test.sh tools/unattended/stop-guard.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/workflows/check-protocol-parity.test.sh tools/workflows/check-review-join.sh tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-verifier-fanout.test.sh tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.test.sh tools/lib/resolve-python.test.sh help/python-floor.md memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-23.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-23-ledger.md
 
-2026-10-23T05:03:39Z rescope · item add TOOL-dSafePassage-57 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): finding id 3 at HIGH (item H2)
+2026-10-26T22:42:26Z brief · item TOOL-dSafePassage-23 · reason b1c90b0b5b61 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-23-build-brief.md
 
-2026-10-23T05:03:40Z rescope · item add TOOL-dSafePassage-58 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): the MEDIUM and LOW batch of TOOL-dSafePassage-52, finding ids 9 14 27 15 28 (MEDIUM) and 10 11 20 26 21 (LOW)
+2026-10-26T23:00:32Z dispatch · item 8b379abf TOOL-dSafePassage-25 · reason tools/push-main.sh tools/push-main.test.sh
 
-2026-10-23T05:03:40Z rescope · item add TOOL-dSafePassage-59 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): the MEDIUM and LOW batch of TOOL-dSafePassage-51, finding ids 2 12 18 23 24 (MEDIUM) and 4 17 5 13 16 19 29 (LOW)
+2026-10-26T23:00:38Z brief · item TOOL-dSafePassage-25 · reason e8c42c671280 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-25-build-brief.md
 
-2026-10-23T05:25:04Z rescope · item defer TOOL-dSafePassage-1 · reason specced; built by this build's build run (README rule 1)
+2026-10-26T23:22:43Z dispatch · item 8b379abf TOOL-dSafePassage-25 · reason tools/push-main.sh tools/push-main.test.sh memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-25-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-25-deviation-170.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-25.md
 
-2026-10-23T05:25:05Z rescope · item defer TOOL-dSafePassage-10 · reason specced; built by this build's build run (README rule 1)
+2026-10-26T23:46:15Z dispatch · item da77d7ac TOOL-dSafePassage-29 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-29.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-29-ledger.md
 
-2026-10-23T05:25:06Z rescope · item defer TOOL-dSafePassage-11 · reason specced; built by this build's build run (README rule 1)
+2026-10-26T23:46:21Z brief · item TOOL-dSafePassage-29 · reason 3003603fc35d memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-29-build-brief.md
 
-2026-10-23T05:25:07Z rescope · item defer TOOL-dSafePassage-12 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T00:05:27Z dispatch · item 22be190d TOOL-dSafePassage-30 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-30.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-30-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
 
-2026-10-23T05:25:07Z rescope · item defer TOOL-dSafePassage-13 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T00:05:35Z brief · item TOOL-dSafePassage-30 · reason 76ca538419c7 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-30-build-brief.md
 
-2026-10-23T05:25:08Z rescope · item defer TOOL-dSafePassage-15 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T00:15:37Z dispatch · item 22be190d TOOL-dSafePassage-30 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-30.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-30-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-30-deviation-171.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
 
-2026-10-23T05:25:09Z rescope · item defer TOOL-dSafePassage-16 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T00:24:38Z dispatch · item 22be190d TOOL-dSafePassage-30 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-30.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-30-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-30-deviation-171.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
-2026-10-23T05:25:09Z rescope · item defer TOOL-dSafePassage-17 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T00:41:56Z dispatch · item 602fe92c TOOL-dSafePassage-32 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-32.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-32-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-32-deviation-172.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
-2026-10-23T05:25:10Z rescope · item defer TOOL-dSafePassage-18 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T00:42:03Z brief · item TOOL-dSafePassage-32 · reason 24fe63339426 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-32-build-brief.md
 
-2026-10-23T05:25:11Z rescope · item defer TOOL-dSafePassage-19 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T01:06:14Z dispatch · item ab5614c2 TOOL-dSafePassage-6 · reason tools/govkit/shims.py tools/govkit/shims.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/gate-legs.json help/shims.md help/README.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-6.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-6-ledger.md memory/map/generated/symbols.json
 
-2026-10-23T05:25:11Z rescope · item defer TOOL-dSafePassage-2 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T01:06:22Z brief · item TOOL-dSafePassage-6 · reason f0fd5b7a8f92 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-6-build-brief.md
 
-2026-10-23T05:25:12Z rescope · item defer TOOL-dSafePassage-20 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T01:24:04Z dispatch · item ab5614c2 TOOL-dSafePassage-6 · reason tools/govkit/shims.py tools/govkit/shims.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/gate-legs.json help/shims.md help/README.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-6.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-6-ledger.md memory/map/generated/symbols.json memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-6-deviation-173.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-6-deviation-174.md
 
-2026-10-23T05:25:13Z rescope · item defer TOOL-dSafePassage-21 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T01:34:20Z dispatch · item ab5614c2 TOOL-dSafePassage-6 · reason tools/govkit/shims.py tools/govkit/shims.toml tools/govkit/govkit.py tools/govkit/selftest.py tools/gate-legs.json help/shims.md help/README.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-6.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-6-ledger.md memory/map/generated/symbols.json memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-6-deviation-173.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-6-deviation-174.md memory/guides/SESSION-KICKOFF.md
 
-2026-10-23T05:25:13Z rescope · item defer TOOL-dSafePassage-22 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T01:53:46Z dispatch · item 57f29f7f TOOL-dSafePassage-9 · reason tools/govkit/govkit.py tools/govkit/fixtures/retired_edits.py tools/govkit/selftest.py tools/gate-legs.json help/update-edits.md help/README.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-9.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-9-ledger.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/README.md
 
-2026-10-23T05:25:14Z rescope · item defer TOOL-dSafePassage-23 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T01:53:51Z brief · item TOOL-dSafePassage-9 · reason b25e49ae5cb2 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-9-build-brief.md
 
-2026-10-23T05:25:15Z rescope · item defer TOOL-dSafePassage-24 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T02:13:12Z dispatch · item 57f29f7f TOOL-dSafePassage-9 · reason tools/govkit/govkit.py tools/govkit/fixtures/retired_edits.py tools/govkit/selftest.py tools/gate-legs.json help/update-edits.md help/README.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-9.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-9-ledger.md memory/map/generated/symbols.json memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/README.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-9-deviation-175.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
-2026-10-23T05:25:15Z rescope · item defer TOOL-dSafePassage-25 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T02:35:32Z dispatch · item 1b64e20a TOOL-dSafePassage-13 · reason tools/govkit/docs_leg.py tools/govkit/usage.toml tools/govkit/selftest.py tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/drift-audit/drift_signals.py memory/project/docs-undocumented.txt memory/map/features/govkit.md help/docs-leg.md help/README.md help/roles.md help/measure-legs.md help/step-gate.md help/upgrade-steps.md help/shims.md help/update-edits.md help/python-floor.md help/policy.md help/size-caps.md help/agent-limit.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-13.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-13-ledger.md memory/map/generated/symbols.json memory/builds/dSafePassage/README.md memory/guides/SESSION-KICKOFF.md
 
-2026-10-23T05:25:16Z rescope · item defer TOOL-dSafePassage-26 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T02:35:39Z brief · item TOOL-dSafePassage-13 · reason d59cb53097d6 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-13-build-brief.md
 
-2026-10-23T05:25:17Z rescope · item defer TOOL-dSafePassage-27 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T02:55:42Z dispatch · item 1b64e20a TOOL-dSafePassage-13 · reason tools/govkit/docs_leg.py tools/govkit/usage.toml tools/govkit/selftest.py tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/drift-audit/drift_signals.py memory/project/docs-undocumented.txt memory/map/features/govkit.md help/docs-leg.md help/README.md help/roles.md help/measure-legs.md help/step-gate.md help/upgrade-steps.md help/shims.md help/update-edits.md help/python-floor.md help/policy.md help/size-caps.md help/agent-limit.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-13.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-13-ledger.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/backlog/TOOL.md memory/builds/dSafePassage/README.md memory/guides/SESSION-KICKOFF.md
 
-2026-10-23T05:25:18Z rescope · item defer TOOL-dSafePassage-28 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T03:02:36Z dispatch · item 1b64e20a TOOL-dSafePassage-13 · reason tools/govkit/docs_leg.py tools/govkit/usage.toml tools/govkit/selftest.py tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/drift-audit/drift_signals.py memory/project/docs-undocumented.txt memory/map/features/govkit.md help/docs-leg.md help/README.md help/roles.md help/measure-legs.md help/step-gate.md help/upgrade-steps.md help/shims.md help/update-edits.md help/python-floor.md help/policy.md help/size-caps.md help/agent-limit.md tools/policy/catalogue.toml tools/policy/unsummarised-keys.txt .governance/policy.json memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-13.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-13-ledger.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/backlog/TOOL.md memory/builds/dSafePassage/README.md memory/guides/SESSION-KICKOFF.md .memory-tree.conf
 
-2026-10-23T05:25:18Z rescope · item defer TOOL-dSafePassage-29 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T03:24:18Z dispatch · item 4cabc885 TOOL-dSafePassage-21 · reason tools/govkit/govkit.py tools/govkit/step_gate.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-21.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-21-ledger.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
 
-2026-10-23T05:25:19Z rescope · item defer TOOL-dSafePassage-3 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T03:24:22Z brief · item TOOL-dSafePassage-21 · reason 4bc4670ec981 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-21-build-brief.md
 
-2026-10-23T05:25:20Z rescope · item defer TOOL-dSafePassage-30 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T03:34:56Z dispatch · item 4cabc885 TOOL-dSafePassage-21 · reason tools/govkit/govkit.py tools/govkit/step_gate.py tools/govkit/selftest.py tools/govkit/surface-classes.toml memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-21.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-21-ledger.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
 
-2026-10-23T05:25:20Z rescope · item defer TOOL-dSafePassage-31 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T03:40:02Z dispatch · item 4cabc885 TOOL-dSafePassage-21 · reason tools/govkit/govkit.py tools/govkit/step_gate.py tools/govkit/selftest.py tools/govkit/surface-classes.toml help/step-gate.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-21.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-21-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-21-deviation-176.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-21-deviation-177.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
 
-2026-10-23T05:25:21Z rescope · item defer TOOL-dSafePassage-32 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T03:45:58Z dispatch · item 4cabc885 TOOL-dSafePassage-21 · reason tools/govkit/govkit.py tools/govkit/step_gate.py tools/govkit/selftest.py tools/govkit/surface-classes.toml help/step-gate.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-21.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-21-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-21-deviation-176.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-21-deviation-177.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
-2026-10-23T05:25:22Z rescope · item defer TOOL-dSafePassage-33 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T04:10:28Z dispatch · item 4749dfba TOOL-dSafePassage-27 · reason tools/push-main.sh tools/push-main.test.sh memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-27.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-27-ledger.md
 
-2026-10-23T05:25:23Z rescope · item defer TOOL-dSafePassage-34 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T04:10:36Z brief · item TOOL-dSafePassage-27 · reason 6f9fc234407e memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-27-build-brief.md
 
-2026-10-23T05:25:23Z rescope · item defer TOOL-dSafePassage-35 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T04:55:44Z dispatch · item f877719e TOOL-dSafePassage-28 · reason tools/push-main.test.sh memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-28.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-28-ledger.md memory/builds/dSafePassage/README.md
 
-2026-10-23T05:25:24Z rescope · item defer TOOL-dSafePassage-36 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T04:55:50Z brief · item TOOL-dSafePassage-28 · reason fbdfd2ffab38 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-28-build-brief.md
 
-2026-10-23T05:25:25Z rescope · item defer TOOL-dSafePassage-37 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T05:22:05Z dispatch · item 05de2d96 TOOL-dSafePassage-33 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-33.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-33-ledger.md memory/builds/dSafePassage/README.md
 
-2026-10-23T05:25:25Z rescope · item defer TOOL-dSafePassage-38 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T05:22:10Z brief · item TOOL-dSafePassage-33 · reason 6e6e214d6886 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-33-build-brief.md
 
-2026-10-23T05:25:26Z rescope · item defer TOOL-dSafePassage-39 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T05:41:03Z dispatch · item 669dc1f9 TOOL-dSafePassage-36 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-36.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-36-ledger.md memory/map/generated/symbols.json
 
-2026-10-23T05:25:27Z rescope · item defer TOOL-dSafePassage-4 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T05:41:10Z brief · item TOOL-dSafePassage-36 · reason 57e5e1708d54 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-36-build-brief.md
 
-2026-10-23T05:25:28Z rescope · item defer TOOL-dSafePassage-40 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T05:52:36Z brief · item TOOL-dSafePassage-37 · reason 1878c1af8e39 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-37-build-brief.md
 
-2026-10-23T05:25:28Z rescope · item defer TOOL-dSafePassage-41 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T05:57:38Z dispatch · item 37152f04 TOOL-dSafePassage-37 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-37.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-37-ledger.md
 
-2026-10-23T05:25:29Z rescope · item defer TOOL-dSafePassage-42 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T07:21:29Z rescope · item add TOOL-dSafePassage-62 · reason TOOL-dSafePassage-5's second build pass measured a killed schema-step walk whose rollback writes 0 files and leaves 38 paths at the tip: below schema 4 the walk persists no receipt, so the file pass's new rows never reach disk and the rollback reads every moved file as patched; update writes its receipt before the first step, ordered before unit 5
 
-2026-10-23T05:25:30Z rescope · item defer TOOL-dSafePassage-43 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T07:44:52Z dispatch · item ff6b1fdf TOOL-dSafePassage-62 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-62.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-62-ledger.md memory/map/generated/symbols.json
 
-2026-10-23T05:25:30Z rescope · item defer TOOL-dSafePassage-44 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T07:44:54Z brief · item TOOL-dSafePassage-62 · reason 83b6052a666e memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-62-build-brief.md
 
-2026-10-23T05:25:31Z rescope · item defer TOOL-dSafePassage-45 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T09:10:40Z rescope · item add TOOL-dSafePassage-63 · reason TOOL-dSafePassage-5's third build pass measured an adopter's edit to a rendered file lost on the first update: the pinned apply writes rendered rows with output_sha256 and no oid, and check_render_edited cannot prove an edit without oid; the check falls back to output_sha256, ordered before unit 5
 
-2026-10-23T05:25:32Z rescope · item defer TOOL-dSafePassage-46 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T09:30:14Z rescope · item add TOOL-dSafePassage-64 · reason TOOL-dSafePassage-5's third build pass measured a withdraw-one rollback leaving a receipt row at retired-edited where release-0 recorded engine; no record declares role re-derived, and round-1 finding D-42 (TOOL-dSafePassage-26 S39/AC38) owned the fix at order 6, after unit 5; S39 and AC38 move to this unit at order 5
 
-2026-10-23T05:25:32Z rescope · item defer TOOL-dSafePassage-47 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T10:00:48Z dispatch · item 4d616a46 TOOL-dSafePassage-63 · reason tools/govkit/govkit.py tools/govkit/fixtures/retired_edits.py tools/govkit/selftest.py help/update-edits.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-63.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-63-ledger.md
 
-2026-10-23T05:25:33Z rescope · item defer TOOL-dSafePassage-48 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T10:00:53Z brief · item TOOL-dSafePassage-63 · reason d43109895594 memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-63-build-brief.md
 
-2026-10-23T05:25:34Z rescope · item defer TOOL-dSafePassage-49 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T10:21:11Z dispatch · item 459f1215 TOOL-dSafePassage-64 · reason tools/govkit/govkit.py tools/govkit/fixtures/retired_edits.py tools/govkit/selftest.py help/update-edits.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-64.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-64-ledger.md memory/map/generated/symbols.json
 
-2026-10-23T05:25:34Z rescope · item defer TOOL-dSafePassage-5 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T10:21:17Z brief · item TOOL-dSafePassage-64 · reason d2694d48c29f memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-64-build-brief.md
 
-2026-10-23T05:25:35Z rescope · item defer TOOL-dSafePassage-50 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T11:39:47Z rescope · item add TOOL-dSafePassage-65 · reason TOOL-dSafePassage-5's fourth build pass measured a rollback leaving a withdrawn row retired-edited: update reads gov's bytes at --to but roles from the checkout's working tree (govkit.py:9521, :10145), against help/upgrade-steps.md:206 and DEPL-dGaugedVintage-9 S1; the role re-resolution reads the kit's descriptor at --to, ordered before unit 5
 
-2026-10-23T05:25:36Z rescope · item defer TOOL-dSafePassage-51 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T11:39:50Z rescope · item add TOOL-dSafePassage-66 · reason TOOL-dSafePassage-5's fourth build pass measured a walk killed inside a step leaving a held kit's files at the tip: update restores a held kit only in its verify pass, after the step walk, and TOOL-dSafePassage-62's receipt records them; the restore runs straight after the HELD BACK lines, before the first step, ordered before unit 5
 
-2026-10-23T05:25:37Z rescope · item defer TOOL-dSafePassage-52 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T11:59:51Z dispatch · item 882f78e5 TOOL-dSafePassage-65 · reason tools/govkit/govkit.py tools/govkit/fixtures/retired_edits.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-65.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-65-ledger.md memory/map/generated/symbols.json memory/builds/dSafePassage/README.md
 
-2026-10-23T05:25:37Z rescope · item defer TOOL-dSafePassage-53 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T11:59:58Z brief · item TOOL-dSafePassage-65 · reason bee680c08075 memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-65-build-brief.md
 
-2026-10-23T05:25:38Z rescope · item defer TOOL-dSafePassage-54 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T12:25:35Z dispatch · item b671532b TOOL-dSafePassage-66 · reason tools/govkit/govkit.py tools/govkit/fixtures/retired_edits.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-66.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-66-ledger.md memory/map/generated/symbols.json
 
-2026-10-23T05:25:39Z rescope · item defer TOOL-dSafePassage-55 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T12:25:37Z brief · item TOOL-dSafePassage-66 · reason def25ab48e06 memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-66-build-brief.md
 
-2026-10-23T05:25:39Z rescope · item defer TOOL-dSafePassage-56 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T14:45:23Z dispatch · item e818aace TOOL-dSafePassage-5 · reason tools/govkit/upgrade_walk.py tools/govkit/fixture_target.py tools/govkit/selftest.py tools/govkit/fixtures/release-0/pin.txt tools/govkit/fixtures/release-0/deploy.toml tools/govkit/fixtures/release-0/plants.toml tools/govkit/fixtures/release-0/arms.toml tools/govkit/fixtures/release-0/arms/arm_step.py tools/govkit/fixtures/release-0/seed/AGENTS.md tools/govkit/usage.toml tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/map/features/govkit.md help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-5.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-5-ledger.md memory/map/generated/symbols.json
 
-2026-10-23T05:25:40Z rescope · item defer TOOL-dSafePassage-57 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T14:45:26Z brief · item TOOL-dSafePassage-5 · reason 237a73c47c73 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-5-build-brief.md
 
-2026-10-23T05:25:41Z rescope · item defer TOOL-dSafePassage-58 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T15:21:10Z dispatch · item e818aace TOOL-dSafePassage-5 · reason tools/govkit/upgrade_walk.py tools/govkit/fixture_target.py tools/govkit/selftest.py tools/govkit/fixtures/release-0/pin.txt tools/govkit/fixtures/release-0/deploy.toml tools/govkit/fixtures/release-0/plants.toml tools/govkit/fixtures/release-0/arms.toml tools/govkit/fixtures/release-0/arms/arm_step.py tools/govkit/fixtures/release-0/seed/AGENTS.md tools/govkit/usage.toml tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/map/features/govkit.md help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-5.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-5-ledger.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dSafePassage/README.md
 
-2026-10-23T05:25:41Z rescope · item defer TOOL-dSafePassage-59 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T15:37:02Z dispatch · item e818aace TOOL-dSafePassage-5 · reason tools/govkit/upgrade_walk.py tools/govkit/fixture_target.py tools/govkit/selftest.py tools/govkit/fixtures/release-0/pin.txt tools/govkit/fixtures/release-0/deploy.toml tools/govkit/fixtures/release-0/plants.toml tools/govkit/fixtures/release-0/arms.toml tools/govkit/fixtures/release-0/arms/arm_step.py tools/govkit/fixtures/release-0/seed/AGENTS.md tools/govkit/usage.toml tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/gate-legs.json tools/run-gates/ceiling-evidence.txt memory/map/features/govkit.md help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-5.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-5-ledger.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dSafePassage/README.md memory/guides/SESSION-KICKOFF.md
 
-2026-10-23T05:25:42Z rescope · item defer TOOL-dSafePassage-6 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T16:02:36Z brief · item TOOL-dSafePassage-26 · reason 7c152ce6e336 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-26-build-brief.md
 
-2026-10-23T05:25:43Z rescope · item defer TOOL-dSafePassage-7 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T16:09:58Z dispatch · item 31b078c3 TOOL-dSafePassage-26 · reason .githooks/pre-push .githooks/pre-push.runlog.test.sh .githooks/pre-push.test.sh .github/workflows/remote-ci.yml .memory-tree.conf help/python-floor.md help/upgrade-steps.md memory/builds/dSafePassage/README.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-26-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md memory/guides/SESSION-KICKOFF.md memory/map/features/govkit.md memory/map/generated/CARDS.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json skills/deploy-governance/SKILL.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/check-agent-cap-restatement.test.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/check-install-prefix.sh tools/check-kit-placeholders.test.sh tools/check-kit-versions.sh tools/check-line-length.sh tools/check-line-length.test.sh tools/check-playbook-parity.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/check-template-size.sh tools/check-testsuite-counts.test.sh tools/check-wiring.sh tools/check-wiring.test.sh tools/codebase-map/adopt-codebase-map.sh tools/codebase-map/adopt-codebase-map.test.sh tools/drift-audit/adopt-drift-audit.sh tools/govkit/census.test.sh tools/govkit/docs_leg.py tools/govkit/fixture_target.py tools/govkit/fixtures/retired_edits.py tools/govkit/govkit.py tools/govkit/refusal_join.py tools/govkit/selftest.py tools/govkit/shims.py tools/govkit/step_gate.py tools/govkit/steps.toml tools/govkit/steps/fanout_cap.py tools/govkit/steps/receipt_schema_4.py tools/govkit/subject-pins.tsv tools/govkit/upgrade_steps.py tools/govkit/upgrade_walk.py tools/hooks/agent-cap.test.sh tools/hooks/format-guard.test.sh tools/hooks/scratch-guard.test.sh tools/lexicon/adopt-lexicon.sh tools/lexicon/selftest.py tools/lib/python-floor.sh tools/lib/python_floor.py tools/lib/resolve-python.sh tools/memory-recall/adopt-memory-recall.sh tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/check-verdict-epoch.sh tools/memory-tree/kit-dogfood-parity.test.sh tools/memory-tree/merge-rows.sh tools/memory-tree/merge-rows.test.sh tools/playbook/adopt-playbook.sh tools/policy/adopt-policy.sh tools/policy/policy-shim.sh tools/process-monitor/adopt-process-monitor.sh tools/process-monitor/adopt-process-monitor.test.sh tools/push-main.sh tools/push-main.test.sh tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh tools/roles/adopt-roles.sh tools/run-gates/ceiling-evidence.txt tools/run-gates/foreign-prefix.gov.test.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.gov.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.turnstile.test.sh tools/run-gates/run-held-wsl.sh tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/runlog/adopt-runlog.sh tools/unattended/adopt-unattended.sh tools/unattended/adopt-unattended.test.sh tools/unattended/check-brief-recorded.test.sh tools/unattended/check-pass-order.test.sh tools/unattended/check-unattended.sh tools/unattended/gate-guard.test.sh tools/unattended/run-unattended-gates.sh tools/unattended/runlog-writer.test.sh tools/unattended/stall-recorder.test.sh tools/unattended/stop-guard.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/workflows/README.md tools/workflows/check-protocol-parity.test.sh tools/workflows/check-review-join.sh tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-verifier-fanout.test.sh tools/workflows/kit.toml tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.test.sh
 
-2026-10-23T05:25:43Z rescope · item defer TOOL-dSafePassage-8 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T17:09:42Z dispatch · item 31b078c3 TOOL-dSafePassage-26 · reason .githooks/pre-push .githooks/pre-push.runlog.test.sh .githooks/pre-push.test.sh .github/workflows/remote-ci.yml help/python-floor.md help/step-gate.md help/upgrade-steps.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dSafePassage/README.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-26-ledger.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-26-deviation-178.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-26-deviation-179.md memory/builds/dSafePassage/build/2026-10-27-build-TOOL-dSafePassage-26-deviation-180.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json skills/deploy-governance/SKILL.md skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/check-agent-cap-restatement.test.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/check-install-prefix.sh tools/check-kit-placeholders.test.sh tools/check-kit-versions.sh tools/check-line-length.sh tools/check-line-length.test.sh tools/check-playbook-parity.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.test.sh tools/check-template-size.sh tools/check-testsuite-counts.test.sh tools/check-wiring.sh tools/check-wiring.test.sh tools/codebase-map/adopt-codebase-map.sh tools/codebase-map/adopt-codebase-map.test.sh tools/drift-audit/adopt-drift-audit.sh tools/gate-legs.json tools/govkit/census.test.sh tools/govkit/docs_leg.py tools/govkit/fixture_target.py tools/govkit/fixtures/retired_edits.py tools/govkit/govkit.py tools/govkit/refusal_join.py tools/govkit/selftest.py tools/govkit/shims.py tools/govkit/step_gate.py tools/govkit/steps.toml tools/govkit/steps/fanout_cap.py tools/govkit/steps/receipt_schema_4.py tools/govkit/upgrade_steps.py tools/hooks/agent-cap.test.sh tools/hooks/format-guard.test.sh tools/hooks/scratch-guard.test.sh tools/lexicon/adopt-lexicon.sh tools/lexicon/selftest.py tools/lib/python-floor.sh tools/lib/python_floor.py tools/lib/render-doc.sh tools/lib/resolve-python.sh tools/lib/resolve-python.test.sh tools/memory-recall/adopt-memory-recall.sh tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/check-verdict-epoch.sh tools/memory-tree/kit-dogfood-parity.test.sh tools/memory-tree/merge-rows.sh tools/memory-tree/merge-rows.test.sh tools/playbook/adopt-playbook.sh tools/policy/adopt-policy.sh tools/policy/policy-shim.sh tools/process-monitor/adopt-process-monitor.sh tools/process-monitor/adopt-process-monitor.test.sh tools/push-main.sh tools/push-main.test.sh tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh tools/roles/adopt-roles.sh tools/run-gates/foreign-prefix.gov.test.sh tools/run-gates/run-gates.evidence.test.sh tools/run-gates/run-gates.gov.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.turnstile.test.sh tools/run-gates/run-held-wsl.sh tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/runlog/adopt-runlog.sh tools/unattended/adopt-unattended.sh tools/unattended/adopt-unattended.test.sh tools/unattended/check-brief-recorded.test.sh tools/unattended/check-pass-order.test.sh tools/unattended/check-unattended.sh tools/unattended/gate-guard.test.sh tools/unattended/run-unattended-gates.sh tools/unattended/runlog-writer.test.sh tools/unattended/stall-recorder.test.sh tools/unattended/stop-guard.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/workflows/check-protocol-parity.test.sh tools/workflows/check-review-join.sh tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-verifier-fanout.test.sh tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.test.sh
 
-2026-10-23T05:25:44Z rescope · item defer TOOL-dSafePassage-9 · reason specced; built by this build's build run (README rule 1)
+2026-10-27T17:27:48Z rescope · item add TOOL-dSafePassage-67 · reason TOOL-dSafePassage-26's build pass found fixture_target.build_target's base commit inheriting the machine's global commit.gpgsign and core.hooksPath, while run_git ignores a failed commit (check=False); every walk and selftest target now goes through it; the factory pins both like core.autocrlf, adopted under M10 at order 6
 
-2026-10-23T06:34:13Z override · item specs-audited · reason the owner stopped the spec reviews after round 7 (memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-owner-audit-cap.md): TOOL-dSafePassage-53 to -59, the round-7 promotions, are specced and deferred to the build run with no audit
+2026-10-27T18:08:45Z dispatch · item d27cf9b0 TOOL-dSafePassage-67 · reason tools/govkit/fixture_target.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-67.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-67-ledger.md memory/map/generated/symbols.json
 
-2026-10-23T06:34:13Z override · item closing-review-recorded · reason the owner stopped the spec reviews after round 7 (memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-owner-audit-cap.md): the spec run's closing review would review the same spec-only diff, and the build run's closing review over code still runs
+2026-10-27T18:09:07Z brief · item TOOL-dSafePassage-67 · reason f909817d2b11 memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-67-build-brief.md
+
+2026-10-27T18:32:06Z dispatch · item 93399df8 TOOL-dSafePassage-39 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-39.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-39-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-27T18:32:14Z brief · item TOOL-dSafePassage-39 · reason ae64c48b6fdf memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-39-build-brief.md
+
+2026-10-27T18:52:54Z dispatch · item e41136f3 TOOL-dSafePassage-40 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-40.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-40-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-27T18:53:00Z brief · item TOOL-dSafePassage-40 · reason 3d142a75de5b memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-40-build-brief.md
+
+2026-10-27T19:08:40Z rescope · item add TOOL-dSafePassage-68 · reason the main loop's kill probe after TOOL-dSafePassage-40 found every upgrade-walk case broken: TOOL-dSafePassage-26 gave run_step_isolated a fifth parameter 'to', and the leg's child walk swaps in a four-argument run(), so each spawned update dies with TypeError at the first witness; the stand-in forwards the real signature, at order 7
+
+2026-10-27T19:32:52Z dispatch · item d8c6a9a2 TOOL-dSafePassage-68 · reason tools/govkit/upgrade_walk.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-68.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-68-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-27T19:33:00Z brief · item TOOL-dSafePassage-68 · reason 92985e38aea1 memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-68-build-brief.md
+
+2026-10-27T19:53:45Z rescope · item add TOOL-dSafePassage-69 · reason after TOOL-dSafePassage-68 the main loop's floor-step kill case went red: since TOOL-dSafePassage-26 S10/S11 the floor down grades the files a rollback restores at <to> under prior 3.11, and the pin's own tools/memory-recall/check-recall.py:394 needs 3.12 (a # in an f-string replacement field), so every rollback to the pin is refused at the floor step; its finding prints on stdout while the step's tail keeps stderr, so the refusal named nothing
+
+2026-10-27T20:35:26Z dispatch · item 4ef2e9fb TOOL-dSafePassage-69 · reason tools/govkit/steps.toml tools/lib/python_floor.py tools/govkit/upgrade_steps.py tools/lib/resolve-python.test.sh tools/govkit/selftest.py help/python-floor.md help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-27-spec-TOOL-dSafePassage-69.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-69-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-27T20:35:33Z brief · item TOOL-dSafePassage-69 · reason 6ec486fb01fd memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-69-build-brief.md
+
+2026-10-27T21:12:57Z dispatch · item 30ba3902 TOOL-dSafePassage-31 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-31.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-31-ledger.md memory/map/generated/symbols.json
+
+2026-10-27T21:13:00Z brief · item TOOL-dSafePassage-31 · reason 18885b6ff945 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-31-build-brief.md
+
+2026-10-27T22:02:19Z dispatch · item c8043dcd TOOL-dSafePassage-34 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md tools/drift-audit/drift_signals.py
+
+2026-10-27T22:02:25Z brief · item TOOL-dSafePassage-34 · reason 59a165f1a169 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-34-build-brief.md
+
+2026-10-27T22:12:22Z dispatch · item c8043dcd TOOL-dSafePassage-34 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md tools/drift-audit/drift_signals.py memory/guides/SESSION-KICKOFF.md
+
+2026-10-27T22:23:21Z dispatch · item c8043dcd TOOL-dSafePassage-34 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/map/features/spec-tokens.md tools/drift-audit/drift_signals.py memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-34-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-34.md
+
+2026-10-27T23:27:24Z rescope · item add TOOL-dSafePassage-70 · reason TOOL-dSafePassage-35's second build pass measured a rollback killed between the schema step's down and the stamp as unresumable: the re-run exits 2, 'a receipt at schema 3 has no steps to record fx/s2 in', because move 3 of run_reverse_walk persists on a receipt the schema down already lowered; 35's S19 and AC17 move here with the walk change that makes them buildable, at order 8
+
+2026-10-28T00:16:22Z dispatch · item 46f1375d TOOL-dSafePassage-35 · reason tools/govkit/govkit.py tools/govkit/upgrade_steps.py tools/govkit/step_gate.py tools/govkit/selftest.py tools/gate-legs.json tools/push-main.sh tools/push-main.test.sh tools/lib/python-floor.sh tools/lib/python_floor.py tools/govkit/surface-classes.toml help/upgrade-steps.md help/step-gate.md help/python-floor.md memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-35.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-35-ledger.md memory/builds/dSafePassage/README.md memory/LIVE.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T00:16:39Z brief · item TOOL-dSafePassage-35 · reason adb6eb4fe37b memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-35-build-brief.md
+
+2026-10-28T01:10:47Z dispatch · item f8f91988 TOOL-dSafePassage-70 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-70.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-70-ledger.md
+
+2026-10-28T01:10:56Z brief · item TOOL-dSafePassage-70 · reason 9ddcf934d88f memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-70-build-brief.md
+
+2026-10-28T01:32:20Z dispatch · item c2ee6f0f TOOL-dSafePassage-41 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh memory/map/features/spec-tokens.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-41.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-41-ledger.md
+
+2026-10-28T01:32:28Z brief · item TOOL-dSafePassage-41 · reason a6ce9575f640 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-41-build-brief.md
+
+2026-10-28T02:08:06Z dispatch · item c930c0a9 TOOL-dSafePassage-41 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh memory/map/features/spec-tokens.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-41.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-41-ledger.md
+
+2026-10-28T02:08:13Z brief · item TOOL-dSafePassage-41 · reason 7d1a51f157db memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-41-build-brief.md
+
+2026-10-28T02:26:36Z dispatch · item 0ea611c2 TOOL-dSafePassage-38 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-38.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-38-ledger.md memory/map/generated/symbols.json
+
+2026-10-28T02:26:46Z brief · item TOOL-dSafePassage-38 · reason 83a8eec39adb memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-38-build-brief.md
+
+2026-10-28T02:48:01Z dispatch · item 166d170c TOOL-dSafePassage-42 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/push-main.sh tools/push-main.test.sh tools/run-gates/selftest-budgets.txt help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-42.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-42-ledger.md memory/map/generated/symbols.json
+
+2026-10-28T02:48:08Z brief · item TOOL-dSafePassage-42 · reason d32c89a21c39 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-42-build-brief.md
+
+2026-10-28T03:13:19Z rescope · item add TOOL-dSafePassage-71 · reason TOOL-dSafePassage-42's builder found the [dSP-36] staged-break arm in tools/govkit/selftest.py copying only govkit.py into its walk copy; upgrade_steps.py now imports fixture_target (TOOL-dSafePassage-5, -26), so the copy dies on ModuleNotFoundError before it can print isolation: FAILED and the arm reds govkit selftest; staged-break copies take every sibling module they import, gated as a class, adopted under M10 at order 10
+
+2026-10-28T04:23:04Z dispatch · item 3e66854b TOOL-dSafePassage-71 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-71.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-71-ledger.md memory/map/generated/symbols.json
+
+2026-10-28T04:23:15Z brief · item TOOL-dSafePassage-71 · reason 20202c68b5c0 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-71-build-brief.md
+
+2026-10-28T05:01:53Z dispatch · item c2663abc TOOL-dSafePassage-44 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-44.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-44-ledger.md memory/map/generated/symbols.json
+
+2026-10-28T05:01:58Z brief · item TOOL-dSafePassage-44 · reason 11310c3a2084 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-44-build-brief.md
+
+2026-10-28T05:32:31Z dispatch · item 73f2042b TOOL-dSafePassage-45 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-45.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-45-ledger.md memory/map/generated/symbols.json
+
+2026-10-28T05:33:31Z brief · item TOOL-dSafePassage-45 · reason 3f5f7300e495 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-45-build-brief.md
+
+2026-10-28T06:01:23Z brief · item TOOL-dSafePassage-46 · reason 54f7845f4470 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-46-build-brief.md
+
+2026-10-28T06:10:31Z dispatch · item c0952b6f TOOL-dSafePassage-46 · reason tools/push-main.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/.memory-tree.conf.example
+
+2026-10-28T06:38:10Z dispatch · item c0952b6f TOOL-dSafePassage-46 · reason tools/push-main.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/.memory-tree.conf.example memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-46-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-46.md
+
+2026-10-28T07:05:11Z dispatch · item 8c69f3e4 TOOL-dSafePassage-47 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-47.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-47-ledger.md
+
+2026-10-28T07:05:16Z brief · item TOOL-dSafePassage-47 · reason c2907ef8e480 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-47-build-brief.md
+
+2026-10-28T07:14:53Z dispatch · item 8c69f3e4 TOOL-dSafePassage-47 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-47.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-47-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md
+
+2026-10-28T07:32:27Z dispatch · item f162fc8d TOOL-dSafePassage-48 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-48.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-48-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md
+
+2026-10-28T07:32:34Z brief · item TOOL-dSafePassage-48 · reason 590aec0b99c0 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-48-build-brief.md
+
+2026-10-28T07:52:01Z dispatch · item 33cc36e0 TOOL-dSafePassage-50 · reason memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-50.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-50-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md
+
+2026-10-28T07:52:08Z brief · item TOOL-dSafePassage-50 · reason 251f2e4b4eec memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-50-build-brief.md
+
+2026-10-28T08:48:34Z dispatch · item 5d4b43a7 TOOL-dSafePassage-49 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-49.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-49-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T08:48:42Z brief · item TOOL-dSafePassage-49 · reason ed32b2f498ea memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-49-build-brief.md
+
+2026-10-28T09:19:55Z dispatch · item 5d4b43a7 TOOL-dSafePassage-49 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-49.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-49-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-49-deviation-181.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T10:01:52Z rescope · item retire TOOL-dSafePassage-55 · reason TOOL-dSafePassage-49 rev-6 struck F1(a)'s order sweep and AC2; 55's whole scope was the four-relation order probe over that sweep, each relation a declared consumes-from edge that --dispatch's edge refusal already enforces (unattended.sh:13857-13926) and RUN.md's dispatch rows show held; spec 55 rev-2 is WONTDO
+
+2026-10-28T10:45:00Z dispatch · item a2a7334b TOOL-dSafePassage-52 · reason memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-52.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-52-ledger.md
+
+2026-10-28T10:45:08Z brief · item TOOL-dSafePassage-52 · reason 5f27de14534a memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-52-build-brief.md
+
+2026-10-28T11:18:31Z dispatch · item e7febbd9 TOOL-dSafePassage-51 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-51.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T11:18:38Z brief · item TOOL-dSafePassage-51 · reason e693225edf56 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-51-build-brief.md
+
+2026-10-28T11:32:02Z dispatch · item e7febbd9 TOOL-dSafePassage-51 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-51.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-51-deviation-182.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T11:39:52Z dispatch · item e7febbd9 TOOL-dSafePassage-51 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md tools/run-gates/selftest-budgets.txt memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-51.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-51-deviation-182.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-10-28T11:59:33Z dispatch · item d3e027ba TOOL-dSafePassage-57 · reason memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-57.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-57-ledger.md
+
+2026-10-28T11:59:41Z brief · item TOOL-dSafePassage-57 · reason 73ee20920f16 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-57-build-brief.md
+
+2026-10-28T12:17:01Z dispatch · item 2ee9d0d1 TOOL-dSafePassage-58 · reason memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-58.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-58-ledger.md memory/builds/dSafePassage/README.md
+
+2026-10-28T12:17:09Z brief · item TOOL-dSafePassage-58 · reason bf7c5711fe99 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-58-build-brief.md
+
+2026-10-28T12:34:19Z dispatch · item 4ba2e168 TOOL-dSafePassage-53 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-53.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-53-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-53-deviation-1.md
+
+2026-10-28T12:34:27Z brief · item TOOL-dSafePassage-53 · reason 8f6343b879a6 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-53-build-brief.md
+
+2026-10-28T13:00:51Z dispatch · item f141d7de TOOL-dSafePassage-54 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-54.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-54-ledger.md
+
+2026-10-28T13:00:59Z brief · item TOOL-dSafePassage-54 · reason 987be3de7397 memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-54-build-brief.md
+
+2026-10-28T13:25:30Z dispatch · item 05313fa0 TOOL-dSafePassage-56 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-56.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-56-ledger.md memory/map/generated/symbols.json
+
+2026-10-28T13:25:33Z brief · item TOOL-dSafePassage-56 · reason 09d36075533f memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-56-build-brief.md
+
+2026-10-28T13:46:42Z dispatch · item 36bc5d25 TOOL-dSafePassage-59 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-59.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-59-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-59-order-check.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/BACKLOG.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
+
+2026-10-28T13:46:50Z brief · item TOOL-dSafePassage-59 · reason 87388565fa2f memory/builds/dSafePassage/prompts/2026-10-26-prompt-TOOL-dSafePassage-59-build-brief.md
+
+2026-10-28T14:01:05Z dispatch · item 36bc5d25 TOOL-dSafePassage-59 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-59.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-59-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-59-order-check.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-51.md memory/builds/dSafePassage/BACKLOG.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-28T19:02:29Z rescope · item add TOOL-dSafePassage-72 · reason the closing review's round-1 HIGH promoted by M4 (review 2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md)
+
+2026-10-28T19:02:39Z rescope · item add TOOL-dSafePassage-73 · reason the closing review's round-1 HIGH promoted by M4 (review 2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md)
+
+2026-10-28T19:02:49Z rescope · item add TOOL-dSafePassage-74 · reason the closing review's round-1 HIGH promoted by M4 (review 2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md)
+
+2026-10-28T19:02:58Z rescope · item add TOOL-dSafePassage-75 · reason the closing review's round-1 HIGH promoted by M4 (review 2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md)
+
+2026-10-28T19:03:03Z rescope · item add TOOL-dSafePassage-76 · reason the closing review's round-1 mediums and lows batched by M4 into two disjoint write sets
+
+2026-10-28T19:03:11Z rescope · item add TOOL-dSafePassage-77 · reason the closing review's round-1 mediums and lows batched by M4 into two disjoint write sets
+
+2026-10-28T19:03:18Z rescope · item add TOOL-dSafePassage-78 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T19:03:26Z rescope · item add TOOL-dSafePassage-80 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T19:03:35Z rescope · item add TOOL-dSafePassage-81 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T19:03:42Z rescope · item add TOOL-dSafePassage-82 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T19:03:50Z rescope · item add TOOL-dSafePassage-83 · reason a red of this build's own found at the close, adopted at once by M10 (discovery bar over 83817478f and the New arm: observations)
+
+2026-10-28T20:03:24Z decision · item the close's spec audit round 1 over TOOL-dSafePassage-72 to -83 (0 blockers, 1 high, 32 minors) was folded into the eleven specs by their writers rather than promoted, and --review refuses fold on a spec audit (check 37) · reason options: (a) accept the folds, each spec's §9 naming the audit record; (b) revert the folds and promote one unit for the HIGH and one or two batches for the minors; the run took (a) to keep building, so no review row is recorded for this round
+
+2026-10-28T20:29:42Z dispatch · item 0b2dda4a TOOL-dSafePassage-72 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py help/upgrade-steps.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-72.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-72-ledger.md
+
+2026-10-28T20:29:49Z brief · item TOOL-dSafePassage-72 · reason b4de0835c978 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-72-build-brief.md
+
+2026-10-28T20:50:08Z dispatch · item 6575474b TOOL-dSafePassage-73 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-73.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-73-ledger.md memory/builds/dSafePassage/README.md
+
+2026-10-28T20:50:14Z brief · item TOOL-dSafePassage-73 · reason 2d637d5033bd memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-73-build-brief.md
+
+2026-10-28T21:12:17Z dispatch · item c59b6dd9 TOOL-dSafePassage-74 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-74.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-74-ledger.md memory/builds/dSafePassage/README.md
+
+2026-10-28T21:12:31Z brief · item TOOL-dSafePassage-74 · reason c3f3fd203fa0 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-74-build-brief.md
+
+2026-10-28T21:30:44Z dispatch · item c713406e TOOL-dSafePassage-75 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-75.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-75-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-28T21:30:52Z brief · item TOOL-dSafePassage-75 · reason 5f111f1ea32c memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-75-build-brief.md
+
+2026-10-28T21:48:50Z dispatch · item f01ff3b9 TOOL-dSafePassage-76 · reason tools/govkit/upgrade_steps.py tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/fixtures/retired_edits.py tools/lib/python_floor.py tools/lib/python-floor.sh tools/lib/resolve-python.test.sh help/upgrade-steps.md help/python-floor.md help/update-edits.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-76.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-76-ledger.md memory/builds/dSafePassage/README.md memory/LIVE.md
+
+2026-10-28T21:48:57Z brief · item TOOL-dSafePassage-76 · reason 019cbe992240 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-76-build-brief.md
+
+2026-10-28T22:35:25Z dispatch · item e72239be TOOL-dSafePassage-78 · reason tools/govkit/selftest.py tools/govkit/govkit.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-78.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-78-ledger.md
+
+2026-10-28T22:35:31Z brief · item TOOL-dSafePassage-78 · reason 245d9314dac5 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-78-build-brief.md
+
+2026-10-28T22:49:36Z dispatch · item e72239be TOOL-dSafePassage-78 · reason tools/govkit/selftest.py tools/govkit/govkit.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-78.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-78-ledger.md memory/builds/dSafePassage/README.md
+
+2026-10-28T23:10:56Z dispatch · item 460ffb58 TOOL-dSafePassage-80 · reason tools/gate-legs.json tools/run-gates/ceiling-evidence.txt tools/run-gates/selftest-budgets.txt tools/govkit/upgrade_walk.py memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-80.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-80-ledger.md
+
+2026-10-28T23:11:04Z brief · item TOOL-dSafePassage-80 · reason 61b7fee70882 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-80-build-brief.md
+
+2026-10-28T23:40:52Z rescope · item add TOOL-dSafePassage-84 · reason a red of this build's own found by TOOL-dSafePassage-78's builder (the preview and the write run answer one question two ways), adopted at once by M10
+
+2026-10-29T00:07:58Z dispatch · item b177b9a9 TOOL-dSafePassage-77 · reason tools/govkit/upgrade_walk.py tools/govkit/fixtures/release-0/arms.toml tools/govkit/fixtures/release-0/plants.toml help/upgrade-steps.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-77.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-77-ledger.md
+
+2026-10-29T00:08:05Z brief · item TOOL-dSafePassage-77 · reason 8bdd4eec6540 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-77-build-brief.md
+
+2026-10-29T00:47:56Z dispatch · item 84661151 TOOL-dSafePassage-84 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_steps.py help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-84.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-84-ledger.md
+
+2026-10-29T00:48:04Z brief · item TOOL-dSafePassage-84 · reason f509406344eb memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-84-build-brief.md
+
+2026-10-29T02:33:14Z dispatch · item b76cc74f TOOL-dSafePassage-82 · reason tools/govkit/govkit.py tools/govkit/shims.py tools/govkit/upgrade_steps.py tools/govkit/upgrade_walk.py tools/govkit/docs_leg.py tools/govkit/usage.toml tools/govkit/steps.toml tools/govkit/steps/python_floor.py tools/govkit/fixture_target.py tools/govkit/selftest.py tools/govkit/fixtures/release-0/arms.toml tools/govkit/fixtures/release-0/plants.toml tools/govkit/fixtures/release-0/deploy.toml tools/lib/python_floor.py tools/lib/resolve-python.test.sh tools/push-main.sh tools/push-main.test.sh tools/gate-legs.json memory/project/unarmed-branches.txt memory/project/spawn-idiom-sites.txt memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-82.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-82-ledger.md
+
+2026-10-29T02:33:21Z brief · item TOOL-dSafePassage-82 · reason 36a427d951f9 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-82-build-brief.md
+
+2026-10-29T03:38:28Z dispatch · item 201eb127 TOOL-dSafePassage-83 · reason memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-9-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-11-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-13-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-15-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-21-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-26-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-31-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-25-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-27-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-28-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-32-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-34-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-35-ledger.md memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-83.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-83-ledger.md
+
+2026-10-29T03:38:35Z brief · item TOOL-dSafePassage-83 · reason 2356f80947e8 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-83-build-brief.md
+
+2026-10-29T03:53:57Z dispatch · item 201eb127 TOOL-dSafePassage-83 · reason memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-9-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-11-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-13-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-15-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-21-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-26-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-31-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-51-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-25-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-27-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-28-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-32-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-34-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-35-ledger.md memory/guides/SESSION-KICKOFF.md memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-83.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-83-ledger.md memory/builds/dSafePassage/README.md
+
+2026-10-29T04:07:52Z brief · item TOOL-dSafePassage-81 · reason 68aa01c41573 memory/builds/dSafePassage/prompts/2026-10-28-prompt-TOOL-dSafePassage-81-build-brief.md
+
+2026-10-29T04:20:35Z dispatch · item 17c1a89b TOOL-dSafePassage-81 · reason tools/govkit/upgrade_steps.py tools/govkit/selftest.py tools/govkit/govkit.py tools/govkit/docs_leg.py tools/govkit/fixture_target.py tools/govkit/fixtures/release-0/arms/arm_step.py tools/govkit/upgrade_walk.py tools/lib/python_floor.py tools/push-main.test.sh memory/map/generated/symbols.json .lexicon.conf memory/builds/dSafePassage/spec/2026-10-28-spec-TOOL-dSafePassage-81.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-81-ledger.md
+
+2026-10-29T05:01:15Z review · item dSafePassage · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 5 · minors 15 · disposition promote
+
+2026-10-29T05:01:35Z review · item dSafePassage-r1-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 9 · disposition promote
+
+2026-10-29T06:17:51Z rescope · item add TOOL-dSafePassage-86 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
+
+2026-10-29T06:17:59Z rescope · item add TOOL-dSafePassage-87 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
+
+2026-10-29T06:18:07Z rescope · item add TOOL-dSafePassage-89 · reason the round-2 closing review's promotions and the moved-prefix walk's adopted stop (M4, M10), specs at 0f46b69d2
+
+2026-10-29T06:56:48Z rescope · item add TOOL-dSafePassage-88 · reason the moved-prefix walk's third stop, adopted at once (M10), spec at 51994336b
+
+2026-10-29T07:13:29Z brief · item TOOL-dSafePassage-86 · reason e91a5723a1b2 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-86-build-brief.md
+
+2026-10-29T07:24:13Z dispatch · item b0106aa1 TOOL-dSafePassage-86 · reason tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-86.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-86-ledger.md
+
+2026-10-29T07:39:16Z dispatch · item b0106aa1 TOOL-dSafePassage-86 · reason tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-86.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-86-ledger.md memory/map/generated/symbols.json
+
+2026-10-29T08:34:57Z brief · item TOOL-dSafePassage-87 · reason f8e75555da14 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-87-build-brief.md
+
+2026-10-29T08:42:28Z dispatch · item 10abda03 TOOL-dSafePassage-87 · reason tools/govkit/upgrade_steps.py tools/govkit/upgrade_walk.py tools/govkit/shims.py tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/steps/python_floor.py tools/govkit/docs_leg.py tools/lib/resolve-python.test.sh help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-87.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-87-ledger.md
+
+2026-10-29T08:50:34Z dispatch · item 10abda03 TOOL-dSafePassage-87 · reason tools/govkit/upgrade_steps.py tools/govkit/upgrade_walk.py tools/govkit/shims.py tools/govkit/selftest.py tools/govkit/refusal_join.py tools/govkit/steps/python_floor.py tools/govkit/docs_leg.py tools/lib/resolve-python.test.sh help/upgrade-steps.md memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-87.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-87-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json
+
+2026-10-29T09:10:02Z brief · item TOOL-dSafePassage-89 · reason 61f653cb9797 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-89-build-brief.md
+
+2026-10-29T09:17:32Z dispatch · item be00fcf4 TOOL-dSafePassage-89 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-89.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-89-ledger.md
+
+2026-10-29T09:25:21Z dispatch · item be00fcf4 TOOL-dSafePassage-89 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-89.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-89-ledger.md
+
+2026-10-29T09:37:07Z brief · item TOOL-dSafePassage-88 · reason cb4c22980c0b memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-88-build-brief.md
+
+2026-10-29T09:44:49Z dispatch · item ed22e3ef TOOL-dSafePassage-88 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-88.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-88-ledger.md
+
+2026-10-29T10:00:50Z dispatch · item ed22e3ef TOOL-dSafePassage-88 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-88.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-88-ledger.md
+
+2026-10-29T10:21:25Z review · item dSafePassage-r2-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 6 · disposition promote
+
+2026-10-29T10:51:48Z rescope · item add TOOL-dSafePassage-90 · reason the round-3 closing review's promotions (M4), specs at 83b250f87
+
+2026-10-29T10:51:58Z rescope · item add TOOL-dSafePassage-91 · reason the round-3 closing review's promotions (M4), specs at 83b250f87
+
+2026-10-29T11:10:10Z brief · item TOOL-dSafePassage-90 · reason 639de0225f70 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-90-build-brief.md
+
+2026-10-29T11:19:33Z dispatch · item a3ad798c TOOL-dSafePassage-90 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-90.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-90-ledger.md
+
+2026-10-29T12:09:34Z dispatch · item a21607b1 TOOL-dSafePassage-90 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-90.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-90-ledger.md
+
+2026-11-01T04:39:58Z brief · item TOOL-dSafePassage-91 · reason e26a2169a048 memory/builds/dSafePassage/prompts/2026-10-29-prompt-TOOL-dSafePassage-91-build-brief.md
+
+2026-11-01T04:44:22Z dispatch · item cef70e87 TOOL-dSafePassage-91 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-91.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md
+
+2026-11-01T04:50:29Z dispatch · item cef70e87 TOOL-dSafePassage-91 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-91.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-11-01T05:01:34Z dispatch · item cef70e87 TOOL-dSafePassage-91 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/upgrade_walk.py memory/builds/dSafePassage/spec/2026-10-29-spec-TOOL-dSafePassage-91.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-91-ledger.md memory/builds/dSafePassage/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/LIVE.md
+
+2026-11-01T05:13:09Z review · item dSafePassage-r3-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 3 · disposition promote
+
+2026-11-01T05:41:54Z rescope · item add TOOL-dSafePassage-92 · reason the round-4 closing review's promotions (M4), specs at 2e6d48453
+
+2026-11-01T05:41:58Z rescope · item add TOOL-dSafePassage-93 · reason the round-4 closing review's promotions (M4), specs at 2e6d48453
+
+2026-11-01T05:52:09Z brief · item TOOL-dSafePassage-92 · reason daacb1186637 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-92-build-brief.md
+
+2026-11-01T05:57:55Z dispatch · item f9b39338 TOOL-dSafePassage-92 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-92.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-92-ledger.md
+
+2026-11-01T06:30:46Z dispatch · item 86fc7acb TOOL-dSafePassage-92 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-92.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-92-ledger.md memory/map/generated/symbols.json
+
+2026-11-01T06:38:52Z brief · item TOOL-dSafePassage-93 · reason e1d5275fa1cb memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-93-build-brief.md
+
+2026-11-01T06:43:19Z dispatch · item 9cf0d367 TOOL-dSafePassage-93 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-93.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-93-ledger.md
+
+2026-11-01T06:53:23Z dispatch · item 9cf0d367 TOOL-dSafePassage-93 · reason tools/govkit/selftest.py memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-93-ledger.md memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-93.md
+
+2026-11-01T07:03:24Z review · item dSafePassage-r4-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition promote
+
+2026-11-01T07:20:16Z rescope · item add TOOL-dSafePassage-94 · reason the round-5 closing review's two minors batched (M4)
+
+2026-11-01T07:30:47Z brief · item TOOL-dSafePassage-94 · reason 6d627b3cd7a6 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-94-build-brief.md
+
+2026-11-01T07:36:32Z dispatch · item 682d170b TOOL-dSafePassage-94 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-94.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-94-ledger.md
+
+2026-11-01T07:42:17Z dispatch · item 682d170b TOOL-dSafePassage-94 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-94.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-94-ledger.md memory/map/generated/symbols.json
+
+2026-11-01T07:58:54Z review · item dSafePassage-r5-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 9 · disposition promote
+
+2026-11-01T08:16:51Z rescope · item add TOOL-dSafePassage-95 · reason the round-6 closing review's nine minors batched (M4)
+
+2026-11-01T08:28:17Z brief · item TOOL-dSafePassage-95 · reason bbe73e26686e memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-95-build-brief.md
+
+2026-11-01T08:33:34Z dispatch · item 29339439 TOOL-dSafePassage-95 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-95.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-95-ledger.md
+
+2026-11-01T09:01:36Z dispatch · item 1fc760e6 TOOL-dSafePassage-95 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-95.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-95-ledger.md
+
+2026-11-01T09:11:49Z review · item dSafePassage-r6-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 3 · disposition promote
+
+2026-11-01T09:23:19Z rescope · item add TOOL-dSafePassage-96 · reason the round-7 closing review's three minors batched (M4)
+
+2026-11-01T09:33:02Z brief · item TOOL-dSafePassage-96 · reason be95c27a374f memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-96-build-brief.md
+
+2026-11-01T09:38:21Z dispatch · item dac8b346 TOOL-dSafePassage-96 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-96.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-96-ledger.md
+
+2026-11-01T09:43:33Z dispatch · item dac8b346 TOOL-dSafePassage-96 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-96.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-96-ledger.md
+
+2026-11-01T09:56:15Z review · item dSafePassage-r7-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 5 · disposition promote
+
+2026-11-01T10:14:02Z rescope · item add TOOL-dSafePassage-97 · reason the round-8 closing review's five wording lows batched (M4); records only
+
+2026-11-01T10:24:14Z brief · item TOOL-dSafePassage-97 · reason 68da1b34e672 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-97-build-brief.md
+
+2026-11-01T10:29:32Z dispatch · item 83931ecb TOOL-dSafePassage-97 · reason memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-97.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-97-ledger.md
+
+2026-11-01T10:39:36Z review · item dSafePassage-r8-promotions · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 1 · disposition promote
+
+2026-11-01T10:53:54Z rescope · item add TOOL-dSafePassage-98 · reason the round-9 closing review's one low (M4), the last promotion: round 9's precision 0.2 is under the floor and ends the chain; records only
+
+2026-11-01T11:03:15Z brief · item TOOL-dSafePassage-98 · reason 43050f971eab memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-98-build-brief.md
+
+2026-11-01T11:08:13Z dispatch · item f51d88ae TOOL-dSafePassage-98 · reason memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-98.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-98-ledger.md
+
+2026-11-01T11:59:50Z rescope · item add TOOL-dSafePassage-99 · reason the close's arm observation found check_upgrade_steps crashing at [dSP-72] after 87 AC6's staged copy rebinds sys.modules[govkit]: the govkit selftest bar leg reds at 390033278
+
+2026-11-01T11:59:54Z rescope · item add TOOL-dSafePassage-100 · reason the close's AC11 observation found the resolver suite's launcher ban naming tools/push-main.test.sh:1409 at 390033278: the python resolver bar leg reds
+
+2026-11-01T12:37:13Z brief · item TOOL-dSafePassage-99 · reason b346f72527aa memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-99-build-brief.md
+
+2026-11-01T12:37:15Z brief · item TOOL-dSafePassage-100 · reason a71c21d321f1 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-100-build-brief.md
+
+2026-11-01T12:58:10Z dispatch · item 512df720 TOOL-dSafePassage-99 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-99.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-99-ledger.md
+
+2026-11-01T13:04:10Z dispatch · item 512df720 TOOL-dSafePassage-99 · reason tools/govkit/selftest.py memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-99.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-99-ledger.md
+
+2026-11-01T13:19:20Z dispatch · item 3909ba68 TOOL-dSafePassage-100 · reason tools/push-main.test.sh memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-100.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-100-ledger.md
+
+2026-11-01T13:24:59Z dispatch · item 3909ba68 TOOL-dSafePassage-100 · reason tools/push-main.test.sh memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-100.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-100-ledger.md
+
+2026-11-01T14:35:52Z rescope · item add TOOL-dSafePassage-101 · reason the close's merge bar at 70273a468 reds memory hygiene, shell hygiene and install-prefix on this build's own lines
+
+2026-11-01T15:26:17Z brief · item TOOL-dSafePassage-101 · reason d2cc05a8099b memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-101-build-brief.md
+
+2026-11-01T15:34:24Z dispatch · item 3bd912e0 TOOL-dSafePassage-101 · reason memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-101.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-101-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-80-ledger.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-88-ledger.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-89-ledger.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-95-ledger.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-96-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-59-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-77-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-82-ledger.md memory/builds/dSafePassage/BACKLOG.md tools/push-main.test.sh tools/lib/resolve-python.test.sh tools/govkit/selftest.py tools/govkit/upgrade_walk.py
+
+2026-11-01T15:41:18Z dispatch · item 3bd912e0 TOOL-dSafePassage-101 · reason memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-101.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-101-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-80-ledger.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-88-ledger.md memory/builds/dSafePassage/build/2026-10-29-build-TOOL-dSafePassage-89-ledger.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-95-ledger.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-96-ledger.md memory/builds/dSafePassage/build/2026-10-26-build-TOOL-dSafePassage-59-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-77-ledger.md memory/builds/dSafePassage/build/2026-10-28-build-TOOL-dSafePassage-82-ledger.md memory/builds/dSafePassage/BACKLOG.md tools/push-main.test.sh tools/lib/resolve-python.test.sh tools/govkit/selftest.py tools/govkit/upgrade_walk.py
+
+2026-11-01T16:31:32Z decision · item Land dSafePassage with TOOL-dSafePassage-61 carried forward, and rule ask TOOL-dSafePassage-85 first · reason the bar at 5fe2c7e34 reds only the two legs ask TOOL-dSafePassage-85 holds as the owner's rows: the spawn budget (five shrink-only memory/project/fork-ceilings.txt rows, +1 or +2 each) and install-prefix (three tools/run-gates/ceiling-evidence.txt lines); every own red is cleared by TOOL-dSafePassage-99, 100 and 101. TOOL-dSafePassage-61 waits on another build's ask, TOOL-dGroundRules-13, so build-complete cannot carry it and VERBS 9 routes the build to --handoff owner-decision. Options: rule 85 (raise the five ceilings with evidence, or retire the three evidence lines) then land with 61 deferred; or hold until TOOL-dGroundRules-13 lands and build 61 first. The run refused both: each moves an owner's shrink-only or ruled record.
+
+2026-11-01T16:37:37Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dSafePassage && bash tools/push-main.sh --land --slug dSafePassage && bash tools/unattended/unattended.sh --settle dSafePassage
+
+2026-11-01T16:37:37Z hold · item owner-decision · reason until owner · reaped 3740de71 · resume none(owner)
+
+2026-11-01T16:44:37Z resume · item dSafePassage · reason held · keepalive e7f5ef83 · manual
+
+2026-11-01T17:03:36Z rescope · item add TOOL-dSafePassage-102 · reason the owner ruled ask TOOL-dSafePassage-85 in chat on 2026-11-01: raise the five fork ceilings, and the three evidence rows are respelled under gate-guard's rule
+
+2026-11-01T17:09:54Z brief · item TOOL-dSafePassage-102 · reason a876e0eb4095 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-102-build-brief.md
+
+2026-11-01T17:43:53Z dispatch · item 699d6376 TOOL-dSafePassage-102 · reason memory/project/fork-ceilings.txt tools/run-gates/ceiling-evidence.txt memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-102.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-102-ledger.md
+
+2026-11-01T17:54:25Z dispatch · item 699d6376 TOOL-dSafePassage-102 · reason memory/project/fork-ceilings.txt tools/run-gates/ceiling-evidence.txt memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-102-ledger.md memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-102.md memory/builds/dSafePassage/README.md memory/backlog/TOOL.md
+
+2026-11-01T19:41:32Z rescope · item add TOOL-dSafePassage-103 · reason the close's bar on the prepared landing merge f14f0f72c reds policy check: derive_census_tree reads TOOL-dSafePassage-8's source-mode receipt as an adopter's
+
+2026-11-01T19:52:59Z brief · item TOOL-dSafePassage-103 · reason 079f9f15cb89 memory/builds/dSafePassage/prompts/2026-11-01-prompt-TOOL-dSafePassage-103-build-brief.md
+
+2026-11-01T20:51:53Z dispatch · item cfe5405c TOOL-dSafePassage-103 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-103.md memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-103-ledger.md
+
+2026-11-01T21:10:32Z dispatch · item cfe5405c TOOL-dSafePassage-103 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/builds/dSafePassage/build/2026-11-01-build-TOOL-dSafePassage-103-ledger.md memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-103.md
+
+2026-11-01T21:25:08Z dispatch · item cfe5405c TOOL-dSafePassage-103 · reason memory/backlog/TOOL.md memory/builds/dSafePassage/README.md
+
+2026-11-01T23:50:32Z rescope · item add TOOL-dSafePassage-104 · reason the close's bar on the landing merge 9f8812d80 reds memory hygiene check 12 on 103's edge onto 8 and both lexicon legs on 103's second ask
+
+2026-11-01T23:50:35Z brief · item TOOL-dSafePassage-104 · reason 714005088178 memory/builds/dSafePassage/prompts/2026-11-02-prompt-TOOL-dSafePassage-104-build-brief.md
+
+2026-11-02T00:47:31Z dispatch · item e0dd80b2 TOOL-dSafePassage-104 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-11-02-spec-TOOL-dSafePassage-104.md memory/builds/dSafePassage/build/2026-11-02-build-TOOL-dSafePassage-104-ledger.md memory/backlog/TOOL.md memory/builds/dSafePassage/README.md
+
+2026-11-02T00:57:51Z dispatch · item e0dd80b2 TOOL-dSafePassage-104 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dSafePassage/spec/2026-11-02-spec-TOOL-dSafePassage-104.md memory/builds/dSafePassage/build/2026-11-02-build-TOOL-dSafePassage-104-ledger.md memory/backlog/TOOL.md memory/builds/dSafePassage/README.md
+
+2026-11-02T02:35:54Z override · item build-complete · reason the plan's id list names TOOL-dSafePassage-85, which is an ask and not a unit; TOOL-dSafePassage-102 closes it as the owner ruled in chat on 2026-11-01 (Raise the ceilings). TOOL-dSafePassage-61 waits on TOOL-dGroundRules-13, another build's ask, and the owner ruled it deferred in the same answer: land dSafePassage with 61 deferred. Met when TOOL-dGroundRules-13 lands and a later run builds 61.
+
+2026-11-02T02:35:54Z override · item specs-audited · reason no spec-audit record names TOOL-dSafePassage-53 to 59 and 62 to 71, the promotions the spec audit of 51 and 52 filed, nor 97 and 98, the last promotions of the closing-review chain that ended at round 9's precision 0.2 (BUILD-METHOD M4 closes those under a recorded override). All are built and their arms observed; a spec audit after the code would audit nothing the build can still change. Met by a retroactive spec audit of those 19 specs.

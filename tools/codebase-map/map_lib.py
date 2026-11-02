@@ -14,7 +14,7 @@ Two claim planes (the load-bearing design decision, learned the hard way):
 This module is identical across repos. Project specifics live in TWO sibling files the adopting
 repo owns: `.codebase-map.conf` at the repo root (paths) and `<kit-dir>/map_extractors.py`
 (the EXTRACTORS dict — what is enumerable in THIS project). Everything here is stdlib-only,
-Python >= 3.11 (tomllib).
+at the interpreter floor python-floor.txt in gov's lib dir declares (tomllib).
 
 The kit DIRECTORY is named `codebase-map` by convention (the gate resolves it by that name), but
 its PREFIX under the repo root is free: `<repo-root>/codebase-map/` and
@@ -44,9 +44,9 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map@1.30 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.31 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.30"
+KIT_CODEBASE_MAP_VERSION = "1.31"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where

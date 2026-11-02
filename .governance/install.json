@@ -1,0 +1,1438 @@
+{
+  "schema": 4,
+  "mode": "source",
+  "gov_source": ".",
+  "prefix": "tools",
+  "kits": [
+    "playbook",
+    "playbook-render",
+    "kickoff-manifest",
+    "memory-tree",
+    "codebase-map",
+    "memory-recall",
+    "drift-audit",
+    "agent-instructions",
+    "unattended",
+    "lexicon",
+    "pytest-parallel-guardrails",
+    "gate-lint",
+    "agent-cap",
+    "review-harness",
+    "settings-merge",
+    "check-wiring",
+    "push-main",
+    "check-kit-versions",
+    "check-install-prefix",
+    "runlog",
+    "process-monitor",
+    "roles"
+  ],
+  "files": [
+    {
+      "path": "tools/agent-instructions/README.md",
+      "kit": "agent-instructions",
+      "role": "engine",
+      "source": "tools/agent-instructions/README.md"
+    },
+    {
+      "path": "tools/agent-instructions/adopt-agent-instructions.sh",
+      "kit": "agent-instructions",
+      "role": "engine",
+      "source": "tools/agent-instructions/adopt-agent-instructions.sh"
+    },
+    {
+      "path": "tools/agent-instructions/kit.toml",
+      "kit": "agent-instructions",
+      "role": "engine",
+      "source": "tools/agent-instructions/kit.toml"
+    },
+    {
+      "path": "tools/check-install-prefix.sh",
+      "kit": "check-install-prefix",
+      "role": "engine",
+      "source": "tools/check-install-prefix.sh"
+    },
+    {
+      "path": "tools/check-install-prefix.test.sh",
+      "kit": "check-install-prefix",
+      "role": "engine",
+      "source": "tools/check-install-prefix.test.sh"
+    },
+    {
+      "path": "tools/check-kit-versions.sh",
+      "kit": "check-kit-versions",
+      "role": "seed",
+      "source": "tools/check-kit-versions.sh"
+    },
+    {
+      "path": "tools/check-wiring.sh",
+      "kit": "check-wiring",
+      "role": "engine",
+      "source": "tools/check-wiring.sh"
+    },
+    {
+      "path": "tools/check-wiring.test.sh",
+      "kit": "check-wiring",
+      "role": "engine",
+      "source": "tools/check-wiring.test.sh"
+    },
+    {
+      "path": "tools/check-wiring.fragment.json",
+      "kit": "check-wiring",
+      "role": "engine",
+      "source": "tools/check-wiring.fragment.json"
+    },
+    {
+      "path": "tools/gate-lint/README.md",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/README.md"
+    },
+    {
+      "path": "tools/gate-lint/encoding_posture.py",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/encoding_posture.py"
+    },
+    {
+      "path": "tools/gate-lint/fork-count.sh",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "path": "tools/gate-lint/kit.toml",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/kit.toml"
+    },
+    {
+      "path": "tools/gate-lint/ps-hygiene.py",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/ps-hygiene.py"
+    },
+    {
+      "path": "tools/gate-lint/sh_hygiene.py",
+      "kit": "gate-lint",
+      "role": "engine",
+      "source": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "path": "tools/manifest-check.sh",
+      "kit": "kickoff-manifest",
+      "role": "engine",
+      "source": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "path": "tools/manifest-check.test.sh",
+      "kit": "kickoff-manifest",
+      "role": "engine",
+      "source": "skills/session-kickoff/manifest-check.test.sh"
+    },
+    {
+      "path": "memory/guides/SESSION-KICKOFF.md",
+      "kit": "kickoff-manifest",
+      "role": "seed",
+      "source": "skills/session-kickoff/MANIFEST-TEMPLATE.md"
+    },
+    {
+      "path": "tools/orientation-card.fragment.json",
+      "kit": "kickoff-manifest",
+      "role": "engine",
+      "source": "skills/session-kickoff/orientation-card.fragment.json"
+    },
+    {
+      "path": "tools/orientation-replay.fragment.json",
+      "kit": "kickoff-manifest",
+      "role": "engine",
+      "source": "skills/session-kickoff/orientation-replay.fragment.json"
+    },
+    {
+      "path": "tools/lexicon/LEXICON.md",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/LEXICON.md"
+    },
+    {
+      "path": "tools/lexicon/README.md",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/README.md"
+    },
+    {
+      "path": "tools/lexicon/SKILL.template.md",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/SKILL.template.md"
+    },
+    {
+      "path": "tools/lexicon/adopt-lexicon.sh",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/adopt-lexicon.sh"
+    },
+    {
+      "path": "tools/lexicon/canon.py",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/canon.py"
+    },
+    {
+      "path": "tools/lexicon/kit.toml",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/kit.toml"
+    },
+    {
+      "path": "tools/lexicon/lexicon.py",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/lexicon.py"
+    },
+    {
+      "path": "tools/lexicon/lexicon_conf.py",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/lexicon_conf.py"
+    },
+    {
+      "path": "tools/lexicon/scaffold_lexicon.py",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/scaffold_lexicon.py"
+    },
+    {
+      "path": "tools/lexicon/subtokens.py",
+      "kit": "lexicon",
+      "role": "engine",
+      "source": "tools/lexicon/subtokens.py"
+    },
+    {
+      "path": "tools/lexicon/lexicon-verb-waivers.txt",
+      "kit": "lexicon",
+      "role": "seed",
+      "source": "tools/lexicon/lexicon-verb-waivers.txt"
+    },
+    {
+      "path": "tools/lexicon/lexicon-suffix-waivers.txt",
+      "kit": "lexicon",
+      "role": "seed",
+      "source": "tools/lexicon/lexicon-suffix-waivers.txt"
+    },
+    {
+      "path": "tools/memory-tree/.memory-tree.conf.example",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/.memory-tree.conf.example"
+    },
+    {
+      "path": "tools/memory-tree/ANNOTATION-STYLE.template.md",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/ANNOTATION-STYLE.template.md"
+    },
+    {
+      "path": "tools/memory-tree/BUILD-METHOD.template.md",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/BUILD-METHOD.template.md"
+    },
+    {
+      "path": "tools/memory-tree/HYGIENE.template.md",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/HYGIENE.template.md"
+    },
+    {
+      "path": "tools/memory-tree/README.md",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/README.md"
+    },
+    {
+      "path": "tools/memory-tree/SPEC-TEMPLATE.template.md",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/SPEC-TEMPLATE.template.md"
+    },
+    {
+      "path": "tools/memory-tree/adopt-memory-tree.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/adopt-memory-tree.sh"
+    },
+    {
+      "path": "tools/memory-tree/asbuilt_view.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "path": "tools/memory-tree/backlog.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/backlog.py"
+    },
+    {
+      "path": "tools/memory-tree/build-readme-slot-highwater.txt",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/build-readme-slot-highwater.txt"
+    },
+    {
+      "path": "tools/memory-tree/build-readme-slot-limits.txt",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/build-readme-slot-limits.txt"
+    },
+    {
+      "path": "tools/memory-tree/check-arms.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "path": "tools/memory-tree/check-memory-hygiene.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "path": "tools/memory-tree/check-memory-hygiene.test.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "path": "tools/memory-tree/check-method-carriers.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/check-method-carriers.sh"
+    },
+    {
+      "path": "tools/memory-tree/check-method-carriers.test.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/check-method-carriers.test.sh"
+    },
+    {
+      "path": "tools/memory-tree/check-verdict-epoch.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/check-verdict-epoch.sh"
+    },
+    {
+      "path": "tools/memory-tree/corpus_ids.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "path": "tools/memory-tree/design_lib.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "path": "tools/memory-tree/deviation_join.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "path": "tools/memory-tree/gen_build_index.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "path": "tools/memory-tree/gotchas.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "path": "tools/memory-tree/kit-dogfood-parity.test.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/kit-dogfood-parity.test.sh"
+    },
+    {
+      "path": "tools/memory-tree/kit.toml",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/kit.toml"
+    },
+    {
+      "path": "tools/memory-tree/marker-contract.test.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/marker-contract.test.sh"
+    },
+    {
+      "path": "tools/memory-tree/merge-rows.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "path": "tools/memory-tree/merge-rows.sh",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/merge-rows.sh"
+    },
+    {
+      "path": "tools/memory-tree/migrate_backlog.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "path": "tools/memory-tree/routed_commits.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "path": "tools/memory-tree/row_grammar.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "path": "tools/memory-tree/transition_audit.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "path": "tools/memory-tree/tree_lib.py",
+      "kit": "memory-tree",
+      "role": "engine",
+      "source": "tools/memory-tree/tree_lib.py"
+    },
+    {
+      "path": "coding-governance-agents.template.md",
+      "kit": "playbook",
+      "role": "seed",
+      "source": "coding-governance-agents.template.md"
+    },
+    {
+      "path": "tools/process-monitor/README.md",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/README.md"
+    },
+    {
+      "path": "tools/process-monitor/adopt-process-monitor.sh",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/adopt-process-monitor.sh"
+    },
+    {
+      "path": "tools/process-monitor/census.py",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/census.py"
+    },
+    {
+      "path": "tools/process-monitor/classify.py",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/classify.py"
+    },
+    {
+      "path": "tools/process-monitor/kit.toml",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/kit.toml"
+    },
+    {
+      "path": "tools/process-monitor/process-monitor.template.conf",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/process-monitor.template.conf"
+    },
+    {
+      "path": "tools/process-monitor/procmon-session.fragment.json",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/procmon-session.fragment.json"
+    },
+    {
+      "path": "tools/process-monitor/reap.py",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/reap.py"
+    },
+    {
+      "path": "tools/process-monitor/scope.py",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/scope.py"
+    },
+    {
+      "path": ".process-monitor.conf",
+      "kit": "process-monitor",
+      "role": "seed",
+      "source": "tools/process-monitor/process-monitor.template.conf"
+    },
+    {
+      "path": "tools/process-monitor/procmon-hook.js",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "path": "tools/process-monitor/procmon-hook.fragment.json",
+      "kit": "process-monitor",
+      "role": "engine",
+      "source": "tools/process-monitor/procmon-hook.fragment.json"
+    },
+    {
+      "path": "tools/push-main.sh",
+      "kit": "push-main",
+      "role": "engine",
+      "source": "tools/push-main.sh"
+    },
+    {
+      "path": "tools/push-main.test.sh",
+      "kit": "push-main",
+      "role": "engine",
+      "source": "tools/push-main.test.sh"
+    },
+    {
+      "path": ".githooks/pre-push",
+      "kit": "push-main",
+      "role": "engine",
+      "source": ".githooks/pre-push"
+    },
+    {
+      "path": ".githooks/pre-push.test.sh",
+      "kit": "push-main",
+      "role": "engine",
+      "source": ".githooks/pre-push.test.sh"
+    },
+    {
+      "path": ".githooks/pre_push_bar_selftest.py",
+      "kit": "push-main",
+      "role": "engine",
+      "source": ".githooks/pre_push_bar_selftest.py"
+    },
+    {
+      "path": "tools/pytest-parallel-guardrails/README.md",
+      "kit": "pytest-parallel-guardrails",
+      "role": "engine",
+      "source": "tools/pytest-parallel-guardrails/README.md"
+    },
+    {
+      "path": "tools/pytest-parallel-guardrails/aiosqlite-seam-conftest.py",
+      "kit": "pytest-parallel-guardrails",
+      "role": "engine",
+      "source": "tools/pytest-parallel-guardrails/aiosqlite-seam-conftest.py"
+    },
+    {
+      "path": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py",
+      "kit": "pytest-parallel-guardrails",
+      "role": "engine",
+      "source": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
+    },
+    {
+      "path": "tools/pytest-parallel-guardrails/crashprobe.py",
+      "kit": "pytest-parallel-guardrails",
+      "role": "engine",
+      "source": "tools/pytest-parallel-guardrails/crashprobe.py"
+    },
+    {
+      "path": "tools/pytest-parallel-guardrails/kit.toml",
+      "kit": "pytest-parallel-guardrails",
+      "role": "engine",
+      "source": "tools/pytest-parallel-guardrails/kit.toml"
+    },
+    {
+      "path": "tools/pytest-parallel-guardrails/pyproject-snippet.toml",
+      "kit": "pytest-parallel-guardrails",
+      "role": "engine",
+      "source": "tools/pytest-parallel-guardrails/pyproject-snippet.toml"
+    },
+    {
+      "path": "tools/runlog/README.md",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/README.md"
+    },
+    {
+      "path": "tools/runlog/SKILL.template.md",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/SKILL.template.md"
+    },
+    {
+      "path": "tools/runlog/adopt-runlog.sh",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/adopt-runlog.sh"
+    },
+    {
+      "path": "tools/runlog/extract.py",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/extract.py"
+    },
+    {
+      "path": "tools/runlog/kit.toml",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/kit.toml"
+    },
+    {
+      "path": "tools/runlog/model.py",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/model.py"
+    },
+    {
+      "path": "tools/runlog/prose.py",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/prose.py"
+    },
+    {
+      "path": "tools/runlog/record.py",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/record.py"
+    },
+    {
+      "path": "tools/runlog/redaction.tsv",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/redaction.tsv"
+    },
+    {
+      "path": "tools/runlog/runlog.py",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/runlog.py"
+    },
+    {
+      "path": "tools/runlog/runlog_lib.py",
+      "kit": "runlog",
+      "role": "engine",
+      "source": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "path": "tools/settings-merge.py",
+      "kit": "settings-merge",
+      "role": "engine",
+      "source": "tools/settings-merge.py"
+    },
+    {
+      "path": "tools/hooks/agent-cap.js",
+      "kit": "agent-cap",
+      "role": "engine",
+      "source": "tools/hooks/agent-cap.js"
+    },
+    {
+      "path": "tools/hooks/kit.toml",
+      "kit": "agent-cap",
+      "role": "engine",
+      "source": "tools/hooks/kit.toml"
+    },
+    {
+      "path": "tools/hooks/README.md",
+      "kit": "agent-cap",
+      "role": "engine",
+      "source": "tools/hooks/README.md"
+    },
+    {
+      "path": "tools/hooks/scratch-guard.js",
+      "kit": "agent-cap",
+      "role": "engine",
+      "source": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "path": "tools/hooks/scratch-guard.fragment.json",
+      "kit": "agent-cap",
+      "role": "engine",
+      "source": "tools/hooks/scratch-guard.fragment.json"
+    },
+    {
+      "path": "tools/hooks/scratch-guard-subagent.fragment.json",
+      "kit": "agent-cap",
+      "role": "engine",
+      "source": "tools/hooks/scratch-guard-subagent.fragment.json"
+    },
+    {
+      "path": "tools/hooks/format-guard.js",
+      "kit": "agent-cap",
+      "role": "engine",
+      "source": "tools/hooks/format-guard.js"
+    },
+    {
+      "path": "tools/hooks/format-guard.fragment.json",
+      "kit": "agent-cap",
+      "role": "engine",
+      "source": "tools/hooks/format-guard.fragment.json"
+    },
+    {
+      "path": "tools/codebase-map/INVENTORY-DERIVATION.md",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/INVENTORY-DERIVATION.md"
+    },
+    {
+      "path": "tools/codebase-map/README.md",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/README.md"
+    },
+    {
+      "path": "tools/codebase-map/adopt-codebase-map.sh",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/adopt-codebase-map.sh"
+    },
+    {
+      "path": "tools/codebase-map/check_gate_coverage.py",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/check_gate_coverage.py"
+    },
+    {
+      "path": "tools/codebase-map/gen_map.py",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/gen_map.py"
+    },
+    {
+      "path": "tools/codebase-map/kit.toml",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/kit.toml"
+    },
+    {
+      "path": "tools/codebase-map/map_diff.py",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/map_diff.py"
+    },
+    {
+      "path": "tools/codebase-map/map_extractors.template.py",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/map_extractors.template.py"
+    },
+    {
+      "path": "tools/codebase-map/map_lib.py",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "path": "tools/codebase-map/reuse-lookup.agent.md",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/reuse-lookup.agent.md"
+    },
+    {
+      "path": "tools/codebase-map/reuse_lookup.py",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "path": "tools/codebase-map/test_codebase_map.template.py",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/test_codebase_map.template.py"
+    },
+    {
+      "path": "tools/codebase-map/map_extractors.py",
+      "kit": "codebase-map",
+      "role": "seed",
+      "source": "tools/codebase-map/map_extractors.template.py"
+    },
+    {
+      "path": "tools/codebase-map/.codebase-map.conf.example",
+      "kit": "codebase-map",
+      "role": "engine",
+      "source": "tools/codebase-map/.codebase-map.conf.example"
+    },
+    {
+      "path": "tools/drift-audit/README.md",
+      "kit": "drift-audit",
+      "role": "engine",
+      "source": "tools/drift-audit/README.md"
+    },
+    {
+      "path": "tools/drift-audit/SKILL.template.md",
+      "kit": "drift-audit",
+      "role": "engine",
+      "source": "tools/drift-audit/SKILL.template.md"
+    },
+    {
+      "path": "tools/drift-audit/adopt-drift-audit.sh",
+      "kit": "drift-audit",
+      "role": "engine",
+      "source": "tools/drift-audit/adopt-drift-audit.sh"
+    },
+    {
+      "path": "tools/drift-audit/drift_report.py",
+      "kit": "drift-audit",
+      "role": "engine",
+      "source": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "path": "tools/drift-audit/drift_signals.template.py",
+      "kit": "drift-audit",
+      "role": "engine",
+      "source": "tools/drift-audit/drift_signals.template.py"
+    },
+    {
+      "path": "tools/drift-audit/kit.toml",
+      "kit": "drift-audit",
+      "role": "engine",
+      "source": "tools/drift-audit/kit.toml"
+    },
+    {
+      "path": "tools/drift-audit/drift_signals.py",
+      "kit": "drift-audit",
+      "role": "seed",
+      "source": "tools/drift-audit/drift_signals.template.py"
+    },
+    {
+      "path": "tools/memory-recall/README.md",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/README.md"
+    },
+    {
+      "path": "tools/memory-recall/SKILL.template.md",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/SKILL.template.md"
+    },
+    {
+      "path": "tools/memory-recall/adopt-memory-recall.sh",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/adopt-memory-recall.sh"
+    },
+    {
+      "path": "tools/memory-recall/bench.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/bench.py"
+    },
+    {
+      "path": "tools/memory-recall/extract.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/extract.py"
+    },
+    {
+      "path": "tools/memory-recall/kit.toml",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/kit.toml"
+    },
+    {
+      "path": "tools/memory-recall/query.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/query.py"
+    },
+    {
+      "path": "tools/memory-recall/recall-opened.fragment.json",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/recall-opened.fragment.json"
+    },
+    {
+      "path": "tools/memory-recall/recall_conf.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/recall_conf.py"
+    },
+    {
+      "path": "tools/memory-recall/union.py",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/union.py"
+    },
+    {
+      "path": "tools/memory-recall/verbatim.json",
+      "kit": "memory-recall",
+      "role": "engine",
+      "source": "tools/memory-recall/verbatim.json"
+    },
+    {
+      "path": "tools/playbook/README.md",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/README.md"
+    },
+    {
+      "path": "tools/playbook/adopt-playbook.sh",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/adopt-playbook.sh"
+    },
+    {
+      "path": "tools/playbook/fleet.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/fleet.toml"
+    },
+    {
+      "path": "tools/playbook/kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/kit.toml"
+    },
+    {
+      "path": "tools/playbook/render_playbook.py",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/playbook/render_playbook.py"
+    },
+    {
+      "path": "tools/playbook/playbook.kit.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/entries/playbook.kit.toml"
+    },
+    {
+      "path": "tools/playbook/registry.toml",
+      "kit": "playbook-render",
+      "role": "engine",
+      "source": "tools/govkit/registry.toml"
+    },
+    {
+      "path": "tools/roles/README.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/README.md"
+    },
+    {
+      "path": "tools/roles/SKILL.template.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/SKILL.template.md"
+    },
+    {
+      "path": "tools/roles/adopt-roles.sh",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/adopt-roles.sh"
+    },
+    {
+      "path": "tools/roles/agents/gov-builder.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-builder.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-diff-reviewer.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-diff-reviewer.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-orienter.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-orienter.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-researcher.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-researcher.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-reuse-scout.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-reuse-scout.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-session.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-session.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-skeptic.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-skeptic.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-spec-reviewer.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-spec-reviewer.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-spec-writer.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-spec-writer.agent.md"
+    },
+    {
+      "path": "tools/roles/agents/gov-synthesizer.agent.md",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/agents/gov-synthesizer.agent.md"
+    },
+    {
+      "path": "tools/roles/check_roles.py",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/check_roles.py"
+    },
+    {
+      "path": "tools/roles/handoff.py",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/handoff.py"
+    },
+    {
+      "path": "tools/roles/kit.toml",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/kit.toml"
+    },
+    {
+      "path": "tools/roles/render_agents.py",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/render_agents.py"
+    },
+    {
+      "path": "tools/roles/roles_lib.py",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/roles_lib.py"
+    },
+    {
+      "path": "tools/roles/workflows.toml",
+      "kit": "roles",
+      "role": "engine",
+      "source": "tools/roles/workflows.toml"
+    },
+    {
+      "path": "tools/roles/house/gov-builder.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-builder.md"
+    },
+    {
+      "path": "tools/roles/house/gov-diff-reviewer.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-diff-reviewer.md"
+    },
+    {
+      "path": "tools/roles/house/gov-orienter.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-orienter.md"
+    },
+    {
+      "path": "tools/roles/house/gov-researcher.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-researcher.md"
+    },
+    {
+      "path": "tools/roles/house/gov-reuse-scout.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-reuse-scout.md"
+    },
+    {
+      "path": "tools/roles/house/gov-session.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-session.md"
+    },
+    {
+      "path": "tools/roles/house/gov-skeptic.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-skeptic.md"
+    },
+    {
+      "path": "tools/roles/house/gov-spec-reviewer.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-spec-reviewer.md"
+    },
+    {
+      "path": "tools/roles/house/gov-spec-writer.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-spec-writer.md"
+    },
+    {
+      "path": "tools/roles/house/gov-synthesizer.md",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/gov-synthesizer.md"
+    },
+    {
+      "path": "tools/roles/house/policy.toml",
+      "kit": "roles",
+      "role": "seed",
+      "source": "tools/roles/house/policy.toml"
+    },
+    {
+      "path": "tools/review-harness/README.md",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/README.md"
+    },
+    {
+      "path": "tools/review-harness/REVIEW-PROTOCOL.template.md",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/REVIEW-PROTOCOL.template.md"
+    },
+    {
+      "path": "tools/review-harness/check-protocol-parity.test.sh",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/check-protocol-parity.test.sh"
+    },
+    {
+      "path": "tools/review-harness/check-review-join.sh",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/check-review-join.sh"
+    },
+    {
+      "path": "tools/review-harness/check-verifier-fanout.sh",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/check-verifier-fanout.sh"
+    },
+    {
+      "path": "tools/review-harness/check-workflow-syntax.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/check-workflow-syntax.js"
+    },
+    {
+      "path": "tools/review-harness/check_by_design_parity.py",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "path": "tools/review-harness/drift-audit-code.template.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/drift-audit-code.template.js"
+    },
+    {
+      "path": "tools/review-harness/drift-audit-state.template.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/drift-audit-state.template.js"
+    },
+    {
+      "path": "tools/review-harness/kit.toml",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/kit.toml"
+    },
+    {
+      "path": "tools/review-harness/orient-counterfactual.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/orient-counterfactual.js"
+    },
+    {
+      "path": "tools/review-harness/orient.agent.md",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/orient.agent.md"
+    },
+    {
+      "path": "tools/review-harness/review_replay.py",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/review_replay.py"
+    },
+    {
+      "path": "tools/review-harness/tier2-review.template.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "path": "tools/review-harness/unattended-build.template.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "path": "tools/review-harness/unattended-unit.js",
+      "kit": "review-harness",
+      "role": "engine",
+      "source": "tools/workflows/unattended-unit.js"
+    },
+    {
+      "path": "tools/unattended/.unattended.conf.example",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/.unattended.conf.example"
+    },
+    {
+      "path": "tools/unattended/ASKS.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/ASKS.template.md"
+    },
+    {
+      "path": "tools/unattended/PLAYBOOK-TEMPLATE.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/PLAYBOOK-TEMPLATE.template.md"
+    },
+    {
+      "path": "tools/unattended/PROTOCOL.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/PROTOCOL.template.md"
+    },
+    {
+      "path": "tools/unattended/README.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/README.md"
+    },
+    {
+      "path": "tools/unattended/SKILL.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/SKILL.template.md"
+    },
+    {
+      "path": "tools/unattended/STOPS.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/STOPS.template.md"
+    },
+    {
+      "path": "tools/unattended/VERBS.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/VERBS.template.md"
+    },
+    {
+      "path": "tools/unattended/adopt-unattended.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/adopt-unattended.sh"
+    },
+    {
+      "path": "tools/unattended/check-arms-groups.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/check-arms-groups.sh"
+    },
+    {
+      "path": "tools/unattended/check-brief-recorded.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/check-brief-recorded.sh"
+    },
+    {
+      "path": "tools/unattended/check-brief-recorded.test.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
+      "path": "tools/unattended/check-pass-order.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/check-pass-order.sh"
+    },
+    {
+      "path": "tools/unattended/check-playbook.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/check-playbook.sh"
+    },
+    {
+      "path": "tools/unattended/check-playbook.test.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/check-playbook.test.sh"
+    },
+    {
+      "path": "tools/unattended/check-unattended.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "path": "tools/unattended/check-unattended.test.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "path": "tools/unattended/fixture-pieces/one/piece.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/fixture-pieces/one/piece.md"
+    },
+    {
+      "path": "tools/unattended/fixture-pieces/two/piece.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/fixture-pieces/two/piece.md"
+    },
+    {
+      "path": "tools/unattended/fixture-record-one.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/fixture-record-one.template.md"
+    },
+    {
+      "path": "tools/unattended/fixture-record-two.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/fixture-record-two.template.md"
+    },
+    {
+      "path": "tools/unattended/fixture-records/set-dScriptedRepeat.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/fixture-records/set-dScriptedRepeat.md"
+    },
+    {
+      "path": "tools/unattended/gate-guard.fragment.json",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/gate-guard.fragment.json"
+    },
+    {
+      "path": "tools/unattended/gate-guard.js",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/gate-guard.js"
+    },
+    {
+      "path": "tools/unattended/kit.toml",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/kit.toml"
+    },
+    {
+      "path": "tools/unattended/lib-unattended.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "path": "tools/unattended/playbook.fixture.template.md",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/playbook.fixture.template.md"
+    },
+    {
+      "path": "tools/unattended/resume-tick.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/resume-tick.sh"
+    },
+    {
+      "path": "tools/unattended/run-lease.js",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/run-lease.js"
+    },
+    {
+      "path": "tools/unattended/run-unattended-gates.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/run-unattended-gates.sh"
+    },
+    {
+      "path": "tools/unattended/stall-recorder.fragment.json",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/stall-recorder.fragment.json"
+    },
+    {
+      "path": "tools/unattended/stall-recorder.js",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/stall-recorder.js"
+    },
+    {
+      "path": "tools/unattended/stop-guard.fragment.json",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/stop-guard.fragment.json"
+    },
+    {
+      "path": "tools/unattended/stop-guard.js",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/stop-guard.js"
+    },
+    {
+      "path": "tools/unattended/unarmed-branches.txt",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/unarmed-branches.txt"
+    },
+    {
+      "path": "tools/unattended/unattended.families.txt",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/unattended.families.txt"
+    },
+    {
+      "path": "tools/unattended/unattended.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/unattended.sh"
+    },
+    {
+      "path": "tools/unattended/unattended.test.sh",
+      "kit": "unattended",
+      "role": "engine",
+      "source": "tools/unattended/unattended.test.sh"
+    }
+  ],
+  "steps": [
+    {
+      "id": "govkit/receipt-schema-4",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "lib/python-floor-3.15",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    },
+    {
+      "id": "agent-cap/fanout-cap-to-agents-in-flight",
+      "introduced": null,
+      "state": "applied",
+      "via": "witness"
+    }
+  ]
+}

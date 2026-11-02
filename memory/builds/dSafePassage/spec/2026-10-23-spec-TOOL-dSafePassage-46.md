@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-46 — the spec audit of units 36 to 42, its three minors off the step module: the drift pin raised in the pass that arms its key, a lander arm that finds its sibling kit, and the `ac-order` key documented
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-3 · 2026-10-28 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,7 +10,12 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-46-deviation-92.md](../build/2026-10-23-build-TOOL-dSafePassage-46-deviation-92.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-build-TOOL-dSafePassage-46-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-46-ledger.md) | journal | — |
+| [2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md](../build/2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePassage-88 TOOL-dSafePassage-89 TOOL-dSafePassage-90 TOOL-dSafePassage-91 TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-95 TOOL-dSafePassage-96 TOOL-dSafePassage-97 TOOL-dSafePassage-98 TOOL-dSafePassage-99 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafePassage-102 TOOL-dSafePassage-103 TOOL-dSafePassage-104 |
+| [2026-10-26-prompt-TOOL-dSafePassage-46-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-46-build-brief.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-50 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-69 |
 | [2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 |
+| [2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md) | diff-review | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 |
 
 <!-- /gen:spec-records -->
 
@@ -37,16 +42,24 @@ REJECTED its finder's fix, so S3 is built from the skeptic's corrected fix.
 ## 2. Scope (IN)
 
 - **S1** — id 25. TOOL-dSafePassage-42 S9's raise of `cutoff_keys_armed` 36 -> 37
-  (`tools/drift-audit/drift_signals.py:351`), its in-place comment naming `SPEC_AC_ORDER_CUTOFF` and
-  its `memory/DECISIONS.md` row in TOOL-dTrueNorth-28's form, is read as landing in
-  TOOL-dSafePassage-34's pass, the commit that arms that key. The `drift-audit records` leg runs
+  (`tools/drift-audit/drift_signals.py:352`), with its in-place comment naming TOOL-dSafePassage-34,
+  `SPEC_AC_ORDER_CUTOFF` and ER:388, is read as landing in TOOL-dSafePassage-34's pass, the commit
+  that arms that key. The `drift-audit records` leg runs
   `drift_report.py --check` with no guard (`tools/gate-legs.json:1053`), which exits 1 when a gateable
   signal is over its pin (`tools/drift-audit/drift_report.py:8`), so the raise and the key land in one
   commit and the leg 42 S9 hands to TOOL-dSafePassage-34's §7 is green at every commit from that pass
   on. 42 S9's sentence on the signal reading 37 against 36 until order 10 is read as void, and its §8
-  F1 resolution (a) stands, carried out at that pass. TOOL-dSafePassage-34's `--dispatch --writes`
-  gain `tools/drift-audit/drift_signals.py` and `memory/DECISIONS.md`. TOOL-dSafePassage-34's §3
-  hands-off bullet to this unit names the reading. Observed by AC1.
+  F1 resolution (a) stands, its pin raise carried out at that pass. TOOL-dSafePassage-34's
+  `--dispatch --writes` gain `tools/drift-audit/drift_signals.py` alone. The `memory/DECISIONS.md`
+  row F1 (a) owes, in TOOL-dTrueNorth-28's form (`memory/DECISIONS.md:239`), is the main loop's,
+  written at the close in a `Pass: none` commit, as that row landed at dTrueNorth's close
+  (`53321feef`): `--dispatch` refuses a pass declaring a shared mutable record
+  (`tools/unattended/unattended.sh:14004`, check 49), and BUILD-METHOD M6 clause 3 names
+  `memory/DECISIONS.md` one. The ratchet reads only the in-place `36 -> 37` comment
+  (`tools/drift-audit/drift_report.py:268-275`), so TOOL-dSafePassage-34's pass is green on that leg
+  without the row. TOOL-dSafePassage-34's §3 hands-off bullet to this unit names the reading.
+  Observed by AC1: its pin half at this pass, its row half by the main loop at the close, as
+  TOOL-dSafePassage-52 S1 leaves an observation to the main loop.
 - **S2** — id 15. TOOL-dSafePassage-42 S12's arm in `tools/push-main.test.sh` loads `check-arms.py`
   from the memory-tree kit's directory beside the lander, found by the scan arm 26 already runs, a
   sibling of `$HERE` holding `routed_commits.py` (`tools/push-main.test.sh:872`), never by a typed
@@ -75,7 +88,7 @@ REJECTED its finder's fix, so S3 is built from the skeptic's corrected fix.
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-34` — the pass that arms `SPEC_AC_ORDER_CUTOFF`, into which S1 moves the pin raise and its decision row
+- **consumes-from** `TOOL-dSafePassage-34` — the pass that arms `SPEC_AC_ORDER_CUTOFF`, into which S1 moves the pin raise; the decision row is the main loop's, at the close
 - **consumes-from** `TOOL-dSafePassage-41` — the `ac-order` join, whose key S3 documents in the template and the example conf, this unit alone writing those three files, finding 5 of the spec audit of units 43 to 46
 - **consumes-from** `TOOL-dSafePassage-42` — S9's pin raise and S12's `tools/push-main.test.sh` arm, which S1 re-sequences and S2 locates
 - **hands-off** `TOOL-dSafePassage-50` — S2's arm placed after the `_mt_rc` scan with a criterion that it prints `ok` in gov's own tree, its locator cited by content, and S3's three files written by this unit alone, findings 30, 8, 13, 17 and 5 of the spec audit of units 43 to 46
@@ -86,9 +99,10 @@ REJECTED its finder's fix, so S3 is built from the skeptic's corrected fix.
 
 | Order | Unit | Commit carries | `drift-audit records` |
 |---|---|---|---|
-| 7 | TOOL-dSafePassage-34 | `SPEC_AC_ORDER_CUTOFF` armed, `cutoff_keys_armed` pinned at 37, the decision row | green: 37 of 37 |
+| 7 | TOOL-dSafePassage-34 | `SPEC_AC_ORDER_CUTOFF` armed, `cutoff_keys_armed` pinned at 37 with its `36 -> 37` comment | green: 37 of 37 |
 | 10 | TOOL-dSafePassage-42 | no pin move; its AC6 reads the raise | green |
 | 11 | this unit | no pin move; AC1 reads which commit raised it | green |
+| close | the main loop | the decision row, in a `Pass: none` commit | green |
 
 ### The arm's locator
 
@@ -130,9 +144,10 @@ Live at landing. It builds at order 11, after every unit of the build. Its write
 `tools/push-main.test.sh`, `tools/memory-tree/SPEC-TEMPLATE.template.md`, `memory/TEMPLATE-SPEC.md` and
 `tools/memory-tree/.memory-tree.conf.example`, does not meet `TOOL-dSafePassage-45`'s; neither writes
 a file the other reads as a contract or an acceptance input; and neither writes a shared mutable
-record, since S1 moves the `memory/DECISIONS.md` write into TOOL-dSafePassage-34's pass. So the two
-passes at order 11 run concurrently (M6). At order 7, TOOL-dSafePassage-31 writes no
-`memory/DECISIONS.md` and no drift file, so S1 adds no shared record to that group.
+record, since S1 leaves the `memory/DECISIONS.md` row to the main loop at the close. So the two
+passes at order 11 run concurrently (M6). At order 7, S1 adds only
+`tools/drift-audit/drift_signals.py` to TOOL-dSafePassage-34's write set, a file
+TOOL-dSafePassage-31 does not write, and no shared record to that group.
 
 ### Files touched (estimate)
 
@@ -159,8 +174,9 @@ passes at order 11 run concurrently (M6). At order 7, TOOL-dSafePassage-31 write
 - perf / scale: unchanged.
 - error / empty / loading states: S2's skip line names the absent kit, so an adopter's suite run says
   why the arm did not run.
-- observability: S1's raise and its decision row sit in the commit that arms the key.
-- risks: S1 widens TOOL-dSafePassage-34's write set by two files; its dispatch records them.
+- observability: S1's raise sits in the commit that arms the key; its decision row in the close's
+  `Pass: none` records commit.
+- risks: S1 widens TOOL-dSafePassage-34's write set by one file; its dispatch records it.
 - testing: AC1's history probe, AC2's grep and the arm of §7, AC3's grep.
 - migration: none.
 - user docs: `memory/TEMPLATE-SPEC.md` (S3); no `help/` page covers the spec-token checker.
@@ -168,10 +184,14 @@ passes at order 11 run concurrently (M6). At order 7, TOOL-dSafePassage-31 write
 ## 6. Acceptance criteria
 
 - **AC1** — When `git log --reverse --format=%H -S '"cutoff_keys_armed": 37' -- tools/drift-audit/drift_signals.py`
-  runs, its first commit's subject names TOOL-dSafePassage-34, and `git show --stat` of that commit
-  lists `.memory-tree.conf` and `memory/DECISIONS.md`; and `python tools/drift-audit/drift_report.py --json`
-  reads `cutoff_keys_armed` at or under its pin.
-  Red when: the raise lands in a commit after the one that arms the key, or the signal is over its pin.
+  runs, its first commit is TOOL-dSafePassage-34's pass commit, its subject naming that unit, and
+  `git show --stat` of that commit lists `.memory-tree.conf` and `tools/drift-audit/drift_signals.py`
+  and not `memory/DECISIONS.md`; and `python tools/drift-audit/drift_report.py --json` reads
+  `cutoff_keys_armed` at or under its pin. At the close, after the main loop's records commit,
+  `git log --format='%h %(trailers:key=Pass,valueonly)' -S 'TOOL-dSafePassage-34' -- memory/DECISIONS.md`
+  prints the commit that added the decision row, its `Pass` trailer reading `none`.
+  Red when: the raise lands in a commit after the one that arms the key, the pass commit carries the
+  decision row, or the signal is over its pin.
 - **AC2** — When `git grep -n -e "check-arms.py" -e "tools/memory-tree" -- tools/push-main.test.sh`
   runs, the arm's load spells `$HERE/` and the scanned directory variable, no line of the arm spells
   `tools/memory-tree/`, and the arm's `skip —` line names the memory-tree kit.
@@ -195,12 +215,20 @@ none
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 36 to 42's 2 MEDIUM and 1
   LOW findings off the step module, one scope item per raw id.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotions of the spec audit of units 43 to 46, `TOOL-dSafePassage-50`, and the `TOOL-dSafePassage-41` bullet is amended for them, written by the disposal stage; no other section moved.
+- rev-3 · 2026-10-27 · S1 · AC1 · §3 · §4 · §5 · §10 · S1 moves the pin raise alone into
+  TOOL-dSafePassage-34's pass, its write set gaining `tools/drift-audit/drift_signals.py` only: the
+  `memory/DECISIONS.md` row is the main loop's, at the close in a `Pass: none` commit, because
+  `--dispatch` refuses a pass declaring a shared mutable record (check 49); AC1 reads the raise in
+  that pass commit and the row in the close's records commit; the `TOOL-dSafePassage-34` Edges
+  bullet, §4's pass table and Rollout, and §5's observability and risk lines follow, and §10's pin
+  and row cites move to `:352` and `:239`; by
+  `memory/builds/dSafePassage/prompts/2026-10-27-prompt-TOOL-dSafePassage-34-2-spec-writer.md`.
 
 ## 10. Reuse audit
 
 The seams extended are the lander suite's kit scan (`tools/push-main.test.sh:872`) and its skip line
-(`:907`), the drift pin (`tools/drift-audit/drift_signals.py:351`) and its decision form
-(`memory/DECISIONS.md`, TOOL-dTrueNorth-28), and the template's cutoff paragraphs
+(`:907`), the drift pin (`tools/drift-audit/drift_signals.py:352`) and its decision form
+(`memory/DECISIONS.md:239`, TOOL-dTrueNorth-28), and the template's cutoff paragraphs
 (`memory/TEMPLATE-SPEC.md:258-275`). `python tools/codebase-map/reuse_lookup.py "locate a sibling kit
 beside the lander and skip when absent"` ranked `absent`, `skip`, `kit_rel` and `resolve_kit_dir`;
 `resolve_kit_dir` installs into `tools/push-main.test.sh` already, but the scan at `:872` is the one

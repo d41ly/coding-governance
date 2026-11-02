@@ -31,7 +31,7 @@ import sys
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover
-    sys.stderr.write("runbook-parity: needs tomllib (CPython 3.11+)\n")
+    sys.stderr.write("runbook-parity: needs tomllib, which ships with every interpreter at the floor python-floor.txt in gov's lib dir declares\n")
     raise SystemExit(2)
 
 HERE = pathlib.Path(__file__).resolve().parent

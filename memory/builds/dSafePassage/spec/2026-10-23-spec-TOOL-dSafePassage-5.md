@@ -1,8 +1,8 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-12 · 2026-10-29 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
-**Carries:** cl-dClosedLoop-0022@4bc8eba9 whole
+**Carries:** cl-dClosedLoop-0022@4bc8eba9 part 1/2
 
 <!-- gen:spec-records -->
 
@@ -11,12 +11,31 @@
 | [2026-10-23-build-TOOL-dSafePassage-5-deviation-136.md](../build/2026-10-23-build-TOOL-dSafePassage-5-deviation-136.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-5-deviation-150.md](../build/2026-10-24-build-TOOL-dSafePassage-5-deviation-150.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-build-TOOL-dSafePassage-5-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-5-ledger.md) | journal | — |
+| [2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md](../build/2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePassage-88 TOOL-dSafePassage-89 TOOL-dSafePassage-90 TOOL-dSafePassage-91 TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-95 TOOL-dSafePassage-96 TOOL-dSafePassage-97 TOOL-dSafePassage-98 TOOL-dSafePassage-99 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafePassage-102 TOOL-dSafePassage-103 TOOL-dSafePassage-104 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-5-phantom-label-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-5-phantom-label-fix.md) | research | — |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-build-brief.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | research | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-10-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-10-spec-writer.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-3-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-3-spec-writer.md) | research | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-4-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-4-spec-writer.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-5-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-5-spec-writer.md) | research | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-7-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-7-spec-writer.md) | research | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-8-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-8-spec-writer.md) | journal | — |
+| [2026-10-27-prompt-TOOL-dSafePassage-5-9-spec-writer.md](../prompts/2026-10-27-prompt-TOOL-dSafePassage-5-9-spec-writer.md) | research | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-37-close-arms-c-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-37-close-arms-c-brief.md) | research | TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-51 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-59 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 |
+| [2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md) | research | TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-46 TOOL-dSafePassage-50 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-69 |
+| [2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-researcher.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-researcher.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 |
+| [2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md) | diff-review | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 |
 
 <!-- /gen:spec-records -->
 
@@ -37,12 +56,26 @@ research's losing test for its candidate E (`research-supersession.md`, section 
   a first-parent ancestor of HEAD at which no `[[upgrade]]` row exists, neither a
   `tools/govkit/steps.toml` nor a kit descriptor carrying one. `check_release_pin` refuses any other
   value. Observed by AC1 and AC11.
-- **S2** — The release-0 tree, generated by `build_release_tree`. A scratch gov clone, untagged,
-  checked out at the pin; a target built by S12's `build_target` from the fixture's
+- **S2** — The release-0 tree, generated by `build_release_tree`. A scratch gov clone made by
+  `git clone --no-tags`, since a plain clone carries gov's `archive/*` tags, checked out at the pin;
+  a target built by S12's `build_target` from the fixture's
   `tools/govkit/fixtures/release-0/deploy.toml` and its `seed/` project layer; the clone's own
-  `govkit.py apply --all` into the target, every non-conditional registry entry, exit 0,
-  committed; the clone then checked out at HEAD's sha, so one gov checkout path serves both
-  vintages as an adopter's does. Observed by AC2.
+  `govkit.py apply --target <t>`, with neither `--all` nor `--kits`, so its selection is the
+  fixture's `kits` line: every non-conditional registry entry at the pin less the kits §8 F3 takes
+  out. Exit 0, committed. Then, in each case's copy once S3's plants are committed, the target's
+  own policy adopter, `tools/policy/adopt-policy.sh --scaffold` as the pin installed it, is run
+  again through govkit's `resolve_bash` (`tools/govkit/govkit.py:1202`) and what it writes is
+  committed: on install day that adopter defers the policy mirror `.governance/policy.json` and
+  names its own remedy, `commit, then re-run --scaffold` (TOOL-dGroundRules-31 S1 and S3), so
+  release-0 is the install an adopter holds after following it. It runs after the plants because
+  the mirror records the blobs of its inputs, `.agent-cap.conf` among them, so a mirror rendered
+  before the `fanout-cap` plant would differ from the one a rollback's re-render writes at the
+  planted commit. The clone's landed ref is gov's own: the commit `resolve_landed_ref` names in gov's
+  checkout is fetched into the clone, the clone's `main` set to it and its `origin` taken out, so
+  `read_steps` in the clone derives each row's introducing commit along the history gov's own
+  `update` derives it along, not along the branch the clone was made from. The clone is then
+  checked out at HEAD's sha, so one gov checkout path serves both vintages as an adopter's does.
+  Observed by AC1 and AC2.
 - **S3** — The plants, `tools/govkit/fixtures/release-0/plants.toml`. `[[plant]]` rows are adopter
   edits committed onto release-0 before every case, each expecting `carried` with its observation
   or `ordered`; `[[gov_plant]]` rows are commits on the clone's tip, the one that makes a planted
@@ -51,7 +84,21 @@ research's losing test for its candidate E (`research-supersession.md`, section 
   refusal. Observed by AC5, AC6 and AC11.
 - **S4** — The state compared. `derive_tree_digest` hashes every file of the target outside `.git/`
   and `.governance/outbox/`, with `git ls-files --stage` over the same paths; byte-identical is equal
-  digests, and a red names each differing path. Observed by AC3, AC4 and AC7.
+  digests, and a red names each differing path. Every case stages and commits the target after each
+  `update` run that returns, the rollback's included, as an adopter commits a run, since `update`
+  leaves the receipt and its sidecar unstaged; a killed run's state is never committed. Three
+  things are compared as the record that owns them declares them, and nothing else is: the receipt `.governance/install.json` parsed, without `carry` in any
+  `files` row, which DEPL-dCarriedReceipt-9 S2 makes output recomputed on every run, and without
+  `sha256`, `oid`, `gov_oid`, `commit` and `version` in any `rendered` row, which
+  DEPL-dRemeasuredRender-1 S1 re-measures from the file on every run whose render ran; its sidecar
+  `.governance/install.sums` without the lines naming a `rendered` row, since DEPL-dRemeasuredRender-1
+  S4 derives the sidecar from those rows; and each index entry of an `engine` row with its mode read
+  through `resolve_landed_mode` against gov's mode at the pin, on both sides, since
+  DEPL-aLevelledCopy-1 S1 and S3 level that mode up from gov's tree on every run and never down. The
+  index entries of the receipt and its sidecar are compared by mode and stage only: their blob ids
+  hash the very contents compared above, so a blob compare would read those records' fields raw. The
+  rendered files' own bytes, and every other key, line and entry, are compared as they are.
+  Observed by AC3, AC4 and AC7.
 - **S5** — The walk, in a child process. `run_child_walk` runs the clone's `govkit.py update` as
   `main` in a fresh Python process that first imports the clone's `upgrade_steps.py` under the name
   `govkit.py` imports it, and may wrap one step's phase by rebinding `run_step_isolated`
@@ -60,7 +107,11 @@ research's losing test for its candidate E (`research-supersession.md`, section 
   Observed by AC6 to AC8 and AC10.
 - **S6** — The cases, each over a fresh copy of the planted release-0 target: `up`, `down`, `reup`,
   `plants`, `skip`, `kill`, `fail`, `shims` and `isolation`, as §4 "### The cases" states them. The
-  per-step cases run once for every step in walk order. Observed by AC2 to AC10.
+  per-step cases run once for every step in walk order. In the `kill` and `fail` cases the child
+  runs step k's first `witness` call for real, and where it answers `ok` the child returns
+  `{"verdict": "failed", "rc": 1, "tail": "upgrade-walk: forced"}` in its place, so the walk spawns
+  k's up, and the case prints `forced` beside k. A walk returns as §4 "### The walk's exit" reads
+  it. Observed by AC2 to AC10.
 - **S7** — The arms, `tools/govkit/fixtures/release-0/arms.toml`: declared defective steps and one
   defective plant, each joining the walk only under `--inject <name>`, each expected red on its case.
   The leg runs every arm after its real cases, and an arm whose case stays green is a red.
@@ -76,12 +127,15 @@ research's losing test for its candidate E (`research-supersession.md`, section 
 - **S10** — The needs-target check over release-0, TOOL-dSafePassage-7's hand-off: its
   `check_needs_target` run for every declared step over a scratch copy of the release-0 target,
   since its plants change the tree's bytes. Observed by AC10.
-- **S11** — The window over an untagged history: in the untagged clone, TOOL-dSafePassage-6's
+- **S11** — The window over an untagged history: in S2's `--no-tags` clone, TOOL-dSafePassage-6's
   `check_shim_windows` holds every `[[shim]]` row, and each forwarder whose `from` path the receipt
   installs is in the walked target. Observed by AC9.
 - **S12** — One target factory. `make_target` (`tools/govkit/selftest.py:679-700`) is extracted
   into `tools/govkit/fixture_target.py` as `build_target`, the name the lexicon's `build` verb
-  gives it, and `selftest.py`'s 80 call sites call it; the leg is its second caller. Observed by AC14.
+  gives it, and `selftest.py`'s 80 call sites call it; the leg is its second caller. The two
+  `selftest.py` helpers that wrap it under that name (`:1272`, `:2428`) become `build_own_target` and
+  `build_levelled_target`, since a local `build_target` calling the factory calls itself, as the
+  fourth pass measured. Observed by AC14.
 - **S13** — The docs: a section of `help/upgrade-steps.md`, "How gov proves a step before you meet
   it", naming the leg, what each case shows and how to run one, its `upgrade_walk.py` command
   carried by a `[[usage]]` row in `tools/govkit/usage.toml` and anchored, as TOOL-dSafePassage-13's
@@ -104,11 +158,11 @@ research's losing test for its candidate E (`research-supersession.md`, section 
 - Running on the automatic bar. The leg is held as a kit-subject leg and runs on demand and in
   remote CI's self-test job (§8 F7).
 - `TOOL-aScouredKit-24`, which this unit advances by passing every non-conditional registry entry
-  to one `apply`, and does not close.
+  but the kits §8 F3 takes out to one `apply`, and does not close.
 
 ### Edges
 
-- **consumes-from** `TOOL-dSafePassage-1` — `read_steps` and `StepRow` in `tools/govkit/upgrade_steps.py`, the step population and the ids `agent-cap/fanout-cap-to-agents-in-flight` and `govkit/template-size-limits-to-budgets`; without them there is nothing to walk and the leg exits 2
+- **consumes-from** `TOOL-dSafePassage-1` — `read_steps` and `StepRow` in `tools/govkit/upgrade_steps.py`, the step population and the id `agent-cap/fanout-cap-to-agents-in-flight`; without them there is nothing to walk and the leg exits 2
 - **consumes-from** `TOOL-dSafePassage-2` — `run_step_walk` inside `update --write`, its `interrupted:` row written before each spawn, the reclaim of a dead holder's lock, and the receipt's `steps` it records through TOOL-dSafePassage-3's writer, read back by `read_step_states`; without them a killed walk leaves nothing a re-run can recover and no case can name the last completed step
 - **consumes-from** `TOOL-dSafePassage-4` — `update --rollback --to <rev> --write` and its `update-reverted` record under `.governance/outbox/`, which is why S4 leaves that directory out
 - **consumes-from** `TOOL-dSafePassage-7` — `run_step_isolated`, its result `{"verdict", "rc", "tail"}`, and `check_needs_target`, named at module level in `tools/govkit/upgrade_steps.py` so S5's child can rebind the runner
@@ -125,7 +179,16 @@ order, which the `edited-retired` plant expects.
 - **consumes-from** `TOOL-dSafePassage-17` — the reverted rule and the no-image down; without them the rollback stops at the floor step and the two legacy-home steps
 - **consumes-from** `TOOL-dSafePassage-18` — the reverse walk past the schema step writing no row; without it the rollback to release-0 refuses after its last down
 - **consumes-from** `TOOL-dSafePassage-19` — the stamp and the record after the schema step's down, and the re-run after a kill; without them the rollback cases end unspecified
+- **consumes-from** `TOOL-dSafePassage-63` — `check_render_edited` proving an edit from `output_sha256` where a row has no `oid`; without it the first `update` renders over the `edited-render` plant with no order, and `down`, `reup` and `kill` differ at that file
+- **consumes-from** `TOOL-dSafePassage-64` — a `retired-edited` row taking back the role gov's descriptor gives its path; without it the rollback to the pin leaves the `withdraw-one` row `tools/hooks/README.md` at `retired-edited` where release-0 recorded `engine`
+- **consumes-from** `TOOL-dSafePassage-65` — the role re-resolution reading the descriptor at `--to`; without it the rollback to the pin resolves `tools/hooks/README.md` at the clone's tip, where the `withdraw-one` plant removed it, and the row stays `retired-edited`
+- **consumes-from** `TOOL-dSafePassage-66` — a held kit's writes put back before the first step; without it a walk killed inside a step leaves the lexicon kit, held by the `edited-render` plant, at the tip, and the `kill` case's re-run and rollback differ at its files
+- **consumes-from** `TOOL-dSafePassage-62` — the receipt `update` writes before its first step, rows and sidecar through `write_install_receipt`; without it the `kill` case's rollback from the schema step's killed state reads every file the killed run moved as an adopter's edit, writes none, and never reaches release-0's digest
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
+- **hands-off** `TOOL-dSafePassage-61` — the `size-limits` `[[condition]]` row of `tools/govkit/fixtures/release-0/plants.toml`, added with the step it names, which joins the population when that unit lands
+- **hands-off** `TOOL-dSafePassage-67` — `fixture_target.py`, `build_target` and the upgrade walk's release-0 target built through it, which unit 67's factory pins (its S12)
+- **hands-off** `TOOL-dSafePassage-68` — the `upgrade-walk` leg, its child script `CHILD`, `run_child_walk`, and the selftest block observing the leg, whose stand-ins unit 68 fixes and extends
+- **hands-off** `TOOL-dSafePassage-69` — the `upgrade-walk` leg and its `kill` and `down` cases, which unit 69's AC5 and AC7 run
 
 ## 4. Design
 
@@ -136,8 +199,8 @@ order, which the `edited-retired` plant expects.
 | File | Holds |
 |---|---|
 | `pin.txt` | the pin, one full sha and a newline |
-| `deploy.toml` | no `kits` line, since `apply --all` derives the selection; the answers of gov's own `.governance/deploy.toml` rewritten to the characters `apply` admits, and `user_skills` inside the scratch |
-| `seed/` | the project layer copied into the target before `apply`: the conf files and answers each kit's adopter refuses without |
+| `deploy.toml` | a `kits` line: every non-conditional registry entry at the pin less the four kits §8 F3 takes out, one id per line. `playbook-render`'s adopter refuses a deploy.toml with none (`read_kits`, `tools/playbook/render_playbook.py:967` at the pin), and `apply`, run with neither `--all` nor `--kits`, reads the line as its selection (`tools/govkit/govkit.py:1113-1121` at the pin). Under `[answers]`: the answers of gov's own `.governance/deploy.toml` rewritten to the characters `ANSWER_VALUE_RE` admits (`:1403`), with `user_skills` inside the scratch; and five gov's file does not carry. `playbook_path` docs/PARALLEL.md, `playbook_dir` docs and `memory_root` memory, the pin's own selftest fixture's values (`tools/govkit/selftest.py:708-710` at the pin), without which `apply` exits 2. `ci_file` set to `none yet`, since a target holding no workflow directory derives none and the render refuses a derived placeholder its probe and the answers both leave blank (`render_playbook.py:272-278`, `:927`). `lexicon_conf` set to the probe's own value, .lexicon.conf, because the probe reads a file the lexicon adopter may not have written, and an answer the probe agrees with is a note, never a refusal (`:920`) |
+| `seed/` | the project layer copied into the target before `apply` and committed with it: one file, AGENTS.md holding one authored line. `agent-instructions`' adopter runs before `playbook-render`'s, which writes the charter there, and with no AGENTS.md and no `--source` it exits 2, printing its reason on stdout, so `apply` saw nothing on stderr (`tools/agent-instructions/adopt-agent-instructions.sh:101` at the pin); the render then appends its region below the authored line (`build_region`, `render_playbook.py:757`). Every other problem the pin's `apply` raised is answered by `deploy.toml` above or by §8 F3's take-outs |
 | `plants.toml` | the `[[plant]]`, `[[gov_plant]]` and `[[condition]]` rows |
 | `arms.toml` and `arms/` | the defective steps and plant of S7, and their scripts |
 
@@ -151,11 +214,15 @@ clone's kit and reads the policy file and `.agent-cap.conf` only as committed at
 (TOOL-dGroundRules-2 S2 and S6, TOOL-dGroundRules-15 S1), so the release-0 target needs no reader of
 its own. The observation holds when stdout is `value` and no `absent` path is in that commit. A
 `get` exit of 2 is a red that carries the reader's `policy: refused` line. `ordered` holds when an order under
-`.governance/outbox/` names the path. A `[[gov_plant]]` row: `id`, `what` and the edit, committed on
-the clone's tip. A `[[condition]]` row: `step`, and either `plant` (a `[[plant]]`-shaped edit) or
+`.governance/outbox/` names the path. A `[[gov_plant]]` row: `id`, `what` and one edit, a `[[plant]]`
+edit or `remove`, the file deleted, committed on the clone's tip. `remove` exists because the grid
+reads `retired-edited` only where gov holds no blob at the row's `source` (`classify_row` and
+`VERDICT_GRID`, `tools/govkit/govkit.py:9131-9133`, `:8650`), so dropping the rule alone reads
+`patched`. A `[[condition]]` row: `step`, and either `plant` (a `[[plant]]`-shaped edit) or
 `fakes` (launcher names and the version each prints, put first on the child's `PATH`).
 
-The rows at this pass, each path re-read against the pin's tree when the row is written:
+The rows at this pass, each path re-read against the pin's tree when the row is written and drawn
+from a kit the `kits` line keeps:
 
 | Row | Kind | What | Expect |
 |---|---|---|---|
@@ -166,14 +233,21 @@ The rows at this pass, each path re-read against the pin's tree when the row is 
 | `old-shape-record` | plant | a spec under `memory/builds/` dated before `SPEC10_CUTOFF`, nine sections | carried, `unchanged` |
 | `edited-render` | plant | one line edited in a `rendered` row's file | ordered |
 | `edited-retired` | plant | one line appended to the file `withdraw-one` withdraws | ordered |
-| `withdraw-one` | gov plant | one installed file dropped from its descriptor's `[[files]]` at the tip | — |
+| `withdraw-one` | gov plant | the hooks README's rule dropped from its descriptor's `[[files]]` at the tip, and its source deleted by the row `withdraw-one-source`, edit `remove` | — |
 | `floor-below` | condition | `lib/python-floor-3.15`, fakes `python3`, `python` and `py` printing `3.14` | — |
-| `size-limits` | condition | `govkit/template-size-limits-to-budgets`, `tools/template-size-limits.txt` created with one row | — |
 
 ### The cases
 
 Every case starts from a fresh copy of the committed, planted release-0 target and walks to the
 clone's tip, `update --target <t> --to <tip> --write`, committed after, as an adopter commits it.
+Every digest compare reads the tree as S4 states, its three record-owned readings included.
+
+Under the plants, `agent-cap/fanout-cap-to-agents-in-flight` is reached by its own witness, which
+fails while the `fanout-cap` plant's `.agent-cap.conf` is present, so its up runs and writes. The
+floor step's witness is a preflight that holds on every node whose interpreter meets the floor, so
+the `kill` and `fail` cases reach its up only by S6's forced first witness; its up, the same
+preflight, writes nothing, so `kill` ends it at its end and observes the walk's recovery, not a
+partial write. A step a later build adds whose witness holds over release-0 takes the same route.
 
 | Case | Per step | What it observes |
 |---|---|---|
@@ -182,16 +256,35 @@ clone's tip, `update --target <t> --to <tip> --write`, committed after, as an ad
 | `reup` | no | after `down`, the walk again; the digest equals `up`'s |
 | `plants` | no | after `up`, each `[[plant]]` carried by its observation, or ordered |
 | `skip` | yes | step k's first `witness` call answers `ok`, so the walk passes it unrun; k is load-bearing when the digest differs from `up`'s or k's real witness then exits non-zero; under k's `[[condition]]` the walk without the skip stops at k and with it gets past k |
-| `kill` | yes | step k's `up` runs on a shadow copy of the target, its first write is applied to the target, and the child exits by `os._exit(137)`; the killed state holds the lock with a dead pid and k's row `failed` with `interrupted:`; a re-run's digest equals `up`'s, and from a copy of the killed state `update --rollback --to <pin> --write` reaches release-0's digest |
-| `fail` | yes | step k's `up` answers `{"verdict": "failed", "rc": 1, "tail": "upgrade-walk: planted exit 1"}`; the walk exits 1, every step before k reads `applied`, the last `applied` row is k-1 (none for the first), k reads `failed` with `exit 1`, and no later step is recorded |
+| `kill` | yes | step k's `up` runs on a shadow copy of the target, its first write is applied to the target, and the child exits by `os._exit(137)`, k's first witness forced first where it holds (S6); the killed state holds the lock with a dead pid and k's row `failed` with `interrupted:`, except the schema step on release-0's schema-3 receipt, which holds no row for k (TOOL-dSafePassage-15 S4); a re-run's digest equals `up`'s with k's `steps` row read without `via`, which that row carries as `"via": "witness"` exactly when k's witness, run through `run_step_isolated` over a copy of the killed state, exits 0, and lacks otherwise, as TOOL-dSafePassage-33 S1 marks a step the walk applies by its witness alone (`tools/govkit/upgrade_steps.py:57`, `:1281`); and from a copy of the killed state `update --rollback --to <pin> --write` reaches release-0's digest, the files the killed run moved returned because TOOL-dSafePassage-62 wrote the receipt naming them before the walk, and the held kit's put back before it by TOOL-dSafePassage-66 |
+| `fail` | yes | step k's `up` answers `{"verdict": "failed", "rc": 1, "tail": "upgrade-walk: planted exit 1"}`, k's first witness forced first where it holds (S6); the walk exits 1, every step before k reads `applied`, the last `applied` row is k-1 (none for the first), k reads `failed` with `exit 1`, and no later step is recorded; the schema step on release-0's schema-3 receipt records no row, its step line ends `(not recorded: receipt below schema 4)`, and the receipt reads schema 3 with no `steps` and `gov_commit` the pin, its rows the ones the file pass moved, as the findings path writes them (`tools/govkit/govkit.py:12979-12988`) |
 | `shims` | no | the clone holds no tag; `read_releases` over it returns none; `check_shim_windows` holds every row `read_shim_rows` reads; each forwarder whose `from` the receipt installs is in the walked target; zero rows prints `shims: 0 declared`, counted as measured-nothing |
 | `isolation` | yes | `check_needs_target` over a scratch copy of release-0 returns `isolated` or `attended`; `breach` or `needs-target` is a red naming the step |
 
-The first write. `derive_first_write(before, shadow)` lists the paths the shadow run changed and
-orders them by modification time, a path the run unlinked timed by its parent directory's; the
-earliest is applied to the target as its bytes, or as its absence. A step whose shadow run changes
-nothing is killed at its end. The order is an approximation of the step's own write order, and
-§5 says what it cannot see.
+### The walk's exit
+
+The `edited-render` plant holds the lexicon kit on every walk (TOOL-dSafePassage-63), so `update`
+exits 1 and withholds the stamp (`tools/govkit/govkit.py:12625-12628`, `:13014-13020`), as it does
+for an adopter holding that edit. A case's `update` run, a rollback included, has returned when it
+exits 0, or exits 1 with its count line `govkit: <n> problem(s)` naming exactly the `kit '<eid>' was
+HELD BACK: this run refused <paths> of it` lines, every one of `<paths>`, split on `, `, an `ordered`
+plant's path; a case expecting its walk to stop adds that stop's problem to the count. After such a
+walk `gov_commit` reads the pin, so the rollback to the pin downs the applied steps under
+`check_rollback_vintage` (`:7686-7704`). Any other exit 1 is a red naming its problems (§8 F9).
+
+### The first write
+
+`derive_first_write(before, shadow, image)` lists the paths the shadow run changed.
+Where `image`, the step's before-image (`derive_image_path`, `tools/govkit/upgrade_steps.py:585-590`),
+is among them, it is the first write: the contract writes it first (`:44-47`), and
+`write_before_image` (`:601-633`) writes it before returning the after-state the up then writes, as
+the fan-out step's `cmd_up` does, the policy file next and `.agent-cap.conf` unlinked last
+(`tools/govkit/steps/fanout_cap.py`). Else a single changed path is it. Else the paths order by
+modification time, and a tie between the two earliest, or a removed path among them, is a red naming
+the step, `first write undetermined`: at `29665dd17` the fan-out step's two writes shared one
+`mtime_ns` and its unlinked conf, timed by its directory, sorted first. The first write is applied to
+the target as its bytes, or as its absence. A step whose shadow run changes nothing is killed at its
+end.
 
 ### The arms
 
@@ -295,7 +388,7 @@ fixture's seed is written there too, against the pin's `apply` (§8 F3).
 - perf / scale: PINNED at `3708a705` on node `d`, 2026-10-23, one run each into a bare target with gov's 22-kit selection: `apply` 15.3 s, a read-only `update` 15.2 s, `check` 17.3 s. A run is about 5 walks per step plus 3 and the arms, so DERIVED it is tens of minutes; the `ceiling` is set from the measured time at the pass and recorded in `tools/run-gates/ceiling-evidence.txt`.
 - error / empty / loading states: a failed pin, a release-0 that does not apply clean, an absent plant path and an empty step population each exit 2 with the reason; zero shims and attended steps are counted on the summary, never read as green.
 - observability: one line per case and step, each red naming the step, the case and the differing paths or rows.
-- risks: the first-write order is read from modification times, so two writes inside one timestamp tick order by path, and a write inside one file is not split; the measured bare-target `apply` at `3708a705` refused 24 problems, five adopters among them refusing for want of a project layer, so the seed must answer each before the leg can run (§8 F3).
+- risks: a step writing several paths and no before-image is ordered by modification time, a tie being a red and never an order (§4), and a write inside one file is not split; the measured bare-target `apply` at `3708a705` refused 24 problems, and at the pin `60d90cb7` 19 lines, each disposed by §8 F3 through the seed, a take-out or its reading as a note, so a refusal a later re-measure finds takes the same route and is never dropped silently. The floor step's down over the committed release-0 target was measured printing no finding, exit 0 (2026-10-27), so the two lines that refuse that down on gov's own tree reach no case of this leg. PINNED at `41062397`, 2026-10-27, measured twice over a fresh release-0 with no plants: `up` then `down` differed from release-0 at the receipt (202 rows by `carry` alone, five `rendered` SKILL.md rows gaining `sha256`, `oid`, `gov_oid` and `commit`), its sidecar (five lines), and the index (the receipt and sidecar unstaged, three `engine` entries at `100755` where release-0's `apply` staged `100644`), each read by S4 under its owning record; killed at the floor step, the rollback added `.governance/policy.json`, which S2's re-run of the policy adopter now puts in release-0; killed at the schema step, it left 38 paths at the tip, which TOOL-dSafePassage-62 closes. TOOL-dSafePassage-40 (order 6) records a step whose earlier record is `failed` as `applied` with no `via` on the re-run, so after it lands the `kill` case's re-run over a forced step carries no `via` where `up` carries `witness`; that unit's pass owns the case's expectation then.
 - testing: the arms of §4, run by the leg after its real cases, and the cheap `--list` and `--pin` observations in the selftest arm (§7).
 - migration: additive; §4 "### Migration".
 - user docs: the `help/upgrade-steps.md` section (S13), graded by the docs leg.
@@ -305,18 +398,27 @@ fixture's seed is written there too, against the pin's `apply` (§8 F3).
 Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read files or one module call.
 
 - **AC1** — When `python "tools/govkit/upgrade_walk.py" --list` runs, it prints the pin as 40 hex,
-  the step population in walk order whose first id is `govkit/receipt-schema-4` and whose second
-  is TOOL-dSafePassage-11's floor step, and every plant, condition and arm row.
-  Red when: the order follows file or row order rather than each step's introducing commit.
+  the clone's landed ref as the commit gov's own `resolve_landed_ref` names, the step population in
+  walk order whose first id is `govkit/receipt-schema-4` and whose second is TOOL-dSafePassage-11's
+  floor step, and every plant, condition and arm row.
+  Red when: the order follows file or row order rather than each step's introducing commit, or the
+  clone's own default branch is read as its landed ref, so `agent-cap/fanout-cap-to-agents-in-flight`,
+  introduced first on the branch the clone was made from, walks first.
   figure: the population is DERIVED from the descriptors at the run.
 - **AC2** — When `python "tools/govkit/upgrade_walk.py" --case up` runs, it prints release-0 applied by
-  the pinned clone's own `govkit.py apply` with exit 0 and a receipt `schema` of 3, then every step
+  the pinned clone's own `govkit.py apply` over the fixture's `kits` line with exit 0 and a receipt
+  `schema` of 3, the policy adopter's re-run committing `.governance/policy.json`, then every step
   `applied` and each step's witness exiting 0, and exits 0.
-  Red when: release-0 is applied by HEAD's `apply`, so the receipt is already at schema 4.
+  Red when: release-0 is applied by HEAD's `apply`, so the receipt is already at schema 4; or
+  `apply` runs with `--all`, which ignores the `kits` line, installs §8 F3's four again and exits 1;
+  or the walk's exit 1 is read as returned while a problem other than the lexicon kit held for the
+  `edited-render` path is counted, or while `gov_commit` reads anything but the pin.
   cost: minutes.
-- **AC3** — When `python "tools/govkit/upgrade_walk.py" --case down` runs, the rollback's digest equals
-  release-0's and it exits 0; with `--inject lossy-down` it exits 1 naming the path the down left.
-  Red when: the digest reads `.git/` or the outbox, or a byte a down leaves goes unnamed.
+- **AC3** — When `python "tools/govkit/upgrade_walk.py" --case down` runs, the rollback's digest, read
+  as S4 states, equals release-0's and it exits 0; with `--inject lossy-down` it exits 1 naming the
+  path the down left.
+  Red when: the digest reads `.git/` or the outbox, a byte a down leaves goes unnamed, or a receipt
+  key, sidecar line or index entry outside S4's readings differs and the case still passes.
 - **AC4** — When `python "tools/govkit/upgrade_walk.py" --case reup` runs, the digest after a second
   walk from the rolled-back tree equals the first walk's, and it exits 0.
   Red when: a step's second up writes differently from its first.
@@ -331,17 +433,27 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
   skipped, and it exits 0; with `--inject no-op` it exits 1 naming `no-op` as not load-bearing.
   Red when: skipping a step is read as passing without comparing the outcome.
 - **AC7** — When `python "tools/govkit/upgrade_walk.py" --case kill` runs, each step's killed state
-  shows a lock whose pid is dead and the step `failed` with `interrupted:`, the re-run's digest
-  equals the `up` digest, the rollback from the killed state reaches release-0's, and it exits 0;
-  with `--inject witness-first`, and separately with `--inject not-rerunnable`, it exits 1 naming
-  the arm.
+  shows a lock whose pid is dead and the step `failed` with `interrupted:`, the floor step printed
+  `forced`, the re-run's digest equals the `up` digest with the step's `steps` row read without
+  `via`, the row carrying `"via": "witness"` exactly when the step's witness, run over a copy of the
+  killed state, exits 0, and no `via` otherwise (TOOL-dSafePassage-33 S1), the rollback from the
+  killed state reaches release-0's, every digest read as S4 states, and it exits 0; for `govkit/receipt-schema-4` the
+  killed state holds no row for the step (TOOL-dSafePassage-15 S4); with `--inject witness-first`,
+  and separately with `--inject not-rerunnable`, it exits 1 naming the arm.
   Red when: the kill lands before the step's first write or after the walk returns, so no partial
-  state is ever re-run.
+  state is ever re-run; or a step whose witness holds over release-0 is passed by that witness, so
+  its up is never killed; or a step's first write is read from modification times where its
+  before-image or a single changed path names it, so the killed state is one its up cannot reach;
+  or a re-run passes that differs from `up` at any byte but the killed step's `via`, or whose row
+  carries `via` where the killed state's witness did not hold, or none where it held.
   cost: the longest case, tens of minutes over every step.
 - **AC8** — When `python "tools/govkit/upgrade_walk.py" --case fail` runs, for each step k the receipt
   names step k-1 as its last `applied` row and k `failed` with `exit 1`, no later step is
-  recorded, and it exits 0.
-  Red when: the walk records a step after the failed one, or advances past k.
+  recorded, the floor step printed `forced`, and it exits 0; for `govkit/receipt-schema-4` the
+  receipt reads schema 3 with no `steps` and `gov_commit` the pin, and the step line ends
+  `(not recorded: receipt below schema 4)` (TOOL-dSafePassage-15 S2).
+  Red when: the walk records a step after the failed one, or advances past k, or a step whose
+  witness holds over release-0 is passed by it, so its planted failure never runs.
 - **AC9** — When `python "tools/govkit/upgrade_walk.py" --case shims` runs, it prints that the clone
   holds no tag and that `read_releases` returned none, and exits 0, printing `shims: 0 declared`
   while gov ships none; with `--inject held-shim --inject drops-shim` it exits 1 naming the shim
@@ -357,22 +469,26 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
   exits 2 naming the absent path.
   Red when: a pin carrying a step row is accepted, so the walk starts after the steps it must walk.
 - **AC12** — When `python "tools/govkit/upgrade_walk.py"` runs on the tree after the pass, it exits 0,
-  its summary naming every case over every step green and every arm red on its case.
+  its summary naming every case over every step green, each digest read as S4 states, the steps the
+  `kill` and `fail` cases forced, and every arm red on its case.
   Red when: an arm's case stays green and the leg still exits 0.
   cost: the whole leg; its time sets the `ceiling`.
 - **AC13** — When `git grep -n -F "upgrade-walk" -- tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/run-gates/ceiling-evidence.txt memory/map/features/govkit.md`
   runs, each of the five files carries the leg's name.
   Red when: the leg lands without a row one of its meta-gates owes.
-- **AC14** — When `git grep -n -e "def build_target" -e "def make_target" -e "make_target(" -- tools/govkit`
-  runs, it prints one definition, `build_target` in the new factory module, and no `make_target`.
-  Red when: the factory is copied into the leg, or the old name survives beside the new one.
-- **AC15** — When `git grep -n -e "upgrade_walk.py" -- help/ tools/govkit/usage.toml` runs, it finds
+- **AC14** — When `git grep -n -w -e "def build_target" -e "make_target" -- tools/govkit/ ':!tools/govkit/fixtures/retired_edits.py' ':!tools/govkit/upgrade_steps.py'`
+  runs, it prints one line, the definition in the factory module. The local builders of
+  `tools/govkit/fixtures/retired_edits.py` and `tools/govkit/upgrade_steps.py` call no factory today
+  and are TOOL-dSafePassage-26 S19's.
+  Red when: the factory is copied into the leg, the old name survives, or a local helper
+  still binds `build_target` and so calls itself.
+- **AC15** — When `git grep -n -e "upgrade_walk.py" -- help/ "tools/govkit/usage.toml"` runs, it finds
   the section's command and its `script:` row, and `python "tools/govkit/docs_leg.py"` exits 0.
   Red when: the section ships a command the docs leg has no row for.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
 The new legs `upgrade-walk` and, from TOOL-dSafePassage-13, `docs` are not on the list above, since
 it names legs the manifest holds today; the main loop observes them at the close through the arm
@@ -396,6 +512,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   faster than its poll, so the case is unobservable for it; (c) kills no process, so no dead
   holder's lock is left. RESOLVED (agent, 2026-10-23, delegated): (d), rung 3, the one option that
   leaves a real dead walk over a real partial state for every step. widens: none · relaxes: none
+  Amended at rev-9 (2026-10-27): the first write is the before-image where the step wrote one, then
+  a lone path, then modification time with a tie a red (§4), since the third pass measured a tie;
+  killing the real up after its first write would need (b)'s watcher.
 - **F3 — Which kits release-0 installs.** Options: gov's own selection, the `kits` of
   `.governance/deploy.toml`; the registry's default selection (`tools/govkit/registry.toml`,
   `[selection]`); `apply --all`, every non-conditional entry. Each of the first two leaves out kits
@@ -405,8 +524,42 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   layer, rung 3, the most surfaces walked and a selection derived rather than typed; a kit whose
   adopter cannot exit 0 at the pin with the seed is taken out by a `kits` line and a rev bump of this
   spec naming the kit and its refusal, never silently. widens: none · relaxes: none
+  Applied at rev-7 (2026-10-27), at the pin `60d90cb7`, from the builder's measurement of the pinned
+  clone's own `apply --all` into a bare target and a reading of each pinned adopter. The selection
+  no longer counts as `apply --all`: `--all` ignores a target's `kits` (`all_kits` and
+  `resolve_selection`, `tools/govkit/govkit.py:906-908` and `:1098` at the pin) and would install the
+  four kits below again, so `apply` runs with no selection flag and reads the fixture's line. The
+  line is `--all`'s population at the pin less these four, and the pin is fixed, so that population
+  cannot move under it. Taken out:
+  - `review-harness`: it has no adopter (`[adopt] argv = []`, `tools/workflows/kit.toml:95-97` at
+    the pin), its five `rendered` rows are written only by its `[[regenerate]]`, which `apply` never
+    runs, and `apply` fails each one absent after CONFIGURE (`govkit.py:8076`, `:8159`). A seed could
+    answer them only with hand copies of gov's rendered bytes, which S8 forbids.
+  - `unattended`: it requires `review-harness` (`tools/unattended/kit.toml:12` at the pin), and
+    `apply` refuses a selection whose `requires` is unmet (`govkit.py:7557`). On its own, its adopter
+    exits 1 `no-project-layer` with no .unattended.conf (`kit.toml:202-205`), and its rendered rows
+    stay absent.
+  - `process-monitor`: its adopter refuses a blank `PROCMON_ROOTS`, and a root that is not a
+    directory on the running machine (`tools/process-monitor/adopt-process-monitor.sh:120`, `:143`
+    at the pin), and the engine's own reader refuses a relative root
+    (`tools/process-monitor/scope.py:102-105`). Only the absolute path of the run's own temp target
+    answers it, which no committed seed can carry.
+  - `check-agent-cap-restatement`: its leg `agent-cap restatement` names
+    `tools/agent-cap-restatement-waivers.txt`, a `generated` row that `apply` never lands and gov
+    never seeds (`tools/govkit/entries/check-agent-cap-restatement.kit.toml:23`, `:31` at the pin), so
+    the leg is withheld and `apply` exits 1 (`govkit.py:4638`). Seeding the file fails sooner: it is
+    one of the entry's destinations, and with `version_from` set to `none` every destination is
+    probed for a foreign install (`:7012`), so `apply` refuses at `:7542` before writing anything.
+  The seed answers the rest (§4 "### The fixture files"): `playbook-render`'s missing `kits` by the
+  line itself, the exit 2 for `playbook_path`, `playbook_dir` and `memory_root` by their answers, and
+  `agent-instructions`' exit 2 by the seeded AGENTS.md. The 20 `lf_pin` lines are notes
+  (`r.note`, `govkit.py:8238`), which `Report.emit` prints without moving the exit (`:1641-1650`).
+  Neither the seed nor a take-out answers them, the leg reads none as a refusal, and the pins the
+  four kits above declare leave with them. `memory-tree`'s seed-and-stop and `roles`' exit 3 are
+  declared outcomes with `ok = true`, which `apply` records with no problem (`:8095`).
 - **F4 — A step that writes nothing on an adopter's tree.** `lib/python-floor-3.15`'s up and witness
-  are a preflight, and `govkit/template-size-limits-to-budgets` exits 0 with no legacy file.
+  are a preflight, and the size-limits step, TOOL-dSafePassage-61's since 2026-10-26, exits 0 with
+  no legacy file.
   Options: (a) red each as not load-bearing; (b) exempt steps with no tree effect; (c) a declared
   `[[condition]]` under which the step is load-bearing. (a) reds two steps whose load is real, the
   floor step's by TOOL-dSafePassage-11's hand-off ("a planted below-floor interpreter stops the walk
@@ -418,6 +571,20 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   path outside `.git/` and `.governance/outbox/`, with the index over the same paths, rung 1, read
   from `cl-dClosedLoop-0021`'s "a recorded rollback" beside this clause; the outbox is graded by the
   `plants` case's orders. widens: none · relaxes: none
+  Amended at rev-8 (2026-10-27) by the builder's measurement, each difference given one disposition
+  and no reading without a record: the case commits after every run that returns, as an adopter
+  does; `carry`, the five re-measured fields of a `rendered` row with the sidecar lines they derive,
+  and an `engine` entry's levelled mode are read as DEPL-dCarriedReceipt-9 S2,
+  DEPL-dRemeasuredRender-1 S1 and S4, and DEPL-aLevelledCopy-1 S1 and S3 declare them (S4); the
+  policy mirror is completed in release-0 by its adopter's own remedy (S2); and the files a walk
+  killed at the schema step left at the tip are TOOL-dSafePassage-62's defect, not a reading.
+  Amended at rev-9 (2026-10-27) by the third pass: the lost render edit is TOOL-dSafePassage-63's
+  defect and the `retired-edited` role a rollback left is TOOL-dSafePassage-64's, since no record
+  declares a row's role output or re-derived per run (TOOL-dSafePassage-9 §4 has a rollback leave
+  it); the receipt's and sidecar's index entries read by mode and stage follow from S4's readings.
+  Amended at rev-10 (2026-10-27) by the fourth pass, no reading added: the role the rollback left is
+  TOOL-dSafePassage-65's defect, since `update` reads bytes at `--to` and roles from the checkout's
+  working tree, and a held kit left at the tip by a kill is TOOL-dSafePassage-66's.
 - **F6 — How the walk is made to skip, fail or die at one step.** Options: a test flag on `update`;
   step rows edited on the clone; a child process rebinding the runner and the reader. A flag is a
   public surface no clause names; an edited landed row is frozen. RESOLVED (agent, 2026-10-23,
@@ -435,6 +602,13 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   run re-grounds this spec against the landed parent and the landed order 1 to 4 units before its
   pass. widens: none · relaxes: none
 
+- **F9 — How a case reads a walk that holds a kit.** Options: (a) §4 "### The walk's exit": exit 1
+  read as returned when its only problems are kits held on `ordered` plants' paths, `gov_commit`
+  then the pin; (b) the `edited-render` plant in a case of its own, so every other walk exits 0 and
+  stamps. (b) changes S3's every-case plants and takes the held kit out of the `kill` tree, where the
+  fourth pass found TOOL-dSafePassage-66's defect. RESOLVED (agent, 2026-10-27, delegated): (a),
+  rung 1, S3 as written and the goal's real adopter tree. widens: none · relaxes: none
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
@@ -445,6 +619,50 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
   as its working directory, so the target needs no reader of its own, and it gains `absent`. The
   `fanout-cap` row and AC5 require `.agent-cap.conf` absent. The Edges gain dGroundRules as an
   external consumes-from. §8 F8 is unchanged.
+- rev-4 · 2026-10-26 · §3 Edges · §4 plants table · §8 F4 · the size-limits step moved from
+  TOOL-dSafePassage-1 to TOOL-dSafePassage-61 at that unit's §8 F8 stop, so its `size-limits`
+  condition row moves there and the consumes-from names the fan-out step's id alone, by
+  `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`.
+- rev-5 · 2026-10-26 · §4 cases table · AC7 · AC8 · the `kill` and `fail` cases at the schema step
+  agree with TOOL-dSafePassage-15 rev-2: release-0's schema-3 receipt takes no `interrupted:` or
+  `exit 1` row for it, and the killed re-run's receipt is compared without `carry`, the only key
+  allowed to differ, by
+  `2026-10-26-prompt-TOOL-dSafePassage-15-1-spec-writer.md`.
+- rev-6 · 2026-10-26 · AC7 · AC15 · §7 · the leg line names `policy fixtures`, whose guard
+  `tools/govkit/selftest.py` trips; AC7 names the receipt outside backticks and AC15 quotes the
+  usage file TOOL-dSafePassage-13 creates, so the path join reads neither as a tracked path, by
+  `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`.
+- rev-7 · 2026-10-27 · S2 · S11 · §3 · §4 fixture files and plants · §5 risks · AC2 · §8 F3 · F3's
+  rule applied at the pin `60d90cb7`: `deploy.toml` carries a `kits` line, `apply` runs with no
+  `--all`, four kits are taken out with their refusals named, the answers and the seeded AGENTS.md
+  answer the rest, and the clone is made with `--no-tags`, by
+  `2026-10-27-prompt-TOOL-dSafePassage-5-2-spec-writer.md`.
+- rev-8 · 2026-10-27 · S2 · S4 · S6 · §3 Edges · §4 cases · §5 risks · AC1 · AC2 · AC3 · AC7 · AC8 ·
+  AC12 · §8 F5 · each byte difference the builder measured between a rolled-back tree and release-0
+  disposed: `carry`, the re-measured `rendered` rows and their sidecar lines, and the levelled
+  `engine` modes read under their owning records; the receipt staged by committing after every run;
+  `.governance/policy.json` put in release-0 by its adopter's re-run; the killed schema step's tip
+  files handed to the new TOOL-dSafePassage-62, consumed here, and the clause carried in parts 1/2
+  and 2/2; the clone's landed ref is gov's own; `kill` and `fail` force a holding first witness; and
+  AC8's schema clause reads the receipt the findings path writes, by
+  `2026-10-27-prompt-TOOL-dSafePassage-5-4-spec-writer.md`.
+- rev-9 · 2026-10-27 · S4 · §3 Edges · §4 fixture files, plants and cases · §5 risks · AC3 · AC7 ·
+  §8 F2 · F5 · the third pass's five reds disposed: the lost render edit and the sticky role to the
+  new TOOL-dSafePassage-63 and -64, consumed here; the first write named by the before-image; the
+  gov plant edit `remove`; the receipt's and sidecar's index entries by mode and stage, by
+  `2026-10-27-prompt-TOOL-dSafePassage-5-6-spec-writer.md`.
+- rev-10 · 2026-10-27 · S6 · S12 · §3 Edges · §4 cases and the walk's exit · AC2 · AC14 · §8 F5 · F9 ·
+  the fourth pass's four reds disposed: the role a rollback left to the new TOOL-dSafePassage-65 and
+  the held kit a kill left to the new TOOL-dSafePassage-66, consumed here; a walk holding a kit read
+  by its exit and withheld stamp; AC14 over the factory's callers, two `selftest.py` helpers renamed,
+  by `2026-10-27-prompt-TOOL-dSafePassage-5-8-spec-writer.md`.
+- rev-11 · 2026-10-27 · §4 cases · AC7 · the fifth pass's one red, the `kill` re-run at
+  `govkit/receipt-schema-4` recording `"via": "witness"` where `up` records none, read as
+  TOOL-dSafePassage-33 S1 declares it, not a defect: the killed step's row carries the mark exactly
+  when the killed state's witness holds, by `2026-10-27-prompt-TOOL-dSafePassage-5-10-spec-writer.md`.
+- rev-12 · 2026-10-29 · §3 · the reciprocal **hands-off** edge to TOOL-dSafePassage-67, -68, -69, whose
+  **consumes-from** onto this unit had no match back (hygiene check 12). Written by the
+  gov-spec-writer pass for TOOL-dSafePassage-83 S1, by that unit's edge ruling.
 
 ## 10. Reuse audit
 

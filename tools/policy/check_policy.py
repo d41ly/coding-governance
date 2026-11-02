@@ -145,7 +145,8 @@ naming the row, and a registry that exempts no census enforcer.
 
 WHERE IT INSTALLS (TOOL-dGroundRules-22): `arm_cap_census` reads a tree with a
 `.governance/install.json` as an adopter, grading each shipped row of an installed kit at its
-`installed` path. With no receipt (TOOL-dGroundRules-29) a tree holding one `<tool-root>/govkit/registry.toml`
+`installed` path, except a source-mode receipt, gov's own (TOOL-dSafePassage-103), read as no receipt
+is. With no receipt (TOOL-dGroundRules-29) a tree holding one `<tool-root>/govkit/registry.toml`
 with the tool root 0 to 2 deep is the source, each row graded at its `enforcer`; a tree holding none is unadopted, every
 row announced and none graded; two are a finding naming both. `census-receiptless-target` reads a
 bare repository so, then again with the registry copied in, where every enforcer reds.
@@ -398,8 +399,9 @@ def arm_legacy_homes(repo, kit):
     installs by this kit's descriptor (TOOL-dGroundRules-17), and the `legacy-homes-present` case holds
     gov's own copy present. It says the same, and grades nothing, wherever `derive_census_tree` answers
     `adopter` or `invalid` (TOOL-dGroundRules-32 S11), a list at the installed kit's directory included: an adopter's list cannot hold gov's
-    rows, so grading one would red every adopter (TOOL-dGroundRules-25 S11). A receipt that does not
-    read, or two registries, is the one finding."""
+    rows, so grading one would red every adopter (TOOL-dGroundRules-25 S11). A source-mode receipt,
+    gov's own, is read as no receipt is (TOOL-dSafePassage-103). A receipt that does not read, one
+    whose `mode` is `source` with no registry beside it, or two registries, is the one finding."""
     try:
         graded = policy.check_legacy_graded(repo, kit)
     except policy.Refusal as exc:
@@ -670,7 +672,8 @@ def arm_cap_census(repo, kit):
     outside row's enforcer makes no request naming it; and each row has its case in CAP_CASES. Tree
     to census: a request in a `derive_code_files` file naming a cap no row names, a CAP_CASES case for
     no row, and a row of the limits file in the tree, parsed by `budgets.parse_limits_rows`, no
-    `limits:` row names. A census or a receipt that does not read, or two registries, is the one finding."""
+    `limits:` row names. A census or a receipt that does not read, a source-mode receipt with no registry
+    (TOOL-dSafePassage-103), or two registries, is the one finding."""
     try:
         census = budgets.read_cap_census(repo)
     except policy.Refusal as exc:
@@ -3618,7 +3621,7 @@ BUDGET_SCHEMA_SEEDS = {
 def seed_ambiguous_registry(repo, kit, rows):
     """`census-ambiguous-registry` (TOOL-dGroundRules-34 S13): two deployer registries in a receipt-less
     repository, `<d>` one deep (this kit's tool root) and two deep (RELOCATED_PREFIX's), both inside the
-    window `derive_census_tree` searches, so the tree is never guessed to be gov's at either."""
+    window `derive_registry_tree` searches, so the tree is never guessed to be gov's at either."""
     found = sorted(posixpath.join(d, REGISTRY_REL) for d in
                    (budgets.derive_tool_root(), posixpath.dirname(RELOCATED_PREFIX.rstrip("/"))))
     for rel in found:
@@ -4190,6 +4193,15 @@ def derive_window_edge_paths():
     return written, posixpath.join(posixpath.dirname(RELOCATED_PREFIX.rstrip("/")), REGISTRY_REL)
 
 
+def ask(call, *args):
+    """`call(*args)`, or `refused <path>` where it raises a `policy.Refusal`: the one Refusal-to-value
+    wrapper the census cases compare through (TOOL-dSafePassage-104 S2)."""
+    try:
+        return call(*args)
+    except policy.Refusal as exc:
+        return f"refused {exc.path}"
+
+
 def run_census_window_edge(name):
     """`census-window-edge` (TOOL-dGroundRules-39 S1): the edges of the window `derive_census_tree`
     searches with no receipt. Over `derive_window_edge_paths`' written registries, each a copy of the
@@ -4199,23 +4211,56 @@ def run_census_window_edge(name):
     would grade every census enforcer and find each absent."""
     written, planted = derive_window_edge_paths()
     checks, t = [], Path(tempfile.mkdtemp(prefix="pol-"))
-
-    def ask():
-        try:
-            return policy.derive_census_tree(t)
-        except policy.Refusal as exc:
-            return f"refused {exc.path}"
     try:
         registry = (derive_source_top() / written[0]).read_bytes()  # each plant a copy of the source's registry
         run_fixture_git(t, "init", "-q")
         for rel in written:
             write_case_file(t, rel, registry)
-        want, got = ("source", budgets.derive_tool_root()), ask()
+        want, got = ("source", budgets.derive_tool_root()), ask(policy.derive_census_tree, t)
         checks.append((", ".join(written), f"{want}, the depth-3 and top-level registries uncounted",
                        got == want, f"{got}"))
         write_case_file(t, planted, registry)
-        want, got = f"refused {', '.join(sorted((written[0], planted)))}", ask()
+        want, got = f"refused {', '.join(sorted((written[0], planted)))}", ask(policy.derive_census_tree, t)
         checks.append((f"{planted} planted", want, got == want, "RED as planted" if got == want else f"{got}"))
+    except (subprocess.CalledProcessError, OSError) as exc:
+        checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_census_source_receipt(name):
+    """`census-source-receipt` (TOOL-dSafePassage-103 S3): gov's source-mode receipt, the keys govkit's
+    source-mode update writes, in one scratch repository. Beside one registry it must answer ("source",
+    this kit's tool root) with the legacy list graded; with its `mode` removed it must read as an
+    adopter, the list not graded; with the registry deleted it must refuse naming the receipt; and
+    with two registries it must refuse naming both, the search's own Refusal and not the receipt's."""
+    written, planted = derive_window_edge_paths()
+    checks, t = [], Path(tempfile.mkdtemp(prefix="pol-"))
+
+    def derive_answer():
+        tree = policy.derive_census_tree(t)
+        return tree[0] if tree[0] == "adopter" else tree, policy.check_legacy_graded(t, KIT)
+    try:
+        registry = (derive_source_top() / written[0]).read_bytes()
+        receipt = {"schema": 4, "mode": "source", "gov_source": ".", "prefix": budgets.derive_tool_root(),
+                   "kits": list(ADOPTER_KITS), "files": []}
+        run_fixture_git(t, "init", "-q")
+        write_case_file(t, written[0], registry)
+        write_case_file(t, RECEIPT_REL, json.dumps(receipt))
+        want, got = (("source", budgets.derive_tool_root()), True), ask(derive_answer)
+        checks.append(("source-mode receipt", f"{want}", got == want, f"{got}"))
+        write_case_file(t, RECEIPT_REL, json.dumps({k: v for k, v in receipt.items() if k != "mode"}))
+        want, got = ("adopter", False), ask(derive_answer)
+        checks.append(("adopter receipt", f"{want}", got == want, f"{got}"))
+        write_case_file(t, RECEIPT_REL, json.dumps(receipt))
+        Path(t, written[0]).unlink()
+        want, got = f"refused {RECEIPT_REL}", ask(derive_answer)
+        checks.append(("no registry", want, got == want, f"{got}"))
+        write_case_file(t, written[0], registry)
+        write_case_file(t, planted, registry)
+        want, got = f"refused {', '.join(sorted((written[0], planted)))}", ask(derive_answer)
+        checks.append(("source-mode receipt, two registries", want, got == want, f"{got}"))
     except (subprocess.CalledProcessError, OSError) as exc:
         checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
     finally:
@@ -4409,6 +4454,7 @@ CASES = [
     ("census-receiptless-target", None, run_budget_case),  # no receipt and no registry: every row announced
     ("census-ambiguous-registry", ARM["arm_cap_census"], seed_ambiguous_registry),  # two registries: one finding naming both
     ("census-window-edge", None, run_census_window_edge),  # the window's edges: depth 3 and a bare top-level file uncounted
+    ("census-source-receipt", None, run_census_source_receipt),  # gov's source-mode receipt read as no receipt is
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
 ]
 

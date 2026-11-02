@@ -11,7 +11,7 @@ repository. The run-gates kit README's section "The gate profiler" is the full r
 
 ## How to use it
 
-- **One leg at a time:** `python tools/run-gates/measure_legs.py --serial`. Each leg starts when the
+- **One leg at a time:** `python tools/run-gates/measure_legs.py --serial`. Each leg starts when the <!-- usage: script:tools/run-gates/measure_legs.py cb31c57a -->
   previous one ends, as the bar's serial run would. A serial reading is the one to argue a ceiling
   from.
 - **Under a load cap:** `python tools/run-gates/measure_legs.py --concurrent`. The next leg is
@@ -70,7 +70,7 @@ launch, so they are **not exactly the bar's**.
 ## Carrying a reading into the ceilings
 
 Only a serial `ok` reading whose `.leg` row has `0` as its eighth field is uncontended. Carry it with
-`python tools/run-gates/derive-ceilings.py --write --observed '<leg>=<s>' --how 'measure_legs <run id>'`.
+`python tools/run-gates/derive-ceilings.py --write --observed '<leg>=<s>' --how 'measure_legs <run id>'`. <!-- usage: script:tools/run-gates/derive-ceilings.py e3fcb3f8 -->
 If the run's `substitutions` is not empty, write `substituted` into the `--how` text as well.
 
 ## Example

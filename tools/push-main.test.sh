@@ -27,28 +27,148 @@ resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
   # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
-  _rp_tried=""
+  # THE FLOOR is declared once, in python-floor.txt in gov's lib dir. The literal below is its
+  # generated copy, held equal to it by the floor module's `check` and by these blocks' parity rows,
+  # because a copy-installed kit has no lib dir to read. A candidate that runs below it is passed
+  # over and named, exactly as a candidate that does not run.
+  _rp_floor="3.15"
+  _rp_fv=$(( ${_rp_floor%%.*} * 1000 + ${_rp_floor#*.} ))
+  _rp_tried=""; _rp_seen=""; _rp_best=""; _rp_bv=0; _rp_bver=""; _rp_o1=""; _rp_og=""; _rp_i=0
   for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    _rp_i=$((_rp_i + 1))
     [ -n "$_rp_c" ] || continue
     _rp_tried="$_rp_tried $_rp_c"
-    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
-      printf '%s\n' "$_rp_c"
-      return 0
+    # ONE spawn per candidate, isolated: its major.minor and its own executable, forward-slashed,
+    # because a backslashed C:\ path handed to MSYS bash loses its separators.
+    _rp_out=$("$_rp_c" -I -c 'import sys; print("%d.%d" % sys.version_info[:2], sys.executable.replace("\\", "/"))' 2>/dev/null) || _rp_out=""
+    _rp_out=${_rp_out%$'\r'}
+    if [[ ${_rp_out%% *} =~ ^([0-9]+)\.([0-9]+)$ ]]; then
+      _rp_cv=$(( 10#${BASH_REMATCH[1]} * 1000 + 10#${BASH_REMATCH[2]} ))
+      if [ "$_rp_cv" -ge "$_rp_fv" ]; then
+        # An override, the caller's or GOV_PYTHON, names the command a consumer spawns, a wrapper
+        # or a venv launcher included, and is echoed as given. Only the three launcher names give
+        # way to the direct executable where the probe named a file; the launcher's own name
+        # otherwise. The `[ -f ]` HOLDS on a Windows App Execution Alias, so a Store Python whose
+        # own sys.executable is an alias is echoed as printed: a gap the run-gates kit's
+        # check_app_alias closes for the legs it measures, and this block does not.
+        _rp_exe=${_rp_out#* }
+        if [ "$_rp_i" -gt 2 ] && [ "$_rp_exe" != "$_rp_out" ] && [ -f "$_rp_exe" ]; then printf '%s\n' "$_rp_exe"; else printf '%s\n' "$_rp_c"; fi
+        return 0
+      fi
+      _rp_why="ran ${_rp_out%% *}, below the floor $_rp_floor"
+      if [ "$_rp_cv" -gt "$_rp_bv" ]; then _rp_best=$_rp_c; _rp_bv=$_rp_cv; _rp_bver=${_rp_out%% *}; fi
+    else
+      _rp_why="did not run"
     fi
+    _rp_seen="${_rp_seen}resolve_python:   $_rp_c: $_rp_why"$'\n'
+    [ "$_rp_i" != 1 ] || _rp_o1=$_rp_why
+    [ "$_rp_i" != 2 ] || _rp_og=$_rp_why
   done
   {
-    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
-    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
-    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
-    echo "resolve_python: tried:$_rp_tried"
+    echo "resolve_python: no usable python launcher at the floor $_rp_floor (python-floor.txt in gov's lib dir)."
+    echo "resolve_python: Each candidate was RUN with -I -c — being on PATH is not evidence (the Microsoft Store"
+    echo "resolve_python: python3 stub answers \`command -v\` and exits 9009 without running anything)."
+    printf '%s' "$_rp_seen"
     if [ -n "${1:-}" ]; then
-      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+      echo "resolve_python: the caller's override '$1' was tried FIRST and $_rp_o1."
     fi
     if [ -n "${GOV_PYTHON:-}" ]; then
-      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and $_rp_og. An override that is"
       echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
       echo "resolve_python: operator believes they chose, and would not have."
     fi
+    # THE INSTALL COMMAND, as platforms.provision says. The policy kit's own reader answers it at the
+    # landed revision, run by the newest candidate that ran, since its tomllib needs 3.11, and never
+    # through the policy shim, which resolves a launcher itself and would re-enter this refusal.
+    _rp_prov=name; _rp_pwhy=""
+    if [ -z "$_rp_best" ]; then
+      _rp_pwhy="no reader ran, because no candidate ran"
+    elif [ "$_rp_bv" -lt 3011 ]; then
+      _rp_pwhy="no reader ran, because the newest candidate that ran, $_rp_best, is $_rp_bver, below the 3.11 the reader needs"
+    else
+      IFS= read -r -d '' _rp_rkd <<'RKD' || :
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+      case "${BASH_SOURCE[0]:-}" in */*) _rp_here=${BASH_SOURCE[0]%/*} ;; *) _rp_here=. ;; esac
+      _rp_kit=$("$_rp_best" -I -c "${_rp_rkd%$'\n'}"'
+import sys
+try:
+    print(resolve_kit_dir("policy", "policy.py", sys.argv[1]).as_posix())
+except LookupError as e:
+    sys.exit(str(e))' "$_rp_here" 2>&1) || _rp_pwhy="no reader ran, because ${_rp_kit%$'\r'}"
+      if [ -z "$_rp_pwhy" ]; then
+        _rp_kit=${_rp_kit%$'\r'}
+        _rp_val=$("$_rp_best" "$_rp_kit/policy.py" get platforms.provision 2>/dev/null) || _rp_pwhy="the reader, policy.py get, exited $?"
+        _rp_val=${_rp_val%$'\r'}
+        case "$_rp_pwhy:$_rp_val" in
+          :name|:uv|:off) _rp_prov=$_rp_val ;;
+          :*) _rp_pwhy="the reader, policy.py get, printed '$_rp_val', which is no value of the key" ;;
+        esac
+      fi
+    fi
+    [ -z "$_rp_pwhy" ] || echo "resolve_python: platforms.provision reads its catalogue default, name: $_rp_pwhy."
+    if [ "$_rp_prov" = uv ]; then
+      if [ ! -t 2 ]; then _rp_no="not offered, because stderr is not a terminal"
+      elif ! uv --version >/dev/null 2>&1; then _rp_no="not offered, because uv does not run"
+      else
+        printf 'resolve_python: platforms.provision is uv. Run `uv python install %s` now? [y/N] ' "$_rp_floor"
+        _rp_a=""; read -r _rp_a </dev/tty || :
+        if [ "$_rp_a" = y ]; then
+          uv python install "$_rp_floor" || :
+          echo "resolve_python: re-run once the floor is on PATH, or name it in GOV_PYTHON."
+          _rp_prov=offered
+        else
+          _rp_no="declined at the prompt"
+        fi
+      fi
+      [ "$_rp_prov" = offered ] || echo "resolve_python: platforms.provision is uv, and the install was $_rp_no."
+    fi
+    case "$_rp_prov" in
+      off) echo "resolve_python: platforms.provision is off, so this refusal names no install command." ;;
+      name|uv)
+        echo "resolve_python: install the floor with: uv python install $_rp_floor"
+        case "${OSTYPE:-}" in msys*|cygwin*|win*) echo "resolve_python: or, on Windows: py install $_rp_floor" ;; esac ;;
+    esac
+    # LAST, verbatim: the first line names the refusal and this one the candidates, and the lines
+    # between them carry the outcomes, the overrides and the install (TOOL-dSafePassage-26 S20).
+    echo "resolve_python: tried:$_rp_tried"
   } >&2
   return 1
 }
@@ -791,9 +911,14 @@ if [ -n "$_mt_gk" ] && [ -n "$_ml_lex" ]; then
   case "$out25" in *"no lexicon kit beside this lander"*) l25=1 ;; *) l25=0 ;; esac
   case "$out25" in *"no govkit deployer beside this lander"*) g25=1 ;; *) g25=0 ;; esac
   case "$out25" in *"DEAD PROBE"*|*"REFUSED"*) x25=1 ;; *) x25=0 ;; esac
-  [ "$l25$g25$x25" = 110 ] \
-    && ok "25 a tree without the lexicon and govkit files skips both checks by name, with no DEAD PROBE or REFUSED" \
-    || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 $out25"
+  # TOOL-dSafePassage-8 AC6: the same prepare names the skipped gov-first walk once, with its reason.
+  printf '%s\n' "$out25" >"$tmp/out25.txt"
+  f25=0; while IFS= read -r ln25; do
+    [[ $ln25 == *'steps were NOT run on gov first — no govkit deployer beside this lander'* ]] && f25=$((f25 + 1))
+  done <"$tmp/out25.txt"
+  [ "$l25$g25$x25$f25" = 1101 ] \
+    && ok "25 a tree without the lexicon and govkit files skips both checks and the gov-first walk by name, with no DEAD PROBE or REFUSED" \
+    || bad "25 lexicon-skip=$l25 govkit-skip=$g25 dead-or-refused=$x25 gov-first-skip-lines=$f25 $out25"
 else
   echo "  skip — 25 no govkit deployer or lexicon kit beside this lander, so the missing-file arm did not run"
 fi
@@ -945,6 +1070,7 @@ fi
 # helper runs cut from the lander, its python and kit resolvers stubbed to a shell stub.
 out27=$(
   eval "$(sed -n '/^read_mint_unit() {/,/^}/p' "$lander")"
+  eval "$(sed -n '/^resolve_lander_kit() {/,/^}/p' "$lander")"  # TOOL-dSafePassage-26 S52: its one kit resolution
   resolve_python() { echo bash; }
   resolve_kit_dir() { echo k; }
   top="$tmp/mint27"; self_dir="$top"; mkdir -p "$top/k"
@@ -964,6 +1090,8 @@ printf '%s\n' "$out27" | grep -qx 'refused=\[\]' && printf '%s\n' "$out27" | gre
 #      read from the clone's conf. Needs the run-gates kit's regen.py beside the lander; an install
 #      without one says so. Observed RED against the base lander, which pushed the stale row.
 _rg_k=$(cd "$HERE" && for d in */; do [ -f "$d/regen.py" ] && { printf '%s' "${d%/}"; break; }; done)
+# The one interpreter arms 33, 34, 37 and 40 run under, resolved once; empty when no launcher runs.
+_py_arms=$(resolve_python 2>/dev/null) || _py_arms=""
 build_regen_fixture() { # remote dir · work dir -> a clone at SRC's HEAD on main, pushed, with origin/HEAD at main
   git clone -q --bare "$SRC" "$1"
   git clone -q "$1" "$2"
@@ -1086,7 +1214,7 @@ if [ -n "$_rg_k" ]; then
   _pk_k=$(cd "$HERE" && for d in */; do [ -f "$d/policy.py" ] && [ -f "$d/catalogue.toml" ] && { printf '%s' "${d%/}"; break; }; done)
   if [ -z "$_pk_k" ]; then
     echo "  skip — 33 no policy kit beside this lander, so the policy-landing arm did not run"
-  elif ! _py33=$(resolve_python); then
+  elif [ -z "$_py_arms" ]; then
     bad "33 no python launcher runs, so the prepared merge's checks cannot be read"
   else
     out33=$(
@@ -1098,8 +1226,8 @@ if [ -n "$_rg_k" ]; then
       printf '%s\n' "$o33"; echo "prepare-rc=$rc33"
       [ "$rc33" = 0 ] || exit 0
       git rev-parse -q --verify 'HEAD^2' >/dev/null && echo merge=1
-      "$_py33" "${KIT_REL}$_rg_k/regen.py" --check >/dev/null 2>&1; echo "regen-rc=$?"
-      "$_py33" "${KIT_REL}$_pk_k/policy.py" mirror --check >/dev/null 2>&1; echo "mirror-rc=$?"
+      "$_py_arms" "${KIT_REL}$_rg_k/regen.py" --check >/dev/null 2>&1; echo "regen-rc=$?"
+      "$_py_arms" "${KIT_REL}$_pk_k/policy.py" mirror --check >/dev/null 2>&1; echo "mirror-rc=$?"
     )
     _rc33=$(printf '%s\n' "$out33" | sed -n 's/^prepare-rc=//p')
     if [ "$_rc33" != 0 ]; then
@@ -1114,6 +1242,370 @@ if [ -n "$_rg_k" ]; then
   fi
 else
   echo "  skip — 28-32 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
+fi
+
+# 34 — TOOL-dSafePassage-8 AC5: --prepare walks every declared upgrade step on gov's own tree first,
+#      into the prepared merge. A clone of this repository at its committed HEAD, pushed to a bare
+#      remote as main: a branch with one unit commit prepares a merge whose tree holds gov's
+#      source-mode receipt, every declared step applied; a branch whose steps file carries a planted
+#      row with a failing witness is refused naming it, the branch unmoved. Needs gov's deployer
+#      beside the lander; an install without one says so. Staged red by dropping the call to
+#      `run_gov_first` from cmd_prepare.
+if [ -n "$_mt_gk" ] && [ -n "$_py_arms" ]; then
+  out34=$(
+    build_regen_fixture "$tmp/remote14.git" "$tmp/work14" || exit 1
+    git checkout -q -b feat
+    git commit -q --no-verify --allow-empty -m "TOOL-tFix-34: a unit"
+    unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tGovFirst >/dev/null 2>&1; echo "clean-rc=$?"
+    git show HEAD:.governance/install.json > "$tmp/gf34.json" 2>/dev/null && "$_py_arms" - "${KIT_REL}$_mt_gk" "$tmp/gf34.json" <<'PY' && echo applied=all
+import json, pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import upgrade_steps as u
+r = json.loads(pathlib.Path(sys.argv[2]).read_text(encoding="utf-8"))
+want = {x.id for x in u.read_steps(".", "HEAD", None)}
+got = {x["id"] for x in r.get("steps") or [] if x.get("state") == "applied"}
+sys.exit(0 if r.get("mode") == "source" and want and got == want and len(r["steps"]) == len(want) else 1)
+PY
+    git checkout -q -b plant main
+    printf '\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\ndown = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\nsurfaces = []\nneeds-target = false\n' >> "${KIT_REL}$_mt_gk/steps.toml"
+    git commit -q --no-verify -am "TOOL-tFix-34: a planted step whose witness never holds"
+    B34=$(git rev-parse HEAD)
+    bash "$lander" --prepare --slug tGovFirstPlant 2>&1 >/dev/null; echo "plant-rc=$?"
+    [ "$(git rev-parse refs/heads/plant)" = "$B34" ] && echo unmoved=1
+    # TOOL-dSafePassage-25 AC1/AC2: the refusal leaves nothing the walk made, and the retry without
+    # the plant prepares a merge whose .governance (receipt, steps, outbox) is the clean run's.
+    st34=$(git status --porcelain); [ -z "$st34" ] && echo plant-clean=1 || echo "plant-left=[$st34]"
+    git checkout -q main -- "${KIT_REL}$_mt_gk/steps.toml"
+    git commit -q --no-verify -m "TOOL-tFix-34: the planted step removed"
+    bash "$lander" --prepare --slug tGovFirstRetry >/dev/null 2>&1; echo "retry-rc=$?"
+    gf34a=$(git ls-tree -r --name-only HEAD -- .governance)
+    gf34b=$(git ls-tree -r --name-only refs/heads/feat -- .governance)
+    [ "$gf34a" = "$gf34b" ] && echo retry-merge=clean || echo "retry-merge=[$gf34a] clean-run=[$gf34b]"
+  )
+  case "$out34" in
+    *"clean-rc=0"*"applied=all"*"govkit/planted-witness-fails"*"plant-rc=1"*"unmoved=1"*"plant-clean=1"*"retry-rc=0"*"retry-merge=clean"*)
+      ok "34 --prepare walks every declared step on gov first into the prepared merge, and refuses a step whose witness never holds, the branch unmoved and no file of the walk left behind, so the retry's merge holds none" ;;
+    *) bad "34 the prepared merge lacks gov's receipt of every applied step, or a failing step was not refused with the branch unmoved and the tree clean, or the retry folded the refused walk's leftovers: $out34" ;;
+  esac
+  # 36 — TOOL-dSafePassage-27 AC1/AC2: the walk passes and a committed regen.py exits 1. The
+  #      regeneration's refusal cleans against the snapshot taken BEFORE the walk, so the tree is
+  #      clean after it, and the retry with the regen.py reverted prepares (exit 0) a merge holding no
+  #      leftover of the refused run. Staged red by a lander copy whose regeneration refusal cleans
+  #      against a snapshot taken after the walk. Needs regen.py beside the lander too.
+  if [ -n "$_rg_k" ]; then
+    out36=$(
+      build_regen_fixture "$tmp/remote16.git" "$tmp/work16" || exit 1
+      git checkout -q -b feat
+      printf 'import sys\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
+      git commit -q --no-verify -am "TOOL-tFix-36: a failing regeneration"
+      B36=$(git rev-parse HEAD)
+      unset GATE_PUSH_BASE; bash "$lander" --prepare --slug tRegenAfterWalk 2>&1 >/dev/null; echo "fail-rc=$?"
+      [ "$(git rev-parse refs/heads/feat)" = "$B36" ] && echo unmoved=1
+      st36=$(git status --porcelain); [ -z "$st36" ] && echo fail-clean=1 || echo "fail-left=[$st36]"
+      git checkout -q main -- "${KIT_REL}$_rg_k/regen.py"
+      git commit -q --no-verify -m "TOOL-tFix-36: the failing regeneration reverted"
+      bash "$lander" --prepare --slug tRegenAfterWalkRetry >/dev/null 2>&1; echo "retry-rc=$?"
+      git rev-parse -q --verify 'HEAD^2' >/dev/null && echo merge=1
+      # the walk makes a file the refusal had to clean, or fail-clean=1 proves nothing
+      [ -n "$(git ls-tree --name-only HEAD -- .governance/install.json)" ] && echo walk-receipt=1
+      printf 'steps-outbox=[%s]\n' "$(git ls-tree -r --name-only HEAD -- .governance/steps .governance/outbox | tr '\n' ' ')"
+    )
+    case "$out36" in
+      *"could NOT be regenerated"*"fail-rc=1"*"unmoved=1"*"fail-clean=1"*"retry-rc=0"*"merge=1"*"walk-receipt=1"*)
+        ok "36 a regeneration refused after a passing gov-first walk leaves no file of the walk behind, and the retry prepares a clean merge" ;;
+      *) bad "36 a refused regeneration after a passing walk left the walk's files untracked, or the retry folded or refused on them: $out36" ;;
+    esac
+  else
+    echo "  skip — 36 no run-gates kit holding regen.py beside this lander, so the walk-then-regeneration arm did not run"
+  fi
+  # 39 — TOOL-dSafePassage-35 AC10: a snapshot that cannot be written refuses before the walk. With
+  #      TMPDIR naming a file, `mktemp` fails, so --prepare exits 1 with the gov-first stage's own
+  #      snapshot refusal, the branch unmoved, and the walk never ran: no receipt and no before-image
+  #      in the fixture. Staged red by a lander copy whose snapshot site keeps its inline line, which
+  #      falls through to the walk.
+  out39=$(
+    build_regen_fixture "$tmp/remote39.git" "$tmp/work39" || exit 1
+    git checkout -q -b feat
+    git commit -q --no-verify --allow-empty -m "TOOL-tFix-39: a unit"
+    B39=$(git rev-parse HEAD)
+    : > "$tmp/tmpdir39"
+    unset GATE_PUSH_BASE; TMPDIR="$tmp/tmpdir39" bash "$lander" --prepare --slug fx 2>&1 >/dev/null; echo "rc=$?"
+    [ "$(git rev-parse refs/heads/feat)" = "$B39" ] && echo unmoved=1
+    { [ -e .governance/install.json ] || [ -n "$(git ls-tree -r --name-only HEAD -- .governance/install.json)" ]; } \
+      && echo receipt=present || echo receipt=absent
+    [ -z "$(find .governance -name '*.before.json' 2>/dev/null)" ] && echo images=absent
+    # TOOL-dSafePassage-82 S4: the ATTENDED landing's own snapshot refusal, from main, the same file
+    # as TMPDIR: it exits 1 with its full message, main unmoved and no receipt walked.
+    git checkout -q main
+    M39=$(git rev-parse HEAD)
+    TMPDIR="$tmp/tmpdir39" bash "$lander" 2>&1 >/dev/null; echo "land-rc=$?"
+    [ "$(git rev-parse HEAD)" = "$M39" ] && echo land-unmoved=1
+    [ -e .governance/install.json ] && echo land-receipt=present || echo land-receipt=absent
+  )
+  case "$out39" in
+    *"gov first could not snapshot the untracked files"*"rc=1"*"unmoved=1"*"receipt=absent"*"images=absent"*)
+      ok "39 --prepare whose snapshot cannot be written refuses at gov first before the walk, leaving no receipt or before-image" ;;
+    *) bad "39 an unwritable snapshot fell through to the walk, or the refusal did not name gov first's snapshot: $out39" ;;
+  esac
+  case "$out39" in
+    *"push-main: gov first could not snapshot the untracked files before its walk, so the walk did not run. Aborted (no push)."*"land-rc=1"*"land-unmoved=1"*"land-receipt=absent"*)
+      ok "39 the attended landing whose snapshot cannot be written refuses at gov first before the walk, main unmoved" ;;
+    *) bad "39 the attended landing's unwritable snapshot fell through to the walk, or its refusal is not the full message: $out39" ;;
+  esac
+else
+  echo "  skip — 34, 36 and 39 no govkit deployer beside this lander or no python launcher, so the gov-first arms did not run"
+fi
+
+# 35 — TOOL-dSafePassage-8 AC6: `run_gov_first` cut from the lander. No deployer beside it, with or
+#      without a python, is one `steps were NOT run on gov first` line and exit 0; a deployer beside it
+#      with the resolver refusing is exit 1, because no later gate runs a step on gov. Staged red by
+#      making the no-python branch return 0 whatever is beside the lander.
+out35=$(
+  eval "$(sed -n '/^run_gov_first() {/,/^}/p' "$lander")"
+  eval "$(sed -n '/^resolve_lander_kit() {/,/^}/p' "$lander")"  # TOOL-dSafePassage-26 S52: its one kit resolution
+  top="$tmp/gf35"; self_dir="$top/kits"; mkdir -p "$self_dir"
+  resolve_python() { return 1; }
+  printf 'nopy-absent=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
+  resolve_python() { echo bash; }
+  resolve_kit_dir() { return 1; }
+  printf 'py-absent=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
+  k35=govkit; mkdir -p "$self_dir/$k35"; : > "$self_dir/$k35/$k35.py"
+  resolve_python() { return 1; }
+  printf 'nopy-present=[%s]\n' "$(run_gov_first 2>&1; echo "rc=$?")"
+)
+printf '%s\n' "$out35" >"$tmp/out35.txt"
+n35=0; while IFS= read -r ln35; do
+  [[ $ln35 == *'steps were NOT run on gov first — no govkit deployer beside this lander'* ]] && n35=$((n35 + 1))
+done <"$tmp/out35.txt"
+case "$out35" in
+  *"nopy-absent=["*"rc=0]"*"py-absent=["*"rc=0]"*"nopy-present=["*"no usable python launcher"*"rc=1]"*)
+    [ "$n35" = 2 ] && ok "35 no deployer beside the lander is one skip line and exit 0; a deployer with no python refuses" \
+      || bad "35 the skip line was printed $n35 time(s) over two absent-deployer runs: $out35" ;;
+  *) bad "35 run_gov_first skipped a deployer it could not run, or refused an adopter's landing: $out35" ;;
+esac
+
+# 37 — TOOL-dSafePassage-28: EVERY refusal of cmd_prepare after the gov-first walk leaves a clean
+#      tree, gated as a class. PREPARE_REFUSALS holds one row per `return 1` line of cmd_prepare from
+#      its `run_gov_first` call to its end, in source order: stage | plant | expect. The arm derives
+#      that count from the lander beside this suite and reds when the table's row count differs, so a
+#      refusal added later joins the table or reds here. A refusal spelled other than `return 1` is
+#      not counted. A plantable row runs one fixture landing, the walk passing unless the row plants
+#      its refusal, and asserts exit 1, the branch where `expect` says (`old`: unmoved; `moved`: at the
+#      sha the planted regen.py moved it to and recorded under .git), the branch checked out, an empty
+#      `git status --porcelain` and no untracked path under .governance. An `unplantable:` row prints a
+#      skip line on every run and runs no case. Staged red by a lander copy carrying one extra refusal
+#      branch with no row, by one whose regeneration refusal cleans against a snapshot taken after the
+#      walk, and by the compare-and-swap row's expect set to `old`.
+PREPARE_REFUSALS=(
+  "gov-first|planted-witness-fails|old"
+  "regeneration|regen-exits-1|old"
+  "commit-tree|unplantable: no fixture fails git commit-tree or git update-ref without a lander switch|-"
+  "merge-loss|merge-loses-definition|old"
+  "compare-and-swap|regen-moves-branch|moved"
+  "final checkout|unplantable: no fixture fails the closing git checkout without a lander switch|-"
+)
+# TOOL-dSafePassage-42 S12 and S13: the count reads check-arms' blanked lines (`scan_shell_lines`), so
+# a comment or a quoted `return 1` is not counted, from the `if ! run_gov_first` call, never the first
+# mention of the name, to cmd_prepare's closing brace, here-document and continued lines aside.
+measure37() {  # lander path -> the count on stdout
+  "$_py_arms" -c '
+import importlib.util, re, sys
+spec = importlib.util.spec_from_file_location("check_arms", sys.argv[1])
+arms = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(arms)
+rows = [r for r in arms.scan_shell_lines(open(sys.argv[2], encoding="utf-8").read()) if r]
+start = next(i for i, r in enumerate(rows) if r[0].startswith("cmd_prepare()"))
+end = next(i for i in range(start, len(rows)) if rows[i][0].startswith("}"))
+at = next((i for i in range(start, end) if re.match(r"[ \t]*if ! run_gov_first\b", rows[i][1])), end)
+print(sum(1 for raw, code, cont, here in rows[at:end] if not cont and not here and re.search(r"\breturn 1\b", code)))
+' "$HERE/$_mt_rc/check-arms.py" "$1" 2>/dev/null || echo 0
+}
+# TOOL-dSafePassage-46 S2: check-arms.py is loaded from the memory-tree kit arm 26's scan found
+# beside this lander (`_mt_rc`), never by a typed kit path, so the arm runs at any install prefix.
+# TOOL-dSafePassage-100: the arm runs only under the launcher line 1093 resolved, so measure37 names no default.
+if [ -n "$_mt_rc" ] && [ -n "$_py_arms" ] && [ -f "$HERE/$_mt_rc/check-arms.py" ]; then
+  d37=$(measure37 "$HERE/push-main.sh")
+  if [ "$d37" -gt 0 ] && [ "$d37" = "${#PREPARE_REFUSALS[@]}" ]; then
+    ok "37 cmd_prepare refuses $d37 way(s) after the gov-first walk, and PREPARE_REFUSALS carries a row for each"
+  else
+    bad "37 cmd_prepare refuses $d37 way(s) after the gov-first walk (0 means the anchor matched nothing), PREPARE_REFUSALS carries ${#PREPARE_REFUSALS[@]} row(s)"
+  fi
+  # AC9's blanking: a lander copy carrying a `# return 1` comment and an `echo "return 1"` line after
+  # the call, and a comment naming run_gov_first above the mint block, counts the same.
+  awk '/^  if ! run_minter/ { print "  # run_gov_first is named above the call" }
+       { print }
+       /^  if ! run_gov_first; then/ { print "    # return 1"; print "    echo \"return 1\" >/dev/null" }' \
+    "$HERE/push-main.sh" > "$tmp/lander37-blanked.sh"
+  b37=$(measure37 "$tmp/lander37-blanked.sh")
+  # the anchors occur twice in the lander, so the plant's liveness is read inside cmd_prepare: three more lines
+  measure_raw37() { awk '/^cmd_prepare\(\)/,/^}/' "$1" | grep -c -e 'return 1' -e 'run_gov_first'; }
+  if [ "$d37" -gt 0 ] && [ "$b37" = "$d37" ] && [ "$(measure_raw37 "$tmp/lander37-blanked.sh")" = "$(( $(measure_raw37 "$HERE/push-main.sh") + 3 ))" ]; then
+    ok "37 a commented and a quoted return 1, and run_gov_first named above the call, leave the count at $d37"
+  else
+    bad "37 the derived count moved on a lander copy carrying a commented and a quoted return 1 and an earlier run_gov_first: $b37, not $d37"
+  fi
+else
+  echo "  skip — 37 no memory-tree kit (check-arms.py) or python launcher beside this lander, so the derived-count arm is NOT covered"
+fi
+n37=0
+for _row37 in "${PREPARE_REFUSALS[@]}"; do
+  n37=$((n37 + 1))
+  IFS='|' read -r st37 pl37 ex37 <<< "$_row37"
+  case "$pl37" in unplantable:*) echo "  skip — 37 $st37: ${pl37#unplantable: }, so this refusal is NOT covered"; continue ;; esac
+  if [ -z "$_mt_gk" ] || [ -z "$_rg_k" ] || [ -z "$_ml_lex" ] || [ -z "$_py_arms" ]; then
+    echo "  skip — 37 $st37: no govkit deployer, regen.py, lexicon kit or python launcher beside this lander, so this refusal is NOT covered"
+    continue
+  fi
+  out37=$(
+    build_regen_fixture "$tmp/remote37-$n37.git" "$tmp/work37-$n37" || exit 1
+    git checkout -q -b feat
+    case "$pl37" in
+      planted-witness-fails)
+        printf '\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\ndown = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\nsurfaces = []\nneeds-target = false\n' >> "${KIT_REL}$_mt_gk/steps.toml"
+        git commit -q --no-verify -am "TOOL-tFix-37: a planted step whose witness never holds"
+        want37="did not hold on gov first" ;;
+      regen-exits-1)
+        printf 'import pathlib, sys\npathlib.Path("regen-litter.txt").write_text("x", encoding="utf-8")\nsys.exit(1)\n' > "${KIT_REL}$_rg_k/regen.py"
+        git commit -q --no-verify -am "TOOL-tFix-37: a failing regeneration"
+        want37="could NOT be regenerated" ;;
+      merge-loses-definition)
+        printf 'fa() { :; }\n' > fx37.sh; git add fx37.sh
+        git commit -q --no-verify -m "TOOL-tFix-37: fx37.sh"
+        git checkout -q -b side37
+        printf 'fa() { echo B; }\nfb() { :; }\n' > fx37.sh; git commit -q --no-verify -am "side B"
+        git checkout -q feat
+        printf 'fa() { echo A; }\n' > fx37.sh; git commit -q --no-verify -am "TOOL-tFix-37: side A"
+        git merge -q --no-ff --no-commit side37 >/dev/null 2>&1
+        printf 'fa() { echo A; }\n' > fx37.sh; git add fx37.sh
+        git commit -q --no-verify -m "merge side37, taking side A"
+        want37="would publish a merge that loses a definition" ;;
+      regen-moves-branch)
+        # A sibling moving the branch between the regeneration and the swap: the branch's own tree,
+        # committed onto it, HEAD and the working tree untouched, the sha recorded under .git.
+        cat > "${KIT_REL}$_rg_k/regen.py" <<'PY'
+import pathlib, subprocess
+def git(*a):
+    return subprocess.check_output(("git",) + a, text=True).strip()
+b = git("rev-parse", "refs/heads/feat")
+c = git("commit-tree", b + "^{tree}", "-p", b, "-m", "a sibling moved the branch")
+git("update-ref", "refs/heads/feat", c, b)
+pathlib.Path(git("rev-parse", "--git-dir"), "cas37-moved").write_text(c, encoding="utf-8")
+PY
+        git commit -q --no-verify -am "TOOL-tFix-37: a regeneration that moves the branch"
+        want37="moved while this merge was being made" ;;
+      *) echo "unknown-plant=$pl37"; exit 0 ;;
+    esac
+    oldb=$(git rev-parse refs/heads/feat)
+    unset GATE_PUSH_BASE; e37=$(bash "$lander" --prepare --slug fx 2>&1 >/dev/null); echo "rc=$?"
+    # the refusal is the row's own stage, or a case refused earlier would pass for it
+    case "$e37" in *"$want37"*) echo stage=refused ;; *) echo "stage-missing=[$e37]" ;; esac
+    nowb=$(git rev-parse refs/heads/feat)
+    if [ "$ex37" = moved ]; then
+      f37="$(git rev-parse --git-dir)/cas37-moved"; mv37=""; [ -f "$f37" ] && mv37=$(<"$f37")
+      [ -n "$mv37" ] && [ "$nowb" = "$mv37" ] && [ "$nowb" != "$oldb" ] && echo branch=expected || echo "branch=[$nowb] old=[$oldb] recorded=[$mv37]"
+    else
+      [ "$nowb" = "$oldb" ] && echo branch=expected || echo "branch=[$nowb] old=[$oldb]"
+    fi
+    printf 'head=%s\n' "$(git symbolic-ref --short HEAD 2>/dev/null)"
+    st37=$(git status --porcelain); [ -z "$st37" ] && echo clean=1 || echo "left=[$st37]"
+    gv37=$(git ls-files --others --exclude-standard -- .governance); [ -z "$gv37" ] && echo governance=clean || echo "governance=[$gv37]"
+  )
+  case "$out37" in
+    *rc=1*stage=refused*branch=expected*head=feat*clean=1*governance=clean*)
+      ok "37 $st37: its own refusal exits 1 with the branch $ex37 and checked out, and leaves a clean tree" ;;
+    *) bad "37 $st37: the refusal did not exit 1 with the branch $ex37, checked out, on a clean tree: $out37" ;;
+  esac
+done
+
+# 38 — TOOL-dSafePassage-26 AC50: every stage resolving a kit calls `resolve_lander_kit`, the one place
+#      `resolve_kit_dir "$py"` runs, and prints the lines it printed before the extraction. Each stage
+#      runs cut from the lander under three stubbed resolutions — no python, no kit, a kit whose file
+#      echoes its argv — and its lines are compared with the ones measured over the lander before the
+#      extraction, pinned below. Staged red by giving one stage its own resolve_kit_dir call back.
+out38=$(
+  for f in resolve_lander_kit check_merge_losses run_regen run_minter run_gov_first read_mint_unit; do
+    eval "$(sed -n "/^$f() {/,/^}/p" "$lander")"
+  done
+  top="$tmp/lk38"; self_dir="$top"; mkdir -p "$top/k"
+  for f in lexicon.py regen.py govkit.py routed_commits.py; do printf 'echo "ran %s $*"\n' "$f" > "$top/k/$f"; done
+  for c38 in nopy nokit kit; do
+    case $c38 in
+      nopy) resolve_python() { return 1; } ;;
+      nokit) resolve_python() { echo bash; }; resolve_kit_dir() { return 1; } ;;
+      kit) resolve_python() { echo bash; }; resolve_kit_dir() { echo k; } ;;
+    esac
+    echo "== $c38"
+    echo "merge-losses: $(check_merge_losses A B 2>&1; echo "rc=$?")"
+    echo "regen: $(run_regen 2>&1; echo "rc=$?")"
+    echo "minter: $(run_minter A 2>&1; echo "rc=$?")"
+    echo "gov-first: $(run_gov_first 2>&1; echo "rc=$?")"
+    echo "mint-unit: $(read_mint_unit A..B 2>&1; echo "rc=$?")"
+  done
+)
+nl38=$'\n'; top38="$tmp/lk38"
+want38="== nopy
+merge-losses: push-main: the merge-loss check did NOT run — no usable python launcher; the pre-push hook grades the landing again.${nl38}rc=0
+regen: push-main: generated outputs were NOT regenerated — no usable python launcher; the push bar's preflight grades them.${nl38}rc=0
+minter: push-main: kit versions were NOT minted — no usable python launcher; the push bar's epoch legs grade the landing.${nl38}rc=0
+gov-first: push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree.${nl38}rc=0
+mint-unit: rc=0
+== nokit
+merge-losses: push-main: the merge-loss check did NOT run — no lexicon kit beside this lander; the pre-push hook grades the landing again.${nl38}rc=0
+regen: push-main: generated outputs were NOT regenerated — no regen.py beside this lander; the push bar's preflight grades them.${nl38}rc=0
+minter: push-main: kit versions were NOT minted — no govkit deployer beside this lander; the push bar's epoch legs grade the landing.${nl38}rc=0
+gov-first: push-main: steps were NOT run on gov first — no govkit deployer beside this lander, so this is not gov's tree.${nl38}rc=0
+mint-unit: rc=0
+== kit
+merge-losses: rc=0
+regen: ran regen.py --write${nl38}rc=0
+minter: ran govkit.py mint --base A${nl38}rc=0
+gov-first: ran govkit.py update --target $top38 --write${nl38}rc=0
+mint-unit: ran routed_commits.py --newest-unit A..B${nl38}rc=0"
+n38=$(grep -c 'resolve_kit_dir "$py"' "$lander")
+s38=$(for f in run_post_merge check_merge_losses run_regen run_minter run_gov_first read_mint_unit; do
+  sed -n "/^$f() {/,/^}/p" "$lander" | grep -q 'resolve_lander_kit ' || echo "$f"; done)
+{ [ "$out38" = "$want38" ] && [ "$n38" = 1 ] && [ -z "$s38" ]; } \
+  && ok "38 every lander stage resolves its kit through resolve_lander_kit and prints the lines it printed before" \
+  || bad "38 resolve_kit_dir \"\$py\" runs $n38 time(s), stages without resolve_lander_kit: [${s38//$'\n'/ }], or a stage's lines moved: $out38"
+
+# 40 — TOOL-dSafePassage-35 AC11: the ATTENDED landing's gov-first refusal cleans what its walk made.
+#      A clone of this repository at its committed HEAD is the remote; a commit on main plants a step
+#      whose witness never holds, and the attended lander exits 1 with `git status --porcelain`
+#      empty. The retry without the plant exits 0, and its mint, steps and regeneration commits name
+#      no file of the refused run: no `.governance/steps` or `.governance/outbox` path of the planted
+#      step, and a receipt that records no row of it. Staged red by a lander copy whose attended
+#      gov-first refusal does not clean against its snapshot.
+if [ -n "$_mt_gk" ] && [ -n "$_py_arms" ]; then
+  out40=$(
+    build_regen_fixture "$tmp/remote40.git" "$tmp/work40" || exit 1
+    R40=$(git rev-parse HEAD)
+    printf '\n[[upgrade]]\nid = "govkit/planted-witness-fails"\nup = ["python", "-c", "pass"]\ndown = ["python", "-c", "pass"]\nwitness = ["python", "-c", "raise SystemExit(1)"]\nsurfaces = []\nneeds-target = false\n' >> "${KIT_REL}$_mt_gk/steps.toml"
+    git commit -q --no-verify -am "TOOL-tFix-40: a planted step whose witness never holds"
+    unset GATE_PUSH_BASE; e40=$(bash "$lander" 2>&1 >/dev/null); echo "plant-rc=$?"
+    case "$e40" in *"push-main: the upgrade steps this landing declares did not hold on gov first (named above). Aborted (no push)."*) echo stage=gov-first ;; *) echo "stage-missing=[$e40]" ;; esac
+    st40=$(git status --porcelain); [ -z "$st40" ] && echo plant-clean=1 || echo "plant-left=[$st40]"
+    git checkout -q "$R40" -- "${KIT_REL}$_mt_gk/steps.toml"
+    git commit -q --no-verify -m "TOOL-tFix-40: the planted step removed"
+    bash "$lander" >/dev/null 2>&1; echo "retry-rc=$?"
+    n40=0
+    for c40 in $(git log --format=%H -E --grep='^(mint: kit versions|steps: gov first|regen: generated outputs) onto' "$R40..HEAD"); do
+      n40=$((n40 + 1))
+      git show --name-only --format= "$c40" | grep -E '^\.governance/(steps|outbox)/' | grep -F 'planted-witness-fails' \
+        | sed 's/^/leftover=/'
+      git show "$c40:.governance/install.json" 2>/dev/null | grep -q 'planted-witness-fails' && echo "receipt-row=$c40"
+    done
+    echo "commits=$n40"
+  )
+  case "$out40" in
+    *"plant-rc=1"*"stage=gov-first"*"plant-clean=1"*"retry-rc=0"*)
+      case "$out40" in
+        *leftover=*|*receipt-row=*|*"commits=0"*) bad "40 the attended retry's commits carry the refused walk's files, or none was found to read: $out40" ;;
+        *) ok "40 the attended gov-first refusal leaves a clean tree, and the retry's mint, steps and regeneration commits hold no file of the refused run" ;;
+      esac ;;
+    *) bad "40 the attended landing with a failing witness did not refuse at gov first on a clean tree, or the retry did not land: $out40" ;;
+  esac
+else
+  echo "  skip — 40 no govkit deployer beside this lander or no python launcher, so the attended gov-first arm did not run"
 fi
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }
