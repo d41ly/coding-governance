@@ -350,6 +350,35 @@ item list, `agreed` holding a confirmed id of each run; it is `null` when the ta
 when no synthesis ran, and on every untwinned run. A twinned run's key print gains `twin: true`, so it
 never reuses an untwinned run's files; an untwinned run's key and synthesis prompt are unchanged.
 
+`fixJudge` is `'instance'` or `'class'`, and absent it is `'instance'`: how a skeptic judges a finding's
+proposed fix. Under `'instance'` it judges the fix against the instance the finding cites, and every
+skeptic prompt and the review key are as they were. Under `'class'` it asks whether the fix cures the
+defect's class, every instance of the pattern the claim names in the subject and the code or specs it
+reaches, and `FIX_VERDICTS` gains `'instance'`: the fix cures the cited instance and leaves another of
+its class standing, `fixNote` holding the class-level fix. A fix judged `'instance'` with a note gives
+way to that note in `confirmedFindings` and the synthesis's fix line, as an unsound one gives way to its
+correction, and RUN INTEGRITY counts the instance-only fixes. Under `'instance'` a skeptic answering
+`'instance'` reads as not judged. `'class'` joins the review key; any other value refuses before the
+first agent. It ships dark: nothing in this kit passes `'class'` until the replay decides.
+
+Every confirmed finding is given one DISPOSITION from the report step's grammar: `class:<slug>`, a
+class this run was handed; `gate:<leg>`, a leg of the leg manifest; `new:<slug>`, a slug matching
+`[a-z][a-z0-9]*(-[a-z0-9]+)*` that is no handed slug; or `none`. The handed class slugs are the
+checklist items' slugs, read by the rule `classes` reads, so a `C<n>` label with no slug is no class.
+The leg names come from `legManifest`, a repo-relative path refused on the `specs` rule, defaulting to
+the kit root's `gate-legs.json` as rendered at install: the resume probe reads it and returns `legs`,
+the `name` of every object in its top-level array, and leaves `legs` out when the file is absent or is
+not such an array. With no `legs`, the log and RUN INTEGRITY say no leg manifest was read, and every
+`gate:` disposition is refused. `unclassed` is the policy key `review.unclassed`, passed as a pin
+argument until a policy-file trigger lands: `'refuse'`, `'reason'` or `'owner-rules'`, and absent it is
+`'refuse'`; any other value refuses before the first agent. `none` is refused under `'refuse'`, and
+admitted under the other two with a non-empty reason. The synthesis is handed the four forms, the
+`unclassed` value, the class slugs and the leg names in a DISPOSITIONS block after RUN INTEGRITY, and
+returns `dispositions`, one `{id, disposition, reason}` per confirmed id, which its schema requires.
+The harness accepts the set only when every confirmed id has exactly one legal disposition and no other
+id has one; otherwise it refuses the set whole, and `blockers` and `highs` keep their own derivation.
+Neither `unclassed` nor `legManifest` joins the review key.
+
 `preset` picks a spec audit's lens literal, `'unit-spec'` or `'design-audit'`, and absent it is
 `'unit-spec'`, the five lenses above. Only the caller picks it, and the kind stays `spec-audit`, so
 the binding line is unchanged. `'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
@@ -378,12 +407,13 @@ default is accepted and reported unread, since the swapped lens is the one that 
 losing test is recorded.
 
 `review_pin.py`, beside the harness, is the stand-in for `review.pin`: it prints the `preset`,
-`optIn` and `twin` of one spec-audit call as one JSON line, and runs nothing.
+`optIn`, `twin` and `unclassed` of one spec-audit call as one JSON line, and runs nothing.
 
 ```
 python <kit>/review_pin.py --subject <path> [--subject <path> ...]
                            [--opt-in none|'<json>'] [--design-record-preset unit-spec|design-audit]
                            [--twin never|design-records|design-and-landing|always]
+                           [--unclassed refuse|reason|owner-rules]
 ```
 
 A subject is a spec subject when the harness's own `SPEC_SUBJECT_PATH`, read from the `tier2-review.js`
@@ -395,6 +425,8 @@ prints `unit-spec`; a set of design records alone prints `--design-record-preset
 membership is the harness's. It exits 2 naming `SPEC_SUBJECT_PATH`, `--opt-in` or `--subject` on a
 harness with no predicate line, a malformed value or no subject. `--twin` is the `review.twin` value,
 printed as `twin` when given and checked against the four values only; absent, no `twin` is printed.
+`--unclassed` is the `review.unclassed` value, printed as `unclassed` the same way and checked against
+the three values only.
 `unattended-build.js` forwards a
 caller's `optIn`, `preset` and `lensNotes` to its audit stage's review call unchanged, and unchecked.
 
@@ -407,7 +439,10 @@ empty and an item owes no `specs`. Under `addressTwins: 'shown'` the final retur
 returned whose `refuted` id stands refuted and whose `confirmed` id stands confirmed, as `{refuted,
 confirmed, sameAddress}`, with `sameAddress` true when the pair was one of those handed. A repeated flag
 is dropped, a flag naming any other id is discarded and named in a `WARNING:` line, and a dead
-synthesis returns `[]`. Under `'hidden'` neither key is present. Every return carries five fields beside the counts:
+synthesis returns `[]`. Under `'hidden'` neither key is present. The final return carries
+`dispositions`, the accepted `{id, disposition, reason}` list in confirmed-id order, `null` when the set
+was refused or no synthesis ran; `dispositionFault`, `''` or each failing id and why, which the `note`
+repeats; and `ownerItems`, the ids disposed `none` under `unclassed: 'owner-rules'`, else `[]`. Every return carries five fields beside the counts:
 
 - `shape` — one record line, also logged, in this fixed grammar:
   `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> merged=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
@@ -428,7 +463,9 @@ synthesis returns `[]`. Under `'hidden'` neither key is present. Every return ca
 
 - `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
   `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict
-  stands), `reason`, `fixVerdict`, `claim` and `classes`. An absent optional value is `null`.
+  stands), `reason`, `fixVerdict`, `claim`, `classes` and `disposition`. An absent optional value is `null`.
+  `disposition` is the accepted disposition on a confirmed entry, and `-` on every other entry and
+  wherever no set was accepted; `confirmedFindings` carries it the same way.
   `classes` lists the checklist classes the claim's leading `C<n>` labels denote, by each item's
   slug, in order and without duplicates; a label with no slug to resolve, its item absent or not
   slug-led, is kept as `C<n>`. It is `[]` when the claim opens with no label or the run had no
@@ -436,9 +473,13 @@ synthesis returns `[]`. Under `'hidden'` neither key is present. Every return ca
 - `confirmedFindings` — one entry per confirmed finding: `id`, `lens`, `ref`, `claim`, `severity` (the
   binding grade), `fix` and `fixVerdict`. A fix the skeptic judged unsound is replaced by its note
   when it gave one. Pass this array as the next round's `priorFindings` rather than re-typing it.
-- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the nine
-  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes`. The
-  ninth joins the `classes` names with one space, so a class's hits can be counted across records. A
+- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the ten
+  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes | disposition`. The
+  ninth joins the `classes` names with one space, so a class's hits can be counted across records. The
+  tenth is the disposition: the synthesis is handed the table with `(synthesis)` in each confirmed row's
+  cell and `-` in every other, and told to copy it verbatim but for those cells, each written with the
+  disposition it returns, a `none` as `none — <reason>`. The returned table carries the accepted
+  dispositions so, and `-` in every cell when the set was refused. A
   cell is `-` when its value is absent or empty, a `|` is escaped, and line breaks fold to a space.
 - `lensYield` — per lens, `defects` and `unique` are `null` when no item list can be trusted (see below).
   One row per lens that RAN, in dispatch order, none for a lens a light run skipped:

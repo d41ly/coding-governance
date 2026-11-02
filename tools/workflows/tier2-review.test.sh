@@ -1684,14 +1684,17 @@ async function runLedgerArms() {
     const rows = al.slice(4)
     const unescaped = (row) => row.split('').filter((ch, i) => ch === '|' && row[i - 1] !== '\\').length
     ck(al[0] === '## Appendix — every finding' && al[1] === '' &&
-      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes |' && al[3] === '|---|---|---|---|---|---|---|---|---|' &&
+      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes | disposition |' && al[3] === '|---|---|---|---|---|---|---|---|---|---|' &&
       rows.length === 5 && rows.length === r.result.ledger.length && rows[0].indexOf('| 1 | security | security.js:1 | high | - | refuted |') === 0,
-      'ledger: the appendix is rendered by the harness: heading, nine columns, one row per finding, the refuted one included')
-    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 10) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
+      'ledger: the appendix is rendered by the harness: heading, ten columns, one row per finding, the refuted one included')
+    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 11) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
       'ledger: the appendix is rendered by the harness: a pipe and a line break in a cell leave the row count unchanged')
+    // TOOL-dFairHearing-8 S8 - the synthesis's copy differs from the returned one in each confirmed row's
+    // disposition cell alone: `(synthesis)` there, `-` in the return, since this stub returns no dispositions.
     const sp = r.trace.find((t) => t.label === 'synth')
-    ck(ap.length > 0 && !!sp && sp.prompt.indexOf(ap) !== -1 && sp.prompt.indexOf('VERBATIM') !== -1,
-      'ledger: the appendix is handed to the synthesis verbatim')
+    const handed = al.map((l) => (l.indexOf(' | confirmed | ') !== -1 ? l.replace(/ - \|$/, ' (synthesis) |') : l)).join('\n')
+    ck(ap.length > 0 && !!sp && handed !== ap && sp.prompt.indexOf(handed) !== -1 && sp.prompt.indexOf('VERBATIM') !== -1,
+      'ledger: the appendix is handed to the synthesis verbatim but for the confirmed rows\' (synthesis) cells')
   }
   // ---- Closing review round 1, L2: a reason carrying every other boundary Python's str.splitlines
   // ---- breaks on. The appendix must split into the same lines under that rule as under `\n`.
@@ -1715,8 +1718,8 @@ async function runLedgerArms() {
     const lg = Array.isArray(r.result.ledger) ? r.result.ledger : []
     const al = (typeof r.result.appendix === 'string' ? r.result.appendix : '').split('\n')
     ck(lg.length === 5 && JSON.stringify(lg.map((e) => e.classes)) === JSON.stringify([['beta-two'], ['alpha-one', 'C9'], [], [], []]) &&
-      al[2].endsWith(' | fixVerdict | classes |') && al[4].endsWith(' | beta-two |') && al[5].endsWith(' | alpha-one C9 |') &&
-      al.slice(6).every((row) => row.endsWith(' | - |')),
+      al[2].endsWith(' | fixVerdict | classes | disposition |') && al[4].endsWith(' | beta-two | - |') && al[5].endsWith(' | alpha-one C9 | - |') &&
+      al.slice(6).every((row) => row.endsWith(' | - | - |')),
       'ledger: classes resolves each head label to its item slug, keeps C<n> out of range, and renders - when unlabelled')
   }
 
@@ -1981,6 +1984,7 @@ async function runLedgerArms() {
   await runOptInArms()
   await runTypedStageArms()
   await runTwinRunArms()
+  await runDispositionArms()
 }
 
 // ==== TOOL-dFairHearing-2 — the design-audit preset: its lenses, its review key and its announcements ====
@@ -2530,6 +2534,137 @@ async function runTwinRunArms() {
   ck(p1.status === 0 && p1.stdout === '{"preset": "unit-spec", "twin": "always"}\n', 'twin: review_pin.py --twin always prints twin always (got ' + p1.status + ': ' + (p1.stdout || p1.stderr).trim() + ')')
   const p2 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--twin', 'sometimes'])
   ck(p2.status === 2 && p2.stdout === '' && p2.stderr.indexOf('--twin') !== -1, 'twin: review_pin.py --twin sometimes exits 2 naming --twin (got ' + p2.status + ')')
+  // ---- TOOL-dFairHearing-8 AC4's stand-in half, on this runner: `--unclassed` printed, and refused off its three values.
+  const p3 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--unclassed', 'reason'])
+  ck(p3.status === 0 && p3.stdout === '{"preset": "unit-spec", "unclassed": "reason"}\n', 'unclassed: review_pin.py --unclassed reason prints unclassed reason (got ' + p3.status + ': ' + (p3.stdout || p3.stderr).trim() + ')')
+  const p4 = runPin(['--subject', 'memory/builds/dX/spec/2026-01-01-spec-TOOL-dX-1.md', '--unclassed', 'maybe'])
+  ck(p4.status === 2 && p4.stdout === '' && p4.stderr.indexOf('--unclassed') !== -1, 'unclassed: review_pin.py --unclassed maybe exits 2 naming --unclassed (got ' + p4.status + ')')
+}
+
+// ==== TOOL-dFairHearing-8 — the class fix judge, and every confirmed finding's disposition (AC1-AC9) ======
+// RED against the parent render: it reads no `fixJudge`, `unclassed` or `legManifest`, so none refuses; its
+// skeptics are never asked the class question; its probe reads no leg manifest; its synthesis is handed no
+// DISPOSITIONS block and its schema requires no `dispositions`; its appendix has nine columns; and its return
+// carries no `dispositions`, `dispositionFault` or `ownerItems`. WHAT IT DOES NOT CHECK: that a live skeptic
+// judges a fix by its class, or that a live synthesis writes the disposition cells it is told to; the return's
+// `appendix` is the source a caller compares the record against. AC2's byte-equality to the parent render is
+// the pass's probe, since this suite reads one render; here `instance` and an absent value agree.
+async function runDispositionArms() {
+  const skepticPrompts = (x) => x.trace.filter((t) => t.label.indexOf('verify:') === 0).map((t) => t.prompt)
+  const synthCall = (x) => x.trace.find((t) => t.label === 'synth') || { prompt: '', schema: { required: [], properties: {} } }
+  const probeCall = (x) => x.trace.find((t) => t.label === 'resume:probe') || { prompt: '' }
+  // A synthesis placing every confirmed id in one HIGH item, returning `pick(ids)` as its dispositions.
+  const buildDisposingSynth = (pick) => (label, prompt) => Object.assign(buildSynth(null)(label, prompt),
+    { dispositions: pick([...prompt.split('UNVERIFIED findings')[0].matchAll(/id=(\d+) \[/g)].map((x) => parseInt(x[1], 10))) })
+  // ---- AC1: a closed set, refused outside it before any spawn; each member and the absent value start.
+  let r = await runReview(Object.assign({}, DIFF, { fixJudge: 'both' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `fixJudge` must be one of instance | class') === 0 && r.trace.length === 0,
+    'fixJudge: both is refused before any spawn, naming the two values')
+  const started = []
+  for (const v of [undefined, 'instance', 'class']) {
+    r = await runReview(v === undefined ? DIFF : Object.assign({}, DIFF, { fixJudge: v }), ALL_OK)
+    if (!r.threw && r.result && r.result.exit === 'complete') started.push(String(v))
+  }
+  ck(started.length === 3, 'fixJudge: absent, instance and class each start and complete: ' + started.join(' '))
+  // ---- AC2: `instance` keeps the absent run's skeptic prompts and key; `class` asks the class question and keys apart.
+  const ra = await runReview(DIFF, ALL_OK)
+  const ri = await runReview(Object.assign({}, DIFF, { fixJudge: 'instance' }), ALL_OK)
+  const rc = await runReview(Object.assign({}, DIFF, { fixJudge: 'class' }), ALL_OK)
+  if (checkNoThrow(ra, 'fixJudge absent') && checkNoThrow(ri, 'fixJudge instance') && checkNoThrow(rc, 'fixJudge class')) {
+    ck(skepticPrompts(ra).length === 5 && JSON.stringify(skepticPrompts(ri)) === JSON.stringify(skepticPrompts(ra)) && ri.result.key === ra.result.key &&
+      skepticPrompts(ra).every((p) => p.indexOf('"instance"') === -1 && p.indexOf('fixVerdict:"sound"|"unsound"|"none", fixNote') !== -1),
+      'fixJudge: instance hands the absent run\'s skeptic prompts, with no instance verdict, and derives its key')
+    ck(skepticPrompts(rc).length === 5 && skepticPrompts(rc).every((p) => p.indexOf('judge its proposed fix by the defect\'s CLASS') !== -1 &&
+      p.indexOf('"instance" when it cures the cited instance and leaves another of its class standing') !== -1 &&
+      p.indexOf('fixVerdict:"sound"|"unsound"|"none"|"instance", fixNote') !== -1) && rc.result.key !== ra.result.key,
+      'fixJudge: class asks every skeptic the class question with the instance verdict, and moves the key: ' + rc.result.key)
+  }
+  // ---- AC3: an instance verdict with a note is the fix under `class`, and not judged under `instance`.
+  const buildInstanceVerdicts = (label, prompt) => {
+    const v = buildVerdicts('confirmed')(label, prompt)
+    for (const x of v.verdicts) Object.assign(x, x.id === 2 ? { fixVerdict: 'instance', fixNote: 'cure every instance' } : { fixVerdict: 'sound' })
+    return v
+  }
+  const r3c = await runReview(Object.assign({}, DIFF, { fixJudge: 'class' }), buildStubs({ 'verify:': buildInstanceVerdicts }))
+  const r3i = await runReview(DIFF, buildStubs({ 'verify:': buildInstanceVerdicts }))
+  if (checkNoThrow(r3c, 'instance under class') && checkNoThrow(r3i, 'instance under instance')) {
+    const c2 = r3c.result.confirmedFindings.find((e) => e.id === 2) || {}
+    const i2 = r3i.result.confirmedFindings.find((e) => e.id === 2) || {}
+    ck(c2.fix === 'cure every instance' && c2.fixVerdict === 'instance' &&
+      synthCall(r3c).prompt.indexOf('fixes on confirmed findings: 4 judged sound, 0 judged UNSOUND, 1 judged INSTANCE-ONLY') !== -1 &&
+      synthCall(r3c).prompt.indexOf('fix: judged INSTANCE-ONLY by the skeptic, whose class-level fix is: cure every instance') !== -1,
+      'fixJudge: under class an instance fix gives way to its note, and RUN INTEGRITY counts one instance-only fix')
+    ck(i2.fix === 'f' && i2.fixVerdict === null && synthCall(r3i).prompt.indexOf('INSTANCE-ONLY') === -1 &&
+      synthCall(r3i).prompt.indexOf('4 judged sound, 0 judged UNSOUND, 0 none proposed, 1 NOT JUDGED') !== -1,
+      'fixJudge: under instance the same answer counts as a fix not judged')
+  }
+  // ---- AC4: `unclassed`, a closed set, and `refuse` stated when absent.
+  r = await runReview(Object.assign({}, DIFF, { unclassed: 'maybe' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `unclassed` must be one of refuse | reason | owner-rules') === 0 && r.trace.length === 0,
+    'unclassed: maybe is refused before any spawn, naming the three values')
+  ck(synthCall(ra).prompt.indexOf('\nunclassed: refuse - none is refused') !== -1, 'unclassed: absent, the synthesis prompt states refuse')
+  // ---- AC5: `legManifest` refused on the specs rule, rendered into the probe, and no legs refusing every gate:.
+  r = await runReview(Object.assign({}, DIFF, { legManifest: '../x.json' }), ALL_OK)
+  ck(!!r.threw && r.threw.indexOf('tier2-review: `legManifest` must be a repo-relative path') === 0 && r.trace.length === 0,
+    'legManifest: ../x.json is refused before any spawn')
+  ck(probeCall(ra).prompt.indexOf('gate-legs.json, the leg manifest') !== -1 && probeCall(ra).prompt.indexOf('{{TOOL_ROOT}}') === -1,
+    'legManifest: absent, the probe is told to read the rendered default gate-legs.json')
+  const r5 = await runReview(DIFF, buildStubs({ synth: buildDisposingSynth((ids) => ids.map((id) => ({ id: id, disposition: 'gate:memory hygiene' }))) }))
+  if (checkNoThrow(r5, 'no legs'))
+    ck(r5.logs.some((l) => l.indexOf('WARNING: no leg manifest was read from ') === 0) && synthCall(r5).prompt.indexOf('Leg names: no leg manifest was read') !== -1 &&
+      r5.result.dispositions === null && r5.result.dispositionFault.indexOf('id 1 is "gate:memory hygiene", and no leg manifest was read') !== -1,
+      'legManifest: a probe returning no legs is logged and stated, and gate:memory hygiene is refused')
+  // ---- AC6: two slug-led items and one with no slug; one leg; the four forms; the schema requires the field.
+  const CL = Object.assign({}, DIFF, { checklist: ['[ ] alpha-one (universal)', 'beta-two the second', 'Not slug-led'] })
+  const LEGS = { 'resume:probe': Object.assign(buildProbe(), { legs: ['memory hygiene'] }) }
+  const r6 = await runReview(CL, buildStubs(LEGS))
+  if (checkNoThrow(r6, 'dispositions block')) {
+    const s6 = synthCall(r6)
+    ck(s6.prompt.indexOf('Class slugs (2): alpha-one, beta-two.') !== -1 && s6.prompt.indexOf('Leg names (1), one per line:\n  - memory hygiene\n') !== -1 &&
+      ['class:<slug>', 'gate:<leg>', 'new:<slug>', 'none'].every((f) => s6.prompt.indexOf('\n- ' + f + ' - ') !== -1) &&
+      s6.schema.required.indexOf('dispositions') !== -1 && !!s6.schema.properties.dispositions,
+      'dispositions: the synthesis is handed two slugs, no C<n>, one leg and the four forms, and its schema requires dispositions')
+  }
+  // ---- AC7: a legal set is accepted; each of six planted faults refuses it, names the id, and keeps the counts.
+  const GOOD = { 1: 'class:alpha-one', 2: 'gate:memory hygiene', 3: 'new:fresh-class', 4: 'class:beta-two', 5: 'new:other-class' }
+  const buildSet = (map, extra) => (ids) => ids.filter((id) => map[id] !== undefined).map((id) => ({ id: id, disposition: map[id] })).concat(extra || [])
+  const r7 = await runReview(CL, buildStubs(Object.assign({ synth: buildDisposingSynth(buildSet(GOOD)) }, LEGS)))
+  if (checkNoThrow(r7, 'dispositions accepted'))
+    ck(Array.isArray(r7.result.dispositions) && r7.result.dispositions.map((x) => x.disposition).join(',') === [1, 2, 3, 4, 5].map((n) => GOOD[n]).join(',') &&
+      r7.result.dispositionFault === '' && r7.result.note === 'complete', 'dispositions: class:, gate: and new: over the handed names are accepted, the fault empty')
+  const FAULTS = [['class:C3', Object.assign({}, GOOD, { 1: 'class:C3' }), [], 'id 1 '], ['gate:no such leg', Object.assign({}, GOOD, { 1: 'gate:no such leg' }), [], 'id 1 '],
+    ['new: a handed slug', Object.assign({}, GOOD, { 1: 'new:alpha-one' }), [], 'id 1 '], ['a repeated id', GOOD, [{ id: 2, disposition: 'new:x' }], 'id 2 is disposed more than once'],
+    ['an id not confirmed', GOOD, [{ id: 99, disposition: 'new:x' }], 'id 99 is not a confirmed id'], ['a confirmed id with none', Object.assign({}, GOOD, { 5: undefined }), [], 'id 5 has no disposition']]
+  for (const [what, map, extra, names] of FAULTS) {
+    const x = await runReview(CL, buildStubs(Object.assign({ synth: buildDisposingSynth(buildSet(map, extra)) }, LEGS)))
+    ck(!x.threw && x.result.dispositions === null && x.result.dispositionFault.indexOf(names) !== -1 && x.result.blockers === 0 && x.result.highs === 5 &&
+      x.result.note.indexOf('the DISPOSITIONS were refused') !== -1 && x.result.appendix.split('\n').slice(4).every((l) => l.endsWith(' | - |')),
+      'dispositions: ' + what + ' refuses the set naming "' + names.trim() + '", keeps the counts and returns - cells: ' + (x.threw || x.result.dispositionFault))
+  }
+  // ---- AC8: `none` with a reason under each `unclassed` value, and `none` with an empty reason under all three.
+  for (const u of ['refuse', 'reason', 'owner-rules']) {
+    const buildNone = (reason) => buildDisposingSynth((ids) => ids.map((id) => (id === 1 ? { id: id, disposition: 'none', reason: reason } : { id: id, disposition: 'new:fresh-class' })))
+    const x = await runReview(Object.assign({}, DIFF, { unclassed: u }), buildStubs({ synth: buildNone('no home') }))
+    const y = await runReview(Object.assign({}, DIFF, { unclassed: u }), buildStubs({ synth: buildNone('') }))
+    ck(!x.threw && !y.threw && (u === 'refuse' ? x.result.dispositions === null : Array.isArray(x.result.dispositions)) &&
+      JSON.stringify(x.result.ownerItems) === (u === 'owner-rules' ? '[1]' : '[]') && y.result.dispositions === null && y.result.dispositionFault.indexOf('id 1 ') === 0,
+      'dispositions: under ' + u + ' none with a reason is ' + (u === 'refuse' ? 'refused' : 'accepted') + ', ownerItems ' + JSON.stringify(x.result && x.result.ownerItems) +
+      ', and none with an empty reason is refused')
+  }
+  // ---- AC9: two confirmed and three refuted; the handed appendix has ten columns and two placeholders; the return the dispositions.
+  const r9 = await runReview(Object.assign({}, DIFF, { unclassed: 'reason' }), buildStubs({
+    'verify:': (label, prompt) => { const v = buildVerdicts('confirmed')(label, prompt); for (const z of v.verdicts) if (z.id > 2) z.verdict = 'refuted'; return v },
+    synth: buildDisposingSynth((ids) => ids.map((id) => (id === 1 ? { id: id, disposition: 'new:fresh-class' } : { id: id, disposition: 'none', reason: 'no home' }))) }))
+  if (checkNoThrow(r9, 'disposition column')) {
+    const handed = (synthCall(r9).prompt.split('<<<APPENDIX\n')[1] || '').split('\nAPPENDIX>>>')[0].split('\n')
+    ck(handed[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes | disposition |' &&
+      handed.length === 9 && handed[4].endsWith(' | (synthesis) |') && handed[5].endsWith(' | (synthesis) |') && handed.slice(6).every((l) => l.endsWith(' | - |')),
+      'dispositions: the handed appendix ends classes | disposition, (synthesis) on the two confirmed rows and - on the refuted ones')
+    const back = r9.result.appendix.split('\n')
+    ck(back[4].endsWith(' | new:fresh-class |') && back[5].endsWith(' | none — no home |') && back.slice(6).every((l) => l.endsWith(' | - |')) &&
+      r9.result.ledger[0].disposition === 'new:fresh-class' && r9.result.ledger[2].disposition === '-' && r9.result.confirmedFindings[1].disposition === 'none',
+      'dispositions: the returned appendix, ledger and confirmed set carry the accepted dispositions, a none cell with its reason')
+  }
 }
 
 // ==== TOOL-aOrientedCast-10 — `efforts`, each stage spawned at the reasoning effort its caller names ====
@@ -3260,7 +3395,14 @@ printf '%s\n' "$out"
 # over four values (4), the two run ranges and counts (2), the figures and both prompts (3), the unplaced id
 # (1), the key (1), the dead run-b lens (1) and two review_pin.py --twin arms (2). The six re-pinned type
 # arms add none. Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=498
+# RAISED 498 -> 524 by TOOL-dFairHearing-8: 26 assertions, counted off the `fixJudge:`, `unclassed:`,
+# `legManifest:` and `dispositions:` arms — the fixJudge refusal and its three starts (2), the instance and
+# class prompts and keys (2), the instance verdict under each judge (2), the unclassed refusal and its default
+# (2), the legManifest refusal, its rendered default and the no-legs run (3), the DISPOSITIONS block (1), the
+# accepted set and six planted faults (7), AC8's loop over three values (3), the handed and returned appendix
+# (2) and two review_pin.py --unclassed arms (2). The four re-pinned ten-column appendix arms add none.
+# Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=524
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

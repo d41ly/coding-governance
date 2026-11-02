@@ -75,11 +75,13 @@ placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "FANOUT_CAP"]
 # (TOOL-aRepatriatedFork-26): the renderer substitutes every token into every template it pairs.
 # The review harness takes a second token, `LENS_SLOTS` (TOOL-dFairHearing-13): the body of each
 # lens literal marked `gov:lens-slots`, filled from this kit's `lenses.toml` by `render_lenses.py`.
+# And a third, `TOOL_ROOT` (TOOL-dFairHearing-8), for the default of its `legManifest` argument, the leg
+# manifest its resume probe reads: the drift-audit-state harness's idiom, `{{TOOL_ROOT}}gate-legs.json`.
 [[files]]
 include = ["tier2-review.template.js"]
 role = "rendered"
 to = "{kit}/tier2-review.js"
-placeholders = ["FANOUT_CAP", "LENS_SLOTS"]
+placeholders = ["FANOUT_CAP", "LENS_SLOTS", "TOOL_ROOT"]
 
 [[files]]
 include = ["drift-audit-code.template.js"]

@@ -3463,6 +3463,16 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "checkDisposition",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkDisposition",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "checkDriveRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3531,6 +3541,16 @@
       "id": "checkPosixRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkRepoPath",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "checkRepoPath",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "checkRoleGate",
@@ -9631,6 +9651,16 @@
       "id": "extractHandoffMarker",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "extractItemSlug",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "extractItemSlug",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "extractNewCommits",

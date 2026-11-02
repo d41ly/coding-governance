@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""review_pin.py — the stand-in for `review.pin`: the `preset`, `optIn` and `twin` arguments of one review call.
+"""review_pin.py — the stand-in for `review.pin`: the `preset`, `optIn`, `twin` and `unclassed` arguments of one review call.
 
   python <kit>/review_pin.py --subject <path> [--subject <path> ...]
                              [--opt-in none|'<json>'] [--design-record-preset unit-spec|design-audit]
                              [--twin never|design-records|design-and-landing|always]
+                             [--unclassed refuse|reason|owner-rules]
   # stdout: {"preset": "<literal>"} or {"preset": "<literal>", "optIn": {"<opt-in>": "<default>"}},
-  #         plus "twin": "<value>" when --twin is given
+  #         plus "twin": "<value>" when --twin is given and "unclassed": "<value>" when --unclassed is
 
 It prints the arguments of ONE `tier2-review.js` spec-audit call and runs nothing. A subject is a SPEC
 subject when the harness's own `SPEC_SUBJECT_PATH` matches its path, read from the `tier2-review.js`
@@ -15,6 +16,8 @@ holding any spec subject maps to `unit-spec`; a set of design records alone maps
 `none`, the default, or a JSON object keyed by literal name whose values are `optIn` maps; `optIn` is
 the entry for the chosen preset, omitted when there is none. `--twin` is `review.twin` (TOOL-dFairHearing-11),
 passed through as the harness's `twin` argument and omitted when not given; its shape is the four values.
+`--unclassed` is `review.unclassed` (TOOL-dFairHearing-8), passed through the same way as the harness's
+`unclassed` argument; its shape is the three values.
 
 Exit 0 = printed · 2 = refused, one stderr line naming the flag or `SPEC_SUBJECT_PATH`.
 
@@ -29,6 +32,7 @@ import sys
 
 PRESETS = ("unit-spec", "design-audit")
 TWINS = ("never", "design-records", "design-and-landing", "always")  # the harness's TWINS, by shape only
+UNCLASSED = ("refuse", "reason", "owner-rules")  # the harness's UNCLASSED, by shape only
 DESIGN_RECORD_PRESET = "unit-spec"  # the replay's verdict edits this one value (shared interface S9)
 SPEC_LINE = re.compile(r"^const SPEC_SUBJECT_PATH = /(.+)/\s*$")
 
@@ -85,6 +89,8 @@ def main(argv):
     p.add_argument("--opt-in", default="none", help="none, or the review.opt-in JSON object")
     p.add_argument("--design-record-preset", choices=PRESETS, default=DESIGN_RECORD_PRESET)
     p.add_argument("--twin", choices=TWINS, help="the review.twin value, passed through as the `twin` argument")
+    p.add_argument("--unclassed", choices=UNCLASSED,
+                   help="the review.unclassed value, passed through as the `unclassed` argument")
     a = p.parse_args(argv[1:])
     try:
         opt_in = parse_opt_in(a.opt_in)
@@ -95,6 +101,8 @@ def main(argv):
     out = derive_pin(a.subject, spec_path, opt_in, a.design_record_preset)
     if a.twin is not None:
         out["twin"] = a.twin
+    if a.unclassed is not None:
+        out["unclassed"] = a.unclassed
     sys.stdout.buffer.write((json.dumps(out) + "\n").encode("utf-8"))
     return 0
 

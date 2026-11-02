@@ -138,6 +138,14 @@ function readOutputTokens() {
 //                                         // `review.twin` key, passed as a pin argument. A run it twins dispatches
 //                                         // a second finder run, run b, and the synthesis merges the two; refused
 //                                         // outside the set (TOOL-dFairHearing-11)
+//   fixJudge: "instance" | "class",      // DEFAULTS to "instance": "class" has the skeptic judge each fix by the
+//                                         // defect's class and adds the fix verdict `instance`; refused outside
+//                                         // the set, and it joins the review key under "class" only
+//   unclassed: "refuse" | "reason" | "owner-rules", // DEFAULTS to "refuse": the `review.unclassed` key, passed
+//                                         // as a pin argument, naming which `none` dispositions the check admits
+//   legManifest: "<repo-relative path>",  // DEFAULTS to "{{TOOL_ROOT}}gate-legs.json": the leg manifest the resume
+//                                         // probe reads the `gate:` leg names from; refused on the `specs` rule
+//                                         // (TOOL-dFairHearing-8)
 //   optIn: { "<opt-in lens key>": "<default lens key>" }, // DEFAULTS to {}: the CALLER's swap. Each key is a
 //                                         // shipped opt-in lens (OPTIN_LENSES) offered for the run's literal, run
 //                                         // in the slot of the default it names, so the literal keeps five. Refused
@@ -266,6 +274,18 @@ const TWINS = ['never', 'design-records', 'design-and-landing', 'always']
 const twin = a.twin === undefined ? 'never' : a.twin
 if (typeof twin !== 'string' || TWINS.indexOf(twin) === -1)
   throw new Error('tier2-review: `twin` must be one of ' + TWINS.join(' | ') + '. Got ' + JSON.stringify(a.twin) + '.')
+// TOOL-dFairHearing-8 S1 - `fixJudge`, in the shape of `intensity`: a closed set refused outside it before any agent,
+// dark at `instance` until the replay decides. `class` adds the fix verdict `instance` to FIX_VERDICTS below and joins
+// the review key; `instance` leaves every skeptic prompt and the key as they were.
+const fixJudge = a.fixJudge === undefined ? 'instance' : a.fixJudge
+if (typeof fixJudge !== 'string' || ['instance', 'class'].indexOf(fixJudge) === -1)
+  throw new Error('tier2-review: `fixJudge` must be one of instance | class. Got ' + JSON.stringify(a.fixJudge) + '.')
+// S3 - `unclassed`, the policy key `review.unclassed` passed as a pin argument until dDeclaredLoop's `review.trigger`
+// lands, in the same shape: which `none` dispositions the disposition check admits.
+const UNCLASSED = ['refuse', 'reason', 'owner-rules']
+const unclassed = a.unclassed === undefined ? 'refuse' : a.unclassed
+if (typeof unclassed !== 'string' || UNCLASSED.indexOf(unclassed) === -1)
+  throw new Error('tier2-review: `unclassed` must be one of ' + UNCLASSED.join(' | ') + '. Got ' + JSON.stringify(a.unclassed) + '.')
 // TOOL-dFairHearing-2 S1 - `preset`, the CALLER's choice of a spec audit's lens literal, in the shape of
 // `intensity` above: a closed set refused by name outside it, and refused beside the diff kind, which
 // has one literal and so no preset. Each member but the default names the `gov:lens-slots` literal it
@@ -647,12 +667,20 @@ const SPECS = a.specs === undefined ? [] : a.specs
 const specsRule = 'an array of repo-relative paths, each a non-empty string with no backslash, no leading / or ~, no drive letter, no .. segment and no control character'
 if (!Array.isArray(SPECS))
   throw new Error('tier2-review: `specs` must be ' + specsRule + '. Got ' + JSON.stringify(a.specs) + ', which is not an array.')
-const specsBadIdx = SPECS.findIndex(
-  (s) => typeof s !== 'string' || !s || s.indexOf('\\') !== -1 || s[0] === '/' || s[0] === '~' || /[\x00-\x1f]/.test(s) ||
-    /^[A-Za-z]:/.test(s) || s.split('/').indexOf('..') !== -1
-)
+// TOOL-dFairHearing-8 S4 - the rule as one predicate, since `legManifest` below is refused by it too.
+function checkRepoPath(s) {
+  return typeof s === 'string' && !!s && s.indexOf('\\') === -1 && s[0] !== '/' && s[0] !== '~' && !/[\x00-\x1f]/.test(s) &&
+    !/^[A-Za-z]:/.test(s) && s.split('/').indexOf('..') === -1
+}
+const specsBadIdx = SPECS.findIndex((s) => !checkRepoPath(s))
 if (specsBadIdx !== -1)
   throw new Error('tier2-review: `specs` must be ' + specsRule + '. Member ' + specsBadIdx + ' is ' + JSON.stringify(SPECS[specsBadIdx]) + '.')
+// TOOL-dFairHearing-8 S4 - `legManifest`, the leg manifest the resume probe reads the `gate:` leg names from. It
+// reaches the probe's prompt as a path an agent reads, so it is refused on the `specs` rule; the default is rendered.
+const legManifest = a.legManifest === undefined ? '{{TOOL_ROOT}}gate-legs.json' : a.legManifest
+if (!checkRepoPath(legManifest))
+  throw new Error('tier2-review: `legManifest` must be a repo-relative path, a non-empty string with no backslash, no leading / or ~, ' +
+    'no drive letter, no .. segment and no control character. Got ' + JSON.stringify(a.legManifest) + '.')
 // S3 - on a spec audit `specs` is sibling context, NOT under audit, so one document cannot be both.
 const specsOverlap = isSpec ? SPECS.find((p) => subjects.some((x) => x && x.path === p)) : undefined
 if (specsOverlap !== undefined)
@@ -808,7 +836,9 @@ const FINDING_SCHEMA = {
 // TOOL-aSightedSkeptic-6 S3 - `uncertain` is a third verdict, and the skeptic's `severity` is OPTIONAL
 // and read on a confirmed verdict only. The harness tests membership in SEVERITIES itself, for the
 // same reason it tests FIX_VERDICTS.
-const FIX_VERDICTS = ['sound', 'unsound', 'none']
+// TOOL-dFairHearing-8 S2 - `instance`, the fix that cures the cited instance and leaves another of its class
+// standing, is a verdict under `fixJudge: 'class'` alone: outside this set it reads as unjudged at every reader.
+const FIX_VERDICTS = ['sound', 'unsound', 'none'].concat(fixJudge === 'class' ? ['instance'] : [])
 const SEVERITIES = ['blocker', 'high', 'medium', 'low']
 const VERDICT_SCHEMA = {
   type: 'object',
@@ -1051,6 +1081,8 @@ const designRecordAudit = isSpec && (preset !== 'unit-spec' || subjects.every((x
 const twinned = twin === 'always' || (twin === 'design-records' && designRecordAudit) || (twin === 'design-and-landing' && (designRecordAudit || !isSpec))
 if (twinned)
   log(`twin ${twin} — this ${kind} runs its finder lenses twice, as run a and run b, and the synthesis merges the two runs`)
+if (fixJudge === 'class')
+  log('fixJudge class — every skeptic judges each fix by the defect\'s class, and a fix curing the cited instance alone is judged instance')
 const notedLenses = Object.keys(runNotes)
 if (!notedLenses.length)
   log('WARNING: no `lensNotes` supplied — every lens runs on the kit\'s generic brief, with no project addendum')
@@ -1173,10 +1205,12 @@ const REVIEW_SHAPE = 'lenses5-r4'
 // per-preset caller passing the same notes derive one key, and every flat-form key holds.
 // TOOL-dFairHearing-11 S8 - and `twin: true` ONLY on a twinned run, so it never reuses an untwinned run's lens
 // or verify files, and every untwinned key holds. The probe's type stays out: it writes no keyed file.
+// TOOL-dFairHearing-8 S2 - and `fixJudge` ONLY under `class`, so a class-judged verify file is never reused by a dark
+// run and every key a run without it derives holds. `unclassed` and `legManifest` reach the synthesis alone, and stay out.
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: runNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
   ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
   roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {},
-  optInKeys.length ? { optIn: optIn } : {}, twinned ? { twin: true } : {})))
+  optInKeys.length ? { optIn: optIn } : {}, twinned ? { twin: true } : {}, fixJudge === 'class' ? { fixJudge: fixJudge } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -1214,7 +1248,11 @@ const probe = await agent(
     `find file's JSON in finds and each verify file's JSON in verifies, EXACTLY as it is on disk plus ` +
     `a name field holding its file name. Do not repair, complete or re-judge anything: a file that ` +
     `does not parse, or lacks a field the schema requires, is left out and its name listed in skipped.\n` +
-    `Return JSON {commonDir, ${isSpec ? 'blobs:[...], ' : 'base, head, '}finds:[...], verifies:[...], skipped:[...]}.`,
+    // TOOL-dFairHearing-8 S4 - the leg manifest, read here because the harness has no filesystem (spec section 8 F4).
+    `5. Whatever steps 3 and 4 found, Read ${repo}/${legManifest}, the leg manifest. When it parses as JSON whose top level ` +
+    `is an array, return legs: the name field of every object in that array, in file order. When it is absent, does not ` +
+    `parse, or its top level is not an array, leave legs out.\n` +
+    `Return JSON {commonDir, ${isSpec ? 'blobs:[...], ' : 'base, head, '}finds:[...], verifies:[...], skipped:[...], legs:[...]}.`,
   Object.assign({
     label: renderAgentLabel(reviewScope, 'resume:probe'),
     phase: 'Resume',
@@ -1228,6 +1266,8 @@ const probe = await agent(
         finds: { type: 'array', items: buildKeyedSchema(isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA, []) },
         verifies: { type: 'array', items: buildKeyedSchema(VERDICT_SCHEMA, ['batch', 'ids']) },
         skipped: { type: 'array', items: { type: 'string' } },
+        // TOOL-dFairHearing-8 S4 - optional: a probe that omits it reads as no leg manifest read.
+        legs: { type: 'array', items: { type: 'string' } },
         // Optional (spec F2): a probe that omits it reads as every subject UNCHECKED, never as none moved.
         ...(isSpec ? { blobs: { type: 'array', items: { type: 'object', required: ['path', 'now'], properties: { path: { type: 'string' }, now: { type: 'string' } } } } } : {}),
       },
@@ -1248,6 +1288,11 @@ if (!isSpec && probeLive && FULL_SHA.test(String(probe.base)) && FULL_SHA.test(S
   log(`WARNING: the resume probe did not resolve ${base}...${head} to two full shas — nothing can be reused, and the lenses are handed the refs as given`)
 }
 if (!probeLive) log('WARNING: the resume probe died — nothing could be reused, so every lens is dispatched with the refs as given')
+// TOOL-dFairHearing-8 S4 - the leg names a `gate:` disposition may name, or null: a dead probe or one returning no
+// `legs` read no manifest, and then every `gate:` disposition is refused and the log and RUN INTEGRITY say so.
+const legs = probeLive && Array.isArray(probe.legs) ? probe.legs.filter((x) => typeof x === 'string' && x) : null
+log(legs ? `leg manifest: ${legs.length} leg name(s) read from ${legManifest}`
+  : `WARNING: no leg manifest was read from ${legManifest} — every gate: disposition is refused`)
 // TOOL-aEvidencedLens-4 S4/S6 - the move check's judging half. A subject is MOVED when the probe read a
 // 40-hex hash that does not begin with the pinned blob, and UNCHECKED when no usable hash came back: a
 // dead probe, a missing `blobs` key or row, or an empty `now` never reads as "none moved".
@@ -1652,20 +1697,30 @@ const verdictResults = await boundedParallel(
           .join('\n') +
         // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
         // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
-        `\n\nTHE FIX, A SECOND AND SEPARATE QUESTION. For each finding also judge its proposed fix, as \`fixVerdict\`: ` +
-        `"sound" when applying it cures the defect and introduces none you can see in the ${isSpec ? 'spec' : 'code'} it touches; ` +
-        `"unsound" when it does not cure the defect, breaks a caller, an invariant or a sibling path, or introduces a defect of its own; ` +
-        // Closing review round 1, M3 - fixNote carries the CORRECTION and nothing else, so an empty note
-        // is the one way to say "no correction", and the harness branches on exactly that.
-        `"none" when no fix was proposed. For "unsound", \`fixNote\` holds ONLY the corrected fix, and is empty when you have none; ` +
-        `say why the fix is unsound in \`reason\`, never in \`fixNote\`. ` +
+        // TOOL-dFairHearing-8 S2 - under `fixJudge: 'class'` the second variant, judged by the defect's class; the
+        // first keeps today's bytes, so a dark run's verify prompt is unchanged.
+        (fixJudge === 'class'
+          ? `\n\nTHE FIX, A SECOND AND SEPARATE QUESTION. For each finding also judge its proposed fix by the defect's CLASS, as \`fixVerdict\`: ` +
+            `"sound" when applying it cures the defect's class, every instance of the pattern the claim names in the subject and the code ` +
+            `or specs it reaches, and introduces none you can see; ` +
+            `"instance" when it cures the cited instance and leaves another of its class standing; ` +
+            `"unsound" when it does not cure the cited instance, breaks a caller, an invariant or a sibling path, or introduces a defect of its own; ` +
+            `"none" when no fix was proposed. For "unsound", \`fixNote\` holds ONLY the corrected fix, and for "instance" ONLY the ` +
+            `class-level fix; either is empty when you have none. Say why in \`reason\`, never in \`fixNote\`. `
+          : `\n\nTHE FIX, A SECOND AND SEPARATE QUESTION. For each finding also judge its proposed fix, as \`fixVerdict\`: ` +
+            `"sound" when applying it cures the defect and introduces none you can see in the ${isSpec ? 'spec' : 'code'} it touches; ` +
+            `"unsound" when it does not cure the defect, breaks a caller, an invariant or a sibling path, or introduces a defect of its own; ` +
+            // Closing review round 1, M3 - fixNote carries the CORRECTION and nothing else, so an empty note
+            // is the one way to say "no correction", and the harness branches on exactly that.
+            `"none" when no fix was proposed. For "unsound", \`fixNote\` holds ONLY the corrected fix, and is empty when you have none; ` +
+            `say why the fix is unsound in \`reason\`, never in \`fixNote\`. `) +
         `The fix verdict NEVER changes the finding's verdict: judge the claim on its own, then the fix on its own.` +
         (!durable
           ? `\n\nWrite no file. Set path to an empty string.`
           : `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus three more fields ` +
             `"key":"${reviewKey}", "batch":"${batchPrints[gi]}" and "ids":[${group.map((f) => f.id).join(',')}], to ${keyDir}/verify-batch-${gi + 1}.json, ` +
             `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.`) +
-        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
+        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none"${fixJudge === 'class' ? '|"instance"' : ''}, fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
         Object.assign({ label: renderAgentLabel(reviewScope, batchLabels[gi]), phase: 'Verify', schema: VERDICT_SCHEMA }, verifyOpts),
@@ -1733,6 +1788,13 @@ const mergedIds = new Set(merged.map((f) => f.id))
 function renderFixLine(f) {
   const v = verdictById.get(f.id) || {}
   const note = String(v.fixNote || '').trim()
+  // TOOL-dFairHearing-8 S2 - an instance-only fix gives way to its class-level note, as an unsound one gives way to
+  // its correction; outside `fixJudge: 'class'` the verdict is not in FIX_VERDICTS and falls through to NOT JUDGED.
+  if (v.fixVerdict === 'instance' && FIX_VERDICTS.indexOf('instance') !== -1)
+    return (note
+      ? `fix: judged INSTANCE-ONLY by the skeptic, whose class-level fix is: ${note}`
+      : `fix: judged INSTANCE-ONLY by the skeptic, who gave no class-level fix - the class fix is STILL TO BE DESIGNED`) +
+      ` (the finder's proposal, which cures the cited instance and leaves its class standing: ${f.fix})`
   if (v.fixVerdict === 'sound') return `fix (judged SOUND by the skeptic): ${f.fix}`
   if (v.fixVerdict === 'none') return `fix: none proposed${f.fix ? ` (the finder wrote: ${f.fix})` : ''}`
   if (v.fixVerdict === 'unsound')
@@ -1786,7 +1848,8 @@ if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the stand
 if (spurious) log(`WARNING: ${spurious} verdict(s) carried an id this run never assigned — discarded.`)
 // TOOL-aSightedSkeptic-2 S4 - the fix verdicts over CONFIRMED findings only, since a refuted
 // finding's fix is never applied. The four counts sum to confirmed.length.
-const fixCounts = { sound: 0, unsound: 0, none: 0 }
+// TOOL-dFairHearing-8 S2 - `instance` moves only under `fixJudge: 'class'`, where FIX_VERDICTS holds it.
+const fixCounts = { sound: 0, unsound: 0, none: 0, instance: 0 }
 const unjudgedFixIds = []
 for (const f of confirmed) {
   const fv = verdictById.get(f.id).fixVerdict
@@ -1821,6 +1884,14 @@ log(
 // `C<n>`, `[C<n>]`, each optionally followed by `:` or `,`, is read, so a `C3` in the prose is not
 // a label. Label n names item n's first token after an optional `[ ]`/`[x]` box when that token is a
 // lowercase slug; otherwise, and for an n outside the items, the label itself, which no slug spells.
+// TOOL-dFairHearing-8 S5 - THE CLASS SLUG GRAMMAR, one constant: an item's slug is read by it here, and the
+// disposition check tests a `new:` slug against it, so the classes a run hands over are the ones `classes` names.
+const CLASS_SLUG = '[a-z][a-z0-9]*(?:-[a-z0-9]+)*'
+const ITEM_SLUG = new RegExp('^(?:\\[[ x]\\]\\s+)?(' + CLASS_SLUG + ')(?=\\s|$)')
+function extractItemSlug(item) {
+  const m = typeof item === 'string' ? ITEM_SLUG.exec(item) : null
+  return m ? m[1] : null
+}
 function extractFindingClasses(claim, items) {
   const names = []
   let rest = String(claim || '')
@@ -1828,13 +1899,13 @@ function extractFindingClasses(claim, items) {
   while ((m = /^\s*(?:\[C(\d+)\]|C(\d+))[:,]?(?=\s|$)/.exec(rest))) {
     rest = rest.slice(m[0].length)
     const n = m[1] || m[2]
-    const item = items[n - 1]
-    const slug = typeof item === 'string' ? /^(?:\[[ x]\]\s+)?([a-z][a-z0-9]*(?:-[a-z0-9]+)*)(?=\s|$)/.exec(item) : null
-    const name = slug ? slug[1] : 'C' + n
+    const name = extractItemSlug(items[n - 1]) || 'C' + n
     if (names.indexOf(name) === -1) names.push(name)
   }
   return names
 }
+// The class slugs the disposition check hands over: each slug-led item's, once, in item order. A `C<n>` is no class.
+const classSlugs = CHECKLIST_ITEMS.map(extractItemSlug).filter((s, i, all) => s && all.indexOf(s) === i)
 
 // TOOL-aSightedSkeptic-8 S3 - THE LEDGER, every finding and its verdict in id order, refuted ones
 // included: the only place a refuted finding reaches a record. Read through verdictById by the
@@ -1853,6 +1924,8 @@ const ledger = allFindings.map((f) => {
     claim: f.claim,
     // TOOL-aMendedFleet-17 S2 - empty with no checklist, where no label can denote a class.
     classes: CHECKLIST_ITEMS.length ? extractFindingClasses(f.claim, CHECKLIST_ITEMS) : [],
+    // TOOL-dFairHearing-8 S8 - the accepted disposition, set on a confirmed entry after the check below; `-` otherwise.
+    disposition: '-',
   }
 })
 // S4 - the confirmed set in the shape `priorFindings` reads, so round N+1 is handed it rather than a
@@ -1862,8 +1935,9 @@ const confirmedFindings = confirmed.map((f) => {
   const v = verdictById.get(f.id)
   const fixVerdict = FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null
   const note = String(v.fixNote || '').trim()
+  // TOOL-dFairHearing-8 S2 - an instance-only fix gives way to its class-level note as an unsound one does.
   return { id: f.id, lens: f.lens, ref: f.ref, claim: f.claim, severity: deriveBindingSeverity(f),
-    fix: fixVerdict === 'unsound' && note ? note : f.fix, fixVerdict }
+    fix: (fixVerdict === 'unsound' || fixVerdict === 'instance') && note ? note : f.fix, fixVerdict, disposition: '-' }
 })
 // S6 - one cell: absent as `-`, a pipe escaped, and a run of any character Python's str.splitlines
 // breaks on folded to one space, so no claim or reason can forge or cut a row in the table
@@ -1880,14 +1954,18 @@ function renderCell(v) {
 }
 // The first eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only
 // (spec F4). TOOL-aMendedFleet-17 S3 - `classes` is the ninth, its names joined by one space.
+// TOOL-dFairHearing-8 S8 - `disposition` is the tenth, each row's `disposition` field.
 function renderAppendix(rows) {
   if (!rows.length) return ''
-  const cols = ['id', 'lens', 'ref', 'severity', 'skepticSeverity', 'verdict', 'reason', 'fixVerdict', 'classes']
+  const cols = ['id', 'lens', 'ref', 'severity', 'skepticSeverity', 'verdict', 'reason', 'fixVerdict', 'classes', 'disposition']
   return ['## Appendix — every finding', '', '| ' + cols.join(' | ') + ' |', '|' + cols.map(() => '---').join('|') + '|']
     .concat(rows.map((e) => '| ' + cols.map((c) => renderCell(c === 'classes' ? (e.classes || []).join(' ') : e[c])).join(' | ') + ' |'))
     .join('\n')
 }
+// `-` in every disposition cell: what an exit with no accepted set returns. The synthesis is handed its copy with a
+// `(synthesis)` cell on each confirmed row, the one cell it writes (spec section 8 F2).
 const appendix = renderAppendix(ledger)
+const synthAppendix = renderAppendix(ledger.map((e) => (e.verdict === 'confirmed' ? Object.assign({}, e, { disposition: '(synthesis)' }) : e)))
 // TOOL-aMendedFleet-18 S1 - every count the verify stage produced, the four severities over RAW
 // confirmed findings by binding grade; a grade outside the closed four is counted in none.
 const verifiedCounts = { raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length, merged: merged.length,
@@ -2045,6 +2123,11 @@ const synth = await agent(
     `Each CONFIRMED finding's fix line says whether a skeptic judged its fix. Where it is REJECTED, write the skeptic's ` +
     `corrected fix into the report, never the rejected one; where the note gives no correction, say the fix is still to be ` +
     `designed. Where it is NOT JUDGED, present it as the finder's proposal only. ` +
+    // TOOL-dFairHearing-8 S2 - an instance-only fix, under `fixJudge: 'class'` alone.
+    (fixJudge === 'class'
+      ? `Where it is judged INSTANCE-ONLY, write the skeptic's class-level fix into the report as the fix, and name the ` +
+        `finder's proposal as curing the cited instance alone; where the note gives no class-level fix, say the class fix is still to be designed. `
+      : '') +
     // TOOL-aSightedSkeptic-7 S6 - the intensity, in the review-shape sentence, on every run.
     `State the review shape near the top — intensity ${intensity}, raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, merged ${merged.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
     // TOOL-aEvidencedLens-6 S6 - copied, as the appendix is, and not verified; the return holds the rows.
@@ -2074,6 +2157,8 @@ const synth = await agent(
     `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s); ` +
     // TOOL-aSightedSkeptic-2 S4 - how many confirmed fixes a skeptic actually judged.
     `fixes on confirmed findings: ${fixCounts.sound} judged sound, ${fixCounts.unsound} judged UNSOUND, ` +
+    // TOOL-dFairHearing-8 S2 - the instance-only count, under `fixJudge: 'class'` alone.
+    (fixJudge === 'class' ? `${fixCounts.instance} judged INSTANCE-ONLY, curing the cited instance and leaving its class standing, ` : '') +
     `${fixCounts.none} none proposed, ${unjudgedFixIds.length} NOT JUDGED - an unjudged fix is the finder's proposal and nothing more; ` +
     // TOOL-aSightedSkeptic-6 S5/S8 - the grades, and the two kinds of unverified finding, apart.
     `severity on confirmed findings: ${ungradedIds.length} UNGRADED by the skeptic (bound at the finder's grade), ` +
@@ -2125,8 +2210,32 @@ const synth = await agent(
       : '') +
     // TOOL-dFairHearing-7 S3 - what the twin blocks held, so a run that flagged nothing is told from one handed nothing.
     (addressTwins === 'shown' ? `refuted findings shown: ${refuted.length}; same-address pairs shown: ${twinPairs.length}.\n` : '') +
+    // TOOL-dFairHearing-8 S4-S6 - what the disposition check below is handed, on every run.
+    `dispositions: unclassed ${unclassed}; ${classSlugs.length} class slug(s) handed; ` +
+    (legs ? `${legs.length} leg name(s) read from ${legManifest}.\n` : `no leg manifest was read from ${legManifest}, so every gate: disposition is refused.\n`) +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
+    // TOOL-dFairHearing-8 S6 - THE DISPOSITIONS, `review.report`'s grammar, the report step's to assign (spec section 8
+    // F1). The harness checks what comes back against exactly what this block names.
+    `DISPOSITIONS - give EVERY CONFIRMED finding above exactly one disposition, in one of these four forms, and return ` +
+    `them as \`dispositions\`, one {id, disposition, reason} per confirmed id:\n` +
+    `- class:<slug> - an instance of a recurring class this run was handed, <slug> being one of the class slugs below;\n` +
+    `- gate:<leg> - a defect an existing gate leg should catch, <leg> being one of the leg names below, spelled exactly;\n` +
+    `- new:<slug> - a recurring class no slug below names, <slug> matching ${CLASS_SLUG};\n` +
+    `- none - nothing above homes it, with a non-empty reason, and only as the unclassed value admits.\n` +
+    `unclassed: ${unclassed} - ` + (unclassed === 'refuse'
+      ? 'none is refused: home every confirmed finding as class:, gate: or new:.'
+      : unclassed === 'reason'
+        ? 'none is admitted with a non-empty reason.'
+        : 'none is admitted with a non-empty reason, and each id disposed none is raised for the owner to rule.') + `\n` +
+    (classSlugs.length
+      ? `Class slugs (${classSlugs.length}): ${classSlugs.join(', ')}.\n`
+      : `Class slugs: none handed, as no checklist item is slug-led, so every class: disposition is refused.\n`) +
+    (legs
+      ? `Leg names (${legs.length}), one per line:\n` + legs.map((x) => `  - ${renderPromptLine(x)}`).join('\n') + `\n`
+      : `Leg names: no leg manifest was read from ${legManifest}, so every gate: disposition is refused.\n`) +
+    `A set that leaves a confirmed id with no disposition, gives one twice, names an id that is not confirmed, or uses a ` +
+    `form or a name outside these is refused whole.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value
     // reaches the record without a human remembering to type it. HONEST LIMIT: `base` is required
     // but may still be a REF, and a caller who passes one at round 1 writes a line carrying no sha,
@@ -2221,12 +2330,16 @@ const synth = await agent(
       ? `\n\nREVIEW-TWIN LINE - copy the review-twin line between the two marker lines below VERBATIM, alone on its own line, ` +
         `directly below the review-shape line, and neither marker line copied.\n<<<TWIN\n${twinLine}\nTWIN>>>`
       : '') +
-    (appendix
+    // TOOL-dFairHearing-8 S8 - the one exception to the copy: each `(synthesis)` cell, written with its disposition.
+    (synthAppendix
       ? `\n\nAPPENDIX - the report's LAST section, after everything else, is the text between the two marker lines ` +
-        `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
-        `<<<APPENDIX\n${appendix}\nAPPENDIX>>>\n\n`
+        `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied. ` +
+        `The one exception is each \`(synthesis)\` cell of the disposition column: write it as the disposition you return ` +
+        `for that row's id, a none as \`none — <reason>\`.\n` +
+        `<<<APPENDIX\n${synthAppendix}\nAPPENDIX>>>\n\n`
       : '') +
-    `Return JSON {path, items, summary${addressTwins === 'shown' ? ', twinFlags' : ''}} with a FORWARD-SLASH path.`,
+    `Return JSON {path, items, summary${addressTwins === 'shown' ? ', twinFlags' : ''}} with a FORWARD-SLASH path, and ` +
+    `\`dispositions\` beside them as the DISPOSITIONS block asks.`,
   {
     ...synthOpts,
     label: renderAgentLabel(reviewScope, 'synth'),
@@ -2238,9 +2351,12 @@ const synth = await agent(
       // that omits it fail loudly at validation instead of returning a partial object nobody notices.
       // TOOL-dMergedTally-1 - that field is `items` now; the two integers are derived below.
       // TOOL-dFairHearing-7 S3 - `twinFlags` joins the schema under `addressTwins: 'shown'` alone.
-      required: ['path', 'summary', 'items', ...(addressTwins === 'shown' ? ['twinFlags'] : [])],
+      // TOOL-dFairHearing-8 S6 - `dispositions` is required on every run; the check below grades its members.
+      required: ['path', 'summary', 'items', 'dispositions', ...(addressTwins === 'shown' ? ['twinFlags'] : [])],
       properties: {
         path: { type: 'string' },
+        dispositions: { type: 'array', items: { type: 'object', required: ['id', 'disposition'],
+          properties: { id: { type: 'integer' }, disposition: { type: 'string' }, reason: { type: 'string' } } } },
         ...(addressTwins === 'shown'
           ? { twinFlags: { type: 'array', items: { type: 'object', required: ['refuted', 'confirmed'], properties: { refuted: { type: 'integer' }, confirmed: { type: 'integer' } } } } }
           : {}),
@@ -2377,6 +2493,64 @@ if (synth) {
   }
 }
 
+// TOOL-dFairHearing-8 S7 - THE DISPOSITION CHECK, after the tally, over confirmed ids only. One disposition's fault,
+// '' when it is legal: `class:` a handed slug, `gate:` a handed leg name, `new:` a slug in the grammar that is no handed
+// slug, or `none` where `unclassed` admits it, with a non-empty reason.
+const NEW_SLUG = new RegExp('^' + CLASS_SLUG + '$')
+function checkDisposition(d) {
+  const s = typeof d.disposition === 'string' ? d.disposition : ''
+  const at = s.indexOf(':')
+  const form = at === -1 ? s : s.slice(0, at)
+  const name = at === -1 ? '' : s.slice(at + 1)
+  const said = JSON.stringify(d.disposition)
+  if (s === 'none') return unclassed === 'refuse' ? 'is none, which unclassed refuse does not admit'
+    : typeof d.reason === 'string' && d.reason.trim() ? '' : 'is none with an empty reason'
+  if (form === 'class') return classSlugs.indexOf(name) !== -1 ? '' : `is ${said}, and ${JSON.stringify(name)} is no class slug this run handed`
+  if (form === 'gate') return !legs ? `is ${said}, and no leg manifest was read, so no gate: disposition is legal`
+    : legs.indexOf(name) !== -1 ? '' : `is ${said}, and ${JSON.stringify(name)} is no leg of ${legManifest}`
+  if (form === 'new') return !NEW_SLUG.test(name) ? `is ${said}, and ${JSON.stringify(name)} is no slug matching ${CLASS_SLUG}`
+    : classSlugs.indexOf(name) !== -1 ? `is ${said}, a handed class slug, so it is class:${name}` : ''
+  return `is ${said}, outside the forms class:<slug> | gate:<leg> | new:<slug> | none`
+}
+// The set is accepted whole or refused whole (spec section 8 F3): refused, `dispositions` is null and every failing id
+// is named in `dispositionFault`, while `blockers` and `highs` keep the tally's derivation above. No synthesis, no set.
+let dispositions = null
+let dispositionFault = ''
+let ownerItems = []
+if (synth) {
+  const confirmedIds = new Set(confirmed.map((f) => f.id))
+  const byId = new Map()
+  const faults = Array.isArray(synth.dispositions) ? [] : ['no dispositions list was returned']
+  for (const d of Array.isArray(synth.dispositions) ? synth.dispositions : []) {
+    const id = d && typeof d === 'object' ? d.id : d
+    if (!confirmedIds.has(id)) faults.push(`id ${JSON.stringify(id)} is not a confirmed id`)
+    else if (byId.has(id)) faults.push(`id ${id} is disposed more than once`)
+    else {
+      byId.set(id, d)
+      const why = checkDisposition(d)
+      if (why) faults.push(`id ${id} ${why}`)
+    }
+  }
+  for (const f of confirmed) if (!byId.has(f.id)) faults.push(`id ${f.id} has no disposition`)
+  if (faults.length) {
+    dispositionFault = faults.join('; ')
+    log(`WARNING: the synthesis dispositions were REFUSED — ${dispositionFault}. dispositions is NULL; blockers and highs stand.`)
+  } else {
+    dispositions = confirmed.map((f) => ({ id: f.id, disposition: byId.get(f.id).disposition,
+      reason: typeof byId.get(f.id).reason === 'string' ? byId.get(f.id).reason : '' }))
+    ownerItems = unclassed === 'owner-rules' ? dispositions.filter((x) => x.disposition === 'none').map((x) => x.id) : []
+    log(`dispositions: ${dispositions.length} confirmed finding(s) disposed, unclassed ${unclassed}` +
+      (ownerItems.length ? ` — ${ownerItems.length} none raised for the owner: ids ${ownerItems.join(', ')}` : ''))
+  }
+}
+// S8 - an accepted set reaches the ledger, the confirmed set and the appendix, a `none` cell as `none — <reason>`.
+const dispositionById = new Map((dispositions || []).map((x) => [x.id, x]))
+for (const e of ledger.concat(confirmedFindings)) if (dispositionById.has(e.id)) e.disposition = dispositionById.get(e.id).disposition
+const returnedAppendix = !dispositions ? appendix : renderAppendix(ledger.map((e) => {
+  const x = dispositionById.get(e.id)
+  return x && x.disposition === 'none' ? Object.assign({}, e, { disposition: 'none — ' + x.reason }) : e
+}))
+
 // TOOL-aBoundedVerdict-14 S6 - the SYNTH-DEATH hole. Lens deaths and skeptic deaths are both counted
 // and reported; a dead synthesis was not, so `synth === null` returned report:null with a note reading
 // `complete` and every confirmed finding was lost with nothing logged. The findings exist here in
@@ -2456,11 +2630,17 @@ return {
   ...(addressTwins === 'shown' ? { twinPairs: twinPairs.length, twinFlags } : {}),
   // TOOL-dFairHearing-11 S7 - null on an untwinned run, and where the tally refused the items or no synthesis ran.
   twin: twinFigures,
+  // TOOL-dFairHearing-8 S7 - the checked set, null when refused or when no synthesis ran; the fault, '' when none;
+  // and the ids disposed `none` under `unclassed: 'owner-rules'`, [] otherwise.
+  dispositions,
+  dispositionFault,
+  ownerItems,
   // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was
   // reportable only when nothing else was degraded and the most serious note was the least reachable
   // one. Worst outcome first. Found by the closing review of the build that ported this ternary into
   // the two drift-audit siblings, where the same ordering had been copied.
-  note:
+  // TOOL-dFairHearing-8 S7 - a refused disposition set says so after whichever note the run earned.
+  note: (
     // Lens and skeptic deaths never reach this return (TOOL-dDerivedDocket-29), so the last two arms
     // speak of UNUSABLE verdicts: a batch that returned with an id missing, spurious or contradicted.
     !synth
@@ -2475,7 +2655,8 @@ return {
             ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none confirmed or refuted — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict — the report lists them as outstanding`
             : unverified.length
               ? `PARTIAL: ${unverified.length} finding(s) are unverified — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict`
-              : 'complete',
+              : 'complete') +
+    (dispositionFault ? `; the DISPOSITIONS were refused (${dispositionFault}), so dispositions is null and blockers and highs stand` : ''),
   round,
   priorFindings: priorFindings.length,
   // TOOL-aSightedSkeptic-7 S6 - on every exit path, so a light run is never read as a full one.
@@ -2487,9 +2668,10 @@ return {
   skippedLenses,
   // TOOL-aSightedSkeptic-8 S5 - every finding and its verdict, the confirmed set as round N+1's
   // `priorFindings`, and the appendix the synthesis was told to copy, for a caller to compare.
+  // TOOL-dFairHearing-8 S8 - each carrying the accepted dispositions, or `-` in every cell when none was accepted.
   ledger,
   confirmedFindings,
-  appendix,
+  appendix: returnedAppendix,
   // TOOL-aEvidencedLens-6 S5 - on every return; README "return fields" states the row shape.
   lensYield,
 }
