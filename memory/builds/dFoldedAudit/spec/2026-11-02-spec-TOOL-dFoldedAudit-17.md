@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively
 
-**Status:** INPROGRESS · rev-5 · 2026-11-02 · node d · Tier-1 · base 8a5328a9 · streams tooling · order 170
+**Status:** CLOSED · rev-5 · 2026-11-02 · node d · Tier-1 · base 8a5328a9 · streams tooling · order 170
 
 <!-- gen:spec-records -->
 
@@ -12,6 +12,8 @@
 | [2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-5-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-5-spec-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-6-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-6-spec-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-17-7-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-7-builder-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-17-ledger.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md) | journal | — |
