@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-39-deviation-391.md](../build/2026-10-23-build-TOOL-dFairHearing-39-deviation-391.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-38-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-38-promoted-fix-brief.md) | research | TOOL-dFairHearing-38 TOOL-dFairHearing-40 |
 | [2026-10-23-prompt-TOOL-dFairHearing-39-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-39-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFairHearing-39-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-39-build-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
 
