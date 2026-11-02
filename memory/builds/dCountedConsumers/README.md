@@ -47,14 +47,14 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-11-02 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-11-02 · streams tooling
 ids TOOL-dCountedConsumers-1 TOOL-dCountedConsumers-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dCountedConsumers-1 — help/policy.md names every policy key family a reader consumes today](spec/2026-11-02-spec-TOOL-dCountedConsumers-1.md) | 10 | 1 | CLOSED | rev-1 | 2026-11-02 |
-| [TOOL-dCountedConsumers-2 — the trace signal counts a commit that writes a help page as product](spec/2026-11-02-spec-TOOL-dCountedConsumers-2.md) | 20 | 1 | INPROGRESS | rev-1 | 2026-11-02 |
+| [TOOL-dCountedConsumers-2 — the trace signal counts a commit that writes a help page as product](spec/2026-11-02-spec-TOOL-dCountedConsumers-2.md) | 20 | 1 | CLOSED | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).
