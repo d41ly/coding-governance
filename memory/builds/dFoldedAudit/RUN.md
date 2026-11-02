@@ -69,3 +69,7 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-01T23:53:21Z dispatch · item f1a7b161 TOOL-dFoldedAudit-5 · reason memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-5-ledger.md memory/map/generated/symbols.json memory/LIVE.md memory/builds/dFoldedAudit/README.md
 
 2026-11-02T00:03:42Z brief · item TOOL-dFoldedAudit-6 · reason fd4a8ea385d8 memory/builds/dFoldedAudit/prompts/2026-11-01-prompt-TOOL-dFoldedAudit-6-build-brief.md
+
+2026-11-02T00:09:19Z dispatch · item f76ff571 TOOL-dFoldedAudit-6 · reason tools/memory-tree/design_lib.py tools/memory-tree/deviation_join.py tools/memory-tree/gen_build_index.py memory/builds/dRankedPlan/README.md memory/builds/dFurnishedOrders/README.md memory/builds/dDeclaredLoop/README.md memory/builds/dFoldedAudit/spec/2026-11-01-spec-TOOL-dFoldedAudit-6.md memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-6-ledger.md memory/builds/dFoldedAudit/README.md memory/map/generated/symbols.json
+
+2026-11-02T00:09:23Z brief · item TOOL-dFoldedAudit-6 · reason e89f3ad9bd31 memory/builds/dFoldedAudit/prompts/2026-11-01-prompt-TOOL-dFoldedAudit-6-build-brief.md

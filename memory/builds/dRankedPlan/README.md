@@ -176,13 +176,9 @@ Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dRankedPlan-78 TOOL-dRankedPlan-79 TOOL-dRankedPlan-80 TOOL-dRankedPlan-81 TOOL-dRankedPlan-82 TOOL-dRankedPlan-83.
 
-Ids whose spec moved past its audited revision: TOOL-dRankedPlan-1@rev-1 TOOL-dRankedPlan-10@rev-1 TOOL-dRankedPlan-11@rev-1 TOOL-dRankedPlan-12@rev-1 TOOL-dRankedPlan-13@rev-1 TOOL-dRankedPlan-14@rev-1 TOOL-dRankedPlan-15@rev-1 TOOL-dRankedPlan-16@rev-1 TOOL-dRankedPlan-19@rev-1
-TOOL-dRankedPlan-2@rev-1 TOOL-dRankedPlan-20@rev-1 TOOL-dRankedPlan-21@rev-1 TOOL-dRankedPlan-22@rev-1 TOOL-dRankedPlan-23@rev-1 TOOL-dRankedPlan-24@rev-1 TOOL-dRankedPlan-25@rev-1 TOOL-dRankedPlan-26@rev-1 TOOL-dRankedPlan-27@rev-1 TOOL-dRankedPlan-28@rev-1 TOOL-dRankedPlan-29@rev-1
-TOOL-dRankedPlan-3@rev-1 TOOL-dRankedPlan-4@rev-1 TOOL-dRankedPlan-5@rev-1 TOOL-dRankedPlan-6@rev-1 TOOL-dRankedPlan-7@rev-1 TOOL-dRankedPlan-8@rev-1 TOOL-dRankedPlan-9@rev-1 TOOL-dRankedPlan-30@rev-1 TOOL-dRankedPlan-31@rev-1 TOOL-dRankedPlan-32@rev-1 TOOL-dRankedPlan-33@rev-1
-TOOL-dRankedPlan-34@rev-1 TOOL-dRankedPlan-35@rev-1 TOOL-dRankedPlan-36@rev-1 TOOL-dRankedPlan-37@rev-1 TOOL-dRankedPlan-38@rev-1 TOOL-dRankedPlan-39@rev-1 TOOL-dRankedPlan-40@rev-1 TOOL-dRankedPlan-41@rev-1 TOOL-dRankedPlan-43@rev-1 TOOL-dRankedPlan-44@rev-1 TOOL-dRankedPlan-45@rev-1
-TOOL-dRankedPlan-46@rev-1 TOOL-dRankedPlan-47@rev-1 TOOL-dRankedPlan-48@rev-1 TOOL-dRankedPlan-49@rev-1 TOOL-dRankedPlan-50@rev-1 TOOL-dRankedPlan-51@rev-1 TOOL-dRankedPlan-52@rev-1 TOOL-dRankedPlan-53@rev-1 TOOL-dRankedPlan-54@rev-1 TOOL-dRankedPlan-55@rev-1 TOOL-dRankedPlan-56@rev-1
-TOOL-dRankedPlan-57@rev-1 TOOL-dRankedPlan-58@rev-1 TOOL-dRankedPlan-59@rev-1 TOOL-dRankedPlan-60@rev-1 TOOL-dRankedPlan-61@rev-1 TOOL-dRankedPlan-62@rev-1 TOOL-dRankedPlan-63@rev-1 TOOL-dRankedPlan-64@rev-1 TOOL-dRankedPlan-65@rev-1 TOOL-dRankedPlan-66@rev-1 TOOL-dRankedPlan-67@rev-1
-TOOL-dRankedPlan-69@rev-1 TOOL-dRankedPlan-70@rev-1 TOOL-dRankedPlan-71@rev-1 TOOL-dRankedPlan-72@rev-1 TOOL-dRankedPlan-73@rev-1 TOOL-dRankedPlan-74@rev-1 TOOL-dRankedPlan-75@rev-1 TOOL-dRankedPlan-76@rev-1 TOOL-dRankedPlan-77@rev-1.
+Ids whose spec moved past its audited revision: TOOL-dRankedPlan-1@rev-1 TOOL-dRankedPlan-13@rev-1 TOOL-dRankedPlan-14@rev-1 TOOL-dRankedPlan-15@rev-1 TOOL-dRankedPlan-16@rev-1 TOOL-dRankedPlan-2@rev-1 TOOL-dRankedPlan-21@rev-1 TOOL-dRankedPlan-22@rev-1 TOOL-dRankedPlan-24@rev-1
+TOOL-dRankedPlan-29@rev-1 TOOL-dRankedPlan-3@rev-1 TOOL-dRankedPlan-4@rev-1 TOOL-dRankedPlan-9@rev-1 TOOL-dRankedPlan-30@rev-1 TOOL-dRankedPlan-31@rev-1 TOOL-dRankedPlan-32@rev-1 TOOL-dRankedPlan-33@rev-1 TOOL-dRankedPlan-34@rev-1 TOOL-dRankedPlan-35@rev-1 TOOL-dRankedPlan-37@rev-1
+TOOL-dRankedPlan-45@rev-1 TOOL-dRankedPlan-46@rev-1 TOOL-dRankedPlan-48@rev-1 TOOL-dRankedPlan-49@rev-1 TOOL-dRankedPlan-50@rev-1 TOOL-dRankedPlan-51@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
