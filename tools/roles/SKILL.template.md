@@ -48,8 +48,8 @@ Read `unattended.sh --plan <slug> --paths`, then call `{{TOOL_ROOT}}workflows/un
 `units[]` entry carries its `planState` from that read; no `runStateExists`; `base` is the READY
 line's; `roles` from `handoff.py harness-args unattended-build`; `efforts` from
 `handoff.py stage-efforts spec-write`; `specAudit` only where the build
-README declares `spec-audit:`; `disposal` beside it, the value
-`policy.py get review.spec-audit.disposal` reports. Act on its `nextAction`.
+README declares `spec-audit:`; `disposal` beside it, the value on that read's
+`spec-disposal:` line, omitted on `absent`. Act on its `nextAction`.
 
 ## Stage 4 — spec-review
 

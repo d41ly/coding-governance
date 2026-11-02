@@ -180,8 +180,8 @@ function chunk(a, n) {
 //   specAudit: "<YYYY-MM-DD>",                      // the README front-matter `spec-audit:` override the
 //                                                   //   driver's preflight pinned; ABSENT = the audit is
 //                                                   //   OFF by declaration and the roster follows SPEC
-//   disposal: "by-nature" | "promote-all",          // optional: the value `policy.py get review.spec-audit.disposal`
-//                                                   //   reports, which this runtime cannot read. ABSENT = a run
+//   disposal: "by-nature" | "promote-all",          // optional: the `spec-disposal:` line of `--plan --paths`,
+//                                                   //   which this runtime cannot read. ABSENT = a run
 //                                                   //   preflighted before SPEC_FOLD_CUTOFF: today's prompt,
 //                                                   //   today's row and no `dispositions`. Not audit-shaped:
 //                                                   //   with the audit off the stage never reads it

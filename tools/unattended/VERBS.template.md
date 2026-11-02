@@ -774,8 +774,11 @@ all, and the kickoff engine's exit list has no entry for this path, deliberately
   off. Pass `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>`
   or `opted in by project default SPEC_AUDIT_DEFAULT: <date>`, and omit it on `not owed (opt-in)`;
   the fan-out hook compares the value with the run's pinned `spec-audit` fact and refuses any other.
-  A run preflighted on or after `SPEC_FOLD_CUTOFF` passes `disposal`, the value
-  `policy.py get review.spec-audit.disposal` reports, and a run before it omits the arg. Under
+  A caller passes `disposal`, the value of the `spec-disposal:` line `--plan <slug> --paths` prints,
+  and omits the arg on `absent`. That line is the one answer `SPEC_FOLD_CUTOFF`, the run's first-commit
+  date and `review.spec-audit.disposal` give together: `by-nature`, `promote-all`, `absent`, or
+  `refused - <why>`, with the run dated today where no run-state file exists and the key at its kit
+  default where no policy kit resolves. Under
   `by-nature` every `units[]` entry also carries its `planState` from `--plan <slug> --paths`,
   because a disposal naming a unit with no `planState` is refused and its hand-out carries no
   roster.

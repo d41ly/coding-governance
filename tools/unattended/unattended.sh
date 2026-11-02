@@ -6182,6 +6182,15 @@ ASKROWS
   else
     echo "roster: the generated units region, in build order (the authored pair names no id of this build)"
   fi
+  # THE LINE A CALLER COPIES AS `disposal` (TOOL-dFoldedAudit-13), under `--paths` alone, because check 30
+  # runs the framed table over every build and this read costs a `git log` per build. It carries no TAB,
+  # so a four-field caller skips it, and a refused read still exits 0: this verb is the resume route, and
+  # a copied `refused - ...` meets the harness's own type check.
+  if [ -n "$PLAN_PATHS" ]; then
+    runmd_of "$slug" >/dev/null
+    read_spec_disposal "$_runmd" "$slug"
+    printf 'spec-disposal: %s\n' "$_sd_value${_se_why:+ - ${_se_why%%$'\n'*}}"
+  fi
   # R3-B1 — THE TERMINAL WORDING IS EARNED, not defaulted. "every tracked spec is terminal" was
   # printed at exit 0 over builds where no spec graded as a unit at all, one line below the NOT A
   # UNIT rows saying so. A reader — or an agent picking up work — is told the build is finished.
@@ -12742,6 +12751,32 @@ read_spec_exit_rule() { # run-state file · slug · subject -> sets _se_rule and
   return 0
 }
 
+# THE ONE ANSWER A CALLER COPIES (TOOL-dFoldedAudit-13). `_sd_value` is by-nature, promote-all, absent
+# or refused, and `_se_why` holds a refused read, as `read_spec_exit_rule` leaves it. Read-only, and
+# called in the caller's shell, because a refusal in `$( )` loses its status.
+#
+# NO RUN-STATE FILE IS AN ATTENDED RUN, WHICH BEGINS TODAY. `read_spec_exit_rule` reads a path with no
+# history as past any cutoff, which is right for a record nothing has committed yet and wrong for a
+# run with no record at all under a cutoff dated ahead of it. A blank cutoff sorts below every date, so
+# it falls through and answers `absent` with no Python, and an unavailable clock leaves the read on
+# `read_spec_exit_rule`'s answer. The third argument is any subject that is not the slug, and this one
+# spells the stem of the harness's own. Any `_se_why` reads as refused, whatever `_se_rule` holds.
+read_spec_disposal() { # run-state file · slug -> sets _sd_value
+  local now
+  _se_why=""
+  if [ ! -f "$1" ]; then
+    now=$(read_utc_now)
+    if [ -n "$now" ] && [[ "${now%%T*}" < "$SPEC_FOLD_CUTOFF" ]]; then _sd_value=absent; return 0; fi
+  fi
+  read_spec_exit_rule "$1" "$2" "$2-spec-set"
+  case "$_se_rule:$_se_why" in
+    old:) _sd_value=absent ;;
+    folds:) _sd_value=by-nature ;;
+    counted:) _sd_value=promote-all ;;
+    *) _sd_value=refused ;;
+  esac
+}
+
 # ONE SITE FOR EVERY REFUSAL OF A COUNTED EXIT (TOOL-dFoldedAudit-2), because `REFUSAL_CEILINGS` holds
 # this file at its ceiling and the way up is the owner's review; `check_exit_fold` below pays for it.
 # Called once, straight after the state is computed. It reads the rule on a terminal state only and
@@ -13470,7 +13505,7 @@ read_chain_record() { # slug -> 0 with _chain_rec the tracked record or empty, e
 # none exists, and the caller commits the record beside the disposal's folds.
 write_chain_round() { # slug · subject · audited ids · blockers · highs, rows in RR_FINDINGS and RR_SIBLINGS
   local slug="$1" subj="$2" audited="$3" blockers="$4" highs="$5"
-  local id='[A-Z]+-[A-Za-z0-9]+-[0-9]+' rel rec now tok rows="" last=0 seen=0 round
+  local id='[A-Z]+-[A-Za-z0-9]+-[0-9]+' rel rec now tok rows="" last=0 seen=0 round folds=""
   local f_id f_sev f_nat f_specs f_unit f_rev
   local re_ids="^$id( $id)*\$" re_sibling="^$id@rev-[0-9]+\$"
   local re_finding="^[0-9]+/(BLOCKER|HIGH|MEDIUM|LOW)/(local|new-mechanism)/$id(,$id)*/$id/[0-9]+\$"
@@ -13504,11 +13539,21 @@ write_chain_round() { # slug · subject · audited ids · blockers · highs, row
     IFS=/ read -r f_id f_sev f_nat f_specs f_unit f_rev <<<"$tok"
     rows+="round $round · finding $f_id · $f_sev · $f_nat · specs ${f_specs//,/ } · unit $f_unit · rev $f_rev"$'\n'
     case "$f_sev" in BLOCKER) b_ids[$f_id]=1 ;; HIGH) h_ids[$f_id]=1 ;; esac
+    [ "$f_nat" != local ] || folds=1
   done
   for tok in ${RR_SIBLINGS[@]+"${RR_SIBLINGS[@]}"}; do
     [[ $tok =~ $re_sibling ]] || { check_chain_fault "a --sibling is outside <id>@rev-<N>: $tok"; return 1; }
     rows+="round $round · sibling · unit ${tok%@rev-*} · rev ${tok##*@rev-}"$'\n'
+    folds=1
   done
+  # A FOLD ANSWERS TO THE RUN'S RULE, because the value a caller passes was its own copy of it
+  # (TOOL-dFoldedAudit-13). A sibling edit is a fold too, and this read is lazy, so a round of
+  # `new-mechanism` rows spawns nothing and passes under every answer.
+  if [ -n "$folds" ]; then
+    runmd_of "$slug" >/dev/null
+    read_spec_disposal "$_runmd" "$slug"
+    [ "$_sd_value" = by-nature ] || { check_chain_fault "a local or --sibling row folds, and this run's spec disposal reads $_sd_value${_se_why:+, $_se_why}, which folds nothing"; return 1; }
+  fi
   if [ "${#b_ids[@]}" -lt "$blockers" ] || [ "${#h_ids[@]}" -lt "$highs" ]; then
     check_chain_fault "the rows dispose ${#b_ids[@]} BLOCKER and ${#h_ids[@]} HIGH id(s) where the review counted $blockers and $highs, and every confirmed one is disposed somewhere"
     return 1

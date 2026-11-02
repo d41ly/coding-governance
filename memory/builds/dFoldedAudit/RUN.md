@@ -110,3 +110,9 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T04:03:21Z dispatch · item 284b21fc TOOL-dFoldedAudit-14 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/unattended.test.sh memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-14.md
 
 2026-11-02T04:25:22Z dispatch · item 284b21fc TOOL-dFoldedAudit-14 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/unattended.test.sh memory/map/generated/symbols.json memory/LIVE.md memory/builds/dFoldedAudit/README.md memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-14-ledger.md memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-14.md
+
+2026-11-02T04:30:14Z dispatch · item a404274b TOOL-dFoldedAudit-13 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/roles/SKILL.template.md .claude/skills/build/SKILL.md tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-13.md
+
+2026-11-02T04:30:19Z brief · item TOOL-dFoldedAudit-13 · reason 2535b8dca639 memory/builds/dFoldedAudit/prompts/2026-11-02-prompt-TOOL-dFoldedAudit-13-build-brief.md
+
+2026-11-02T04:40:25Z dispatch · item a404274b TOOL-dFoldedAudit-13 · reason memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-13-ledger.md memory/builds/dFoldedAudit/README.md memory/LIVE.md memory/map/generated/symbols.json

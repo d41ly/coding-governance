@@ -2505,11 +2505,12 @@ _fa_old="--folded and --promoted are counted only at a spec audit's terminal exi
 commit_fold_fixture() { # committer date · message
   ( cd "$_fa_r" && git add -A >/dev/null && GIT_COMMITTER_DATE="$1" git commit -q -m "$2" --no-verify )
 }
-write_fold_fixture() { # the record's first commit · SPEC_FOLD_CUTOFF's value · 1 for the policy kit beside the driver
+write_fold_fixture() { # the record's first commit, or nothing for no record · SPEC_FOLD_CUTOFF's value · 1 for the policy kit beside the driver · the policy file's text
   rm -rf "$_fa_r"
-  write_switch_fixture "$_fa_r" "${3:-0}" ""
+  write_switch_fixture "$_fa_r" "${3:-0}" "${4:-}"
   printf 'DISPOSITION_CUTOFF="2000-01-01"\nREVIEW_ROUNDS="1"\nSPEC_FOLD_CUTOFF="%s"\n' "$2" >> "$_fa_r/.unattended.conf"
   mkdir -p "${_fa_run%/*}"
+  [ -n "$1" ] || return 0
   printf '# tFix\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n## Parked\n\n' > "$_fa_run"
   commit_fold_fixture "$1" record
 }
@@ -2668,6 +2669,9 @@ write_chain_fixture() { # 1 for the policy kit beside the driver · the policy f
     printf '# FIX-dFix-%s — u\n\n**Status:** OPEN · rev-1 · 2026-11-01 · node d · Tier-2 · base 0123abcd\n' "$_fc_i" \
       > "$_fc_r/memory/builds/dFix/spec/2026-11-01-spec-FIX-dFix-$_fc_i.md"
   done
+  # DATED, because a `local` or `--sibling` row refuses under a blank cutoff (TOOL-dFoldedAudit-13), and
+  # the year 2000 keeps every arm off the day it runs. The kit default then admits the fold.
+  printf 'SPEC_FOLD_CUTOFF="2000-01-01"\n' >> "$_fc_r/.unattended.conf"
   ( cd "$_fc_r" && git add -A >/dev/null && git commit -q -m roster --no-verify )
 }
 # STDOUT ALONE: the switch reader's note on stderr spells its default, `own-work`, which AC9 asserts absent.
@@ -2812,6 +2816,99 @@ hit "$out" "the roster yields no id"
 # AC17: both verbs refuse through one site, and the merge of check 41's two left one, so the census holds.
 same "FA5 AC17 the chain's refusal has one site" "$(grep -c 'fail 118' "$SCRIPT")" "1"
 same "FA5 AC17 the waiver refusal has one site" "$(grep -c 'fail 41 "a waiver reason may not spell' "$SCRIPT")" "1"
+
+# ---- TOOL-dFoldedAudit-13: ONE DRIVER ANSWER, PRINTED BY `--plan --paths` AND COPIED AS `disposal`, WITH A
+# ---- FOLD REFUSED UNDER ANY OTHER. Each fixture holds one tracked unit at rev-2, and a policy kit only
+# ---- where the arm is about the switch. No arm turns on the day it runs: a past cutoff stays past, and
+# ---- AC5's 2099 is the one that reads the clock. The failing cases, observed at the close and not by the
+# ---- pass that wrote this: `read_spec_disposal` answering `by-nature` at its head reds AC1, AC4 and AC5;
+# ---- the line printing the kit default reds AC3; the fold branch deleted reds AC8.
+_sd_fold=7/HIGH/local/TOOL-tFix-1/TOOL-tFix-1/2; _sd_tab=$(printf '\t')
+write_disposal_fixture() { # write_fold_fixture's arguments -> that fixture and one tracked unit, so `--plan` has a row
+  write_fold_fixture "$@"
+  mkdir -p "${_fa_run%/*}/spec"
+  printf '%s\n' '# tFix' '' '<!-- gen:build-units -->' '| Unit | Status | Rev | Last change |' '|---|---|---|---|' \
+    '| [TOOL-tFix-1 — u](spec/2026-11-01-spec-TOOL-tFix-1.md) | OPEN | rev-2 | 2026-11-01 |' '<!-- /gen:build-units -->' \
+    '' '<!-- roster:units -->' 'TOOL-tFix-1' '<!-- /roster:units -->' > "${_fa_run%/*}/README.md"
+  printf '# TOOL-tFix-1 — u\n\n**Status:** OPEN · rev-2 · 2026-11-01 · node d · Tier-2 · base 0123abcd\n\n## 9. Revision log\n\n- rev-1 · 2026-11-01 · u.\n- rev-2 · 2026-11-01 · a fold.\n' \
+    > "${_fa_run%/*}/spec/2026-11-01-spec-TOOL-tFix-1.md"
+  commit_fold_fixture "$_fa_dated" units
+}
+# STDOUT ALONE, for the reason `run_chain` gives; AC1 and AC2 read the reader's note from the file.
+run_disposal() { ( cd "$_fa_r" && env -u GOV_REMOTE -u GOV_DEFAULT_BRANCH bash "$_fa_r/u/unattended.sh" "$@" ) 2>"$_sw_tmp/err"; }
+check_fold_refused() { # the flags after --blockers 0 -> exit 1, the refusal, and no record
+  out=$(run_disposal --record-round tFix --subject tFix-spec-set-r1 --audited TOOL-tFix-1 --blockers 0 "$@"); rc=$?
+  same "FA13 AC8 [$*] exits 1" "$rc" "1"
+  hit "$out" "UNATTENDED check 118 FAILED — the spec-audit chain record refuses this: a local or --sibling row folds"
+  same "FA13 AC8 [$*] wrote no record" "$(ls "${_fa_run%/*}/build" 2>/dev/null)" ""
+}
+# AC1 and AC7: a blank cutoff reads no switch, and the line sits between `roster:` and a last `next:`.
+write_disposal_fixture "" ""
+out=$(run_disposal --plan tFix --paths); rc=$?
+same "FA13 AC1 the read exits 0" "$rc" "0"
+same "FA13 AC1 the line follows roster:" "$(grep -A1 '^roster: ' <<<"$out" | sed -n 2p)" "spec-disposal: absent"
+same "FA13 AC7 next: is the last line" "$(tail -1 <<<"$out" | cut -d' ' -f1)" "next:"
+same "FA13 AC7 the line carries no TAB" "$(grep '^spec-disposal: ' <<<"$out" | grep -cF "$_sd_tab")" "0"
+miss "$(cat "$_sw_tmp/err")" "no policy kit resolves"
+# ...and neither other form prints it, whatever the cutoff.
+for _sd_cut in "" 2026-11-01; do
+  write_disposal_fixture "" "$_sd_cut"
+  same "FA13 AC7 --plan under [$_sd_cut] prints no line" "$(run_disposal --plan tFix | grep -c 'spec-disposal:')" "0"
+  same "FA13 AC7 --plan --framed under [$_sd_cut] prints no line" "$(run_disposal --plan tFix --framed | grep -c 'spec-disposal:')" "0"
+done
+# AC2: past the cutoff with no policy kit the line takes the kit default and says so, and over a record
+# it agrees with the spec exit.
+write_disposal_fixture "" 2026-11-01
+hit "$(run_disposal --plan tFix --paths)" "spec-disposal: by-nature"
+hit "$(cat "$_sw_tmp/err")" "no policy kit resolves"
+write_disposal_fixture "$_fa_dated" 2026-11-01
+hit "$(run_disposal --plan tFix --paths)" "spec-disposal: by-nature"
+run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 3 --promoted 0 --disposition fold >/dev/null
+same "FA13 AC2 the spec exit takes the fold the line admits" "$?" "0"
+# AC4: a record begun before the cutoff keeps the old rule, on the line and at the exit.
+write_disposal_fixture "$_fa_early" 2026-11-01
+hit "$(run_disposal --plan tFix --paths)" "spec-disposal: absent"
+hit "$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 2 --folded 0 --promoted 0 --disposition fold)" "$_fa_refused$_fa_old"
+# AC5: with no record the run begins today, so a cutoff ahead of it answers `absent`. 2000 is the control.
+write_disposal_fixture "" 2099-01-01
+hit "$(run_disposal --plan tFix --paths)" "spec-disposal: absent"
+write_disposal_fixture "" 2000-01-01
+hit "$(run_disposal --plan tFix --paths)" "spec-disposal: by-nature"
+# AC8: with no run-state file each fold row refuses under `absent` before a byte is written, and a dated
+# cutoff admits the first of them.
+write_disposal_fixture "" ""
+check_fold_refused --highs 1 --finding "$_sd_fold"
+check_fold_refused --highs 0 --sibling TOOL-tFix-1@rev-2
+write_disposal_fixture "" 2026-11-01
+out=$(run_disposal --record-round tFix --subject tFix-spec-set-r1 --audited TOOL-tFix-1 --blockers 0 --highs 1 --finding "$_sd_fold"); rc=$?
+same "FA13 AC8 a dated cutoff admits the fold" "$rc" "0"
+hit "$out" "chain round recorded"
+# AC3, AC6 and AC8 over a policy kit. COUNTED EITHER WAY, as the reader's own arms above are.
+if [ -z "$_sw_rel" ]; then
+  n=$((n+14))
+  echo "  SKIP the disposal line's arms over a policy kit: no policy kit resolves beside this one, so nothing answers them; their 14 assertions are counted, not run"
+else
+  _sd_pa=$'[review.spec-audit]\ndisposal = "promote-all"\n'
+  write_disposal_fixture "$_fa_dated" 2026-11-01 1 "$_sd_pa"
+  hit "$(run_disposal --plan tFix --paths)" "spec-disposal: promote-all"
+  hit "$(run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 1 --promoted 0 --disposition fold)" "which folds nothing"
+  run_fold --subject S1 --verdict "$_fa_cf" --blockers 0 --highs 1 --minors 0 --folded 0 --promoted 1 --disposition promote >/dev/null
+  same "FA13 AC3 the promotion the line names records" "$?" "0"
+  # ...M1's gap: the verb reads the switch itself, with no run-state file, and a round that folds nothing
+  # passes under every answer.
+  write_disposal_fixture "" 2026-11-01 1 "$_sd_pa"
+  hit "$(run_disposal --plan tFix --paths)" "spec-disposal: promote-all"
+  check_fold_refused --highs 1 --finding "$_sd_fold"
+  check_fold_refused --highs 0 --sibling TOOL-tFix-1@rev-2
+  run_disposal --record-round tFix --subject tFix-spec-set-r1 --audited TOOL-tFix-1 --blockers 0 --highs 1 --finding 8/HIGH/new-mechanism/TOOL-tFix-1/TOOL-tFix-2/1 >/dev/null
+  same "FA13 AC8 a round of new-mechanism rows records under promote-all" "$?" "0"
+  # AC6: a refused read prints its first line and leaves the resume route up, at exit 0 with every row.
+  write_disposal_fixture "" 2026-11-01 1 $'[review.spec-audit]\ndisposal = "fold-all"\n'
+  out=$(run_disposal --plan tFix --paths); rc=$?
+  same "FA13 AC6 a refused read exits 0" "$rc" "0"
+  hit "$out" "spec-disposal: refused - "
+  hit "$out" "TOOL-tFix-1"
+fi
 rm -rf "$_sw_tmp"
 
 # ---- TOOL-aSparedSpawn-6 S8, AC8: THE TOP-LEVEL EXIT ARM. An `exit` the driver runs at top level,
@@ -3290,11 +3387,13 @@ same "--plan --paths: a NOT A UNIT diagnostic carries no TAB at all" \
 hit "$paths" "roster: the README roster region"
 hit "$paths" "next: ARCH-tPlan-1 (READY - build it)"
 # AC12 - ORDER comes free. Both modes take their set and order from the generated units region, so
-# the two listings are the same lines in the same sequence and no sort was added.
+# the two listings are the same lines in the same sequence and no sort was added. The `spec-disposal:`
+# line is the one `--paths` adds (TOOL-dFoldedAudit-13), so these read past it and the padded side stays
+# unfiltered, which still pins that nothing else differs.
 same "--plan --paths: the same line count as the padded table" \
-  "$(printf '%s\n' "$paths" | grep -c .)" "$(printf '%s\n' "$out" | grep -c .)"
+  "$(printf '%s\n' "$paths" | grep -v '^spec-disposal: ' | grep -c .)" "$(printf '%s\n' "$out" | grep -c .)"
 same "--plan --paths: the ids appear in the padded table's order" \
-  "$(printf '%s\n' "$paths" | cut -f1 | awk '{print $1}' | tr '\n' ' ')" \
+  "$(printf '%s\n' "$paths" | grep -v '^spec-disposal: ' | cut -f1 | awk '{print $1}' | tr '\n' ' ')" \
   "$(printf '%s\n' "$out" | awk '{print $1}' | tr '\n' ' ')"
 # A TRAILING flag that is NOT --paths leaves the human table alone rather than being read as one.
 same "--plan <slug> <anything else>: still the padded table" \
@@ -18417,7 +18516,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2978 -> 2983 by TOOL-dFoldedAudit-14: the staged rotation's arm in region one after the spec
 # exit's, two `same`, two `miss` and one `hit`, counted off the block's own lines; no suite ran, and
 # their RED-first observation is the close's.
-FLOOR_ASSERTIONS=2983
+# RAISED 2983 -> 3022 by TOOL-dFoldedAudit-13: the disposal line's arms in region one after the chain's,
+# 25 unconditional and 14 over a policy kit, those COUNTED EITHER WAY, counted off the block's own lines
+# with its one two-pass loop at 4; no suite ran, and their RED-first observation is the close's.
+FLOOR_ASSERTIONS=3022
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18558,7 +18660,8 @@ PROLOGUE_ARMS=20
 # RAISED 319 -> 365 by TOOL-dFoldedAudit-2: the same 46 region-one spec exit assertions, see FLOOR_ASSERTIONS.
 # RAISED 365 -> 461 by TOOL-dFoldedAudit-5: the same 96 region-one chain assertions, see FLOOR_ASSERTIONS.
 # RAISED 461 -> 466 by TOOL-dFoldedAudit-14: the same 5 region-one staged rotation assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=466
+# RAISED 466 -> 505 by TOOL-dFoldedAudit-13: the same 39 region-one disposal line assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=505
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
