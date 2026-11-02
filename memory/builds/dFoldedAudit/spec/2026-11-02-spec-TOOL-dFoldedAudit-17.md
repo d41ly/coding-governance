@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively
 
-**Status:** INPROGRESS · rev-3 · 2026-11-02 · node d · Tier-1 · base 8a5328a9 · streams tooling · order 170
+**Status:** INPROGRESS · rev-5 · 2026-11-02 · node d · Tier-1 · base 8a5328a9 · streams tooling · order 170
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-11-02-build-TOOL-dFoldedAudit-17-3-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-3-spec-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-5-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-5-spec-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-17-6-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-6-spec-return.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md) | journal | — |
@@ -178,7 +179,7 @@ git diff --name-only --diff-filter=U
 
 `--no-commit` holds the merge open, so the generated renders and the stamp land in the merge commit.
 The builder records `git rev-parse origin/main`. Every figure below is PINNED at `8a5328a9`, and the
-last subsection says what re-derives when the tip has moved. The probes and `drift.err` live in `$P`,
+last subsection says what re-derives when the tip has moved. The probes live in `$P`,
 outside the worktree, so `git status` shows the merge's own paths alone.
 
 ### The stop
@@ -279,7 +280,8 @@ block S2 resolves, and `docs-undocumented.txt` added to `PROJECT_REGISTRY_EXTRA`
 `TOOL-dSafePassage-13`, at line 925 of main's conf. That addition sits outside the conflicted hunk and
 merges clean, and no §B line names the key.
 
-One §B line names the resolver floor. It is `memory/guides/SESSION-KICKOFF.md:219` at `84acebdc`, and
+One §B line names the resolver floor. It is line 219 of main's copy of the kickoff manifest,
+`memory/guides/SESSION-KICKOFF.md`, at `84acebdc`, and
 line 223 of the conflicted blob. Main added it in `1f7d1966`, whose parent `201eb127` is the sha its
 `last-body-change` names, and it is current at main's tip. So the expected delta stays none, measured
 2026-11-02, and the builder re-reads §B to confirm it. The stall check then counts 5 non-merge watched
@@ -467,8 +469,9 @@ SIX=".memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec
   permission: scratch-guard refuses a leg's exact argv to a role agent (`tools/hooks/scratch-guard.js:1373-1379`).
   Where it refuses this one, the main loop observes it at the close.
   Red when: `main()` reads one key only, so the other join raises before its line prints.
-- **AC9** — When `"$GOV_PYTHON" tools/drift-audit/drift_report.py --check 2>"$P/drift.err"` runs,
-  `grep -c cutoff_keys_armed "$P/drift.err"` prints 0, and its stdout row for `cutoff_keys_armed` reads
+- **AC9** — When `"$GOV_PYTHON" tools/drift-audit/drift_report.py --check 2>&1 >/dev/null | grep -c cutoff_keys_armed`
+  runs, its stderr piped into the count, it prints 0. The same command's stdout row, read by
+  `"$GOV_PYTHON" tools/drift-audit/drift_report.py --check 2>/dev/null | grep cutoff_keys_armed`, reads
   38 with `ok (pin 39, drain it)`.
   permission: this is the `drift-audit records` leg's argv, and AC8's note applies.
   fixture: the base ref is the shared `refs/remotes/origin/main`, the tip S1's fetch set.
@@ -533,6 +536,12 @@ none
   at `:1442-1443` and the always-advances rule at `MANIFEST-TEMPLATE.md:30`.
 - rev-3 · 2026-11-02 · S10 · §4 · both commits carry the charter's trailer,
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
+- rev-4 · 2026-11-02 · S1 · AC9 · AC9 pipes stderr straight into its count, and reads the stdout row in
+  a second run, so no scratch file is written and no code span holds an untracked path; S1 drops the
+  file it named. Rev-3 was committed in `f0f766def` under a records subject with this hit present.
+- rev-5 · 2026-11-02 · S7 · the resolver floor's line on main is named in prose, line 219 of main's
+  copy of the kickoff manifest, since the cite join grades a path-and-line span against this tree's
+  218-line copy; it was the spec's only path-and-line span into main's copy.
 
 ## 9. Reuse audit
 
