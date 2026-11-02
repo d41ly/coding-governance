@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-13 — one read-only driver read answers whether a run takes the fold rule
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 100
+**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 100
 
 <!-- gen:spec-records -->
 
