@@ -74,6 +74,17 @@ out=$(PATH="$C:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1); rc=$?
 [ "$rc" != 0 ] || bad "an all-broken PATH still returned 0"; ok
 grep -qF 'no usable python launcher' <<<"$out" || bad "the all-broken failure does not name itself"; ok
 grep -qF 'tried: python3 python py' <<<"$out" || bad "the failure does not list the candidates it tried"; ok
+# TOOL-dSafePassage-26 S20, AC19: the refusal opens with its name and closes with the candidates,
+# verbatim, every other line between them; the two RA7-4 arms of unattended-build.test.sh read both.
+out=$(env -u GOV_PYTHON PATH="$C:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1 >/dev/null)
+[[ $(head -n 1 <<<"$out") == "resolve_python: no usable python launcher"* ]] || bad "the refusal's first line is not its name: $(head -n 1 <<<"$out")"; ok
+[ "$(tail -n 1 <<<"$out" | tr -d '\r')" = "resolve_python: tried: python3 python py" ] || bad "a line prints after the tried: line: $(tail -n 1 <<<"$out")"; ok
+# TOOL-dSafePassage-26 S48, AC46: the probe runs each candidate under -I. A launcher that exits 1
+# under -I and runs without it is passed over as `did not run`; a probe without -I would pick it.
+mkdir -p "$TMP/noisolate"; printf '#!/usr/bin/env bash\nfor a in "$@"; do [ "$a" = -I ] && exit 1; done\nexec "%s" "$@"\n' "$REALPY_ABS" > "$TMP/noisolate/python3"
+chmod +x "$TMP/noisolate/python3"; mkfake "$TMP/noisolate" python 9009; mkfake "$TMP/noisolate" py 9009
+out=$(env -u GOV_PYTHON PATH="$TMP/noisolate:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1); rc=$?
+{ [ "$rc" != 0 ] && grep -qF 'resolve_python:   python3: did not run' <<<"$out"; } || bad "a launcher failing only under -I was not passed over as did not run: rc=$rc $out"; ok
 
 # (c) GOV_PYTHON, both states. An override that is set and unusable must be a NAMED failure — the
 # operator believes they chose, and a silent fall-through hides that they did not.
@@ -156,6 +167,178 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 UNATTENDED_DIR=$(resolve_kit_dir "$REALPY" unattended check-unattended.sh "$HERE") || exit 2
 RUNGATES_DIR=$(resolve_kit_dir "$REALPY" run-gates run-gates.sh "$HERE") || exit 2
+
+# ---- 1b. THE FLOOR, BEHAVIOUR (TOOL-dSafePassage-11) ---------------------------------------------
+# The floor is READ from its one declaration here, never typed, so a later raise moves no line of
+# this file. (f) fake launchers that RUN and report 3.14 — the old probe asked only whether a
+# candidate runs, so it took the first of them; each must now be passed over and named, the refusal
+# must name the install command, and the preflight must refuse with the resolver's own stderr, byte
+# for byte. (g) a fake alias that reports the floor and a real interpreter's path must yield that
+# path, never its own name. WHAT THIS DOES NOT CHECK: a real interpreter below the floor, which is
+# dWitnessedBar's real-interpreter arm, or the `uv` offer on a terminal, which no captured run has.
+FLOOR=$(tr -d '\r\n' < "$HERE/python-floor.txt")
+FLOORPY=$("$REALPY" -I -c 'import sys; print(sys.executable.replace("\\", "/"))' | tr -d '\r')
+write_fake_launcher() { # $1=dir $2=name $3=what it prints for any argument
+  mkdir -p "$1"; printf '#!/usr/bin/env bash\necho "%s"\n' "$3" > "$1/$2"; chmod +x "$1/$2"
+}
+FLO="$TMP/below"
+for nm in python3 python py gp; do write_fake_launcher "$FLO" "$nm" '3.14 $0'; done
+out=$(PATH="$FLO:$PATH" GOV_PYTHON="$FLO/gp" bash -c '. "$1"; resolve_python' _ "$CANON" 2>"$TMP/below.err"); rc=$?
+[ "$rc" != 0 ] && [ -z "$out" ] || bad "fakes reporting 3.14 were accepted below the floor $FLOOR (got '$out')"; ok
+for nm in "$FLO/gp" python3 python py; do
+  grep -qF "resolve_python:   $nm: ran 3.14, below the floor $FLOOR" "$TMP/below.err" \
+    || bad "the refusal does not name $nm as 3.14, below the floor $FLOOR"; ok
+done
+grep -qF "uv python install $FLOOR" "$TMP/below.err" || bad "the refusal does not name the install command uv python install $FLOOR"; ok
+PATH="$FLO:$PATH" GOV_PYTHON="$FLO/gp" bash "$HERE/python-floor.sh" preflight >/dev/null 2>"$TMP/pre.err"; rc=$?
+[ "$rc" = 1 ] || bad "the preflight below the floor exited $rc, not 1"; ok
+cmp -s "$TMP/below.err" "$TMP/pre.err" || bad "the preflight's refusal differs from the resolver's own, byte for byte"; ok
+out=$(bash "$HERE/python-floor.sh" preflight 2>&1); rc=$?
+{ [ "$rc" = 0 ] && [[ $out == *"$FLOORPY runs Python $FLOOR"* ]]; } || bad "the preflight at the floor did not print the interpreter and its version: rc=$rc '$out'"; ok
+write_fake_launcher "$TMP/alias" python3 "$FLOOR $FLOORPY"
+got=$(env -u GOV_PYTHON PATH="$TMP/alias:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
+[ "$got" = "$FLOORPY" ] || bad "a fake alias at the floor yielded '$got', not the direct executable $FLOORPY it reported"; ok
+# (h) TOOL-dSafePassage-23: an override is echoed as given, whatever it is named; only the three
+# launcher names give way to the executable their probe printed, which (g) holds. A wrapper reporting
+# the floor and a real file's path yields the wrapper, from GOV_PYTHON and from the caller alike;
+# GOV_PYTHON=python with a fake `python` first on PATH yields `python`; a wrapper below the floor is
+# still passed over and named. WHAT THIS DOES NOT CHECK: a wrapper that forwards to a real
+# interpreter, which the install-prefix and manifest-check suites' own arms spawn.
+WRP="$TMP/override"
+write_fake_launcher "$WRP" wrap "$FLOOR $FLOORPY"
+got=$(PATH="$TMP/alias:$PATH" GOV_PYTHON="$WRP/wrap" bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
+[ "$got" = "$WRP/wrap" ] || bad "a GOV_PYTHON wrapper at the floor yielded '$got', not the wrapper as given"; ok
+got=$(env -u GOV_PYTHON bash -c '. "$1"; resolve_python "$2"' _ "$CANON" "$WRP/wrap" 2>/dev/null)
+[ "$got" = "$WRP/wrap" ] || bad "a caller override at the floor yielded '$got', not the override as given"; ok
+write_fake_launcher "$WRP/shim" python "$FLOOR $FLOORPY"
+got=$(PATH="$WRP/shim:$PATH" GOV_PYTHON=python bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
+[ "$got" = python ] || bad "GOV_PYTHON=python yielded '$got', not python as given"; ok
+write_fake_launcher "$WRP" wrap14 "3.14 $FLOORPY"
+out=$(PATH="$FLO:$PATH" GOV_PYTHON="$WRP/wrap14" bash -c '. "$1"; resolve_python' _ "$CANON" 2>&1); rc=$?
+{ [ "$rc" != 0 ] && [[ $out == *"$WRP/wrap14: ran 3.14, below the floor $FLOOR"* ]]; } || bad "a GOV_PYTHON wrapper at 3.14 was not passed over and named: rc=$rc $out"; ok
+
+# ---- 1c. THE INSTALL COMMAND AS platforms.provision SAYS (TOOL-dSafePassage-11) -------------------
+# A scratch repository with no remote holds the resolver and the policy kit at gov's paths. Its
+# pass-through fakes report 3.14 to the resolver's probe and run the real interpreter otherwise, so
+# the refusal path reads the key with the real reader. `off` on `main` names no command; `uv` with
+# stderr captured names `name`'s command and says it was not offered; an unset key names it; `off` on
+# `main` with `uv` on the checked-out branch's commit and in an uncommitted edit names none, because
+# the landed revision is read; the kit removed names the command and says no reader ran.
+POL_DIR=$(resolve_kit_dir "$REALPY" policy policy.py "$HERE") || exit 2
+PV="$TMP/prov"; PVF="$TMP/passthru"; mkdir -p "$PV/$KIT_REL" "$PVF"
+cp "$CANON" "$PV/$KIT_REL/"
+(cd "$ROOT" && git ls-files -- "$POL_DIR") | while IFS= read -r p; do mkdir -p "$PV/${p%/*}"; cp "$ROOT/$p" "$PV/$p"; done
+for nm in python3 python py; do
+  printf '#!/usr/bin/env bash\nfor a in "$@"; do last=$a; done\ncase "${last:-}" in *"sys.version_info[:2], sys.executable"*) echo "3.14 $0"; exit 0 ;; esac\nexec "%s" "$@"\n' "$FLOORPY" > "$PVF/$nm"
+  chmod +x "$PVF/$nm"
+done
+write_provision() { mkdir -p "$PV/.governance"; if [ -n "$1" ]; then printf '[platforms]\nprovision = "%s"\n' "$1"; else printf '# unset\n'; fi > "$PV/.governance/policy.toml"; }
+run_provision_refusal() { (cd "$PV" && env -u GOV_PYTHON PATH="$PVF:$PATH" bash -c '. "$1"; resolve_python' _ "$KIT_REL/resolve-python.sh" 2>&1 >/dev/null); }
+run_provision_git() { git -C "$PV" -c user.email=t@e -c user.name=t "$@"; }
+run_provision_git init -q -b main
+write_provision off; run_provision_git add -A; run_provision_git commit -qm off
+out=$(run_provision_refusal)
+{ [[ $out != *"python install"* ]] && [[ $out != *"py install"* ]] && [[ $out == *"provision is off"* ]]; } || bad "platforms.provision off on main still named an install command: $out"; ok
+write_provision uv; run_provision_git commit -qam uv
+out=$(run_provision_refusal)
+{ [[ $out == *"uv python install $FLOOR"* ]] && [[ $out == *"not offered"* ]]; } || bad "platforms.provision uv with stderr captured did not name the command and say it was not offered: $out"; ok
+write_provision ""; run_provision_git commit -qam unset
+out=$(run_provision_refusal)
+{ [[ $out == *"uv python install $FLOOR"* ]] && [[ $out != *"not offered"* ]] && [[ $out != *"no reader ran"* ]]; } || bad "an unset platforms.provision did not name the command as name does: $out"; ok
+write_provision off; run_provision_git commit -qam off-again; run_provision_git checkout -qb feature; write_provision uv; run_provision_git commit -qam branch-uv
+printf '[platforms]\nprovision = "uv"\n# uncommitted\n' > "$PV/.governance/policy.toml"
+out=$(run_provision_refusal)
+[[ $out != *"python install"* ]] || bad "the refusal read platforms.provision from the branch or the working tree, not the landed main: $out"; ok
+rm -rf "${PV:?}/$POL_DIR"
+out=$(run_provision_refusal)
+{ [[ $out == *"uv python install $FLOOR"* ]] && [[ $out == *"no reader ran"* ]]; } || bad "with the policy kit removed the refusal did not name the command and say no reader ran: $out"; ok
+
+# ---- 1d. THE FLOOR STATEMENTS AND THE COPIES (TOOL-dSafePassage-11) -------------------------------
+# On this tree the query finds no statement and every copy's literal equals the declaration; at the
+# raise's base it finds the seven statements, settings-merge's and the lexicon selftest's among them
+# (PINNED; the lexicon one is TOOL-dSafePassage-26 S49's). Then a fixture repository: a declaration that differs from a copy's literal, a planted statement (built
+# here, so this file carries none), and an unmarked multi-line definition, each named.
+out=$(cd "$ROOT" && "$REALPY" -I "$HERE/python_floor.py" check 2>&1); rc=$?
+[ "$rc" = 0 ] && [ -z "$out" ] || bad "python_floor.py check on this tree is not clean: rc=$rc $out"; ok
+out=$(cd "$ROOT" && "$REALPY" -I "$HERE/python_floor.py" check --rev 3708a705 2>&1 | tr -d '\r')
+# The statements counted with no fork, each matched by a path assembled from this suite's own names.
+printf '%s\n' "$out" >"$TMP/floor-rev.txt"
+n1c=0; while IFS= read -r l1c; do [ -n "$l1c" ] && n1c=$((n1c + 1)); done <"$TMP/floor-rev.txt"
+lx1c=lexicon
+{ [ "$n1c" = 7 ] && [[ $out == *"${PFX}settings-merge.py:3: "*"py>="*"3.10"* ]] && [[ $out == *"${PFX}$lx1c/selftest.py:109: "* ]]; } \
+  || bad "python_floor.py check --rev 3708a705 did not print the seven pinned statements: $out"; ok
+FQ="$TMP/fq"; mkdir -p "$FQ/$KIT_REL"
+cp "$HERE/python_floor.py" "$FQ/$KIT_REL/"; printf '9.99\n' > "$FQ/$KIT_REL/python-floor.txt"
+sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$CANON" > "$FQ/copy.sh"
+printf 'needs Python %s or newer\n' 3.12 > "$FQ/note.md"
+printf 'resolve_python() {\n  :\n}\n' > "$FQ/unmarked.sh"
+git -C "$FQ" init -q && git -C "$FQ" add -A
+out=$(cd "$FQ" && "$REALPY" -I "$KIT_REL/python_floor.py" check 2>&1 | tr -d '\r'); rc=$?
+[[ $out == *"copy.sh:"*"_rp_floor=\"$FLOOR\" differs from the declaration 9.99"* ]] || bad "a copy's literal differing from the declaration was not named: $out"; ok
+[[ $out == *"note.md:1: needs Python"* ]] || bad "a planted floor statement in a tracked .md was not named: $out"; ok
+[[ $out == *"unmarked.sh:1: an unmarked multi-line definition"* ]] || bad "an unmarked multi-line resolve_python definition was not named: $out"; ok
+
+# ---- 1e. THE STEP'S DOWN (TOOL-dSafePassage-11, TOOL-dSafePassage-26 S10 S11) ----------------------
+# A fixture gov carrying the declaration, the floor kit's three files and one copy, downed on its own
+# tree, its source mode: a planted PEP 701 f-string at <to> reds the down, names its file and line
+# and writes nothing; one planted at the tip but absent at <to> passes, since the down grades what the
+# rollback restores (AC9), and restores 3.11 in the declaration and the copy's literal; a planted TOML
+# 1.1 inline table at <to> reds it again. Then an adopter of that gov: its own PEP 701 file, which no
+# receipt row names, passes, and a TOML 1.1 table in its `.governance/policy.toml` reds (AC10). Red
+# in either mode: `ast.parse(feature_version=(3, 11))` accepts the f-string, and the running tomllib
+# accepts the table. WHAT THIS DOES NOT CHECK: a real 3.11 compile on a node with none, which is
+# dWitnessedBar's, and any grammar change outside the static mode's eight shapes.
+FD="$TMP/fd"; mkdir -p "$FD/$KIT_REL"
+printf '%s\n' "$FLOOR" > "$FD/$KIT_REL/python-floor.txt"; sed -n '/^# >>> resolve_python/,/^# <<< resolve_python/p' "$CANON" > "$FD/copy.sh"
+cp "$HERE/python-floor.sh" "$HERE/python_floor.py" "$CANON" "$FD/$KIT_REL/"
+PF701='c = 1\nv = f"{"X" if c else "y"}"\n'
+printf "$PF701" > "$FD/planted.py"
+run_down_git() { git -C "$FD" -c user.email=t@e -c user.name=t "$@"; }
+run_down() { out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$1" "$2" 2>&1); rc=$?; out=${out//$'\r'/}; }
+run_down_git init -q && run_down_git config core.autocrlf false && run_down_git add -A && run_down_git commit -qm raise
+run_down "$FD" "$(run_down_git rev-parse HEAD)"
+{ [ "$rc" = 1 ] && [[ $out == "python-floor down: mode "* ]] && [[ $out == *"planted.py:2: "* ]]; } || bad "the down over a planted PEP 701 f-string did not exit 1 naming planted.py:2: rc=$rc $out"; ok
+[ "$(tr -d '\r\n' < "$FD/$KIT_REL/python-floor.txt")" = "$FLOOR" ] || bad "the down wrote the declaration before grading"; ok
+# TOOL-dSafePassage-69 S3, S2: the step's tail is stderr and the walk keeps its last line, so the down
+# reports there alone, its count line naming the first finding; and the static mode grades the PEP 701
+# shapes only below 3.12, the version that made them legal (`resolve_floor_interpreter` stubbed out).
+out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FD" "$(run_down_git rev-parse HEAD)" 2>/dev/null)
+[ -z "$out" ] || bad "the down printed on stdout, which the step's tail never reads: $out"; ok
+out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FD" "$(run_down_git rev-parse HEAD)" 2>&1 >/dev/null); out=${out//$'\r'/}
+[[ ${out##*$'\n'} == "python-floor down: 1 finding(s) under the floor 3.11, the first planted.py:2: "* ]] \
+  || bad "the down's last stderr line does not count its finding and name the first: $out"; ok
+printf '%s\n' "v = f\"{'#':>3}\"" > "$FD/hash.py" && run_down_git add hash.py && run_down_git commit -qm "a # in a replacement field"
+out=$("$REALPY" -I -c 'import sys; sys.path.insert(0, sys.argv[1]); import python_floor as pf; pf.resolve_floor_interpreter = lambda v: None
+for prior in ("3.12", "3.11"): print(pf.check_down_floor(sys.argv[2], prior, sys.argv[3]))' "$FD/$KIT_REL" "$FD" "$(run_down_git rev-parse HEAD)" 2>&1); out=${out//$'\r'/}
+{ [[ ${out%%$'\n'*} == "('static', "* && ${out%%$'\n'*} != *"hash.py"* ]] && [[ ${out#*$'\n'} == *"hash.py:1: "* ]]; } \
+  || bad "the static grade of a committed '#' in a replacement field did not pass under 3.12 and name hash.py:1 under 3.11: $out"; ok
+run_down_git rm -q hash.py && run_down_git commit -qm "unplant the #"
+run_down_git rm -q planted.py && run_down_git commit -qm unplant
+TO=$(run_down_git rev-parse HEAD)
+printf "$PF701" > "$FD/planted.py" && run_down_git add planted.py && run_down_git commit -qm "the tip plants again"
+run_down "$FD" "$TO"
+{ [ "$rc" = 0 ] && [ "$(tr -d '\r\n' < "$FD/$KIT_REL/python-floor.txt")" = 3.11 ] && grep -q '^  _rp_floor="3.11"$' "$FD/copy.sh"; } \
+  || bad "the down over a file at the tip but absent at <to> did not pass and restore 3.11 in the declaration and the copy: rc=$rc $out"; ok
+run_down_git checkout -q -- . && printf '[a]\nt = { x = 1,\n      y = 2 }\n' > "$FD/planted.toml" && run_down_git add planted.toml && run_down_git commit -qm toml
+run_down "$FD" "$(run_down_git rev-parse HEAD)"
+{ [ "$rc" = 1 ] && [[ $out == *"planted.toml:"* ]]; } || bad "the down over a planted TOML 1.1 inline table did not exit 1 naming planted.toml: rc=$rc $out"; ok
+FT="$TMP/ft"; mkdir -p "$FT/.governance"
+printf '{"schema": 3, "files": [{"path": "kit/ok.py", "role": "engine", "source": "%s/python_floor.py"}]}\n' "$KIT_REL" > "$FT/.governance/install.json"
+printf "$PF701" > "$FT/own.py"
+run_down "$FT" "$(run_down_git rev-parse HEAD)"
+{ [ "$rc" = 0 ] && [[ $out != *"own.py"* ]]; } || bad "the down graded an adopter-owned file no receipt row names: rc=$rc $out"; ok
+printf '[a]\nt = { x = 1,\n      y = 2 }\n' > "$FT/.governance/policy.toml"
+run_down "$FT" "$(run_down_git rev-parse HEAD)"
+{ [ "$rc" = 1 ] && [[ $out == *".governance/policy.toml:"* ]]; } || bad "the down over a TOML 1.1 table in the adopter's policy file did not exit 1 naming it: rc=$rc $out"; ok
+# TOOL-dSafePassage-76 AC5: a <to> left out defaults to HEAD only on gov's own tree; an adopter's HEAD
+# is a commit gov's repository never holds, so there the down refuses at exit 2, saying <to> is required.
+out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FT" 2>&1); rc=$?; out=${out//$'\r'/}
+{ [ "$rc" = 2 ] && [[ $out == *"<to> is required outside gov's own tree"* ]]; } \
+  || bad "the down over an adopter with no <to> did not exit 2 saying <to> is required: rc=$rc $out"; ok
+out=$(bash "$FD/$KIT_REL/python-floor.sh" down 3.11 "$FD" 2>&1); rc=$?; out=${out//$'\r'/}
+{ [ "$rc" = 1 ] && [[ $out == "python-floor down: mode "* ]] && [[ $out == *"planted.toml:"* ]] && [[ $out != *Traceback* ]]; } \
+  || bad "the down over gov's own tree with no <to> did not grade its HEAD default: exit 1 naming planted.toml, no traceback: rc=$rc $out"; ok
+
 # ---- 2. PARITY ----------------------------------------------------------------------------------
 # A TABLE of (marker, canonical source, exclude-prefix), not one hardcoded predicate. It held exactly
 # one row for a long time and read as a population; it was not one — the marker was hardcoded in both

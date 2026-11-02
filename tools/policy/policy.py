@@ -57,7 +57,7 @@ import tomllib
 from collections import namedtuple
 from pathlib import Path
 
-KIT_POLICY_VERSION = "1.1"
+KIT_POLICY_VERSION = "1.2"
 KIT = Path(__file__).resolve().parent
 CATALOGUE = "catalogue.toml"
 POLICY_REL = ".governance/policy.toml"
@@ -1040,25 +1040,33 @@ DEPLOYER_HOME = "govkit"
 REGISTRY_REL = f"{DEPLOYER_HOME}/registry.toml"  # the deployer's registry, under the tool root of gov's tree alone
 
 
+def derive_registry_tree(repo):
+    """-> ("source", <d>) where exactly one `REGISTRY_REL` sits under a `<d>` 0 to 2 deep, the search
+    govkit's `derive_tool_root` makes, since only gov's tree holds the registry; ("unadopted", None)
+    where none does; and two or more is a Refusal naming each candidate (TOOL-dGroundRules-29)."""
+    found = sorted({p.relative_to(repo).as_posix() for pat in ("", "*/", "*/*/")
+                    for p in Path(repo).glob(pat + REGISTRY_REL)})
+    if len(found) > 1:
+        raise Refusal(", ".join(found), 0, f"{len(found)} {REGISTRY_REL} candidates, so the "
+                      "tool root is not guessed and no row is graded") from None
+    if not found:
+        return "unadopted", None
+    return "source", posixpath.dirname(posixpath.dirname(found[0]))
+
+
 def derive_census_tree(repo):
     """-> ("adopter", the parsed receipt) where the tree under test holds an install receipt
-    (TOOL-dGroundRules-22). With none (TOOL-dGroundRules-29): ("source", <d>) where exactly one
-    `REGISTRY_REL` sits under a `<d>` 0 to 2 deep, the search govkit's `derive_tool_root`
-    makes, since only gov's tree holds the registry; ("unadopted", None) where none does; and two or
-    more is a Refusal naming each candidate. A receipt that is not a JSON object is a Refusal naming
-    it, never a `source` answer. One whose `kits` is not a list of strings, or whose `prefix` is not a
-    relative string free of `..` segments, is ("invalid", that field) (TOOL-dGroundRules-32 S11)."""
+    (TOOL-dGroundRules-22), except a source-mode one, a Refusal naming it where no registry backs it.
+    That is gov's own receipt, its top-level `mode` being `source` (TOOL-dSafePassage-103). With
+    none, or with that one, `derive_registry_tree` answers (TOOL-dGroundRules-29), its `unadopted`
+    being the Refusal above where the receipt is gov's. A receipt that is not a JSON object is
+    a Refusal naming it, never a `source` answer. One whose `kits` is not a list of strings, or whose
+    `prefix` is not a relative string free of `..` segments, is ("invalid", that field)
+    (TOOL-dGroundRules-32 S11)."""
     try:
         text = Path(repo, RECEIPT_REL).read_text(encoding="utf-8")
     except FileNotFoundError:
-        found = sorted({p.relative_to(repo).as_posix() for pat in ("", "*/", "*/*/")
-                        for p in Path(repo).glob(pat + REGISTRY_REL)})
-        if len(found) > 1:
-            raise Refusal(", ".join(found), 0, f"{len(found)} {REGISTRY_REL} candidates, so the "
-                          "tool root is not guessed and no row is graded") from None
-        if not found:
-            return "unadopted", None
-        return "source", posixpath.dirname(posixpath.dirname(found[0]))
+        return derive_registry_tree(repo)
     except OSError as exc:
         raise Refusal(RECEIPT_REL, 0, f"the install receipt does not read: {exc}") from None
     try:
@@ -1067,6 +1075,12 @@ def derive_census_tree(repo):
         raise Refusal(RECEIPT_REL, 0, f"the install receipt does not parse: {exc}") from None
     if not isinstance(receipt, dict):
         raise Refusal(RECEIPT_REL, 0, "the install receipt does not parse as a JSON object")
+    if receipt.get("mode") == "source":  # TOOL-dSafePassage-103 S1: gov's own receipt
+        tree = derive_registry_tree(repo)
+        if tree[0] == "unadopted":  # S2
+            raise Refusal(RECEIPT_REL, 0, f"a source-mode receipt in a tree holding no {REGISTRY_REL} "
+                          "0 to 2 deep, so it is neither gov's tree nor an adopter's")
+        return tree
     kits, prefix = receipt.get("kits"), receipt.get("prefix")
     if not isinstance(kits, list) or not all(isinstance(k, str) for k in kits):
         return "invalid", "kits"

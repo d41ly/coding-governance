@@ -4,7 +4,7 @@ description: Orients one session for one task, read-only.
 tools: Read, Grep, Glob, Bash
 model: inherit
 maxTurns: 60
-effort: xhigh
+effort: high
 omitClaudeMd: true
 workflow: orient
 writes: none

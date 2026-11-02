@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.153 -->
+<!-- gov:kit memory-tree@2.154 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -510,6 +510,12 @@ write, and an author discovering that the negation is all there is has found som
 - **AC1** — When `check-memory-hygiene.sh` runs over the fixture tree, it names `tFixture-120`.
   Red when: the fixture carries no clause and the arm stays silent.
 ```
+
+Once a spec's filename date reaches `SPEC_AC_ORDER_CUTOFF` (`.memory-tree.conf`; blank turns it
+off), a LIVE spec's criterion labels must ascend in the order this section lists them, and the
+`ac-order` join of `tools/check-spec-tokens.py` names the spec and the first label listed before a lower
+one (`AC2` of `AC2, AC1`). A repeated label is no descent, and a spec dated before the key keeps its
+order ungraded.
 
 Once a spec's filename date reaches `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`; blank turns it off),
 no backticked token in an acceptance bullet — nor on the §7 leg line — may spell a merge-bar or

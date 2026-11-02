@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** CLOSED · rev-5 · 2026-10-26 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0025@4e486ab9 whole
 
@@ -11,10 +11,18 @@
 | [2026-10-23-build-TOOL-dSafePassage-8-deviation-143.md](../build/2026-10-23-build-TOOL-dSafePassage-8-deviation-143.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-8-deviation-152.md](../build/2026-10-24-build-TOOL-dSafePassage-8-deviation-152.md) | deviation | — |
 | [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-26-build-TOOL-dSafePassage-8-deviation-166.md](../build/2026-10-26-build-TOOL-dSafePassage-8-deviation-166.md) | deviation | — |
+| [2026-10-26-build-TOOL-dSafePassage-8-ledger.md](../build/2026-10-26-build-TOOL-dSafePassage-8-ledger.md) | journal | — |
+| [2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md](../build/2026-11-01-build-TOOL-dSafePassage-1-runlog-0a000b40.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 TOOL-dSafePassage-72 TOOL-dSafePassage-73 TOOL-dSafePassage-74 TOOL-dSafePassage-75 TOOL-dSafePassage-76 TOOL-dSafePassage-77 TOOL-dSafePassage-78 TOOL-dSafePassage-80 TOOL-dSafePassage-81 TOOL-dSafePassage-82 TOOL-dSafePassage-83 TOOL-dSafePassage-84 TOOL-dSafePassage-86 TOOL-dSafePassage-87 TOOL-dSafePassage-88 TOOL-dSafePassage-89 TOOL-dSafePassage-90 TOOL-dSafePassage-91 TOOL-dSafePassage-92 TOOL-dSafePassage-93 TOOL-dSafePassage-94 TOOL-dSafePassage-95 TOOL-dSafePassage-96 TOOL-dSafePassage-97 TOOL-dSafePassage-98 TOOL-dSafePassage-99 TOOL-dSafePassage-100 TOOL-dSafePassage-101 TOOL-dSafePassage-102 TOOL-dSafePassage-103 TOOL-dSafePassage-104 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-8-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-8-1-spec-writer.md) | journal | — |
+| [2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-17 TOOL-dSafePassage-21 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-61 |
+| [2026-10-26-prompt-TOOL-dSafePassage-8-build-brief.md](../prompts/2026-10-26-prompt-TOOL-dSafePassage-8-build-brief.md) | journal | — |
+| [2026-10-28-prompt-TOOL-dSafePassage-1-close-arms-b-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-1-close-arms-b-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-26 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-35 TOOL-dSafePassage-36 |
+| [2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md](../prompts/2026-10-28-prompt-TOOL-dSafePassage-5-close-arms-a-brief.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-46 TOOL-dSafePassage-50 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-69 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
+| [2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md](../reviews/2026-10-28-review-TOOL-dSafePassage-1-71-closing-diff-round1.md) | diff-review | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePassage-61 TOOL-dSafePassage-62 TOOL-dSafePassage-63 TOOL-dSafePassage-64 TOOL-dSafePassage-65 TOOL-dSafePassage-66 TOOL-dSafePassage-67 TOOL-dSafePassage-68 TOOL-dSafePassage-69 TOOL-dSafePassage-70 TOOL-dSafePassage-71 |
 
 <!-- /gen:spec-records -->
 
@@ -115,7 +123,7 @@ closes `gap-deploy-20`.
 - **consumes-from** `TOOL-dSafePassage-11` — `lib/python-floor-3.15`, the second declared step, whose application to gov is the first the floor makes; without it AC5's receipt lists one step fewer than this landing declares
 - **hands-off** `TOOL-dSafePassage-12` — gov's receipt in the prepared merge, holding `lib/python-floor-3.15` as `applied`, which its AC7 reads
 - **hands-off** `TOOL-dSafePassage-10` — gov's source-mode receipt at `.governance/install.json`, whose `files` rows, one per planned destination, are the step gate's `file` class
-- **consumes-from** external — dGroundRules' minimal guard (`cl-dClosedLoop-0012`) judging gov's policy-file write at TOOL-dSafePassage-1's unit-pass commit, where that unit's §8 F8 (a) runs its `template-size-limits` step's up on gov; the guard never fires at a landing (`memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-6.md:105-107`), so the landing's walk finds that step's witness holding and writes no guarded path; without that unit-pass write, TOOL-dSafePassage-1's AC15 stays red and this unit has no landed step to record
+- **consumes-from** external — dGroundRules' minimal guard (`cl-dClosedLoop-0012`), which never fires at a landing (`memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-6.md:105-107`), so no step a landing declares may write gov's policy file at the walk: TOOL-dSafePassage-1's fan-out step writes nothing on gov, which tracks no `.agent-cap.conf`, and the size-limits step, whose up writes that file, is declared only by TOOL-dSafePassage-61, whose pass migrates gov under the guard in the commit that declares the row, so the walk finds its witness holding; without that rule a landing commits a write the guard refuses
 - **consumes-from** `TOOL-dSafePassage-20` — the writer taking the reader's unlanded value as null; without it every step this landing introduces refuses at its record
 - **hands-off** `TOOL-dSafePassage-21` — the derivation of gov's planned destinations, shared by the source receipt's rows and the step gate's file class, the repair of finding 5
 - **hands-off** `TOOL-dSafePassage-25` — the refused landing removing the untracked files its walk made, the repair of finding 54
@@ -259,9 +267,10 @@ receipt that the landing's own walk would also write.
 - observability: the lander prints each step walked and its outcome. The attended path's commit
   subject names the landing, and the receipt names each step's state.
 - risks: the guard never sees a landing, since the lander commits through `commit-tree`
-  (`tools/push-main.sh:921`) and `--no-verify` (`:1092`). TOOL-dSafePassage-1's two steps write
-  nothing guarded there: its unit pass migrates gov's policy file under the guard (§3 Edges), and
-  gov tracks no `.agent-cap.conf`, whose absence is the fan-out step's witness. A step
+  (`tools/push-main.sh:921`) and `--no-verify` (`:1092`). The steps this build declares write
+  nothing guarded there: gov tracks no `.agent-cap.conf`, whose absence is the fan-out step's
+  witness, and TOOL-dSafePassage-61's pass migrates gov's policy file under the guard in the commit
+  that declares the size-limits step (§3 Edges). A step
   whose up writes outside the receipt writes those files into the merge, and they land with it.
   That is the point of gov first, and it is named in the lander's output.
 - testing: the probes of §6, and the arms in `tools/push-main.test.sh` and `tools/govkit/selftest.py`
@@ -326,14 +335,14 @@ receipt that the landing's own walk would also write.
 
 ## 7. Gates
 
-`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `push-main self-test` · `receipt sync (installed files match the receipt)` · `verdict epoch (kit version dates the engine)` · `verdict-epoch self-test` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
+`govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `push-main self-test` · `receipt sync (installed files match the receipt)` · `verdict epoch (kit version dates the engine)` · `verdict-epoch self-test` · `kit epoch (shipped bytes move, the version moves)` · `policy fixtures` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
 
 New arm: tools/push-main.test.sh · covers AC5 AC6 · a fixture landing whose branch carries a step row with a failing witness, and one with no deployer beside the lander · none
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC8 AC9 · gov's own deploy file planned in place, a planted metacharacter in an interpolated answer, and a planted step row with a failing witness on a source-mode clone · none
 New arm: tools/run-gates/check-receipt.py · covers AC7 · its in-file fixtures gain a source-mode receipt whose unhashed row's file is absent, and the same row with a `sha256` · none
 
-What these arms do not check: that the minimal guard admits TOOL-dSafePassage-1's write of gov's
-policy file, which that unit's pass meets and dGroundRules shows; that no step writes a guarded path
+What these arms do not check: that the minimal guard admits TOOL-dSafePassage-61's write of gov's
+policy file, which that unit's pass meets; that no step writes a guarded path
 at a landing, where no guard fires; and the attended landing's own commit, which AC5's prepared path
 stands in for.
 
@@ -377,6 +386,13 @@ stands in for.
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-20`, `TOOL-dSafePassage-21`, `TOOL-dSafePassage-25`, `TOOL-dSafePassage-26`; no other section moved.
 - rev-3 · 2026-10-24 · §3 Edges' external line, §5 risks and the note under §7 · the guard never fires at a landing, so it binds TOOL-dSafePassage-1's unit-pass commit and the landing's walk finds that step's witness holding, re-grounded by `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md` row 27; no other section moved.
+- rev-4 · 2026-10-26 · §3 Edges' external line · §5 risks · §7 · the size-limits step and gov's
+  migration moved from TOOL-dSafePassage-1 to TOOL-dSafePassage-61 at that unit's §8 F8 stop, so the
+  guard binds TOOL-dSafePassage-61's pass and no landing walk writes gov's policy file, by
+  `2026-10-26-prompt-TOOL-dSafePassage-61-1-spec-writer.md`; no other section moved.
+- rev-5 · 2026-10-26 · §7 · the leg line names `policy fixtures`, whose guard
+  `tools/govkit/govkit.py` from §4 Files touched trips, by
+  `2026-10-26-prompt-TOOL-dSafePassage-5-tokens-a-1-spec-writer.md`; no other section moved.
 
 ## 10. Reuse audit
 

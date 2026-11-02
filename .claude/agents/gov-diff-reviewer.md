@@ -3,7 +3,7 @@ name: gov-diff-reviewer
 description: Reviews a diff through one lens.
 tools: Read, Grep, Glob, Bash
 model: inherit
-effort: high
+effort: medium
 omitClaudeMd: true
 workflow: closing-review
 writes: none

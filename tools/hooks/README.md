@@ -272,8 +272,18 @@ The verify total does not move with it: that is `MAX_VERIFIERS`, here. The revie
 the `{{FANOUT_CAP}}` width of `tier2-review.js`, `unattended-build.js` and both drift-audit workflows
 from the same reader, and the policy kit renders the harness's settings from it, so a repo that changes
 its limit re-renders both in the same commit: `bash <kit>/check-protocol-parity.test.sh --render` and
-`python <policy kit>/policy.py settings --write`. Moving `FANOUT_CAP` into the key itself, and
-retiring the file, is a later build's step.
+`python <policy kit>/policy.py settings --write`.
+
+**Retiring the file is an upgrade step**, `agent-cap/fanout-cap-to-agents-in-flight`, declared as
+this kit's `[[upgrade]]` row in `kit.toml` beside this file (TOOL-dSafePassage-1). Its up moves a
+`FANOUT_CAP` that lowers the key into `runtime.agents-in-flight` in `.governance/policy.toml`,
+leaves the policy file untouched when the line lowers nothing, and removes the file, so the limit
+reads the same before and after; its down restores both files byte-identical from the before-image
+under `.governance/steps/agent-cap/`. The up refuses, writing nothing, a value that is not an integer
+of at least 1, any other assignment in the file, and a file or policy file that differs from its
+blob at HEAD. Until gov's walk runs steps, it runs from gov's checkout by its own argv: `python
+<gov>/<prefix>/govkit/steps/fanout_cap.py up <target>`, then `witness` (exit 0 once the file is
+gone) or `down`. What a step is: gov's help page `help/upgrade-steps.md`.
 
 ## scratch-guard's second check: a `git commit` on an un-oriented card
 

@@ -3,7 +3,7 @@ name: gov-skeptic
 description: Tries to refute each finding it is handed.
 tools: Read, Grep, Glob, Bash
 model: inherit
-effort: high
+effort: medium
 omitClaudeMd: true
 workflow: closing-review
 writes: none

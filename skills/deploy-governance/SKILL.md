@@ -60,9 +60,9 @@ what makes the receipt's provenance claim true — then stages everything it wro
 adopter. It writes `<target>/.governance/install.json` and a flat `install.sums` a target verifies
 with bash alone.
 
-**The receipt is at schema 3, and each landed row carries TWO identities.** `gov_oid` is the git
-blob gov shipped at that row's `commit`; `oid` is the blob the target holds, read from its INDEX
-rather than from worktree bytes. The pair is what lets `update` tell gov's own file from one
+**The receipt is at schema 4, with `steps`, and each landed row carries TWO identities.**
+`gov_oid` is the git blob gov shipped at that row's `commit`; `oid` is the blob the target holds,
+read from its INDEX rather than from worktree bytes. The pair is what lets `update` tell gov's own file from one
 somebody edited, without a stored flag that can go stale: `oid != gov_oid` IS the local-delta
 question, asked fresh every run. Reading the index rather than the worktree is what makes this
 survive a checkout filter — on a default Windows clone the old worktree comparison reported
@@ -72,7 +72,9 @@ the target owns, and the unlanded `project-owned` / `generated` / `rendered` row
 
 A schema-2 receipt upgrades in place on its first `update`, from gov's blob at each row's own
 commit. Nothing back-fills a schema-3 receipt, because filling one in is how a merge result would
-be laundered into a provenance claim.
+be laundered into a provenance claim. A schema-3 receipt reaches schema 4 through the upgrade step
+`govkit/receipt-schema-4`, which adds `steps`, the record of each upgrade step the target has run:
+see [what the receipt records about steps](../../help/upgrade-steps.md#what-the-receipt-records-about-steps).
 
 **It does not commit, branch, push, or open a pull request.** That is deliberate and it is your job:
 review what it staged, then land it the way that target lands anything.
@@ -86,7 +88,7 @@ hole's discharge probe. Exit 0 from an adopter means "the adopter ran", never "t
 `check` reds on an undischarged hole regardless of what any adopter exited with.
 
 ```bash
-python <gov>/<prefix>/govkit/govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+python <gov>/<prefix>/govkit/govkit.py update --target <path> [--to <rev>] [--rollback] [--write] [--write-withdrawals]
 ```
 
 Moves an installed target forward to a newer gov commit. **Read-only by default**, because this

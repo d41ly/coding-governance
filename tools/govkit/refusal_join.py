@@ -38,7 +38,81 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 335    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 334 -> 335 at TOOL-dSafePassage-87, BY THE MEASURED DELTA: the matcher reads 473 over the
+# deployer's directory at that unit's base `cba885c5` and 474 on the tree it left, the one in
+# `upgrade_steps.py`: `check_contained`'s refusal of a key holding a `..` segment that normalises
+# inside (S1, selftest's `[dSP-87 AC1]` checks). S6 rewords a message and adds no site.
+# 327 -> 334 at TOOL-dSafePassage-76, BY THE MEASURED DELTA: the matcher reads 466 over the
+# deployer's directory at that unit's base `f01ff3b9` and 473 on the tree it left, all seven in
+# `upgrade_steps.py`. `check_contained`'s two refusals of a path in the git directory, by a `.git`
+# segment and by where it resolves (S1, selftest's `[dSP-76]` rows); `read_image_paths`' two, an
+# image that does not parse or lists no paths in the working tree (selftest's `[dSP-76]` row) and in
+# the index (S3, `fixture rollback --plant kill-after-down-stage-garbled`); `derive_reverse_steps`'
+# refusal of a retired id that owes a down (S4, `fixture rollback-update --plant retired-step`); and
+# `check_target_local_config`'s refusal of a walk that failed with `run_step_isolated`'s wrap of it
+# (S8, `fixture isolation`'s unkeyed `submodule-*` plants).
+# 324 -> 327 at TOOL-dSafePassage-26, BY THE MEASURED DELTA: the matcher reads 447 over the
+# deployer's directory at that unit's base `31b078c3` and 450 on the tree it left, by this module's
+# own walk over each file at both ends. Four are new, each armed: `check_argv`'s refusal of `{to}`
+# outside a down (S10, the steps reader's planted rows), `read_steps`' refusal of a shallow clone
+# (S37, the moved-descriptor arm's shallow clone), `write_before_image`'s refusal of an image that
+# does not parse over a changed path (S31, `fixture walk --plant truncated-image`), and
+# `read_surface_population`'s refusal of a reader that raises (S38, the step gate's
+# `reader-raises` plant). One went: `fanout_cap.py`'s refusal of another assignment in the conf,
+# which the shared grammar admits (S30).
+# 320 -> 324 at TOOL-dSafePassage-8, BY THE MEASURED DELTA: the matcher's two shapes read 46 in
+# `_cmd_update` at that unit's base `208c2260` and 50 on the tree it left, by an AST probe of
+# `govkit.py`; `upgrade_steps.py` stays at 54, since `check_gov_first` returns its misses. Five are
+# source mode's: its refusals of `--kits` or `--rollback`, of a receipt not in source mode and of an
+# unresolvable `--to`, and its two `r.fail`s on a stopped walk and on a gov-first miss, each reached
+# by `check_source_mode`. One went: `update`'s refusal of the gov checkout as its target, which
+# source mode replaces.
+# 319 -> 320 at TOOL-dSafePassage-24, BY THE MEASURED DELTA: the matcher's two shapes read 53 in
+# `upgrade_steps.py` at that unit's base `a182f2c2` and 54 on the tree it left, by an AST probe of
+# that file alone. The one is `run_step_isolated`'s refusal of a target whose own git config
+# declares an executor or a credential, reached by `check_step_isolation`'s `local-*` plants; a
+# `git config` that fails to read is that same refusal, so it adds no site.
+# 314 -> 319 at TOOL-dSafePassage-4, BY THE MEASURED DELTA: the matcher read 384 at that unit's base
+# `f8262323` and 389 on the tree it left. Five are in the engine: `check_rollback_vintage`'s three
+# (no gov_commit, a --to that is not an ancestor, nothing to roll back), reached in process by
+# `check_step_rollback` and the first two by its `fixture rollback-update` plants too; `update`'s
+# refusal of `--rollback --kits`, reached by `--plant scoped`; and its `r.fail` on a stopped reverse
+# walk, reached by the base plant's first run. `upgrade_steps.py` stays at 51: `derive_reverse_steps`'
+# refusal of a row HEAD no longer declares (reached in process) is one more, and lifting the walk's
+# receipt re-read out of its nested `spawn` into `run_step_reread` counts it once where it counted
+# twice; the staging refusal moved into `write_step_staged` unchanged.
+# 310 -> 314 at TOOL-dSafePassage-2, BY THE MEASURED DELTA: the matcher read 380 at that unit's base
+# `5aac6409` and 384 on the tree it left. One is `update`'s `r.fail` on a stopped upgrade-step walk,
+# reached by `check_step_walk`'s `fixture update --plant update-fail`; three are `run_step_walk`'s
+# two refusals, a receipt that does not read back after a spawn (counted twice: it sits in the nested
+# `spawn`, which `ast.walk` reaches from both functions) and a step's writes git will not stage, both
+# reached by that arm in process. `take_write_lock`'s refusal was rewritten in place, not added.
+# 308 -> 310 at TOOL-dSafePassage-7, BY THE MEASURED DELTA: the matcher's two shapes read 46 in
+# `upgrade_steps.py` at that unit's base `0becfe7d` and 48 on the tree it left, by an AST probe of
+# that file alone. The two are the isolation contract's: `resolve_step_argv`'s refusal of a token
+# the run does not answer, reached by `check_step_isolation`'s `--plant token` run, and
+# `run_step_isolated`'s refusal of a phase with no argv, reached by that arm in process.
+# 307 -> 308 at TOOL-dSafePassage-20, BY THE MEASURED DELTA: the matcher read 377 at that unit's base
+# `c4fc7de1` and 378 on the tree it left. The one is `resolve_recorded_introduced`'s refusal of an
+# `introduced` that is neither a 40-hex commit, the reader's `unlanded` nor null, in
+# `upgrade_steps.py`; `check_upgrade_steps` reaches it in process (its dSP-20 AC1 arm).
+# 297 -> 307 at TOOL-dSafePassage-3, BY THE MEASURED DELTA: the matcher read 367 over the seven
+# modules at that unit's base `14054d44` and 377 on the tree it left. Nine are the `steps` field's
+# reader and writer in `upgrade_steps.py` (`read_step_states` eight, `set_step_state`'s schema
+# guard one) and one is `check`'s `r.fail` on a malformed field in the engine; the step program
+# `steps/receipt_schema_4.py` exits by code and adds none. 10/10 reached by `check_receipt_schema`.
+# 255 -> 297 at TOOL-dSafePassage-1, BY THE MEASURED DELTA and not to the live count, which keeps the
+# re-baselining below that row's own job: the matcher read 325 over four modules at the build's base
+# `60d90cb7` and 367 over six on the tree this unit left, so the floor moves by 42. The two new
+# modules are the upgrade-step reader `upgrade_steps.py` (36 `raise Refusal` sites) and the step
+# program `steps/fanout_cap.py` (5 sites, which the matcher counts as 7: two sit in a function nested
+# inside `cmd_up`, and `ast.walk` reaches them from both). The engine lost ONE: `update`'s whole-run
+# refusal of a claim that is no longer a registry entry moved into `resolve_claim`, its text
+# unchanged. 41/41 new sites are reached by a `selftest.py` arm: `check_upgrade_steps` plants every
+# grammar and succession refusal into a scratch gov's `list` and calls the rest in process,
+# `check_succession` reaches `resolve_claim`, and `check_fanout_step` reaches the step's conf, HEAD
+# and policy-read refusals, the down's edited-path refusal and the writer's two.
 # 255 UNMOVED ACROSS THE RECONCILE, deliberately. The merge of origin/main into cMendedVintage
 # unions two branch populations and the matcher reads 264 over the merged four modules. The pin
 # is a FLOOR — `len(branches) < BRANCH_PIN` is the whole test — so the larger of the two

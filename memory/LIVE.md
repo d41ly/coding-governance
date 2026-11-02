@@ -27,10 +27,10 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dOrderedCharter](builds/dOrderedCharter/README.md) | DEFERRED | d | 2026-10-21 | playbook | 60 | 2026-10-26 | active | 0 |
 | [dPlacedRequest](builds/dPlacedRequest/README.md) | DEFERRED | d | 2026-10-21 | tooling | 73 | 2026-10-26 | active | 0 |
 | [dRankedPlan](builds/dRankedPlan/README.md) | DEFERRED | d | 2026-10-21 | tooling | 83 | 2026-10-29 | active | 0 |
-| [dSafePassage](builds/dSafePassage/README.md) | DEFERRED | d | 2026-10-21 | tooling | 60 | 2026-10-25 | active | 0 |
-| [dScopedBuild](builds/dScopedBuild/README.md) | OPEN | d | 2026-10-21 | tooling | 16 | 2026-10-21 | active | 0 |
-| [dShippedRelease](builds/dShippedRelease/README.md) | OPEN | d | 2026-10-21 | deployer | 32 | 2026-10-21 | active | 0 |
-| [dTendedCadence](builds/dTendedCadence/README.md) | OPEN | d | 2026-10-21 | tooling | 20 | 2026-10-26 | active | 0 |
+| [dSafePassage](builds/dSafePassage/README.md) | DEFERRED | d | 2026-10-21 | tooling | 104 | 2026-11-02 | active | 0 |
+| [dScopedBuild](builds/dScopedBuild/README.md) | DEFERRED | d | 2026-10-21 | tooling | 43 | 2026-11-01 | active | 0 |
+| [dShippedRelease](builds/dShippedRelease/README.md) | DEFERRED | d | 2026-10-21 | deployer | 145 | 2026-11-01 | active | 0 |
+| [dTendedCadence](builds/dTendedCadence/README.md) | DEFERRED | d | 2026-10-21 | tooling | 74 | 2026-11-01 | active | 0 |
 | [dTotalRecall](builds/dTotalRecall/README.md) | DEFERRED | d | 2026-10-21 | tooling | 106 | 2026-10-26 | active | 0 |
 | [dWellOiledMachine](builds/dWellOiledMachine/README.md) | DEFERRED | d | 2026-10-21 | tooling | 129 | 2026-10-29 | active | 0 |
 | [dWitnessedBar](builds/dWitnessedBar/README.md) | DEFERRED | d | 2026-10-21 | tooling | 98 | 2026-10-26 | active | 0 |
@@ -61,3 +61,4 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 ## Open BLOCKER asks
 
 - [TOOL-aBriskPreflight-18](builds/aBriskPreflight/BACKLOG.md) · aBriskPreflight · inherited red: leg playbook render wiring red at 37200355, older than…
+- [TOOL-dEasedEffort-3](builds/dEasedEffort/BACKLOG.md) · dEasedEffort · inherited red: leg recall floor arms red at 529b98a4, older than the…

@@ -212,6 +212,12 @@ key, read across their line wraps.
          blanking; and whether a sibling was actually edited, which the deviation join reads. A
          double-quoted span ends on its own line, so an instance quoted across a wrap is a hit, a
          loud miss where a span reaching the next stray quote would hide a real one silently.
+  ac-order the criterion-order join: every LIVE spec dated at or after SPEC_AC_ORDER_CUTOFF
+         (`.memory-tree.conf`, blank = off) -> a hit when its section 6 labels, read with `AC_LABEL`
+         inside `AC_HEAD`'s section, descend; it names the first label listed before a lower one
+         (TOOL-dSafePassage-41). Its line prints the graded count on every run. What it does NOT
+         see: a spec dated before the key, which keeps an out-of-order list ungraded, and a repeated
+         label, which is no descent.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -386,6 +392,10 @@ AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # `**AC1** `): the label regex of the hygiene gate's acceptance-witness check, ported, so the covers
 # join and that check agree on which criteria a spec defines (TOOL-aMendedFleet-75).
 AC_LABEL = re.compile(r"^(?:[ \t]*[-*][ \t]*)?(?:\*\*)?(AC[0-9]+[a-z]?)(?:\*\*)?(?:[^A-Za-z0-9]|$)", re.M)
+# TOOL-dSafePassage-34: the criterion-order join's key — a LIVE spec dated at or after it has its
+# section 6 labels ascend. Blank or absent is OFF; a set value that is not an ISO date refuses the run.
+# Read in `main` beside the other date keys; the join itself is TOOL-dSafePassage-41's, in the spec loop.
+AC_ORDER_KEY = "SPEC_AC_ORDER_CUTOFF"
 # A merge-bar or suite INVOCATION: the runner or a suite at command position — the token's start
 # or a chain separator, past optional VAR=value prefixes, `timeout` with its options and duration,
 # and a bash/sh/python/py launcher with one option — a short one, `py`'s version selector
@@ -1540,7 +1550,8 @@ def main(argv):
     handoff_cut = read_cutoff_key(root, HANDOFF_KEY)
     guards_cut = read_cutoff_key(root, GUARDS_KEY)
     supersede_cut = read_cutoff_key(root, SUPERSEDE_KEY)
-    if None in (legline_cut, direct_cut, handoff_cut, guards_cut, supersede_cut):
+    ac_order_cut = read_cutoff_key(root, AC_ORDER_KEY)
+    if None in (legline_cut, direct_cut, handoff_cut, guards_cut, supersede_cut, ac_order_cut):
         return 1
     relation = check_cutoff_relation(root, DIRECT_KEY, direct_cut) if direct_cut else ""
     grelation = check_cutoff_relation(root, GUARDS_KEY, guards_cut) if guards_cut else ""
@@ -1568,6 +1579,7 @@ def main(argv):
     c_runs, c_specs, c_cleared = 0, 0, 0
     cv_lines, cv_specs, cv_carriers, cv_graded = 0, 0, 0, 0
     so_examined, so_specs, so_bare = 0, 0, 0
+    ao_graded, ao_bad = 0, 0
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         m = SPEC_DATE.search("/" + f)
@@ -1725,6 +1737,20 @@ def main(argv):
         so_hits = scan_bare_sources(text)
         so_bare += len(so_hits)
         hits += [(f, "source", op, SOURCE_WHY) for op in so_hits]
+        # THE AC-ORDER JOIN (TOOL-dSafePassage-41, the predicate of TOOL-dSafePassage-26 S45): a live
+        # spec dated at or after AC_ORDER_KEY lists its section 6 labels ascending, and the first label
+        # listed before a lower one is the finding (AC2 of `AC2, AC1`). A repeated label is no descent.
+        m = SPEC_DATE.search("/" + f)
+        if ac_order_cut and m and m.group(1) >= ac_order_cut:
+            ao_graded += 1
+            labs = [(int(x[2:].rstrip("abcdefghijklmnopqrstuvwxyz")), x[2:].lstrip("0123456789"), x)
+                    for x in AC_LABEL.findall(extract_acceptance(text) or "")]
+            bad = next((a for a, b in zip(labs, labs[1:]) if b < a), None)
+            if bad:
+                ao_bad += 1
+                hits.append((f, "ac-order", f"ac-order <- {bad[2]}",
+                             f"section 6 lists {bad[2]} before a lower label; its criteria must ascend at/after "
+                             f"{AC_ORDER_KEY} {ac_order_cut}"))
 
     # The seventh join, over a population the six above never build: one uid map over the live specs,
     # then one read per graded target. It is folded into `hits` before the waiver pass, so a handoff
@@ -1841,6 +1867,11 @@ def main(argv):
     # as clean. Its `live spec(s) ·` is the hands-off line's reason: `--dispatch` filters on it.
     print(f"spec-tokens: source join · {so_examined} sourced file(s) examined in {so_specs} live spec(s) · "
           f"{so_bare} by bare name")
+    # The ac-order join's line, on every run and carrying `live spec(s) ·` for the hands-off line's
+    # reason: the graded count is what keeps a join that graded nothing from reading as clean.
+    print(f"spec-tokens: ac-order join · {ao_graded} of {len(specs)} live spec(s) · "
+          + (f"graded at/after {AC_ORDER_KEY} {ac_order_cut} · {ao_bad} out of order" if ac_order_cut
+             else f"{AC_ORDER_KEY} blank (arm off)"))
     # THE UNGRADED POPULATION, which the report used to leave out entirely. A leg join that reads N
     # specs and grades a leg name in far fewer of them looks identical to one that graded them all
     # and found nothing wrong. These two numbers are what separate the cases, and they are kept

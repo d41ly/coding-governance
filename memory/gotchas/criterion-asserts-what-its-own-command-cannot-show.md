@@ -10,7 +10,7 @@ universal: false
 ## Symptom
 
 An acceptance criterion looks rigorous — it names a real command, gives a real number, reads like an
-observation. It cannot fail, or cannot pass. Six ways, and a spec set usually has more than one:
+observation. It cannot fail, or cannot pass. Seven ways, and a spec set usually has more than one:
 
 - **The command does not print that.** The criterion asserts on a per-subject set or a breakdown the
   named invocation never emits, so nobody can run it as written and the nearest printed total moves
@@ -31,6 +31,11 @@ observation. It cannot fail, or cannot pass. Six ways, and a spec set usually ha
   observes it through a side probe of the table, fixture or file the check grades, so the item is
   certified while the check's own code never runs. A side probe that misreads the input's spelling
   prints nothing, and the criterion still reads as an observation.
+- **Its ledger line lands in the commit it observes.** A criterion graded on `HEAD` names a diff
+  whose far end is the commit its own ledger line lands in, so that commit does not exist while the
+  line is written. The command prints the tree before it, and the line either claims an output
+  nobody saw or records another form. A spec audit asks of each such criterion which commit its
+  ledger line lands in, and wants a form observable before that commit or a line landing after it.
 
 ## Where it bit
 
@@ -85,6 +90,14 @@ disjoint with the string's closing quote attached, and a probe that blanked no s
 no row. The respelled staging was not the cause. The revised `TRAP_PROBE` of `TOOL-dGroundRules-44`
 blanks the single quote and lists the row, and a probe that lists the row still never runs the
 check. `TOOL-dGroundRules-56`, which runs the row check itself, is the repair.
+
+The commit that holds its own ledger line bit dEasedEffort at its closing diff review, round 1, as
+items L1 and L2. `TOOL-dEasedEffort-1` AC3 graded a diff on `HEAD`, its rollout added the line and
+then committed, and the line said the command printed four paths on a commit it landed inside, when
+`HEAD` was still the commit before and that form printed nothing. AC1 named the same form, the
+ledger recorded a `--cached` spelling, and the reason lived only in a commit trailer, as
+`TOOL-aOrientedCast-21` AC2's deviation had. A close compares each criterion's command with the form
+its ledger line records, and a difference owes a spec amendment or an observation of the named form.
 
 ## The fix
 

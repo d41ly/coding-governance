@@ -6,12 +6,12 @@
 default = "medium"            # every role and stage this file does not name
 
 [effort.roles]                # one entry per role slot whose `agent` is true
-gov-orienter = "xhigh"
+gov-orienter = "high"
 gov-spec-writer = "high"
 gov-spec-reviewer = "medium"
-gov-builder = "xhigh"
-gov-diff-reviewer = "high"
-gov-skeptic = "high"
+gov-builder = "high"
+gov-diff-reviewer = "medium"
+gov-skeptic = "medium"
 gov-synthesizer = "high"
 
 [effort.stages.spec-review]   # one table per workflow; keys are that workflow's stage keys

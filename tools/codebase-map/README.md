@@ -15,7 +15,7 @@ project specifics live in exactly two files the adopting repo owns.
 
 - `map_lib.py` — the engine: dossier/baseline contract (first ```` ```toml ```` fence), pure
   both-direction coverage, deterministic renderers, digest attribution, fail-closed extractor
-  helpers, and the one root resolver (`resolve_root`/`repo_root`). Stdlib-only, Python ≥ 3.11.
+  helpers, and the one root resolver (`resolve_root`/`repo_root`). Stdlib-only, at the interpreter floor `python-floor.txt` in gov's lib dir declares.
 - `map_extractors.template.py` — the PROJECT layer: the `EXTRACTORS` dict declaring what is
   enumerable in this repo. Filling it well is the whole adoption job — see
   `INVENTORY-DERIVATION.md`.
