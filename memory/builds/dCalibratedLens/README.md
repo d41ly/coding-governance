@@ -116,7 +116,7 @@ ids TOOL-dCalibratedLens-25 TOOL-dCalibratedLens-26 TOOL-dCalibratedLens-27 TOOL
 | [TOOL-dCalibratedLens-30 — the round-1 spec audit's 41 minors batched: each correction carried by the sibling it lands on, and six arms that hold the classes no sibling owns](spec/2026-11-02-spec-TOOL-dCalibratedLens-30.md) | 18 | 2 | OPEN | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 4 record folder(s).
+Records: 27 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
