@@ -104,7 +104,7 @@ ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17
 | [TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively](spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md) | 170 | 1 | INPROGRESS | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 119 bound to this build, across 4 record folder(s).
+Records: 120 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
