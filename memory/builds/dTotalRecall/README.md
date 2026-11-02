@@ -120,7 +120,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-64 — unit 46's spec observes unit 54's parser body and designs none of its own](spec/2026-10-26-spec-TOOL-dTotalRecall-64.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-26 |
 | [TOOL-dTotalRecall-22 — each edge type's cardinality declared per source and per target, mirrored in the kind registry, and checked over the merged tree after every merge](spec/2026-10-26-spec-TOOL-dTotalRecall-22.md) | 10 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dTotalRecall-3 — slug claim refs and ask-family counter refs, each commit carrying its claimant, minted by leased compare-and-swap and never pruned](spec/2026-10-26-spec-TOOL-dTotalRecall-3.md) | 11 | 2 | DEFERRED | rev-2 | 2026-10-26 |
-| [TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing](spec/2026-10-26-spec-TOOL-dTotalRecall-2.md) | 12 | 2 | DEFERRED | rev-6 | 2026-10-26 |
+| [TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing](spec/2026-10-26-spec-TOOL-dTotalRecall-2.md) | 12 | 2 | DEFERRED | rev-7 | 2026-11-02 |
 | [TOOL-dTotalRecall-7 — the ask kind's acceptance at filing, under `asks.acceptance`](spec/2026-10-26-spec-TOOL-dTotalRecall-7.md) | 13 | 2 | DEFERRED | rev-3 | 2026-10-26 |
 | [TOOL-dTotalRecall-11 — the shape-run kind, the parsed view of the review-shape line](spec/2026-10-26-spec-TOOL-dTotalRecall-11.md) | 14 | 2 | DEFERRED | rev-4 | 2026-10-26 |
 | [TOOL-dTotalRecall-41 — the ask door refuses a line break or row separator in any value and grades the row it would write, read back](spec/2026-10-26-spec-TOOL-dTotalRecall-41.md) | 14 | 2 | DEFERRED | rev-2 | 2026-10-26 |
@@ -193,7 +193,7 @@ ids TOOL-dTotalRecall-99 TOOL-dTotalRecall-100 TOOL-dTotalRecall-101 TOOL-dTotal
 | [TOOL-dTotalRecall-100 — the round-9 minors: each reading of units 89 to 92 that a dropped line, a stale cite or a loose key could mislead is made once at the tip, and each record it decides is written once](spec/2026-10-26-spec-TOOL-dTotalRecall-100.md) | 41 | 2 | DEFERRED | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 178 bound to this build, across 4 record folder(s).
+Records: 181 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
