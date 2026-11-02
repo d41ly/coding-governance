@@ -68,11 +68,23 @@ TRACE_CUTOFF: str = "2026-08-11"
 # CONFIGURATION that a records or kickoff commit routinely touches, so leaving them in lets the
 # house's own bookkeeping certify the bookkeeping — the exact hole the path restriction exists to
 # close. It is taken before it changes a verdict, not after one.
+#
+# AND ONE PATH WIDER than the kit paths: `help`. It holds the user-facing pages the `docs` leg
+# grades, and the charter's [docs] rule makes a current page part of a user-facing change, so a
+# pass that writes one has shipped product. Without it a unit whose whole product is a help page
+# read as an offender: TOOL-dCountedConsumers-1, whose pass commit touched `help/policy.md` and
+# its own records and nothing above. No records commit touches `help/`. Measured 2026-11-02, every
+# commit that does is a build, tool, docs or playbook pass.
+#
+# NOT ADDED TO PRODUCT_GLOBS, and that is a scope line, not a verdict on the pages. PRODUCT_GLOBS
+# also feeds signal 2, through EVIDENCE_GLOBS below, and the escape ratio. A help page that names a
+# unit id would then cite that unit as shipped, and neither reading was measured with `help` in it.
 TRACE_GLOBS: list[str] = [
     _TOOLS,
     "skills",
     "coding-governance-agents.template.md",
     "WIRE-INTO-PROJECT.md",
+    "help",
 ]
 
 
