@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-build-TOOL-dFoldedAudit-1-runlog-85af115c.md](../build/2026-11-02-build-TOOL-dFoldedAudit-1-runlog-85af115c.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-17 TOOL-dFoldedAudit-18 |
 | [2026-11-02-build-TOOL-dFoldedAudit-16-1-first-bar.md](../build/2026-11-02-build-TOOL-dFoldedAudit-16-1-first-bar.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-16-2-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-16-2-spec-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-16-3-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-16-3-builder-return.md) | journal | — |
