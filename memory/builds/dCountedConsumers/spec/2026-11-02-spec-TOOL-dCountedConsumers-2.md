@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-build-TOOL-dCountedConsumers-2-1-builder-return.md](../build/2026-11-02-build-TOOL-dCountedConsumers-2-1-builder-return.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dCountedConsumers-2-brief.md](../prompts/2026-11-02-prompt-TOOL-dCountedConsumers-2-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

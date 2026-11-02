@@ -57,7 +57,7 @@ ids TOOL-dCountedConsumers-1 TOOL-dCountedConsumers-2
 | [TOOL-dCountedConsumers-2 — the trace signal counts a commit that writes a help page as product](spec/2026-11-02-spec-TOOL-dCountedConsumers-2.md) | 20 | 1 | CLOSED | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
