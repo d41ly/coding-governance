@@ -4,6 +4,12 @@
 
 Every unit's own return is recorded under `build/`. This record lists only what they hand to the close.
 
+## Where the run stands, held 2026-11-02
+
+- All 16 units CLOSED. The pre-merge flagged bar reds 9 legs: two were this build's and unit 16 cleared both (shell hygiene and drift-audit, each re-run green); the rest read inherited or host in `build/2026-11-02-build-TOOL-dFoldedAudit-16-1-first-bar.md`.
+- Held for the owner on two items: the origin confirmation the `main` merge needs, and whether the two `tools/unattended/` suites may run once for this build's 58 arms. Both are parked in `RUN.md`.
+- On resume: sync `main`, resolve the seven conflicts, set the drift pin to 39 (`origin/main` already arms `SPEC_AC_ORDER_CUTOFF`), write `SPEC_FOLD_CUTOFF` strictly past the newest run record on any ref, re-derive `SPEC_SUPERSEDE_CUTOFF`, run `--authorization`, observe the 30 runnable arms RED in clones (and the 58 if allowed), then `--prepare` and `GATE_FULL=1 GATE_SELFTESTS=1 --close`.
+
 ## Before the bar
 
 - Observe every `New arm:` RED on its staged break and GREEN restored, in a scratch clone, and record both in that unit's acceptance ledger under a `Pass: none` commit (M8). Unit 7 holds seven arms, unit 2 ten, unit 3 five.
