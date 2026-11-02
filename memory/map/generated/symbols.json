@@ -45,7 +45,7 @@
     {
       "id": "Conf",
       "kind": "class",
-      "file": "tools/memory-recall/recall_conf.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "ConfError",
@@ -55,7 +55,7 @@
     {
       "id": "ConfError",
       "kind": "class",
-      "file": "tools/memory-recall/recall_conf.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "Corpus",
@@ -145,7 +145,7 @@
     {
       "id": "Grammar",
       "kind": "class",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "Invocation",
@@ -740,7 +740,7 @@
     {
       "id": "anchor_at",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "anchor_break",
@@ -2098,6 +2098,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "build_grammar",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
+    },
+    {
       "id": "build_graph",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -2190,7 +2195,7 @@
     {
       "id": "build_index",
       "kind": "function",
-      "file": "tools/memory-recall/bench.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "build_input_keys",
@@ -3036,6 +3041,11 @@
       "id": "build_summary_facts",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "build_supersede_patterns",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "build_swapped_rules",
@@ -6965,12 +6975,12 @@
     {
       "id": "corpus_files",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "corpus_inputs",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "count12",
@@ -7791,6 +7801,11 @@
       "id": "derive_graded_rows",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_grammar_epoch",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "derive_grants",
@@ -8955,7 +8970,7 @@
     {
       "id": "derive_supersession_map",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "derive_supersession_order",
@@ -9730,7 +9745,7 @@
     {
       "id": "extract_records",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "extract_roster_ids",
@@ -9785,7 +9800,7 @@
     {
       "id": "extract_supersessions",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "extract_task_fields",
@@ -10015,12 +10030,12 @@
     {
       "id": "git",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "git",
       "kind": "function",
-      "file": "tools/memory-recall/query.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "gitCommonDir",
@@ -10100,7 +10115,7 @@
     {
       "id": "grammar_for",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "gut_parser",
@@ -10170,7 +10185,7 @@
     {
       "id": "heading_level",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "history_exclude_re",
@@ -10700,11 +10715,6 @@
     {
       "id": "load_conf",
       "kind": "function",
-      "file": "tools/memory-recall/recall_conf.py"
-    },
-    {
-      "id": "load_conf",
-      "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
     },
     {
@@ -10721,6 +10731,11 @@
       "id": "load_conf",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "load_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "load_conf",
@@ -10838,6 +10853,11 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
+      "id": "load_index_builder",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "load_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -10878,11 +10898,6 @@
       "file": "tools/roles/render_agents.py"
     },
     {
-      "id": "load_parse_spec_h1",
-      "kind": "function",
-      "file": "tools/memory-recall/extract.py"
-    },
-    {
       "id": "load_policy",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
@@ -10901,11 +10916,6 @@
       "id": "load_project_layer",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
-    },
-    {
-      "id": "load_recall_kit",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "load_records_at",
@@ -11560,7 +11570,7 @@
     {
       "id": "match_expr",
       "kind": "function",
-      "file": "tools/memory-recall/bench.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "matchers_of",
@@ -16068,11 +16078,6 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
-      "id": "read_relation_gate",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
-    },
-    {
       "id": "read_release_pin",
       "kind": "function",
       "file": "tools/govkit/upgrade_walk.py"
@@ -17180,7 +17185,7 @@
     {
       "id": "refusal",
       "kind": "function",
-      "file": "tools/memory-recall/recall_conf.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "refuse_if_terminal",
@@ -18815,7 +18820,7 @@
     {
       "id": "repo_root",
       "kind": "function",
-      "file": "tools/memory-recall/recall_conf.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "report",
@@ -18860,7 +18865,7 @@
     {
       "id": "resolve",
       "kind": "function",
-      "file": "tools/memory-recall/recall_conf.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "resolve",
@@ -19225,7 +19230,7 @@
     {
       "id": "resolve_declared_sources",
       "kind": "function",
-      "file": "tools/memory-recall/extract.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "resolve_default",
@@ -19336,6 +19341,11 @@
       "id": "resolve_govkit",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "resolve_grammar_name",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "resolve_harness_path",
@@ -19615,7 +19625,17 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/recall_conf.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -19630,37 +19650,12 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
-      "file": "tools/memory-tree/check-verdict-epoch.sh"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
-      "file": "tools/memory-tree/corpus_ids.py"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
       "file": "tools/memory-tree/marker-contract.test.sh"
     },
     {
       "id": "resolve_kit_dir",
       "kind": "function",
-      "file": "tools/memory-tree/merge-rows.py"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
-      "file": "tools/memory-tree/row_grammar.py"
-    },
-    {
-      "id": "resolve_kit_dir",
-      "kind": "function",
-      "file": "tools/memory-tree/transition_audit.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -20451,16 +20446,6 @@
       "id": "resolve_read",
       "kind": "function",
       "file": "tools/policy/policy.py"
-    },
-    {
-      "id": "resolve_recall_kit",
-      "kind": "function",
-      "file": "tools/memory-tree/transition_audit.py"
-    },
-    {
-      "id": "resolve_recall_name",
-      "kind": "function",
-      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "resolve_receipt_path",
@@ -23973,11 +23958,6 @@
       "file": "tools/unattended/check-pass-order.test.sh"
     },
     {
-      "id": "seed_recall_kit",
-      "kind": "function",
-      "file": "tools/memory-tree/migrate_backlog.py"
-    },
-    {
       "id": "seed_records",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -24495,7 +24475,7 @@
     {
       "id": "terms",
       "kind": "function",
-      "file": "tools/memory-recall/bench.py"
+      "file": "tools/memory-tree/id_grammar.py"
     },
     {
       "id": "test_a_member_gone_at_the_settled_reread_is_not_a_signal_error",
@@ -24963,7 +24943,7 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
-      "id": "test_digest_covers_kit_version",
+      "id": "test_digest_covers_grammar_epoch",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },

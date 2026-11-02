@@ -826,37 +826,36 @@ def test_conf_digest_both_directions():
         cleanup(root)
 
 
-@check("the KIT VERSION is inside conf_digest, so a grammar edit cannot leave a cache warm")
-def test_digest_covers_kit_version():
+@check("the GRAMMAR EPOCH is inside conf_digest, so a grammar edit cannot leave a cache warm")
+def test_digest_covers_grammar_epoch():
     """`digest()`'s docstring promises "an id-grammar or corpus-root edit invalidates a warm cache".
 
     The blob hashed `memory_root`, `families` and `node_tag_class` — and the ERAS, which are half the
-    id grammar, live in `extract.py` and reached the blob through none of them. Measured on the
-    commit that widened the session era to `\\d+[a-z]*`: `records` went 53 documents to 91, and every
-    cache built before it stayed warm and stayed blind to the 38 new ones. `corpus_digest` cannot
-    cover this either — it is mtime+size over the tree's `.md` files, and a regex edit moves no `.md`
-    byte.
+    id grammar, live in code and reached the blob through none of them. Measured on the commit that
+    widened the session era to `\\d+[a-z]*`: `records` went 53 documents to 91, and every cache built
+    before it stayed warm and stayed blind to the 38 new ones.
 
-    The kit VERSION is what goes in, not the era tuple: the version is already this kit's declared
-    epoch for its own behaviour, it is bumped by the same unit that edits the grammar, and it needs
-    no knowledge of a regex owned by a module `recall_conf` cannot import without an import cycle.
-
-    Two Confs differing in NOTHING but the constant. Equal digests here means the promise is prose.
+    The term that dates them is the memory-tree kit's `id_grammar.py`'s own bytes since
+    PLAY-dOrderedCharter-18 (its spec's §8 F1): the eras live there, so the file's hash moves exactly
+    when the grammar's code does. Two Confs differing in NOTHING but that epoch; equal digests here
+    means the promise is prose.
     """
+    ig = sys.modules["id_grammar"]
     conf = recall_conf.Conf(pathlib.Path("/nowhere"), "memory", ("TOOL",))
-    was = recall_conf.KIT_MEMORY_RECALL_VERSION
+    was = ig.derive_grammar_epoch
     try:
-        recall_conf.KIT_MEMORY_RECALL_VERSION = "0.0"
+        ig.derive_grammar_epoch = lambda: "0" * 12
         lo = conf.digest()
-        recall_conf.KIT_MEMORY_RECALL_VERSION = "99.99"
+        ig.derive_grammar_epoch = lambda: "f" * 12
         hi = conf.digest()
     finally:
-        recall_conf.KIT_MEMORY_RECALL_VERSION = was
+        ig.derive_grammar_epoch = was
     assert lo != hi, (
-        f"digest() is {lo} at kit 0.0 and {hi} at kit 99.99 — the kit version is not in the blob, so "
-        "a grammar edit ships under a digest that says nothing moved and every warm cache survives it"
+        f"digest() is {lo} at epoch 000000000000 and {hi} at epoch ffffffffffff — the grammar epoch is "
+        "not in the blob, so a grammar edit ships under a digest that says nothing moved and every warm "
+        "cache survives it"
     )
-    return f"kit 0.0 -> {lo}, kit 99.99 -> {hi}"
+    return f"epoch 000000000000 -> {lo}, epoch ffffffffffff -> {hi}"
 
 
 @check("a query writes NOTHING in the worktree — asserted by path, with no ignore rule present")

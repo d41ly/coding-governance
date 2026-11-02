@@ -32,17 +32,78 @@ Usage:
   python bench.py <data-dir> <fixture.json> [--sets spine,records,chunks]
                   [--subs grep,fts5,fts5w,rm3]
                   [--ks 1,5,10,20,50,100] [--slice all|hard|easy] [--json OUT]
+
+check 27's four index names -- ``build_index``, ``match_expr``, ``terms`` and ``ALIAS_WEIGHT`` --
+and the tokenizer they read live in the memory-tree kit's ``id_grammar.py`` since
+PLAY-dOrderedCharter-18, found through ``resolve_kit_dir``; this file re-exports them, so every
+substrate below and every reader of ``bench.<name>`` reads the same objects.
 """
 
 from __future__ import annotations
 
 import json
 import pathlib
-import re
 import sqlite3
 import sys
 import time
 from collections import Counter
+
+# The kit writes no bytecode inside the adopter's worktree: ABOVE the grammar import below.
+sys.dont_write_bytecode = True
+
+
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+_GRAMMAR_KIT = str(resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent))
+if _GRAMMAR_KIT not in sys.path:
+    sys.path.append(_GRAMMAR_KIT)
+
+from id_grammar import (  # noqa: E402,F401 — re-exported: check 27 and query.py read them here too
+    ALIAS_WEIGHT,
+    STOP,
+    TOKEN,
+    build_index,
+    match_expr,
+    terms,
+)
 
 HEAD_WEIGHT = 8.0
 # FORKED, one delta, and it is stated here because the digest pin cannot say WHY it moved.
@@ -53,21 +114,6 @@ HEAD_WEIGHT = 8.0
 RM3_DOCS = 3
 RM3_TERMS = 8
 
-STOP = set(
-    """a an and are as at be but by for from has have how in into is it its of on or that the
-    this to was were what when where which who why will with does do did can could should would
-    my our your their there here if then than so not no yes get got make made use used using i
-    you we they he she them us me about after before between during over under again more most
-    some any all each other same such only own too very just now new old also been being had"""
-    .split()
-)
-
-TOKEN = re.compile(r"[A-Za-z][A-Za-z0-9_]{1,}")
-
-
-def terms(text: str) -> list[str]:
-    return [t.lower() for t in TOKEN.findall(text) if t.lower() not in STOP and len(t) > 2]
-
 
 def load(data: pathlib.Path, name: str) -> list[dict]:
     rows = []
@@ -76,60 +122,6 @@ def load(data: pathlib.Path, name: str) -> list[dict]:
             if line.strip():
                 rows.append(json.loads(line))
     return rows
-
-
-# Swept on the 99-query hard slice with 262 records aliased. 1.0 costs r@10 a point against the
-# un-aliased baseline; 0.25-0.5 recovers it and lifts r@20 to 0.74 against 0.71. Weights >=4 are
-# actively harmful (16.0 drops r@10 to 0.55). The alias text is a bridge, not evidence -- it should
-# break ties, not win them.
-ALIAS_WEIGHT = 0.4
-
-
-def build_index(
-    docs: list[dict], crumb: bool = False, db_path: str = ":memory:"
-) -> sqlite3.Connection:
-    """FTS5 index over three columns: ``head``, ``body`` and ``alias``.
-
-    ``crumb=True`` folds each chunk's heading ancestry into the searchable head. The breadcrumb is a
-    structural variant, not the default: a slice deep in a document loses every heading above it, so
-    `Rules` under `Sanitization` under `Security` indexes as `Rules`.
-
-    ``alias`` is its OWN column rather than text concatenated onto the body, because BM25 divides by
-    document length: appending ~484 chars of alias text to a ~1 000-char record costs that record
-    roughly a third of the weight of the terms it already had. Aliasing a record made it worse at
-    matching its own vocabulary, and when rivals were aliased and the target was not, the penalty
-    landed entirely on the target. A separate column keeps the bridge searchable without diluting
-    the record, and lets ``bm25()`` weight the two independently.
-
-    ``db_path`` defaults to ``":memory:"`` -- every benchmark caller keeps that and no measured
-    number moves. ``query.py`` passes a file so the CLI's cache is built by the SAME builder the
-    measurement uses; a second ``CREATE VIRTUAL TABLE`` elsewhere would be a second place for the
-    column order and the alias weight to drift.
-    """
-    db = sqlite3.connect(db_path)
-    db.execute("CREATE VIRTUAL TABLE d USING fts5(head, body, alias, tokenize='unicode61')")
-    db.executemany(
-        "INSERT INTO d(rowid, head, body, alias) VALUES (?,?,?,?)",
-        [
-            (
-                i,
-                " ".join(
-                    x
-                    for x in (
-                        r.get("id", ""),
-                        r["path"],
-                        r["text"].split("\n", 1)[0],
-                        r.get("crumb", "") if crumb else "",
-                    )
-                    if x
-                ),
-                r["text"],
-                r.get("alias", ""),
-            )
-            for i, r in enumerate(docs)
-        ],
-    )
-    return db
 
 
 def parent_of(r: dict) -> str:
@@ -160,15 +152,6 @@ def run_rollup(db, docs: list[dict], query: str, k: int, weighted: bool = False)
         if len(out) >= k:
             break
     return out
-
-
-def match_expr(query: str) -> str:
-    ts = terms(query)
-    if not ts:
-        return '"the"'
-    # OR the terms. FTS5's query language treats most punctuation as syntax, so every term is
-    # double-quoted -- an unquoted `use client` or `c++` is a syntax error, not a miss.
-    return " OR ".join('"' + t.replace('"', "") + '"' for t in dict.fromkeys(ts))
 
 
 def run_fts(db: sqlite3.Connection, query: str, k: int, weighted: bool) -> list[int]:

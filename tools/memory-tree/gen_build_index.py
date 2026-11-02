@@ -559,7 +559,7 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
     this corpus, two thirds of its ids had no spec at all. Resolving a record against it would let a
     binding name something no spec ever defined.
 
-    The predicate itself is `tree_lib.parse_spec_h1`, shared with the memory-recall kit's extractor
+    The predicate itself is `tree_lib.parse_spec_h1`, shared with `id_grammar.extract_records`
     so the two readers cannot disagree about which line defines an id (TOOL-aRepatriatedFork-40).
     """
     m = conf["MEMORY_ROOT"]
@@ -6946,7 +6946,7 @@ def cmd_selftest() -> int:
             print(f"arm SKIP  the view's anchor arms did not run — {_why}")
             fails.append("the anchor arms were SKIPPED, so the anchor property is unobserved")
         else:
-            import extract as _anchor_kit  # noqa: PLC0415 — deferred exactly as backlog.py's is
+            import id_grammar as _anchor_kit  # noqa: PLC0415 — deferred exactly as backlog.py's is
             # THE GRAMMAR IS BOUND TO THE FIXTURE, not to this repo. Bound to this repo it would
             # recognise none of the fixture's families, return nothing for every line, and pass by
             # finding nothing — the empty-classification shape this kit has measured twice.

@@ -11,15 +11,15 @@ Every number a gate here quotes is DERIVED from one walk rather than written int
 classifier that lives in prose is a classifier nobody can check.
 
 NOTHING HERE DECLARES A GRAMMAR OR A SET IT DOES NOT OWN.
-  * the id grammar and the four anchor shapes come from the memory-recall kit's `extract.py`, which
-    already derives them from `.memory-tree.conf`. A second grammar is the catalogue-drift class:
+  * the id grammar and the four anchor shapes come from this kit's `id_grammar.py`, which
+    already derives them from `.memory-tree.conf` (PLAY-dOrderedCharter-18). A second grammar is the catalogue-drift class:
     upstream re-typed one alternation with its branches reordered and would never have noticed.
   * the append-only areas and the byte-capped index set come from `check-memory-hygiene.sh`, which
     already owns both — asked for through its print modes, never transcribed. Upstream transcribed
     the index set and had to guard the transcription in BOTH directions, because a shell-side
     addition the Python side still excludes leaves a file under no cap at all.
 
-THE CROSS-KIT DEPENDENCY IS DECLARED, and its two states are kept apart: with every pin blank the
+THE GRAMMAR MODULE IS A LATE IMPORT, and its two states are kept apart: with every pin blank the
 grammar module is never imported and checks 13-16 are simply off, while a pin SET with the module
 absent is a NAMED error — you armed a check whose grammar is not installed. Never a traceback, and
 never the silent pass a bare `try: import` would produce.
@@ -43,57 +43,12 @@ import tempfile
 HERE = pathlib.Path(__file__).resolve().parent
 HYGIENE = HERE / "check-memory-hygiene.sh"
 
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
-       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
-       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
-       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        src = str(row.get("source") or "").split("/")
-        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
-        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
-
-# The grammar lives in the sibling kit, found by `resolve_kit_dir` (TOOL-aRepatriatedFork-2 S3): the
-# receipt first, which is the only record of a kit dir an adopter RENAMED, then the two probes. On a
-# miss it holds THIS kit's own directory, which carries no extract.py, so both readers below take
-# their not-installed branch, and GRAMMAR_WHERE carries the resolver's own account of where it looked.
-# TOOL-aRepatriatedFork-46: the miss used to name `<this kit's parent>/memory-recall`, a kit name typed
-# after a derived base, which is the class the carried-prefix ban counts.
-try:
-    GRAMMAR_DIR = resolve_kit_dir("memory-recall", "extract.py", HERE)
-    GRAMMAR_WHERE = "%s/extract.py" % GRAMMAR_DIR.as_posix()
-except LookupError as _grammar_miss:
-    GRAMMAR_DIR = HERE
-    GRAMMAR_WHERE = "the kit's extract.py (%s)" % _grammar_miss
+# The grammar is this kit's own `id_grammar.py` (PLAY-dOrderedCharter-18), a sibling imported late
+# so a tree with every pin blank never imports it. GRAMMAR_DIR is a module global so the selftest can
+# point it at a directory holding an absent or an outdated grammar; GRAMMAR_WHERE is the file a
+# refusal names.
+GRAMMAR_DIR = HERE
+GRAMMAR_WHERE = "%s/id_grammar.py" % GRAMMAR_DIR.as_posix()
 
 # TOOL-dSpentCeiling-1 — the two keys this engine no longer reads. A conf that still declares one
 # is ANNOUNCED, never refused: the shipped example declared READ_PATH_CEILING blank, so refusing on
@@ -243,47 +198,46 @@ def armed(conf: dict) -> bool:
 # correct. Both of the module's refusal points take the pair, because re-causing only the first would
 # leave the pin cure alive on the second — the path a STALE sibling kit takes.
 _PIN_WHY = "a pin is set in .memory-tree.conf"
-_PIN_CURE_ABSENT = ("Either adopt that kit or blank DEAD_PATH_PIN / ORPHAN_ID_PIN to turn "
-                    "checks 13-15 off.")
+_PIN_CURE_ABSENT = ("Either restore it from the memory-tree kit or blank DEAD_PATH_PIN / "
+                    "ORPHAN_ID_PIN to turn checks 13-15 off.")
 _PIN_CURE_OUTDATED = "update it, or blank the pins to turn checks 13-15 off"
 _ROUTE_WHY = "the anchor route was asked for"
-_ROUTE_CURE_ABSENT = ("Install the memory-recall kit beside this one; no conf value of this kit "
-                      "turns the anchor route off.")
-_ROUTE_CURE_OUTDATED = ("update that kit beside this one, because no conf value of this kit turns "
-                        "the anchor route off")
+_ROUTE_CURE_ABSENT = ("Restore it from the memory-tree kit; no conf value of this kit turns "
+                      "the anchor route off.")
+_ROUTE_CURE_OUTDATED = ("update it from the memory-tree kit, because no conf value of this kit "
+                        "turns the anchor route off")
 
 
 def _check_grammar_installed(why: str, cure_absent: str, cure_outdated: str):
-    """The module's ONE raise for a memory-recall kit that is absent or too old, and its import.
+    """The module's ONE raise for an id grammar module that is absent or too old, and its import.
 
-    Two refusal points and TWO remedies, because the remedies genuinely differ — adopt that kit
+    Two refusal points and TWO remedies, because the remedies genuinely differ — restore the module
     versus update it — and one string reused at both would be wrong at one of them. The cause is the
     caller's at both.
 
     Returns the imported module, so exactly one site puts GRAMMAR_DIR on `sys.path` and a caller
     that needs `grammar_for` has it without a second import.
     """
-    if not (GRAMMAR_DIR / "extract.py").is_file():
+    if not (GRAMMAR_DIR / "id_grammar.py").is_file():
         raise Problem(
-            "corpus_ids: %s, but the id grammar lives in the "
-            "memory-recall kit and %s is not installed. %s"
+            "corpus_ids: %s, but the id grammar lives in %s, which is not installed. %s"
             % (why, GRAMMAR_WHERE, cure_absent)
         )
     if str(GRAMMAR_DIR) not in sys.path:
         sys.path.insert(0, str(GRAMMAR_DIR))
-    import extract  # noqa: E402  (deliberately late: see the module docstring)
+    import id_grammar  # noqa: E402  (deliberately late: see the module docstring)
 
-    if not hasattr(extract, "grammar_for"):
-        raise Problem("corpus_ids: %s, but the installed memory-recall kit predates "
-                      "grammar_for(root); %s" % (why, cure_outdated))
-    return extract
+    if not hasattr(id_grammar, "grammar_for"):
+        raise Problem("corpus_ids: %s, but the installed %s predates grammar_for(root); %s"
+                      % (why, GRAMMAR_WHERE, cure_outdated))
+    return id_grammar
 
 
 def grammar(root: str, why: str = _PIN_WHY, cure_absent: str = _PIN_CURE_ABSENT,
             cure_outdated: str = _PIN_CURE_OUTDATED):
-    """The sibling kit's id + anchor grammar, BOUND TO THIS ROOT — or a named error naming the kit.
+    """The kit's id + anchor grammar, BOUND TO THIS ROOT — or a named error naming its module.
 
-    `extract.repo_root()` anchors on the kit's own file, so the module-level constants describe the
+    `id_grammar.repo_root()` anchors on the module's own file, so the module-level constants describe the
     repo the kit is installed in and no chdir can move them. That is right for its CLI and wrong for
     a caller classifying a different tree: the alternation would come from the wrong repo and every
     id in the target would fail to match — silently, since a grammar that recognises nothing yields
@@ -338,10 +292,9 @@ def resolve_anchor(root: str, E=None):
             raise
         except RuntimeError as exc:
             # `ConfError` is matched BY NAME, and the obvious alternative was measured and rejected:
-            # reaching the class through `sys.modules["extract"].recall_conf` raises KeyError when
-            # `extract.py` refused DURING its own import — it resolves a conf at module scope, so the
-            # kit can fail to import for exactly the reason this clause exists to map, and the
-            # look-up that was supposed to catch it becomes a second traceback. A RuntimeError that
+            # reaching the class through the grammar module in `sys.modules` raised KeyError when
+            # that module refused DURING its own import, so the look-up that was supposed to catch
+            # it became a second traceback. A RuntimeError that
             # is NOT that class is re-raised untouched rather than re-labelled with a cause it does
             # not have.
             if type(exc).__name__ != "ConfError":
@@ -676,9 +629,9 @@ def walk(root: str, conf: dict) -> dict:
 
 def _anchor(E, line):
     """The grammar bundle carries its own anchor patterns; `anchor_at` takes it as `g`."""
-    import extract
+    import id_grammar
 
-    return extract.anchor_at(line, E)
+    return id_grammar.anchor_at(line, E)
 
 
 def _roots(tracked_set) -> set:
@@ -731,8 +684,7 @@ def check_read_path(root: str, conf: dict) -> tuple:
     never once caused a trim. The exhibit is in `memory/builds/dSpentCeiling/`.
 
     Calls neither `walk()` nor `grammar()`: `read_set` needs only root, conf and tracked, so the
-    memory-recall kit stays a CONDITIONAL dependency rather than becoming a hard one for every
-    adopter of memory-tree alone.
+    grammar module stays a CONDITIONAL import rather than one every run of check 16 pays for.
 
     Returns `(bad, notes)`. Notes print and do not touch the exit code.
     """
@@ -963,7 +915,7 @@ def _render_defined_ids(root: str, conf: dict) -> list:
     this set in ONE spawn, and it cannot extract id-shaped tokens from the card without the grammar;
     spelling the grammar in shell is the second-predicate class `TOOL-cSpliceWarden-6` closed, so the
     one spawn carries it. The translation covers exactly the two Python-only constructs the grammar
-    builder in the memory-recall kit uses — `(?:` and `\\d` — and refuses if either survives, because
+    builder in `id_grammar.py` uses — `(?:` and `\\d` — and refuses if either survives, because
     an ERE that `grep -E` reads differently from the reader would let the shell and the reader
     disagree about what an id is, silently.
     """
@@ -979,14 +931,14 @@ def print_defined_ids(root: str, conf: dict) -> int:
     """Print the id grammar, then every id this corpus DEFINES, one per line. Read-only; the pins do
     not gate it — it is a set for a caller, not a check.
 
-    Exit 3 is a NAMED DEGRADATION, not a refusal: the grammar lives in the memory-recall kit, and a
-    tree holding memory-tree alone has no id set to print. The caller (`manifest-check.sh --card
+    Exit 3 is a NAMED DEGRADATION, not a refusal: an install whose `id_grammar.py` is absent has no
+    id set to print. The caller (`manifest-check.sh --card
     --append`) maps 3 onto its "id citations unchecked" branch and still judges paths; before this
     the grammar's Problem exited 1, the append refused every body, and the commit deny's printed
     remedy re-ran the refusing append — a lockout (the aReplayedCard closing review, F1)."""
-    if not (GRAMMAR_DIR / "extract.py").is_file():
-        print("corpus_ids: no id set — the id grammar lives in the memory-recall kit and %s "
-              "is not installed; adopt that kit to check id citations" % GRAMMAR_WHERE)
+    if not (GRAMMAR_DIR / "id_grammar.py").is_file():
+        print("corpus_ids: no id set — the id grammar lives in %s, which is not installed; "
+              "restore it to check id citations" % GRAMMAR_WHERE)
         return 3
     for line in _render_defined_ids(root, conf):
         print(line)
@@ -1098,7 +1050,7 @@ def cmd_selftest() -> int:
             lambda: (lambda ls: "ok" if ls[0].startswith("# id-ere: ") and "(?" not in ls[0]
                      and r"\d" not in ls[0] and re.fullmatch(ls[0][len("# id-ere: "):], "ARCH-tOne-1")
                      and ls[1:] == ["ARCH-tOne-1"] else repr(ls))(_render_defined_ids(t, c)))
-        # The aReplayedCard closing review, F1: with no memory-recall kit beside this one the verb
+        # The aReplayedCard closing review, F1: with no id_grammar.py in the grammar dir the verb
         # DEGRADES — exit 3, one line naming the kit — instead of raising the grammar's Problem.
         # GRAMMAR_DIR is pointed at a directory that does not exist, then restored.
 
@@ -1112,8 +1064,8 @@ def cmd_selftest() -> int:
             finally:
                 globals()["GRAMMAR_DIR"] = saved
             return f"rc={rc} lines={len(buf.getvalue().splitlines())} {buf.getvalue().strip()}"
-        arm("--print-defined-ids with no memory-recall kit exits 3 with one line naming the kit",
-            "rc=3 lines=1 corpus_ids: no id set — the id grammar lives in the memory-recall kit", _check_degraded)
+        arm("--print-defined-ids with no id_grammar.py exits 3 with one line naming it",
+            "rc=3 lines=1 corpus_ids: no id set — the id grammar lives in ", _check_degraded)
 
         # ---- TOOL-dDerivedDocket-50: the kit's ONE public route to the anchor grammar.
         # ---- BOUND TO THE ROOT IT IS GIVEN, and the fixture's family (`arch:ARCH`) is one this
@@ -1165,23 +1117,23 @@ def cmd_selftest() -> int:
             "route args in walk=[2]", _graph)
 
         # ---- THE ROUTE'S OWN REFUSAL, at BOTH of the installed-check's points, and `grammar()`'s
-        # ---- beside it. The second fixture needs `extract` out of sys.modules or the real module
+        # ---- beside it. The second fixture needs `id_grammar` out of sys.modules or the real module
         # ---- answers `hasattr(grammar_for)` and the outdated point is never reached — the arm would
         # ---- pass by exercising nothing.
         def _under_grammar_dir(d, fn):
             # GRAMMAR_WHERE is swapped beside GRAMMAR_DIR: the refusal reads it (TOOL-aRepatriatedFork-46 S4).
             saved_dir, saved_where = globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"]
             saved_path = list(sys.path)
-            saved_mod = sys.modules.pop("extract", None)
-            globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"] = d, "%s/extract.py" % d
+            saved_mod = sys.modules.pop("id_grammar", None)
+            globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"] = d, "%s/id_grammar.py" % d
             try:
                 return fn()
             finally:
                 globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"] = saved_dir, saved_where
                 sys.path[:] = saved_path
-                sys.modules.pop("extract", None)
+                sys.modules.pop("id_grammar", None)
                 if saved_mod is not None:
-                    sys.modules["extract"] = saved_mod
+                    sys.modules["id_grammar"] = saved_mod
 
         def _refusals(d):
             def _say(f):
@@ -1198,20 +1150,21 @@ def cmd_selftest() -> int:
         for _sub, _body, _state, _cure, _pincure in (
             ("nowhere",
              None,
-             "the id grammar lives in the memory-recall kit and %s/extract.py is not installed.",
-             "Install the memory-recall kit beside this one; no conf value of this kit turns the "
-             "anchor route off.",
-             "Either adopt that kit or blank DEAD_PATH_PIN / ORPHAN_ID_PIN to turn checks 13-15 off."),
+             "the id grammar lives in %s/id_grammar.py, which is not installed.",
+             "Restore it from the memory-tree kit; no conf value of this kit turns the anchor route "
+             "off.",
+             "Either restore it from the memory-tree kit or blank DEAD_PATH_PIN / ORPHAN_ID_PIN to "
+             "turn checks 13-15 off."),
             ("oldkit",
-             "# a memory-recall kit that predates grammar_for(root)\n",
-             "the installed memory-recall kit predates grammar_for(root);",
-             "update that kit beside this one, because no conf value of this kit turns the anchor "
+             "# an id_grammar.py that predates grammar_for(root)\n",
+             "the installed %s/id_grammar.py predates grammar_for(root);",
+             "update it from the memory-tree kit, because no conf value of this kit turns the anchor "
              "route off",
              "update it, or blank the pins to turn checks 13-15 off"),
         ):
             _d = pathlib.Path(base) / _sub
             if _body is not None:
-                _w(base, _sub + "/extract.py", _body)
+                _w(base, _sub + "/id_grammar.py", _body)
             _state_text = _state % _d if "%s" in _state else _state
             _route, _pin = _refusals(_d)
             n_label = "the anchor route's refusal (%s) states ITS cause and ITS cure" % _sub

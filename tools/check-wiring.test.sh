@@ -277,7 +277,7 @@ HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree merge-rows.py "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
-MEMORY_RECALL_DIR=$(resolve_kit_dir "$_rkd_py" memory-recall extract.py "$HERE") || exit 2
+MEMORY_RECALL_DIR=$(resolve_kit_dir "$_rkd_py" memory-recall query.py "$HERE") || exit 2
 MEMORY_RECALL="${MEMORY_RECALL_DIR##*/}"
 LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib pyrun.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
@@ -307,8 +307,8 @@ seed_driver_kit() {  # $1 = destination directory -> every python module of the 
 
 # Lay a COMPLETE, RUNNABLE merge-driver install into the cwd under prefix $1 ("<prefix>/" here, "" for
 # the copy-installed adopter layout). Complete is the point: the driver sources a resolver through
-# its shim, imports its anchor grammar from the sibling memory-recall kit and its view layer from its
-# own kit (`seed_driver_kit`), and walks up for `.memory-tree.conf`. A fixture missing any of those
+# its shim, imports its anchor grammar (`id_grammar.py`) and its view layer from its own kit
+# (`seed_driver_kit`), and walks up for `.memory-tree.conf`. A fixture missing any of those
 # holds a driver that CANNOT START — which is exactly the state the arm under test has to report, so
 # it must be reachable on purpose and never by accident.
 install_driver() {
@@ -317,12 +317,11 @@ install_driver() {
   # A CONTINUED LINE CANNOT CARRY A COMMENT — the backslash would escape the space before it,
   # not the newline — so the list is two assignments, each of which can be marked.
   _rels="${ROOTPFX}${MT_KIT}/merge-rows.py ${ROOTPFX}${MT_KIT}/merge-rows.sh ${ROOTPFX}${LIB}/pyrun.sh ${ROOTPFX}${LIB}/resolve-python.sh"
-  _rels="$_rels ${ROOTPFX}${MEMORY_RECALL}/extract.py ${ROOTPFX}${MEMORY_RECALL}/recall_conf.py"
   for rel in $_rels; do
     src=$(src_of "$rel")
     # A NAMED cause instead of `cp: cannot stat ''`. Every file in this list is a runtime dependency
-    # of the driver — the shim's resolver, the memory-recall kit the anchor grammar is imported
-    # from — so a repo carrying `merge-rows.py` without one of them carries a driver that cannot
+    # of the driver — the shim and its resolver — so a repo carrying `merge-rows.py` without one
+    # of them carries a driver that cannot
     # start. That is a defect in the repo, not a gap in the fixture, and it reds rather than skips.
     [ -n "$src" ] || { ck "install_driver: $rel is not installed in $REPO (the driver cannot run without it)" 0; return 1; }
     cp "$src" "${p}${rel}"
@@ -1116,15 +1115,15 @@ out=$(TMPDIR=/nonexistent-check-wiring-tmp bash "$SCRIPT" --check 2>/dev/null); 
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'cannot verify'; } \
   && ck "AC10 unverifiable (no temp dir) -> UNWIRED, not a silent ok" 1 || ck "AC10 unverifiable (no temp dir) -> UNWIRED, not a silent ok" 0
 
-# state 5c — the driver STARTS but cannot key a row: the sibling memory-recall kit that owns the
+# state 5c — the driver STARTS but cannot key a row: the kit's `id_grammar.py` that owns the
 # anchor grammar is gone, so the deferred import raises and the fail-closed wrapper writes a conflict
 # on every governed-index merge, forever. Loud rather than destructive, but the arm's own header
 # claims it turns "declared" into "wired"; a driver that conflicts unconditionally is not wired.
-mv ${KP}${MEMORY_RECALL} ${KP}${MEMORY_RECALL}.away
+mv ${KP}${MT_KIT}/id_grammar.py ${KP}${MT_KIT}/id_grammar.py.away
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'cannot merge'; } \
-  && ck "AC10 driver cannot key rows (no memory-recall) -> UNWIRED, exit 1" 1 || ck "AC10 driver cannot key rows (no memory-recall) -> UNWIRED, exit 1" 0
-mv ${KP}${MEMORY_RECALL}.away ${KP}${MEMORY_RECALL}
+  && ck "AC10 driver cannot key rows (no id_grammar.py) -> UNWIRED, exit 1" 1 || ck "AC10 driver cannot key rows (no id_grammar.py) -> UNWIRED, exit 1" 0
+mv ${KP}${MT_KIT}/id_grammar.py.away ${KP}${MT_KIT}/id_grammar.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the grammar kit goes green again" 1 || ck "AC10 restoring the grammar kit goes green again" 0
@@ -1185,7 +1184,7 @@ git reset -q --hard HEAD~1
 # id-level no-duplicate guarantee is entirely off. Every other assertion in the arm is green over it.
 # `anchor_at` is REDEFINED rather than deleted, so the import still succeeds and the fail-closed
 # handler is not what answers: this state is about a grammar that works and recognises nothing.
-printf '\n\ndef anchor_at(line, g=None):\n    return None\n' >> $KIT_REL/${MEMORY_RECALL}/extract.py
+printf '\n\ndef anchor_at(line, g=None):\n    return None\n' >> $KIT_REL/${MT_KIT}/id_grammar.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'HASHED'; } \
   && ck "AC10 a grammar that keys NOTHING -> UNWIRED naming the hashed count, exit 1" 1 || ck "AC10 a grammar that keys NOTHING -> UNWIRED naming the hashed count, exit 1" 0
@@ -1200,9 +1199,9 @@ qn=0; for i in 001 002 003; do [ "$(grep -c -- "^- TOOL-$i |" "$Q/a")" = 1 ] && 
   && ck "AC10 the dead grammar still merges cleanly (0 keyed, 3 hashed) — the channel is real and quiet" 1 \
   || ck "AC10 the dead grammar still merges cleanly (0 keyed, 3 hashed) — the channel is real and quiet [rc=$qrc ids=$qn err=$qerr]" 0
 rm -rf "$Q"
-git checkout -q -- $KIT_REL/${MEMORY_RECALL}/extract.py 2>/dev/null || true
-if grep -q 'def anchor_at(line, g=None):' $KIT_REL/${MEMORY_RECALL}/extract.py; then
-  cp "$(src_of "${ROOTPFX}${MEMORY_RECALL}/extract.py")" $KIT_REL/${MEMORY_RECALL}/extract.py
+git checkout -q -- $KIT_REL/${MT_KIT}/id_grammar.py 2>/dev/null || true
+if grep -q 'def anchor_at(line, g=None):' $KIT_REL/${MT_KIT}/id_grammar.py; then
+  cp "$(src_of "${ROOTPFX}${MT_KIT}/id_grammar.py")" $KIT_REL/${MT_KIT}/id_grammar.py
 fi
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
@@ -1650,17 +1649,12 @@ unset GOV_DEFAULT_BRANCH
 # hold that severity, the mode gate in front of it, and the fact that it names the branch at all.
 seed_relocation_kit() { # $1 = install prefix ("" here, the copy-installed adopter layout)
   local p="$1" rel src
-  for rel in "${ROOTPFX}${MT_KIT}" "${ROOTPFX}${MEMORY_RECALL}" "${ROOTPFX}${LIB}"; do
+  for rel in "${ROOTPFX}${MT_KIT}" "${ROOTPFX}${LIB}"; do
     src=$(src_of "$rel")
     [ -n "$src" ] || { ck "seed_relocation_kit: $rel is not installed in $REPO" 0; return 1; }
     cp -r "$src" "${p}${rel}"
   done
-  rm -rf "${p}${ROOTPFX}${MT_KIT}/__pycache__" "${p}${ROOTPFX}${MEMORY_RECALL}/__pycache__"
-  # The recall-opened OPT-IN pair is dropped on purpose. It is not a dependency of the straggler
-  # inventory, and leaving it here makes check R report UNWIRED over a fixture with no settings.json
-  # — which would decide this script's exit code and make the `--check` arm below assert nothing
-  # about the straggler severity it exists to hold.
-  rm -f "${p}${ROOTPFX}${MEMORY_RECALL}/recall-opened.js" "${p}${ROOTPFX}${MEMORY_RECALL}/recall-opened.fragment.json"
+  rm -rf "${p}${ROOTPFX}${MT_KIT}/__pycache__"
 }
 # A SHARDS-mode tree first: the step must be silent about stragglers where no branch can be one.
 newrepo
@@ -1791,10 +1785,8 @@ if [ -f "$SMERGE" ] && [ -f "$SGFRAG" ] && [ -n "$FRAG" ]; then
   newrepo; git config core.hooksPath .githooks   # isolate: hooks wired, so only the arms under test move
   mkdir -p scripts/memory-recall scripts/recall .claude/hooks memory/backlog ${KIT_REL:-.}
   _flat="${ROOTPFX}${MT_KIT}/merge-rows.py ${ROOTPFX}${MT_KIT}/merge-rows.sh"  # src_of keys under the tool root; the scratch repo lays them FLAT under scripts/, where no probe looks
-  _grammar="${ROOTPFX}${MEMORY_RECALL}/extract.py ${ROOTPFX}${MEMORY_RECALL}/recall_conf.py"  # src_of keys under the tool root; the grammar kit the flat driver finds beside itself
   for rel in $_flat; do cp "$(src_of "$rel")" "scripts/${rel#*/}"; done
-  seed_driver_kit scripts   # FLAT as well: the driver imports its siblings from its own directory
-  for rel in $_grammar; do cp "$(src_of "$rel")" "scripts/$rel"; done
+  seed_driver_kit scripts   # FLAT as well: the driver imports its siblings, its grammar included, from its own directory
   printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
   printf '# tooling backlog\n\n- TOOL-001 | a landed row, so the family harvest has a population\n' > memory/backlog/TOOL.md
   printf 'memory/backlog/*.md merge=rows\n' > .gitattributes

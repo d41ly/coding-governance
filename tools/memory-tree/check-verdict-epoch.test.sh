@@ -279,6 +279,34 @@ arm 'a sibling a delegate imports and DELEGATES omits exits 2 naming both' 2 "$K
 printf 'def load(:\n    import newmod\n' > "$Q/$KIT_REL/design_lib.py"
 arm '...and a delegate that does not parse exits 2 naming it' 2 "$KIT_REL/design_lib.py does not parse, so its imports were not read" "$Q" "$BASE_Q"
 
+# ---- 5f. THE GRAMMAR IS A DELEGATE (PLAY-dOrderedCharter-18). The id grammar moved out of the recall
+# kit into this kit's `id_grammar.py`, so its change dates a verdict the way any delegate's does: a
+# behaviour-bearing edit with the constant unmoved FAILS naming it. Then the same tree is graded by a
+# copy of this gate whose DELEGATES drops `${_kit}id_grammar.py`, and the import-closure walk exits 2
+# naming it and the delegate that imports it. The copy sits beside the gate, where its own-directory
+# derivation reads the same kit prefix, and is removed by the EXIT trap. The gate before the move,
+# which scanned the grammar only through a resolved recall kit, exits 0 clean on the first fixture.
+G=$(newrepo grammar)
+engine "$G" 1.5 ""
+printf 'def grammar(root):\n    import id_grammar\n    return id_grammar.grammar_for(root)\n' > "$G/$KIT_REL/corpus_ids.py"
+printf 'ERAS = ("flat",)\n' > "$G/$KIT_REL/id_grammar.py"
+( cd "$G" && git add -A && git commit -qm base --no-verify ) >/dev/null
+BASE_G=$(cd "$G" && git rev-parse HEAD)
+printf 'ERAS = ("flat", "session")\n' > "$G/$KIT_REL/id_grammar.py"
+( cd "$G" && git add -A && git commit -qm "the grammar widens an era, no bump" --no-verify ) >/dev/null
+arm 'an id_grammar.py edit with no bump FAILS naming it' 1 "moved: $KIT_REL/id_grammar.py" "$G" "$BASE_G"
+MUT="$HERE/check-verdict-epoch.mut$$.sh"
+trap 'rm -rf "$TMP" "$MUT"' EXIT
+sed 's/ \${_kit}id_grammar\.py / /' "$GATE" > "$MUT"
+if grep -q '{_kit}id_grammar\.py' "$MUT"; then
+  fails=$((fails+1)); printf 'arm FAIL  %s\n' 'the DELEGATES-drop plant did not remove id_grammar.py from the gate copy'
+else
+  GATE_SAVED=$GATE; GATE=$MUT
+  arm '...and a gate whose DELEGATES drops id_grammar.py exits 2 naming it and its importer' 2 "$KIT_REL/id_grammar.py is imported by $KIT_REL/corpus_ids.py and is not in DELEGATES" "$G" "$BASE_G"
+  GATE=$GATE_SAVED
+fi
+rm -f "$MUT"
+
 # ---- 6. this repo, right now --------------------------------------------------------------------
 # The live tree must be clean, and it must be clean because the constant MOVED — not because nothing
 # changed. Asserting the message discriminates the two.

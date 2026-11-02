@@ -279,8 +279,6 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 LIB_DIR=$(resolve_kit_dir "$PY" lib pyrun.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
-MEMORY_RECALL_DIR=$(resolve_kit_dir "$PY" memory-recall extract.py "$HERE") || exit 2
-MEMORY_RECALL="${MEMORY_RECALL_DIR##*/}"
 
 DRV="bash $LIB_DIR/pyrun.sh $KIT_REL/${KIT}/merge-rows.py"
 bad() { echo "FAIL $1"; st=1; }
@@ -530,18 +528,18 @@ failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/${KIT}/merge-rows
     || bad "$1: the driver failed closed for a reason other than the staged one ($3): $(head -1 "$TMP/fcerr" | cut -c1-160)"
 }
 mkscratch() { local d; d=$(mktemp -d); SCRATCH="$SCRATCH $d"
-  mkdir -p "$d/${PFX}${KIT}" "$d/${PFX}${MEMORY_RECALL}"
+  mkdir -p "$d/${PFX}${KIT}"
   seed_driver_kit "$d/${PFX}${KIT}"
   printf '%s' "$d"; }
 S=$(mkscratch); cp .memory-tree.conf "$S/"
-printf 'this is not valid syntax(\n' > "$S/${PFX}${MEMORY_RECALL}/extract.py"
+printf 'this is not valid syntax(\n' > "$S/${PFX}${KIT}/id_grammar.py"
 failclosed "broken grammar" "$S" "SyntaxError: "
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
-S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, extract.py absent
-failclosed "missing grammar module" "$S" "LookupError: no memory-recall kit"
+S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, id_grammar.py absent
+rm -f "$S/${PFX}${KIT}/id_grammar.py"
+failclosed "missing grammar module" "$S" "ModuleNotFoundError: No module named 'id_grammar'"
 S=$(mkscratch)                                       # no .memory-tree.conf above the driver
-cp $MEMORY_RECALL_DIR/extract.py $MEMORY_RECALL_DIR/recall_conf.py "$S/${PFX}${MEMORY_RECALL}/"
 failclosed "missing .memory-tree.conf" "$S" "RuntimeError: no .memory-tree.conf"
 
 # --- 0d. the oracle sees a row the driver's grammar does NOT, and `dups` fires ---------------------
@@ -832,10 +830,9 @@ audit "a structure conflict at rc 1" 1 0 0 1
 # configured command is `bash <prefix>/lib/pyrun.sh <prefix>/memory-tree/merge-rows.py …` and its paths are
 # RELATIVE, so a fixture carrying only the two kits cannot launch anything.
 E=$(mktemp -d); SCRATCH="$SCRATCH $E"
-mkdir -p "$E/${PFX}${KIT}" "$E/${PFX}${MEMORY_RECALL}" "$E/${PFX}${LIB}" "$E/memory/backlog"
+mkdir -p "$E/${PFX}${KIT}" "$E/${PFX}${LIB}" "$E/memory/backlog"
 cp .memory-tree.conf "$E/"
 seed_driver_kit "$E/${PFX}${KIT}"
-cp $MEMORY_RECALL_DIR/extract.py $MEMORY_RECALL_DIR/recall_conf.py "$E/${PFX}${MEMORY_RECALL}/"
 cp $LIB_DIR/pyrun.sh $LIB_DIR/resolve-python.sh "$E/${PFX}lib/"
 (
   cd "$E" || exit 2
@@ -1325,7 +1322,7 @@ cr=$(endings "$TMP/a")
 # ...and the fail-closed path, which is a THIRD synthesis site and the one an author hits when the
 # grammar cannot be read at all.
 S=$(mkscratch); cp .memory-tree.conf "$S/"
-printf 'this is not valid syntax(\n' > "$S/${PFX}${MEMORY_RECALL}/extract.py"
+printf 'this is not valid syntax(\n' > "$S/${PFX}${KIT}/id_grammar.py"
 { cprose alpha beta; crow TOOL-zFixture-1 base; } > "$TMP/o"
 { cprose alpha beta; crow TOOL-zFixture-1 OURS; } > "$TMP/a"
 { cprose alpha beta; crow TOOL-zFixture-1 THEIRS; } > "$TMP/b"
@@ -1825,9 +1822,9 @@ done < "$TMP/recipe"
 # BEFORE %A is written, and git then reports a conflict over ours-only content with no markers in
 # it — the incoming rows simply absent, nothing saying so.
 S=$(mkscratch); cp .memory-tree.conf "$S/"
-cp $MEMORY_RECALL_DIR/extract.py $MEMORY_RECALL_DIR/recall_conf.py "$S/${PFX}${MEMORY_RECALL}/"
-# `backlog.py` and its siblings are already here, because `mkscratch` lays the whole kit.
-# `git init` AND NOT A TIDY-UP: `recall_conf.resolve` refuses a root that is not inside a git
+# `backlog.py`, `id_grammar.py` and their siblings are already here, because `mkscratch` lays the
+# whole kit.
+# `git init` AND NOT A TIDY-UP: `id_grammar.resolve` refuses a root that is not inside a git
 # repository, so without this the liveness control below fails for that reason and the broken-import
 # arm after it would be graded against a tree that never worked.
 git -C "$S" init -q -b main >/dev/null 2>&1 \
@@ -1869,13 +1866,13 @@ fi
 # unset, `git -C <dir> rev-parse --show-toplevel` returns the root; linked worktree, GIT_DIR set, the
 # same command returns <dir> itself. So the driver aborted on every backlog merge in a worktree while
 # case 9 stayed green, and this leg was blind to the class it exists to hold. Observed RED against the
-# pre-fix recall_conf.py.
+# pre-fix conf layer.
 #
 # It wires the SHIPPED wrapper, not pyrun.sh: `merge-rows.sh` is what a node actually carries, and it
 # is the path an adopter gets.
 #
 # EACH KIT DIR IS NAMED ONCE, and the sources are anchored rather than left to the caller's cwd.
-# `MT`/`MR`/`LIB` each appear in three places — the scratch layout this case BUILDS, the copies into
+# `MT`/`LIB` each appear in three places — the scratch layout this case BUILDS, the copies into
 # it, and (for `MT`) the driver command — so those cannot drift apart. Sources hang off `$ROOT`,
 # which is the repository git reports for this script's own location; that makes them independent of
 # the ambient cwd, which a bare relative path is not once any subshell cds elsewhere. It was two
@@ -1885,12 +1882,10 @@ fi
 # writes gov's bytes verbatim and such a literal resolves to nothing at another prefix.
 W=$(mktemp -d); SCRATCH="$SCRATCH $W"
 MT=${PFX}${KIT}
-MR=${PFX}${MEMORY_RECALL}
 LIB=${PFX}lib
-mkdir -p "$W/$MT" "$W/$MR" "$W/$LIB" "$W/memory/backlog"
+mkdir -p "$W/$MT" "$W/$LIB" "$W/memory/backlog"
 cp "$ROOT/.memory-tree.conf" "$W/"
 seed_driver_kit "$W/$MT"
-cp "$ROOT/$MR/extract.py" "$ROOT/$MR/recall_conf.py" "$W/$MR/"
 cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$W/$LIB/"
 WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 (
@@ -1945,11 +1940,10 @@ WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 # the generator all import the kit's one conf parser from it, and without it `--check` died on
 # ModuleNotFoundError in every fixture this builder made.
 mkfixrepo() {  # $1 = a directory -> a git repo on `main` with this kit wired as the row driver
-  local d=$1 mt=${PFX}${KIT} mr=${PFX}${MEMORY_RECALL} lb=${PFX}lib
-  mkdir -p "$d/$mt" "$d/$mr" "$d/$lb" "$d/memory/backlog"
+  local d=$1 mt=${PFX}${KIT} lb=${PFX}lib
+  mkdir -p "$d/$mt" "$d/$lb" "$d/memory/backlog"
   cp "$ROOT/.memory-tree.conf" "$d/"
   seed_driver_kit "$d/$mt"
-  cp "$ROOT/$MEMORY_RECALL_DIR/extract.py" "$ROOT/$MEMORY_RECALL_DIR/recall_conf.py" "$d/$mr/"
   cp "$ROOT/$LIB_DIR/pyrun.sh" "$ROOT/$LIB_DIR/resolve-python.sh" "$d/$lb/"
   git -C "$d" init -q -b main
   git -C "$d" config user.email t@e

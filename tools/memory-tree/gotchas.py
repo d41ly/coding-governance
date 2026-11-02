@@ -161,7 +161,7 @@ def append_only_re(root: str) -> re.Pattern:
 
 def load_defined_ids(root: str, grammar_dir=None):
     """`(ids, None)`: every id this corpus DEFINES, from `corpus_ids`' one walk — or `(None, why)` when
-    the id grammar's kit is absent, which check 18 ANNOUNCES rather than reds (TOOL-aGraftedHelix-3).
+    the id grammar's module is absent, which check 18 ANNOUNCES rather than reds (TOOL-aGraftedHelix-3).
 
     The set `corpus_ids.py --print-defined-ids` prints, reached in-process the way `append_only_re`
     reaches its sibling, so there is still ONE id grammar: a decision recorded as a spec H1 or a backlog
@@ -180,8 +180,8 @@ def load_defined_ids(root: str, grammar_dir=None):
         spec.loader.exec_module(mod)
         if grammar_dir is not None:
             mod.GRAMMAR_DIR = pathlib.Path(grammar_dir)
-        if not (mod.GRAMMAR_DIR / "extract.py").is_file():
-            return None, "the id grammar lives in the memory-recall kit, which is not installed beside this one"
+        if not (mod.GRAMMAR_DIR / "id_grammar.py").is_file():
+            return None, "the id grammar lives in id_grammar.py, which is not installed beside this module"
         return set(mod.walk(root, mod.load_conf(root))["defs"]), None
     except Exception as exc:  # noqa: BLE001 — the sibling's own Problem is a different class
         raise Problem(f"gotchas: could not ask corpus_ids for the defined-id set: "
@@ -1140,8 +1140,8 @@ def cmd_selftest() -> int:
         globals()["load_defined_ids"] = lambda root: real_load(root, grammar_dir=os.path.join(base, "no-grammar"))
         try:
             arm("an absent id-grammar kit is announced NOT resolved and exits 0",
-                "decision ARCH-tOne-1 NOT resolved — the id grammar lives in the memory-recall kit, which is "
-                "not installed beside this one\n[rc=0]", lambda: cmd_check(ti, ci))
+                "decision ARCH-tOne-1 NOT resolved — the id grammar lives in id_grammar.py, which is "
+                "not installed beside this module\n[rc=0]", lambda: cmd_check(ti, ci))
         finally:
             globals()["load_defined_ids"] = real_load
 

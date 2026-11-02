@@ -3,345 +3,90 @@
 
 gov:kit memory-recall@1.33
 
-The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
-read and no third declaration is invented:
+The kit indexes the memory tree the memory-tree kit already declares, and the conf layer that reads
+it lives in that kit since PLAY-dOrderedCharter-18: `id_grammar.py`, beside the memory-tree kit's other
+modules, holds `repo_root`, `load_conf`, `ConfError`, `Conf` with `Conf.digest`, and `resolve`, and
+this file re-exports every one of them, found through `resolve_kit_dir` (this kit `requires`
+memory-tree). Two of that conf's keys are read and no third declaration is invented:
 
   MEMORY_ROOT   the corpus root passed to `git ls-files` and folded into extract.DURABLE
   FAMILIES      discipline:FAMILY pairs; the uppercase FAMILY tokens are the id allowlist
 
-The conf is REQUIRED and its absence is a refusal, not a default -- matching adopt-memory-tree.sh
-and adopt-codebase-map.sh, which refuse for the same reason. This kit does not OWN the conf, so it
-must not create one: the refusal names the memory-tree kit and prints a two-key stub instead. There
-is deliberately no --memory-root and no --families flag anywhere in the kit; a second way to declare
-the same values is the hand-kept-second-copy defect the port exists to remove.
+The conf is REQUIRED and its absence is a refusal, not a default. This kit does not OWN the conf, so
+it must not create one: the refusal names the memory-tree kit and prints a two-key stub instead.
+There is deliberately no --memory-root and no --families flag anywhere in the kit.
 
-Four OPTIONAL `RECALL_*` keys carry facts that belong to the adopter's corpus and not to the kit
-(TOOL-aRepatriatedFork-12); absent, each keeps the kit's previous behaviour exactly:
-
-  RECALL_NODE_TAG_CLASS     the body of the node-tag character class; absent = `a-z`, matching the
-                            memory-tree hygiene gate's own `node [a-z]`
-  RECALL_CITED_FAMILIES     families the id grammar RECOGNISES but the corpus does not HOME: they
-                            join the id alternation and never the durable-home alternation
-  RECALL_BUILD_QID_CUTOFF   `<tag>:<qid>` pairs, each node's build-era boundary in its own log
-  RECALL_EXPORT_DIR         a repo-relative directory for `query.py --export`; absent = beside the
-                            log under the common git dir
-
-A malformed value is a ConfError naming the key, never a silent fallback. Only the first two change
-which strings are ids, so only they enter `digest()`. `RECALL_EXCLUDE` (TOOL-aMendedFleet-27) is not
-one of the four: like `RECALL_EXTRA_SOURCES` it changes which documents exist, so it enters
-`digest()` too.
-
-The conf PARSER below is a copy of the twenty lines in codebase-map's map_lib.load_conf, not an
-import of it: kits are copied into adopters independently, and importing across kit directories
-would make memory-recall un-adoptable without codebase-map. The drift is gated by asserting this
-parser against BASH sourcing the same file (selftest `conf parser == bash`), never against a second
-Python parser -- two operands from one generator assert nothing.
+What stays here: `KIT_MEMORY_RECALL_VERSION`, which `kit.toml`'s `version_from` reads, and `main()`,
+the KEY=VALUE printer `adopt-memory-recall.sh` parses.
 """
 
 from __future__ import annotations
 
-import hashlib
 import pathlib
-import re
-import subprocess
 import sys
 
-# The kit never leaves bytecode in the adopter's worktree — see query.py's note.
+# The kit never leaves bytecode in the adopter's worktree — see query.py's note. ABOVE the import of
+# the grammar module: the flag is read when a module is imported, not when it is defined.
 sys.dont_write_bytecode = True
 
 KIT_MEMORY_RECALL_VERSION = "1.33"
 
-CONF_NAME = ".memory-tree.conf"
-# The DEFAULT: a-z, per the memory-tree hygiene gate's own `node [a-z]` (spec Q1 option (b)).
-# `RECALL_NODE_TAG_CLASS` narrows it for a corpus whose registry is narrower.
-NODE_TAG_CLASS = "a-z"
-_TAG_CLASS_RE = re.compile(r"^[a-z0-9-]+$")
-_CUTOFF_RE = re.compile(r"^([a-z]):(\d+)$")
 
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-class ConfError(RuntimeError):
-    """The project layer is missing or unusable. Always a refusal, never a default."""
-
-
-def repo_root() -> pathlib.Path:
-    """The adopting repo's root, anchored on THIS FILE rather than on the cwd.
-
-    The kit directory lives inside the adopting repo (`memory-recall/` at the root in an adopter,
-    `<prefix>/memory-recall/` in this one), so the anchor is exact from any cwd, and a throwaway-repo
-    test that copies the kit in resolves to that repo rather than to wherever the runner stood.
-
-    WALK UP FOR THE CONF RATHER THAN ASKING GIT (TOOL-aCollapsedScan-7), which is the choice
-    the `codebase-map` kit's `map_lib.py` `resolve_root` already made for the same measured reason,
-    and which the `govkit` kit reached for the same defect WITHOUT the boundary - its walk
-    is still unbounded, which is `TOOL-aCollapsedScan-12`. `git -C <dir> rev-parse
-    --show-toplevel` returns <dir> ITSELF when an absolute GIT_DIR is inherited and no
-    GIT_WORK_TREE names a tree, because git then treats the current directory as the work tree.
-    That is exactly what git exports to a merge driver inside a LINKED WORKTREE, and it is how the
-    row-keyed merge driver was found inert here: this function answered the KIT directory itself,
-    `resolve()` looked for the conf beside the kit, `extract.py`'s import-time CONF raised, and
-    every `memory/DECISIONS.md` and `memory/backlog/*.md` merge got conflict markers instead of a
-    merge. Measured with a control: in an ordinary clone git exports no GIT_DIR and the defect is
-    ABSENT, so the precondition is the worktree and not the merge.
-
-    THE ALTERNATIVE WAS AN ENVIRONMENT SCRUB and it lost on being a DENYLIST. `.githooks/pre-push`
-    already pins eight names for that job under `TOOL-dScrubbedConduit-1`, with one deliberate
-    exclusion; a second list here would be a ninth thing to keep current. The walk inherits nothing.
-
-    THEY DO NOT ALWAYS COINCIDE, and an earlier revision of this docstring said they did. The
-    nearest conf-holding ancestor is deliberately NOT the answer once a `.git` boundary intervenes -
-    see the walk below, which is where that rule lives. Where no boundary intervenes the two agree,
-    because `resolve()` refuses a root that does not hold `.memory-tree.conf`.
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
     """
-    here = pathlib.Path(__file__).resolve()
-    for parent in here.parents:
-        # THE WALK STOPS AT THE REPOSITORY BOUNDARY, which the `codebase-map` kit's `map_lib.py`
-        # `resolve_root` already pays two lines for and records the reason: worktrees are commonly
-        # kept INSIDE the primary tree (this repo puts them under `.claude/worktrees/`), so an
-        # UNBOUNDED walk out of a checkout reaches the PRIMARY tree's conf and answers with a
-        # different repository. Reproduced during this unit's own closing review: with a conf at
-        # `outer/` and a separate repo at `outer/inner/` holding the kit, an unbounded walk answered
-        # `outer` and `resolve()` succeeded against a FOREIGN conf, where the pre-fix code refused.
-        # `.git` is a directory in a primary tree and a FILE in a linked worktree, so one
-        # `exists()` covers both.
-        #
-        # THE CONF IS TESTED FIRST, so an adopted root that holds both still wins on its own line.
-        # Falling out of the loop hands the question to the git probe below, which is what raises
-        # the not-a-git-repository refusal for a conf-bearing tree that is not a checkout at all.
-        if (parent / CONF_NAME).is_file() and (parent / ".git").exists():
-            return parent
-        if (parent / ".git").exists():
-            break
-    # NO USABLE CONF ON THE WALK - none at all, or one only beyond the repository boundary. Keep
-    # the old git answer, so `resolve()` raises ITS refusal - the one
-    # carrying the copy-pasteable conf stub an adopter needs. This is NOT a fallback that
-    # fabricates a passing value: the path it returns is by definition one with no conf on it, so
-    # `resolve()` refuses on the very next line. It also cannot mask the defect above, because that
-    # defect only reaches a tree where a conf DOES exist and the walk-up therefore wins first.
-    here = here.parent
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
     try:
-        out = subprocess.run(
-            ["git", "-C", str(here), "rev-parse", "--show-toplevel"],
-            capture_output=True,
-            text=True, encoding="utf-8",
-            check=True,
-        ).stdout.strip()
-    except (OSError, subprocess.CalledProcessError) as e:
-        raise ConfError(f"memory-recall: {here} is not inside a git repository") from e
-    return pathlib.Path(out).resolve()
-
-
-def load_conf(root: pathlib.Path) -> dict[str, str]:
-    """Parse the restricted shell grammar `.memory-tree.conf` documents.
-
-    Quoted values keep everything inside the quotes; an unquoted value ends at the first
-    whitespace, so a trailing ` # comment` cannot leak in and diverge from bash.
-    """
-    path = root / CONF_NAME
-    conf: dict[str, str] = {}
-    if not path.is_file():
-        return conf
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#") or "=" not in line:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
             continue
-        key, value = line.split("=", 1)
-        key = key.strip().removeprefix("export ").strip()
-        # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): whitespace right after `=`
-        # ends the assignment, so `K=   # note` is empty in bash, not the word `#`.
-        if value[:1].isspace():
-            conf[key] = ""
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
             continue
-        value = value.strip()
-        # TOOL-aRepatriatedFork-38: a quoted value ends at its MATCHING quote, whatever follows it.
-        # Testing the first and last characters read `K="a b"  # note` as `"a`.
-        close = value.find(value[0], 1) if value[:1] in {'"', "'"} else -1
-        if close >= 0:
-            value = value[1:close]
-        else:
-            value = value.split()[0] if value.split() else ""
-        conf[key] = value
-    return conf
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
 
 
-def refusal(root: pathlib.Path, why: str) -> str:
-    return (
-        f"refused: {why}\n\n"
-        "memory-recall reads the memory-tree kit's project layer and declares no config of its\n"
-        "own, so it will not create one. Adopt the memory-tree kit (adopt-memory-tree.sh), or\n"
-        f"paste this into {(root / CONF_NAME).as_posix()} and fill in real values:\n\n"
-        "  MEMORY_ROOT=memory\n"
-        '  FAMILIES="<discipline>:<FAMILY> ..."\n\n'
-        "There is no --memory-root and no --families: the conf is the single source."
-    )
+_GRAMMAR_KIT = str(resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent))
+if _GRAMMAR_KIT not in sys.path:
+    sys.path.append(_GRAMMAR_KIT)
 
-
-_FAMILY_RE = re.compile(r"^[A-Z][A-Z0-9]*$")
-
-# The default cache budget. Upstream measured ~110 MB per LIVE worktree; a cache's size here is
-# read off its directory under `<git-common-dir>/recall/cache/`, never typed in this comment,
-# because it moves with every corpus edit. 512 sits above a single cache of that order, so the cap
-# protects an adopter carrying many worktrees without firing on a normal one. Blank in the conf =
-# uncapped; absent = this.
-DEFAULT_CACHE_BUDGET_MB = 512.0
-
-
-def _budget(raw: str | None) -> float | None:
-    """`RECALL_CACHE_BUDGET_MB` -> megabytes, or None for uncapped.
-
-    A BLANK value disables the cap, matching every other knob in this tree. An unparseable one also
-    disables it rather than raising: this is a housekeeping limit, and refusing to answer a question
-    because a size limit is misspelled would be a worse failure than not evicting.
-    """
-    if raw is None:
-        return DEFAULT_CACHE_BUDGET_MB
-    raw = raw.strip()
-    if not raw:
-        return None
-    try:
-        val = float(raw)
-    except ValueError:
-        return None
-    return val if val > 0 else None
-
-
-class Conf:
-    """The RESOLVED values every other module in the kit reads."""
-
-    __slots__ = ("root", "path", "memory_root", "families", "node_tag_class", "cache_budget_mb",
-                 "extra_sources", "cited_families", "build_qid_cutoff", "export_dir", "exclude")
-
-    def __init__(self, root: pathlib.Path, memory_root: str, families: tuple[str, ...],
-                 cache_budget_mb: float | None = DEFAULT_CACHE_BUDGET_MB,
-                 extra_sources: tuple[str, ...] = (), node_tag_class: str = NODE_TAG_CLASS,
-                 cited_families: tuple[str, ...] = (),
-                 build_qid_cutoff: dict[str, int] | None = None, export_dir: str | None = None,
-                 exclude: tuple[str, ...] = ()):
-        self.root = root
-        self.path = root / CONF_NAME
-        self.memory_root = memory_root
-        self.families = families
-        self.node_tag_class = node_tag_class
-        # Ids, never homes: extract joins these to `ID` and keeps them out of `DURABLE`'s `_IDX`.
-        self.cited_families = cited_families
-        # Neither of these two changes which strings are ids, so neither is in digest() — the same
-        # reasoning the cache budget below carries.
-        self.build_qid_cutoff = dict(build_qid_cutoff or {})
-        self.export_dir = export_dir
-        # None = uncapped, which is what a BLANK value means — the same convention as every other
-        # measured knob in this tree. It is deliberately NOT part of digest(): a size limit is not a
-        # corpus input, and folding it in would rebuild every cache whenever someone raised the cap.
-        self.cache_budget_mb = cache_budget_mb
-        # DECLARED extra corpus sources, repo-relative. Empty is the pre-widening corpus
-        # exactly, which is what an adopter whose conf has no such key must keep getting.
-        self.extra_sources = extra_sources
-        # `RECALL_EXCLUDE`: repo-relative glob patterns the ONE corpus walk leaves out
-        # (TOOL-aMendedFleet-27). Globbed where the sources above are declared, because an exclusion
-        # only takes answers away and a glob is what keeps a new archived snapshot from being missed.
-        self.exclude = exclude
-
-    def digest(self) -> str:
-        """A hash of the RESOLVED values, not of the conf file's bytes.
-
-        The manifest keys freshness on this (query.ensure_cache), so an id-grammar or corpus-root
-        edit invalidates a warm cache the way an alias edit already does. Hashing the file's bytes
-        instead would force a full rebuild for a comment edit, for no semantic change.
-
-        THE KIT VERSION IS IN THE BLOB, and it is here because the sentence above was half false. The
-        eras are the other half of the id grammar and they live in `extract.py`, so a widening of the
-        session era reached none of the three project values below. Measured on the commit that
-        widened it: `records` went 53 documents to 91 and every already-built cache stayed warm and
-        stayed blind to the 38 new ones. `corpus_digest` cannot cover it either — that is mtime+size
-        over the tree's `.md` files, and a regex edit moves no `.md` byte.
-
-        The VERSION rather than the era tuple, on two grounds. It is already this kit's declared
-        epoch for its own behaviour and `check-kit-versions.sh` plus the selftest's marker arm force
-        it to move when the kit's behaviour does. And passing the resolved eras down would invert the
-        layering: `extract` imports `recall_conf`, not the other way round. The cost is one rebuild
-        per kit bump, which is the same order as the alias-edit rebuild already accepted above.
-        """
-        # `extra_sources` is in the blob for the same reason the kit version is: it changes WHICH
-        # documents exist, so a widened or narrowed list must not read a cache built before it.
-        # Measured: without it, editing the declaration left the index warm and the corpus stale,
-        # so both arms proving the widening is opt-in were answered by a cached number.
-        # `cited_families` is in the blob beside `node_tag_class`: both change which strings are ids.
-        # `exclude` is in it for the `extra_sources` reason: it changes WHICH documents exist.
-        blob = "\0".join((self.memory_root, ",".join(sorted(self.families)), self.node_tag_class,
-                          " ".join(self.extra_sources), KIT_MEMORY_RECALL_VERSION,
-                          ",".join(sorted(self.cited_families)), " ".join(self.exclude)))
-        return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
-
-
-_cached: Conf | None = None
-
-
-def resolve(root: pathlib.Path | None = None) -> Conf:
-    """The kit's project layer, or a ConfError carrying the printable refusal.
-
-    Cached per process: every module in the kit calls this at import. It no longer costs a
-    `git rev-parse` on any path where a conf exists - `repo_root()` walks for it - but the call
-    frequency is what justified the cache and that has not changed.
-    """
-    global _cached
-    if root is None and _cached is not None:
-        return _cached
-    base = root if root is not None else repo_root()
-    path = base / CONF_NAME
-    if not path.is_file():
-        raise ConfError(refusal(base, f"no {CONF_NAME} at {path.as_posix()}"))
-    conf = load_conf(base)
-    memory_root = conf.get("MEMORY_ROOT", "").strip().strip("/")
-    if not memory_root:
-        raise ConfError(refusal(base, f"{CONF_NAME} declares no MEMORY_ROOT"))
-    families = tuple(
-        dict.fromkeys(
-            fam
-            for pair in conf.get("FAMILIES", "").split()
-            if _FAMILY_RE.match(fam := pair.rpartition(":")[2].strip())
-        )
-    )
-    if not families:
-        raise ConfError(
-            refusal(base, f"{CONF_NAME} declares no usable FAMILIES (want `discipline:FAMILY ...`)")
-        )
-    # Each malformed value is refused as `<KEY>=<value> is not <shape>`, one string shape for all four.
-    refused = "refused: " + CONF_NAME + " {}={!r} is not {}"
-    tag_class = conf.get("RECALL_NODE_TAG_CLASS", "").strip() or NODE_TAG_CLASS
-    if not _TAG_CLASS_RE.match(tag_class):
-        raise ConfError(refused.format("RECALL_NODE_TAG_CLASS", tag_class,
-                                       "a character-class body over [a-z0-9-], e.g. a-f"))
-    try:
-        re.compile(f"[{tag_class}]")
-    except re.error as e:  # a reversed range such as `f-a` passes the shape and fails here
-        raise ConfError(refused.format("RECALL_NODE_TAG_CLASS", tag_class,
-                                       f"a valid character class ({e})")) from e
-    cited = tuple(dict.fromkeys(conf.get("RECALL_CITED_FAMILIES", "").split()))
-    for fam in cited:
-        if not _FAMILY_RE.match(fam):
-            raise ConfError(refused.format("RECALL_CITED_FAMILIES", fam, "an uppercase family token"))
-        if fam in families:
-            raise ConfError(refused.format("RECALL_CITED_FAMILIES", fam,
-                                           "a family FAMILIES does not already declare"))
-    cutoff: dict[str, int] = {}
-    for pair in conf.get("RECALL_BUILD_QID_CUTOFF", "").split():
-        m = _CUTOFF_RE.match(pair)
-        if not m:
-            raise ConfError(refused.format("RECALL_BUILD_QID_CUTOFF", pair,
-                                           "a `<tag>:<qid>` pair, e.g. a:163"))
-        cutoff[m.group(1)] = int(m.group(2))
-    # Only the TRAILING slash goes: a leading one is an absolute path and must reach the refusal.
-    export_dir = conf.get("RECALL_EXPORT_DIR", "").strip().rstrip("/") or None
-    if export_dir is not None:
-        # A WRITE destination: refused here, before any caller can open a file under it.
-        dest = (base / export_dir).resolve()
-        if pathlib.PurePath(export_dir).is_absolute() or not dest.is_relative_to(base.resolve()):
-            raise ConfError(refused.format("RECALL_EXPORT_DIR", export_dir,
-                                           "a repo-relative directory inside the root"))
-    out = Conf(base, memory_root, families, _budget(conf.get("RECALL_CACHE_BUDGET_MB")),
-               tuple(conf.get("RECALL_EXTRA_SOURCES", "").split()), tag_class, cited, cutoff,
-               export_dir, tuple(conf.get("RECALL_EXCLUDE", "").split()))
-    if root is None:
-        _cached = out
-    return out
+from id_grammar import (  # noqa: E402,F401 — re-exported: every recall reader keeps its spelling
+    CONF_NAME,
+    DEFAULT_CACHE_BUDGET_MB,
+    NODE_TAG_CLASS,
+    Conf,
+    ConfError,
+    load_conf,
+    refusal,
+    repo_root,
+    resolve,
+)
 
 
 def main() -> int:

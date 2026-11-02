@@ -1437,18 +1437,18 @@ check_eq "K2 AC10 ...and the card holds one READY line, one task section, the se
   "$(grep -c '^READY — ' "$K2CCARD") $(grep -c '^## task' "$K2CCARD") $(grep -c 'Title:\*\* two' "$K2CCARD") $(grep -c 'Title:\*\* one' "$K2CCARD")"
 
 # ---- the aReplayedCard closing review, round 1: F1, F7, F8 and F9, each observed RED first -------
-# F1 — memory-tree installed WITHOUT memory-recall: the reader is present, its grammar is not. The
-# append must degrade to "id citations unchecked" and still judge the paths, never refuse — a
-# refusal here was a lockout whose printed remedy re-ran the refusing append. The grammar file is
-# hidden in the worktree for the one arm and restored after it.
+# F1 — memory-tree installed WITHOUT memory-recall: the reader is present and so is its grammar,
+# which is the memory-tree kit's own `id_grammar.py` since PLAY-dOrderedCharter-18. The recall kit's
+# extractor is hidden in the worktree for the one arm and restored after it, and the append still
+# CHECKS the card's id citations — no "id citations unchecked" NOTE — and judges the paths.
 K2E="$NONCE-k2e"; K2ECARD="$CARD_HOME/$K2E.md"
 run_card "F1 setup: a card for the no-grammar arm" "$CWT" 0 - --card --write --session "$K2E"
 mv "$CWT/$RECALL_REL/extract.py" "$CWT/$RECALL_REL/extract.py.hid"
 { render_task_section; printf '## read\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")"; } | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
 mv "$CWT/$RECALL_REL/extract.py.hid" "$CWT/$RECALL_REL/extract.py"
-[ "$got" = 0 ] && grep -q '^NOTE: id citations unchecked — .*the id grammar lives in the memory-recall kit' "$CARD_OUT" && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
-  && { echo "ok   F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit 0)"; pass=$((pass+1)); } \
-  || { echo "FAIL F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+[ "$got" = 0 ] && ! grep -q '^NOTE: id citations unchecked' "$CARD_OUT" && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
+  && { echo "ok   F1 a reader with no memory-recall kit still checks ids, no NOTE, the path is judged, the append lands (exit 0)"; pass=$((pass+1)); } \
+  || { echo "FAIL F1 a reader with no memory-recall kit still checks ids, no NOTE, the path is judged, the append lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 check_eq "F1 ...and the card ends with the body's READY line" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2ECARD")"
 # F7 — a root-level tracked file cited by NAME is a path token (the spec-token lint's "exact tracked
 # path" half); a slashless dotted word that is not tracked (`e.g`) is nothing, never an UNVERIFIED.
@@ -1577,11 +1577,12 @@ else
   echo "skip KQ AC8 R0 with no id reader — gov resolved no id reader, so there is none to hide and R0's MEMORY_ROOT words go unexercised"
 fi
 cp "$TMP/qconf" "$CWT2/.memory-tree.conf"
-mv "$CWT2/$RECALL_REL/extract.py" "$CWT2/$RECALL_REL/extract.py.hid"
+# The reader exits 3 only when ITS grammar is absent, which is the memory-tree kit's id_grammar.py.
+q_grammar="$CWT2/$(dirname -- "$READER_REL")/id_grammar.py"; mv "$q_grammar" "$q_grammar.hid"
 check_route_refusal "KQ AC8 R0 a route whose id reader exits 3 exits 2" "$KQ" 2 "route R0: no defined-id set" < "$TMP/qb"
 grep -q '^NOTE: id citations unchecked' "$CARD_OUT" && { echo "ok   KQ AC8 liveness: the reader took its exit-3 branch"; pass=$((pass+1)); } \
   || { echo "FAIL KQ AC8 liveness: the reader took its exit-3 branch"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
-mv "$CWT2/$RECALL_REL/extract.py.hid" "$CWT2/$RECALL_REL/extract.py"
+mv "$q_grammar.hid" "$q_grammar"
 # AC6 — a route on a card no kickoff has appended to.
 KQ6="$NONCE-kq6"
 run_card "KQ AC6 setup: a fresh card with the sentinel" "$CWT2" 0 - --card --write --session "$KQ6"

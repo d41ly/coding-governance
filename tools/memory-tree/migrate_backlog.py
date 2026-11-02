@@ -2802,21 +2802,6 @@ def read_kit_root() -> str:
     return run("git", "rev-parse", "--show-toplevel", cwd=_HERE).strip()
 
 
-def seed_recall_kit(tree: str) -> None:
-    """The memory-recall sibling, inside the fixture, because unit 9 keys every row through it.
-
-    The SOURCE is resolved by that unit's own resolver beside this install, so nothing here
-    spells a sibling kit's install path; the destination is its own basename at the fixture root,
-    which is the second layout that resolver accepts.
-    """
-    import shutil
-    src = audit.resolve_recall_kit()
-    dst = os.path.join(tree, src.name)
-    os.makedirs(dst, exist_ok=True)
-    for name in ("extract.py", "recall_conf.py"):
-        shutil.copyfile(str(src / name), os.path.join(dst, name))
-
-
 def run_commit_on(tree: str, message: str, files: dict, day: str = "",
                   removals=()) -> str:
     """One dated fixture commit. The date is the AUTHOR date `filed` is mined from."""
@@ -2848,7 +2833,6 @@ def seed_shards_base(tree: str, rows, slugs=("aFoo", "aWho"), conf_text: str = "
                      extra=None) -> str:
     """The pre-flip seed both fixture shapes start from: one shards-mode tree with one shard."""
     init_repo(tree)
-    seed_recall_kit(tree)
     files = {
         ".memory-tree.conf": conf_text or render_transition_conf("shards"),
         "README.md": "fixture" + NEWLINE,
@@ -3007,7 +2991,6 @@ def seed_write_fixture(base: str, name: str, rows=WRITE_ROWS) -> str:
     """A shards-mode tree planned with `--record` and signed, the state `--write` meets at a flip."""
     tree = os.path.join(base, name)
     init_repo(tree)
-    seed_recall_kit(tree)
     files = {".memory-tree.conf": render_transition_conf("shards"),
              "README.md": "fixture" + NEWLINE,
              "memory/backlog/EXMP.md": render_shard("EXMP", list(rows)),

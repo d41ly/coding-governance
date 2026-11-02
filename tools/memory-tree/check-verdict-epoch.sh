@@ -60,12 +60,12 @@ cd "$ROOT" || exit 2
 # and would have let all of them drift under a still constant.
 #
 # AND THE CHAIN IS TWO HOPS, not one. `corpus_ids.py` is listed, but it deliberately declares no
-# grammar of its own (`corpus_ids.py:12`): `grammar()` returns `extract.grammar_for(root)`, so the
-# regex that decides checks 13-16's verdicts lives one file further out, in the memory-recall kit.
-# Measured on the commit that widened it: the session era went `\d+` to `\d+[a-z]*`, check 14's
-# answer went 5 orphans to 9, and this gate printed `clean` with the constant untouched — the same
-# defect TOOL-aBatchedTribunal-6o closed for the three modules below, one hop short. A kit an adopter
-# has not installed is skipped by the `[ -f ]` guard, so listing it costs a non-adopter nothing.
+# grammar of its own: `grammar()` returns `id_grammar.grammar_for(root)`, so the regex that decides
+# checks 13-16's verdicts lives one file further out. Measured on the commit that widened it, when
+# that file was the recall kit's: the session era went `\d+` to `\d+[a-z]*`, check 14's answer went
+# 5 orphans to 9, and this gate printed `clean` with the constant untouched — the same defect
+# TOOL-aBatchedTribunal-6o closed for the three modules below, one hop short. Since
+# PLAY-dOrderedCharter-18 the grammar is this kit's own `id_grammar.py`, a delegate like the rest.
 #
 # AND `merge-rows.py` IS IN THE SET, which is the same one-hop-short shape found a third time. The
 # merge driver ships in this kit and the constant DATES the kit's verdicts; a redesign of what the
@@ -81,10 +81,9 @@ cd "$ROOT" || exit 2
 # is spelled off ENGINE's own directory, because the carried-prefix ban takes no new literal.
 #
 # THE ENGINE IS THIS SCRIPT'S NEIGHBOUR, derived (TOOL-aRepatriatedFork-2 S2): both lines spelled
-# gov's prefix, so at both adopters this gate exited 2 naming an engine that sat beside it. The
-# memory-recall delegate is a SIBLING kit, found through the sibling-kit resolver, which reads the
-# install receipt before it probes beside this kit and one level up (TOOL-aRepatriatedFork-46: the
-# two probes used to type the kit's name after this kit's own base). A miss is SAID, never skipped.
+# gov's prefix, so at both adopters this gate exited 2 naming an engine that sat beside it. Every
+# delegate is this kit's own since PLAY-dOrderedCharter-18 moved the grammar in, so none is found
+# through a sibling-kit resolver.
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
@@ -236,71 +235,9 @@ except LookupError as e:
   return 1
 }
 # <<< resolve_python
-# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
-# canonical copy named on its marker line and gated by the resolve-python self-test's parity
-# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
-# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
-# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
-resolve_kit_dir() {
-  local _rkd
-  IFS= read -r -d '' _rkd <<'RKD' || :
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
-       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
-       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
-       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        src = str(row.get("source") or "").split("/")
-        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
-        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
-RKD
-  "$1" -c "${_rkd%$'\n'}"'
-import sys
-try:
-    d = resolve_kit_dir(*sys.argv[1:4])
-except LookupError as e:
-    sys.exit(str(e))
-r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
-print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
-}
 _kit=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "verdict-epoch: cannot derive this gate's own directory from '$_self_dir'"; exit 2; }
 ENGINE="${_kit}check-memory-hygiene.sh"
-_recall=""
-if _ve_py=$(resolve_python 2>/dev/null); then
-  _ve_mr=$(resolve_kit_dir "$_ve_py" memory-recall extract.py "$_self_dir" 2>/dev/null) && _recall="$_ve_mr/extract.py"
-  [ -n "$_recall" ] || echo "verdict-epoch: note — no memory-recall kit's extract.py through the install receipt or beside this kit, so its lines are not in the scan set"
-else
-  echo "verdict-epoch: note — no usable python, so the memory-recall kit was not resolved and its lines are not in the scan set"
-fi
+_ve_py=$(resolve_python 2>/dev/null) || _ve_py=""
 # TOOL-dTrueNorth-16 S34: the modules checks 29 and 30 run join the delegates — `design_lib.py`, the
 # design's one parser; `asbuilt_view.py`, check 30's render; and the spec-token checker beside the
 # kit, check 29's join. The `[ -f ]` guard passes over one an install does not carry, and a `..`
@@ -311,7 +248,7 @@ fi
 # `routed_commits.py`, which `deviation_join.py` imports at module level; and `backlog.py`, the ask
 # grammar `gen_build_index.py` imports at module level and `row_grammar.py`, `corpus_ids.py` and
 # `merge-rows.py` import lazily. The import-closure check below is what keeps this list whole.
-DELEGATES="${_kit}tree_lib.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py $_recall ${_kit}merge-rows.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}deviation_join.py ${_kit}routed_commits.py ${_kit}backlog.py ${_kit}../check-spec-tokens.py"
+DELEGATES="${_kit}tree_lib.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py ${_kit}id_grammar.py ${_kit}merge-rows.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}deviation_join.py ${_kit}routed_commits.py ${_kit}backlog.py ${_kit}../check-spec-tokens.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
 for _d in $DELEGATES; do
@@ -332,8 +269,8 @@ done
 # sibling the scan set does not hold exits 2 naming it and its importer; a scanned module that does
 # not parse exits 2 naming it, because its imports were not read; else one line counts the modules
 # the walk read in two populations (TOOL-dTrueNorth-31 S13): <k> sibling module(s), the read paths
-# directly inside the kit directory, and <m> other scanned file(s), the rest, the recall kit's
-# extractor and the checker beside the kit among them, so a dropped sibling offset by an added outside
+# directly inside the kit directory, and <m> other scanned file(s), the rest, the checker beside the
+# kit among them, so a dropped sibling offset by an added outside
 # file moves both figures. It binds on and off the push boundary, because it grades this gate's own
 # list, not a bump. It over-counts as the gate does: a module only a self-test imports is a delegate.
 # WHAT IT DOES NOT CHECK: a module loaded by computed path, through `importlib` or by a shell

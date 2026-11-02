@@ -576,7 +576,8 @@ _STATUS = re.compile(r"^\*\*Status:\*\*\s*([A-Za-z]+)", re.M)
 # memory-tree conf, which is precisely where the wrong binding reports a confident zero.
 #
 # IMPORTABLE OR NOT. drift-audit is copy-installed and must keep running in a tree that has no
-# memory-recall, so the accessor answers when it imports and a LOCAL COPY answers when it does not.
+# memory-tree kit, so the accessor answers when its `id_grammar.py` imports and a LOCAL COPY answers
+# when it does not.
 # That copy is not a second grammar by stealth: the self-test asserts it still equals what the
 # extractor produces whenever the extractor is present, so a divergence fails loudly here instead of
 # silently in an adopter. This is unit 2's F1 resolution, and unit 3 adopts it by reference rather
@@ -586,7 +587,7 @@ _FAMILY_SHAPE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
 
 def _build_local_ident(families) -> str:
-    """The LOCAL COPY of the shipped id alternation, for a tree with no recall kit.
+    """The LOCAL COPY of the shipped id alternation, for a tree with no id grammar module.
 
     Byte-compared against the extractor's own output by this kit's self-test whenever that kit is
     present, which is what keeps "fallback" from meaning "second grammar".
@@ -602,16 +603,16 @@ def _build_local_ident(families) -> str:
 
 
 def _resolve_ident(root, families) -> str:
-    """The shipped alternation for THIS tree, from the recall extractor where it is importable."""
+    """The shipped alternation for THIS tree, from the memory-tree kit's id grammar where it imports."""
     try:
-        kit = resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+        kit = resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent)
     except LookupError:
         return _build_local_ident(families)
     added = str(kit)
     sys.path.insert(0, added)
     try:
-        import extract  # type: ignore
-        return extract.grammar_for(root).ID
+        import id_grammar  # type: ignore
+        return id_grammar.grammar_for(root).ID
     except Exception:
         # A present-but-unusable sibling is the fallback case, never a crash. Every signal is
         # evaluated in one unguarded comprehension, so a raise here takes the whole report down.
@@ -625,7 +626,7 @@ def _resolve_ident(root, families) -> str:
 
 
 def _build_local_anchors(ident: str):
-    """The LOCAL COPY of the four anchor shapes, for a tree with no recall kit.
+    """The LOCAL COPY of the four anchor shapes, for a tree with no id grammar module.
 
     UNGUARDED, and said so rather than claimed otherwise. The sibling `_build_local_ident` IS
     byte-compared against the extractor by this kit's self-test; these anchor patterns are NOT.
@@ -650,16 +651,16 @@ def _build_local_anchors(ident: str):
 
 
 def _resolve_anchors(root, families):
-    """The anchor patterns for THIS tree, from the recall extractor where it is importable."""
+    """The anchor patterns for THIS tree, from the memory-tree kit's id grammar where it imports."""
     try:
-        kit = resolve_kit_dir("memory-recall", "extract.py", pathlib.Path(__file__).resolve().parent)
+        kit = resolve_kit_dir("memory-tree", "id_grammar.py", pathlib.Path(__file__).resolve().parent)
     except LookupError:
         return _build_local_anchors(_build_local_ident(families))
     added = str(kit)
     sys.path.insert(0, added)
     try:
-        import extract  # type: ignore
-        return tuple(re.compile(a.pattern, a.flags | re.M) for a in extract.grammar_for(root).anchors)
+        import id_grammar  # type: ignore
+        return tuple(re.compile(a.pattern, a.flags | re.M) for a in id_grammar.grammar_for(root).anchors)
     except Exception:
         return _build_local_anchors(_build_local_ident(families))
     finally:

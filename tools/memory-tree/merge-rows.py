@@ -153,14 +153,14 @@ Its own header states what it cannot see.
 Exit 0 = merged clean, or `--check` passed. Exit 1 = conflict markers written to %A (git leaves the
 path unmerged), or `--check` failed. Exit 2 = called with fewer than the three input paths (usage).
 """
-# Annotations as strings, the same house rule `extract.py` and `map_lib.py` follow. `resolve_python`
+# Annotations as strings, the same house rule `id_grammar.py` and `map_lib.py` follow. `resolve_python`
 # imposes NO version floor — every candidate is accepted on `-c "import sys"` alone — so the
 # interpreter a node hands this driver is whatever it has, and a `str | None` in a signature is
 # evaluated at def time without this line.
 from __future__ import annotations
 
-# Module scope, unlike `extract` and `tempfile` below: this import runs BEFORE `anchors()` appends
-# the memory-recall kit to `sys.path`, so the shadowing the deferred imports guard against cannot
+# Module scope, unlike `id_grammar` and `tempfile` below: this import runs BEFORE `anchors()` appends
+# this kit's directory to `sys.path`, so the shadowing the deferred imports guard against cannot
 # reach it.
 import hashlib
 import pathlib
@@ -168,50 +168,10 @@ import re
 import subprocess
 import sys
 
-# Same rationale as `<prefix>/memory-recall/extract.py`: CPython writes a module's bytecode next to its
+# Same rationale as this kit's `id_grammar.py`: CPython writes a module's bytecode next to its
 # SOURCE, which is inside the worktree being merged. A merge driver that reads three blobs and writes
 # one should write nothing else, and this is the whole of that property on the deferred import below.
 sys.dont_write_bytecode = True
-
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
-       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
-       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
-       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        src = str(row.get("source") or "").split("/")
-        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
-        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
-
 
 _ANCHOR_AT = None
 _GRAMMAR = None
@@ -255,14 +215,15 @@ def anchors() -> tuple:
     global _ANCHOR_AT, _GRAMMAR
     if _ANCHOR_AT is None:
         root = _anchor_root()
+        # The grammar is this kit's own `id_grammar.py` (PLAY-dOrderedCharter-18), a sibling: an
+        # absent or broken one raises here and the driver turns it into a real conflict.
         # APPEND, never `insert(0, …)`: prepending puts the kit dir ahead of the stdlib, so any
         # module name it ever gains shadows the real one — a `tempfile.py` there would silently
         # replace the stdlib module `text_merge` imports below.
-        # The sibling kit through the ONE resolver (TOOL-aRepatriatedFork-2 S3): receipt, probes, then
-        # a LookupError naming all three places, which the driver turns into a real conflict.
-        sys.path.append(str(resolve_kit_dir("memory-recall", "extract.py",
-                                            pathlib.Path(__file__).resolve().parent)))
-        import extract as EX  # noqa: PLC0415 — deliberately deferred; see above
+        here = str(pathlib.Path(__file__).resolve().parent)
+        if here not in sys.path:
+            sys.path.append(here)
+        import id_grammar as EX  # noqa: PLC0415 — deliberately deferred; see above
         _GRAMMAR = EX.grammar_for(str(root))
         _ANCHOR_AT = EX.anchor_at
     return _ANCHOR_AT, _GRAMMAR
@@ -286,7 +247,7 @@ def resolve_view_layer():
     content with no markers. Raised from in here it lands in the fail-closed handler and the author
     gets conflict markers instead of a quietly truncated file.
 
-    APPEND, never `insert(0, …)`, for the reason spelled at the memory-recall append above: this
+    APPEND, never `insert(0, …)`, for the reason spelled at the grammar append above: this
     directory carries module names of its own and prepending it would let one shadow a stdlib
     module. Running as `__main__` already puts this directory first, so the append is what makes the
     import work when the driver is IMPORTED rather than run — which `--check` does.
