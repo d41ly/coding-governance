@@ -20,7 +20,7 @@ argument is the leg that grades them:
 |---|---|---|
 | `<memory root>/guides/REVIEW-PROTOCOL.md` | `REVIEW-PROTOCOL.template.md` | `TOOL_ROOT` |
 | `unattended-build.js`, beside its template | `unattended-build.template.js` | `KIT_DIR`, `TOOL_ROOT`, `MEMORY_TREE_DIR`, `FANOUT_CAP` |
-| `tier2-review.js`, beside its template | `tier2-review.template.js` | `FANOUT_CAP` |
+| `tier2-review.js`, beside its template | `tier2-review.template.js` | `FANOUT_CAP`, `LENS_SLOTS` |
 | `drift-audit-code.js`, beside its template | `drift-audit-code.template.js` | `FANOUT_CAP` |
 | `drift-audit-state.js`, beside its template | `drift-audit-state.template.js` | `FANOUT_CAP` |
 
@@ -164,9 +164,10 @@ A diff review fans out over five finder lenses, in this order: `security`, `corr
 check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
 old `regressions` lens is retired. A spec audit runs five lenses of its own, in this order:
 `coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1).
-`SPEC_LENSES` in the harness is that catalogue's one source; the method and the memory-tree README
-point at it. Five is also the most the agent-cap hook admits on that receiver, so neither set can
-grow a sixth.
+Both sets have one source, `lenses.toml`, this kit's lens catalogue (below); `DIFF_LENSES` and
+`SPEC_LENSES` in the harness are its render, and the method and the memory-tree README point at the
+literal. The fan-out leg holds each rendered literal to exactly five slots, and five is also the most
+the agent-cap hook admits on that receiver, so neither set can grow a sixth.
 
 `lensNotes` appends a project addendum to one lens's brief, and to no other prompt:
 
@@ -340,6 +341,40 @@ synthesis to copy it verbatim as the report's last section. That copy is the onl
 reaches a record, and the harness cannot check it was made: compare the report against the returned
 `appendix`. A run whose every finding is refuted writes no report, so there the appendix exists in the
 return alone, and the caller writes it down if it wants one.
+
+## The lens catalogue — `lenses.toml`
+
+Every review lens is a row of `lenses.toml`, beside the harness. A workflow script has no filesystem
+when it runs, so the harness cannot read the file: `render_lenses.py` fills each lens literal of
+`tier2-review.template.js` from it, at install and in the parity leg, through the `LENS_SLOTS`
+token. A literal opts in with a marker ending its opening line,
+`const SPEC_LENSES = [ // gov:lens-slots unit-spec`, and its body is the one line `{{LENS_SLOTS}}`.
+Add or swap a lens as a row, never by an edit to either harness copy.
+
+```toml
+[[lens]]
+key = "coherence"            # ^[a-z][a-z0-9-]*$, the key lensNotes and a finding's `lens` use
+kinds = ["spec-audit"]       # the review kinds it may run under: diff-review, spec-audit
+presets = ["unit-spec"]      # every literal it may fill, by default or by a swap
+default_in = ["unit-spec"]   # the literals it fills by default, a subset of presets
+optin = false                # whether it may be swapped into a literal of presets it is no default of
+brief = "Coherence: ..."     # one line, raw text; the render escapes \ and '
+```
+
+A literal's name is what its marker declares: `diff-review` for the diff kind's literal, a
+spec-audit preset name otherwise. The set is read from the template's markers and typed nowhere
+else. A row's place in the file is its slot order. A row with `default_in = []` and `optin = false`
+is catalogued and selected by nothing.
+
+The renderer refuses, exit 2, naming the row and the rule: a file that is not TOML or carries a key
+beside `lens`, or a python below 3.11 (rule 1); a missing, extra or mistyped field, a bad key, an
+empty or multi-line brief (2); an empty or repeating `kinds` or `presets`, an unknown kind (3); a
+`default_in` outside `presets` (4); `kinds` disagreeing with the kinds of `presets` (5); two rows
+sharing a key and a literal (6); a key equal to a literal name (7); a literal no marker declares (8);
+a marked literal no default row fills (9); an opt-in row with no literal outside its `default_in`
+(10); a marker not followed by the token, or a token with no marker (11). It does NOT count slots:
+`check-verifier-fanout.sh` holds every marked literal to exactly five, so a sixth default row
+renders and reds there.
 
 ## `workerType` — judges spawned as a named agent type, in all three harnesses
 

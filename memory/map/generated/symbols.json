@@ -298,6 +298,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "Refused",
+      "kind": "class",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
       "id": "Report",
       "kind": "class",
       "file": "tools/govkit/govkit.py"
@@ -4076,6 +4081,11 @@
       "id": "check_carry_set",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "check_catalogue",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
     },
     {
       "id": "check_catalogue_region",
@@ -10673,6 +10683,11 @@
       "file": "tools/roles/render_agents.py"
     },
     {
+      "id": "load_catalogue",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
+    },
+    {
       "id": "load_checker",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
@@ -11506,6 +11521,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
     },
     {
       "id": "main",
@@ -18251,6 +18271,11 @@
       "id": "render_legs_row",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "render_lens_slots",
+      "kind": "function",
+      "file": "tools/workflows/render_lenses.py"
     },
     {
       "id": "render_limit_env",

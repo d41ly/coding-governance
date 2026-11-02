@@ -2021,6 +2021,73 @@ async function runRolesArms() {
   ck(extractSynthPrompt(r).length > 0 && extractSynthPrompt(r).indexOf('Roles:') === -1, 'roles: a classic run\'s synthesis prompt carries no Roles clause')
 }
 
+// ---- TOOL-dFairHearing-13: the lens catalogue and its render (AC1, AC4, AC7) ---------------------
+// The lens literals are rendered from `lenses.toml` by `render_lenses.py`, both beside the harness.
+// The python is the one this shell resolved, passed in, so an absent one reds these arms rather
+// than skipping them. Synchronous, and ahead of the whole-script arms, so no early exit strands it.
+function runLensArms() {
+  const path = require('path')
+  const { spawnSync } = require('child_process')
+  const kit = path.dirname(FILE)
+  const py = process.argv[5] || ''
+  const renderer = path.join(kit, 'render_lenses.py')
+  const tpl = fs.readFileSync(path.join(kit, 'tier2-review.template.js'))
+  const runRender = (catalogue, input) => {
+    if (!py) return { status: -1, stdout: '', stderr: 'no python was resolved' }
+    const r = spawnSync(py, ['-B', renderer, catalogue], { input, encoding: 'utf8', env: Object.assign({}, process.env, { PYTHONUTF8: '1' }) })
+    return { status: r.status, stdout: r.stdout || '', stderr: (r.stderr || '') + (r.error ? String(r.error) : '') }
+  }
+  // A literal's body: the lines between its opening line and the `]` that closes it, the marker
+  // comment ignored, so the live harness and the render compare on the lens text alone.
+  const extractLensBody = (text, name) => {
+    const ls = text.split('\n')
+    const at = ls.findIndex((l) => l.startsWith('const ' + name + ' = ['))
+    const end = ls.findIndex((l, i) => i > at && l === ']')
+    return at === -1 || end === -1 ? null : ls.slice(at + 1, end).join('\n')
+  }
+  const shipped = runRender(path.join(kit, 'lenses.toml'), tpl)
+  ck(shipped.status === 0 && shipped.stdout.indexOf('{{LENS_SLOTS}}') === -1, 'lens: the shipped catalogue renders the template, every slot token filled (' + shipped.stderr.trim() + ')')
+  for (const name of ['DIFF_LENSES', 'SPEC_LENSES']) {
+    const want = extractLensBody(src, name)
+    ck(want !== null && want.split('\n').length === 25 && extractLensBody(shipped.stdout, name) === want,
+      'lens: the rendered ' + name + ' holds the live harness\'s five lenses byte for byte')
+  }
+  const scratch = fs.mkdtempSync(path.join(require('os').tmpdir(), 'lens-'))
+  const writeCatalogue = (name, text) => { const p = path.join(scratch, name + '.toml'); fs.writeFileSync(p, text); return p }
+  const optin = '\n[[lens]]\nkey = "extra-lens"\nkinds = ["diff-review", "spec-audit"]\npresets = ["unit-spec", "diff-review"]\n' +
+    'default_in = []\noptin = true\nbrief = "An opt-in lens nothing selects by default."\n'
+  const withOptin = runRender(writeCatalogue('optin', fs.readFileSync(path.join(kit, 'lenses.toml'), 'utf8') + optin), tpl)
+  ck(withOptin.status === 0 && shipped.status === 0 && withOptin.stdout === shipped.stdout,
+    'lens: an opt-in row added as data changes no marked literal')
+  // One scratch catalogue per refusal rule, over a two-literal template: each exits 2, writes
+  // nothing, and names its rule and its subject.
+  const TPL = 'const D = [ // gov:lens-slots diff-review\n{{LENS_SLOTS}}\n]\nconst S = [ // gov:lens-slots unit-spec\n{{LENS_SLOTS}}\n]\n'
+  const row = (o) => '[[lens]]\n' + Object.entries(Object.assign({ key: 'k', kinds: ['diff-review'], presets: ['diff-review'],
+    default_in: ['diff-review'], optin: false, brief: 'b' }, o)).filter(([, v]) => v !== undefined)
+    .map(([k, v]) => k + ' = ' + JSON.stringify(v)).join('\n') + '\n'
+  const SPEC = row({ key: 's', kinds: ['spec-audit'], presets: ['unit-spec'], default_in: ['unit-spec'] })
+  const cases = [
+    ['the parse', 'this is = = not toml\n', TPL, 'rule 1: the lens catalogue', 'is not TOML'],
+    ['the field', row({ optin: undefined }) + SPEC, TPL, 'rule 2: row `k`', 'optin'],
+    ['the kind set', row({ kinds: ['full-review'] }) + SPEC, TPL, 'rule 3: row `k`', 'full-review'],
+    ['default_in', row({ default_in: ['unit-spec'] }) + SPEC, TPL, 'rule 4: row `k`', 'default_in'],
+    ['the kind disagreement', row({ kinds: ['spec-audit'] }) + SPEC, TPL, 'rule 5: row `k`', 'kinds'],
+    ['the duplicated key and literal', row({}) + row({}) + SPEC, TPL, 'rule 6:', 'key `k` and the literal diff-review'],
+    ['the key equal to diff-review', row({ key: 'diff-review' }) + SPEC, TPL, 'rule 7: row `diff-review`', 'literal name'],
+    ['the unknown literal', row({}) + SPEC + row({ key: 'x', kinds: ['spec-audit'], presets: ['design-audit'], default_in: [] }), TPL, 'rule 8: row `x`', 'design-audit'],
+    ['the unfilled literal', row({}), TPL, 'rule 9:', 'unit-spec'],
+    ['the opt-in with nowhere to go', row({ optin: true }) + SPEC, TPL, 'rule 10: row `k`', 'optin = true'],
+    ['the orphan token', row({}) + SPEC, TPL + '{{LENS_SLOTS}}\n', 'rule 11:', 'without a `gov:lens-slots` marker'],
+  ]
+  for (const [subject, text, template, rule, word] of cases) {
+    const r = runRender(writeCatalogue(subject.replace(/\W+/g, '-'), text), template)
+    ck(r.status === 2 && r.stdout === '' && r.stderr.indexOf(rule) !== -1 && r.stderr.indexOf(word) !== -1,
+      'lens: ' + subject + ' refuses, exit 2, naming ' + rule.replace(/:.*/, '') + ' (got ' + r.status + ': ' + r.stderr.trim() + ')')
+  }
+  fs.rmSync(scratch, { recursive: true, force: true })
+}
+runLensArms()
+
 runWholeScriptArms().then(() => {
   console.log('---- ' + pass + ' passed, ' + fail + ' failed ----')
   process.exit(fail ? 1 : 0)
@@ -2281,7 +2348,10 @@ if [ -z "$bd_why" ]; then
 fi
 [ -z "$bd_why" ] || printf 'PRODUCER-FAILED %s\n' "$bd_why" > "$BD_OUT"
 
-out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT" "$bd_mtd"); rc=$?
+# The lens arms (TOOL-dFairHearing-13) run the renderer with the python resolved above, or with none,
+# which reds them by name rather than skipping them.
+case "$bd_why" in "no usable python"*) lens_py="" ;; *) lens_py=$bd_py ;; esac
+out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT" "$bd_mtd" "$lens_py"); rc=$?
 printf '%s\n' "$out"
 
 # The arms run inside a node process, so the count crosses a process boundary and this shell cannot
@@ -2390,7 +2460,10 @@ printf '%s\n' "$out"
 # hand, not by a run: the pass runs no suite.
 # RAISED 354 -> 357 by TOOL-dFoldedAudit-15: the undeclared spec audit's three `ck` sites beside the address
 # arms. Not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=357
+# RAISED 357 -> 372 by TOOL-dFairHearing-13: 15 assertions, counted off the `lens:` arms — the shipped
+# render (1), its two literals against the live harness (2), the opt-in row (1) and the eleven refusal
+# rules (11). Counted by hand and by a probe of the block alone: the pass runs no suite.
+FLOOR_ASSERTIONS=372
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

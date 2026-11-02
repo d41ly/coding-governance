@@ -778,7 +778,12 @@ const SPEC_FINDING_SCHEMA = {
 // `args.checklist`. `verification` hunts the defect this repo finds most, a check that cannot fail,
 // which no brief named. No brief names a web surface. Five is the most the agent-cap hook admits on
 // an array-literal receiver, so a sixth lens is denied at the tool call rather than chosen against.
-const DIFF_LENSES = [
+// TOOL-dFairHearing-13 - the catalogue, this kit's `lenses.toml`, is the source of every lens, and
+// each lens literal here is its RENDER: render_lenses.py fills the slot token under a literal's
+// lens-slots marker with the rows whose `default_in` names it, at install and in the parity leg,
+// because this script has no filesystem to read the catalogue from. A lens is added or swapped as a
+// row there, never by an edit here. The fan-out leg holds every marked literal to exactly five slots.
+const DIFF_LENSES = [ // gov:lens-slots diff-review
   {
     key: 'security',
     brief:
@@ -810,11 +815,12 @@ const DIFF_LENSES = [
 // skip happens inside the Find thunk, so the receiver the agent-cap hook sizes keeps its shape.
 const LIGHT_LENSES = ['correctness', 'seams', 'verification']
 
-// TOOL-aEvidencedLens-1 - this array IS the M4 spec-audit catalogue, its one source. The method and
-// the memory-tree README point here rather than list lens names, so there is no second copy to drift.
-// Five lenses aimed at the measured escape classes; `coherence` keeps the first slot so a fixture
-// keyed on the first lens keeps its ids.
-const SPEC_LENSES = [
+// TOOL-aEvidencedLens-1 - this array holds the M4 spec-audit lenses. The method and the memory-tree
+// README point here rather than list lens names, so there is no second copy to drift. Since
+// TOOL-dFairHearing-13 its source is the `unit-spec` rows of this kit's `lenses.toml`, and this
+// literal is their render. Five lenses aimed at the measured escape classes; `coherence` keeps the
+// first slot so a fixture keyed on the first lens keeps its ids.
+const SPEC_LENSES = [ // gov:lens-slots unit-spec
   {
     key: 'coherence',
     brief:
@@ -845,7 +851,9 @@ const SPEC_LENSES = [
 // The ONE dialect <prefix>/hooks/agent-cap.js admits here: two sibling top-level array literals and a
 // marked ternary. A map, object or registry of lens sets is DENIED at the tool call, so this shape
 // is fixed by the enforcement point rather than chosen. TOOL-dTieredTribunal-13 tightened the branch
-// this line sits on to require EVERY value branch bounded, and both branches here are literals.
+// this line sits on to require EVERY value branch bounded, and both branches here are literals. Both
+// are rendered from the lens catalogue (TOOL-dFairHearing-13), and a render keeps this shape: the
+// rows fill each literal's body, never its name or this receiver.
 const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
 // S3 - checked on EVERY run of either kind, before the resume probe: a renamed lens would otherwise
 // empty the light set, and a light run would review nothing while reporting clean. An INDEX names the

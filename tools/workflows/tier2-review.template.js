@@ -778,74 +778,34 @@ const SPEC_FINDING_SCHEMA = {
 // `args.checklist`. `verification` hunts the defect this repo finds most, a check that cannot fail,
 // which no brief named. No brief names a web surface. Five is the most the agent-cap hook admits on
 // an array-literal receiver, so a sixth lens is denied at the tool call rather than chosen against.
-const DIFF_LENSES = [
-  {
-    key: 'security',
-    brief:
-      'Security: trust boundaries for THIS kind of code. Commands built from interpolated input (shell, SQL, regex, paths), path traversal and symlinks, secrets reaching logs or output, authorization or enforcement that can be bypassed, and output from another program or agent trusted without validation.',
-  },
-  {
-    key: 'correctness',
-    brief:
-      'Correctness: logic bugs, wrong conditionals and edge cases, off-by-one, type and encoding coercion drift, error and empty-input paths, and two copies of one rule that disagree.',
-  },
-  {
-    key: 'seams',
-    brief:
-      'Integration seams + dead plumbing: values computed→passed→never read, stale caches not reset on every mutation path, indexes that don\'t serve their query, half-applied merges, cross-language catalog drift.',
-  },
-  {
-    key: 'verification',
-    brief:
-      'Verification: does every behaviour this diff changes have a check that can FAIL? Report a test or gate whose fixture never triggers the rule, a predicate that matches nothing, a skip that reads as a pass, and a changed behaviour with no check at all.',
-  },
-  {
-    key: 'intent',
-    brief:
-      'Intent: does the diff do what its stated intent says? Read the range\'s commit messages and any spec or design document the diff touches or those messages name, then report an acceptance criterion with no code behind it, a stated mechanism that is not the one built, and scope beyond what was asked.',
-  },
+// TOOL-dFairHearing-13 - the catalogue, this kit's `lenses.toml`, is the source of every lens, and
+// each lens literal here is its RENDER: render_lenses.py fills the slot token under a literal's
+// lens-slots marker with the rows whose `default_in` names it, at install and in the parity leg,
+// because this script has no filesystem to read the catalogue from. A lens is added or swapped as a
+// row there, never by an edit here. The fan-out leg holds every marked literal to exactly five slots.
+const DIFF_LENSES = [ // gov:lens-slots diff-review
+{{LENS_SLOTS}}
 ]
 // TOOL-aSightedSkeptic-7 S3 - a LIGHT diff review's lenses, as KEYS (spec F1: 70 of the 76 classed
 // findings in the owner's sample, inside the protocol's three-to-six range). Not a third lens set: the
 // skip happens inside the Find thunk, so the receiver the agent-cap hook sizes keeps its shape.
 const LIGHT_LENSES = ['correctness', 'seams', 'verification']
 
-// TOOL-aEvidencedLens-1 - this array IS the M4 spec-audit catalogue, its one source. The method and
-// the memory-tree README point here rather than list lens names, so there is no second copy to drift.
-// Five lenses aimed at the measured escape classes; `coherence` keeps the first slot so a fixture
-// keyed on the first lens keeps its ids.
-const SPEC_LENSES = [
-  {
-    key: 'coherence',
-    brief:
-      'Coherence: does the spec set agree with itself, and can its acceptance decide anything? Report a section-2 item no section-6 criterion observes; a criterion whose observation cannot FAIL on today\'s tree, because it is already green before the unit is built; a criterion that cannot PASS on a correct build, because it demands what the design does not produce or a figure the build cannot reach; section 2 against section 3; section 4 Design against section 7 Gates; and, across the subjects and the sibling context, the four axes scope, interface, ordering and acceptance: a name, path or key spelled two ways, a unit depending on one ordered after it, two units claiming one file or one landing slot, and an overview acceptance no unit\'s criteria imply.',
-  },
-  {
-    key: 'grounding',
-    brief:
-      'Grounding: is every claim sections 4 and 10 make about the world TRUE where the subjects stand? Check each claim about existing code, a tool\'s flags or output, a record, a count, a platform behaviour or a cost against the source, never against the spec. Hunt the traps this platform sets: MSYS argument and path rewriting, drive-letter and backslash paths, CRLF in a working copy and a text-mode read that drops a CR, and a stated wall-clock goal nobody timed. A claim marked UNVERIFIED is a finding only where the design rests on it.',
-  },
-  {
-    key: 'reuse',
-    brief:
-      'Reuse: functionality is reused and extended, never rebuilt. Report a design that builds what already exists, such as a function, a checker, a gate leg, a driver verb or a record shape, instead of extending it; a section-10 seam that is cited but is not the one section 4 extends, or that does not exist; and a question a decision record or an ask already decided, decided asks included. Probe before you claim: the codebase-map kit\'s reuse_lookup.py with a behaviour phrase, the memory-recall kit\'s query.py with a plain-English question and 8-14 --terms in this corpus\'s own jargon, and grep, because the lookup cannot see every layer and prints the ones it skipped. Locate each tool with git ls-files; where one is absent, say so in the finding and use grep. Read the asks through the memory-tree kit\'s gen_build_index.py --asks --json --all --path <every path the spec\'s Files touched estimate names>, falling back to the backlog shards when its mode field says shards. THE BAR: a reuse finding names the existing seam or record by path or id AND quotes the spec text that duplicates or contradicts it. That a related record exists is not a finding.',
-  },
-  {
-    key: 'blast-radius',
-    brief:
-      'Blast radius: what does this change trip that the spec does not list? For every name, value or rule the spec renames, retires or changes, grep the name AND the value, and report each consumer, carrier, test arm or document the spec does not name. Join section 4\'s files-touched list against the gate-leg manifest (gate-legs.json, where the project keeps one) and report a guarded leg section 7 omits; report a declared size or time budget the change will cross; and report the repo\'s own machinery the spec forgets: version carriers, codebase-map keys, record and filename rules, a --dispatch write set, and a render an adopter regenerates.',
-  },
-  {
-    key: 'failure-envelope',
-    brief:
-      'Failure envelope: what will the built thing meet that the spec never says it handles? Report the input classes the design is silent on (empty, malformed, multi-line, unterminated, huge, concurrent), signals, partial failure and a dead dependency; a security or write surface section 5 did not price; and a spec that names one INSTANCE where the class was meant, such as one file of two or one caller of three. A spec is built as a ceiling: in this kit\'s own trial (aBlindedTrial, report section 4.3), when a spec named the class for one input file and not the other, the builder handled exactly the file it named.',
-  },
+// TOOL-aEvidencedLens-1 - this array holds the M4 spec-audit lenses. The method and the memory-tree
+// README point here rather than list lens names, so there is no second copy to drift. Since
+// TOOL-dFairHearing-13 its source is the `unit-spec` rows of this kit's `lenses.toml`, and this
+// literal is their render. Five lenses aimed at the measured escape classes; `coherence` keeps the
+// first slot so a fixture keyed on the first lens keeps its ids.
+const SPEC_LENSES = [ // gov:lens-slots unit-spec
+{{LENS_SLOTS}}
 ]
 
 // The ONE dialect <prefix>/hooks/agent-cap.js admits here: two sibling top-level array literals and a
 // marked ternary. A map, object or registry of lens sets is DENIED at the tool call, so this shape
 // is fixed by the enforcement point rather than chosen. TOOL-dTieredTribunal-13 tightened the branch
-// this line sits on to require EVERY value branch bounded, and both branches here are literals.
+// this line sits on to require EVERY value branch bounded, and both branches here are literals. Both
+// are rendered from the lens catalogue (TOOL-dFairHearing-13), and a render keeps this shape: the
+// rows fill each literal's body, never its name or this receiver.
 const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
 // S3 - checked on EVERY run of either kind, before the resume probe: a renamed lens would otherwise
 // empty the light set, and a light run would review nothing while reporting clean. An INDEX names the

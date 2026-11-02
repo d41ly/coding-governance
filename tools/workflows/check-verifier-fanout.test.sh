@@ -316,6 +316,36 @@ arm 'a non-workflow .js is not judged by the discovery path' 'verifier-fanout: c
   bash -c 'cp "$2" "$1/'"${PFX}x-helper.js"'" && cp "$3" "$1/'"${PFX}wf.js"'" && cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' \
   _ "$E" "$TMP/not-a-workflow.js" "$TMP/bounded.js"
 
+# ---- TOOL-dFairHearing-13: the slot count, the one rule this gate holds natively -----------------
+# AC3: the shipped harness with a sixth element planted in its `unit-spec` literal. The hook denies a
+# sixth element too, so the arm keys on the SLOTS line, which a gate that counts nothing never prints.
+SIX="$TMP/six-slots.js"
+awk '{ print } /gov:lens-slots unit-spec$/ { print "  { key: \x27sixth\x27, brief: \x27a planted sixth slot\x27 }," }' \
+  "$ROOT/$KIT_REL/tier2-review.js" > "$SIX"
+out=$(bash "$GATE" "$SIX" 2>&1); rc=$?
+case "$rc:$out" in 1:*"SLOTS — "*"literal unit-spec holds 6 slot(s)"*) printf 'arm ok    AC3: a sixth slot in a marked literal reds the slot count\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC3: a sixth slot was not named (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+# AC5: punctuation inside a string and a trailing comma are no slots.
+cat >"$TMP/punct.js" <<'EOF'
+export const meta = { name: 'slot-fixture', description: 'five slots whose strings carry punctuation' }
+const a = 1, b = 2
+const L = [ // gov:lens-slots unit-spec
+  { key: 'one', brief: 'commas, inside, a string' },
+  { key: 'two', brief: "a ] bracket and a [ one" },
+  { key: 'three', brief: 'a quote \' and a "double"' },
+  { key: 'four', brief: `a template span ${a, b} and ${[1, 2].join(', ')}` }, // a, comment ]
+  /* a block, comment ] */ { key: 'five', brief: 'the last, with a trailing comma' },
+]
+EOF
+out=$(bash "$GATE" "$TMP/punct.js" 2>&1); rc=$?
+case "$rc:$out" in 0:*"slots — 1 lens-slot literal(s), each holding 5"*) printf 'arm ok    AC5: strings, comments and a trailing comma do not move the slot count\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC5: the punctuated literal did not count 5 (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+# AC6: a whole tree whose only workflow script carries no marker. The count graded nothing, which is
+# not a pass. `$E` already holds a hook, the gate and one bounded workflow script, from the arm above.
+out=$(cd "$E" && bash "./${KIT_REL}/gate.sh" 2>&1); rc=$?
+case "$rc:$out" in 1:*"no lens-slot literal (a line marked gov:lens-slots) in any workflow script"*) printf 'arm ok    AC6: an empty marker population is not a pass\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC6: a tree with no marked literal did not red (rc=%s)\n%s\n' "$rc" "$out" ;; esac
+
 # The gate has no predicate of its own: break the delegation and it must FAIL, not pass quietly.
 D="$TMP/nohook"; mkdir -p "$D"
 ( cd "$D" && git init -q . && git config user.email t@t.test && git config user.name t

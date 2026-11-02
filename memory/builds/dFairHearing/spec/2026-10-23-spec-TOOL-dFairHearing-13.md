@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-13 — the lens catalogue as data, rendered into the harness's five-slot literals, and a slot count in the fan-out leg
 
-**Status:** INPROGRESS · rev-3 · 2026-11-02 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dFairHearing-19
+**Status:** CLOSED · rev-3 · 2026-11-02 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0080@8c9e5de7 whole
 **Carries:** node:item.review.lens

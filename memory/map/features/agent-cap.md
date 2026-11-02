@@ -186,8 +186,8 @@ resolver.
 
 `tools/workflows/check-verifier-fanout.sh` DELEGATES to the hook rather than re-implementing it: it
 builds a payload and feeds each committed harness through `tools/hooks/agent-cap.js`. One predicate,
-two entry points. A bash re-implementation would not disagree loudly — it would drift the day
-either side is tightened.
+two entry points. Its one native rule, which the hook lacks: each literal marked `gov:lens-slots`
+holds exactly five slots (`measureSlots`).
 
 `tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path, plus the
 optional interpreter and args from `TOOL-aReplayedCard-2`) and

@@ -34,11 +34,12 @@
 # purpose, and no line anywhere named the file. Creating a live copy is an install decision, so it
 # stays with the hand `--render` a fresh install runs; `--tracked-only` refreshes and skips out loud.
 #
-# FOUR TOKENS, and each one is DERIVED here rather than typed:
+# FIVE TOKENS, and each one is DERIVED here rather than typed:
 #   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
 #   TOOL_ROOT        the directory the kits sit in, with a trailing slash; empty at a root install
 #   MEMORY_TREE_DIR  the directory holding the memory-tree kit's `gotchas.py`
 #   FANOUT_CAP       the agent limit, runtime.agents-in-flight, as the policy reader answers it at HEAD
+#   LENS_SLOTS       a marked lens literal's body, the rows of `lenses.toml` render_lenses.py fills
 # The third is NOT derivable from the second. Both adopters measured when this was written install
 # the memory-tree kit FLAT, directly in their tool root, so `TOOL_ROOT` plus `memory-tree/` names a
 # file neither of them has. It is PROBED instead: the first TRACKED of the nested and the flat
@@ -619,6 +620,15 @@ render() { # template -> stdout
     esac
   fi
   out=${out//\{\{FANOUT_CAP\}\}/"$FANOUT_CAP"}
+  # THE LENS SLOTS (TOOL-dFairHearing-13): each `{{LENS_SLOTS}}` line under a lens-slots marker is
+  # filled from this kit's lens catalogue, `lenses.toml`, by `render_lenses.py`, both beside this
+  # script, which refuses by name on a catalogue or marker fault. Last, so a brief is never read as a
+  # token. Only a template carrying the token pays the python start; the `X` sentinel keeps the
+  # trailing newlines a substitution strips, as the first read above does.
+  if [[ $out == *'{{LENS_SLOTS}}'* ]]; then
+    out=$( printf '%s' "$out" | "$_cite_py" -B "$HERE/render_lenses.py" "$HERE/lenses.toml" || exit 1; printf X ) || return 1
+    out=${out%X}
+  fi
   printf '%s' "$out"
 }
 read_lf() { sed 's/\r$//' "$1"; }
