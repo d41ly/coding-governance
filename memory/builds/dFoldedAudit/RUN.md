@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: 529b98a4717bd8c884697bd247e5c689db976ebf · park · 23 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: d322d6ac4c07648bef3c547cae6fbf8b4d5e7659
-phase: BUILDING
+witness: 63669d50534ac8588c74a8fa5f3a5a1766659b8f
+phase: SPECCING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/gov-build-m4-spec-audit-694e7b
@@ -86,3 +86,19 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T02:00:39Z brief · item TOOL-dFoldedAudit-8 · reason 2e9e9fb95f5d memory/builds/dFoldedAudit/prompts/2026-11-02-prompt-TOOL-dFoldedAudit-8-pass-brief.md
 
 2026-11-02T02:12:24Z dispatch · item e07851fe TOOL-dFoldedAudit-8 · reason memory/builds/dClosedLoop/README.md memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-8-3-pass-return.md
+
+2026-11-02T02:46:44Z review · item dFoldedAudit · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 6 · minors 21 · disposition promote
+
+2026-11-02T02:46:45Z rescope · item add TOOL-dFoldedAudit-9 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md
+
+2026-11-02T02:46:46Z rescope · item add TOOL-dFoldedAudit-10 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md
+
+2026-11-02T02:46:47Z rescope · item add TOOL-dFoldedAudit-11 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md
+
+2026-11-02T02:46:47Z rescope · item add TOOL-dFoldedAudit-12 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md
+
+2026-11-02T02:46:48Z rescope · item add TOOL-dFoldedAudit-13 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md
+
+2026-11-02T02:46:49Z rescope · item add TOOL-dFoldedAudit-14 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md
+
+2026-11-02T02:46:50Z rescope · item add TOOL-dFoldedAudit-15 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md

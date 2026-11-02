@@ -5,7 +5,7 @@ opened: 2026-11-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8
+ids: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15
 ---
 
 # dFoldedAudit — a spec audit folds local fixes, promotes only new mechanisms, and its chain stops itself
@@ -48,6 +48,7 @@ verbatim under `prompts/`.
   reaches an unbuilt sibling only. A budget does not outrank R1 for spec audits. dSafePassage and
   every live run stay untouched.
 - No `spec-audit:` key: the owner's prompt does not ask for one, so none is owed here.
+- Closing review round 1: 0 blockers, CONVERGED; its 6 high items and 21 minors are promoted as units 9 to 15 (M8), with no further review round.
 
 ## Parked decisions
 
@@ -65,11 +66,19 @@ None.
 | 6 | `TOOL-dFoldedAudit-6` | an audit's own fold owes no hand `spec-revised` deviation record |
 | 7 | `TOOL-dFoldedAudit-7` | policy keys switch the disposal, the stop and the ceiling |
 | 8 | `TOOL-dFoldedAudit-8` | dClosedLoop's unbuilt specs and its frozen design take the same rules |
+| 9 | `TOOL-dFoldedAudit-9` | `--dispatch` or a Definition-of-Done item refuses a build past a chain verdict that is not STOP |
+| 10 | `TOOL-dFoldedAudit-10` | a chain round joins to the terminal review row and the spec-audit records it claims |
+| 11 | `TOOL-dFoldedAudit-11` | a chain fold joins to the tree: the spec's header rev and its Revision log |
+| 12 | `TOOL-dFoldedAudit-12` | the DEGRADED by-hand route ends in the chain record and verdict, not a dispatch |
+| 13 | `TOOL-dFoldedAudit-13` | one read-only driver read answers whether a run takes the fold rule, for attended and unattended callers |
+| 14 | `TOOL-dFoldedAudit-14` | a rotated record keeps its own date floor for the fold cutoff |
+| 15 | `TOOL-dFoldedAudit-15` | the closing review's mediums and lows closed as one batch |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node d · opened 2026-11-01 · streams tooling
-ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8
+ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14
+ids TOOL-dFoldedAudit-15
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -84,7 +93,7 @@ ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudi
 | [TOOL-dFoldedAudit-8 — dClosedLoop's unbuilt specs and its frozen design take the same rules](spec/2026-11-01-spec-TOOL-dFoldedAudit-8.md) | 80 | 2 | CLOSED | rev-2 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 70 bound to this build, across 3 record folder(s).
+Records: 86 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

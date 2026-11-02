@@ -20,6 +20,7 @@
 | [2026-11-01-prompt-TOOL-dFoldedAudit-8-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-8-spec-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-8-2-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-8-2-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-8-pass-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-8-pass-brief.md) | research | — |
+| [2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md](../reviews/2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md) | diff-review | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 
 <!-- /gen:spec-records -->
 

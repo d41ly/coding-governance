@@ -15,6 +15,7 @@
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-3-build-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-3-build-brief.md) | research | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-3-spec-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-3-spec-brief.md) | research | — |
+| [2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md](../reviews/2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md) | diff-review | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 |
 
 <!-- /gen:spec-records -->
 
