@@ -212,6 +212,10 @@ ex1-pair|1|row 'layer.exp' uses point.exp.hook, which 'layer.exp2' declares
 no-layer|1|descriptor tools/mapkit/kit.toml declares no layer
 unknown-layer|1|descriptor tools/mapkit/kit.toml names layer 'layer.nowhere', which no row holds
 undeclared-point|1|row 'layer.exp' uses point.core.missing, which 0 core row(s) declare
+quoted|1|tools/corekit/run.sh:6 · probe · core kit corekit depends on non-core kit expkit
+quoted|1|0 allowed, 1 red;
+unshipped|1|tools/corekit/core.py:9 · probe · core kit corekit depends on non-core kit mapkit
+unshipped|1|0 allowed, 1 red;
 PLANTS
 if [ "$_lf" != 0 ]; then echo "FAIL — $_lf layer-check arm(s) failed"; exit 1; fi
 echo "PASS — the layer check's plants"

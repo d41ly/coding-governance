@@ -40,3 +40,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-02T19:38:43Z brief · item PLAY-dOrderedCharter-16 · reason f9e8e0dc0a19 memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-16-build-brief.md
 
 2026-11-02T20:06:35Z rescope · item add PLAY-dOrderedCharter-61 · reason repairs PLAY-dOrderedCharter-16's CLOSED check_layers.py, which unit 17's builder found over-reporting (run wf_dce016de-13e): message text, .git/ journal paths, id strings and fixture pins read as edges, the check's own read of govkit/entries reads as one, and core test suites building fixtures from optional kits have no disposition; also lands unit 16's owed playbook render selftest guard
+
+2026-11-02T21:40:43Z dispatch · item ebb0ebfe PLAY-dOrderedCharter-61 · reason tools/playbook/check_layers.py tools/playbook/adopt-playbook.sh tools/playbook/README.md tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/builds/dOrderedCharter/spec/2026-11-02-spec-PLAY-dOrderedCharter-61.md memory/builds/dOrderedCharter/build/2026-11-02-build-PLAY-dOrderedCharter-61-ledger.md
+
+2026-11-02T21:40:53Z brief · item PLAY-dOrderedCharter-61 · reason ed7e877c03ed memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-61-build-brief.md

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-61 — the layer check reads an edge only where a path names a file a non-core kit ships, and never from a word inside a string
 
-**Status:** DEFERRED · rev-1 · 2026-11-02 · node d · Tier-2 · base 8bec4cef · streams playbook · order 3 · advances PLAY-dOrderedCharter-38
+**Status:** CLOSED · rev-1 · 2026-11-02 · node d · Tier-2 · base 8bec4cef · streams playbook · order 3 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-11-02-build-PLAY-dOrderedCharter-61-ledger.md](../build/2026-11-02-build-PLAY-dOrderedCharter-61-ledger.md) | journal | — |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-61-1-spec-writer.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-61-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-61-build-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-61-build-brief.md) | journal | — |
 | [2026-11-02-prompt-PLAY-dOrderedCharter-61-spec-brief.md](../prompts/2026-11-02-prompt-PLAY-dOrderedCharter-61-spec-brief.md) | research | PLAY-dOrderedCharter-17 |

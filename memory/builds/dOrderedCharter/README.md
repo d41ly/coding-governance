@@ -116,7 +116,7 @@ ids PLAY-dOrderedCharter-61 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-18 — the moved grammar: every name the core imports from the recall kit moved into memory-tree, and every by-path reader re-pointed in the same unit](spec/2026-10-23-spec-PLAY-dOrderedCharter-18.md) | 1 | 2 | CLOSED | rev-3 | 2026-11-02 |
 | [PLAY-dOrderedCharter-16 — the layer register, the layer contract and the check that the core never depends on an expansion or an optional component](spec/2026-10-23-spec-PLAY-dOrderedCharter-16.md) | 2 | 2 | CLOSED | rev-4 | 2026-11-02 |
 | [PLAY-dOrderedCharter-17 — every edge the layer check finds today made a declared optional slot with a named fallback, or moved into the core](spec/2026-10-23-spec-PLAY-dOrderedCharter-17.md) | 3 | 2 | DEFERRED | rev-4 | 2026-11-02 |
-| [PLAY-dOrderedCharter-61 — the layer check reads an edge only where a path names a file a non-core kit ships, and never from a word inside a string](spec/2026-11-02-spec-PLAY-dOrderedCharter-61.md) | 3 | 2 | DEFERRED | rev-1 | 2026-11-02 |
+| [PLAY-dOrderedCharter-61 — the layer check reads an edge only where a path names a file a non-core kit ships, and never from a word inside a string](spec/2026-11-02-spec-PLAY-dOrderedCharter-61.md) | 3 | 2 | CLOSED | rev-1 | 2026-11-02 |
 | [PLAY-dOrderedCharter-19 — the tag grammar, its namespace registry, the derived SQLite tag index and its one resolver, and the join factory moved to the core](spec/2026-10-23-spec-PLAY-dOrderedCharter-19.md) | 4 | 2 | DEFERRED | rev-5 | 2026-10-25 |
 | [PLAY-dOrderedCharter-10 — the namespaced tag system: this build's eight namespaces registered, joined both ways, shape-checked in the core, and their words handed to the lexicon](spec/2026-10-23-spec-PLAY-dOrderedCharter-10.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [PLAY-dOrderedCharter-44 — the tag index keys freshness on each extractor as well as each blob, so a newly registered extractor reads old blobs](spec/2026-10-24-spec-PLAY-dOrderedCharter-44.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -170,7 +170,7 @@ ids PLAY-dOrderedCharter-61 TOOL-dOrderedCharter-7
 | [PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order](spec/2026-10-24-spec-PLAY-dOrderedCharter-55.md) | 41 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 242 bound to this build, across 4 record folder(s).
+Records: 243 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

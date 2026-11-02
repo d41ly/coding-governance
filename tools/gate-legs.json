@@ -1726,7 +1726,10 @@
   {
     "name": "playbook render selftest",
     "guard": [
-      "{prefix}/playbook/"
+      "{prefix}/playbook/",
+      "{prefix}/memory-tree/import_walk.py",
+      "{prefix}/memory-tree/check-arms.py",
+      "{prefix}/memory-tree/tree_lib.py"
     ],
     "argv": [
       "bash",

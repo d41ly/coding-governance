@@ -22,11 +22,20 @@ name resolving to a `.py` file at a non-core home and not in the importer's own 
 name its file as `part`; every other edge is red. Exit 0 green, 1 red, 2 an unreadable register or
 descriptor.
 
-WHAT IT DOES NOT READ, printed every run: a path computed at run time, JavaScript, and a file no
-descriptor claims. A Python docstring and a shell comment line are no edge.
+A spelled path `<home>/<rest>` is an edge only when <rest> names a file the tree tracks under that
+home, or a directory or glob matching one, that no core kit owns; an empty <rest>, or one opening on
+a variable, names the home itself and stays an edge (PLAY-dOrderedCharter-61). A bare home word in a
+shell file is read from the code `scan_shell_lines` (memory-tree's `check-arms.py`) leaves, quoting
+carried across lines; a script whose quoting does not balance is read line by line and named.
+
+WHAT IT DOES NOT READ, printed every run: a path computed at run time, JavaScript, a file no
+descriptor claims, a path that names no file the kit ships (a journal under the git directory, an id
+shaped like a path), and a bare kit name inside a string or a here-document. A Python docstring and
+a shell comment line are no edge.
 """
 import ast
 import fnmatch
+import importlib.util
 import json
 import os
 import pathlib
@@ -78,14 +87,21 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 HERE = pathlib.Path(__file__).absolute().parent
-sys.path.insert(0, str(resolve_kit_dir("memory-tree", "import_walk.py", HERE)))
+MEMORY_TREE = resolve_kit_dir("memory-tree", "import_walk.py", HERE)
+sys.path.insert(0, str(MEMORY_TREE))
 import import_walk  # noqa: E402  the one AST walk, shared with the verdict-epoch gate
+
+_arms_spec = importlib.util.spec_from_file_location("layers_check_arms", str(MEMORY_TREE / "check-arms.py"))
+check_arms = importlib.util.module_from_spec(_arms_spec)
+_arms_spec.loader.exec_module(check_arms)  # the one shell lexer: scan_shell_lines
 
 KINDS = ("import", "dynamic", "probe", "copy", "shell", "requires-if")
 LAYER_KINDS = ("core", "optional", "expansion")
 TAG = re.compile(r"^layer(\.[a-z][a-z0-9-]*)+$")
 COPY_CALLS = ("copy", "copy2", "copyfile", "copytree")
-NOT_READ = "layers: not read: a path computed at run time, JavaScript, and a file no descriptor claims"
+NOT_READ = ("layers: not read: a path computed at run time, JavaScript, a file no descriptor claims, "
+            "a path that names no file the kit ships, and a bare kit name inside a string or a here-document")
+VAR = re.compile(r"\$\{[^}]*\}?|\$\w*|%[sdr]|\{[^}]*\}?")  # a variable inside a spelled path
 
 
 class Unreadable(Exception):
@@ -162,9 +178,9 @@ def derive_string_constants(tree):
             if isinstance(n, ast.Constant) and isinstance(n.value, str) and id(n) not in bare]
 
 
-def derive_edges(root, kits, rows):
-    """-> [(file, line, kind, source kit, target kit, allowed)], every edge from a core kit's shipped
-    file to a non-core kit, sorted."""
+def derive_edges(root, kits, rows, tracked):
+    """-> ([(file, line, kind, source kit, target kit, allowed)], notes): every edge from a core kit's
+    shipped file to a non-core kit, sorted, and a line per shell file read line by line."""
     by_tag = {r.get("tag"): r for r in rows}
     core = lambda k: by_tag.get(k["layer"], {}).get("kind") == "core"  # noqa: E731
     homes = {}  # home basename -> (kit name, core?)
@@ -184,7 +200,9 @@ def derive_edges(root, kits, rows):
         for p in (d.iterdir() if d.is_dir() else []):
             if p.suffix in (".py", ".sh") and p.is_file():
                 modules.setdefault(p.name, []).append(h)
-    seg = re.compile(r"(?:^|[^\w.-])(%s)/" % "|".join(re.escape(h) for h in sorted(far, key=len, reverse=True))) if far else None
+    seg = re.compile(r"(?:^|[^\w.-])(%s)/([\w.*?/${}%%-]*)" % "|".join(re.escape(h) for h in sorted(far, key=len, reverse=True))) if far else None
+    owned = {p for k in kits if core(k) for p in [k["path"]] + k["files"]}
+    far_paths = {}
     # ponytail: precedence keeps one edge per file, line and target, the kind that names it most exactly
     precedence = ("requires-if", "import", "dynamic", "copy", "shell", "probe")
     rkd = re.compile(r"""resolve_kit_dir(?:\(\s*|\s+(?:"[^"]*"|\S+)\s+)["']?([\w.-]+)""")
@@ -194,15 +212,28 @@ def derive_edges(root, kits, rows):
     alt = "|".join(re.escape(h) for h in sorted(far, key=len, reverse=True)) or "(?!)"
     bare = re.compile(r"""(?:^|[\s"'=(])(%s)(?=["'\s;)]|$)""" % alt)
 
+    def check_far_path(home, rest):
+        """True when <tool root>/<home>/<rest> names the home itself (an empty rest, or one opening on a
+        variable) or a tracked file, directory or glob match there that no core kit owns."""
+        rest = rest.rstrip(".")
+        if not rest or VAR.match(rest):
+            return True
+        if (home, rest) not in far_paths:
+            want = "%s/%s/%s" % (tool_root, home, VAR.sub("*", rest).rstrip("/"))
+            stem = re.split(r"[*?]", want)[0]
+            far_paths[home, rest] = any(p not in owned for p in tracked if p.startswith(stem)
+                                        and (p == want or p.startswith(want + "/") or fnmatch.fnmatchcase(p, want)))
+        return far_paths[home, rest]
+
     def derive_named_homes(text):
-        return [m.group(1) for m in seg.finditer(text)] if seg else []
+        return [m.group(1) for m in seg.finditer(text) if check_far_path(m.group(1), m.group(2))] if seg else []
 
     def derive_module_homes(name, own_dir):
         if (root / own_dir / name).is_file() or any((root / d / name).is_file() for d in near_dirs):
             return []
         return modules.get(name, [])
 
-    edges = {}
+    edges, notes = {}, []
 
     def add_edge(f, line, kind, src, home):
         key = (f, line, far[home])
@@ -252,14 +283,24 @@ def derive_edges(root, kits, rows):
                         add_edge(f, line, "probe", k, h)
                 for node in ast.walk(tree):  # a bare home name handed to a call or bound to a name
                     vals = node.args if isinstance(node, ast.Call) else [node.value] if isinstance(node, ast.Assign) else []
-                    for v in vals:
+                    for i, v in enumerate(vals):
                         if isinstance(v, ast.Constant) and v.value in far:
-                            add_edge(f, v.lineno, "probe", k, v.value)
+                            later = []  # the constant string arguments that follow it, the path's rest
+                            for w in vals[i + 1:]:
+                                if not (isinstance(w, ast.Constant) and isinstance(w.value, str)):
+                                    break
+                                later.append(w.value)
+                            if check_far_path(v.value, "/".join(later)):
+                                add_edge(f, v.lineno, "probe", k, v.value)
             elif f.endswith(".sh") or check_shell_file(path):
                 try:
-                    text = path.read_text(encoding="utf-8").splitlines()
+                    body = path.read_text(encoding="utf-8")
                 except (OSError, UnicodeDecodeError):
                     continue
+                text, scan = body.split("\n"), check_arms.scan_shell_lines(body)
+                if scan and scan[-1] is None:
+                    notes.append("layers: %s read line by line: its quoting does not balance" % f)
+                    scan = None
                 inline = False  # an inlined copy of a shared primitive is the shared directory's, no kit's
                 for line, t in enumerate(text, 1):
                     if t.startswith("# >>> ") or t.startswith("# <<< "):
@@ -269,8 +310,8 @@ def derive_edges(root, kits, rows):
                     probed = [m.group(1) for m in rkd.finditer(t) if m.group(1) in far]
                     copied = cp.search(t)
                     kind = "probe" if probed else "copy" if copied else "shell" if runs.search(t) else "probe"
-                    unquoted = re.sub(r""""[^"]*"|'[^']*'""", '""', t)
-                    hits = derive_named_homes(t) + probed + [m.group(1) for m in bare.finditer(unquoted)]
+                    code = scan[line - 1][1] if scan else re.sub(r""""[^"]*"|'[^']*'""", '""', t)
+                    hits = derive_named_homes(t) + probed + [m.group(1) for m in bare.finditer(code)]
                     if copied:
                         hits += [h for m in token.findall(t) for h in derive_module_homes(m.rsplit("/", 1)[-1], own)]
                     for h in hits:
@@ -280,7 +321,7 @@ def derive_edges(root, kits, rows):
         parts = {o.get("part") for o in src["optional"]}
         rel = f[len(src["home"]) + 1:] if src["home"] and f.startswith(src["home"] + "/") else f
         out.append((f, line, kind, src["id"], target, f in parts or rel in parts))
-    return out
+    return out, notes
 
 
 def check_shell_file(path):
@@ -369,8 +410,7 @@ def check_layers(root, tool_root, register, listing=False):
     for d in sorted(dirs):
         if d not in covered:
             reds.append("tool directory %s is no descriptor's home, no row's homes entry and no shared entry" % d)
-    edges = derive_edges(root, kits, rows)
-    lines = []
+    edges, lines = derive_edges(root, kits, rows, tracked)
     if listing:
         for r in rows:
             lines.append("layers: row %s · %s · kits: %s" % (r.get("tag"), r.get("kind"),
@@ -420,7 +460,7 @@ def write_layer_row(register, tag, kind, of, definition):
 
 
 PLANTS = ("import", "dynamic", "probe", "copy", "shell", "requires-if", "unslotted", "slotted",
-          "ex1-pair", "no-layer", "unknown-layer", "undeclared-point")
+          "ex1-pair", "no-layer", "unknown-layer", "undeclared-point", "quoted", "unshipped")
 
 
 def build_layers_fixture(top, plant):
@@ -453,10 +493,16 @@ def build_layers_fixture(top, plant):
         "copy": "\n\ndef late(kit, dst):\n    import shutil\n    shutil.copyfile(os.path.join(kit, \"reader.py\"), dst)\n",
         "unslotted": "\nfrom reader import read as read_map\n",
         "slotted": "\nfrom reader import read as read_map\n",
+        # a path to a shipped file is an edge; a journal under the git directory and an id are not
+        "unshipped": "\n\ndef late(root):\n    a = \"mapkit/reader.py\"\n"
+                     "    b = os.path.join(root, \".git\", \"mapkit\", \"journal.log\")\n"
+                     "    return a, b, \"mapkit/planted-id\"\n",
     }.get(plant, "")
     core_sh = "#!/usr/bin/env bash\n# bash tools/expkit/go.sh in a comment is no edge\necho core\n"
     if plant == "shell":
         core_sh += 'bash "$ROOT/tools/expkit/go.sh"\n'
+    if plant == "quoted":  # a word in a message continued onto the next line is no edge; $(...) in quotes is code
+        core_sh += 'msg="the expkit kit\nis absent"\nout="$(resolve_receipt_path expkit)"\n'
     files = {
         "tools/corekit/kit.toml": core_desc,
         "tools/corekit/core.py": core_py,

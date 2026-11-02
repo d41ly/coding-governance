@@ -174,8 +174,15 @@ The check reds a row the contract refuses, a descriptor with no layer or an unkn
 directory nothing claims, a core layer with no kit, a point declared by a non-core row or used where
 no single core row declares it (EX-1), and every edge from a file a core kit ships to a non-core kit
 that no `optional` row allows. Edges are found by kind: `import`, `dynamic`, `probe`, `copy`,
-`shell` and `requires-if`. It does not read a path computed at run time, JavaScript, or a file no
-descriptor claims, and says so on every run. `--new` appends a row the contract admits and prints the
+`shell` and `requires-if`. A spelled path `<home>/<rest>` is an edge only when `<rest>` names a
+file the tree tracks under that home, or a directory or glob matching one, that no core kit owns; an
+empty `<rest>`, or one opening on a variable, names the home itself and stays an edge. A bare kit
+name in a shell file is read from the code memory-tree's `scan_shell_lines` leaves, its quoting
+carried across lines; a script whose quoting does not balance is read line by line and named on a
+`layers:` line. It does not read a path computed at run time, JavaScript, a file no descriptor
+claims, a path that names no file the kit ships (a journal under the git directory, an id shaped
+like a path, a file a non-core kit writes but does not track), or a bare kit name inside a string or
+a here-document, and says so on every run. `--new` appends a row the contract admits and prints the
 descriptor key a kit adds to join it. The imports come from memory-tree's `import_walk.py`, the walk
-the verdict-epoch gate shares. The leg is gov's own; `adopt-playbook.sh --selftest` runs every
+the verdict-epoch gate shares, and the shell lexer from its `check-arms.py`. The leg is gov's own; `adopt-playbook.sh --selftest` runs every
 fixture plant.
