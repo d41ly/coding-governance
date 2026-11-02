@@ -2,7 +2,7 @@
 
 # gov-spec-writer handoff — PLAY-dOrderedCharter-17
 
-<!-- gov:handoff role=gov-spec-writer build=dOrderedCharter unit=PLAY-dOrderedCharter-17 path=memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-17-1-spec-writer.md role-sha=dcd8416ea3d2 task-sha=978cc911f126 -->
+<!-- gov:handoff role=gov-spec-writer build=dOrderedCharter unit=PLAY-dOrderedCharter-17 path=memory/builds/dOrderedCharter/prompts/2026-11-02-prompt-PLAY-dOrderedCharter-17-1-spec-writer.md role-sha=dcd8416ea3d2 task-sha=eb55d96f3287 -->
 
 ## Role
 
@@ -75,6 +75,20 @@ In every spec you revise:
 - Verify every name you cite (a function, a unit, a clause) against the tree or the clause text before writing it.
 - Stay under the 49152-byte cap with the generated records rows the render adds; a spec over 47000 bytes is trimmed
   in its authored prose.
+
+For the run:
+
+- Writes stay in the four spec files and the files `gen_build_index.py --write` rewrites.
+- This is an unattended run and nobody answers a question: where an ask's accept clause cannot be written truthfully
+  against the tree, leave that spec unedited and say so in the return.
+- Commit once, after `python tools/memory-tree/gen_build_index.py --write`, staging the four specs and every file the
+  render rewrote by name, and only when the spec-token check exits 0. Subject: `spec(dOrderedCharter):
+  PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-42 — asks 56 to 59
+  folded before their units build`; trailers `Pass: none` and `Co-Authored-By: Claude Opus 5.5
+  <noreply@anthropic.com>`. Give `git commit` a 600000 ms timeout: the pre-commit hook takes minutes.
+- Scratch files go under the session scratchpad
+  `C:/Users/DAILY-~1/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unattended-dorderedcharter-725f52/0394fa33-012c-408f-a840-e6e4cfaac23f/scratchpad`.
+- Return the commit sha, each spec's new rev, and the output of each acceptance grep.
 
 ### brief:acceptance
 
