@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-1 — M4 and its carriers state the spec-audit disposal and chain stop
 
-**Status:** OPEN · rev-4 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
+**Status:** INPROGRESS · rev-4 · 2026-11-01 · node d · Tier-2 · base 74274869 · streams tooling · order 70
 
 <!-- gen:spec-records -->
 

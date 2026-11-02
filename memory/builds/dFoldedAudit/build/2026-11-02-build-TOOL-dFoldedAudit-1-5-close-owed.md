@@ -24,4 +24,8 @@ Every unit's own return is recorded under `build/`. This record lists only what 
 - `amendment-leaves-its-other-half-standing`: the terminal-subject throw in `writeRound` still says a re-invoke passes `promotedIds` as `auditIds`. Under a declared `disposal` the ids are the ones `--chain-verdict` names.
 - Unit 5 owes seven arms, recorded in its ledger. `unattended kit gate` may red until unit 1 writes the verbs' entries.
 - Pre-existing, preserved by unit 5's S11: with an empty `BYPASS_BAN`, `${BYPASS_BAN:+x}$r` does not guard the glob, so every waiver is refused.
+- `two-answers-to-one-question` a fourth time: `read_population` spells the spec-audit test twice, in `audits` and in `by_build`.
+- Unit 6's §4 pin reads 974 and 77, while the built predicate clears 82 of 976 (47 dRankedPlan, 23 dFurnishedOrders, 12 dDeclaredLoop). A candidate reading only `**Serves:**` with no stem boundary reproduces the pin, so the pin measured that candidate and not §4's predicate; the +2 past-pin ids were not traced. The unit's ledger names the 9 ids that differ.
+- The join reads `reviews/` only and the generator every `spec-audit` record, as S2 and S3 state; one record outside `reviews/` differs and clears nothing.
+- Unit 6 owes two arms, recorded in its ledger.
 - Three check 2 branches about the rescope acts carry no literal arm line in a `check-arms.py` probe. Unit 2 did not touch them; the `harness arms` leg judges them.
