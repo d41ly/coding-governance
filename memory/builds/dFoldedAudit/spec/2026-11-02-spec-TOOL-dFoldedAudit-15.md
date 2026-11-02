@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-15 — the closing review's mediums and lows closed as one batch
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 150 · ratified 2026-11-02
+**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 150 · ratified 2026-11-02
 
 <!-- gen:spec-records -->
 
