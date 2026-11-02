@@ -4923,6 +4923,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "check_order_fa12",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "check_ours",
       "kind": "function",
       "file": "tools/settings-merge.py"
@@ -14053,6 +14058,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "read_field_fa12",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "read_file_value",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -16609,6 +16619,16 @@
     },
     {
       "id": "renderChainRoute",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "renderChainStep",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderChainStep",
       "kind": "function",
       "file": "tools/workflows/unattended-build.template.js"
     },

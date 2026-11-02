@@ -2297,9 +2297,10 @@ function deriveDispositionFault(d, promotedIds) {
 }
 
 // TOOL-dFoldedAudit-5 S5 - THE ONE COMMAND THAT RECORDS THIS ROUND, rendered and never run: this runtime
-// has no shell, and the round is recorded after the caller commits the folds it joins to. Every token
-// passed `deriveDispositionFault`'s shape rows, so a `--finding` row is one shell word. `audited` is the
-// units whose `specPath` is among `subjects`, the clean round's join.
+// has no shell, and the round is recorded after the caller commits the folds it joins to, then committed
+// itself, because the verb stages its record and commits nothing. Every token passed
+// `deriveDispositionFault`'s shape rows, so a `--finding` row is one shell word. `audited` is the units
+// whose `specPath` is among `subjects`, the clean round's join.
 function renderChainRecord(subject, audited, dispositions, siblingEdits) {
   return DRIVER + ' --record-round ' + slug + ' --subject ' + subject + ' --audited "' + audited.join(' ') + '"' +
     ' --blockers ' + au.blockers + ' --highs ' + au.highs +
@@ -2307,6 +2308,12 @@ function renderChainRecord(subject, audited, dispositions, siblingEdits) {
       return ' --finding ' + [e.id, e.severity, e.nature, e.specs.join(','), e.unit, e.rev].join('/')
     }).join('') +
     siblingEdits.map(function (e) { return ' --sibling ' + e.unit + '@rev-' + e.rev }).join('')
+}
+// TOOL-dFoldedAudit-12 S2 - THE ONE SENTENCE THAT RUNS A ROUND'S COMMAND AND COMMITS THE RECORD. The verb
+// leaves that record staged, so a caller going straight to the verdict carries it into the next pass's
+// commit. The route below opens `Then run`, so each caller's sentence reads in order.
+function renderChainStep(command) {
+  return 'run `' + command + '`, then commit the chain record it staged. '
 }
 // THE ROUTE ON THE VERDICT, and the harness spells no stop value: the driver derives the verdict from the
 // record and the roster, so this file renders two commands and reads no set. It dispatches nothing until
@@ -2353,6 +2360,19 @@ function renderChainRoute(stopClause) {
 // eight highs still reaches it, and each disposition joins to a unit and a rev in
 // `deriveDispositionFault`, so no HIGH can vanish into prose. Either declared value returns that list.
 phase('Disposal')
+// WHAT THE CALLEE READ, never the roster. `subjects` is what `tier2-review.js` was handed — caller-supplied,
+// or resolver-returned only for units whose spec path resolves at HEAD — and a unit the spec stage authored
+// carries its committed `specPath` only where the commit stage ran (the comment above the hand-out says
+// when it did not), so the roster minus the refused set can name units no audit opened. A record over
+// those would certify an audit that never read them. Round-3 cluster B of aProbedUnit. The clean round's
+// binding line and the chain's `audited` row are this one join. TOOL-dFoldedAudit-12 S1 - it sits above
+// the stage because the DEGRADED return reads it, and nothing it reads moves past this line.
+const auditedIds = !specAudit ? [] : auditUnits
+  .filter(function (u) {
+    return specRefused.indexOf(u.id) === -1 && u.specPath &&
+      subjects.some(function (s) { return s.path === u.specPath })
+  })
+  .map(function (u) { return u.id })
 // WHAT STOOD IS HOISTED OUT OF THE STAGE so the hand-out can report it. It never reached the return
 // at all, which is `degradation-known-but-unreported` — the class this file names three times in
 // its own comments and then committed one screen below. `promoted` and `folded` ride the same
@@ -2669,6 +2689,9 @@ if (!specAudit) {
         // exists to end. The subject is not terminal, so the caller's route back is the driver's own verb.
         // A HELD EXIT IS THE SAME CASE (TOOL-dFoldedAudit-3), so the by-hand command spells that row's
         // verdict and blocker count, and the two counts only the hand that disposes can supply.
+        // TOOL-dFoldedAudit-12 S3 - UNDER A DECLARED `disposal` THE ROUTE ENDS ON THE VERDICT, never a
+        // dispatch, so a hand disposal cannot build around the chain. The lists are empty on purpose:
+        // on this return they are what a refused stage said, so the hand that disposes writes the rows.
         (recordAfter
           ? ' The round was NOT recorded: ' +
             (disposalDeclared
@@ -2687,7 +2710,14 @@ if (!specAudit) {
                 '`--folded` is above 0'
               : '`, adding to `--minors` every promoted UNVERIFIED finding, with ` --disposition promote` ' +
                 'appended iff any finding became a unit') +
-            ' — and dispatch from `' + DRIVER + ' --plan ' + slug + ' --paths`, the resume route.'
+            (disposalDeclared
+              ? ' — then commit the disposal\'s folds and specs, ' +
+                renderChainStep(renderChainRecord(subject, auditedIds, [], []) +
+                  ' --finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>') +
+                'One `--finding` per finding you disposed, and one `--sibling <unit>@rev-<n>` per sibling edit. ' +
+                renderChainRoute('dispatch every unit `' + DRIVER + ' --plan ' + slug + ' --paths` lists as READY, ' +
+                  'one main-loop Workflow call each')
+              : ' — and dispatch from `' + DRIVER + ' --plan ' + slug + ' --paths`, the resume route.')
           : ''),
     }
   }
@@ -2722,21 +2752,10 @@ if (recordAfter) {
     )
   }
 }
-// WHAT THE CALLEE READ, never the roster. `subjects` is what `tier2-review.js` was handed — caller-supplied,
-// or resolver-returned only for units whose spec path resolves at HEAD — and a unit the spec stage authored
-// carries its committed `specPath` only where the commit stage ran (the comment above the hand-out says
-// when it did not), so the roster minus the refused set can name units no audit opened. A record over
-// those would certify an audit that never read them. Round-3 cluster B of aProbedUnit. The clean round's
-// binding line and the chain's `audited` row are this one join.
-const auditedIds = !specAudit ? [] : auditUnits
-  .filter(function (u) {
-    return specRefused.indexOf(u.id) === -1 && u.specPath &&
-      subjects.some(function (s) { return s.path === u.specPath })
-  })
-  .map(function (u) { return u.id })
 // TOOL-dFoldedAudit-5 S5 - PAST THE STAGE ONLY: a dead disposal returned above with no command, so nothing
-// is recorded over findings nobody disposed. `''` on the absent path and with the audit off, which is
-// how a run preflighted before the cutoff keeps today's hand-out.
+// is recorded over findings nobody disposed, and the by-hand shape in that note is no command: its rows
+// are placeholders. `''` on the absent path and with the audit off, which is how a run preflighted before
+// the cutoff keeps today's hand-out.
 const chainRecord = specAudit && disposalDeclared ? renderChainRecord(subject, auditedIds, dispositions, siblingEdits) : ''
 // ==================================================== THE HAND-OUT, and what is graded before it
 // S4/S4b - THE PER-UNIT REFUSAL, and in attended mode it happens HERE rather than at `--dispatch`.
@@ -2891,7 +2910,7 @@ const handOut = {
   siblingEdits: siblingEdits,
   ...(chainRecord ? { chainRecord: chainRecord } : {}),
   nextAction: chainRecord
-    ? 'RECORD this round: commit the disposal\'s folds and specs, then run `' + chainRecord + '`. ' +
+    ? 'RECORD this round: commit the disposal\'s folds and specs, ' + renderChainStep(chainRecord) +
       renderChainRoute('dispatch the roster below, one main-loop Workflow call per unit')
     : promotedIds.length
     ? 'AUDIT the promoted specs before any of them is dispatched: re-invoke this harness with round: ' +
@@ -3011,7 +3030,7 @@ if (cleanRound && !attended) {
         ' — each owes a later audit once its spec is committed. '
       : '') +
     (chainRecord
-      ? 'Commit the record, then run `' + chainRecord + '`. ' + renderChainRoute(cleanDispatch) + ' '
+      ? 'Commit the record, then ' + renderChainStep(chainRecord) + renderChainRoute(cleanDispatch) + ' '
       : 'Commit the record, then ' + cleanDispatch + '. ') +
     'No roster is handed out here: a roster over an unrecorded audit is the build `specs-audited` cannot close.'
   handOut.note = 'HELD AT HAND-OUT — a clean round with no tracked spec-audit record; the roster is ' +

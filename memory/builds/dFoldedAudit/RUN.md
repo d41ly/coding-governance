@@ -130,3 +130,7 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T05:29:43Z brief · item TOOL-dFoldedAudit-9 · reason ee1b83005930 memory/builds/dFoldedAudit/prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-build-brief.md
 
 2026-11-02T05:58:37Z dispatch · item 243b6430 TOOL-dFoldedAudit-9 · reason tools/unattended/lib-unattended.sh memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-9-ledger.md
+
+2026-11-02T06:06:27Z dispatch · item ee05a9ce TOOL-dFoldedAudit-12 · reason tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-12.md memory/builds/dFoldedAudit/build/2026-11-02-build-TOOL-dFoldedAudit-12-ledger.md memory/builds/dFoldedAudit/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-11-02T06:06:28Z brief · item TOOL-dFoldedAudit-12 · reason 1bf28fa1a166 memory/builds/dFoldedAudit/prompts/2026-11-02-prompt-TOOL-dFoldedAudit-12-build-brief.md

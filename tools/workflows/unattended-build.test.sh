@@ -3312,6 +3312,70 @@ has    "FA5 row 17 ...and reaches the command" "$(read_result_fa5)" "--finding 9
 same   "FA5 AC16 the harness spells neither stop value" "$(grep -c 'own-work\|clean-only' "$F")" "0"
 same   "FA5 AC16 the driver reads each switch once" "$(grep -c 'read_spec_audit_switch chain-' "$DRV")" "2"
 
+# ================================================== TOOL-dFoldedAudit-12 — THE BY-HAND ROUTE ENDS ON THE VERDICT
+# The FA3 doubles, so every run is strict. A `note` or `nextAction` is read parsed off the RESULT, so an
+# absence reads that field alone and a quote reads as the caller reads it. The staged break of each arm,
+# observed RED at the close and not by the pass that wrote it:
+#   AC1 to AC4    the ` — and dispatch from ` ending restored under `disposalDeclared`
+#   AC5           the declared branch taken unconditionally
+#   AC6 to AC8    `renderChainStep` returning no commit clause
+read_field_fa12() { read_result_fa5 | node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(0, "utf8").slice(7))[process.argv[1]])' "$1"; }
+# Each needle stands past the one before it, because the text is cut behind every match.
+check_order_fa12() { local name=$1 rest=$2 want; shift 2
+  for want in "$@"; do
+    has  "$name: $want" "$rest" "$want"
+    rest=${rest#*"$want"}
+  done; }
+
+# AC1 and AC3: a held exit over a dead stage. A join left below the stage throws here.
+build_review_fa3 1 1 0 '[{"id":3}]' "$FA3_A3"; rec BOUNDED >/dev/null; _fa3_d=null
+o=$(run_strict_fa3 "$FA3_NAT" "$FA3_HELD" "$_rec"); r=$(read_field_fa12 note)
+has    "FA12 AC1 a dead stage at a held exit is named" "$o" "disposal: NOT done"
+same   "FA12 AC1 ...and the run returns" "$(printf '%s\n' "$o" | grep -c '^THROW ')" "0"
+for fa12 in '--record-round tB --subject tB-spec-set-r1 --audited "A-tB-1 A-tB-2"' '--blockers 1 --highs 0' \
+  '--chain-verdict tB' '--finding <id>/<severity>/<nature>/<spec>[,<spec>]/<unit>/<rev>' \
+  'CONTINUE: re-invoke this harness with round: 2' 'STOP: dispatch every unit' 'HOLD: run the recipe it prints'; do
+  has  "FA12 AC1 the note carries: $fa12" "$r" "$fa12"
+done
+check_order_fa12 "FA12 AC3 the note orders" "$r" "commit the disposal's folds and specs" '--record-round' \
+  'commit the chain record it staged' '--chain-verdict'
+
+# AC2 and AC4: a return the reconciliation refuses with a row and a sibling edit on it, so each absence
+# reads a note that had both in reach.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]" "[$FA4_E1]"; rec CONVERGED >/dev/null
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_field_fa12 note); p=$(read_result_fa5)
+has    "FA12 AC2 the stage is refused" "$o" "disposal: NOT done"
+has    "FA12 AC2 the note spells the review's counts" "$r" "--blockers 0 --highs 1"
+has    "FA12 AC2 ...and ends on the verdict" "$r" "--chain-verdict tB"
+hasnt_ "FA12 AC2 ...not on the resume route" "$r" "the resume route"
+hasnt_ "FA12 AC2 ...and orders no dispatch" "$r" "and dispatch from"
+has    "FA12 AC4 the return carries the refused row" "$p" "\"dispositions\":[$FA3_L7]"
+has    "FA12 AC4 ...and the refused sibling edit" "$p" "\"siblingEdits\":[$FA4_E1]"
+hasnt_ "FA12 AC4 ...the note renders neither: the row" "$r" "--finding 7/"
+hasnt_ "FA12 AC4 ...the sibling edit" "$r" "--sibling A-tB-"
+hasnt_ "FA12 AC4 ...and no command rides the return" "$p" "chainRecord"
+
+# AC5: no `disposal` keeps its note, the resume route included.
+build_review_fa3 0 1 1 '[{"id":7}]'; _fa3_d=null
+o=$(run_strict_fa3 "$UNITS" "$_rec"); r=$(read_field_fa12 note)
+has    "FA12 AC5 undeclared: the stage is dead" "$o" "disposal: NOT done"
+has    "FA12 AC5 ...the note dispatches from the plan" "$r" "--plan tB --paths"
+same   "FA12 AC5 ...and ends on the resume route" "${r: -17}" "the resume route."
+hasnt_ "FA12 AC5 ...with no round to record" "$r" "--record-round"
+hasnt_ "FA12 AC5 ...and no verdict to read" "$r" "--chain-verdict"
+
+# AC6 and AC7: both sentences commit the record ahead of the verdict, and AC8 reads the one step they share.
+build_review_fa3 0 1 1 '[{"id":7}]' "$FA3_A7"; build_dispose_fa3 1 0 '[]' '[]' "[$FA3_L7]"
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_field_fa12 nextAction)
+check_order_fa12 "FA12 AC6 the hand-out orders" "$r" "RECORD this round: commit the disposal's folds and specs, run \`" \
+  '--record-round tB --subject tB-spec-set-r1' '`, then commit the chain record it staged. Then run `' '--chain-verdict tB'
+_fa3_d=null; _fa3_review='{"confirmed":[],"blockers":null,"highs":null,"lensesDead":0,"report":null,"note":"clean"}'
+o=$(run_strict_fa3 "$FA3_NAT" "$_rec"); r=$(read_field_fa12 nextAction)
+check_order_fa12 "FA12 AC7 the clean round orders" "$r" 'Commit the record, then run `' \
+  'commit the chain record it staged' '--chain-verdict tB'
+same   "FA12 AC8 the render spells the sentence once" "$(grep -c 'commit the chain record it staged' "$F")" "1"
+same   "FA12 AC8 ...and every site reaches it" "$([ "$(grep -c 'renderChainStep(' "$F")" -ge 4 ] && echo floor)" "floor"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
@@ -3423,7 +3487,11 @@ same   "FA5 AC16 the driver reads each switch once" "$(grep -c 'read_spec_audit_
 # block — AC11 (6, one in a loop run eleven times), S5 (6), AC12 (4), AC13's two absences (2), row 17's two
 # passes (2) and AC16 (2). Its five calls of the FA3 refusal helper add no static site and execute 25, so
 # the block executes 57. Not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=778
+# RAISED 778 -> 815 by TOOL-dFoldedAudit-12: the 37 its block executes, as its New arm lines state, from
+# 21 static sites counted with the grep above — AC1 (9, a loop run seven times), AC3 (4, the order helper's
+# one site), AC2 (5), AC4 (5), AC5 (5), AC6 (4), AC7 (3) and AC8 (2). Not measured by a run: the pass that
+# wrote it runs no suite.
+FLOOR_ASSERTIONS=815
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
