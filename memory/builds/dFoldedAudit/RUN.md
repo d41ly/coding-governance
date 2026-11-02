@@ -9,10 +9,18 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at 81214fa1
+resume-owed: none · owner
+held-at: 2026-11-02T09:16:42Z
+hold-reason: the main merge needs the owner to confirm the pinned git origin in the app (Help, Troubleshooting, Review Pinned Git Origins); and the parked question whether the two tools/unattended suites may run once for this build's 58 arms
+hold-until: owner
+hold-code: host-owner-action
+held-from: VERIFYING
 refreshed-at: 8a5328a9f8d0dc8fd58b3b86c10a5a08344426eb · park · 109 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: bcbbaea3f706c12c7c54daf90af21cf036b6c9c9
-phase: VERIFYING
+witness: 81214fa1441b6ce5f0821337257399b2e81cd9ca
+phase: HELD
 may: none
 mode: prompt
 run-branch: refs/heads/branch/gov-build-m4-spec-audit-694e7b
@@ -154,3 +162,5 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T09:11:51Z dispatch · item 4588369d TOOL-dFoldedAudit-16 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/workflows/unattended-build.test.sh tools/drift-audit/drift_signals.py memory/builds/dFoldedAudit/spec/2026-11-02-spec-TOOL-dFoldedAudit-16.md memory/LIVE.md memory/builds/dFoldedAudit/README.md
 
 2026-11-02T09:15:54Z decision · item May this run execute tools/unattended/unattended.test.sh and check-unattended.test.sh once, to observe GREEN and RED for the 58 New arm lines this build added there? · reason Options: (a) run each once in a scratch clone, GREEN then one RED sweep with every break staged, about 2 to 3 hours; (b) land with those arms never executed, as written, owed to a later run. Refused here because the owner's standing instruction of 2026-08-23 bars those suites, and the flagged bar carries no leg for them, so their floor counts are hand-counted and unrun.
+
+2026-11-02T09:16:43Z hold · item host-owner-action · reason until owner · reaped 4cecbb34 · resume none(owner)
