@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-104 — the two reds TOOL-dSafePassage-103 leaves on the landing merge `9f8812d80`, each cleared by its leg's own remedy: 103's edge onto CLOSED 8 written as prose, and one Refusal wrapper both census cases call
 
-**Status:** DEFERRED · rev-1 · 2026-11-02 · node a · Tier-2 · base 4467aa796 · streams tooling · order 16 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-11-02 · node a · Tier-2 · base 4467aa796 · streams tooling · order 16 · advances TOOL-dSafePassage-14
 
 **Derived:** TOOL-dSafePassage-103
 
@@ -9,8 +9,11 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-prompt-TOOL-dSafePassage-104-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dSafePassage-104-1-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dSafePassage-104-2-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dSafePassage-104-2-spec-writer.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dSafePassage-104-audit-fold-brief.md](../prompts/2026-11-02-prompt-TOOL-dSafePassage-104-audit-fold-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dSafePassage-104-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dSafePassage-104-build-brief.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dSafePassage-104-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dSafePassage-104-spec-brief.md) | research | — |
+| [2026-11-02-review-TOOL-dSafePassage-104-spec-audit-round1.md](../reviews/2026-11-02-review-TOOL-dSafePassage-104-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -66,8 +69,12 @@ census cases' Refusal-to-value wrapper fold into one function both cases call. N
 - **consumes-from** external — the main loop's runs of the `policy fixtures` leg's checker on the
   two census cases, for AC5 and AC6. Scratch-guard row G1 refuses a leg's argv to a role whose
   allowlist does not name that leg (`tools/hooks/README.md`, the G1 row).
+- **consumes-from** external — the main loop's post-commit write-set diff of the build commit, for
+  AC7's third probe. Only the main loop holds the build commit's sha.
 - **consumes-from** external — the prepared landing merge of the build commit with main, for AC9.
-  It is the main loop's to prepare, and this run holds none.
+  It is the main loop's to prepare, and this run holds none. The main loop records the main sha the
+  merge is prepared on. A main move that shifts the merge's verb count off the pin is a hand-back
+  to the main loop, never a pin move by this unit.
 
 TOOL-dSafePassage-103 and TOOL-dSafePassage-8 are CLOSED, and this unit reads their landed code and
 text: 103's two census-case wrappers, which S2 folds, and 103's §3, which S1 edits. They are named
@@ -78,6 +85,9 @@ here rather than joined, so neither CLOSED spec gains a reciprocal line.
 Every line cited here was read at `4467aa796`, the HEAD this spec was written at, on 2026-11-02 on
 node a. The bar log is the close's run on the prepared landing merge `9f8812d80` with its packet
 commit `ae1be0507`, saved at `C:/Users/daily-agent/AppData/Local/Temp/dsp86-logs/close-ae1be0507.log`.
+rev-2 re-read every cited line at `bfc894d06`. No file under `tools/` moved between `4467aa796` and
+`bfc894d06`, and neither did `.lexicon.conf`. This probe prints nothing:
+`git diff --name-only 4467aa796 bfc894d06 -- tools/ .lexicon.conf`.
 
 ### Where the reds come from
 
@@ -109,7 +119,14 @@ So the branch's own count is the observation for brief id 2, and it needs no tre
 moved names: the branch reads 1212 over its own pin. The merge reads the branch's pin, 1211, because the
 merge keeps the branch's `.lexicon.conf`. Per the brief, `ask#2` is the one offender the merge adds
 that is not a name main moved, so the merge reads 1211 once S2 lands. AC9 observes that on the
-prepared merge.
+prepared merge, together with the absence of `ask#2` itself.
+
+`9f8812d80`'s parents are `2a6f39756`, main, and `4467aa796`, this branch. Main's `.lexicon.conf`
+reads `VERB_OFFENDER_PIN="1212"` at its line 327. On 2026-11-02 `origin/main` reads `529b98a47`, and
+the only files that changed between `2a6f39756` and it are Markdown files under `memory/`. A merge
+re-prepared on a later main can still bring a different verb count from main's side. AC9 then reds
+on the count while `ask#2` is gone. That is a hand-back to the main loop (§3 "Edges"), because §3
+rules out every pin move.
 
 ### The edge ruling
 
@@ -248,7 +265,14 @@ bar reds both lexicon legs as `9f8812d80` did. S1 is a records edit and lands wi
 - `memory/builds/dSafePassage/spec/2026-11-01-spec-TOOL-dSafePassage-103.md` — S1, by this
   spec-writer pass.
 - `memory/builds/dSafePassage/README.md` — this unit's roster row, by this pass.
-- The unit's acceptance ledger, under the build's own build-records folder.
+- `memory/builds/dSafePassage/spec/2026-11-02-spec-TOOL-dSafePassage-104.md` — this spec: the
+  status flip, and the records region `gen_build_index.py` re-renders.
+- `memory/builds/dSafePassage/build/2026-11-02-build-TOOL-dSafePassage-104-ledger.md` — the
+  acceptance ledger, a `journal` record written by the build pass.
+- `memory/backlog/TOOL.md` — the TOOL-dSafePassage-14 row's next-unit cell, re-rendered at the
+  close.
+- `memory/builds/dSafePassage/RUN.md` — the `--brief` and `--dispatch` rows the pass commit
+  carries, as 103's build commit `02030bc97` carried its own.
 
 ### Alternatives rejected
 
@@ -337,36 +361,56 @@ bar reds both lexicon legs as `9f8812d80` did. S1 is a records edit and lands wi
   receipt dict in its value.
   figure: `<n>` is DERIVED by the run.
   permission: as AC5.
-- **AC7** — When `git grep -n -e "def ask" -- tools/policy/check_policy.py` runs at the build
-  commit, it prints exactly one line, opening `def ask(call, *args):` at column 0. When
-  `git show --name-only --format= HEAD -- tools/` runs there, it prints only
-  `tools/policy/check_policy.py`.
-  Red when: a nested `def ask():` stays, or the build edits another tool file such as `policy.py`.
-  At `4467aa796` the first probe prints lines 4206 and 4238, both indented.
-  fixture: the build lands as one commit under the tool root.
+- **AC7** — When `git grep -n -e "def ask" -- tools/policy/check_policy.py` runs on the build's
+  tree, it prints exactly one line, opening `def ask(call, *args):` at column 0. When these two
+  probes run on the builder's working tree just before the pass commit,
+  `git diff --name-only HEAD -- tools/` prints only `tools/policy/check_policy.py`, and
+  `git ls-files --others --exclude-standard -- tools/` prints nothing. The ledger records these
+  three outputs, all read before the commit. After the pass commit the main loop runs a third probe,
+  `git diff --name-only 4467aa796 <build-commit> -- tools/`, which prints only
+  `tools/policy/check_policy.py`. The main loop records that output at the close, not in the ledger.
+  Red when: a nested `def ask():` stays, or the build edits or adds another tool file such as
+  `tools/policy/policy.py`, in the pass commit or in an earlier commit on the branch. At `bfc894d06` the first
+  probe prints lines 4206 and 4238, both indented, and the two pre-commit probes print nothing.
+  fixture: the third probe needs the build commit's sha, which only the main loop holds (§3
+  "Edges"). `4467aa796` is this spec's base, and no file under `tools/` moved between it and
+  `bfc894d06` (§4).
 - **AC8** — When `python tools/codebase-map/gen_map.py --check` runs at the build commit, it exits
   0, and `git grep -c -e "\"id\": \"ask\"" -- memory/map/generated/symbols.json` prints a count of 1.
-  Red when: the module-level `ask` lands without the regen. `gen_map.py --check` then exits 1 on
-  the stale render, and the grep prints nothing, as it does at `4467aa796`.
+  `git grep -c -e "\"id\": \"derive_answer\"" -- memory/map/generated/symbols.json` prints nothing
+  and exits 1.
+  Red when: the module-level `ask` lands without the regen, or `derive_answer` is hoisted to module
+  level and the map regenerated. Without the regen `gen_map.py --check` exits 1 on the stale render,
+  and the `ask` grep prints nothing, as it does at `bfc894d06`. A hoisted `derive_answer` enters the
+  symbol tier, and its grep prints a count.
 - **AC9** — When `python tools/lexicon/lexicon.py` runs at the root of the prepared landing merge of
-  the build commit with main, it prints no `over pin` line and no `UNDER pin` line.
-  Red when: the merge still carries `ask#2`. At `9f8812d80` the run printed
-  `lexicon: verb offenders 1212 over pin 1211:` (the close's log, line 319).
+  the build commit with main, it prints no `over pin` line and no `UNDER pin` line. When
+  `python tools/lexicon/lexicon.py --offenders` runs there, no line of its output pairs
+  `tools/policy/check_policy.py` with `ask#2`.
+  Red when: the merge still carries `ask#2`, whatever count main's side brings. At `9f8812d80` the
+  first run printed `lexicon: verb offenders 1212 over pin 1211:` (the close's log, line 319). At
+  `bfc894d06` the second run's list carries `ask#2` for `tools/policy/check_policy.py`.
   fixture: the prepared landing merge, which the main loop prepares and this run does not hold.
+  Its main parent is `2a6f39756`, as `9f8812d80`'s is, or the main sha a re-prepared merge is built
+  on, which the main loop records beside the observation (§4 "Where the reds come from"). A main
+  move that shifts the merge's count off the pin while `ask#2` is gone is a hand-back to the main
+  loop, never a pin move by this unit.
   figure: 1211 is PINNED by the branch's `.lexicon.conf`, which the merge keeps.
 
 ## 7. Gates
 
-`memory hygiene` · `lexicon naming predicates` · `lexicon wiring` · `policy fixtures` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms`
+`memory hygiene` · `lexicon naming predicates` · `lexicon wiring` · `policy check` · `policy fixtures` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms`
 
 `memory hygiene` grades S1's edit of 103 and this spec. `lexicon naming predicates` and `lexicon
-wiring` are the two legs the merge redded, and both read the verb pin. `policy fixtures` runs both
+wiring` are the two legs the merge redded, and both read the verb pin. `policy check` carries no
+guard, and its argv runs `tools/policy/check_policy.py` itself, the module S2 edits, on every
+change (its row in `tools/gate-legs.json`). `policy fixtures` runs both
 census cases, `census-window-edge` and `census-source-receipt`, and each must still read 0 wrong. It
 is tripped by the narrow `tools/policy/` guard, carried by one leg.
 `codebase-map coverage + freshness` carries no guard and compares the regenerated `symbols.json`.
-`recall floor` and `recall floor arms` are tripped by the `memory/` guard through `symbols.json`,
-103's spec, the README and the ledger. Every other leg the estimate trips is reached only through
-the broad `tools/` guard.
+`recall floor` and `recall floor arms` are tripped by the `memory/` guard through every `memory/`
+path in the estimate. Every other leg the estimate trips is either unguarded or reached through the
+broad `tools/` guard.
 
 No arm is added or moved. The two census cases exist and keep their assertions, so they observe S2
 as a regression and not as RED then GREEN. The fixture suite pins no assertion count, so no floor
@@ -397,6 +441,19 @@ none
   declared-verb wrapper drains to 1210. It kept 103's two `external` bullets, so 103's block does
   not read `none` as the brief worded it (§4 "The edge ruling"). Every cited line was read at
   `4467aa796`.
+- rev-2 · 2026-11-02 · §3 · §4 · AC7 · AC8 · AC9 · §7 · §10 · folded the round-1 spec audit
+  `memory/builds/dSafePassage/reviews/2026-11-02-review-TOOL-dSafePassage-104-spec-audit-round1.md`
+  (CLEAN WITH FIXES, 2 medium and 4 low), from
+  `memory/builds/dSafePassage/prompts/2026-11-02-prompt-TOOL-dSafePassage-104-2-spec-writer.md` and
+  its brief `memory/builds/dSafePassage/prompts/2026-11-02-prompt-TOOL-dSafePassage-104-audit-fold-brief.md`.
+  Finding 5: AC7 no longer reads `HEAD` after the commit. The ledger records the pre-commit write
+  set from the working tree, and the main loop diffs `4467aa796` to the build commit after it. A
+  new §3 external edge names that diff. Finding 6: AC9 names the main sha it grades and checks that
+  `ask#2` is absent, and §3 and §4 make a main move that shifts the count a hand-back. Finding 1:
+  AC8 reds on a module-level `derive_answer`. Finding 2: §7 names the unguarded `policy check` leg
+  and corrects its guard sentence. Finding 3: §10 quotes reuse_lookup's candidates in printed
+  order. Finding 4: the estimate names this spec, the ledger, the backlog row and `RUN.md`, which
+  103's build commit `02030bc97` also wrote. Every cited line was re-read at `bfc894d06`.
 
 ## 10. Reuse audit
 
@@ -408,10 +465,24 @@ do not touch the fixture cases, and `tools/lib/` holds no fixture-side Refusal h
 `policy.Refusal` is the policy kit's own class.
 
 `python tools/codebase-map/reuse_lookup.py "turn a policy Refusal into a comparable value in a fixture case"`
-ranked name-stem neighbours: `refusal` in `tools/memory-recall/recall_conf.py` with fan-in 25, the
-`Refusal` classes with fan-in 16, `build_fixture` with fan-in 6, and `run_fixture` with fan-in 2.
-None fits. Each raises a Refusal, defines one, or builds a fixture repository, and none turns a
-policy Refusal into a compared value. The recall probe ranked the brief first, then
+printed its candidates in this order at `bfc894d06`, ranked by fan-in. The first seven, every one
+it marks SEAM, and the reason none fits:
+
+| # | Candidate | Fan-in | Why it does not fit |
+|---|---|---|---|
+| 1 | `refusal`, `tools/memory-recall/recall_conf.py` | 25 | renders memory-recall's refusal message |
+| 2 | `fixture`, three `*.test.sh` suites | 22 | a shell helper that writes a fixture file |
+| 3 | `Refusal`, seven classes, `tools/policy/policy.py` among them | 16 | defines the exception the wrapper catches |
+| 4 | `DesignRefusal`, `tools/memory-tree/design_lib.py` | 6 | another kit's exception class |
+| 5 | `build_fixture`, ten files | 6 | builds a fixture repository |
+| 6 | `resolve_compare_base`, three files | 4 | resolves a git compare base |
+| 7 | `load_policy`, `tools/roles/roles_lib.py` | 3 | parses the roles kit's policy file |
+
+It prints 167 candidates in all. The rest carry fan-in 2 or less, and `run_fixture` prints 14th.
+The three later names nearest the need were read too. `build_comparable` normalizes a path for
+scratch-guard's suite, `derive_refusal_reason` classifies a shell refusal site in
+`tools/memory-tree/check-arms.py`, and `read_fixture_raises` plants a reader that raises. None of
+the candidates read turns a policy Refusal into a compared value. The recall probe ranked the brief first, then
 TOOL-dDerivedDocket-67 and TOOL-aWiredReckoning-1, which raised the pin rather than draining it, and
 TOOL-dRedressedBar-2, which renamed one lone offender to a declared verb.
 
