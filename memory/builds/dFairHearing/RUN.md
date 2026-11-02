@@ -77,3 +77,7 @@ base: 8bec4cefd957d194660a8d7c2916f420b7299074
 2026-11-02T21:42:18Z dispatch · item 1b56b65e TOOL-dFairHearing-7 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-7.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json
 
 2026-11-02T21:44:56Z brief · item TOOL-dFairHearing-7 · reason c4f9838e083b memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-7-build-brief.md
+
+2026-11-02T22:20:34Z dispatch · item 2cf64592 TOOL-dFairHearing-11 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/review_pin.py tools/workflows/README.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-11.md memory/LIVE.md memory/backlog/TOOL.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json
+
+2026-11-02T22:20:43Z brief · item TOOL-dFairHearing-11 · reason 2f934610e225 memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-11-build-brief.md
