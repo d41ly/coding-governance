@@ -76,7 +76,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 15 unit(s) · node d · opened 2026-11-01 · streams tooling
+**Build status:** INPROGRESS · 15 unit(s) · node d · opened 2026-11-01 · streams tooling
 ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14
 ids TOOL-dFoldedAudit-15
 
@@ -95,12 +95,12 @@ ids TOOL-dFoldedAudit-15
 | [TOOL-dFoldedAudit-13 — one read-only driver read answers whether a run takes the fold rule](spec/2026-11-02-spec-TOOL-dFoldedAudit-13.md) | 100 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dFoldedAudit-10 — a chain round joins to the terminal review row and the spec-audit records it claims](spec/2026-11-02-spec-TOOL-dFoldedAudit-10.md) | 110 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dFoldedAudit-11 — a chain fold joins to the tree: the spec's header rev and its Revision log](spec/2026-11-02-spec-TOOL-dFoldedAudit-11.md) | 120 | 2 | CLOSED | rev-2 | 2026-11-02 |
-| [TOOL-dFoldedAudit-9 — a build cannot pass a chain verdict that is not STOP](spec/2026-11-02-spec-TOOL-dFoldedAudit-9.md) | 130 | 2 | OPEN | rev-2 | 2026-11-02 |
+| [TOOL-dFoldedAudit-9 — a build cannot pass a chain verdict that is not STOP](spec/2026-11-02-spec-TOOL-dFoldedAudit-9.md) | 130 | 2 | INPROGRESS | rev-2 | 2026-11-02 |
 | [TOOL-dFoldedAudit-12 — the DEGRADED by-hand route ends in the chain record and verdict](spec/2026-11-02-spec-TOOL-dFoldedAudit-12.md) | 140 | 2 | OPEN | rev-1 | 2026-11-02 |
 | [TOOL-dFoldedAudit-15 — the closing review's mediums and lows closed as one batch](spec/2026-11-02-spec-TOOL-dFoldedAudit-15.md) | 150 | 2 | OPEN | rev-2 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 98 bound to this build, across 4 record folder(s).
+Records: 99 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

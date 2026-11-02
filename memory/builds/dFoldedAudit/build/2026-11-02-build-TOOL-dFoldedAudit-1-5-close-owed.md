@@ -12,6 +12,10 @@ Every unit's own return is recorded under `build/`. This record lists only what 
 - Re-derive `SPEC_SUPERSEDE_CUTOFF` and its comment's reading at landing: any commit on a later day moves it. Unit 4 set it to 2026-11-03.
 - Unit 4 owes four arms, recorded in its ledger.
 
+- The arm `no in_shard block of this suite exceeds 2500 lines` reads 2509 for region 3 of the driver suite at BASE and on `main` by its own awk, so it looks inherited. Attribute it at the bar before treating it as this build's.
+- Units 9 to 15 hold their own `New arm:` lines; each unit's ledger names them.
+- Unit 13's refusal stays off the `--record-round` list in the verbs carrier; the wrap-up names it.
+
 ## Findings for the closing review
 
 - Lexicon pin: `lexicon.py --check` reports 1214 verb offenders over a pin of 1212. The two names this build's diff adds are `foldconf` (`tools/unattended/check-unattended.test.sh:486`) and `commit_fold_fixture` (`tools/unattended/unattended.test.sh:2503`), from TOOL-dFoldedAudit-2.

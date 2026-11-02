@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-9 — a build cannot pass a chain verdict that is not STOP
 
-**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 130 · ratified 2026-11-02
+**Status:** INPROGRESS · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 130 · ratified 2026-11-02
 
 <!-- gen:spec-records -->
 
