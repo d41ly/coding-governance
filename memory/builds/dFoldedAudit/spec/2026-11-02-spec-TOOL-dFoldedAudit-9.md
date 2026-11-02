@@ -9,6 +9,7 @@
 | [2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md) | research | TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 | [2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 | [2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md) | journal | TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-4-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-4-builder-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-9-ledger.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-ledger.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-9-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-9-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-build-brief.md) | research | — |

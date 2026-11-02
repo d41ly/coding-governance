@@ -1,6 +1,6 @@
 # TOOL-dFoldedAudit-12 — the DEGRADED by-hand route ends in the chain record and verdict
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 140
+**Status:** INPROGRESS · rev-1 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 140
 
 <!-- gen:spec-records -->
 

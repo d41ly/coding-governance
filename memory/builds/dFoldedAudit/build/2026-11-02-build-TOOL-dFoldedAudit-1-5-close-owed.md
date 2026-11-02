@@ -16,6 +16,9 @@ Every unit's own return is recorded under `build/`. This record lists only what 
 - Units 9 to 15 hold their own `New arm:` lines; each unit's ledger names them.
 - Unit 13's refusal stays off the `--record-round` list in the verbs carrier; the wrap-up names it.
 
+- `runlog-writer.test.sh`'s fixture has no `base:`, so its `--dispatch` and `--review` now refuse; unit 9 read its arms as staying green, unrun. The leg suite's tRev no-base arm likewise.
+- Check 2's `$(awk ...)` status is untested: a typo that broke that awk read as a clean corpus, and only a positive arm caught it.
+
 ## Findings for the closing review
 
 - Lexicon pin: `lexicon.py --check` reports 1214 verb offenders over a pin of 1212. The two names this build's diff adds are `foldconf` (`tools/unattended/check-unattended.test.sh:486`) and `commit_fold_fixture` (`tools/unattended/unattended.test.sh:2503`), from TOOL-dFoldedAudit-2.
