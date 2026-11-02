@@ -35,3 +35,4 @@ coding-governance-agents.template.md · v4.0's memory-tree protocol line points 
 tools/roles/SKILL.template.md · the SOURCE the build router Skill is rendered from; it names the method as the procedure the router loads
 tools/policy/caps.toml · the size-cap census row for the rendered method: its name and its limits-file home are the method's path, the subject the cap measures — a row keyed by the file, never a restatement of what the method says
 tools/policy/check_policy.py · the cap census's case table and its budgets-correctness-kept case name the method's path as a size-cap subject they plant into a scratch repository — a path the checker reads, never a restatement of what the method says
+help/spec-audit.md · the user-facing page for the three review.spec-audit keys and the two chain verbs; it points at M4 for the rule and anchors each member's usage row for the docs leg, so a changed default or flag reds there
