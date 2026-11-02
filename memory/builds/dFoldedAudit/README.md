@@ -79,7 +79,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 17 unit(s) · node d · opened 2026-11-01 · streams tooling
+**Build status:** INPROGRESS · 18 unit(s) · node d · opened 2026-11-01 · streams tooling
 ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14
 ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17 TOOL-dFoldedAudit-18
 
@@ -103,16 +103,17 @@ ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17 TOOL-dFoldedA
 | [TOOL-dFoldedAudit-15 — the closing review's mediums and lows closed as one batch](spec/2026-11-02-spec-TOOL-dFoldedAudit-15.md) | 150 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dFoldedAudit-16 — the flagged bar's own reds cleared: the fork-site registry and the armed-cutoff pin](spec/2026-11-02-spec-TOOL-dFoldedAudit-16.md) | 160 | 2 | CLOSED | rev-2 | 2026-11-02 |
 | [TOOL-dFoldedAudit-17 — origin/main reconciled into the run branch: the eight conflicted paths merged additively](spec/2026-11-02-spec-TOOL-dFoldedAudit-17.md) | 170 | 1 | CLOSED | rev-5 | 2026-11-02 |
+| [TOOL-dFoldedAudit-18 — the help page for the spec-audit switches and the chain verbs, so the docs leg anchors them](spec/2026-11-02-spec-TOOL-dFoldedAudit-18.md) | 180 | 1 | INPROGRESS | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 140 bound to this build, across 4 record folder(s).
+Records: 141 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13
-TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17 TOOL-dFoldedAudit-9.
+TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17 TOOL-dFoldedAudit-18 TOOL-dFoldedAudit-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 17 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 18 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -136,6 +137,7 @@ Ids whose spec moved past its audited revision: none — 0 of 17 unit id(s) carr
 | 150 | `TOOL-dFoldedAudit-15` | no |
 | 160 | `TOOL-dFoldedAudit-16` | no |
 | 170 | `TOOL-dFoldedAudit-17` | no |
+| 180 | `TOOL-dFoldedAudit-18` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
