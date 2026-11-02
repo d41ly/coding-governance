@@ -30,3 +30,7 @@ anchor-ref: refs/heads/main
 base: 8bec4cefd957d194660a8d7c2916f420b7299074
 
 ## Parked
+
+2026-11-02T16:29:43Z brief · item TOOL-dFairHearing-13 · reason 5e821c99d8cc memory/builds/dFairHearing/prompts/2026-11-02-prompt-TOOL-dFairHearing-13-build-brief.md
+
+2026-11-02T16:42:23Z dispatch · item 76d72122 TOOL-dFairHearing-13 · reason tools/workflows/lenses.toml tools/workflows/render_lenses.py tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/check-protocol-parity.test.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-verifier-fanout.test.sh tools/workflows/tier2-review.test.sh tools/workflows/kit.toml tools/workflows/README.md tools/memory-tree/README.md memory/map/features/agent-cap.md memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-13.md memory/LIVE.md memory/builds/dFairHearing/README.md memory/map/generated/symbols.json

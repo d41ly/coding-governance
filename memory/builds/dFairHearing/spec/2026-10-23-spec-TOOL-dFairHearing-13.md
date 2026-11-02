@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-13 — the lens catalogue as data, rendered into the harness's five-slot literals, and a slot count in the fan-out leg
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dFairHearing-19
+**Status:** INPROGRESS · rev-3 · 2026-11-02 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0080@8c9e5de7 whole
 **Carries:** node:item.review.lens
@@ -10,9 +10,12 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-13-deviation-138.md](../build/2026-10-23-build-TOOL-dFairHearing-13-deviation-138.md) | deviation | — |
+| [2026-11-02-build-TOOL-dFairHearing-13-1-builder-return.md](../build/2026-11-02-build-TOOL-dFairHearing-13-1-builder-return.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-11-02-prompt-TOOL-dFairHearing-13-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-13-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFairHearing-13-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-13-build-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFairHearing-13-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFairHearing-13-fix-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
@@ -20,7 +23,7 @@
 ## 1. Goal
 
 Every review lens is today a literal object typed into `tools/workflows/tier2-review.template.js`
-(`DIFF_LENSES` at :774-800, `SPEC_LENSES` at :810-836), so adding or swapping a lens is an edit to the
+(`DIFF_LENSES` at :781-807, `SPEC_LENSES` at :817-843), so adding or swapping a lens is an edit to the
 harness, and the only thing that bounds a literal's size is `tools/hooks/agent-cap.js`, which retires.
 This unit moves the lenses into a catalogue file in the review kit, `tools/workflows/lenses.toml`, has
 the install render fill the harness's five-slot literals from it, and gives the merge bar's harness
@@ -38,22 +41,23 @@ design-audit preset, the opt-in swap and the whole-design walk add rows to (shar
   §4 lists. Observed by AC1, AC4 and AC7.
 - **S3** — In `tools/workflows/tier2-review.template.js` each of the two literals keeps its name and
   its receiver line, its opening line gains the marker `// gov:lens-slots <literal>`, and its body is
-  the single line `{{LENS_SLOTS}}`. The comments at :769-773, :806-809 and :838-841 say the catalogue
+  the single line `{{LENS_SLOTS}}`. The comments at :776-780, :813-816 and :845-848 say the catalogue
   is the source and the render fills the literal. The live `tools/workflows/tier2-review.js` is
   re-rendered; its lens text is byte-identical to base. Observed by AC1 and AC2.
-- **S4** — `tools/workflows/check-protocol-parity.test.sh`'s `render()` (:476-487) pipes a template
+- **S4** — `tools/workflows/check-protocol-parity.test.sh`'s `render()` (:600-623) pipes a template
   carrying `{{LENS_SLOTS}}` through `render_lenses.py`, keeping its trailing bytes; the header's token
   list (:37) names the fifth token. `tools/workflows/kit.toml` declares `LENS_SLOTS` in the
-  `tier2-review.template.js` rule's `placeholders` (:79) and rewords that rule's one-token comment.
+  `tier2-review.template.js` rule's `placeholders` (:80) and rewords that rule's one-token comment
+  (:68-75).
   Observed by AC2 and AC8.
 - **S5** — `tools/workflows/check-verifier-fanout.sh` measures, natively and without the hook, every
   array literal whose opening line carries `gov:lens-slots` in the workflow scripts it already scans,
   and reds any that does not hold exactly `LENS_SLOTS=5` top-level elements, counted string-aware.
   In its whole-tree mode it reds when no marked literal exists anywhere. Its clean line stays byte for
-  byte; the slot verdict prints on a line of its own. Its header (:15-23) says which rule is native.
+  byte; the slot verdict prints on a line of its own. Its header (:14-23) says which rule is native.
   Observed by AC3, AC4, AC5 and AC6.
 - **S6** — The two sentences that call `SPEC_LENSES` the catalogue's one source,
-  `tools/workflows/README.md:165-167` and `tools/memory-tree/README.md:699`, name `lenses.toml` as
+  `tools/workflows/README.md:167-169` and `tools/memory-tree/README.md:699`, name `lenses.toml` as
   the source and the literal as its render; the workflows README gains a short catalogue section with
   the row grammar. `memory/map/features/agent-cap.md:187-190`, which says the fan-out leg only
   delegates, names the slot count as the one native rule. Observed by AC9.
@@ -66,7 +70,7 @@ design-audit preset, the opt-in swap and the whole-design walk add rows to (shar
 - The `optIn` swap, the six opt-in rows, the opt-in marker form and the slot wrapper the swap needs:
   `TOOL-dFairHearing-3`. This unit validates the `optin` field and renders nothing for it.
 - The whole-design literal and its rows: `TOOL-dFairHearing-18`.
-- `tools/hooks/agent-cap.js`'s array-literal allowance (`MAX_LENSES`, :486-497, :934-968). It stays:
+- `tools/hooks/agent-cap.js`'s array-literal allowance (`MAX_LENSES`, :450-461, :897-929). It stays:
   it is what ADMITS the finder fan over `LENSES`, so removing it denies the harness. The hook retires
   in dBoundRoles (night pass two, point 7, the table at its lines 555 and 560). The verifier total and the
   loop markers move in `TOOL-dFairHearing-16`.
@@ -75,7 +79,7 @@ design-audit preset, the opt-in swap and the whole-design walk add rows to (shar
 - `memory/guides/BUILD-METHOD.md:133-134` (M4's pointer at `SPEC_LENSES`) and its template. The
   literal still holds every spec brief after this unit, so the pointer still resolves; rewording a
   governance guide is not a change clause 13 names.
-- `REVIEW_SHAPE` (:970) and the kit `version:`. No lens prompt changes, so no lens file goes stale;
+- `REVIEW_SHAPE` (:977) and the kit `version:`. No lens prompt changes, so no lens file goes stale;
   versions are minted at landing (`725b97638`, the aTrimmedHook mint over a merge).
 - `memory/guides/REVIEW-PROTOCOL.md`'s lens list: `TOOL-dFairHearing-10`.
 
@@ -93,21 +97,24 @@ design-audit preset, the opt-in swap and the whole-design walk add rows to (shar
 
 ### Evidence
 
-- The two literals and their receiver: `tools/workflows/tier2-review.template.js:774-800`, `:810-836`
-  and `const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers` at :842. Every brief
-  is one single-quoted line under a `brief:` line, and the only escape the twenty briefs use is `\'`
-  (13 of them), measured 2026-10-23 at `3dca04036`, whose `tools/` equals base.
+- The two literals and their receiver: `tools/workflows/tier2-review.template.js:781-807`, `:817-843`
+  and `const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers` at :849. Every brief
+  is one single-quoted line under a `brief:` line, and the only escape the twenty briefs (ten in the
+  template, ten in its render) use is `\'`, in fourteen of them, seven per copy: re-measured
+  2026-11-02 at `76d72122b`, where both literals' text in either copy is byte-identical to base.
 - A workflow script has no filesystem (`memory/map/features/review-harnesses.md:48-53`), so the
   harness cannot read the catalogue at run time. The install render is its one derivation, as it is
-  for the `FANOUT_CAP` token (`tools/workflows/kit.toml:72-79`).
+  for the `FANOUT_CAP` token (`tools/workflows/kit.toml:73-80`).
 - The hook counts a literal's top-level elements over a string-blanked view and admits five
-  (`tools/hooks/agent-cap.js:934-968`); measured 2026-10-23, a copy of `tools/workflows/tier2-review.js`
-  with a sixth element planted in `SPEC_LENSES` is denied, exit 2, so the hook's count is live today.
+  (`tools/hooks/agent-cap.js:897-929`); re-measured 2026-11-02 at `76d72122b` through the leg's own
+  `--only=scripts` call, a copy of `tools/workflows/tier2-review.js` with a sixth element planted in
+  `SPEC_LENSES` is denied, exit 2, and the shipped file exits 0, so the hook's count is live today.
 - `check-verifier-fanout.sh` feeds every scanned script to the hook and implements no rule itself
-  (:15-23); its whole-tree population is every tracked or untracked `*.js` exporting `meta`, the
-  templates excluded (:163-186).
-- The kit already reads TOML with `tomllib` elsewhere (`tools/roles/roles_lib.py:339-350`), and govkit
-  requires CPython 3.11 for it (`tools/govkit/govkit.py:108`).
+  (:14-23); its whole-tree population is every tracked or untracked `*.js` exporting `meta`, the
+  templates excluded (:277-300).
+- The kit already reads TOML with `tomllib` elsewhere (`tools/roles/roles_lib.py:364-377`), and govkit
+  refuses to run without it (`tools/govkit/govkit.py:103-111`), naming the floor
+  `tools/lib/python-floor.txt` declares. `tomllib` arrived in CPython 3.11.
 
 ### Data model
 
@@ -187,9 +194,9 @@ and `memory/gotchas/text-mode-read-eats-a-bare-cr.md` record. Every byte outside
 through unchanged, the trailing newline included.
 
 `render()` in `tools/workflows/check-protocol-parity.test.sh` runs it only for a template whose text
-carries the token, with the python it already resolved at :517 and the catalogue beside the script,
-and keeps the trailing bytes by the `printf X` idiom its first line uses (:478-479). A non-zero exit
-is the existing "render ... FAILED" branch, and the existing unsubstituted-placeholder arm (:579-583)
+carries the token, with the python it already resolved at :653 and the catalogue beside the script,
+and keeps the trailing bytes by the `printf X` idiom its first line uses (:602-603). A non-zero exit
+is the existing "render ... FAILED" branch, and the existing unsubstituted-placeholder arm (:762-766)
 still reds a token the renderer missed.
 
 ### The slot count
@@ -209,9 +216,12 @@ verifier-fanout: slots — <m> lens-slot literal(s), each holding 5
 ```
 
 The first two set the exit to 1. The second fires in whole-tree mode only: with explicit files, a
-fixture harness carrying no marker is legal, and every existing fixture arm passes explicit files.
-The hook's clean line at :223 is unchanged, so no arm keyed on it strands
-(`memory/gotchas/arm-literal-strands-on-message-edit.md`).
+fixture harness carrying no marker is legal. Not every existing fixture arm passes explicit files:
+`tools/workflows/check-verifier-fanout.test.sh`'s `mkfix` arms AC2 and AC3 (:357-370) run the gate
+with no arguments over a fixture whose one harness (`mkfix`, :339-355) carries no marker and expect
+exit 0, so this unit reds them. `TOOL-dFairHearing-23` S23 marks that harness and moves the
+"non-workflow .js" arm (:314-317) to explicit files (§3 Edges, §7). The hook's clean line at :336 is
+unchanged, so no arm keyed on it strands (`memory/gotchas/arm-literal-strands-on-message-edit.md`).
 
 ### Inventory
 
@@ -263,14 +273,16 @@ Names follow the lexicon's verb cells (`.lexicon.conf`: `py.function snake`, `js
   no marked literal reds rather than passing; a missing catalogue file refuses naming its path.
 - observability — the fan-out leg prints the slot line on every clean run, so a live count is visible.
 - risks — an adopter whose resolved python is below 3.11 cannot render; it refuses by name rather
-  than writing a harness with a placeholder in it. govkit already needs 3.11, so an install that ran
-  govkit has one, though `resolve_python` may pick another launcher (`tools/govkit/govkit.py:1151`).
+  than writing a harness with a placeholder in it. govkit already needs `tomllib`, so an install that
+  ran govkit has a python that carries it, though another launcher may be the one picked: the bare
+  `bash` that reached a 3.10 python under WSL (`tools/govkit/upgrade_steps.py:369-377`).
 - testing — AC1 to AC9 as probes; the arms in §7.
 - migration — an existing install re-renders `tier2-review.js` through the kit's `[[regenerate]]`
-  row (`tools/workflows/kit.toml:115-120`); the result differs from today's file by comment lines
-  only. The new engine files arrive under `**`.
-- user docs — `tools/workflows/README.md` gains the catalogue section; no page under `help/` covers
-  the review harness (it holds `README.md`, `measure-legs.md` and `roles.md`).
+  row (`tools/workflows/kit.toml:116-121`); the result differs from today's file by comment lines
+  and the two marked opening lines only. The new engine files arrive under `**`.
+- user docs — `tools/workflows/README.md` gains the catalogue section; no page under `help/` states
+  the lens set or its source (`grep -n -i lens help/` finds none at `76d72122b`; `help/spec-audit.md`
+  covers the spec audit's run, not its lenses), so none goes stale.
 
 ## 6. Acceptance criteria
 
@@ -280,11 +292,15 @@ Names follow the lexicon's verb cells (`.lexicon.conf`: `py.function snake`, `js
   `SPEC_LENSES` in `git show '3708a705:tools/workflows/tier2-review.js'`.
   Red when: a brief is reordered, re-escaped, re-wrapped or changed, or a row is missing.
   figure: the ten keys and ten briefs are PINNED at base `3708a705`; the comparison reads only those
-  lines, so a later unit's wrapper around a slot leaves it standing.
-- **AC2** — When `git diff -U0 3708a705 -- tools/workflows/tier2-review.js` runs, every changed line
-  is a `//` comment line or one of the two marked opening lines.
-  Red when: the render changed a lens's text, so the parity leg's live copy no longer equals base's
-  prompts.
+  lines, so a later unit's wrapper around a slot leaves it standing. Both literals in
+  `tools/workflows/tier2-review.js` are still byte-identical to base at `76d72122b` (2026-11-02), so
+  the pin is the pre-unit text and a correct build can meet it.
+- **AC2** — When `git diff -U0 <unit>~1 <unit> -- tools/workflows/tier2-review.js` runs, where
+  `<unit>` is the sha of this unit's commit and `<unit>~1` its parent, the tree the build pass starts
+  from, every changed line is a `//` comment line or one of the two marked opening lines, and both
+  marked opening lines are among them.
+  Red when: the render changed a lens's text, so the parity leg's live copy no longer equals the
+  pre-unit prompts, or the live copy was not re-rendered.
 - **AC3** — When `bash tools/workflows/check-verifier-fanout.sh <copy>` runs on a scratch copy of
   `tools/workflows/tier2-review.js` with a sixth element added to the literal marked
   `gov:lens-slots unit-spec`, it prints the `SLOTS` line naming `unit-spec` and `6` and exits 1.
@@ -293,7 +309,8 @@ Names follow the lexicon's verb cells (`.lexicon.conf`: `py.function snake`, `js
   `presets = ["unit-spec", "diff-review"]` and `kinds` for both, every literal marked
   `gov:lens-slots` in the render of AC1 over it is byte-identical to the same literal rendered over
   the shipped catalogue, and `check-verifier-fanout.sh` on that render prints the `slots`
-  line naming every marked literal and exits 0.
+  line in §4's format (The slot count), its `<m>` the number of `gov:lens-slots` lines in that
+  render, and exits 0.
   Red when: a row added as data changes a literal or reds the leg.
 - **AC5** — When `check-verifier-fanout.sh` runs on a scratch harness whose marked literal holds five
   elements whose strings carry `,`, `]`, `'` and a template span `${a, b}`, plus a trailing comma, the
@@ -323,7 +340,13 @@ Names follow the lexicon's verb cells (`.lexicon.conf`: `py.function snake`, `js
 
 `verifier fan-out` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `kit placeholders (a declared token its adopter substitutes)` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/workflows/check-verifier-fanout.test.sh · covers AC3 AC5 AC6 · a scratch harness with a sixth slot in a marked literal, one whose strings carry commas, brackets and a template span, and a whole-tree fixture with no marker, each red against the base gate that counts nothing itself · none
+Owed at the close, not at this unit's commit: `verifier fan-out self-test` reds here on the `mkfix`
+arms AC2 and AC3 of `tools/workflows/check-verifier-fanout.test.sh` (:357-370), which run the gate
+whole-tree over an unmarked fixture and expect exit 0 (§4 The slot count). `TOOL-dFairHearing-23`,
+order 19, carries their repair (its S23, AC14; this spec's §3 Edges), and that leg is observed green
+at the close, after unit 23 lands.
+
+New arm: tools/workflows/check-verifier-fanout.test.sh · covers AC3 AC5 AC6 · a scratch harness with a sixth slot in a marked literal, one whose strings carry commas, brackets and a template span, and a whole-tree fixture with no marker, each red against the gate at this unit's parent commit, which counts nothing itself · none
 New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC4 AC7 · the render over the shipped catalogue compared with base's literals, a catalogue with an opt-in row added, and one scratch catalogue per refusal rule, red against a tree with no renderer · FLOOR_ASSERTIONS in that suite, raised by the arms added
 
 ## 8. Open questions
@@ -359,22 +382,27 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC4 AC7 · the rende
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-11-02 · AC2 AC1 §5 · item 1 of `2026-11-02-prompt-TOOL-dFairHearing-13-fix-brief`: AC2 now diffs the unit's commit against its parent (`<unit>~1 <unit>`), never base `3708a705`, whose version line, `boundedParallel` cap and `addressOwed` other builds since changed; it also asks that both marked lines appear. AC1 keeps its base pin, its literals re-checked byte-identical at `76d72122b`; §5 migration names the marked lines.
+- rev-3 · 2026-11-02 · AC4 · item 2 of `2026-11-02-prompt-TOOL-dFairHearing-13-fix-brief`: AC4 reads the `slots` line in §4's format, its count equal to the render's `gov:lens-slots` lines; §4 stays the format's one home.
+- rev-3 · 2026-11-02 · §1 §2 §3 §4 §5 §10 · S3 S4 S5 S6 · item 3 of `2026-11-02-prompt-TOOL-dFairHearing-13-fix-brief`: every `path:line` re-grounded at `76d72122b`; §4 Evidence re-measured (fourteen escaped briefs of twenty, the hook's sixth-slot denial through `--only=scripts`, govkit's `tomllib` refusal naming `python-floor.txt`); §5 cites `resolve_bash` in `upgrade_steps.py` and the `help/` pages as they stand.
+- rev-3 · 2026-11-02 · §4 §7 · item 4 of `2026-11-02-prompt-TOOL-dFairHearing-13-fix-brief`: the hands-off note to TOOL-dFairHearing-23 stands (its S23, AC14); §4 drops the false claim that every fixture arm passes explicit files, and §7 names the `mkfix` arms AC2 and AC3 as owed green at the close, after unit 23. The first New arm line reds against the parent commit's gate, not base's.
+- rev-3 · 2026-11-02 · §9 · item 5 of `2026-11-02-prompt-TOOL-dFairHearing-13-fix-brief`: the rev bumped, state left at DEFERRED, one line per item.
 
 ## 10. Reuse audit
 
 The seam extended is the kit's install render, `render()` in
-`tools/workflows/check-protocol-parity.test.sh:476-487`, which already fills four derived tokens into
+`tools/workflows/check-protocol-parity.test.sh:600-623`, which already fills four derived tokens into
 the same template; this unit adds a fifth, filled by a python step because the source is TOML.
 `python tools/codebase-map/reuse_lookup.py "render a template placeholder from a declared data file
 at install"` ranked `render` first with that file among its homes, and `render_charter_blocks` and
-`render_role` in `tools/roles/roles_lib.py`, whose `load_workflows` (:339-350) is the kit's precedent
+`render_role` in `tools/roles/roles_lib.py`, whose `load_workflows` (:364-377) is the kit's precedent
 for reading TOML with `tomllib`. The slot count's precedent is the hook's array-literal walk
-(`tools/hooks/agent-cap.js:934-968`, `topLevelArgs` at :1362); it is not called, because the hook
+(`tools/hooks/agent-cap.js:897-929`, `topLevelArgs` at :1295); it is not called, because the hook
 retires and its walk runs on a string-blanked view this leg does not have. `python
 tools/codebase-map/reuse_lookup.py "count the elements of an array literal in a workflow script"`
 returned only name-stem neighbours (`counts`, `measure_typed_counts`), none a literal counter: no
 existing seam fits that half. No hit disagreed with source; the recall hit naming `tier2-review.js:705-773`
-for the literals is stale, they sit at :774-836 at base.
+for the literals is stale, they sat at :774-836 at base and sit at :781-843 at `76d72122b`.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the review lens set declared and how
 many lenses may a harness literal hold" --terms "lens catalogue SPEC_LENSES DIFF_LENSES five-slot
