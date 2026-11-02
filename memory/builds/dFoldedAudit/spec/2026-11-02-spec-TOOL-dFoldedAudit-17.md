@@ -9,12 +9,15 @@
 | [2026-11-02-build-TOOL-dFoldedAudit-17-1-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-1-spec-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-2-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-2-builder-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-17-3-spec-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-3-spec-return.md) | journal | — |
+| [2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-17-4-builder-return.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-2-builder.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-3-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-4-builder.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-4-builder.md) | journal | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-17-5-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-5-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-fix-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-17-fix2-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-fix2-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-17-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-17-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
