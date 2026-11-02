@@ -1,14 +1,17 @@
 # TOOL-dFoldedAudit-11 — a chain fold joins to the tree: the spec's header rev and its Revision log
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 120
+**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 120
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-11-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-11-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-11-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-11-spec-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 
 <!-- /gen:spec-records -->
 
@@ -54,7 +57,7 @@ item H3 of the closing review.
 ### Edges
 
 - **consumes-from** external — the row grammar, `check_chain_fault` and `load_spec_facts`, all shipped, and the rendered route that commits a disposal's folds before it runs the command; a caller reversing that order is refused with its fold on disk
-- **hands-off** external — the refusal list in the `--record-round` entry of `memory/guides/UNATTENDED-VERBS.md` does not gain this refusal, because that carrier is outside this run's delegation (M3, veto 2). No sentence there turns false and the refusal names its own reason. The wrap-up names the entry for the owner
+- **hands-off** `TOOL-dFoldedAudit-15` — the refusal list in the `--record-round` entry of `memory/guides/UNATTENDED-VERBS.md` does not gain this refusal here. That unit's batch writes it with the render, and this unit's write set holds no carrier
 
 ## 4. Design
 
@@ -65,8 +68,11 @@ the header's base.
 
 The two row loops in `write_chain_round` (`tools/unattended/unattended.sh:13525-13534`) each add a
 `<unit> <rev>` pair to a local `folds` array, the first for a `local` row and the second for every
-`--sibling` row. Every severity joins, because a minor's fold bumps a rev too. After the count test at
-`:13535-13538` and before `rec=$_chain_rec` at `:13539`:
+`--sibling` row. Every severity joins, because a minor's fold bumps a rev too.
+`TOOL-dFoldedAudit-13`, at order 100, leaves a scalar `folds` in those two loops and tests it with
+`[ -n "$folds" ]`. This unit retypes that variable as the array, so one name marks a fold, and moves the
+test to `[ "${#folds[@]}" -gt 0 ]`, because `$folds` over an empty array is unbound under the driver's
+`set -u`. After the count test at `:13535-13538` and before `rec=$_chain_rec` at `:13539`:
 
 ```bash
 if [ "${#folds[@]}" -gt 0 ]; then
@@ -137,7 +143,7 @@ on it, one spec at a time.
 | Minted | Cell | Graded by |
 |---|---|---|
 | `check_chain_fold` | `sh.function` | `lexicon.py --suggest` answered OK on 2026-11-02 |
-| `folds` | local array in `write_chain_round` | none, a local |
+| `folds` | local array in `write_chain_round`, retyping the scalar `TOOL-dFoldedAudit-13` leaves | none, a local |
 
 ### Rollout
 
@@ -180,7 +186,9 @@ no tracked build yet holds, so no landed record moves.
 
 Fixture R is a scratch git repository at `%TEMP%/fa11` holding copies of
 `tools/unattended/unattended.sh` and `tools/unattended/lib-unattended.sh` under `u/`, a
-`.unattended.conf` carrying `MEMORY_ROOT=memory`, and a build `dFix` whose README's roster region names
+`.unattended.conf` carrying `MEMORY_ROOT=memory` and `SPEC_FOLD_CUTOFF="2000-01-01"`, because
+`TOOL-dFoldedAudit-13` refuses a `local` or `--sibling` row under a blank cutoff, and a build `dFix`
+whose README's roster region names
 `FIX-dFix-1` to `FIX-dFix-7`, each with a tracked OPEN spec at rev-3 whose `## 9. Revision log` holds
 `- rev-1`, `- rev-2` and `- rev-3` entries, and no `RUN.md`. A step the criterion names commits its
 change to a spec. `$V` is `bash "$F/u/unattended.sh"`, run from the fixture root with `GOV_REMOTE` and
@@ -239,6 +247,10 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, from the closing review's item H3, the promotion notes, and the
   design's [survive] 2.
+- rev-2 · 2026-11-02 · §3 · §4 · §6 · Fixture R's conf declares `SPEC_FOLD_CUTOFF="2000-01-01"`, because
+  `TOOL-dFoldedAudit-13` ships first and refuses these rows under a blank cutoff, and the list's edge
+  is a `hands-off` to `TOOL-dFoldedAudit-15`, which writes that list. M2's cross-read: this spec's
+  `folds` array and unit 13's scalar `folds` shared one name in one function, so §4 retypes the scalar.
 
 ## 10. Reuse audit
 

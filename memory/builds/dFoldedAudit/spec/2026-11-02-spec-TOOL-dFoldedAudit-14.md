@@ -1,14 +1,17 @@
 # TOOL-dFoldedAudit-14 — a rotated record keeps its own date floor for the fold cutoff
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 90
+**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 90 · ratified 2026-11-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-15 |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-14-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-14-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-14-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-14-spec-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-15 |
 
 <!-- /gen:spec-records -->
 
@@ -62,7 +65,7 @@ and M5 of `memory/builds/dFoldedAudit/reviews/2026-11-02-review-TOOL-dFoldedAudi
 
 ### Edges
 
-- **hands-off** external — this unit ships at order 90 and `TOOL-dFoldedAudit-9` at order 130. That
+- **hands-off** `TOOL-dFoldedAudit-9` — this unit ships at order 90 and that unit at order 130. That
   unit rewrites the two calls S2 changes, onto a per-record cutoff, and each must keep `tenancy`, which
   AC3's arm reds if it does not. It also takes `rv_foldcut` away, so S5 reads `SPEC_FOLD_CUTOFF` itself
   and stays on the working copy.
@@ -269,7 +272,9 @@ Fixture T is a scratch git repository at `%TEMP%/fa14t` on branch `main` with no
 `core.autocrlf` false, holding a copy of `tools/unattended/` whole, a `.unattended.conf` carrying
 `MEMORY_ROOT=memory`, `DISPOSITION_CUTOFF="2000-01-01"`, `REVIEW_ROUNDS="1"` and
 `SPEC_FOLD_CUTOFF="2026-11-02"`, and a build `memory/builds/tFix/` with a README carrying a
-`gen:build-units` region, as the suites' `mkdisp` writes one. Every commit is dated at noon UTC with
+`gen:build-units` region, as the suites' `mkdisp` writes one. Every `RUN.md` a criterion writes carries
+`base:` at the commit holding that conf, as `mkdisp` writes it, because `TOOL-dFoldedAudit-9`, at order
+130, reds a spec row on a record with none. Every commit is dated at noon UTC with
 `GIT_COMMITTER_DATE`, and every command runs with `GOV_REMOTE` and `GOV_DEFAULT_BRANCH` cleared.
 `$D` and `$G` are `bash "$F/tools/unattended/unattended.sh"` and
 `bash "$F/tools/unattended/check-unattended.sh"`, run with the fixture as the working directory, and
@@ -371,6 +376,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC6 · M5's left-shift ga
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft, from the closing review's H6, M3 and M5 and the promotion notes.
+- rev-2 · 2026-11-02 · §3 · §6 · The Edges line reads `hands-off` `TOOL-dFoldedAudit-9` so the pair joins,
+  and the header gains `ratified` for F1, which stands as written. M2's cross-read: Fixture T's records
+  carried no `base:`, which that unit's read refuses once it builds, so this unit's arms would red at
+  order 130.
 
 ## 10. Reuse audit
 

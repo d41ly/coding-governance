@@ -6,11 +6,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-11-01-build-TOOL-dFoldedAudit-8-deviation-81.md](../../dClosedLoop/build/2026-11-01-build-TOOL-dFoldedAudit-8-deviation-81.md) | deviation | — |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-3-design.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md](../build/2026-11-01-build-TOOL-dFoldedAudit-1-4-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-5-1-cross-read-return.md) | journal | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |
 | [2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md](../build/2026-11-01-build-TOOL-dFoldedAudit-8-1-claim-fold-return.md) | journal | TOOL-dFoldedAudit-1 |
+| [2026-11-01-build-TOOL-dFoldedAudit-8-deviation-81.md](../build/2026-11-01-build-TOOL-dFoldedAudit-8-deviation-81.md) | deviation | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-8-3-pass-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-8-3-pass-return.md) | journal | — |
 | [2026-11-02-build-TOOL-dFoldedAudit-8-ledger.md](../build/2026-11-02-build-TOOL-dFoldedAudit-8-ledger.md) | journal | — |
 | [2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md](../prompts/2026-11-01-prompt-TOOL-dFoldedAudit-1-brief.md) | research | TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 |

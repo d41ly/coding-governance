@@ -1,13 +1,17 @@
 # TOOL-dFoldedAudit-9 — a build cannot pass a chain verdict that is not STOP
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 130
+**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 130 · ratified 2026-11-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md) | research | TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md) | journal | TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-9-1-spec-writer.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-1-spec-writer.md) | journal | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-9-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-build-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md) | research | TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-9-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -213,7 +217,7 @@ generated symbol index, which the pass declares with the indexes it regenerates.
   M6 places the refusal of a pass at `--dispatch`.
 - **The check 2 clause the judged fix offers as an alternative.** It reds a landed record at the bar,
   after the code is written, and reaches the same subjects S6 reads at the act. `TOOL-dFoldedAudit-10`
-  owns any presence term.
+  leaves a presence term out too, so S6 is the one reader of that population.
 - **`check_chain_dispatch` keyed on `promote-all` too.** [scope] keeps today's rule there, and H1's
   compensation argument is about a fold.
 - **Reading `AUTH_CONF_AT`.** Only `check_authorization` sets it, and neither `--review` nor check 2
@@ -294,9 +298,10 @@ policy kit sits beside the driver unless a criterion says so, so the switches an
 - **AC6** — When a `DATED` fixture's `RUN.md` carries `spec-audit: 2026-11-01` and holds no row and no
   chain record, `$D $PASS` exits 1 printing `round 0` and `reason unreviewed`.
   Red when: the fact is not read, so a run skipping both verbs builds unaudited.
-- **AC7** — When AC1's record sits in a fixture whose BASE conf has a blank `SPEC_FOLD_CUTOFF`, in an
-  `EARLY` fixture, and in a `DATED` fixture with the policy kit and `disposal = "promote-all"`, `$D $PASS`
-  exits 0 each time and prints no `unattended: dispatch — chain` line.
+- **AC7** — When AC1's record, committed by hand because `--record-round` refuses its `local` row on
+  each of these since `TOOL-dFoldedAudit-13`, sits in a fixture whose BASE conf has a blank
+  `SPEC_FOLD_CUTOFF`, in an `EARLY` fixture, and in a `DATED` fixture with the policy kit and
+  `disposal = "promote-all"`, `$D $PASS` exits 0 each time and prints no `unattended: dispatch — chain` line.
   Red when: the word is read ahead of the rule, so an old-rule run is refused.
   fixture: the third case needs the policy kit, so the arm counts its assertions either way.
 - **AC8** — When a `DATED` fixture's `RUN.md` carries no `spec-audit:` fact and one row on subject
@@ -361,6 +366,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC14 AC15 · the one deri
   Recommendation: (a). Option (b) fails the fix's own word "owner", and (c) is vetoed under a mandate.
   AC2 and AC3 are its discriminating arms. If the owner wants "build at the hold", that is (c) as a
   follow-up, and it reads this gate rather than changing it.
+  RESOLVED (agent, 2026-11-02, delegated): (a). Nothing passes a HOLD, and the owner's move of the
+  guarded ceiling key moves the verdict.
 - **F2 — Who corrects M6's sentence?** `memory/guides/BUILD-METHOD.md:232` says `--dispatch` refuses
   "on a MISSING or THIN unit and on nothing else", and this unit makes that false. The method is a
   governance carrier, `RUN.md` records `may: none`, and the file stands at 30565 of 30720 bytes.
@@ -374,11 +381,17 @@ New arm: tools/unattended/unattended.test.sh · covers AC14 AC15 · the one deri
   Recommendation: (a), the only option past veto 2. It is written here and not as a hands-off line
   because the `orchestrator-hand-off-owed-a-disposition` class names a line no run reads, and §8 is
   what the main loop sweeps.
+  RESOLVED (agent, 2026-11-02, delegated): (a). The `decision` row stands in `RUN.md` at
+  2026-11-02T03:29:31Z, so no pass writes the sentence and the wrap-up carries it to the owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft, from items H1 and M4 of the closing review round 1, the promotion
   notes' tags and the design's [chain], [cutoff] and [scope].
+- rev-2 · 2026-11-02 · §4 · §8 · AC7 · F1 and F2 are RESOLVED to (a), and the header gains `ratified`.
+  M2's cross-read: AC7 read its three off-rule records as written by a verb `TOOL-dFoldedAudit-13`
+  refuses there, so each is committed by hand; and §4 named `TOOL-dFoldedAudit-10` the owner of a
+  presence term that spec's §3 rules out.
 
 ## 10. Reuse audit
 

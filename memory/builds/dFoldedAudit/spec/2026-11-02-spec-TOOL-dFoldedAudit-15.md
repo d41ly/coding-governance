@@ -1,14 +1,17 @@
 # TOOL-dFoldedAudit-15 — the closing review's mediums and lows closed as one batch
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 150
+**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 150 · ratified 2026-11-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-15-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-15-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-15-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-15-spec-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 |
 
 <!-- /gen:spec-records -->
 
@@ -28,18 +31,19 @@ The report items, by report id, each with its own §2 item:
 | M9 | 1 | S6 |
 | M11 | 22, 32, 39 | S7 |
 | M12 | 40 | S8 |
-| M13 | 43 | S9 |
+| M13 | 43 | S9, S30 |
 | M14 | 30 | S10 |
 | M15 | 31 | S11 |
 | M16 | 33 | S12 |
 | M17 | 34 | S13 |
 | L1 | 14, 23 | S3 |
-| L2 | 24 | S14 |
+| L2 | 24 | S14, S31, S32 |
 | L3 | 8 | S15 |
 | L4 | 42 | S16 |
 
 The items `2026-11-02-build-TOOL-dFoldedAudit-1-5-close-owed.md` lists under Findings for the closing
-review take S1 and S17 to S28, the lexicon pin first.
+review take S1 and S17 to S28, the lexicon pin first. Under §8 F3, S30 to S34 align the carriers with
+what this batch and units 10, 11 and 13 build.
 
 ## 2. Scope (IN)
 
@@ -102,11 +106,22 @@ review take S1 and S17 to S28, the lexicon pin first.
   `tools/unattended/VERBS.template.md:278` and `:291` hold both entries. Unit 6's figures are corrected
   in §4 here. NOT OBSERVED: nothing is built for them.
 - **S29** — No item above adds a `fail` site, in either file at its ceiling. Observed by AC30.
+- **S30** — The `--record-round` refusal list in `tools/unattended/VERBS.template.md` and its render stops
+  naming a terminal run, after S9, and names the fold join `TOOL-dFoldedAudit-11` builds. Observed by
+  AC31.
+- **S31** — The `--plan` bullet of that carrier states S14's fifth field and the `spec-disposal:` line
+  `TOOL-dFoldedAudit-13` prints. Observed by AC32.
+- **S32** — That carrier's "Drive the build as ONE program" bullet and the `/build` Skill's stage 3 tell
+  a caller to pass `rev`. Observed by AC33.
+- **S33** — M4's first verdict test in `tools/memory-tree/BUILD-METHOD.template.md` and its render states
+  the case `TOOL-dFoldedAudit-10` adds, under M1's 30720-byte ceiling. Observed by AC34 and AC35.
+- **S34** — The pass re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md` and carries a delta
+  line, because the method is on that manifest's `watch:` list. Observed by AC36.
 
 ## 3. Non-goals (OUT)
 
-- Every other item of that report, which the sibling units below order 150 own. This unit reads none
-  of their specs as a contract and rests no criterion on what they build.
+- Every other item of that report, which the sibling units below order 150 own. Only S30, S31 and S33
+  rest on what a sibling builds, and the Edges below declare those three.
 - A closing diff review's row, floor, verdict or sentence. Every change here branches on a spec subject
   or on a declared `disposal`.
 - A new verb, a new check number, a new `fail` site, or a `.lexicon.conf` pin move.
@@ -115,13 +130,19 @@ review take S1 and S17 to S28, the lexicon pin first.
 - A rewrite of a CLOSED spec, a landed record, or any row before `SPEC_FOLD_CUTOFF`.
 - A kit version move, which the lander mints at landing (`tools/push-main.sh:26-31`).
 - `memory/DECISIONS.md`, `memory/HYGIENE.md`, `.memory-tree.conf` and `.unattended.conf`.
-- The unattended Skill, the unattended protocol and its verbs guide. F3 states why.
+- The unattended Skill and the unattended protocol. S9 and S14 turn no sentence there false: the Skill's
+  `--record-round` line is the invocation, and the protocol spells neither verb's refusals.
+- M6's `--dispatch` sentence, which `TOOL-dFoldedAudit-9`'s §8 F2 parked for the owner.
+- The refusal `TOOL-dFoldedAudit-13` adds to `--record-round`, in S30's list. That spec's §3 leaves it to
+  the wrap-up.
 - A trace of the two past-pin ids unit 6's ledger left untraced. The figure is a stale number in a
   frozen spec, and the build README's lines derive it from the tree.
 
 ### Edges
 
-- **hands-off** external — the `--record-round` entry of `memory/guides/UNATTENDED-VERBS.md` keeps `a terminal run` in its refusal list, and no carrier tells a caller to pass a `units[]` `rev`, because F3 leaves both sentences to the owner through the wrap-up
+- **consumes-from** `TOOL-dFoldedAudit-10` — the second test of the verdict's step 1, which S33 states; without it M4 names a case the driver does not answer
+- **consumes-from** `TOOL-dFoldedAudit-11` — the fold join S30 adds to the refusal list; without it the list names a refusal the verb does not make
+- **consumes-from** `TOOL-dFoldedAudit-13` — the `spec-disposal:` line S31 describes; without it the `--plan` bullet states a line `--plan` does not print
 
 ## 4. Design
 
@@ -149,7 +170,7 @@ owe = b + h > f ? b + h - f + (m > 0 ? 1 : 0) : 1
 ```
 
 It holds only where `p > 0`. A row with `p = 0` is a fold and owes nothing, as today. F1 records why
-this is neither of the two corrections the report carries, and §4 is written to its recommendation.
+this is neither of the two corrections the report carries, and §4 is written to its resolution.
 
 | Site | Today | After |
 |---|---|---|
@@ -244,7 +265,7 @@ and one new arm runs without it.
 
 `write_chain_round` at `tools/unattended/unattended.sh:13506-13507` loses its `runmd_of` line and its
 guard call, and `rel` leaves its locals, because the verb writes a separate record and never moves the
-run's state. The comment at `:13492` says so. F3 holds the carrier's sentence.
+run's state. The comment at `:13492` says so, and S30 corrects the carrier's sentence.
 
 ### S10 — the ceiling arm
 
@@ -307,14 +328,13 @@ read_spec_rev() { # spec path -> the N of its header's rev-N, empty when it has 
 | neither | 1 | `rev 1, the lowest a spec carries` |
 
 A `rev` that is no such integer reads as absent, so S14 adds no refusal. The `args` comment at `:174`
-names the field. The `--paths` paragraph at `tools/unattended/VERBS.template.md:81-85` stays true, because
-a row still carries the fourth field a caller reads. No carrier sentence tells a caller to pass `rev`
-(F3), so the comparison runs for a caller reading that comment, and every other caller takes the third
-row, whose sentence is true.
+names the field, S31 names the fifth field in the `--paths` paragraph, and S32 tells a caller to pass it.
+A caller that passes none takes the third row, whose sentence is true.
 
 ### S15 — the live set
 
-`print_chain_verdict` at `tools/unattended/unattended.sh:13646`, after its status loop:
+`read_chain_verdict`, after the status loop `TOOL-dFoldedAudit-9` moves there out of `print_chain_verdict`
+(`tools/unattended/unattended.sh:13646`):
 
 ```bash
 [ -n "$live$_chain_rec" ] || { check_chain_fault "every unit of the roster is CLOSED or WONTDO and no round is recorded, so a verdict would stop a chain nothing audited: $slug"; return 1; }
@@ -327,8 +347,9 @@ all-terminal roster still answers, so spec 5's AC14 keeps its verdict.
 
 `tools/roles/SKILL.template.md:19-20` reads `the driver verbs used are` the `--plan <slug> --paths`
 form, plus `--record-round` and `--chain-verdict` where a hand-out's `nextAction` orders them. The render
-at `.claude/skills/build/SKILL.md` comes from `bash tools/roles/adopt-roles.sh`. That file has no row in
-`tools/template-size-limits.txt`.
+at `.claude/skills/build/SKILL.md` comes from `bash tools/roles/adopt-roles.sh --scaffold`. That file has
+no row in `tools/template-size-limits.txt`. The bullet takes a third line, so the file and its render read
+103 lines, past the 102 `TOOL-dFoldedAudit-13`'s AC10 bounds at that unit's own pass.
 
 ### S17, S18, S19 — the harness's small facts
 
@@ -399,6 +420,65 @@ As built 976 ids sit past their pin and 82 clear: 47 dRankedPlan, 23 dFurnishedO
 (PINNED, unit 6's ledger, measured 2026-11-02). Its §4 pin of 974 and 77 measured a `**Serves:**`-only
 candidate with no stem boundary, not the predicate its own §4 states.
 
+### S30 to S34 — the carriers, under F3
+
+Line numbers are this tree's at `f055a11b`, and `TOOL-dFoldedAudit-13` moves the verbs carrier's first.
+Each edit lands in the template, with its render in the same commit:
+`bash tools/unattended/adopt-unattended.sh` for the verbs guide, `bash tools/roles/adopt-roles.sh --scaffold`
+for the Skill, and `bash tools/memory-tree/adopt-memory-tree.sh --render` for the method. No new sentence
+spells a kit path, which `tools/check-install-prefix.sh` refuses in a shipped template.
+
+**S30.** The last sentence of the `--record-round` entry, `tools/unattended/VERBS.template.md:287-290`,
+becomes:
+
+> Before writing a byte it refuses a token outside its grammar, a slug with no build folder, two
+> `-chain-rounds.md` files, a tracked record gone from the worktree, rows disposing fewer BLOCKER or HIGH
+> ids than `--blockers` or `--highs` count, so a round whose HIGHs reached neither a promotion nor a fold
+> is a refusal, and a `local` or `--sibling` row that never reached the tree: a unit no tracked spec
+> carries, a rev below 2 or above the spec's header, or a rev with no Revision log entry.
+
+The phrase `a terminal run` leaves with S9's guard, and the last clause is `TOOL-dFoldedAudit-11`'s four
+refusals.
+
+**S31.** Two edits in the `--plan` bullet, `tools/unattended/VERBS.template.md:81-88`. The field clause
+reads:
+
+> a FOURTH field, the spec path this verb already resolves per unit and otherwise discards, and a FIFTH,
+> that spec's header rev, each empty for a unit no tracked spec defines
+
+After the sentence that closes on "where is its spec", this one joins:
+
+> A `spec-disposal:` line sits between those two, carries no TAB and holds the value a caller copies as
+> `disposal`.
+
+**S32.** The sentence at `tools/unattended/VERBS.template.md:779-781` becomes:
+
+> Under `by-nature` every `units[]` entry also carries its `planState` and `rev` from
+> `--plan <slug> --paths`, because a disposal naming a unit with no `planState` is refused and its
+> hand-out carries no roster, and a fold into a unit no audit read compares against that `rev`.
+
+In `tools/roles/SKILL.template.md`, stage 3's `units[]` clause takes `planState` and `rev` from that read,
+and its paragraph reflows inside its seven lines.
+
+**S33.** M4's first test, `tools/memory-tree/BUILD-METHOD.template.md:148`, becomes:
+
+> a live roster spec no round audited and this round did not promote, or one of the previous round's
+> promotions and BLOCKER-or-HIGH folds this round did not audit, audit it with the last step's set;
+
+Those two nouns are M4's own for the set step 3 reads, which is the set `prior` holds. The sentence adds
+94 bytes and no line, so the render reads 30659 of 30720, 61 free. PINNED 2026-11-02 at `3cf55f6a`, by
+applying this text to the render with its CRs stripped.
+
+**S34.** `memory/guides/BUILD-METHOD.md` is on the `watch:` list at `memory/guides/SESSION-KICKOFF.md:6`,
+so `fail 5` (`skills/session-kickoff/manifest-check.sh:1537`) refuses the pass until `last-audit` moves.
+The stamp is that line alone, its sha the commit's parent and its datetime later than the one it
+replaces, as in `TOOL-dFoldedAudit-1`'s pass. The method is the only watched file this unit writes, and no
+section B claim restates M4's text, so the commit message carries this line and the body does not move:
+
+```
+Manifest delta: none to section B — last-audit re-stamped for the watched memory/guides/BUILD-METHOD.md, whose M4 text no section B claim restates.
+```
+
 ### Inventory
 
 | Minted | Cell | Graded by |
@@ -432,6 +512,11 @@ candidate with no stem boundary, not the predicate its own §4 states.
 `memory/map/features/spec-tokens.md`
 `memory/map/generated/CARDS.md`
 `memory/map/generated/symbols.json`
+`tools/unattended/VERBS.template.md`
+`memory/guides/UNATTENDED-VERBS.md`
+`tools/memory-tree/BUILD-METHOD.template.md`
+`memory/guides/BUILD-METHOD.md`
+`memory/guides/SESSION-KICKOFF.md`
 
 The two harness renders come from `bash tools/workflows/check-protocol-parity.test.sh --render`, which
 `gate-guard` admits as a read-only verb. `memory/LIVE.md` and `memory/ledger/` are generated indexes and
@@ -464,9 +549,8 @@ stay undeclared.
   so S5 feeds `rv_bad` and S15 shares `check_chain_fault`. S2 tightens a floor, so a by-hand row that
   passed at this tree may red; the harness's `unitFloor` already demands at least as much on its path.
   S14 changes the field count an arm pins, and `tools/unattended/unattended.test.sh:3245` and `:3252` move
-  with it. The batch writes the same files as units 9 to 14, so it builds last, by its order. Under F3 a
-  carrier sentence goes stale until the owner reads the wrap-up: the verb is looser than the sentence, so
-  a caller obeying it loses nothing.
+  with it. The batch writes the same files as units 9 to 14, so it builds last, by its order. S33 spends
+  94 of the method's 155 free bytes, PINNED in §4.
 - **testing** — Fixture repositories and stub runners, a green control beside each red, and no gate or
   suite inside the pass. Every `New arm:` is owed to the main loop at the close.
 - **migration** — None. No row is rewritten, and the floor reads only rows past `SPEC_FOLD_CUTOFF`,
@@ -480,12 +564,15 @@ Fixture R is unit 2's: a scratch git repository at `%TEMP%/fa15r` on branch `mai
 holding copies of `tools/unattended/` whole and of `tools/policy/policy.py`, `tools/policy/budgets.py`
 and `tools/policy/catalogue.toml`, a `.unattended.conf` carrying `MEMORY_ROOT=memory`,
 `DISPOSITION_CUTOFF="2000-01-01"`, `REVIEW_ROUNDS="1"` and `SPEC_FOLD_CUTOFF="2026-11-01"`, and a build
-`memory/builds/tFix/` whose `RUN.md` first commits on `2026-11-02T12:00:00 +0000`. `$D` and `$G` are its
+`memory/builds/tFix/` whose `RUN.md` carries `base:` at the commit holding that conf, where
+`TOOL-dFoldedAudit-9` reads the cutoff, and first commits on `2026-11-02T12:00:00 +0000`. `$D` and `$G` are its
 own `unattended.sh` and `check-unattended.sh` by absolute path, run with `GOV_REMOTE` and
 `GOV_DEFAULT_BRANCH` cleared, and only their check lines are read.
 
-Fixture F is the same at `%TEMP%/fa15c`, with no `RUN.md`, a build `dFix` whose roster is `FIX-dFix-1` to
-`-7`, each spec OPEN at rev-1, and committed rounds written by `$D --record-round`.
+Fixture F is the same at `%TEMP%/fa15c`, with no `RUN.md`, a build `dFix` whose README carries a
+`gen:build-units` region and whose roster is `FIX-dFix-1` to `-7`, each spec OPEN at rev-3 with rev-1 to
+rev-3 logged, where `TOOL-dFoldedAudit-11` leaves the suite's `write_chain_fixture`, and committed rounds
+written by `$D --record-round`.
 
 `node disposal-fixture.js <case>` and `node review-fixture.js <case>` are stub runners the pass writes
 under the run's scratch from the AsyncFunction shape of `run_wf`, evaluating
@@ -516,7 +603,7 @@ fixture.
   `this exit owes at least 2 new unit(s), one per blocker and high plus one for the minors when any stood`.
   Red when: `promote-all` owes below today's rule, or the number and the sentence disagree.
 - **AC4** — When a Fixture R runs `$D --review tFix --subject T1 --verdict "CLEAN WITH FIXES" --blockers 0`,
-  the refusal holds `because every one of them is disposed`. With `SPEC_FOLD_CUTOFF` blanked, and on
+  the refusal holds `because every one of them is disposed`. With `SPEC_FOLD_CUTOFF` blanked at `base:`, and on
   `--subject tFix`, it holds `because every one of them is promoted`.
   Red when: the sentence is reworded on the shared path, or `exits CONVERGED` leaves it.
 - **AC5** — When a Fixture R's past-cutoff row falls short of its floor, `$G` prints
@@ -530,10 +617,10 @@ fixture.
   `Appended by ` and one opening `**Serves:** journal `. The untouched record, and one with a blank line
   added between rows, each exit 0.
   Red when: the skip stays unanchored, so the prefixed record prints `reason clean`.
-- **AC7** — When a Fixture R commits a chain record, then commits a further round, `$G` prints no check 2
-  line. When a commit then deletes a round's row, `$G` prints `no longer extends what commit`. When the
-  bytes are restored and committed it prints no check 2 line. An uncommitted edit to an earlier row prints
-  the same sentence.
+- **AC7** — When a Fixture R commits a chain record, then commits a further round, `$G` prints no
+  `UNATTENDED check 2 FAILED` line. When a commit then deletes a round's row, `$G` prints
+  `no longer extends what commit`. When the bytes are restored and committed it prints no
+  `UNATTENDED check 2 FAILED` line. An uncommitted edit to an earlier row prints the same sentence.
   Red when: the gate compares the last revision only, or a green record reds on line endings.
 - **AC8** — When `python tools/memory-tree/deviation_join.py --fixture --plant audit-fold-closed --policy refuse`
   runs, it exits 1 naming the plant's unit, and `--plant audit-fold-pass` still exits 0.
@@ -585,8 +672,8 @@ fixture.
   prints a verdict.
   Red when: the verdict prints `N=0 STOP clean` over nothing, or a chain with a record stops answering.
 - **AC19** — When `grep -c 'the one driver verb used' .claude/skills/build/SKILL.md` runs it prints 0, and
-  `grep -c -e '--chain-verdict' .claude/skills/build/SKILL.md` prints at least 1 on the line pair naming
-  the attended run.
+  `grep -c -e '--chain-verdict' .claude/skills/build/SKILL.md` prints at least 1 on the lines naming the
+  attended run.
   Red when: the template is edited and not re-rendered.
 - **AC20** — When `grep -c "'BLOCKER', 'HIGH', 'MEDIUM', 'LOW'" tools/workflows/unattended-build.template.js`
   runs it prints 1, and `grep -c "'local', 'new-mechanism'"` over the same file prints 1. A
@@ -632,10 +719,35 @@ fixture.
   runs after the pass, it prints the two counts it printed before the pass.
   figure: DERIVED, the pass reads both before its first edit.
   Red when: a refusal is written as a new site, past the ceiling only the owner moves.
+- **AC31** — When `grep -c 'a terminal run' tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md`
+  runs, each file prints 0, and `grep -c 'Revision log entry'` over the same two files prints 1 for each.
+  Red when: the list keeps the guard S9 removed, or the template moves and the render does not.
+- **AC32** — When `grep -c 'a FIFTH' tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md`
+  runs, each file prints 1, and `grep -c 'line sits between those two'` over the same two files prints 1
+  for each.
+  Red when: the bullet stays at four fields, or a caller has no sentence naming the line.
+- **AC33** — When `grep -c 'planState. and .rev.' tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/roles/SKILL.template.md .claude/skills/build/SKILL.md`
+  runs, each file prints 1.
+  Red when: `rev` reaches only a caller reading the harness's `args` comment.
+- **AC34** — When `grep -c 'BLOCKER-or-HIGH folds this round did not audit' tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md`
+  runs, each file prints 1.
+  Red when: M4 keeps naming only a spec no round audited, so CONTINUE `unreviewed` has a case it does not
+  state.
+- **AC35** — When `tr -d '\r' < memory/guides/BUILD-METHOD.md | wc -c` runs, it prints at most 30720, and
+  `grep -c 'on a MISSING or THIN unit and on nothing else' memory/guides/BUILD-METHOD.md` prints 1.
+  figure: 30720 is PINNED by M1, and the render reads 30659 by §4's PINNED measure.
+  Red when: S33 overruns M1's ceiling, or the pass writes M6's parked sentence.
+- **AC36** — When `git show --format= --unified=0 <pass> -- memory/guides/SESSION-KICKOFF.md` is piped to
+  `grep -c '^+last-audit: '` and to `grep -c '^+[^+]'`, each prints 1, and
+  `git show -s --format=%B <pass>` piped to `grep -c '^Manifest delta: '` prints 1.
+  Red when: the pass moves the method and leaves the stamp, which `fail 5` refuses, or the stamp arrives
+  with no delta line, which no check reads.
+  fixture: `<pass>` is the pass commit, which does not exist when the builder writes its ledger, so this
+  is owed to the close and the main loop observes it.
 
 ## 7. Gates
 
-`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `policy fixtures` · `workflow script syntax` · `kit/dogfood doc parity` · `build-index selftest` · `routed-commits selftest` · `roles render wiring` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `kit version markers` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `policy fixtures` · `workflow script syntax` · `kit/dogfood doc parity` · `build-index selftest` · `routed-commits selftest` · `roles render wiring` · `roles render selftest` · `unattended skill wiring` · `install-prefix (shipped surface)` · `build-method size` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `memory hygiene` · `kit version markers` · `spec tokens (a spec's own names resolve)`
 
 The floors below are COUNTED off each block's own lines by the pass, and the first suite run at the close
 tests them.
@@ -678,6 +790,7 @@ New arm: tools/unattended/check-unattended.test.sh · covers AC29 · one `mutate
   Recommendation: (c). It alone equals the least on every row, and it is today's at `folded 0`. Options
   (a) and (b) leave part of M2's own defect standing: a run that merged a minor into a high's unit can
   still pass on those rows.
+  RESOLVED (agent, 2026-11-02, delegated): (c), by the probe's observation above.
 
 - **F2 — What does the chain record's append-only gate compare against?** M8's left-shift line reads
   "extends its bytes at BASE". A departure from a judged fix goes here.
@@ -690,28 +803,42 @@ New arm: tools/unattended/check-unattended.test.sh · covers AC29 · one `mutate
     record no verb rewrites, the failure `tools/unattended/check-unattended.sh:834` records.
 
   Recommendation: (b). It is the most feature-rich survivor, it trips no M3 veto, and §4 is written to it.
+  RESOLVED (agent, 2026-11-02, delegated): (b).
 
 - **F3 — Does this unit write the verbs guide?** S9 makes `a terminal run` false in the refusal list at
   `tools/unattended/VERBS.template.md:288` and its render, and S14 would like one sentence there and one
   in the `/build` Skill telling a caller to pass `rev`. The accepted brief reads "Never write a governance
   carrier beyond M4's stated change", `RUN.md` carries `may: none`, and M4 states neither sentence.
-  - (a) Write them. It closes both sentences, and M3's veto 2 discards it: a mandate cannot delegate a
-    carrier change, so this option is an owner turn.
-  - (b) Leave them, and let the wrap-up name both for the owner, as `TOOL-dFoldedAudit-11` does for the
-    same entry. One phrase goes stale, in the safe direction, and `rev` reaches only a caller reading the
+  - (a) Write them. It closes both sentences. At rev-1 it read as discarded by M3's veto 2, because a
+    mandate cannot delegate a carrier change.
+  - (b) Leave them, and let the wrap-up name both for the owner, as `TOOL-dFoldedAudit-11`'s rev-1 did for
+    the same entry. One phrase goes stale, in the safe direction, and `rev` reaches only a caller reading the
     `args` comment.
   - (c) Keep the guard and leave M13 open, which fails the brief's order to close each item.
 
-  Recommendation: (b). It is the only option M3 leaves. S16 is not this case: the `/build` Skill is not
+  Recommendation at rev-1: (b), read as the only option M3 leaves. S16 is not this case: the `/build` Skill is not
   one of M11's six carriers, the report and this unit's brief name that line, and it states M4's own chain
   route, which the accepted brief assigns to the carriers. `TOOL-dFoldedAudit-13` does write the guide,
-  because the report's H5 fix orders it, and M13's fix orders no such line. M2's cross-read is where that
-  difference is settled. §4 and §3 are written to (b).
+  because the report's H5 fix orders it, and M13's fix orders no such line.
+  RESOLVED (agent, 2026-11-02, delegated): (a), overruling that recommendation on the main loop's ruling.
+  The accepted brief's item 1 makes M4's text and its carriers this build's change, and
+  `TOOL-dFoldedAudit-1`'s spec brief lists `tools/unattended/VERBS.template.md` and the protocol among
+  them, so aligning them is its stated change and M3's veto 2 does not reach them. §3 and §4 are written
+  to (a), and S30 to S34 carry it. M6's sentence stays parked.
 
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft, from the closing review's items M2, M8, M9, M11 to M17 and L1 to
   L4, the close-owed record's findings, the promotion notes and the design record.
+- rev-2 · 2026-11-02 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §8 · F1 resolves to (c) by its probe, F2 to (b),
+  and F3 to (a), overruling rev-1's recommendation, so §3 and §4 move to (a). S30 to S34 and AC31 to AC36
+  write the `--record-round` list, the `--plan` bullet, `rev`, M4's first test and the manifest stamp, and
+  `memory/guides/SESSION-KICKOFF.md` joins the write set. M2's cross-read: S15 named `print_chain_verdict`
+  where `TOOL-dFoldedAudit-9` moves the status loop to `read_chain_verdict`; S16 spelled `adopt-roles.sh`
+  with no flag, which exits 2 where `TOOL-dFoldedAudit-13` spells `--scaffold`; Fixture R held no `base:`, so
+  that unit's read refuses it, and AC4 blanked the cutoff away from where it is read; Fixture F held specs
+  at rev-1 where `TOOL-dFoldedAudit-11` refuses a `local` row, and no `gen:build-units` region for AC16's
+  `--plan`; and AC7's "no check 2 line" would red on `TOOL-dFoldedAudit-10`'s attended announcement.
 
 ## 10. Reuse audit
 
@@ -726,8 +853,9 @@ this build's own report and two batched-minors specs, and no earlier append-only
 Where the records and the source disagreed: the report's M2 note says id 10's form is "never lower
 than id 27's above it", and that holds only with no adjudicated finding in the sum. The fixture
 probe in F1 enumerates honest rows, and neither form equals the least. The review's M13 item names
-no carrier, and finding 43 shows `tools/unattended/VERBS.template.md` lists the refusal, so F3 holds
-that line.
+no carrier, and finding 43 shows `tools/unattended/VERBS.template.md` lists the refusal, so S30 writes
+that line under F3. The carriers' seam is the sentence each names, and S34's is `TOOL-dFoldedAudit-1`'s
+stamp.
 
 Reuse probe used: `python tools/codebase-map/reuse_lookup.py "an append-only record whose earlier bytes must stand at every later commit"`.
 Recall terms used: `python tools/memory-recall/query.py "how is an append-only run record protected from a deleted row and how does a spec exit floor count minors" --terms "append-only chain record check 2 floor promoted minors folded rv_bad deletion prefix"`.

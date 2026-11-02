@@ -9,10 +9,10 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 529b98a4717bd8c884697bd247e5c689db976ebf · park · 23 touching
+refreshed-at: 8a5328a9f8d0dc8fd58b3b86c10a5a08344426eb · park · 109 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 63669d50534ac8588c74a8fa5f3a5a1766659b8f
-phase: SPECCING
+witness: 3cf55f6a6adeb182561eab0203c0689275647e1a
+phase: BUILDING
 may: none
 mode: prompt
 run-branch: refs/heads/branch/gov-build-m4-spec-audit-694e7b
@@ -102,3 +102,5 @@ base: 74274869737b6ba5ea73a9b6e6772bc7d76065ea
 2026-11-02T02:46:49Z rescope · item add TOOL-dFoldedAudit-14 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md
 
 2026-11-02T02:46:50Z rescope · item add TOOL-dFoldedAudit-15 · reason closing review round 1 promoted it, per M8: 2026-11-02-review-TOOL-dFoldedAudit-1-2-3-4-5-6-7-8-closing-diff-round1.md
+
+2026-11-02T03:29:31Z decision · item Should BUILD-METHOD M6's sentence that --dispatch refuses on a MISSING or THIN unit and on nothing else name the chain-verdict refusal TOOL-dFoldedAudit-9 adds? · reason Options: (a) leave it for the owner; (b) add a clause of about 40 bytes. Refused here because M6 is outside M4's stated change and the accepted brief bars a carrier write beyond it, so M3's veto 2 collapses onto a park. The sentence was already loose: --dispatch also refuses on spec tokens, order and shared records.

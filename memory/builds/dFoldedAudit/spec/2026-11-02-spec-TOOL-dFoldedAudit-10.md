@@ -1,14 +1,17 @@
 # TOOL-dFoldedAudit-10 — a chain round joins to the terminal review row and the spec-audit records it claims
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 110
+**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base 74274869 · streams tooling · order 110
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-10-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-10-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-10-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-10-spec-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 
 <!-- /gen:spec-records -->
 
@@ -65,7 +68,7 @@ extends is [chain] and [address].
 ### Edges
 
 - **consumes-from** external — the record `write_chain_round` writes and the sets `derive_chain_verdict` reads, both shipped by a closed unit; a change to either row's spelling reds the arms that write a round through the real verb
-- **hands-off** external — the first verdict test in M4 of `memory/guides/BUILD-METHOD.md` still names only a spec no round audited. M4 stays as it shipped, because a governance carrier is outside this run's delegation (M3, veto 2) and its last test already orders the re-audit this unit holds a round to. The wrap-up names the sentence for the owner
+- **hands-off** `TOOL-dFoldedAudit-15` — the first verdict test in M4 of `memory/guides/BUILD-METHOD.md` still names only a spec no round audited when this unit lands, so CONTINUE `unreviewed` has a case M4 does not state until that unit's batch writes it. This unit writes no carrier
 
 ## 4. Design
 
@@ -275,7 +278,9 @@ build's `reviews/` folder whose first line is `**Serves:** spec-audit FIX-tFix-1
 
 Fixture C is a scratch git repository at `%TEMP%/fa10c` holding copies of
 `tools/unattended/unattended.sh` and `tools/unattended/lib-unattended.sh` under `u/`, a
-`.unattended.conf` carrying `MEMORY_ROOT=memory`, and a build `dFix` whose README's roster region names
+`.unattended.conf` carrying `MEMORY_ROOT=memory` and `SPEC_FOLD_CUTOFF="2000-01-01"`, because
+`TOOL-dFoldedAudit-13` refuses a `local` row under a blank cutoff, and a build `dFix` whose README's
+roster region names
 `FIX-dFix-1` to `FIX-dFix-7`, each with a tracked OPEN spec at rev-3 whose Revision log holds rev-1 to
 rev-3, and no `RUN.md`. `$V` is `bash "$F/u/unattended.sh"`, run from the fixture root with `GOV_REMOTE`
 and `GOV_DEFAULT_BRANCH` cleared. `ALL` is the seven ids.
@@ -337,7 +342,7 @@ and `GOV_DEFAULT_BRANCH` cleared. `ALL` is the seven ids.
 
 ## 7. Gates
 
-`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `shell hygiene (a fork spent on builtin work)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kit version markers`
+`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `routed-commits selftest` · `shell hygiene (a fork spent on builtin work)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kit version markers`
 
 New arm: tools/unattended/check-unattended.test.sh · covers AC1 AC2 AC3 · a forged zero-count round written by the real verb beside a terminal row carrying a HIGH, with its green control, staged with the join's exceeds test forced false, which greens the forged round · none
 New arm: tools/unattended/check-unattended.test.sh · covers AC4 · a round with no terminal row, staged with the attended count forced to 0, which leaves the skip silent · none
@@ -353,6 +358,11 @@ none
 
 - rev-1 · 2026-11-02 · initial draft, from the closing review's items H2 and M7, the promotion notes,
   and the design's [chain] and [address].
+- rev-2 · 2026-11-02 · §3 · §6 · §7 · Fixture C's conf declares `SPEC_FOLD_CUTOFF="2000-01-01"`, because
+  `TOOL-dFoldedAudit-13` ships first and refuses a `local` row under a blank cutoff. §7 gains
+  `routed-commits selftest`, whose guard §4's `tools/unattended/lib-unattended.sh` trips. M2's
+  cross-read: the M4 edge read as outside this run while `TOOL-dFoldedAudit-15` writes that sentence,
+  so it is a `hands-off` to that unit.
 
 ## 10. Reuse audit
 

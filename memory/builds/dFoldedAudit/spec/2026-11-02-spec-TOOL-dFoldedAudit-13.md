@@ -1,14 +1,17 @@
 # TOOL-dFoldedAudit-13 — one read-only driver read answers whether a run takes the fold rule
 
-**Status:** OPEN · rev-1 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 100
+**Status:** OPEN · rev-2 · 2026-11-02 · node d · Tier-2 · base f055a11b · streams tooling · order 100
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-1-promotion-notes.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-2-spec-stage-returns.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
+| [2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md](../build/2026-11-02-build-TOOL-dFoldedAudit-9-3-cross-read-return.md) | journal | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-13-build-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-13-build-brief.md) | research | — |
 | [2026-11-02-prompt-TOOL-dFoldedAudit-13-spec-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-13-spec-brief.md) | research | — |
+| [2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md](../prompts/2026-11-02-prompt-TOOL-dFoldedAudit-9-fix-brief.md) | research | TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 |
 
 <!-- /gen:spec-records -->
 
@@ -64,14 +67,11 @@ This closes H5, M1 and M6 of
 
 ### Edges
 
-- **hands-off** external — the `--plan` bullet and the `--record-round` refusal list of
-  `tools/unattended/VERBS.template.md` do not gain this line or S3's refusal. The report orders neither
-  sentence, no sentence there turns false, and units 11 and 15 leave the same entry alone under M3's
-  veto 2. The wrap-up names both for the owner.
-- **hands-off** external — this unit ships at order 100, ahead of orders 110 and 120, and S3 refuses every
-  `local` and `--sibling` row under a blank cutoff. Fixture C of unit 10 and fixture R of unit 11 declare
-  no cutoff, so each needs one conf line, `SPEC_FOLD_CUTOFF="2000-01-01"`, before its unit builds. That
-  is M2's cross-read, and no spec here edits another.
+- **hands-off** `TOOL-dFoldedAudit-15` — the `--plan` bullet of `tools/unattended/VERBS.template.md` does
+  not gain this line here. The report orders no such sentence, and that unit's batch writes it.
+- **hands-off** external — the `--record-round` refusal list of `tools/unattended/VERBS.template.md` does
+  not gain S3's refusal. The report orders no such sentence and no sentence there turns false. The
+  wrap-up names it for the owner.
 
 ## 4. Design
 
@@ -182,7 +182,8 @@ The sentence at `tools/unattended/VERBS.template.md:777-778` becomes:
 
 The sentence at `:779` follows unchanged. `bash tools/unattended/adopt-unattended.sh` writes the render,
 as the kit's `[[regenerate]]` (`tools/unattended/kit.toml:193-194`) does. This is the one sentence of
-that carrier the report orders changed, which is why §3's edge leaves the rest to the owner.
+that carrier the report orders changed, which is why §3's edges leave the rest to the batch unit and the
+wrap-up.
 
 `tools/workflows/unattended-build.template.js:183-184` becomes, on the same two lines:
 
@@ -257,8 +258,8 @@ and leaving it would keep the old route written down.
 - **observability** — The answer is on stdout on every read a caller already makes. An absent policy
   kit keeps the reader's note on stderr.
 - **risks** — S3 reds `write_chain_fixture`'s every round until S7 lands, so both land in one pass.
-  §3's second edge is the same break one step on: the specs of units 10 and 11 are authored beside
-  this one, and a builder of either meets S3 as a divergence unless the cross-read lands the line first.
+  The fixture confs of units 10 and 11 each declare `SPEC_FOLD_CUTOFF="2000-01-01"`, so neither builder
+  meets S3 as a divergence.
   AC8's fixture carries a real rev, so unit 11's fold join passes there whichever runs first.
   `policy-value-with-no-route` is the class this closes, and `promote-all` is witnessed by AC3 and AC8.
 - **testing** — Fixture repositories with no policy kit unless the arm is about the switch, committer
@@ -352,6 +353,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-11-02 · initial draft, from the closing review's H5, M1 and M6 and the promotion notes.
+- rev-2 · 2026-11-02 · §3 · §4 · §5 · The `--plan` bullet is a `hands-off` to `TOOL-dFoldedAudit-15`, whose
+  §8 F3 writes it, and the fixture edge retires with the conf lines units 10 and 11 now carry. M2's
+  cross-read: the edge read that unit as leaving this carrier alone, and §4 and §5 pointed at the old
+  edges. S3's refusal in the `--record-round` list stays `hands-off external`.
 
 ## 10. Reuse audit
 
