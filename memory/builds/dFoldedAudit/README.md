@@ -106,7 +106,7 @@ ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16 TOOL-dFoldedAudit-17 TOOL-dFoldedA
 | [TOOL-dFoldedAudit-18 — the help page for the spec-audit switches and the chain verbs, so the docs leg anchors them](spec/2026-11-02-spec-TOOL-dFoldedAudit-18.md) | 180 | 1 | INPROGRESS | rev-1 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 141 bound to this build, across 4 record folder(s).
+Records: 142 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
