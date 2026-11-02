@@ -169,6 +169,33 @@ armIntensity('intensity: absent proceeds', {}, 'full')
 armIntensity('intensity: light on a spec audit is refused', Object.assign({ intensity: 'light' }, GOOD_SPEC), 'refused')
 armIntensity('intensity: full on a spec audit proceeds', Object.assign({ intensity: 'full' }, GOOD_SPEC), 'full')
 
+// ---- TOOL-dFairHearing-2 AC1 — `preset`, a closed set read in the prelude, refused beside the diff kind ----
+// The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
+// `preset`: on the base render the read throws `preset is not defined`, a harness fault. A refusal must
+// START `tier2-review: \`preset\`` and carry its word, so an unrelated throw cannot satisfy one.
+const DESIGN_SPEC = { kind: 'spec-audit', round: 1, subjects: [{ path: 'memory/builds/dX/build/a.md', blob: BLOB, id: 'PLAY-dX-1' }] }
+function armPreset(name, extra, want, word) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn preset')(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review: `preset`') === 0 && threw.indexOf(word) !== -1 : !threw && got === want,
+    name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+armPreset('preset: design-audit over a design subject proceeds', Object.assign({ preset: 'design-audit' }, DESIGN_SPEC), 'design-audit')
+armPreset('preset: absent on a spec audit is unit-spec', DESIGN_SPEC, 'unit-spec')
+armPreset('preset: absent on a diff review is unit-spec', {}, 'unit-spec')
+armPreset('preset: an unknown preset is refused naming the set', Object.assign({ preset: 'whole-design' }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
+armPreset('preset: a non-string is refused', Object.assign({ preset: 7 }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
+armPreset('preset: an empty string is refused', Object.assign({ preset: '' }, DESIGN_SPEC), 'refused', 'unit-spec | design-audit')
+armPreset('preset: unit-spec beside the diff kind is refused naming it', { kind: 'diff-review', preset: 'unit-spec' }, 'refused', 'diff-review')
+
 // ---- TOOL-aEvidencedLens-2 AC3 — `scratch`, required on a spec audit and refused by shape ---------
 // The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
 // `scratch`: on the base render the read throws `scratch is not defined`, a harness fault. A refusal
@@ -1725,6 +1752,53 @@ async function runLedgerArms() {
   await runRolesArms()
   await runEffortsArms()
   await runAddressArms()
+  await runPresetArms()
+}
+
+// ==== TOOL-dFairHearing-2 — the design-audit preset: its lenses, its review key and its announcements ====
+// Every arm is RED against the base harness, which reads no `preset`: a design-audit run fans over
+// SPEC_LENSES, derives the default run's key, logs nothing and carries no `preset` on any return. The
+// briefs are read off the live harness's own literals, and each check carries its count of five.
+async function runPresetArms() {
+  const readLiteral = (name) => {
+    const ls = src.split('\n')
+    const at = ls.findIndex((l) => l.startsWith('const ' + name + ' = ['))
+    const end = ls.findIndex((l, i) => i > at && l === ']')
+    return at === -1 || end === -1 ? [] : new Function('return [' + ls.slice(at + 1, end).join('\n') + ']')()
+  }
+  const DL = readLiteral('DESIGN_LENSES')
+  const SL = readLiteral('SPEC_LENSES')
+  const DESIGN = Object.assign({}, SPEC, { subjects: [{ path: 'memory/builds/dX/build/a.md', blob: 'abc1234', id: 'PLAY-dX-1' }] })
+  const scanFinds = (run) => run.trace.filter((t) => t.label.indexOf('find:') === 0)
+  const checkBriefs = (finds, lenses) => finds.length === 5 && lenses.length === 5 &&
+    finds.every((t, i) => t.label === 'find:' + lenses[i].key && t.prompt.indexOf('LENS: ' + lenses[i].brief + '\n') !== -1)
+  const rd = await runReview(Object.assign({}, DESIGN, { preset: 'design-audit' }), ALL_OK)
+  const ru = await runReview(DESIGN, ALL_OK)
+  const rx = await runReview(Object.assign({}, DESIGN, { preset: 'unit-spec' }), ALL_OK)
+  if (checkNoThrow(rd, 'preset design-audit run') && checkNoThrow(ru, 'preset default run') && checkNoThrow(rx, 'preset explicit unit-spec run')) {
+    // ---- AC3: the design-audit run's five finders carry the design briefs; the default run's, the spec briefs.
+    ck(DL.map((L) => L.key).join(' ') === 'coherence grounding reuse failure-envelope alternatives-and-cost' && checkBriefs(scanFinds(rd), DL),
+      'preset: a design-audit run fans over DESIGN_LENSES, each finder carrying its design brief: ' + rd.scanSpawned('find:').join(' '))
+    ck(checkBriefs(scanFinds(ru), SL) && checkBriefs(scanFinds(rx), SL),
+      'preset: a run without it, or naming unit-spec, fans over SPEC_LENSES with the spec briefs: ' + ru.scanSpawned('find:').join(' '))
+    ck(DL.length === 5 && DL.every((L) => !/\bsections? \d/.test(L.brief)),
+      'preset: no design brief names a unit spec\'s numbered section')
+    // ---- AC4: the preset joins the key off its default only.
+    ck(rd.result.key !== ru.result.key, 'preset: a design-audit run and a default run over the same subjects derive different keys')
+    ck(ru.result.key === rx.result.key && ru.result.key.indexOf('spec-audit-r1-') === 0,
+      'preset: unit-spec, absent or named, derives one key, so a caller without the argument keeps its key: ' + ru.result.key)
+    // ---- AC6: the preset on the complete return and on the no-finding return, in RUN INTEGRITY and in the log.
+    const re = await runReview(Object.assign({}, DESIGN, { preset: 'design-audit' }), buildStubs({ 'find:': buildEmptyLens }))
+    ck(rd.result.preset === 'design-audit' && !re.threw && re.result.note === 'clean: 0 findings' && re.result.preset === 'design-audit',
+      'preset: the complete and the no-finding return of a design-audit run carry preset design-audit')
+    const sp = rd.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(/\npreset: design-audit - /.test(ri) && rd.logs.some((l) => l.indexOf('preset design-audit') === 0) && !ru.logs.some((l) => l.indexOf('preset ') === 0),
+      'preset: RUN INTEGRITY names design-audit, and only a run off the default logs its preset')
+    const rdf = await runReview(DIFF, ALL_OK)
+    ck(ru.result.preset === 'unit-spec' && !!rdf.result && !Object.prototype.hasOwnProperty.call(rdf.result, 'preset'),
+      'preset: a default spec audit returns preset unit-spec, and a diff review carries no preset field')
+  }
 }
 
 // ==== TOOL-dFoldedAudit-5 — THE ADDRESS, each spec-kind BLOCKER or HIGH naming the specs its fix changes ====
@@ -2463,7 +2537,11 @@ printf '%s\n' "$out"
 # RAISED 357 -> 372 by TOOL-dFairHearing-13: 15 assertions, counted off the `lens:` arms — the shipped
 # render (1), its two literals against the live harness (2), the opt-in row (1) and the eleven refusal
 # rules (11). Counted by hand and by a probe of the block alone: the pass runs no suite.
-FLOOR_ASSERTIONS=372
+# RAISED 372 -> 387 by TOOL-dFairHearing-2: 15 assertions, counted off the `preset:` arms — seven prelude
+# arms, three proceeding and four refusals (7), the two lens sets and the briefs (3), the key (2), the
+# returns, RUN INTEGRITY and the log (2) and the default and diff returns (1). Counted by hand, not by a
+# run: the pass runs no suite.
+FLOOR_ASSERTIONS=387
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

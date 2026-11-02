@@ -87,3 +87,43 @@ presets = ["unit-spec"]
 default_in = ["unit-spec"]
 optin = false
 brief = "Failure envelope: what will the built thing meet that the spec never says it handles? Report the input classes the design is silent on (empty, malformed, multi-line, unterminated, huge, concurrent), signals, partial failure and a dead dependency; a security or write surface section 5 did not price; and a spec that names one INSTANCE where the class was meant, such as one file of two or one caller of three. A spec is built as a ceiling: in this kit's own trial (aBlindedTrial, report section 4.3), when a spec named the class for one input file and not the other, the builder handled exactly the file it named."
+
+[[lens]]
+key = "coherence"
+kinds = ["spec-audit"]
+presets = ["design-audit"]
+default_in = ["design-audit"]
+optin = false
+brief = "Coherence: does the design record agree with itself and with the records it cites? Report a stated goal, requirement or invariant no mechanism in the record delivers; one rule, name, path, key or number stated two ways; a step that depends on one ordered after it; two mechanisms claiming one file, one owner or one landing slot; and, across the subjects and the sibling context, a decision one record takes that another contradicts."
+
+[[lens]]
+key = "grounding"
+kinds = ["spec-audit"]
+presets = ["design-audit"]
+default_in = ["design-audit"]
+optin = false
+brief = "Grounding: is every claim the design makes about the world TRUE where the subjects stand? Check each claim about existing code, a tool's flags or output, a record, a count, a platform behaviour or a cost against the source, never against the design. Flag every load-bearing claim that rests on a docs line or a single observation as an untested assumption, name the observation that would overturn it, and probe it where the probe rules allow. Hunt the traps this platform sets: MSYS argument and path rewriting, drive-letter and backslash paths, CRLF in a working copy and a text-mode read that drops a CR, and a stated wall-clock goal nobody timed."
+
+[[lens]]
+key = "reuse"
+kinds = ["spec-audit"]
+presets = ["design-audit"]
+default_in = ["design-audit"]
+optin = false
+brief = "Reuse and precedent: functionality is reused and extended, never rebuilt, and every choice keeps faith with what was decided. Report a mechanism that rebuilds an existing function, checker, gate leg, driver verb or record shape; and a choice that re-opens a decision row, an owner ruling or a decided ask, or drops a condition a ruling rested on, naming the id and quoting both texts. Probe before you claim: the codebase-map kit's reuse_lookup.py with a behaviour phrase, the memory-recall kit's query.py with a plain-English question and 8-14 --terms in this corpus's own jargon, and grep. THE BAR: a finding names the existing seam, record or ruling by path or id AND quotes the design text that duplicates or contradicts it."
+
+[[lens]]
+key = "failure-envelope"
+kinds = ["spec-audit"]
+presets = ["design-audit"]
+default_in = ["design-audit"]
+optin = false
+brief = "Failure envelope and trust boundaries: what will the built system meet that the design never says it handles? Report the input classes it is silent on (empty, malformed, multi-line, unterminated, huge, concurrent), signals, partial failure and a dead dependency; every trust boundary the design creates or relies on, an enforcement a rule, a setting, a second path or a dead dependency bypasses, input trusted without validation, and a guarded action left allowed on failure; and a design that names one instance where the class was meant."
+
+[[lens]]
+key = "alternatives-and-cost"
+kinds = ["spec-audit"]
+presets = ["design-audit"]
+default_in = ["design-audit"]
+optin = false
+brief = "Alternatives and cost: is there a materially simpler or cheaper mechanism meeting the same contract, and what does this one cost? Report an existing seam, a checker in place of an agent, or one process in place of many that meets the same requirement or invariant, saying which; and every agent, session, spawn, token and wall-clock cost the design adds that carries no ceiling, no enforcer, or a ceiling nobody measured."

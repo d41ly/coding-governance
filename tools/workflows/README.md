@@ -163,11 +163,12 @@ A diff review fans out over five finder lenses, in this order: `security`, `corr
 `verification` and `intent`. Since 1.17 `verification` asks whether every changed behaviour has a
 check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
 old `regressions` lens is retired. A spec audit runs five lenses of its own, in this order:
-`coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1).
-Both sets have one source, `lenses.toml`, this kit's lens catalogue (below); `DIFF_LENSES` and
-`SPEC_LENSES` in the harness are its render, and the method and the memory-tree README point at the
-literal. The fan-out leg holds each rendered literal to exactly five slots, and five is also the most
-the agent-cap hook admits on that receiver, so neither set can grow a sixth.
+`coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1),
+or, under `preset: 'design-audit'` (below), the five of `DESIGN_LENSES`. Every set has one source,
+`lenses.toml`, this kit's lens catalogue (below); `DIFF_LENSES`, `SPEC_LENSES` and `DESIGN_LENSES` in
+the harness are its render, and the method and the memory-tree README point at the literal. The
+fan-out leg holds each rendered literal to exactly five slots, and five is also the most the
+agent-cap hook admits on that receiver, so no set can grow a sixth.
 
 `lensNotes` appends a project addendum to one lens's brief, and to no other prompt:
 
@@ -290,6 +291,23 @@ before the first finder, a RUN INTEGRITY clause telling the report not to call i
 lens counts as neither live nor dead. A spec audit has no light subset, so `'light'` refuses there; any
 value other than the two refuses on both kinds. `intensity` joins the review key. A diff that crosses a
 trust boundary is not one to review light: the `security` lens is one of the two a light run skips.
+
+`preset` picks a spec audit's lens literal, `'unit-spec'` or `'design-audit'`, and absent it is
+`'unit-spec'`, the five lenses above. Only the caller picks it; the kind stays `spec-audit`, so the
+binding line is unchanged:
+
+```js
+args: { repo, kind: 'spec-audit', subjects, scratch, reviewDir, preset: 'design-audit' }
+```
+
+`'design-audit'` runs `DESIGN_LENSES`, the `design-audit` rows of `lenses.toml`, for a design or
+architecture record, whose sections are not a unit spec's: `coherence`, `grounding`, `reuse` and
+`failure-envelope` in design briefs of their own, and `alternatives-and-cost` in place of
+`blast-radius`. Any value outside `PRESETS` refuses, and so does any `preset` on a diff review, before
+the first agent. A preset off the default is logged before the first agent and joins the review key,
+so a design-audit run never reuses a unit-spec run's lens files; a run without it keeps its key. Every
+spec audit names its preset in RUN INTEGRITY and carries `preset` on every return, beside `intensity`.
+It ships dark: nothing in this kit passes `'design-audit'` yet.
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names

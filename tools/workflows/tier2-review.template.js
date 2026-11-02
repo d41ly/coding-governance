@@ -120,6 +120,9 @@ function readOutputTokens() {
 //   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING
 //   intensity: "full" | "light",          // DEFAULTS to "full"; only the CALLER picks light, which runs
 //                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
+//   preset: "unit-spec" | "design-audit", // spec-audit ONLY, DEFAULTS to "unit-spec": the CALLER's choice of
+//                                         // lens literal, design-audit running DESIGN_LENSES, aimed at a design
+//                                         // or architecture record; refused outside the set and on a diff review
 //   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...], // the project's recurring
 //                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING.
 //                                         // The STRING form may carry the by-design block the checker prints
@@ -221,6 +224,16 @@ if (typeof intensity !== 'string' || ['full', 'light'].indexOf(intensity) === -1
   throw new Error('tier2-review: `intensity` must be one of full | light. Got ' + JSON.stringify(a.intensity) + '.')
 if (isSpec && intensity === 'light')
   throw new Error('tier2-review: a spec-audit has no light lens subset; `intensity` must be full or absent. Got "light".')
+// TOOL-dFairHearing-2 S1 - `preset`, the CALLER's choice of a spec audit's lens literal, in the shape of
+// `intensity` above: a closed set refused by name outside it, and refused beside the diff kind, which
+// has one literal and so no preset. Each member but the default names the `gov:lens-slots` literal it
+// selects below. It ships dark: no caller in this kit passes `design-audit` until the replay's verdict.
+const PRESETS = ['unit-spec', 'design-audit']
+const preset = a.preset === undefined ? 'unit-spec' : a.preset
+if (!isSpec && a.preset !== undefined)
+  throw new Error('tier2-review: `preset` picks a spec-audit lens literal, and a diff-review has none; leave it out. Got ' + JSON.stringify(a.preset) + '.')
+if (typeof preset !== 'string' || PRESETS.indexOf(preset) === -1)
+  throw new Error('tier2-review: `preset` must be one of ' + PRESETS.join(' | ') + '. Got ' + JSON.stringify(a.preset) + '.')
 // TOOL-aMendedFleet-67 S1/S2 - `workerType`, the agent type the JUDGES spawn as: every finder and every
 // skeptic, never the resume probe or the synthesis, which read and write the lens files and the report.
 // Shape-checked here, before any spawn. The built-in types that omit the charter hold no Write tool,
@@ -800,13 +813,22 @@ const SPEC_LENSES = [ // gov:lens-slots unit-spec
 {{LENS_SLOTS}}
 ]
 
-// The ONE dialect <prefix>/hooks/agent-cap.js admits here: two sibling top-level array literals and a
+// TOOL-dFairHearing-2 S2/S3 - the `design-audit` preset's lenses, for a design or architecture record,
+// whose sections are not a unit spec's: the `design-audit` rows of `lenses.toml`, `coherence`,
+// `grounding`, `reuse` and `failure-envelope` in design briefs of their own, and `alternatives-and-cost`
+// in the slot `blast-radius` holds above. `PRESETS` in the argument checks names it.
+const DESIGN_LENSES = [ // gov:lens-slots design-audit
+{{LENS_SLOTS}}
+]
+
+// The ONE dialect <prefix>/hooks/agent-cap.js admits here: sibling top-level array literals and a
 // marked ternary. A map, object or registry of lens sets is DENIED at the tool call, so this shape
 // is fixed by the enforcement point rather than chosen. TOOL-dTieredTribunal-13 tightened the branch
-// this line sits on to require EVERY value branch bounded, and both branches here are literals. Both
-// are rendered from the lens catalogue (TOOL-dFairHearing-13), and a render keeps this shape: the
-// rows fill each literal's body, never its name or this receiver.
-const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
+// this line sits on to require EVERY value branch bounded, and all three branches here are literals,
+// the spec kind's two picked by `preset` (TOOL-dFairHearing-2). All are rendered from the lens catalogue
+// (TOOL-dFairHearing-13), and a render keeps this shape: the rows fill each literal's body, never its
+// name or this receiver.
+const LENSES = !isSpec ? DIFF_LENSES : preset === 'design-audit' ? DESIGN_LENSES : SPEC_LENSES // gov:fixed-verifiers
 // S3 - checked on EVERY run of either kind, before the resume probe: a renamed lens would otherwise
 // empty the light set, and a light run would review nothing while reporting clean. An INDEX names the
 // offender, since `''` is itself a key this refuses (the D6 class).
@@ -841,6 +863,9 @@ if (lensNotesBad) {
       'legal keys: ' + LENS_KEYS.join(' | ') + '. Got ' + JSON.stringify(lensNotesGot) + '.',
   )
 }
+// TOOL-dFairHearing-2 S5 - a spec audit off the default preset says so before the first agent.
+if (preset !== 'unit-spec')
+  log(`preset ${preset} — this spec audit runs the ${preset} lenses, not the unit-spec ones: ${LENS_KEYS.join(', ')}`)
 const notedLenses = Object.keys(lensNotes)
 if (!notedLenses.length)
   log('WARNING: no `lensNotes` supplied — every lens runs on the kit\'s generic brief, with no project addendum')
@@ -949,9 +974,11 @@ const REVIEW_SHAPE = 'lenses5-r3'
 // took from it, ONLY when one of the two is set, so a run whose judges took no role keeps its key. The
 // synthesis role and the other kind's finder key stay out: the synthesis writes no keyed file, so its
 // role cannot make one stale, and the other finder key is never read.
+// TOOL-dFairHearing-2 S4 - and `preset`, ONLY off its `unit-spec` default, so a design-audit run never
+// reuses a unit-spec run's lens files on the same subjects and every key a run without it derives holds.
 const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
   ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }, workerType ? { workerType: workerType } : {},
-  roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {})))
+  roledJudges ? { roles: { find: roles[finderKey] || null, verify: roles.skeptic || null } } : {}, preset !== 'unit-spec' ? { preset: preset } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -1280,7 +1307,7 @@ if (lensesDead === lensesRunning) {
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     lensesReused: reusedLens.size,
     note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; ${renderRerunTail(deadLensLabels.join(', '), false)}`,
-    round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    round, priorFindings: priorFindings.length, intensity, ...(isSpec ? { preset } : {}), skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
     ledger: [], confirmedFindings: [], appendix: '', lensYield,
   }
@@ -1303,7 +1330,7 @@ if (allFindings.length === 0) {
     shape: shapeLine,
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels, durable,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
-    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, ...(isSpec ? { preset } : {}), skippedLenses,
     ledger: [], confirmedFindings: [], appendix: '', lensYield, // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
@@ -1640,7 +1667,7 @@ if (confirmed.length + unverified.length === 0) {
     note: deferred
       ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — ${renderRerunTail(pendingLabels.join(', '), false)}`
       : 'all findings adjudicated and refuted',
-    round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    round, priorFindings: priorFindings.length, intensity, ...(isSpec ? { preset } : {}), skippedLenses,
     // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
     // only place this ledger and appendix exist; a caller may write them.
     ledger, confirmedFindings, appendix, lensYield,
@@ -1671,7 +1698,7 @@ if (pendingLabels.length) {
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — ${renderRerunTail(pendingLabels.join(', '), false)}`,
-    round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    round, priorFindings: priorFindings.length, intensity, ...(isSpec ? { preset } : {}), skippedLenses,
     ledger, confirmedFindings, appendix, lensYield, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
@@ -1761,6 +1788,8 @@ const synth = await agent(
     (roles[finderKey] || roles.skeptic || roles.synthesis
       ? `Roles: finders ${findType || 'the platform default'}, skeptic batches ${verifyType || 'the platform default'}, synthesis ${synthType || 'the platform default'}.\n`
       : '') +
+    // TOOL-dFairHearing-2 S5 - spec kind only, so the report says which lens literal ran.
+    (isSpec ? `preset: ${preset} - the ${preset} lenses ran: ${LENS_KEYS.join(', ')}.\n` : '') +
     // TOOL-aSightedSkeptic-7 S6 - a light run names every skipped lens; a full run carries no clause.
     (skippedLenses.length
       ? `Intensity: light - the ${skippedLenses.join(', ')} lens(es) were NOT run, so their classes were swept only ` +
@@ -2073,6 +2102,8 @@ return {
   priorFindings: priorFindings.length,
   // TOOL-aSightedSkeptic-7 S6 - on every exit path, so a light run is never read as a full one.
   intensity,
+  // TOOL-dFairHearing-2 S5 - beside `intensity` on every exit path of the spec kind, which lens literal ran.
+  ...(isSpec ? { preset } : {}),
   skippedLenses,
   // TOOL-aSightedSkeptic-8 S5 - every finding and its verdict, the confirmed set as round N+1's
   // `priorFindings`, and the appendix the synthesis was told to copy, for a caller to compare.
