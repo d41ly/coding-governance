@@ -5,7 +5,7 @@ opened: 2026-11-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15
+ids: TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14 TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16
 ---
 
 # dFoldedAudit — a spec audit folds local fixes, promotes only new mechanisms, and its chain stops itself
@@ -73,12 +73,13 @@ None.
 | 13 | `TOOL-dFoldedAudit-13` | one read-only driver read answers whether a run takes the fold rule, for attended and unattended callers |
 | 14 | `TOOL-dFoldedAudit-14` | a rotated record keeps its own date floor for the fold cutoff |
 | 15 | `TOOL-dFoldedAudit-15` | the closing review's mediums and lows closed as one batch |
+| 16 | `TOOL-dFoldedAudit-16` | the flagged bar's own reds cleared: the fork-site registry and the armed-cutoff pin |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 15 unit(s) · node d · opened 2026-11-01 · streams tooling
 ids TOOL-dFoldedAudit-1 TOOL-dFoldedAudit-2 TOOL-dFoldedAudit-3 TOOL-dFoldedAudit-4 TOOL-dFoldedAudit-5 TOOL-dFoldedAudit-6 TOOL-dFoldedAudit-7 TOOL-dFoldedAudit-8 TOOL-dFoldedAudit-9 TOOL-dFoldedAudit-10 TOOL-dFoldedAudit-11 TOOL-dFoldedAudit-12 TOOL-dFoldedAudit-13 TOOL-dFoldedAudit-14
-ids TOOL-dFoldedAudit-15
+ids TOOL-dFoldedAudit-15 TOOL-dFoldedAudit-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -100,7 +101,7 @@ ids TOOL-dFoldedAudit-15
 | [TOOL-dFoldedAudit-15 — the closing review's mediums and lows closed as one batch](spec/2026-11-02-spec-TOOL-dFoldedAudit-15.md) | 150 | 2 | CLOSED | rev-2 | 2026-11-02 |
 <!-- /gen:build-units -->
 
-Records: 105 bound to this build, across 4 record folder(s).
+Records: 109 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
